@@ -1,0 +1,82 @@
+###########################################################
+# Automation: Media Player
+###########################################################
+
+- alias: HTPC Playing at Night
+  trigger:
+    - platform: state
+      entity_id: media_player.plex_htpc
+      from: "idle"
+      to: "playing"
+    - platform: state
+      entity_id: media_player.plex_htpc
+      from: "paused"
+      to: "playing"
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: "below_horizon"
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: "{{ states.media_player.plex_htpc.attributes.media_content_type == 'tvshow' }}"
+      - condition: template
+        value_template: "{{ states.media_player.plex_htpc.attributes.media_content_type == 'movie' }}"
+  action:
+    - service: homeassistant.turn_on
+      entity_id: light.living_room_level_3_0
+      data:
+        brightness: 20
+        transition: 5
+
+- alias: HTPC Paused at Night
+  trigger:
+    - platform: state
+      entity_id: media_player.plex_htpc
+      from: "playing"
+      to: "paused"
+    - platform: state
+      entity_id: media_player.plex_htpc
+      from: "playing"
+      to: "idle"
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: "below_horizon"
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: "{{ states.media_player.plex_htpc.attributes.media_content_type == 'tvshow' }}"
+      - condition: template
+        value_template: "{{ states.media_player.plex_htpc.attributes.media_content_type == 'movie' }}"
+  action:
+    - service: homeassistant.turn_on
+      entity_id: light.living_room_level_3_0
+      data:
+        brightness: 80
+        transition: 10
+
+- alias: Shield Auto Off
+  trigger:
+    - platform: state
+      entity_id: media_player.plex_shield_android_tv
+      from: "playing"
+      to: "idle"
+  condition:
+    - condition: state
+      entity_id: sun.sun
+      state: "below_horizon"
+    - condition: or
+      conditions:
+      - condition: template
+        value_template: "{{ states.media_player.plex_shield_android_tv.attributes.media_content_type == 'tvshow' }}"
+      - condition: template
+        value_template: "{{ states.media_player.plex_shield_android_tv.attributes.media_content_type == 'movie' }}"
+  action:
+    - delay: "00:05:00"
+    - service: remote.turn_off
+      entity_id: remote.bedroom
+    - service: input_select.select_option
+      entity_id: input_select.remote_bedroom
+      data_template:
+        option: Select Activity

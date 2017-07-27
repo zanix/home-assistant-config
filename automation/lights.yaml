@@ -1,0 +1,94 @@
+###########################################################
+# Automation: Lights
+###########################################################
+
+- alias: Front Lights on at Night
+  trigger:
+    platform: numeric_state
+    entity_id: sun.sun
+    value_template: "{{ state.attributes.elevation }}"
+    below: 2
+  action:
+    service: homeassistant.turn_on
+    entity_id: switch.light_outside_front_switch_5_0
+
+- alias: Front Lights off at Night
+  trigger:
+    platform: time
+    after: "22:32:00"
+  action:
+    service: homeassistant.turn_off
+    entity_id: switch.light_outside_front_switch_5_0
+
+- alias: Lights on Arrive Home
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: group.people
+    from: "not_home"
+    to: "home"
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: "22:35:00"
+      - condition: state
+        entity_id: light.living_room_level_3_0
+        state: "off"
+  action:
+    - service: homeassistant.turn_on
+      entity_id: switch.light_garage_entry_switch_7_0
+    - service: light.turn_on
+      entity_id: light.living_room_level_3_0
+    - service: notify.phone_1
+      data_template:
+        title: Welcome Home
+        message: "The lights have been turned on."
+        data:
+          icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lightbulb-on.png"
+          smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+    - service: notify.phone_2
+      data_template:
+        title: Welcome Home
+        message: "The lights have been turned on."
+        data:
+          icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lightbulb-on.png"
+          smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+    - delay: "00:10:00"
+    - service: homeassistant.turn_off
+      entity_id: switch.light_outside_front_switch_5_0
+
+- alias: Lights off Leave Home
+  initial_state: true
+  trigger:
+    platform: state
+    entity_id: group.people
+    from: "home"
+    to: "not_home"
+    for:
+      minutes: 10
+  condition:
+    condition: and
+    conditions:
+      - condition: time
+        after: "08:00:00"
+      - condition: sun
+        before: sunset
+        before_offset: "-00:45:00"
+  action:
+    - service: homeassistant.turn_off
+      entity_id: group.all_lights
+    - service: notify.phone_1
+      data_template:
+        title: Leaving Home
+        message: "The lights have been turned off since no one is home."
+        data:
+          icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lightbulb.png"
+          smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+    - service: notify.phone_2
+      data_template:
+        title: Leaving Home
+        message: "The lights have been turned off since no one is home."
+        data:
+          icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lightbulb.png"
+          smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
