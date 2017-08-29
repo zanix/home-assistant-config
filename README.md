@@ -38,6 +38,9 @@ Software on the Pi: [Hass.io](https://home-assistant.io/hassio/) by [Home Assist
 * [UPS Packages](https://home-assistant.io/components/sensor.ups/)
 * [USPS Mail and Packages](https://home-assistant.io/components/sensor.usps/)
 
+## Custom UI Elements
+* Uses custom UI elements from https://github.com/andrey-git/home-assistant-custom-ui (`update.sh`)
+
 ## Automations
 * Auto Heal ZWave at 2:30am
 * Turn on some lights and switches when we get home
