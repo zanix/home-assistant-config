@@ -30,6 +30,14 @@ Software on the Pi: [Hass.io](https://home-assistant.io/hassio/) by [Home Assist
 * [Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home. (You should use the [Gen5](https://www.amazon.com/dp/B00XD8WZX6) version if you can afford it)
 * Track Solar power generation from [PVOutput](https://pvoutput.org) (needs work)
 
+## Sensors
+* [Speedtest.net](https://home-assistant.io/components/sensor.speedtest/)
+* [Forecast.io (Darksky)](https://darksky.net)
+* [Pi System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
+* [FedEx Packages](https://home-assistant.io/components/sensor.fedex/)
+* [UPS Packages](https://home-assistant.io/components/sensor.ups/)
+* [USPS Mail and Packages](https://home-assistant.io/components/sensor.usps/)
+
 ## Automations
 * Auto Heal ZWave at 2:30am
 * Turn on some lights and switches when we get home
