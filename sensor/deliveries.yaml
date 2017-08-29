@@ -1,0 +1,34 @@
+###########################################################
+# Sensor: Deliveries
+###########################################################
+
+- platform: template
+  sensors:
+    packages_in_transit:
+      friendly_name: In Transit
+      unit_of_measurement: packages
+      value_template: >
+        {% macro in_transit(sensor) %}
+          {{ sensor.state | int - delivered(sensor) | int }}
+        {% endmacro %}
+        {% macro delivered(sensor) %}
+          {% if 'delivered' in sensor.attributes %}
+            {{ sensor.attributes.delivered }}
+          {% else %}
+            0
+          {% endif %}
+        {% endmacro %}
+        {{ in_transit(states.sensor.usps_packages) | int + in_transit(states.sensor.fedex) | int + in_transit(states.sensor.ups) | int }}
+
+    deliveries_today:
+      friendly_name: Out for Delivery
+      unit_of_measurement: packages
+      value_template: >
+        {% macro delivered(sensor) %}
+          {% if 'delivered' in sensor.attributes %}
+            {{ sensor.attributes.delivered }}
+          {% else %}
+            0
+          {% endif %}
+        {% endmacro %}
+        {{ delivered(states.sensor.usps_packages) | int + delivered(states.sensor.fedex) | int + delivered(states.sensor.ups) | int }}
