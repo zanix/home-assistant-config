@@ -7,20 +7,24 @@
     platform: state
     entity_id: sensor.usps_mail
   condition:
-    - condition: template
-      value_template: '{{ trigger.to_state.state | int != trigger.from_state.state | int }}'
+    condition: and
+    conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state.state | int > 0 }}'
+      - condition: template
+        value_template: '{{ trigger.to_state.state | int != trigger.from_state.state | int }}'
   action:
-    - service: notify.phone_j
+    - service: notify.phone_josh
       data_template:
         title: Mail Delivery
-        message: "You've got mail! {{ trigger.to_state.state }} pieces are waiting."
+        message: "{{ states('sensor.usps_mail') }} {% if is_state('sensor.usps_mail', '1') %}item is{% else %}items are{% endif %} in the mailbox."
         data:
           icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/mailbox.png"
           smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
-    - service: notify.phone_a
+    - service: notify.phone_amy
       data_template:
         title: Mail Delivery
-        message: "You've got mail! {{ trigger.to_state.state }} pieces are waiting."
+        message: "{{ states('sensor.usps_mail') | int }} {% if is_state('sensor.usps_mail', '1') %}item is{% else %}items are{% endif %} in the mailbox."
         data:
           icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/mailbox.png"
           smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
