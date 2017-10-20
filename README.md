@@ -58,6 +58,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * Turn off all lights when we leave home
 * Turn on front outdoor Lights at Sunset, turn off at 10:35pm
 * Turn off bedroom TV after 5 minutes of inactivity (not working)
+* Notify when mail is out for delivery
+* Notify when packages are out for delivery
 * Watch and alert on low battery for some devices
 * Watch and alert on Home Assistant's disk usage
 
