@@ -28,7 +28,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK) - Hard-wired into lamps with local control using a [touch sensor](https://www.adafruit.com/product/1374) on the metal frame of the lamp
 * Z-Wave Door/Window sensors
 * [EcoBee3 Thermostat](https://www.amazon.com/dp/B00ZIRV39M) - Smart Thermostat with [extra sensors](https://www.amazon.com/dp/B00NXRYOIQ/)
-* [Amazon Echo Dot](https://www.amazon.com/dp/B01DFKC2SO) - Voice control
+* [Google Home Mini](https://store.google.com/us/product/google_home_mini) - Voice assistant
+* [Amazon Echo Dot](https://www.amazon.com/dp/B01DFKC2SO) - Voice assistant
 * [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
 * [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/) - Runs Android TV, poorly
 * [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/) - Android TV device
