@@ -57,8 +57,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * Auto Heal ZWave at 2:30am
 * Turn on some lights and switches when we get home
 * Turn off all lights when we leave home
-* Turn on front outdoor Lights at Sunset, turn off at 10:35pm
-* Turn off bedroom TV after 5 minutes of inactivity (not working)
+* Turn on front outdoor Lights at Sunset, turn off at 10:32pm
+* Turn off bedroom TV after 10 minutes of inactivity
 * Notify when mail is out for delivery
 * Notify when packages are out for delivery
 * Watch and alert on low battery for some devices
