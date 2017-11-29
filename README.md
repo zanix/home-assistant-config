@@ -39,9 +39,12 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
   * [Plex for Windows](https://www.plex.tv/apps/computer/windows/)
   * [RasPlex for Raspberry Pi](http://www.rasplex.com)
 * [ChromeCast](https://www.google.com/chromecast/)
+* [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presense of my car.
 * Emulated Hue exposes all Switches, Groups, input booleans, scripts, and scene information to Alexa for voice control
-* [Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home. (You should use the [Gen5](https://www.amazon.com/dp/B00XD8WZX6) version if you can afford it)
-* Track Solar power generation from [PVOutput](https://pvoutput.org) (needs work)
+
+## Retired
+* __Doesn't work well with my solar__ [Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home.
+* __Can't read backlog of readings__ Track Solar power generation from [PVOutput](https://pvoutput.org)
 
 ## Sensors
 
@@ -69,7 +72,6 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * [Amazon Dash Buttons](https://www.amazon.com/dp/B01F6ETRNA)
 * [433Mhz Transmitter and receiver](https://www.amazon.com/dp/B00M2CUALS) - For 433Mhz based devices
 * [Amplifiers](https://www.amazon.com/dp/B006AMF2R8) - Power speakers for Dots, Chromecasts or other devices.
-* [Garadget](https://www.amazon.com/dp/B01KUZ2JPS) - Garage Door opener/sensor
 * LED RGB [Wifi Controller](https://www.amazon.com/dp/B01JZ2SI6Q) flux_led compatible with [LED Strip kits](https://www.amazon.com/dp/B01CUILC3I) - ~100 Feet
 * [SkyBell HD](https://www.amazon.com/dp/B01IAB9ZME) or [Ring Pro](https://www.amazon.com/dp/B01DM6BDA4)
 * [Withings](https://www.amazon.com/dp/B01F3LJ2RW) - Smart Weight scale
