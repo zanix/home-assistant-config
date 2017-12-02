@@ -20,6 +20,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 * [Custom UI elements for Home Assistant](https://github.com/andrey-git/home-assistant-custom-ui), updates via `update.sh`
 
+### Custom Components
+
+* [Attributes as Sensors](https://github.com/pilotak/HomeAssistant-CustomComponents) - Allows the creation of a sensor that breaks out attribute of defined entities.
+
 ## Devices
 
 * [Ubiquiti Unifi Security Gateway](https://www.amazon.com/dp/B00LV8YZLK) - Network gateway and router. Used for internet access and as a presence tracker for many devices.
@@ -43,8 +47,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * Emulated Hue exposes all Switches, Groups, input booleans, scripts, and scene information to Alexa for voice control
 
 ## Retired
-* __Doesn't work well with my solar__ [Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home.
-* __Can't read backlog of readings__ Track Solar power generation from [PVOutput](https://pvoutput.org)
+
+* __Does not work with Solar__  
+[Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home.
+* __Does not read backlog__  
+Track Solar power generation from [PVOutput](https://pvoutput.org)
 
 ## Sensors
 
