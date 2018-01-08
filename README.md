@@ -43,6 +43,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
   * [Plex for Windows](https://www.plex.tv/apps/computer/windows/)
   * [RasPlex for Raspberry Pi](http://www.rasplex.com)
 * [ChromeCast](https://www.google.com/chromecast/)
+* [Schlage Connect Lock](https://www.amazon.com/gp/product/B00OV49YXU) - Z-Wave controllable lock. Nice to give temp codes for guests or when you forget the keys.
 * [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presense of my car.
 * Emulated Hue exposes all Switches, Groups, input booleans, scripts, and scene information to Alexa for voice control
 
@@ -55,7 +56,6 @@ Track Solar power generation from [PVOutput](https://pvoutput.org)
 
 ## Sensors
 
-* [Speedtest.net](https://home-assistant.io/components/sensor.speedtest/)
 * [Forecast.io (Darksky)](https://darksky.net)
 * [Pi System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
 * [FedEx Packages](https://home-assistant.io/components/sensor.fedex/)
