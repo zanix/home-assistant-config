@@ -36,6 +36,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * [Amazon Echo Dot](https://www.amazon.com/dp/B01DFKC2SO) - Voice assistant
 * [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
 * [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/) - Runs Android TV, poorly
+* [TCL Roku TV](https://www.bestbuy.com/site/tcl-55-class-54-6-diag--led-2160p-smart-4k-ultra-hd-tv-with-high-dynamic-range-roku-tv/5878705.p?skuId=5878705) - Runs Roku TV, quite well
 * [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/) - Android TV device
 * Other, non-smart TVs
 * [Plex](https://plex.tv) - Watching media and streams.
@@ -45,14 +46,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * [ChromeCast](https://www.google.com/chromecast/)
 * [Schlage Connect Lock](https://www.amazon.com/gp/product/B00OV49YXU) - Z-Wave controllable lock. Nice to give temp codes for guests or when you forget the keys.
 * [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presense of my car.
-* Emulated Hue exposes all Switches, Groups, input booleans, scripts, and scene information to Alexa for voice control
 
 ## Retired
 
-* __Does not work with Solar__  
-[Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home.
-* __Does not read backlog__  
-Track Solar power generation from [PVOutput](https://pvoutput.org)
+* __[Does not work with Solar]__ [Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home.
+* __[Does not read backlog]__ Track Solar power generation from [PVOutput](https://pvoutput.org)
 
 ## Sensors
 
