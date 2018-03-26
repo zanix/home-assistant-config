@@ -5,10 +5,12 @@
 - alias: Front Lights on at Night
   initial_state: true
   trigger:
-    - platform: numeric_state
-      entity_id: sun.sun
-      value_template: "{{ state.attributes.elevation }}"
-      below: 2
+    - platform: sun
+      event: sunset
+      offset: "-00:20:00"
+  condition:
+    - condition: time
+      before: "22:31:00"
   action:
     - service: homeassistant.turn_on
       entity_id: switch.outside_front_light_switch
@@ -29,14 +31,11 @@
       from: "not_home"
       to: "home"
   condition:
-    - condition: or
-      conditions:
-        - condition: sun
-          after: sunset
-          after_offset: "-0:30:00"
-        - condition: sun
-          before: sunrise
-          before_offset: "-0:30:00"
+    - condition: sun
+      after: sunset
+      after_offset: "-0:30:00"
+    - condition: time
+      before: "23:59:59"
   action:
     - service: homeassistant.turn_on
       entity_id: switch.garage_entry_light_switch
@@ -70,14 +69,12 @@
       for:
         minutes: 10
   condition:
-    - condition: and
-      conditions:
-        - condition: sun
-          after: sunrise
-          after_offset: "00:45:00"
-        - condition: sun
-          before: sunset
-          before_offset: "-00:45:00"
+    - condition: sun
+      after: sunrise
+      after_offset: "00:45:00"
+    - condition: sun
+      before: sunset
+      before_offset: "-00:45:00"
   action:
     - service: homeassistant.turn_off
       entity_id: group.all_light_switches
