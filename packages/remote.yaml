@@ -1,0 +1,139 @@
+###########################################################
+# Package: Remote
+#   Automation is located in the automation directory
+###########################################################
+
+remote:
+  - platform: harmony
+    name: Bedroom
+    activity: Shield
+    host: !secret remote_harmony_bedroom_host
+
+  - platform: harmony
+    name: Family Room
+    activity: Watch Roku
+    host: !secret remote_harmony_family_room_host
+
+  - platform: harmony
+    name: Living Room
+    activity: Shield
+    host: !secret remote_harmony_living_room_host
+
+homeassistant:
+  customize:
+    remote.bedroom:
+      friendly_name: Harmony [Bedroom]
+      hidden: true
+
+    remote.family_room:
+      friendly_name: Harmony [Family Room]
+      hidden: true
+
+    remote.living_room:
+      friendly_name: Harmony [Living Room]
+      hidden: true
+
+script:
+  remote_bedroom:
+    alias: Remote Bedroom
+    sequence:
+      - service: remote.turn_on
+        data_template:
+          entity_id: remote.bedroom
+          activity: >
+            {% if is_state("input_select.remote_bedroom", "PowerOff") %}
+              -1
+            {% elif is_state("input_select.remote_bedroom", "Shield") %}
+              28124049
+            {% endif %}
+      - service: input_select.select_option
+        entity_id: input_select.bedroom
+        data_template:
+          option: "Select Activity"
+
+  remote_family_room:
+    alias: Remote Family Room
+    sequence:
+      - service: remote.turn_on
+        data_template:
+          entity_id: remote.family_room
+          activity: >
+            {% if is_state("input_select.remote_family_room", "PowerOff") %}
+              -1
+            {% elif is_state("input_select.remote_family_room", "Gaming PC") %}
+              34027083
+            {% elif is_state("input_select.remote_living_room", "Roku") %}
+              34027794
+            {% endif %}
+      - service: input_select.select_option
+        entity_id: input_select.family_room
+        data_template:
+          option: "Select Activity"
+
+  remote_living_room:
+    alias: Remote Living Room
+    sequence:
+      - service: remote.turn_on
+        data_template:
+          entity_id: remote.living_room
+          activity: >
+            {% if is_state("input_select.remote_living_room", "PowerOff") %}
+              -1
+            {% elif is_state("input_select.remote_living_room", "Shield") %}
+              33952374
+            {% elif is_state("input_select.remote_living_room", "Broadcast TV") %}
+              33952418
+            {% endif %}
+      - service: input_select.select_option
+        entity_id: input_select.remote_living_room
+        data_template:
+          option: "Select Activity"
+
+sensor:
+  - platform: template
+    sensors:
+      remote_bedroom:
+        friendly_name: Bedroom Activity
+        icon_template: mdi:remote
+        value_template: "{{ states.remote.bedroom.attributes.current_activity }}"
+
+      remote_family_room:
+        friendly_name: Family Room Activity
+        icon_template: mdi:remote
+        value_template: "{{ states.remote.family_room.attributes.current_activity }}"
+
+      remote_living_room:
+        friendly_name: Living Room Activity
+        icon_template: mdi:remote
+        value_template: "{{ states.remote.living_room.attributes.current_activity }}"
+
+input_select:
+  remote_bedroom:
+    name: Bedroom TV
+    icon: mdi:monitor
+    options:
+      - Select Activity
+      - Shield
+      - PowerOff
+    initial: Select Activity
+
+  remote_family_room:
+    name: Family Room TV
+    icon: mdi:monitor
+    options:
+      - Select Activity
+      - Gaming PC
+      - Roku
+      - PowerOff
+    initial: Select Activity
+
+  remote_living_room:
+    name: Living Room TV
+    icon: mdi:monitor
+    options:
+      - Select Activity
+      - Shield
+      - Bluetooth
+      - Broadcast TV
+      - PowerOff
+    initial: Select Activity
