@@ -1,0 +1,113 @@
+###########################################################
+# Package: Weather
+#   Automation is located in the automation directory
+###########################################################
+
+homeassistant:
+  customize:
+    sensor.weather_minutely_summary:
+      hidden: true
+    sensor.weather_icon:
+      hidden: true
+    sensor.weather_daily_max_precip_intensity:
+      icon: mdi:ruler
+
+sun:
+
+group:
+  weather:
+    name: Weather
+    control: hidden
+    icon: mdi:weather-sunny
+    entities:
+      - sensor.weather_temperature
+      - sensor.weather_summary_icon
+      - sensor.weather_humidity
+      - sensor.weather_precip
+      - sensor.weather_precip_intensity
+      - sensor.weather_daily_max_precip_intensity
+      - sensor.weather_wind_speed
+      - sensor.weather_cloud_coverage
+      - sun.sun
+      - sensor.sunrise_time
+      - sensor.sunset_time
+      - sensor.moon
+
+sensor:
+  - platform: template
+    sensors:
+      sunrise_time:
+        friendly_name: "Sunrise"
+        value_template: "{% set timestamp = as_timestamp(states.sun.sun.attributes.next_rising) | timestamp_custom('%I:%M %p') %}{{ timestamp.lstrip('0') }}"
+        icon_template: "mdi:weather-sunset-up"
+
+      sunset_time:
+        friendly_name: "Sunset"
+        value_template: "{% set timestamp = as_timestamp(states.sun.sun.attributes.next_setting) | timestamp_custom('%I:%M %p') %}{{ timestamp.lstrip('0') }}"
+        icon_template: "mdi:weather-sunset-down"
+
+  - platform: moon
+
+  - platform: darksky
+    name: Weather
+    api_key: !secret darksky_api_key
+    update_interval:
+      minutes: 5
+    monitored_conditions:
+      # - summary
+      - precip_type
+      - precip_intensity
+      # - precip_probability
+      - temperature
+      # - apparent_temperature
+      # - dew_point
+      - wind_speed
+      # - wind_bearing
+      - cloud_cover
+      - humidity
+      # - pressure
+      # - visibility
+      # - ozone
+      - minutely_summary
+      # - hourly_summary
+      # - daily_summary
+      # - temperature_high
+      # - temperature_low
+      # - apparent_temperature_high
+      # - apparent_temperature_low
+      - precip_intensity_max
+      # - uv_index
+      # - nearest_storm_distance
+      - icon
+
+  - platform: template
+    sensors:
+      weather_summary_icon:
+        friendly_name: Weather Summary
+        value_template: "{{ states('sensor.weather_minutely_summary') }}"
+        icon_template: >
+          {% if is_state('sensor.weather_icon', 'clear-day') %}
+            mdi:weather-sunny
+          {% elif is_state('sensor.weather_icon', 'clear-night') %}
+            mdi:weather-night
+          {% elif is_state('sensor.weather_icon', 'rain') %}
+            mdi:weather-rainy
+          {% elif is_state('sensor.weather_icon', 'snow') %}
+            mdi:weather-snowy
+          {% elif is_state('sensor.weather_icon', 'sleet') %}
+            mdi:weather-snowy-rainy
+          {% elif is_state('sensor.weather_icon', 'wind') %}
+            mdi:weather-windy
+          {% elif is_state('sensor.weather_icon', 'fog') %}
+            mdi:weather-fog
+          {% elif is_state('sensor.weather_icon', 'cloudy') %}
+            mdi:weather-cloudy
+          {% elif is_state('sensor.weather_icon', 'partly-cloudy-day') or is_state('sensor.weather_icon', 'partly-cloudy-night') %}
+            mdi:weather-partlycloudy
+          {% elif is_state('sensor.weather_icon', 'hail') %}
+            mdi:weather-hail
+          {% elif is_state('sensor.weather_icon', 'thunderstorm') %}
+            mdi:weather-lightning
+          {% else %}
+            mdi:help-circle
+          {% endif %}
