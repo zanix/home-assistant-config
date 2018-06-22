@@ -1,0 +1,79 @@
+###########################################################
+# Package: Pi-hole
+#   Automation is located in the automation directory
+###########################################################
+
+homeassistant:
+  customize:
+    input_text.pihole_host:
+      icon: mdi:web
+    input_text.pihole_auth:
+      icon: mdi:textbox-password
+    script.enable_pihole:
+      icon: mdi:security-network
+
+group:
+  pihole:
+    name: Pi-hole Status
+    entities:
+      - sensor.pihole_status
+      - script.enable_pihole
+      - input_select.pihole_time
+      - sensor.pihole_ads_blocked_today
+      - sensor.pihole_ads_percentage_blocked_today
+      - sensor.pihole_dns_queries_cached
+      - sensor.pihole_dns_queries_forwarded
+      - sensor.pihole_dns_queries_today
+      - sensor.pihole_dns_unique_clients
+      - sensor.pihole_dns_unique_domains
+      - sensor.pihole_domains_blocked
+      - input_text.pihole_host
+      - input_text.pihole_auth
+
+sensor:
+  - platform: pi_hole
+
+  - platform: command_line
+    name: Pi-hole Status
+    command: curl -X GET 'http://{{ states.input_text.pihole_host.state }}/admin/api.php?status'
+    scan_interval: 10
+    value_template: "{{ value_json.status }}"
+    icon_template: >
+      {% if value_json.status == "enabled" %}
+        mdi:security
+      {% else %}
+        mdi:security-off
+      {% endif %}
+
+shell_command:
+  pihole_enable: curl -X GET 'http://{{ states.input_text.pihole_host.state }}/admin/api.php?enable&auth={{ states.input_text.pihole_auth.state }}'
+  pihole_disable: curl -X GET 'http://{{ states.input_text.pihole_host.state }}/admin/api.php?disable={{ states.input_select.pihole_time.state }}&auth={{ states.input_text.pihole_auth.state }}'
+
+script:
+  enable_pihole:
+    alias: Enable Pi-hole
+    sequence:
+      service: shell_command.pihole_enable
+
+input_text:
+  pihole_host:
+    name: Host
+  pihole_auth:
+    name: API key
+    pattern: '[a-fA-F0-9]*'
+    mode: password
+
+input_select:
+  pihole_time:
+    name: Disable Time (seconds)
+    options:
+      - Select Time
+      - 10
+      - 30
+      - 60
+      - 300
+      - 600
+      - 900
+      - 1800
+      - 3600
+    initial: Select Time
