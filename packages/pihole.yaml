@@ -6,10 +6,6 @@
 
 homeassistant:
   customize:
-    input_text.pihole_host:
-      icon: mdi:web
-    input_text.pihole_auth:
-      icon: mdi:textbox-password
     script.enable_pihole:
       icon: mdi:security-network
 
@@ -28,35 +24,25 @@ group:
       - sensor.pihole_dns_unique_clients
       - sensor.pihole_dns_unique_domains
       - sensor.pihole_domains_blocked
-      - input_text.pihole_host
-      - input_text.pihole_auth
 
 sensor:
   - platform: pi_hole
 
   - platform: command_line
     name: Pi-hole Status
-    command: curl -X GET 'http://{{ states.input_text.pihole_host.state }}/admin/api.php?status'
+    command: !secret pihole_status
     scan_interval: 10
-    value_template: "{{ value_json.status }}"
+    value_template: "{{ value_json.status | capitalize }}"
 
 shell_command:
-  pihole_enable: curl -X GET 'http://{{ states.input_text.pihole_host.state }}/admin/api.php?enable&auth={{ states.input_text.pihole_auth.state }}'
-  pihole_disable: curl -X GET 'http://{{ states.input_text.pihole_host.state }}/admin/api.php?disable={{ states.input_select.pihole_time.state }}&auth={{ states.input_text.pihole_auth.state }}'
+  pihole_enable: !secret pihole_enable
+  pihole_disable: !secret pihole_disable
 
 script:
   enable_pihole:
     alias: Enable Pi-hole
     sequence:
       service: shell_command.pihole_enable
-
-input_text:
-  pihole_host:
-    name: Host
-  pihole_auth:
-    name: API key
-    pattern: '[a-fA-F0-9]*'
-    mode: password
 
 input_select:
   pihole_time:
