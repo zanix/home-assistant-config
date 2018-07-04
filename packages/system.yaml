@@ -1,0 +1,167 @@
+###########################################################
+# Package: System
+#   Automation is located in the automation directory
+###########################################################
+
+homeassistant:
+  customize:
+    sensor.ha_version:
+      icon: mdi:numeric
+
+    sensor.ha_uptime:
+      icon: mdi:clock-start
+
+    sensor.since_last_boot:
+      hidden: true
+
+    sensor.since_last_boot_templated:
+      icon: mdi:raspberrypi
+
+    sensor.disk_use_:
+      friendly_name: Disk Usage
+      icon: mdi:sd
+
+    sensor.external_ip:
+      friendly_name: External IP
+      icon: mdi:ethernet
+
+    sensor.cpu_temperature:
+      icon: mdi:oil-temperature
+
+recorder:
+  exclude:
+    entities:
+      - sensor.date
+      - sensor.ha_uptime
+      - sensor.since_last_boot_templated
+      - sensor.time
+
+influxdb:
+  exclude:
+    entities:
+      - sensor.date
+      - sensor.ha_uptime
+      - sensor.since_last_boot_templated
+      - sensor.time
+
+group:
+  system_status:
+    name: System Status
+    control: hidden
+    icon: mdi:server-network
+    entities:
+      - sensor.date
+      - sensor.time
+      - sensor.ha_version
+      - sensor.ha_uptime
+      - sensor.since_last_boot_templated
+      - sensor.external_ip
+      - sensor.cpu_temperature
+      - sensor.processor_use
+      - sensor.memory_use_percent
+      - sensor.disk_use_percent_
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: processor_use
+      - type: memory_use_percent
+      - type: since_last_boot
+      - type: disk_use_percent
+        arg: /
+
+  - platform: command_line
+    name: HA Version
+    command: >-
+      cat /config/.HA_VERSION
+    scan_interval: 86400
+
+  - platform: command_line
+    name: HA Uptime
+    command: echo "$(($(date +%s) - $(date -d "$(head -n1 /config/home-assistant.log | cut -d' ' -f-2)" +%s)))"
+    scan_interval: 720
+    value_template: >-
+      {% set uptime = value | int %}
+      {% set seconds = (uptime % 60) | int %}
+      {% set minutes = ((uptime % 3600) / 60) | int %}
+      {% set hours = ((uptime % 86400) / 3600) | int %}
+      {% set days = (uptime / 86400) | int %}
+
+      {%- if days > 0 -%}
+        {%- if days == 1 -%}
+          1 day
+        {%- else -%}
+          {{ days }} days
+        {%- endif -%}
+        {{ ', ' }}
+      {%- endif -%}
+      {%- if hours > 0 -%}
+        {{ hours }} h
+      {%- endif -%}
+      {%- if minutes > 0 -%}
+        {%- if hours > 0 -%}
+          {{ ', ' }}
+        {%- endif -%}
+        {{ minutes }} m
+      {%- endif -%}
+      {%- if seconds > 0 -%}
+        {%- if hours > 0 or minutes > 0 -%}
+          {{ ', ' }}
+        {%- endif -%}
+        {{ seconds }} s
+      {%- endif -%}
+
+  - platform: command_line
+    name: CPU Temperature
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    scan_interval: 720
+    unit_of_measurement: 'C'
+    value_template: '{{ (value | multiply(0.001)) | round(1) }}'
+
+  - platform: template
+    sensors:
+      date:
+        friendly_name: Date
+        icon_template: mdi:calendar
+        value_template: '{{ now().strftime("%m/%d/%Y") }}'
+
+      time:
+        friendly_name: Time
+        icon_template: mdi:clock
+        value_template: '{% set timestamp = now().strftime("%I:%M %p") %}{{ timestamp.lstrip("0") }}'
+
+      since_last_boot_templated:
+        friendly_name: Pi Uptime
+        value_template: >-
+          {%- set slb = states.sensor.since_last_boot.state.split(' ') -%}
+          {%- set count = slb | length -%}
+          {%- set hms = slb[count - 1] -%}
+          {%- set hms_trimmed = hms.split('.')[0] -%}
+          {%- set hms_split = hms_trimmed.split(':') -%}
+          {%- set hours = hms_split[0] | int -%}
+          {%- set minutes = hms_split[1] | int -%}
+          {%- set seconds = hms_split[2] | int -%}
+
+          {%- if count == 3 -%}
+            {{ slb[0] ~ ' ' ~ slb[1] ~ ' ' }}
+          {%- endif -%}
+          {%- if hours > 0 -%}
+            {{ hours }} h
+          {%- endif -%}
+          {%- if minutes > 0 -%}
+            {%- if hours > 0 -%}
+              {{ ', ' }}
+            {%- endif -%}
+            {{ minutes }} m
+          {%- endif -%}
+          {%- if seconds > 0 -%}
+            {%- if hours > 0 or minutes > 0 -%}
+              {{ ', ' }}
+            {%- endif -%}
+            {{ seconds }} s
+          {%- endif -%}
+
+  - platform: rest
+    name: external_ip
+    scan_interval: 86400
+    resource: https://api.ipify.org
