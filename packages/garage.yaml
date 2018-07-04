@@ -1,0 +1,115 @@
+###########################################################
+# Package: Garage
+#   Automation is located in the automation directory
+###########################################################
+
+homeassistant:
+  customize:
+    cover.garage_door:
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: no-slider
+      confirm_controls_show_lock: true
+      show_last_changed: false
+      extra_data_template: >
+        ${attributes.door_state !== 'offline' ? (attributes.wifi_signal + 'dBm') : 'offline'}
+      extra_badge:
+        attribute: distance_sensor
+        unit: "cm"
+
+alert:
+  garage_door:
+    name: "Garage door is still open!"
+    done_message: "Garage door is closed"
+    entity_id: cover.garage_door
+    state: "open"
+    repeat:
+      - 60
+      - 30
+    skip_first: true
+    notifiers:
+      - join_users
+
+cover:
+  - platform: opengarage
+    covers:
+      garage:
+        host: !secret cover_opengarage_host
+        device_key: !secret cover_opengarage_device_key
+        name: Garage Door
+
+group:
+  garage_door:
+    name: Garage Door
+    entities:
+      - cover.garage_door
+      - sensor.garage_door_status
+      - sensor.garage_car_present
+
+sensor:
+  - platform: template
+    sensors:
+      garage_door_status:
+        friendly_name: Status
+        value_template: >-
+          {% if states.cover.garage_door %}
+            {% if states.cover.garage_door.attributes["door_state"] == "open" %}
+              Open
+            {% elif states.cover.garage_door.attributes["door_state"] == "closed" %}
+              Closed
+            {% elif states.cover.garage_door.attributes["door_state"] == "opening" %}
+              Opening
+            {% elif states.cover.garage_door.attributes["door_state"] == "closing" %}
+              Closing
+            {% else %}
+              Unknown
+            {% endif %}
+          {% else %}
+            Offline
+          {% endif %}
+        icon_template: >
+          {% if states.cover.garage_door %}
+            {% if states.cover.garage_door.attributes["door_state"] == "open" %}
+              mdi:garage-open
+            {% elif states.cover.garage_door.attributes["door_state"] == "closed" %}
+              mdi:garage
+            {% elif states.cover.garage_door.attributes["door_state"] == "opening" %}
+              mdi:arrow-expand-up
+            {% elif states.cover.garage_door.attributes["door_state"] == "closing" %}
+              mdi:arrow-expand-down
+            {% else %}
+              mdi:help-circle
+            {% endif %}
+          {% else %}
+            mdi:cancel
+          {% endif %}
+
+      garage_car_present:
+        friendly_name: Car in Garage
+        value_template: >-
+          {% if states.cover.garage_door %}
+            {% if states.cover.garage_door.attributes["distance_sensor"] == "offline" %}
+              Offline
+            {% elif states.cover.garage_door.state == "open" %}
+              Door Open
+            {% elif ((states.cover.garage_door.attributes["distance_sensor"] > 50) and (states.cover.garage_door.attributes["distance_sensor"] < 170)) %}
+              Yes
+            {% else %}
+              No
+            {% endif %}
+          {% else %}
+            Offline
+          {% endif %}
+        icon_template: >
+          {% if states.cover.garage_door %}
+            {% if states.cover.garage_door.attributes["distance_sensor"] == "offline" %}
+              mdi:cancel
+            {% elif states.cover.garage_door.state == "open" %}
+              mdi:garage-open
+            {% elif ((states.cover.garage_door.attributes["distance_sensor"] > 50) and (states.cover.garage_door.attributes["distance_sensor"] < 170)) %}
+              mdi:car
+            {% else %}
+              mdi:close-circle-outline
+            {% endif %}
+          {% else %}
+            mdi:cancel
+          {% endif %}
