@@ -49,10 +49,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ## Retired
 
 * __[Does not work with Solar]__ [Aeon Labs AEDSB09104ZWUS Aeotec Z-Wave Smart Energy Monitor Meter](https://www.amazon.com/dp/B00DIBSKFU) to measure energy usage in the home.
-* __[Does not read backlog]__ Track Solar power generation from [PVOutput](https://pvoutput.org)
 
 ## Sensors
 
+* Monitor SolarEdge performance with custom [JSON Rest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) component
 * [Forecast.io (Darksky)](https://darksky.net)
 * [Pi System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
 * [FedEx Packages](https://home-assistant.io/components/sensor.fedex/)
