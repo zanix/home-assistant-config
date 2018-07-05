@@ -41,8 +41,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 * Other, non-smart TVs
 * [Plex](https://plex.tv) - Watching media and streams.
   * [Plex for Android TV](https://www.plex.tv/apps/streaming-devices/android-tv/)
+  * [Plex for Roku TV](https://www.plex.tv/blog/roku-live-tv/)
   * [Plex for Windows](https://www.plex.tv/apps/computer/windows/)
-  * [RasPlex for Raspberry Pi](http://www.rasplex.com)
 * [ChromeCast](https://www.google.com/chromecast/)
 * [Schlage Connect Lock](https://www.amazon.com/gp/product/B00OV49YXU) - Z-Wave controllable lock. Nice to give temp codes for guests or when you forget the keys.
 * [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presense of my car.
@@ -62,15 +62,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Automations
 
-* Auto Heal ZWave at 2:30am
-* Turn on some lights and switches when we get home
-* Turn off all lights when we leave home
-* Turn on front outdoor Lights at Sunset, turn off at 10:32pm
-* Turn off bedroom TV after 10 minutes of inactivity
-* Notify when mail is out for delivery
-* Notify when packages are out for delivery
-* Watch and alert on low battery for some devices
-* Watch and alert on Home Assistant's disk usage
+* See automations folder
 
 ## Things to Buy
 
