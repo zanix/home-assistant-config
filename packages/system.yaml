@@ -31,9 +31,28 @@ homeassistant:
     sensor.database_size:
       icon: mdi:database-search
 
+    group.battery:
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: badges
+
+    group.all_automations:
+      friendly_name: Automations
+      control: hidden
+      hidden: false
+
+    group.all_scripts:
+      friendly_name: Scripts
+      control: hidden
+      hidden: false
+
   customize_glob:
     "sensor.table_size_*":
       icon: mdi:database-search
+
+    "sensor.*_battery_level":
+      custom_ui_state_card: state-card-custom-ui
+      templates:
+        theme: "if (state < 30) return 'alert_red'; elseif (state < 60) return 'alert_orange'; elseif (state < 80) return 'alert_yellow'; else return null;"
 
 recorder:
   exclude:
@@ -52,6 +71,18 @@ influxdb:
       - sensor.time
 
 group:
+  system_view:
+    name: System
+    view: yes
+    icon: mdi:tune
+    entities:
+      - group.system_status
+      - group.database
+      - group.all_automations
+      - group.all_scripts
+      - group.battery
+      - group.zwave
+
   system_status:
     name: System Status
     control: hidden
@@ -83,7 +114,29 @@ group:
       - sensor.hline_1
       - sensor.database_size
 
+  battery:
+    name: Battery Level
+    control: hidden
+    icon: mdi:battery-charging
+    entities:
+      - sensor.door_front_battery_level
+      - sensor.door_garage_entry_battery_level
+      - sensor.door_garage_outside_battery_level
+      - sensor.door_back_battery_level
+      - sensor.lock_front_battery_level
+
 sensor:
+  - platform: attributes
+    friendly_name: Battery
+    attribute: battery_level
+    unit_of_measurement: "%"
+    entities:
+      - zwave.lock_front
+      - zwave.door_front
+      - zwave.door_garage_entry
+      - zwave.door_garage_outside
+      - zwave.door_back
+
   - platform: systemmonitor
     resources:
       - type: processor_use
