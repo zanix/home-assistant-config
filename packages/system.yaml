@@ -28,6 +28,13 @@ homeassistant:
     sensor.cpu_temperature:
       icon: mdi:oil-temperature
 
+    sensor.database_size:
+      icon: mdi:database-search
+
+  customize_glob:
+    "sensor.table_size_*":
+      icon: mdi:database-search
+
 recorder:
   exclude:
     entities:
@@ -63,6 +70,18 @@ group:
       - sensor.disk_use_percent_
       - sensor.hline_3
       - sensor.external_ip
+
+  database:
+    name: Database Info
+    control: hidden
+    icon: mdi:database
+    entities:
+      - sensor.table_size_states
+      - sensor.table_size_events
+      - sensor.table_size_recorder_runs
+      - sensor.table_size_schema_changes
+      - sensor.hline_1
+      - sensor.database_size
 
 sensor:
   - platform: systemmonitor
@@ -168,3 +187,27 @@ sensor:
     name: external_ip
     scan_interval: 86400
     resource: https://api.ipify.org
+
+  - platform: sql
+    db_url: !secret recorder_db_url
+    queries:
+      - name: "Table size 'states'"
+        query: 'SELECT round(((data_length + index_length) / 1024 / 1024), 2) "size" FROM information_schema.TABLES WHERE table_schema = "homeassistant" AND table_name = "states";'
+        column: "size"
+        unit_of_measurement: "MB"
+      - name: "Table size 'schema_changes'"
+        query: 'SELECT round(((data_length + index_length) / 1024 / 1024), 2) "size" FROM information_schema.TABLES WHERE table_schema = "homeassistant" AND table_name = "schema_changes";'
+        column: "size"
+        unit_of_measurement: "MB"
+      - name: "Table size 'recorder_runs'"
+        query: 'SELECT round(((data_length + index_length) / 1024 / 1024), 2) "size" FROM information_schema.TABLES WHERE table_schema = "homeassistant" AND table_name = "recorder_runs";'
+        column: "size"
+        unit_of_measurement: "MB"
+      - name: "Table size 'events'"
+        query: 'SELECT round(((data_length + index_length) / 1024 / 1024), 2) "size" FROM information_schema.TABLES WHERE table_schema = "homeassistant" AND table_name = "events";'
+        column: "size"
+        unit_of_measurement: "MB"
+      - name: "Database size"
+        query: 'SELECT round(sum(data_length + index_length) / 1024 / 1024, 2) "size" FROM information_schema.tables WHERE table_schema = "homeassistant" GROUP BY table_schema;'
+        column: "size"
+        unit_of_measurement: "MB"
