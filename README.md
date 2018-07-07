@@ -18,7 +18,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Custom UI Elements
 
-* [Custom UI elements for Home Assistant](https://github.com/andrey-git/home-assistant-custom-ui), updates via `update.sh`
+* [Custom UI elements for Home Assistant](https://github.com/andrey-git/home-assistant-custom-ui), updates via `update_custom_ui.sh`
+* [Horizontal line state card for Home Assistant](https://github.com/covrig/homeassistant-hline), updates via `update_hline_ui.sh`
+* [Tiles custom state card for Home Assistant](https://github.com/andrey-git/home-assistant-custom-ui), updates via `update_tiles_ui.sh`
 
 ### Custom Components
 
