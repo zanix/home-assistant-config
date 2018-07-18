@@ -1,6 +1,5 @@
 ###########################################################
 # Package: System
-#   Automation is located in the automation directory
 ###########################################################
 
 homeassistant:
@@ -266,3 +265,151 @@ sensor:
 shell_command:
   zwave_disco_off: echo -e -n "\x01\x08\x00\xF2\x51\x01\x00\x05\x01\x51" > /dev/ttyACM0
   zwave_disco_on: echo -e -n "\x01\x08\x00\xF2\x51\x01\x01\x05\x01\x50" > /dev/ttyACM0
+
+automation:
+  - alias: "[System] Clear TTS Cache"
+    trigger:
+      - platform: time
+        hours: "/24"
+    condition:
+      - condition: time
+        weekday:
+          - mon
+    action:
+      - service: tts.clear_cache
+
+  - alias: "[System] Failed Login"
+    trigger:
+      - platform: template
+        value_template: "{{ states('persistent_notification.httplogin') != 'unknown' }}"
+    action:
+      - service: notify.join_user1
+        data_template:
+          title: "{{ state_attr('persistent_notification.httplogin', 'title') }}"
+          message: "{{ state_attr('persistent_notification.httplogin', 'message') }}"
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+
+  - alias: "[System] Low Battery"
+    trigger:
+      - platform: time
+        at: "10:00:00"
+      - platform: time
+        at: "18:00:00"
+    condition:
+      - condition: template
+        value_template: >
+          {%- set threshold_high = 30 -%}
+          {%- set threshold_low = 0 -%}
+          {% macro battery_level() %}
+          {% set domains = ['light', 'switch', 'sensor', 'zwave', 'lock'] %}
+          {% for domain in domains -%}
+          {% for item in states[domain] if ((item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold_high and item.attributes['battery_level'] | int > threshold_low) or ('battery' in item.name | lower and ((item.state | int < threshold_high and item.state | int > threshold_low and item.state|int != 0) or item.state | lower == 'low' or item.state | lower == 'unknown'))) -%}
+          {% if (item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold_high and item.attributes['battery_level'] | int > threshold_low) -%}
+          {{ item.name }}{% endif -%}
+          {% if 'battery' in item.name | lower and ((item.state | int < threshold_high and item.state | int > threshold_low and item.state|int != 0) or item.state | lower == 'low' or item.state | lower == 'unknown') -%}
+          {{ item.name }}{% endif -%}
+          {% endfor %}
+          {%- endfor %}
+          {% endmacro %}
+          {{ battery_level() |trim != '' }}
+    action:
+      - service: persistent_notification.create
+        data_template:
+          title: "Low Battery Levels"
+          notification_id: low-battery-alert
+          message: >
+            {%- set threshold_high = 30 -%}
+            {%- set threshold_low = 0 -%}
+            {% macro battery_level(domain) %}
+            {%- for item in states[domain] if ((item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold_high and item.attributes['battery_level'] | int > threshold_low) or ('battery' in item.name | lower and ((item.state | int < threshold_high and item.state|int != 0) or item.state | lower == 'low' or item.state | lower == 'unknown'))) -%}
+            {% if (item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold_high and item.attributes['battery_level'] | int > threshold_low) -%}
+            {{ item.attributes.friendly_name }} ({{ item.attributes['battery_level'] }}){%- if not loop.last %}, {% endif -%}{%- endif -%}
+            {%- if 'battery' in item.name | lower and ((item.state | int < threshold_high and item.state | int > threshold_low and item.state|int != 0) or item.state | lower == 'low' or item.state | lower == 'unknown') -%}
+            {{ item.attributes.friendly_name }} ({{ item.state }}){% if not loop.last %}, {% endif %}{% endif -%}
+            {%- endfor -%}
+            {% endmacro %}
+            {%- set domains = ['light', 'switch', 'sensor', 'zwave', 'lock'] -%}
+            {%- for domain in domains if battery_level(domain) |trim != ''-%}
+            {{ battery_level(domain) }}{%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+      - service: notify.join_user1
+        data_template:
+          title: "Low Battery Levels"
+          message: >
+            {%- set threshold_high = 30 -%}
+            {%- set threshold_low = 0 -%}
+            {% macro battery_level(domain) %}
+            {%- for item in states[domain] if ((item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold_high and item.attributes['battery_level'] | int > threshold_low) or ('battery' in item.name | lower and ((item.state | int < threshold_high and item.state|int != 0) or item.state | lower == 'low' or item.state | lower == 'unknown'))) -%}
+            {% if (item.attributes.battery_level is defined and item.attributes['battery_level'] | int < threshold_high and item.attributes['battery_level'] | int > threshold_low) -%}
+            {{ item.attributes.friendly_name }} ({{ item.attributes['battery_level'] }}){%- if not loop.last %}, {% endif -%}{%- endif -%}
+            {%- if 'battery' in item.name | lower and ((item.state | int < threshold_high and item.state | int > threshold_low and item.state|int != 0) or item.state | lower == 'low' or item.state | lower == 'unknown') -%}
+            {{ item.attributes.friendly_name }} ({{ item.state }}){% if not loop.last %}, {% endif %}{% endif -%}
+            {%- endfor -%}
+            {% endmacro %}
+            {%- set domains = ['light', 'switch', 'sensor', 'zwave', 'lock'] -%}
+            {%- for domain in domains if battery_level(domain) |trim != ''-%}
+            {{ battery_level(domain) }}{%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/battery-alert.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+
+  - alias: "[System] SD Card Space at 90%"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.disk_use_percent_
+        above: 89
+    action:
+      - service: persistent_notification.create
+        data:
+          title: Low SD Card Space
+          message: "SD card usage is at {{ states.sensor.disk_use_percent_.state }}%"
+          notification_id: low_disk_space
+      - service: notify.join_user1
+        data_template:
+          title: Low SD Card Space
+          message: "SD card usage is at {{ states.sensor.disk_use_percent_.state }}%"
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/micro-sd.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+
+  - alias: "[System] Set Theme at Startup"
+    trigger:
+      - platform: homeassistant
+        event: start
+    action:
+      service: frontend.set_theme
+      data:
+        name: PmxMononight
+
+  - alias: "[System] Update Available"
+    hide_entity: true
+    trigger:
+      - platform: state
+        entity_id: updater.updater
+    condition:
+      - condition: template
+        value_template: "{{ states('updater.updater') != 'unknown' }}"
+    action:
+      - service: persistent_notification.create
+        data:
+          title: Update Available
+          message: "Home Assistant {{ states('updater.updater') }} is available. You are currently running {{ states('sensor.ha_version') }}"
+          notification_id: update_available
+      - service: notify.join_user1
+        data_template:
+          title: Update Available
+          message: "Home Assistant {{ states('updater.updater') }} is available. You are currently running {{ states('sensor.ha_version') }}"
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/update.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+            url: "{{ state_attr('updater.updater', 'release_notes') }}"
+
+  - alias: "[System] Z-Wave Heal"
+    trigger:
+      - platform: time
+        at: "02:30:00"
+    action:
+      - service: zwave.heal_network
