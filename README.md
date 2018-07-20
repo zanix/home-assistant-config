@@ -11,6 +11,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - [Hass.io](https://home-assistant.io/hassio/) by [Home Assistant](https://home-assistant.io)
 
+### Add-Ons
+
+- [Mosquitto broker](https://www.home-assistant.io/addons/mosquitto/) - MQTT Broker
+
 ### Custom UI Elements
 
 - [Custom UI elements for Home Assistant](https://github.com/andrey-git/home-assistant-custom-ui), updates via `update_custom_ui.sh`
