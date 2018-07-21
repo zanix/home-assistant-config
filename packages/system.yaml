@@ -13,15 +13,11 @@ homeassistant:
     sensor.since_last_boot:
       hidden: true
 
-    sensor.since_last_boot_templated:
-      icon: mdi:raspberrypi
-
     sensor.disk_use_percent_:
-      friendly_name: SD Card Usage
+      friendly_name: SD Card use
       icon: mdi:micro-sd
 
     sensor.external_ip:
-      friendly_name: External IP
       icon: mdi:ethernet
 
     sensor.cpu_temperature:
@@ -30,8 +26,26 @@ homeassistant:
     sensor.processor_use:
       icon: mdi:chip
 
+    sensor.memory_use_percent:
+      friendly_name: Memory use
+
     sensor.database_size:
       icon: mdi:database-search
+
+    input_boolean.sql_purge:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 8
+        row_height: 50px
+        column_width: 50px
+        entities:
+        - entity: script.sql_purge
+          icon: mdi:delete-variant
+          column_span: 4
+          column: 3
+
+    script.sql_purge:
+      hidden: true
 
     group.battery:
       custom_ui_state_card: state-card-custom-ui
@@ -47,6 +61,12 @@ homeassistant:
       control: hidden
       hidden: false
 
+    group.system_status:
+      custom_ui_state_card: state-card-custom-ui
+    group.system_status_badges:
+      custom_ui_state_card: state-card-custom-ui
+      state_card_mode: badges
+
   customize_glob:
     "sensor.table_size_*":
       icon: mdi:database-search
@@ -59,6 +79,7 @@ homeassistant:
 recorder:
   exclude:
     entities:
+      - input_boolean.sql_purge
       - sensor.date
       - sensor.since_last_boot
       - sensor.time
@@ -66,6 +87,7 @@ recorder:
 influxdb:
   exclude:
     entities:
+      - input_boolean.sql_purge
       - sensor.date
       - sensor.since_last_boot
       - sensor.time
@@ -95,12 +117,19 @@ group:
       - sensor.ha_uptime
       - sensor.since_last_boot_templated
       - sensor.hline_2
+      - group.system_status_badges
+      - sensor.hline_3
+      - sensor.external_ip
+
+  system_status_badges:
+    name: System Stats
+    icon: mdi:chip
+    control: hidden
+    entities:
       - sensor.cpu_temperature
       - sensor.processor_use
       - sensor.memory_use_percent
       - sensor.disk_use_percent_
-      - sensor.hline_3
-      - sensor.external_ip
 
   database:
     name: Database Info
@@ -113,6 +142,9 @@ group:
       - sensor.table_size_schema_changes
       - sensor.hline_1
       - sensor.database_size
+      - sensor.hline_2
+      - input_number.sql_purge_keep
+      - input_boolean.sql_purge
 
   battery:
     name: Battery Level
@@ -207,6 +239,7 @@ sensor:
 
       since_last_boot_templated:
         friendly_name: Pi Uptime
+        icon_template: mdi:raspberrypi
         value_template: >-
           {%- set slb = states.sensor.since_last_boot.state.split(' ') -%}
           {%- set count = slb | length -%}
@@ -237,7 +270,7 @@ sensor:
           {%- endif -%}
 
   - platform: rest
-    name: external_ip
+    name: External IP
     scan_interval: 86400
     resource: https://api.ipify.org
 
@@ -268,6 +301,26 @@ sensor:
 shell_command:
   zwave_disco_off: echo -e -n "\x01\x08\x00\xF2\x51\x01\x00\x05\x01\x51" > /dev/ttyACM0
   zwave_disco_on: echo -e -n "\x01\x08\x00\xF2\x51\x01\x01\x05\x01\x50" > /dev/ttyACM0
+
+input_boolean:
+  sql_purge:
+
+input_number:
+  sql_purge_keep:
+    name: Days to Keep
+    icon: mdi:calendar-today
+    initial: 7
+    min: 1
+    max: 60
+
+script:
+  sql_purge:
+    alias: "Purge Home Assistant Database"
+    sequence:
+      - service: recorder.purge
+        data_template: 
+          keep_days : >
+            {{ states.input_number.sql_purge_keep.state | int }}
 
 automation:
   - alias: "[System] Clear TTS Cache"
@@ -399,7 +452,7 @@ automation:
       - service: persistent_notification.create
         data:
           title: Update Available
-          message: "Home Assistant {{ states('updater.updater') }} is available. You are currently running {{ states('sensor.ha_version') }}"
+          message: "Home Assistant {{ states('updater.updater') }} is available. You are currently running {{ states('sensor.ha_version') }}. [Release Notes]({{ state_attr('updater.updater', 'release_notes') }})"
           notification_id: update_available
       - service: notify.join_user1
         data_template:

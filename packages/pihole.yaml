@@ -5,9 +5,20 @@
 
 homeassistant:
   customize:
+    input_boolean.enable_pihole:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 8
+        row_height: 50px
+        column_width: 50px
+        entities:
+        - entity: script.enable_pihole
+          icon: mdi:server-security
+          column_span: 4
+          column: 3
+
     script.enable_pihole:
-      icon: mdi:security-network
-      action_name: Enable
+      hidden: true
 
     input_select.pihole_time:
       icon: mdi:calendar-clock
@@ -15,12 +26,14 @@ homeassistant:
 recorder:
   exclude:
     entities:
+      - input_boolean.enable_pihole
       - input_select.pihole_time
       - script.enable_pihole
 
 influxdb:
   exclude:
     entities:
+      - input_boolean.enable_pihole
       - input_select.pihole_time
       - script.enable_pihole
 
@@ -29,8 +42,6 @@ group:
     name: Pi-hole Status
     entities:
       - sensor.pihole_status
-      - script.enable_pihole
-      - input_select.pihole_time
       - sensor.pihole_ads_blocked_today
       - sensor.pihole_ads_percentage_blocked_today
       - sensor.pihole_dns_queries_cached
@@ -40,6 +51,9 @@ group:
       - sensor.pihole_seen_clients
       - sensor.pihole_dns_unique_domains
       - sensor.pihole_domains_blocked
+      - sensor.hline_1
+      - input_select.pihole_time
+      - input_boolean.enable_pihole
 
 sensor:
   - platform: pi_hole
@@ -70,6 +84,9 @@ script:
     alias: Enable Pi-hole
     sequence:
       service: shell_command.pihole_enable
+
+input_boolean:
+  enable_pihole:
 
 input_select:
   pihole_time:
@@ -102,8 +119,8 @@ automation:
         entity_id: script.enable_pihole
       - platform: state
         entity_id: sensor.pihole_status
-        from: "disabled"
-        to: "enabled"
+        from: "Disabled"
+        to: "Enabled"
     action:
       service: input_select.select_option
       data:

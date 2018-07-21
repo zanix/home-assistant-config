@@ -1,0 +1,186 @@
+###########################################################
+# Package: Computer
+###########################################################
+
+homeassistant:
+  customize:
+    switch.athos_power_on:
+      icon: mdi:power
+
+    input_boolean.athos_tiles:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 8
+        row_height: 50px
+        gap: 8px
+        icon_size: 32px
+        entities:
+          - entity: switch.athos_sleep
+            # label: "Sleep"
+            icon: mdi:sleep
+            column: 2
+            column_span: 2
+          - entity: switch.athos_lock
+            # label: "Lock"
+            icon: mdi:lock
+            column_span: 2
+          - entity: switch.athos_mute
+            # label: "Mute"
+            icon: mdi:volume-off
+            color_on: var(--google-red-500)
+            color_off: var(--google-green-500)
+            column: 7
+
+          - entity: switch.athos_power_on
+            # label: "Turn On"
+            icon: mdi:power
+            column_span: 2
+            column: 2
+          - entity: switch.athos_reboot
+            # label: "Reboot"
+            icon: mdi:reload
+            column_span: 2
+          - entity: switch.athos_power_off
+            # label: "Turn Off"
+            icon: mdi:power-off
+            column_span: 2
+
+recorder:
+  exclude:
+    entities:
+      - input_boolean.athos_tiles
+
+influxdb:
+  exclude:
+    entities:
+      - input_boolean.athos_tiles
+
+group:
+  computers_view:
+    name: Computers
+    view: yes
+    icon: mdi:desktop-tower
+    entities:
+      - group.computer_athos
+
+  computer_athos:
+    name: Athos
+    icon: mdi:desktop-tower
+    control: hidden
+    entities:
+      - sensor.device_athos
+      - input_number.athos_volume
+      - input_boolean.athos_tiles
+
+input_boolean:
+  athos_tiles:
+
+switch:
+# power control
+  - platform: wake_on_lan
+    name: Athos Power On
+    mac_address: !secret wol_athos_mac
+    host: !secret host_athos
+    turn_off:
+      - service: switch.turn_on
+        entity_id: switch.athos_sleep
+  - platform: mqtt
+    name: "Athos Sleep"
+    icon: mdi:sleep
+    state_topic: "computer/athos/power/status"
+    command_topic: "computer/athos/power/sleep"
+    payload_on: "1"
+    payload_off: "0"
+  - platform: mqtt
+    name: "Athos Reboot"
+    icon: mdi:reload
+    state_topic: "computer/athos/power/status"
+    command_topic: "computer/athos/power/reboot"
+    payload_on: "1"
+    payload_off: "0"
+  - platform: mqtt
+    name: "Athos Power Off"
+    icon: mdi:power
+    state_topic: "computer/athos/power/status"
+    command_topic: "computer/athos/power/shutdown"
+    payload_on: "1"
+    payload_off: "0"
+  - platform: mqtt
+    name: "Athos Lock"
+    icon: mdi:lock
+    state_topic: "computer/athos/power/status"
+    command_topic: "computer/athos/power/lock"
+    payload_on: "1"
+    payload_off: "0"
+# media
+  - platform: mqtt
+    name: "Athos Mute"
+    icon: mdi:volume-off
+    state_topic: "computer/athos/media/mute"
+    command_topic: "computer/athos/media/mute/set"
+    payload_on: "1"
+    payload_off: "0"
+
+sensor:
+  - platform: mqtt
+    state_topic: "computer/athos/media/volume"
+    name: "Athos Volume"
+    icon: mdi:volume-low
+    value_template: "{{ value | int }}"
+    unit_of_measurement: "%"
+
+input_number:
+  athos_volume:
+    name: Volume Level
+    icon: mdi:volume-low
+    min: 0
+    max: 100
+    step: 1
+    unit_of_measurement: "%"
+
+automation:
+  - alias: "[Athos] Wake on Harmony Computer Activity"
+    trigger:
+      - platform: state
+        entity_id: sensor.remote_family_room
+        to: "Computer"
+    action:
+      - service: switch.turn_on
+        entity_id: switch.athos_power_on
+
+  - alias: "[Athos] Sleep on Harmony Power Off"
+    trigger:
+      platform: state
+      entity_id: sensor.remote_family_room
+      to: "Power Off"
+    condition:
+      - condition: state
+        entity_id: sensor.device_athos
+        state: "Online"
+    action:
+      - service: switch.turn_on
+        entity_id: switch.athos_sleep
+
+  - alias: "[Athos] Set Volume"
+    hide_entity: true
+    trigger:
+      - platform: state
+        entity_id: input_number.athos_volume
+    action:
+      - service: mqtt.publish
+        data_template:
+          payload: "{{ trigger.to_state.state | int }}"
+          topic: "computer/athos/media/volume/set"
+
+  - alias: "[Athos] Volume Changed"
+    hide_entity: true
+    trigger:
+      # We can't use the mqtt topic since it includes the % sign
+      - platform: state
+        entity_id: sensor.athos_volume
+    action:
+      - delay: "00:00:20"
+      - service: input_number.set_value
+        data_template:
+          entity_id: input_number.athos_volume
+          value: "{{ states('sensor.athos_volume') | int }}"
