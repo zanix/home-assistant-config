@@ -1,0 +1,238 @@
+###########################################################
+# Package: Media Player
+###########################################################
+
+homeassistant:
+  customize:
+    media_player.yamaha_receiver:
+      friendly_name: Yamaha Receiver
+      icon: mdi:music-box
+
+    media_player.yamaha_receiver_zone_2:
+      friendly_name: Yamaha Receiver Zone 2
+      icon: mdi:music-box
+      hidden: true
+
+    media_player.onkyo_receiver:
+      friendly_name: Onkyo Receiver
+      icon: mdi:music-box
+
+    media_player.onkyo_receiver_zone_2:
+      friendly_name: Onkyo Receiver Zone 2
+      icon: mdi:music-box
+      hidden: true
+
+    media_player.onkyo_receiver_zone_3:
+      friendly_name: Onkyo Receiver Zone 3
+      icon: mdi:music-box
+      hidden: true
+
+    media_player.plex_bedroom:
+      friendly_name: Plex [Bedroom]
+      icon: mdi:plex
+
+    media_player.plex_living_room:
+      friendly_name: Plex [Living Room]
+      icon: mdi:plex
+
+    media_player.plex_family_room:
+      friendly_name: Plex [Family Room]
+      icon: mdi:plex
+
+    media_player.media_player.plex_roku_hd__18c23a043785:
+      friendly_name: Plex [Roku HD]
+      icon: mdi:plex
+
+    media_player.family_room:
+      friendly_name: Family Room
+
+    media_player.bedroom:
+      friendly_name: Cast [Bedroom]
+
+    media_player.living_room:
+      friendly_name: Cast [Living Room]
+
+    media_player.living_room_speaker:
+      friendly_name: Cast [Living Room Speaker]
+
+    media_player.mechanixcast:
+      friendly_name: Cast [Family Room]
+
+    sensor.plex:
+      hidden: true
+
+media_player:
+  - platform: onkyo
+    host: !secret media_player_onkyo_host
+    sources:
+      tv-cd: "TV"
+
+  - platform: plex
+    entity_namespace: plex
+    scan_interval: 5
+
+  - platform: roku
+    host: !secret media_player_roku_host
+
+  - platform: yamaha
+    host: !secret media_player_yamaha_host
+    source_ignore:
+      - "AUDIO1"
+      - "AUDIO2"
+      - "AUX"
+      - "AV2"
+      - "AV3"
+      - "AV4"
+      - "AV5"
+      - "AV6"
+      - "HDMI2"
+      - "HDMI3"
+      - "HDMI4"
+      - "HDMI5"
+      - "NET RADIO"
+      - "Napster"
+      - "Rhapsody"
+      - "SiriusXM"
+      - "Spotify"
+    source_names:
+      AV1: "TV"
+    zone_ignore:
+      - "Zone_2"
+
+group:
+  media_view:
+    name: Media
+    view: yes
+    icon: mdi:play-circle
+    entities:
+      - group.media_living_room
+      - group.media_family_room
+      - group.media_bedroom
+      - media_player.plex_roku_hd__18c23a043785
+
+  media_living_room:
+    name: Living Room Media
+    control: hidden
+    icon: mdi:play-circle-outline
+    entities:
+      - sensor.remote_living_room
+      - input_select.remote_living_room
+      - media_player.plex_living_room
+      - media_player.living_room
+      - media_player.onkyo_receiver
+  media_family_room:
+    name: Family Room Media
+    control: hidden
+    icon: mdi:play-circle-outline
+    entities:
+      - sensor.remote_family_room
+      - input_select.remote_family_room
+      - media_player.plex_family_room
+      - media_player.family_room
+      - media_player.mechanixcast
+      - media_player.yamaha_receiver
+  media_bedroom:
+    name: Bedroom Media
+    control: hidden
+    icon: mdi:play-circle-outline
+    entities:
+      - sensor.remote_bedroom
+      - input_select.remote_bedroom
+      - media_player.plex_bedroom
+      - media_player.bedroom
+
+sensor:
+  - platform: plex
+    host: !secret plex_host
+
+automation:
+  - alias: "[Media] Shield Living Room Playing at Night"
+    initial_state: false
+    trigger:
+      - platform: state
+        entity_id: media_player.plex_living_room
+        from: "idle"
+        to: "playing"
+      - platform: state
+        entity_id: media_player.plex_living_room
+        from: "paused"
+        to: "playing"
+    condition:
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon"
+      - condition: or
+        conditions:
+        - condition: template
+          value_template: "{{ states.media_player.plex_living_room.attributes.media_content_type == 'tvshow' }}"
+        - condition: template
+          value_template: "{{ states.media_player.plex_living_room.attributes.media_content_type == 'movie' }}"
+    action:
+      - service: homeassistant.turn_on
+        entity_id: light.living_room_level
+        data:
+          brightness: 20
+          transition: 5
+
+  - alias: "[Media] Family Room Auto Off"
+    initial_state: false
+    trigger:
+      - platform: state
+        entity_id: media_player.family_room
+        to: "home"
+    condition:
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon"
+    action:
+      - delay: "00:10:00"
+      - service: remote.turn_off
+        entity_id: remote.family_room
+      - service: input_select.select_option
+        entity_id: input_select.remote_family_room
+        data_template:
+          option: Select Activity
+
+  - alias: "[Media] Shield Living Room Paused at Night"
+    initial_state: false
+    trigger:
+      - platform: state
+        entity_id: media_player.plex_living_room
+        from: "playing"
+        to: "paused"
+    condition:
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon"
+      - condition: or
+        conditions:
+        - condition: template
+          value_template: "{{ states.media_player.plex_living_room.attributes.media_content_type == 'tvshow' }}"
+        - condition: template
+          value_template: "{{ states.media_player.plex_living_room.attributes.media_content_type == 'movie' }}"
+    action:
+      - service: homeassistant.turn_on
+        entity_id: light.living_room_level
+        data:
+          brightness: 80
+          transition: 10
+
+  - alias: "[Media] Shield Bedroom Auto Off"
+    initial_state: false
+    trigger:
+      - platform: state
+        entity_id: media_player.plex_bedroom
+        from: "playing"
+        to: "idle"
+    condition:
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon"
+    action:
+      - delay: "00:10:00"
+      - service: remote.turn_off
+        entity_id: remote.bedroom
+      - service: input_select.select_option
+        entity_id: input_select.remote_bedroom
+        data_template:
+          option: Select Activity

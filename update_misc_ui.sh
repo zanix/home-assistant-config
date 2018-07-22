@@ -62,5 +62,10 @@ fi
 
 check_dir "www/custom_ui"
 
+# Hline
+get_file state-card-hline.html https://raw.githubusercontent.com/covrig/homeassistant-hline/master/www/custom_ui/state-card-hline.html www/custom_ui/
+get_file state-card-hline_es5.html https://raw.githubusercontent.com/covrig/homeassistant-hline/master/www/custom_ui/state-card-hline_es5.html www/custom_ui/
+
+# Tiles
 get_file state-card-tiles.html https://raw.githubusercontent.com/c727/home-assistant-tiles/master/www/custom_ui/state-card-tiles.html www/custom_ui/
 get_file state-card-tiles_es5.html https://raw.githubusercontent.com/c727/home-assistant-tiles/master/www/custom_ui/state-card-tiles_es5.html www/custom_ui/
