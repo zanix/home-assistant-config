@@ -45,15 +45,58 @@ homeassistant:
             icon: mdi:power-off
             column_span: 2
 
+    switch.erebus_turn_on:
+      icon: mdi:power
+
+    input_boolean.erebus_tiles:
+      custom_ui_state_card: state-card-tiles
+      config:
+        columns: 8
+        row_height: 50px
+        gap: 8px
+        icon_size: 32px
+        entities:
+          - entity: switch.erebus_sleep
+            # label: "Sleep"
+            icon: mdi:sleep
+            column: 2
+            column_span: 2
+          - entity: switch.erebus_lock
+            # label: "Lock"
+            icon: mdi:lock
+            column_span: 2
+          - entity: switch.erebus_mute
+            # label: "Mute"
+            icon: mdi:volume-off
+            color_on: var(--google-red-500)
+            color_off: var(--google-green-500)
+            column: 7
+
+          - entity: switch.erebus_turn_on
+            # label: "Turn On"
+            icon: mdi:power
+            column_span: 2
+            column: 2
+          - entity: switch.erebus_reboot
+            # label: "Reboot"
+            icon: mdi:reload
+            column_span: 2
+          - entity: switch.erebus_turn_off
+            # label: "Turn Off"
+            icon: mdi:power-off
+            column_span: 2
+
 recorder:
   exclude:
     entities:
       - input_boolean.athos_tiles
+      - input_boolean.erebus_tiles
 
 influxdb:
   exclude:
     entities:
       - input_boolean.athos_tiles
+      - input_boolean.erebus_tiles
 
 group:
   computers_view:
@@ -62,6 +105,7 @@ group:
     icon: mdi:desktop-tower
     entities:
       - group.computer_athos
+      - group.computer_erebus
       - group.pihole
 
   computer_athos:
@@ -73,8 +117,18 @@ group:
       - input_number.athos_volume
       - input_boolean.athos_tiles
 
+  computer_erebus:
+    name: Erebus
+    icon: mdi:desktop-tower
+    control: hidden
+    entities:
+      - sensor.device_erebus
+      # - input_number.erebus_volume
+      - input_boolean.erebus_tiles
+
 input_boolean:
   athos_tiles:
+  erebus_tiles:
 
 switch:
 # power control
@@ -122,6 +176,51 @@ switch:
     payload_on: "1"
     payload_off: "0"
 
+# power control
+  - platform: wake_on_lan
+    name: Erebus Turn On
+    mac_address: !secret wol_erebus_mac
+    host: !secret host_erebus
+    turn_off:
+      - service: switch.turn_on
+        entity_id: switch.erebus_sleep
+  - platform: mqtt
+    name: "Erebus Sleep"
+    icon: mdi:sleep
+    state_topic: "computer/erebus/power/status"
+    command_topic: "computer/erebus/power/sleep"
+    payload_on: "1"
+    payload_off: "0"
+  - platform: mqtt
+    name: "Erebus Reboot"
+    icon: mdi:reload
+    state_topic: "computer/erebus/power/status"
+    command_topic: "computer/erebus/power/reboot"
+    payload_on: "1"
+    payload_off: "0"
+  - platform: mqtt
+    name: "Erebus Turn Off"
+    icon: mdi:power
+    state_topic: "computer/erebus/power/status"
+    command_topic: "computer/erebus/power/shutdown"
+    payload_on: "1"
+    payload_off: "0"
+  - platform: mqtt
+    name: "Erebus Lock"
+    icon: mdi:lock
+    state_topic: "computer/erebus/power/status"
+    command_topic: "computer/erebus/power/lock"
+    payload_on: "1"
+    payload_off: "0"
+# media
+  - platform: mqtt
+    name: "Erebus Mute"
+    icon: mdi:volume-off
+    state_topic: "computer/erebus/media/mute"
+    command_topic: "computer/erebus/media/mute/set"
+    payload_on: "1"
+    payload_off: "0"
+
 sensor:
   - platform: mqtt
     state_topic: "computer/athos/media/volume"
@@ -129,6 +228,13 @@ sensor:
     icon: mdi:volume-low
     value_template: "{{ value | int }}"
     unit_of_measurement: "%"
+
+  # - platform: mqtt
+  #   state_topic: "computer/erebus/media/volume"
+  #   name: "Erebus Volume"
+  #   icon: mdi:volume-low
+  #   value_template: "{{ value | int }}"
+  #   unit_of_measurement: "%"
 
 input_number:
   athos_volume:
@@ -139,8 +245,16 @@ input_number:
     step: 1
     unit_of_measurement: "%"
 
+  # erebus_volume:
+  #   name: Volume Level
+  #   icon: mdi:volume-low
+  #   min: 0
+  #   max: 100
+  #   step: 1
+  #   unit_of_measurement: "%"
+
 automation:
-  - alias: "[Athos] Wake on Harmony Computer Activity"
+  - alias: "[Athos] Power on Harmony Computer Activity"
     trigger:
       - platform: state
         entity_id: sensor.remote_family_room
@@ -185,3 +299,19 @@ automation:
         data_template:
           entity_id: input_number.athos_volume
           value: "{{ states('sensor.athos_volume') | int }}"
+
+  - alias: "[Erebus] Power on for Work"
+    trigger:
+      - platform: time
+        at: "08:55:00"
+    condition:
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+    action:
+      - service: switch.turn_on
+        entity_id: switch.erebus_turn_on
