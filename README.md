@@ -89,6 +89,77 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - See automation folder and automation blocks within packages
 
+### Computer Control
+
+- Power on when Harmony activity is on "Computer"
+- Power on office computer for work
+- Set and update volume
+- Sleep on when Harmony activity is "Power Off"
+
+### Delivery
+
+- Notify when packages out for delivery
+- Notify when packages are delivered
+
+### Harmony
+
+- Set Harmony activity when selected
+
+### Lights
+
+- front lights off at night
+- front lights on at night
+- Set brightness on all office lights
+- Turn off all lights when away
+- Turn on some lights when arriving
+
+### Lock
+
+- Lock front door at night
+- Lock front door when away
+- Re-lock front door after unlock
+- Revoke one time use code when used
+- Set pass code when keypad is switched on
+- Revoke pass code when keypad is switched off
+- Set temporary pass code on set date start
+- Revoke temporary pass code on set date end
+
+### Media Control
+
+- (Initially disabled) Family room auto off
+- (Initially disabled) Shield bedroom auto off
+- (Initially disabled) Shield living room paused at night
+- (Initially disabled) Shield living room playing at night
+
+### Notifications
+
+- Door was left open
+- Door was left open and leaving
+- Door opened and away
+- Garage door was left open
+- Garage door was left open and leaving
+- Garage door opened and away
+
+### Pi-hole
+
+- Disable when time is selected
+- Reset disable time after re-enabled
+
+### Ring
+
+- Notify when front door motion is detected
+- Notify when front door rings
+
+### System
+
+- Clear tts cache
+- Notify on failed login
+- Notify on low battery
+- Notify when SD card space reaches 90%
+- Set theme at startup
+- Notify when update is available
+- Z-wave heal at night
+
 ## Things to Buy
 
 - [Amazon Dash Buttons](https://www.amazon.com/dp/B01F6ETRNA)
