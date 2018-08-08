@@ -5,8 +5,7 @@
 
 homeassistant:
   customize:
-    lock.lock_front_locked:
-      friendly_name: Front Door
+    lock.lock_front:
       extra_data_template: >
         ${entities['sensor.lock_front_status'].state}
       extra_badge:
@@ -29,9 +28,9 @@ homeassistant:
           mdi:lock-reset
         {% elif is_state('sensor.lock_front_alarm_type', '161') %}
           mdi:lock-alert
-        {% elif states('lock.lock_front_locked') == "locked" %}
+        {% elif states('lock.lock_front') == "locked" %}
           mdi:lock
-        {% elif states('lock.lock_front_locked') == "unlocked" %}
+        {% elif states('lock.lock_front') == "unlocked" %}
           mdi:lock-open
         {% else %}
           mdi:lock-question
@@ -42,7 +41,7 @@ homeassistant:
       icon: mdi:lock-smart
 
     # Apply Custom UI
-    "lock.lock_*_locked":
+    "lock.lock_*":
       custom_ui_state_card: state-card-custom-ui
       confirm_controls_show_lock: true
 
@@ -203,7 +202,7 @@ group:
   locks:
     name: Locks
     entities:
-      - lock.lock_front_locked
+      - lock.lock_front
       - sensor.lock_front_status
 
   lock_keypad_1:
@@ -537,9 +536,9 @@ sensor:
             Lock Jammed
           {% elif is_state('sensor.lock_front_alarm_type', '161') %}
             Tamper Alarm
-          {% elif states('lock.lock_front_locked') == "locked" %}
+          {% elif states('lock.lock_front') == "locked" %}
             Locked
-          {% elif states('lock.lock_front_locked') == "unlocked" %}
+          {% elif states('lock.lock_front') == "unlocked" %}
             Unlocked
           {% else %}
             Unknown
@@ -561,9 +560,9 @@ sensor:
             mdi:lock-reset
           {% elif is_state('sensor.lock_front_alarm_type', '161') %}
             mdi:lock-alert
-          {% elif states('lock.lock_front_locked') == "locked" %}
+          {% elif states('lock.lock_front') == "locked" %}
             mdi:lock
-          {% elif states('lock.lock_front_locked') == "unlocked" %}
+          {% elif states('lock.lock_front') == "unlocked" %}
             mdi:lock-open
           {% else %}
             mdi:lock-question
@@ -998,25 +997,39 @@ input_boolean:
     name: Front Lock
 
 automation:
+  - alias: "[Lock] Front Door Lock Jammed"
+    trigger:
+      - platform: state
+        entity_id: sensor.lock_front_alarm_type
+        to: "9"
+    action:
+      - service: notify.join_users
+        data_template:
+          title: Front Door Lock Jammed
+          message: "The front door lock is jammed and needs to be locked manually."
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+
   - alias: "[Lock] Front Door Lock at Night"
     trigger:
       - platform: time
         at: "21:00:00"
     condition:
       - condition: state
-        entity_id: lock.lock_front_locked
+        entity_id: lock.lock_front
         state: "unlocked"
       - condition: state
         entity_id: sensor.door_front
         state: "Closed"
     action:
       - service: lock.lock
-        entity_id: lock.lock_front_locked
+        entity_id: lock.lock_front
 
   - alias: "[Lock] Front Door Re-lock after Unlock"
     trigger:
       - platform: state
-        entity_id: lock.lock_front_locked
+        entity_id: lock.lock_front
         to: "unlocked"
         for:
           minutes: 2
@@ -1029,7 +1042,7 @@ automation:
         state: "Closed"
     action:
       - service: lock.lock
-        entity_id: lock.lock_front_locked
+        entity_id: lock.lock_front
 
   - alias: "[Lock] Front Door Lock when Away"
     trigger:
@@ -1041,11 +1054,11 @@ automation:
         after: "09:00:00"
         before: "21:00:00"
       - condition: state
-        entity_id: lock.lock_front_locked
+        entity_id: lock.lock_front
         state: "unlocked"
     action:
       - service: lock.lock
-        entity_id: lock.lock_front_locked
+        entity_id: lock.lock_front
       - service: notify.join_users
         data_template:
           title: Front Door Lock
@@ -1083,7 +1096,7 @@ automation:
           node_id: >-
             {% set object_id = trigger.to_state.object_id %}
             {% set lock_name = object_id.split('_')[4] %}
-            {% set lock_id = 'lock_' ~ lock_name ~ '_locked' %}
+            {% set lock_id = 'lock_' ~ lock_name %}
             {{ states['lock'][lock_id].attributes.node_id }}
           code_slot: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -1124,7 +1137,7 @@ automation:
           node_id: >-
             {% set object_id = trigger.to_state.object_id %}
             {% set lock_name = object_id.split('_')[4] %}
-            {% set lock_id = 'lock_' ~ lock_name ~ '_locked' %}
+            {% set lock_id = 'lock_' ~ lock_name %}
             {{ states['lock'][lock_id].attributes.node_id }}
           code_slot: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -1160,7 +1173,7 @@ automation:
       - service: lock.set_usercode
         data_template:
           node_id: >-
-            {{ states['lock']['lock_front_locked'].attributes.node_id }}
+            {{ states['lock']['lock_front'].attributes.node_id }}
           code_slot: >-
             {% set object_id = trigger.to_state.object_id %}
             {% set code_slot = object_id.split('_')[1] %}
@@ -1209,7 +1222,7 @@ automation:
       - service: lock.set_usercode
         data_template:
           node_id: >-
-            {{ states['lock']['lock_front_locked'].attributes.node_id }}
+            {{ states['lock']['lock_front'].attributes.node_id }}
           code_slot: >-
             {% set object_id = trigger.to_state.object_id %}
             {% set code_slot = object_id.split('_')[1] %}
@@ -1260,7 +1273,7 @@ automation:
       - service: lock.set_usercode
         data_template:
           node_id: >-
-            {{ states['lock']['lock_front_locked'].attributes.node_id }}
+            {{ states['lock']['lock_front'].attributes.node_id }}
           code_slot: >-
             {% set code_slot = trigger.to_state.state %}
             {{ code_slot }}
