@@ -24,11 +24,11 @@ if entity_id is not None and (brightness is not None or brightness_pct is not No
     light = hass.states.get(entity_id)
 
     start_level = light.attributes.get('brightness', 0)
-    transition = data.get('transition', 0)
+    transition = int(data.get('transition', 0))
 
     """ Use brightness or convert brightness_pct """
     end_level = int(brightness) if brightness is not None else math.ceil(
-        brightness_pct * 2.55)
+        float(brightness_pct) * 2.55)
 
     """ Calculate number of steps """
     steps = int(math.fabs((start_level - end_level)))
