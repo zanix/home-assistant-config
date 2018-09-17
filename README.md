@@ -67,6 +67,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/)
 - [TCL Roku TV](https://www.bestbuy.com/site/tcl-55-class-54-6-diag--led-2160p-smart-4k-ultra-hd-tv-with-high-dynamic-range-roku-tv/5878705.p?skuId=5878705)
 - [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/) x2
+- [Roku Streaming Stick](https://www.amazon.com/gp/product/B075XN5L53/)
 - [ChromeCast](https://www.google.com/chromecast/)
 - [Harmony Hub](https://www.amazon.com/gp/product/B00BQ5RYI4/) x3
 - [Plex](https://plex.tv)
