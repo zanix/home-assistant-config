@@ -22,6 +22,15 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Tiles custom state card](https://github.com/c727/home-assistant-tiles), updates via `update_tiles_ui.sh`
 - [Floorplan](https://community.home-assistant.io/c/third-party/floorplan), interactive floorplan
 
+### Custom Lovelace Elements
+
+- [Lovelace Custom Cards](https://github.com/ciotlosm/custom-lovelace) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
+- [Animated Weather Card](https://github.com/arsaboo/homeassistant-config) ([Forum](https://community.home-assistant.io/t/custom-dark-sky-animated-weather-card/59816)) - Custom animated weather card
+- [Button card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
+- [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
+- [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
+- [Vertical Stack In Card](https://github.com/custom-cards/vertical-stack-in-card) - Similar to vertical-stack but removes card borders
+
 ### Custom Components
 
 - [Attributes as Sensors](https://github.com/pilotak/HomeAssistant-CustomComponents) - Allows the creation of a sensor that breaks out attribute of defined entities. I use this to separate `battery_level` attributes into their own sensors
