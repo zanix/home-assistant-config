@@ -71,6 +71,17 @@ group:
       - camera.front_door
 
 automation:
+  # - alias: Ring Video Download
+  #   trigger:
+  #     platform: template
+  #     value_template: "{{ is_state_attr('sensor.ring_front_door_last_motion', 'recording_status', 'ready') }}"
+  #   action:
+  #     service: downloader.download_file
+  #     data_template:
+  #       url: "{{ camera.front_door.attributes.video_url }}"
+  #       filename: latest.mp4
+  #       overwrite: true
+
   - alias: "[Ring] Front Door Motion"
     trigger:
       - platform: state
@@ -105,7 +116,43 @@ automation:
             icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/doorbell-video.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
 
-  # - alias: "[Ring] Turn Exterior Lights to 100% when Rung after 9PM"
+  - alias: "[Ring] Turn on Front Light when Motion Detected at Night"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.ring_front_door_motion
+        from: "off"
+        to: "on"
+    condition:
+      - condition: time
+        after: "22:30:00"
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon"
+    action:
+      - service: homeassistant.turn_on
+        entity_id: switch.outside_front_light
+
+  - alias: "[Ring] Turn off Front Light after Motion Detected at Night"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.ring_front_door_motion
+        from: "on"
+        to: "off"
+        for:
+          hours: 0
+          minutes: 10
+          seconds: 0
+    condition:
+      - condition: time
+        after: "22:30:00"
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon"
+    action:
+      - service: homeassistant.turn_off
+        entity_id: switch.outside_front_light
+
+  # - alias: "[Ring] Turn Front Light when Rung at Night"
   #   trigger:
   #     - platform: state
   #       entity_id: binary_sensor.ring_front_door_ding
@@ -113,7 +160,7 @@ automation:
   #       to: "on"
   #   condition:
   #     - condition: time
-  #       after: "21:00:00"
+  #       after: "22:30:00"
   #     - condition: state
   #       entity_id: sun.sun
   #       state: "below_horizon"
@@ -123,7 +170,7 @@ automation:
   #       data:
   #         brightness: 254
 
-  # - alias: "[Ring] Reset Exterior Lights to 35% after Ring at NightM"
+  # - alias: "[Ring] Reset Front Light to 35% after Ring at Night"
   #   trigger:
   #     - platform: state
   #       entity_id: binary_sensor.ring_front_door_ding
@@ -131,7 +178,7 @@ automation:
   #       to: "off"
   #       for:
   #         hours: 0
-  #         minutes: 30
+  #         minutes: 10
   #         seconds: 0
   #   condition:
   #     - condition: time
@@ -146,7 +193,7 @@ automation:
   #         brightness: 85
   #         transition: 60
 
-  # - alias: "[Ring] Turn Exterior Lights to 100% when Motion Detected at Night"
+  # - alias: "[Ring] Turn Front Light to 100% when Motion Detected at Night"
   #   trigger:
   #     - platform: state
   #       entity_id: binary_sensor.ring_front_door_motion
@@ -154,7 +201,7 @@ automation:
   #       to: "on"
   #   condition:
   #     - condition: time
-  #       after: "21:00:00"
+  #       after: "22:30:00"
   #     - condition: state
   #       entity_id: sun.sun
   #       state: "below_horizon"
@@ -164,7 +211,7 @@ automation:
   #       data:
   #         brightness: 254
 
-  # - alias: "[Ring] Reset Exterior Lights to 35% after Motion Detected at Night"
+  # - alias: "[Ring] Reset Front Light to 35% after Motion Detected at Night"
   #   trigger:
   #     - platform: state
   #       entity_id: binary_sensor.ring_front_door_motion
@@ -172,11 +219,11 @@ automation:
   #       to: "off"
   #       for:
   #         hours: 0
-  #         minutes: 30
+  #         minutes: 10
   #         seconds: 0
   #   condition:
   #     - condition: time
-  #       after: "21:00:00"
+  #       after: "22:30:00"
   #     - condition: state
   #       entity_id: sun.sun
   #       state: "below_horizon"
