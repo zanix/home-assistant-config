@@ -37,7 +37,7 @@ if entity_id is not None and (brightness is not None or brightness_pct is not No
     """ Calculate the delay time """
     delay = round(transition / steps, 3)
 
-    """ Disable delay anbd increase stepping if delay < 3/4 second """
+    """ Disable delay and increase stepping if delay < 3/4 second """
     if (delay < .750):
         delay = 0
         steps = int(steps / 5)
