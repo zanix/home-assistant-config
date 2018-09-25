@@ -19,9 +19,6 @@ homeassistant:
       icon: mdi:lightbulb
 
   customize:
-    script.office_light_color:
-      hidden: true
-
     zwave.living_room:
       icon: mdi:lightbulb
 
@@ -114,22 +111,6 @@ homeassistant:
     #     off_when_min: false
     #     report_when_not_changed: false
 
-history:
-  exclude:
-    entities:
-      - input_number.office_light_brightness
-
-recorder:
-  exclude:
-    entities:
-      - script.office_light_color
-
-influxdb:
-  exclude:
-    entities:
-      - input_number.office_light_brightness
-      - script.office_light_color
-
 group:
   lights_view:
     name: Lights
@@ -162,15 +143,11 @@ group:
       - switch.basement_hallway_light
 
   lights_office:
-    name: Office Light
+    name: Office Lights
     entities:
       - light.office_lamp
       - sensor.hline_1
-      - light.office_1
-      - light.office_2
-      - light.office_3
-      - sensor.hline_2
-      - input_number.office_light_brightness
+      - light.office_light
 
   lights_basement:
     name: Basement Lights
@@ -271,49 +248,15 @@ group:
       - switch.outside_side_light
       - switch.outside_back_light
 
-script:
-  office_light_color:
-    alias: "[Light] Office Color"
-    sequence:
-    - service: light.turn_on
-      data_template:
-        entity_id:
-          - light.office_1
-          - light.office_2
-          - light.office_3
-        color_temp: "{{ color_temp }}"
-        # brightness: "{{ brightness | default(states.light.office_1.attributes.brightness) }}"
-        # brightness_pct: "{{ brightness_pct | default('') }}"
-        transition: "{{ transition | default(2) }}"
-
-input_number:
-  office_light_brightness:
-    name: Brightness
-    icon: mdi:brightness-6
-    min: 1
-    max: 100
-    step: 1
-    unit_of_measurement: "%"
+light:
+  platform: group
+  name: Office Light
+  entities:
+    - light.office_1
+    - light.office_2
+    - light.office_3
 
 automation:
-  - alias: "[Lights] Set Office Brightness"
-    hide_entity: true
-    trigger:
-      - platform: state
-        entity_id: input_number.office_light_brightness
-    condition:
-      - condition: state
-        entity_id: group.lights_office
-        state: "on"
-    action:
-      - service: light.turn_on
-        entity_id:
-          - light.office_1
-          - light.office_2
-          - light.office_3
-        data_template:
-          brightness: "{{ (trigger.to_state.state | float * 2.55) | round }}"
-
   - alias: "[Lights] Front on at Night"
     trigger:
       - platform: sun
