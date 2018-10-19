@@ -75,7 +75,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Media
 
-- [Amazon Echo Dot](https://www.amazon.com/dp/B01DFKC2SO)
+- [Google Home Mini](https://store.google.com/us/product/google_home_mini?hl=en-US) x3
 - [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/)
 - [TCL Roku TV](https://www.bestbuy.com/site/tcl-55-class-54-6-diag--led-2160p-smart-4k-ultra-hd-tv-with-high-dynamic-range-roku-tv/5878705.p?skuId=5878705)
 - [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/) x2
