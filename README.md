@@ -15,15 +15,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - [Mosquitto broker](https://www.home-assistant.io/addons/mosquitto/) - MQTT Broker
 
-### Custom UI Elements
+### Custom Elements
 
-- [Custom UI elements](https://github.com/andrey-git/home-assistant-custom-ui), updates via `update_custom_ui.sh`
-- [Horizontal line state card](https://github.com/covrig/homeassistant-hline), updates via `update_hline_ui.sh`
-- [Tiles custom state card](https://github.com/c727/home-assistant-tiles), updates via `update_tiles_ui.sh`
 - [Floorplan](https://community.home-assistant.io/c/third-party/floorplan), interactive floorplan
-
-### Custom Lovelace Elements
-
 - [Custom Updater](https://github.com/custom-components/custom_updater) - A component which allows you to track and update custom cards/components and python_scripts
 - [Tracker Card](https://github.com/custom-cards/tracker-card) - Card to track updates for custom cards and custom components
 - [Lovelace Custom Cards](https://github.com/ciotlosm/custom-lovelace) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
@@ -85,7 +79,6 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Plex](https://plex.tv)
   - [Plex for Android TV](https://www.plex.tv/apps/streaming-devices/android-tv/)
   - [Plex for Roku TV](https://www.plex.tv/blog/roku-live-tv/)
-  - [Plex for Windows](https://www.plex.tv/apps/computer/windows/)
 
 ### Network
 
@@ -111,8 +104,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Delivery
 
-- Notify when packages out for delivery
-- Notify when packages are delivered
+- (Broken) Notify when packages out for delivery
+- (Broken) Notify when packages are delivered
 
 ### Harmony
 
@@ -120,8 +113,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Lights
 
-- front lights off at night
-- front lights on at night
+- Front lights off at night
+- Front lights on at night
 - Set brightness on all office lights
 - Turn off all lights when away
 - Turn on some lights when arriving
@@ -139,10 +132,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Media Control
 
-- (Initially disabled) Family room auto off
-- (Initially disabled) Shield bedroom auto off
-- (Initially disabled) Shield living room paused at night
-- (Initially disabled) Shield living room playing at night
+- (Disabled) Family room auto off
+- (Disabled) Shield bedroom auto off
+- (Disabled) Shield living room paused at night
+- (Disabled) Shield living room playing at night
 
 ### Notifications
 
