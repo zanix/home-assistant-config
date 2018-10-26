@@ -32,6 +32,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - [Attributes as Sensors](https://github.com/pilotak/HomeAssistant-CustomComponents) - Allows the creation of a sensor that breaks out attribute of defined entities. I use this to separate `battery_level` attributes into their own sensors
 - JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Used to gather solar production from SolarEdge
+- Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
 
 ## Devices
 
@@ -44,7 +45,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - GE Z-Wave Light Switch (12722) x5
 - [GE Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R) x4
 - GE Z-Wave Dimmer (12724) x2
-- [GE Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2) x2
+- [GE Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2) x3
 - [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK) x2
   - Hard-wired into lamps with local control using a [touch sensor](https://www.adafruit.com/product/1374) on the metal frame of a lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/) x4
@@ -113,8 +114,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Lights
 
-- Front lights off at night
-- Front lights on at night
+- Front lights on at sunset
+- Front lights 15% at 10:30pm
+- Front lights off at sunrise
 - Set brightness on all office lights
 - Turn off all lights when away
 - Turn on some lights when arriving
@@ -155,6 +157,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - Notify when front door motion is detected
 - Notify when front door rings
+- Front lights 100% on ring or motion
+- Front lights 15% after 10 minutes of ring or motion
 
 ### System
 

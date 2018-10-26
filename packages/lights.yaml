@@ -23,6 +23,9 @@ homeassistant:
     zwave.play_space:
       icon: mdi:lightbulb
 
+    zwave.outside_front:
+      icon: mdi:lightbulb
+
     # zwave.lamp_left:
     #   icon: mdi:lamp
 
@@ -95,7 +98,8 @@ group:
   lights_outside:
     name: Outside Lights
     entities:
-      - switch.outside_front_light
+      # - switch.outside_front_light
+      - light.outside_front
       - switch.outside_side_light
       - switch.outside_back_light
 
@@ -145,7 +149,8 @@ group:
       # - switch.bedroom2_light
       # - switch.bedroom3_light
       # - switch.bedroom4_light
-      - switch.outside_front_light
+      - light.outside_front
+      # - switch.outside_front_light
       - switch.outside_side_light
       - switch.outside_back_light
 
@@ -158,7 +163,7 @@ light:
     - light.office_3
 
 automation:
-  - alias: "[Lights] Front on at Night"
+  - alias: "[Lights] Front on at Sunset"
     trigger:
       - platform: sun
         event: sunset
@@ -167,18 +172,36 @@ automation:
       - condition: time
         before: "22:30:00"
     action:
-      - service: homeassistant.turn_on
-        entity_id: switch.outside_front_light
+      - service: light.turn_on
+        entity_id: light.outside_front
+        data:
+          brightness: 255
 
-  - alias: "[Lights] Front off at Night"
+  - alias: "[Lights] Front to 15% at 10:30p"
     trigger:
       - platform: time
         at: "22:30:00"
     action:
-      - service: homeassistant.turn_off
-        entity_id: switch.outside_front_light
+      # - service: light.turn_on
+      #   entity_id: light.outside_front
+      #   data:
+      #     brightness: 38
+      - service: python_script.zwave_fade
+        data:
+          entity_id: light.outside_front
+          brightness: 38
+          transition: 60
 
-  - alias: "[Lights] Turn on when Arrive"
+  - alias: "[Lights] Front off at Sunrise"
+    trigger:
+      - platform: sun
+        event: sunrise
+        offset: "+00:20:00"
+    action:
+      - service: light.turn_off
+        entity_id: light.outside_front
+
+  - alias: "[Lights] Great Room on when Arrive"
     trigger:
       - platform: state
         entity_id: group.people
@@ -196,7 +219,7 @@ automation:
       - service: light.turn_on
         entity_id: light.living_room
         data:
-          brightness: 50
+          brightness: 38
       - service: notify.join_users
         data_template:
           title: Welcome Home
@@ -208,7 +231,7 @@ automation:
       - service: homeassistant.turn_off
         entity_id: switch.garage_entry_light
 
-  - alias: "[Lights] Turn off when Away"
+  - alias: "[Lights] Turn all off when Away"
     trigger:
       - platform: state
         entity_id: group.people

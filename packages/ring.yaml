@@ -71,28 +71,11 @@ automation:
   #       filename: latest.mp4
   #       overwrite: true
 
-  - alias: "[Ring] Front Door Motion"
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.ring_front_door_motion
-        to: 'on'
-    condition:
-      - condition: template
-        value_template: '{{ states.remote.living_room.state != "off" }}'
-    action:
-      - service: notify.shield_living_room
-        data_template:
-          title: Door Bell
-          message: "There is motion at the Front Door"
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/run-fast.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
-
   - alias: "[Ring] Front Door Ring"
     trigger:
       - platform: state
         entity_id: binary_sensor.ring_front_door_ding
-        to: 'on'
+        to: "on"
     condition:
       - condition: template
         value_template: '{{ states.remote.living_room.state != "off" }}'
@@ -105,120 +88,113 @@ automation:
             icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/doorbell-video.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
 
-  - alias: "[Ring] Turn on Front Light when Motion Detected at Night"
+  - alias: "[Ring] Set Front Light to 100% when Rung at Night"
     trigger:
       - platform: state
-        entity_id: binary_sensor.ring_front_door_motion
-        from: "off"
+        entity_id: binary_sensor.ring_front_door_ding
         to: "on"
     condition:
-      - condition: time
-        after: "22:30:00"
-      - condition: state
-        entity_id: sun.sun
-        state: "below_horizon"
+      condition: or
+      conditions:
+        - condition: time
+          after: "22:30:00"
+        - condition: sun
+          before: sunrise
+          before_offset: "00:20:00"
     action:
-      - service: homeassistant.turn_on
-        entity_id: switch.outside_front_light
+      - service: light.turn_on
+        entity_id: light.outside_front
+        data:
+          brightness: 255
 
-  - alias: "[Ring] Turn off Front Light after Motion Detected at Night"
+  - alias: "[Ring] Reset Front Light to 15% after Ring at Night"
     trigger:
       - platform: state
-        entity_id: binary_sensor.ring_front_door_motion
-        from: "on"
+        entity_id: binary_sensor.ring_front_door_ding
         to: "off"
         for:
           hours: 0
           minutes: 10
           seconds: 0
     condition:
-      - condition: time
-        after: "22:30:00"
-      - condition: state
-        entity_id: sun.sun
-        state: "below_horizon"
+      condition: or
+      conditions:
+        - condition: time
+          after: "22:30:00"
+        - condition: sun
+          before: sunrise
+          before_offset: "00:20:00"
     action:
-      - service: homeassistant.turn_off
-        entity_id: switch.outside_front_light
+      # - service: light.turn_on
+      #   entity_id: light.outside_front
+      #   data:
+      #     brightness: 38
+      - service: python_script.zwave_fade
+        data:
+          entity_id: light.outside_front
+          brightness: 38
+          transition: 60
 
-  # - alias: "[Ring] Turn Front Light when Rung at Night"
-  #   trigger:
-  #     - platform: state
-  #       entity_id: binary_sensor.ring_front_door_ding
-  #       from: "off"
-  #       to: "on"
-  #   condition:
-  #     - condition: time
-  #       after: "22:30:00"
-  #     - condition: state
-  #       entity_id: sun.sun
-  #       state: "below_horizon"
-  #   action:
-  #     - service: light.turn_on
-  #       entity_id: group.exterior_lights
-  #       data:
-  #         brightness: 254
+  - alias: "[Ring] Front Door Motion"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.ring_front_door_motion
+        to: "on"
+    condition:
+      - condition: template
+        value_template: '{{ states.remote.living_room.state != "off" }}'
+    action:
+      - service: notify.shield_living_room
+        data_template:
+          title: Door Bell
+          message: "There is motion at the Front Door"
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/run-fast.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
 
-  # - alias: "[Ring] Reset Front Light to 35% after Ring at Night"
-  #   trigger:
-  #     - platform: state
-  #       entity_id: binary_sensor.ring_front_door_ding
-  #       from: "on"
-  #       to: "off"
-  #       for:
-  #         hours: 0
-  #         minutes: 10
-  #         seconds: 0
-  #   condition:
-  #     - condition: time
-  #       after: "21:00:00"
-  #     - condition: state
-  #       entity_id: sun.sun
-  #       state: "below_horizon"
-  #   action:
-  #     - service: light.turn_on
-  #       entity_id: group.exterior_lights
-  #       data:
-  #         brightness: 85
-  #         transition: 60
+  - alias: "[Ring] Set Front Light to 100% when Motion Detected at Night"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.ring_front_door_motion
+        to: "on"
+    condition:
+      condition: or
+      conditions:
+        - condition: time
+          after: "22:30:00"
+        - condition: sun
+          before: sunrise
+          before_offset: "00:20:00"
+    action:
+      - service: light.turn_on
+        entity_id: light.outside_front
+        data:
+          brightness: 255
 
-  # - alias: "[Ring] Turn Front Light to 100% when Motion Detected at Night"
-  #   trigger:
-  #     - platform: state
-  #       entity_id: binary_sensor.ring_front_door_motion
-  #       from: "off"
-  #       to: "on"
-  #   condition:
-  #     - condition: time
-  #       after: "22:30:00"
-  #     - condition: state
-  #       entity_id: sun.sun
-  #       state: "below_horizon"
-  #   action:
-  #     - service: light.turn_on
-  #       entity_id: group.exterior_lights
-  #       data:
-  #         brightness: 254
-
-  # - alias: "[Ring] Reset Front Light to 35% after Motion Detected at Night"
-  #   trigger:
-  #     - platform: state
-  #       entity_id: binary_sensor.ring_front_door_motion
-  #       from: "on"
-  #       to: "off"
-  #       for:
-  #         hours: 0
-  #         minutes: 10
-  #         seconds: 0
-  #   condition:
-  #     - condition: time
-  #       after: "22:30:00"
-  #     - condition: state
-  #       entity_id: sun.sun
-  #       state: "below_horizon"
-  #   action:
-  #     - service: light.turn_on
-  #       entity_id: group.exterior_lights
-  #       data:
-  #         brightness: 85
-  #         transition: 60
+  - alias: "[Ring] Reset Front Light to 15% after Motion Detected at Night"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.ring_front_door_motion
+        to: "off"
+        for:
+          hours: 0
+          minutes: 10
+          seconds: 0
+    condition:
+      condition: or
+      conditions:
+        - condition: time
+          after: "22:30:00"
+        - condition: sun
+          before: sunrise
+          before_offset: "00:20:00"
+    action:
+      # - service: light.turn_on
+      #   entity_id: light.outside_front
+      #   data:
+      #     brightness: 38
+      - service: python_script.zwave_fade
+        data:
+          entity_id: light.outside_front
+          brightness: 38
+          transition: 60

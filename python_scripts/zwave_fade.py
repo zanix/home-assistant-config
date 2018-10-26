@@ -9,11 +9,11 @@ automation:
     offset: "-01:00:00"
     action:
     - service: python_script.zwave_fade
-        data:
-          entity_id: light.level  # Entity ID to fade
-          transition: 20  # Seconds to go from current to end brightness
-          brightness: 255  # Brightness to end at
-          brightness_pct: 100  # Brightness to end at as a percentage
+      data:
+        entity_id: light.level  # Entity ID to fade
+        transition: 20          # Seconds to go from current to end brightness
+        brightness: 255         # Brightness to end at
+        brightness_pct: 100     # Brightness percentage to end at
 """
 
 entity_id = data.get('entity_id')
