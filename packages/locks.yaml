@@ -7,22 +7,32 @@ homeassistant:
   customize:
     lock.lock_front:
       icon_template: >
-        {% if is_state('sensor.lock_front_alarm_type', '19') %}
-          mdi:account-key
-        {% elif is_state('sensor.lock_front_alarm_type', '18') %}
-          mdi:lock-smart
-        {% elif is_state('sensor.lock_front_alarm_type', '21') %}
-          mdi:lock
-        {% elif is_state('sensor.lock_front_alarm_type', '22') %}
-          mdi:lock-open
-        {% elif is_state('sensor.lock_front_alarm_type', '24') %}
-          mdi:wifi-strength-4-lock
-        {% elif is_state('sensor.lock_front_alarm_type', '25') %}
-          mdi:wifi
-        {% elif is_state('sensor.lock_front_alarm_type', '9') %}
-          mdi:lock-reset
-        {% elif is_state('sensor.lock_front_alarm_type', '161') %}
-          mdi:lock-alert
+        {% set alarm_type_value = states('sensor.lock_front_alarm_type') %}
+        {% set alarm_type_icons = {
+          '0':'mdi:blur-radial',
+          '9':'mdi:lock-reset',
+          '17':'mdi:lock-reset',
+          '18':'mdi:lock-smart',
+          '19':'mdi:account-key',
+          '21':'mdi:lock',
+          '22':'mdi:lock-open',
+          '23':'mdi:lock-reset',
+          '24':'mdi:wifi-strength-4-lock',
+          '25':'mdi:wifi',
+          '26':'mdi:lock-reset',
+          '27':'mdi:lock-clock',
+          '32':'mdi:delete-sweep',
+          '33':'mdi:delete',
+          '112':'mdi:textbox-password',
+          '113':'mdi:content-duplicate',
+          '161':'mdi:lock-alert',
+          '162':'mdi:lock-clock',
+          '167':'mdi:battery-10',
+          '168':'mdi:battery-outline',
+          '169':'mdi:battery-alert',
+          } %}
+        {% if alarm_type_value in alarm_type_icons %}
+          {{ alarm_type_icons[alarm_type_value] }}
         {% elif states('lock.lock_front') == "locked" %}
           mdi:lock
         {% elif states('lock.lock_front') == "unlocked" %}
@@ -388,54 +398,75 @@ sensor:
     sensors:
       lock_front_status:
         friendly_name: Front Lock Status
-        value_template: >-
-          {% if is_state('sensor.lock_front_alarm_type', '19') %}
-            {% set code_slot = states('sensor.lock_front_alarm_level') %}
-            {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
-            {% set name = states['input_text'][name_input].state %}
-            {% if name in ['unknown', ''] %}
-              Unlocked with user code {{ code_slot }}
-            {% else %}
-              Unlocked by {{ name }}
-            {% endif %}
-          {% elif is_state('sensor.lock_front_alarm_type', '18') %}
-            Keypad Lock
-          {% elif is_state('sensor.lock_front_alarm_type', '21') %}
-            Manual Lock
-          {% elif is_state('sensor.lock_front_alarm_type', '22') %}
-            Manual Unlock
-          {% elif is_state('sensor.lock_front_alarm_type', '24') %}
-            Remote Lock
-          {% elif is_state('sensor.lock_front_alarm_type', '25') %}
-            Remote Unlock
-          {% elif is_state('sensor.lock_front_alarm_type', '9') %}
-            Lock Jammed
-          {% elif is_state('sensor.lock_front_alarm_type', '161') %}
-            Tamper Alarm
-          {% elif states('lock.lock_front') == "locked" %}
-            Locked
-          {% elif states('lock.lock_front') == "unlocked" %}
-            Unlocked
+        value_template: >
+          {% set number = states('sensor.lock_front_alarm_level') %}
+          {% set alarm_type_value = states('sensor.lock_front_alarm_type') %}
+          {% set entity_id = 'input_text.lock_keypad_' + number + '_name' %}
+          {% set user = 'Master' if number == '0' else states(entity_id) %}
+          {% set alarm_type_value = '24' if (as_timestamp(now())-as_timestamp(states.lock.lock_front.last_changed)) < 15 and (as_timestamp(now())-as_timestamp(states.sensor.lock_front_alarm_type.last_changed)) > 15  and (states.lock.lock_front.state) == 'locked' else alarm_type_value %}
+          {% set alarm_type_value = '25' if (as_timestamp(now())-as_timestamp(states.lock.lock_front.last_changed)) < 15 and (as_timestamp(now())-as_timestamp(states.sensor.lock_front_alarm_type.last_changed)) > 15  and (states.lock.lock_front.state) == 'unlocked' else alarm_type_value %}
+          {% set alarm_type_general_actions = {
+            '0':'No Status Reported',
+            '9':'Lock Jammed',
+            '17':'Keypad Lock Jammed',
+            '21':'Manual Lock',
+            '22':'Manual Unlock',
+            '23':'HA Lock Jammed',
+            '24':'HA Lock',
+            '25':'HA Unlock',
+            '26':'Auto Lock Jammed',
+            '27':'Auto Lock',
+            '32':'All Codes Deleted',
+            '161':'Bad Code Entered',
+            '167':'Battery Low',
+            '168':'Battery Critical',
+            '169':'Battery Too Low To Operate Lock' } %}
+          {% set alarm_type_lock_actions = {
+            '18':'Keypad Lock',
+            '19':'Keypad Unlock',
+            '162':'Lock Code Attempt Outside of Schedule' } %}
+          {% set alarm_type_code_actions = {
+            '33':'Code Deleted',
+            '112':'Code Changed',
+            '113':'Duplicate Code' } %}
+          {% if alarm_type_value in alarm_type_code_actions %}
+            {{ alarm_type_code_actions[alarm_type_value] }} (Code {{ number }})
+          {% elif alarm_type_value in alarm_type_lock_actions and number == '0' %}
+            {{ alarm_type_lock_actions[alarm_type_value] }} with Schlage Button
+          {% elif alarm_type_value in alarm_type_lock_actions %}
+            {{ alarm_type_lock_actions[alarm_type_value] }} by {{ user }} ({{ number }})
+          {% elif alarm_type_value in alarm_type_general_actions %}
+            {{ alarm_type_general_actions[alarm_type_value] }}
           {% else %}
-            Unknown
+            Unknown Alarm Type Value {{ states('sensor.lock_front_alarm_type') }}
           {% endif %}
         icon_template: >
-          {% if is_state('sensor.lock_front_alarm_type', '19') %}
-            mdi:account-key
-          {% elif is_state('sensor.lock_front_alarm_type', '18') %}
-            mdi:lock-smart
-          {% elif is_state('sensor.lock_front_alarm_type', '21') %}
-            mdi:lock
-          {% elif is_state('sensor.lock_front_alarm_type', '22') %}
-            mdi:lock-open
-          {% elif is_state('sensor.lock_front_alarm_type', '24') %}
-            mdi:wifi-strength-4-lock
-          {% elif is_state('sensor.lock_front_alarm_type', '25') %}
-            mdi:wifi
-          {% elif is_state('sensor.lock_front_alarm_type', '9') %}
-            mdi:lock-reset
-          {% elif is_state('sensor.lock_front_alarm_type', '161') %}
-            mdi:lock-alert
+          {% set alarm_type_value = states('sensor.lock_front_alarm_type') %}
+          {% set alarm_type_icons = {
+            '0':'mdi:blur-radial',
+            '9':'mdi:lock-reset',
+            '17':'mdi:lock-reset',
+            '18':'mdi:lock-smart',
+            '19':'mdi:account-key',
+            '21':'mdi:lock',
+            '22':'mdi:lock-open',
+            '23':'mdi:lock-reset',
+            '24':'mdi:wifi-strength-4-lock',
+            '25':'mdi:wifi',
+            '26':'mdi:lock-reset',
+            '27':'mdi:lock-clock',
+            '32':'mdi:delete-sweep',
+            '33':'mdi:delete',
+            '112':'mdi:textbox-password',
+            '113':'mdi:content-duplicate',
+            '161':'mdi:lock-alert',
+            '162':'mdi:lock-clock',
+            '167':'mdi:battery-10',
+            '168':'mdi:battery-outline',
+            '169':'mdi:battery-alert',
+            } %}
+          {% if alarm_type_value in alarm_type_icons %}
+            {{ alarm_type_icons[alarm_type_value] }}
           {% elif states('lock.lock_front') == "locked" %}
             mdi:lock
           {% elif states('lock.lock_front') == "unlocked" %}
@@ -1008,7 +1039,7 @@ automation:
           {% set select_id = 'lock_keypad_' ~ code_slot ~ '_access_schedule' %}
           {{ states['input_select'][select_id].state == 'Always' }}
     action:
-      - service: lock.set_usercode
+      - service: lock.clear_usercode
         data_template:
           node_id: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -1019,8 +1050,8 @@ automation:
             {% set object_id = trigger.to_state.object_id %}
             {% set code_slot = object_id.split('_')[3] %}
             {{ code_slot }}
-          usercode: >-
-            {{ range(1000, 9999) | random }}
+          # usercode: >-
+          #   {{ range(1000, 9999) | random }}
 
   - alias: "[Lock] Keypad Temporary Code Start"
     hide_entity: true
@@ -1095,7 +1126,7 @@ automation:
           - sensor.keypad_10_temp_lock_turn_off
         to: "True"
     action:
-      - service: lock.set_usercode
+      - service: lock.clear_usercode
         data_template:
           node_id: >-
             {{ states['lock']['lock_front'].attributes.node_id }}
@@ -1103,8 +1134,8 @@ automation:
             {% set object_id = trigger.to_state.object_id %}
             {% set code_slot = object_id.split('_')[1] %}
             {{ code_slot }}
-          usercode: >-
-            {{ range(1000, 9999) | random }}
+          # usercode: >-
+          #   {{ range(1000, 9999) | random }}
       - service: notify.join_users
         data_template:
           title: "Temporary Code Disabled"
@@ -1141,20 +1172,21 @@ automation:
     condition:
       - condition: template
         value_template: >-
+          {% set alarm_type_value = states('sensor.lock_front_alarm_type') %}
           {% set code_slot = trigger.to_state.state %}
           {% set input = 'lock_keypad_' ~ code_slot ~ '_access_schedule' %}
           {% set input_value = states['input_select'][input].state %}
-          {{ input_value == 'One Time' }}
+          {{ input_value == 'One Time' and alarm_type_value == '19' }}
     action:
-      - service: lock.set_usercode
+      - service: lock.clear_usercode
         data_template:
           node_id: >-
             {{ states['lock']['lock_front'].attributes.node_id }}
           code_slot: >-
             {% set code_slot = trigger.to_state.state %}
             {{ code_slot }}
-          usercode: >-
-            {{ range(1000, 9999) | random }}
+          # usercode: >-
+          #   {{ range(1000, 9999) | random }}
       - service: notify.join_users
         data_template:
           title: "One Time Use Code Used"
@@ -1164,7 +1196,7 @@ automation:
             {% set usercode = states['input_text'][usercode_input].state %}
             {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
             {% set name = states['input_text'][name_input].state %}
-            The pin code {{ usercode }} for {{ name }} has now been used and removed.
+            The pin code {{ usercode }} for {{ name }} has been used and removed.
           data:
             icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
