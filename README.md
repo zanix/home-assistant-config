@@ -77,9 +77,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Roku Streaming Stick](https://www.amazon.com/gp/product/B075XN5L53/)
 - [ChromeCast](https://www.google.com/chromecast/)
 - [Harmony Hub](https://www.amazon.com/gp/product/B00BQ5RYI4/) x3
-- [Plex](https://plex.tv)
-  - [Plex for Android TV](https://www.plex.tv/apps/streaming-devices/android-tv/)
-  - [Plex for Roku TV](https://www.plex.tv/blog/roku-live-tv/)
+- [Emby](https://emby.media)
+  - [Emby for Android TV](https://emby.media/emby-for-android-tv.html)
+  - [Emby for Roku TV](https://emby.media/emby-for-roku.html)
 
 ### Network
 
