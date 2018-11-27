@@ -30,9 +30,11 @@ if entity_id is not None and (brightness is not None or brightness_pct is not No
     end_level = int(brightness) if brightness is not None else math.ceil(
         float(brightness_pct) * 2.55)
 
+    """ Fade in or out """
+    fadeout = True if start_level > end_level else False
+
     """ Calculate number of steps """
     steps = int(math.fabs((start_level - end_level)))
-    fadeout = True if start_level > end_level else False
 
     """ Calculate the delay time """
     delay = round(transition / steps, 3)

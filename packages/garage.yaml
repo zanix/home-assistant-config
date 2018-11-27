@@ -20,19 +20,6 @@ influxdb:
     entities:
     - sensor.garage_door_status
 
-alert:
-  garage_door:
-    name: "Garage door is still open!"
-    done_message: "Garage door is closed"
-    entity_id: cover.garage_door
-    state: "open"
-    repeat:
-      - 75
-      - 30
-    skip_first: true
-    notifiers:
-      - join_all
-
 sensor:
   - platform: template
     sensors:
@@ -125,23 +112,50 @@ automation:
 
   - alias: "[Notify] Garage Door Left Open"
     trigger:
-      - platform: state
-        entity_id: cover.garage_door
-        to: "open"
-        for:
-          minutes: 45
+      - platform: time
+        minutes: "/30"
+        seconds: "00"
     condition:
-      - condition: state
-        entity_id: group.people
-        state: "home"
-      - condition: state
-        entity_id: binary_sensor.garage_motion_sensor
-        state: "off"
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: cover.garage_door
+          state: "open"
+        - condition: state
+          entity_id: binary_sensor.garage_motion_sensor
+          state: "off"
+        - condition: template
+          value_template: >
+            {{ (as_timestamp(now()) - as_timestamp(states.cover.garage_door.last_changed)) / 60 > 45 }}
     action:
       - service: notify.join_all
         data_template:
           title: Garage Door Open
-          message: "The garage door has been open for 45 minutes"
+          message: >
+            {% macro last_changed(entity) %}
+            {% if entity.state %}
+            {% set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed)) | int %}
+            {% set minutes = ((uptime % 3600) / 60) | int %}
+            {% set hours = ((uptime % 86400) / 3600) | int %}
+            {% set days = (uptime / 86400) | int %}
+            {%- if days > 0 -%}
+            {{ days }} d
+            {%- endif -%}
+            {%- if hours > 0 -%}
+            {%- if days > 0 -%}
+            {{ ' ' }}
+            {%- endif -%}
+            {{ hours }}h
+            {%- endif -%}
+            {%- if minutes > 0 -%}
+            {%- if hours > 0 -%}
+            {{ ' ' }}
+            {%- endif -%}
+            {{ minutes }}min
+            {%- endif -%}
+            {%- endif -%}
+            {% endmacro %}
+            The {{ states.cover.garage_door.attributes.friendly_name }} has been open for {{ last_changed(states.cover.garage_door) }}.
           data:
             icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/garage-open.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
