@@ -31,6 +31,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ### Custom Components
 
 - [Attributes as Sensors](https://github.com/pilotak/HomeAssistant-CustomComponents) - Allows the creation of a sensor that breaks out attribute of defined entities. I use this to separate `battery_level` attributes into their own sensors
+- [DreamScreen](https://github.com/GregoryDosh/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com/) (HD & 4k)
 - JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Used to gather solar production from SolarEdge
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
 
@@ -49,6 +50,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK) x2
   - Hard-wired into lamps with local control using a [touch sensor](https://www.adafruit.com/product/1374) on the metal frame of a lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/) x4
+- [DreamScreen](https://www.dreamscreentv.com/) 4K DIY
+  - Responsive LED Backlighting for Video, Music & Games
 
 ### Sensor / Switch
 
