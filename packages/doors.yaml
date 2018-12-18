@@ -72,6 +72,16 @@ influxdb:
       - sensor.door_garage_outside_burglar
       - sensor.door_garage_outside_sourcenodeid
 
+group:
+  all_doors:
+    name: All Doors
+    icon: mdi:door
+    entities:
+      - sensor.door_front
+      - sensor.door_garage_entry
+      - sensor.door_garage_outside
+      - sensor.door_back
+
 sensor:
   - platform: template
     sensors:
@@ -289,9 +299,43 @@ automation:
             {% endmacro %}
             {% for entity in ['door_front', 'door_back', 'door_garage_entry', 'door_garage_outside'] %}
             {% if states['sensor'][entity].state == 'Open' and (as_timestamp(now()) - as_timestamp(states['sensor'][entity].last_changed)) / 60 > 5 %}
-            {{ states['sensor'][entity].attributes.friendly_name }} has been open for {{ last_changed(states['sensor'][entity]) }}
+            The {{ states['sensor'][entity].attributes.friendly_name }} has been open for {{ last_changed(states['sensor'][entity]) }}
             {% endif %}
             {%- endfor %}
           data:
             icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/door-open.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+      - service: tts.google_say
+        entity_id: media_player.living_room_speaker
+        data_template:
+          message: >
+            {% macro last_changed(entity) %}
+            {% if entity.state %}
+            {% set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed)) | int %}
+            {% set minutes = ((uptime % 3600) / 60) | int %}
+            {% set hours = ((uptime % 86400) / 3600) | int %}
+            {% set days = (uptime / 86400) | int %}
+            {%- if days > 0 -%}
+            {{ days }} d
+            {%- endif -%}
+            {%- if hours > 0 -%}
+            {%- if days > 0 -%}
+            {{ ' ' }}
+            {%- endif -%}
+            {{ hours }}h
+            {%- endif -%}
+            {%- if minutes > 0 -%}
+            {%- if hours > 0 -%}
+            {{ ' ' }}
+            {%- endif -%}
+            {{ minutes }}min
+            {%- endif -%}
+            {%- endif -%}
+            {% endmacro %}
+            {% for entity in ['door_front', 'door_back', 'door_garage_entry', 'door_garage_outside'] %}
+            Hey!
+            {% if states['sensor'][entity].state == 'Open' and (as_timestamp(now()) - as_timestamp(states['sensor'][entity].last_changed)) / 60 > 5 %}
+            The {{ states['sensor'][entity].attributes.friendly_name }} has been open for {{ last_changed(states['sensor'][entity]) }}
+            {% endif %}
+            {%- endfor %}
+          cache: false
