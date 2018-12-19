@@ -161,6 +161,22 @@ light:
     - light.office_2
     - light.office_3
 
+script:
+  tts_light_status:
+    alias: "Light Status"
+    sequence:
+    - service: tts.google_say
+      entity_id: media_player.living_room_speaker
+      data_template:
+        message: >-
+          {% set entities = states | selectattr('entity_id', 'in', state_attr('group.all_light_switches','entity_id')) | selectattr('state','in',['on']) | list %}
+          {%- for entity in entities -%}
+          {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
+          {{ entity.name }}
+          {%- endfor %}
+          {%- if entities | length > 1 %} are on{% elif entities | length == 1 %} is on{% else %}No lights are on{% endif -%}.
+        cache: false
+
 automation:
   - alias: "[Lights] Front on at Sunset"
     trigger:
