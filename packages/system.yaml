@@ -112,19 +112,19 @@ sensor:
       {% set hours = ((uptime % 86400) / 3600) | int %}
       {% set days = (uptime / 86400) | int %}
       {%- if days > 0 -%}
-        {{ days }} d
+        {{ days }}d
       {%- endif -%}
       {%- if hours > 0 -%}
         {%- if days > 0 %}, {% endif -%}
-        {{ hours }} h
+        {{ hours }}h
       {%- endif -%}
       {%- if minutes > 0 -%}
-        {%- if hours > 0 %}, {% endif -%}
-        {{ minutes }} m
+        {%- if hours > 0 or days > 0 %}, {% endif -%}
+        {{ minutes }}m
       {%- endif -%}
       {%- if seconds > 0 -%}
-        {%- if minutes > 0 %}, {% endif -%}
-        {{ seconds }} s
+        {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
+        {{ seconds }}s
       {%- endif %}
 
   - platform: command_line
@@ -157,28 +157,25 @@ sensor:
         entity_id: sensor.last_boot
         icon_template: mdi:raspberrypi
         value_template: >-
-          {%- set slb = states.sensor.last_boot.state.split(' ') -%}
-          {%- set count = slb | length -%}
-          {%- set hms = slb[count - 1] -%}
-          {%- set hms_trimmed = hms.split('.')[0] -%}
-          {%- set hms_split = hms_trimmed.split(':') -%}
-          {%- set hours = hms_split[0] | int -%}
-          {%- set minutes = hms_split[1] | int -%}
-          {%- set seconds = hms_split[2] | int -%}
-
-          {%- if count == 3 -%}
-            {{ slb[0] ~ ' ' ~ slb[1] ~ ' ' }}
+          {% set uptime = (as_timestamp(now()) - as_timestamp(states.sensor.last_boot.state)) | int %}
+          {% set seconds = (uptime % 60) | int %}
+          {% set minutes = ((uptime % 3600) / 60) | int %}
+          {% set hours = ((uptime % 86400) / 3600) | int %}
+          {% set days = (uptime / 86400) | int %}
+          {%- if days > 0 -%}
+            {{ days }}d
           {%- endif -%}
           {%- if hours > 0 -%}
-            {{ hours }} h
+            {%- if days > 0 %}, {% endif -%}
+            {{ hours }}h
           {%- endif -%}
           {%- if minutes > 0 -%}
-            {%- if hours > 0 %}, {% endif -%}
-            {{ minutes }} m
+            {%- if hours > 0 or days > 0 %}, {% endif -%}
+            {{ minutes }}m
           {%- endif -%}
           {%- if seconds > 0 -%}
-            {%- if minutes > 0 %}, {% endif -%}
-            {{ seconds }} s
+            {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
+            {{ seconds }}s
           {%- endif %}
 
   - platform: rest

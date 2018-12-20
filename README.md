@@ -24,7 +24,6 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Animated Weather Card](https://github.com/arsaboo/homeassistant-config) ([Forum](https://community.home-assistant.io/t/custom-dark-sky-animated-weather-card/59816)) - Custom animated weather card
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
-- [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - A minimalistic sensor with graph lovelace card
 - [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
 - [Vertical Stack In Card](https://github.com/custom-cards/vertical-stack-in-card) - Similar to vertical-stack but removes card borders
 
