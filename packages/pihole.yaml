@@ -5,35 +5,35 @@
 
 homeassistant:
   customize:
-    script.enable_pihole:
+    script.enable_pi_hole:
       hidden: true
 
-    sensor.pihole_status:
+    sensor.pi_hole_status:
       icon_template: >
-        {% if is_state('sensor.pihole_status', 'Enabled') %}
+        {% if is_state('sensor.pi_hole_status', 'Enabled') %}
           mdi:security
         {% else %}
           mdi:security-off
         {% endif %}
 
-    input_select.pihole_disable_time:
+    input_select.pi_hole_disable_time:
       icon: mdi:calendar-clock
 
 recorder:
   exclude:
     entities:
-      - input_select.pihole_disable_time
-      - script.enable_pihole
+      - input_select.pi_hole_disable_time
+      - script.enable_pi_hole
 
 influxdb:
   exclude:
     entities:
-      - input_select.pihole_disable_time
-      - script.enable_pihole
+      - input_select.pi_hole_disable_time
+      - script.enable_pi_hole
 
 sensor:
   - platform: pi_hole
-    host: !secret pihole_host
+    host: !secret pi_hole_host
     monitored_conditions:
       - ads_blocked_today
       - ads_percentage_today
@@ -48,21 +48,21 @@ sensor:
   - platform: rest
     name: Pi-hole Status
     scan_interval: 5
-    resource: !secret pihole_status
+    resource: !secret pi_hole_status
     value_template: "{{ value_json.status | capitalize }}"
 
 shell_command:
-  pihole_enable: !secret pihole_enable
-  pihole_disable: !secret pihole_disable
+  pi_hole_enable: !secret pi_hole_enable
+  pi_hole_disable: !secret pi_hole_disable
 
 script:
-  enable_pihole:
-    alias: Enable Pi-hole
+  enable_pi_hole:
+    alias: Enable Pi-Hole
     sequence:
-      service: shell_command.pihole_enable
+      service: shell_command.pi_hole_enable
 
 input_select:
-  pihole_disable_time:
+  pi_hole_disable_time:
     name: Disable Time (seconds)
     options:
       - Select Time
@@ -81,21 +81,21 @@ automation:
     hide_entity: true
     trigger:
       platform: state
-      entity_id: input_select.pihole_disable_time
+      entity_id: input_select.pi_hole_disable_time
     action:
-      service: shell_command.pihole_disable
+      service: shell_command.pi_hole_disable
 
   - alias: "[Pi-hole] Reset Disable Time"
     hide_entity: true
     trigger:
       - platform: state
-        entity_id: script.enable_pihole
+        entity_id: script.enable_pi_hole
       - platform: state
-        entity_id: sensor.pihole_status
+        entity_id: sensor.pi_hole_status
         from: "Disabled"
         to: "Enabled"
     action:
       service: input_select.select_option
       data:
-        entity_id: input_select.pihole_disable_time
+        entity_id: input_select.pi_hole_disable_time
         option: Select Time
