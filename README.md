@@ -137,7 +137,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ### Media Control
 
 - (Disabled) Family room auto off
-- (Disabled) Shield bedroom auto off
+- (Disabled) Shield master bedroom auto off
 - (Disabled) Shield living room paused at night
 - (Disabled) Shield living room playing at night
 
