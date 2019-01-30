@@ -1,0 +1,83 @@
+---
+# Sends notification if a door is open longer than 5 minutes.
+#
+alias: "[Notify] Door Left Open"
+trigger:
+  platform: time_pattern
+  minutes: "*"
+condition:
+  condition: template
+  value_template: >
+    {%- set ns = namespace(found=false) -%}
+    {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | map(attribute='entity_id') | list -%}
+    {%- for entity_id in open_doors -%}
+      {%- set parts = entity_id.split('.') -%}
+      {%- if (as_timestamp(now()) - as_timestamp(states[parts[0]][parts[1]].last_changed)) / 60 > 5 -%}
+        {%- set ns.found = true -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {{ ns.found }}
+action:
+  - service: notify.join_all
+    data_template:
+      title: Door Open
+      message: >
+        {%- macro parse_last_changed(entity) -%}
+          {%- if entity.state -%}
+            {%- set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed)) | int -%}
+            {%- set minutes = ((uptime % 3600) / 60) | int -%}
+            {%- set hours = ((uptime % 86400) / 3600) | int -%}
+            {%- set days = (uptime / 86400) | int -%}
+            {%- if days > 0 -%}
+              {{ days }} day{% if days > 1 %}s{% endif %}
+            {%- endif -%}
+            {%- if hours > 0 -%}
+              {%- if days > 0 %} {% endif -%}
+              {{ hours }} hour{% if hours > 1 %}s{% endif %}
+            {%- endif -%}
+            {%- if minutes > 0 -%}
+              {%- if hours > 0 or days > 0 %} {% endif -%}
+              {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
+            {%- endif -%}
+          {% endif -%}
+        {%- endmacro -%}
+        {%- set current = as_timestamp(now()) -%}
+        {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | list -%}
+        {%- for entity in open_doors if ( (current - as_timestamp(entity.last_changed)) / 60 > 5 and (((current - as_timestamp(entity.last_changed)) / 60) | int) % 5 == false ) -%}
+          {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
+          {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
+        {%- endfor %}
+      data:
+        icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/door-open.png"
+        smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+  - service: tts.google_say
+    entity_id: media_player.living_room_speaker
+    data_template:
+      message: >
+        {%- macro parse_last_changed(entity) -%}
+          {%- if entity.state -%}
+            {%- set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed)) | int -%}
+            {%- set minutes = ((uptime % 3600) / 60) | int -%}
+            {%- set hours = ((uptime % 86400) / 3600) | int -%}
+            {%- set days = (uptime / 86400) | int -%}
+            {%- if days > 0 -%}
+              {{ days }} day{% if days > 1 %}s{% endif %}
+            {%- endif -%}
+            {%- if hours > 0 -%}
+              {%- if days > 0 %} {% endif -%}
+              {{ hours }} hour{% if hours > 1 %}s{% endif %}
+            {%- endif -%}
+            {%- if minutes > 0 -%}
+              {%- if hours > 0 or days > 0 %} {% endif -%}
+              {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
+            {%- endif -%}
+          {% endif -%}
+        {%- endmacro -%}
+        {%- set current = as_timestamp(now()) -%}
+        {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | list -%}
+        Hey!
+        {%- for entity in open_doors if ( (current - as_timestamp(entity.last_changed)) / 60 > 5 and (((current - as_timestamp(entity.last_changed)) / 60) | int) % 5 == false ) -%}
+          {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
+          {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
+        {%- endfor %}
+      cache: false

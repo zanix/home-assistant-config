@@ -1,0 +1,33 @@
+---
+# Template sensor that formats the last boot sensor how I want.
+#
+# https://www.home-assistant.io/components/sensor.template/
+# https://www.home-assistant.io/components/sensor.systemmonitor/
+#
+platform: template
+sensors:
+  since_last_boot:
+    friendly_name: Pi Uptime
+    entity_id: sensor.last_boot
+    icon_template: mdi:raspberrypi
+    value_template: >-
+      {% set uptime = (as_timestamp(now()) - as_timestamp(states.sensor.last_boot.state)) | int %}
+      {% set seconds = (uptime % 60) | int %}
+      {% set minutes = ((uptime % 3600) / 60) | int %}
+      {% set hours = ((uptime % 86400) / 3600) | int %}
+      {% set days = (uptime / 86400) | int %}
+      {%- if days > 0 -%}
+        {{ days }}d
+      {%- endif -%}
+      {%- if hours > 0 -%}
+        {%- if days > 0 %}, {% endif -%}
+        {{ hours }}h
+      {%- endif -%}
+      {%- if minutes > 0 -%}
+        {%- if hours > 0 or days > 0 %}, {% endif -%}
+        {{ minutes }}m
+      {%- endif -%}
+      {%- if seconds > 0 -%}
+        {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
+        {{ seconds }}s
+      {%- endif %}

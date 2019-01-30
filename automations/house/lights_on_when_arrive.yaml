@@ -1,0 +1,32 @@
+---
+# Turns various lights on when someone arrives home after sunset.
+#
+alias: "[Lights] On when Arrive"
+trigger:
+  platform: state
+  entity_id: group.people
+  from: "not_home"
+  to: "home"
+condition:
+  - condition: sun
+    after: sunset
+    after_offset: "-0:30:00"
+  - condition: time
+    before: "23:59:59"
+action:
+  - service: homeassistant.turn_on
+    entity_id: switch.garage_entry_light
+  - service: light.turn_on
+    entity_id: light.living_room
+    data:
+      brightness: 38
+  - service: notify.join_users
+    data_template:
+      title: Welcome Home
+      message: "The lights have been turned on."
+      data:
+        icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lightbulb-on.png"
+        smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+  - delay: "00:05:00"
+  - service: homeassistant.turn_off
+    entity_id: switch.garage_entry_light
