@@ -39,8 +39,8 @@
         }
         button-card-button div {
           padding: 4%;
-          text-transform: uppercase;
-          font-size: 0.95rem;
+          text-transform: none;
+          font-size: 1.2rem;
         }
       `;
     }

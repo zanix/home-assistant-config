@@ -2,18 +2,18 @@
 
 [Home Assistant](https://home-assistant.io) configuration files (YAMLs)
 
-This is my Home Assistant Configuration created for use with [Hass.io](https://home-assistant.io/hassio/).
-Home Assistant runs on a [Raspberry Pi 3](http://amzn.to/2e3DOBY). The main SD Card is 32GB.
+This is my Home Assistant Configuration created for use with the [docker container](https://www.home-assistant.io/docs/installation/docker/)
+version of [Home Assistant](https://home-assistant.io) running on [UnRaid](https://unraid.net).
 
 If you want to back up your own Home Assistant configuration to GitHub, follow [this guide](https://home-assistant.io/docs/ecosystem/backup/backup_github/).
 
 ## Software
 
-- [Hass.io](https://home-assistant.io/hassio/) by [Home Assistant](https://home-assistant.io)
+- [Home Assistant](https://home-assistant.io)
 
 ### Add-Ons
 
-- [Mosquitto broker](https://www.home-assistant.io/addons/mosquitto/) - MQTT Broker
+- [MQTT Docker](https://forums.unraid.net/topic/36810-support-spants-nodered-mqtt-dashing-couchdb/) - MQTT Broker docker container in UnRaid
 
 ### Custom Elements
 
