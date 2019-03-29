@@ -18,6 +18,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ### Custom Elements
 
 - [Animated Weather Card](https://github.com/iammexx/home-assistant-config/tree/master/ui/darksky) ([Forum](https://community.home-assistant.io/t/custom-dark-sky-animated-weather-card/59816/272)) - Custom animated weather card
+- [Battery Entity Card](https://github.com/cbulock/lovelace-battery-entity) ([Forum](https://community.home-assistant.io/t/lovelace-battery-entity-card/107500)) - Custom Lovelace component for displaying battery levels for battery entities
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Custom Updater](https://github.com/custom-components/custom_updater) - A component which allows you to track and update custom cards/components and python_scripts
 - [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)), interactive floorplan

@@ -571,6 +571,7 @@
         position: absolute;
         left: ${currentTextLeftPos};
         margin-top: ${currentTextTopMargin};
+        max-width: 16em;
       }
 
       .pop {
