@@ -45,7 +45,7 @@
   //    var icons = this.config.static_icons ? "static" : "animated";
       var currentText = this.config.entity_current_text ? html`<span class="currentText" id="current-text" @click="${() => this.openEntityPopover(this.config.entity_current_text)}">${this._hass.states[this.config.entity_current_text].state}</span>` : ``;
       var apparentTemp = this.config.entity_apparent_temp ? html`<span class="apparent" @click="${() => this.openEntityPopover(this.config.entity_apparent_temp)}">${this.localeText.feelsLike} <span id="apparent-text">${this.current.apparent}</span> ${this.getUOM("temperature")}</span>` : ``;
-      var summary = this.config.entity_daily_summary ? html`<br><span class="unit" id="daily-summary-text" @click="${() => this.openEntityPopover(this.config.entity_daily_summary)}">${this._hass.states[this.config.entity_daily_summary].state}</span></br>` : ``;
+      var summary = this.config.entity_daily_summary ? html`<div class="daily-summary" id="daily-summary-text" @click="${() => this.openEntityPopover(this.config.entity_daily_summary)}">${this._hass.states[this.config.entity_daily_summary].state}</div>` : ``;
       var separator = this.config.show_separator ? html`<hr class=line>` : ``;
 
   // Build HTML
@@ -59,36 +59,34 @@
           ${currentText}
           ${apparentTemp}
           ${separator}
-          <span>
-            <ul class="variations">
-              <li>
-                ${this.getSlot().l1}
-                ${this.getSlot().l2}
-                ${this.getSlot().l3}
-                ${this.getSlot().l4}
-              </li>
-              <li>
-                ${this.getSlot().r1}
-                ${this.getSlot().r2}
-                ${this.getSlot().r3}
-                ${this.getSlot().r4}
-              </li>
+          <div class="variations">
+            <ul>
+              ${this.getSlot().l1}
+              ${this.getSlot().l2}
+              ${this.getSlot().l3}
+              ${this.getSlot().l4}
             </ul>
-          </span>
-              <div class="forecast clear">
-                ${this.forecast.map(daily => html`
-                  <div class="day fcasttooltip">
-                    <span class="dayname" id="fcast-dayName-${daily.dayIndex}">${(daily.date).toLocaleDateString(this.config.locale,{weekday: 'short'})}</span>
-                    <br><i class="icon" id="fcast-icon-${daily.dayIndex}" style="background: none, url(/local/icons/weather_icons/${this.config.static_icons ? "static" : "animated"}/${this.weatherIcons[this._hass.states[daily.condition].state]}.svg) no-repeat; background-size: contain;"></i>
-                    ${this.config.old_daily_format
-                      ? html`<br><span class="highTemp" id="fcast-high-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.temphigg)}">${Math.round(this._hass.states[daily.temphigh].state)}${this.getUOM("temperature")}</span>
-                             <br><span class="lowTemp" id="fcast-low-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.templow)}">${Math.round(this._hass.states[daily.templow].state)}${this.getUOM("temperature")}</span>`
-                      : html`<br><span class="lowTemp" id="fcast-low-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.templow)}">${Math.round(this._hass.states[daily.templow].state)}</span> / <span class="highTemp" id="fcast-high-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.temphigh)}">${Math.round(this._hass.states[daily.temphigh].state)}${this.getUOM("temperature")}</span>`}
-                    ${this.config.entity_pop_1 && this.config.entity_pop_2 && this.config.entity_pop_3 && this.config.entity_pop_4 && this.config.entity_pop_5
-                      ? html`<br><span class="pop" id="fcast-pop-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.pop)}">${Math.round(this._hass.states[daily.pop].state)} %</span>` : ``}
-                    <div class="fcasttooltiptext" id="fcast-summary-${daily.dayIndex}">${ this.config.tooltips ? this._hass.states[daily.summary].state : ""}</div>
-                  </div>`)}
-                </div>
+            <ul>
+              ${this.getSlot().r1}
+              ${this.getSlot().r2}
+              ${this.getSlot().r3}
+              ${this.getSlot().r4}
+            </ul>
+          </div>
+          <div class="forecast clear">
+            ${this.forecast.map(daily => html`
+              <div class="day fcasttooltip">
+                <div class="dayname" id="fcast-dayName-${daily.dayIndex}">${(daily.date).toLocaleDateString(this.config.locale,{weekday: 'short'})}</div>
+                <i class="icon" id="fcast-icon-${daily.dayIndex}" style="background: none, url(/local/icons/weather_icons/${this.config.static_icons ? "static" : "animated"}/${this.weatherIcons[this._hass.states[daily.condition].state]}.svg) no-repeat; background-size: contain;"></i>
+                ${this.config.old_daily_format
+                  ? html`<div><span class="highTemp" id="fcast-high-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.temphigh)}">${Math.round(this._hass.states[daily.temphigh].state)}${this.getUOM("temperature")}</div>
+                         <div><span class="lowTemp" id="fcast-low-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.templow)}">${Math.round(this._hass.states[daily.templow].state)}${this.getUOM("temperature")}</div>`
+                  : html`<div><span class="lowTemp" id="fcast-low-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.templow)}">${Math.round(this._hass.states[daily.templow].state)}</span> / <span class="highTemp" id="fcast-high-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.temphigh)}">${Math.round(this._hass.states[daily.temphigh].state)}${this.getUOM("temperature")}</span></div>`}
+                ${this.config.entity_pop_1 && this.config.entity_pop_2 && this.config.entity_pop_3 && this.config.entity_pop_4 && this.config.entity_pop_5
+                  ? html`<div class="pop" id="fcast-pop-${daily.dayIndex}" @click="${() => this.openEntityPopover(daily.pop)}">${Math.round(this._hass.states[daily.pop].state)} %</div>` : ``}
+                <div class="fcasttooltiptext" id="fcast-summary-${daily.dayIndex}">${ this.config.tooltips ? this._hass.states[daily.summary].state : ""}</div>
+              </div>`)}
+          </div>
           ${summary}
         </ha-card>
       `;
@@ -494,6 +492,7 @@
     var tooltipWidth = this.config.tooltip_width || "110";
     var tooltipLeftOffset = this.config.tooltip_left_offset || "-12";
     var tooltipVisible = this.config.tooltips ? "visible" : "hidden";
+    var tooltipTextFontSize = this.config.tooltips_text_font_size || "0.8em";
     var tempTopMargin = this.config.temp_top_margin || "-0.3em";
     var tempFontWeight = this.config.temp_font_weight || "300";
     var tempFontSize = this.config.temp_font_size || "4em";
@@ -509,6 +508,7 @@
     var largeIconTopMargin = this.config.large_icon_top_margin || "-3.5em";
     var largeIconLeftPos = this.config.large_icon_left_pos || "0em";
     var currentDataTopMargin = this.config.current_data_top_margin ? this.config.current_data_top_margin : this.config.show_separator ? "1em" : "7em";
+    var dailySummaryTopMargin = this.config.daily_summary_top_margin || "1em";
     var separatorTopMargin = this.config.separator_top_margin || "6em";
 
     return html`
@@ -584,13 +584,23 @@
         justify-content: space-between;
         font-weight: 300;
         color: var(--primary-text-color);
-        list-style: none;
         padding: 0.2em;
         margin-top: ${currentDataTopMargin};
+      }
+      .variations ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 45%;
       }
 
       .unit {
         font-size: 0.8em;
+      }
+
+      .daily-summary {
+        font-size: 0.8em;
+        margin-top: ${dailySummaryTopMargin}
       }
 
       .forecast {
@@ -680,6 +690,7 @@
         border-color: ${tooltipBorderColor};
         border-width: ${tooltipBorderWidth}px;
         padding: 5px 0;
+        font-size: ${tooltipTextFontSize};
 
         /* Position the tooltip */
         position: absolute;
