@@ -18,6 +18,8 @@ from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers import template as template_helper
 
+__version__ = '1.0.0'
+
 _LOGGER = logging.getLogger(__name__)
 
 CONF_ATTRIBUTE = "attribute"
@@ -94,7 +96,7 @@ def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
             _LOGGER.debug("Applying battery icon template")
 
             new_icon = ("{{% if states('{0}') != '{2}' %}}\
-                {{% set batt = states.{0}.attributes['{1}'] %}}\
+                {{% set batt = states.{0}.attributes['{1}']|int %}}\
                 {{% if batt == 'unknown' %}}\
                 mdi:battery-unknown\
                 {{% elif batt > 95 %}}\
