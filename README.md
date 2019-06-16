@@ -13,6 +13,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Add-Ons
 
+- [HACS](https://custom-components.github.io/hacs) - Home Assistant Community Store. Makes installing custom components and lovelace cars easy.
 - [MQTT Docker](https://forums.unraid.net/topic/36810-support-spants-nodered-mqtt-dashing-couchdb/) - MQTT Broker docker container in UnRaid
 
 ### Custom Elements
@@ -20,13 +21,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Animated Weather Card](https://github.com/iammexx/home-assistant-config/tree/master/ui/darksky) ([Forum](https://community.home-assistant.io/t/custom-dark-sky-animated-weather-card/59816/272)) - Custom animated weather card
 - [Battery Entity Card](https://github.com/cbulock/lovelace-battery-entity) ([Forum](https://community.home-assistant.io/t/lovelace-battery-entity-card/107500)) - Custom Lovelace component for displaying battery levels for battery entities
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
-- [Custom Updater](https://github.com/custom-components/custom_updater) - A component which allows you to track and update custom cards/components and python_scripts
 - [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)), interactive floorplan
 - [Lovelace Custom Cards](https://github.com/ciotlosm/custom-lovelace) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
 - [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
-- [Tracker Card](https://github.com/custom-cards/tracker-card) - Card to track updates for custom cards and custom components
 - [Vertical Stack In Card](https://github.com/custom-cards/vertical-stack-in-card) - Similar to vertical-stack but removes card borders
 
 ### Custom Components
@@ -49,7 +48,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - GE Z-Wave Dimmer (12724) x2
 - [GE Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2) x3
 - [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK) x2
-  - Hard-wired into lamps with local control using a [touch sensor](https://www.adafruit.com/product/1374) on the metal frame of a lamp
+  - Hard-wired into lamps with local control using a switch on the metal frame of a lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/) x4
 - [DreamScreen](https://www.dreamscreentv.com/) 4K DIY
   - Responsive LED Backlighting for Video, Music & Games
@@ -61,9 +60,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - Various Z-Wave Door/Window sensors
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU)
   - Smart Sprinkler controller
-- SolarEdge via [JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) component
 - [Forecast.io (Darksky)](https://darksky.net)
-- [Pi System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
+- [System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
 - (Broken) [UPS Packages](https://home-assistant.io/components/sensor.ups/)
 - (Broken) [FedEx Packages](https://home-assistant.io/components/sensor.fedex/)
 - (Broken) [USPS Mail and Packages](https://home-assistant.io/components/sensor.usps/)
@@ -104,10 +102,14 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - See automation folder and automation blocks within packages
 
+### Areas
+
+- Office day mode - Turn on computer and lights to full and daylight temp
+- Office night mode - Dim lights and set to soft temp
+
 ### Computer Control
 
 - Power on when Harmony activity is on "Computer"
-- Power on office computer for work
 - Set and update volume
 - Sleep on when Harmony activity is "Power Off"
 
@@ -123,9 +125,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ### Lights
 
 - Front lights on at sunset
-- Front lights 15% at 10:30pm
+- Front lights dim at night
 - Front lights off at sunrise
-- Set brightness on all office lights
 - Turn off all lights when away
 - Turn on some lights when arriving
 
@@ -165,15 +166,15 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - Notify when front door motion is detected
 - Notify when front door rings
-- Front lights 100% on ring or motion
-- Front lights 15% after 10 minutes of ring or motion
+- Front lights full on ring or motion
+- Front lights dim after 10 minutes of ring or motion
 
 ### System
 
 - Clear tts cache
 - Notify on failed login
-- Notify on low battery
-- Notify when SD card space reaches 90%
+- Notify when devices have low battery
+- Notify when disk space is low
 - Set theme at startup
 - Notify when update is available
 - Z-wave heal at night
