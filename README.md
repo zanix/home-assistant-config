@@ -3,7 +3,7 @@
 [Home Assistant](https://home-assistant.io) configuration files (YAMLs)
 
 This is my Home Assistant Configuration created for use with the [docker container](https://www.home-assistant.io/docs/installation/docker/)
-version of [Home Assistant](https://home-assistant.io) running on [UnRaid](https://unraid.net).
+version of [Home Assistant](https://home-assistant.io) running on an Intel NUC5i5MYHE.
 
 If you want to back up your own Home Assistant configuration to GitHub, follow [this guide](https://home-assistant.io/docs/ecosystem/backup/backup_github/).
 
@@ -23,6 +23,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)) - Interactive floorplan
 - [Lovelace Custom Cards](https://github.com/ciotlosm/custom-lovelace) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Custom cards for lovelace
+- [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card for Home Assistant Lovelace UI
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) ([Forum](https://community.home-assistant.io/t/lovelace-multiple-entity-row/109109)) - Show multiple entity states on entity rows
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
@@ -31,7 +32,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Custom Components
 
-- [Attributes as Sensors](https://github.com/pilotak/HomeAssistant-CustomComponents) - Allows the creation of a sensor that breaks out attribute of defined entities. I use this to separate `battery_level` attributes into their own sensors
+- [Attributes as Sensors](https://github.com/pilotak/homeassistant-attributes) - Allows the creation of a sensor that breaks out attribute of defined entities. I use this to separate `battery_level` attributes into their own sensors
 - [DreamScreen](https://github.com/GregoryDosh/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com/) (HD & 4k)
 - JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Was used to gather solar production from SolarEdge, but now is inactive.
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
