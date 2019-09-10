@@ -9,10 +9,12 @@ condition:
   condition: template
   value_template: >
     {%- set ns = namespace(found=false) -%}
+    {%- set current = as_timestamp(now()) -%}
     {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | map(attribute='entity_id') | list -%}
     {%- for entity_id in open_doors -%}
       {%- set parts = entity_id.split('.') -%}
-      {%- if (as_timestamp(now()) - as_timestamp(states[parts[0]][parts[1]].last_changed)) / 60 > 5 -%}
+      {%- set entity = states[parts[0]][parts[1]] -%}
+      {%- if ((current - as_timestamp(entity.last_changed) / 60) | int) > 5 and ((current - as_timestamp(entity.last_changed) / 60) | int) % 5 == false -%}
         {%- set ns.found = true -%}
       {%- endif -%}
     {%- endfor -%}
