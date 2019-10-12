@@ -64,9 +64,6 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
   - Smart Sprinkler controller
 - [Forecast.io (Darksky)](https://darksky.net)
 - [System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
-- (Broken) [UPS Packages](https://home-assistant.io/components/sensor.ups/)
-- (Broken) [FedEx Packages](https://home-assistant.io/components/sensor.fedex/)
-- (Broken) [USPS Mail and Packages](https://home-assistant.io/components/sensor.usps/)
 
 ### Camera
 
@@ -81,13 +78,13 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Roku Streaming Stick](https://www.amazon.com/gp/product/B075XN5L53/)
 - [ChromeCast](https://www.google.com/chromecast/)
 - [Harmony Hub](https://www.amazon.com/gp/product/B00BQ5RYI4/) x3
+- [Plex](https://plex.tv)
+  - [Plex for Android](https://play.google.com/store/apps/details?id=com.plexapp.android)
+  - [Plex for Roku TV](https://channelstore.roku.com/details/13535/plex)
 - [Emby](https://emby.media) - Currently not in use
   - [Emby for Android](https://play.google.com/store/apps/details?id=com.mb.android)
   - [Emby for Android TV](https://play.google.com/store/apps/details?id=tv.emby.embyatv)
   - [Emby for Roku TV](https://channelstore.roku.com/details/44191/emby)
-- [Plex](https://plex.tv)
-  - [Plex for Android](https://play.google.com/store/apps/details?id=com.plexapp.android)
-  - [Plex for Roku TV](https://channelstore.roku.com/details/13535/plex)
 
 ### Network
 
@@ -114,11 +111,6 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - Power on when Harmony activity is on "Computer"
 - Set and update volume
 - Sleep on when Harmony activity is "Power Off"
-
-### Delivery
-
-- (Broken) Notify when packages out for delivery
-- (Broken) Notify when packages are delivered
 
 ### Harmony
 

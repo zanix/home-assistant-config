@@ -1,0 +1,33 @@
+---
+# Changes the activity on a Harmony remote.
+#
+# Remote devices and input entities should be named as follows:
+#   - input_select.remote_living_room
+#   - remote.living_room
+# The automation parses out "input_select.remote_" and passes "living_room"
+# to the script which prepends "input_select.remote_" and "remote." as needed.
+#
+# https://www.home-assistant.io/components/script/
+# https://www.home-assistant.io/components/remote.harmony/
+#
+remote_harmony_activity:
+  alias: Remote Harmony Activity
+  description: "Changes the activity on a Harmony remote."
+  fields:
+    input_remote:
+      description: "Name of the remote"
+      example: "living_room"
+  sequence:
+    - service: remote.turn_on
+      data_template:
+        entity_id: "{{ 'remote.' ~ input_remote }}"
+        activity: >-
+          {% if is_state('input_select.remote_' ~ input_remote, "Power Off") %}
+            -1
+          {% else %}
+            {{ states('input_select.remote_' ~ input_remote) }}
+          {% endif %}
+    - service: input_select.select_option
+      data_template:
+        entity_id: "input_select.remote_{{ input_remote }}"
+        option: "Select Activity"
