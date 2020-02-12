@@ -1,0 +1,174 @@
+---
+# OctoPrint is a web interface for your 3D printer.
+# This is the main integration to integrate OctoPrint sensors.
+#
+# https://www.home-assistant.io/integrations/octoprint/
+#
+octoprint:
+  - host: !secret octoprint_host
+    api_key: !secret octoprint_api_key
+    name: Ender 3 Pro
+    number_of_tools: 1
+    bed: true
+
+camera:
+  - platform: mjpeg
+    name: Ender 3 Pro
+    still_image_url: !secret octoprint_image_url
+    mjpeg_url: !secret octoprint_mjpeg_url
+
+switch:
+  - platform: rest
+    name: "Ender 3 Pro Power"
+    resource: !secret octoprint_api_psu_control
+    body_on: '{ "command":"turnPSUOn" }'
+    body_off: '{ "command":"turnPSUOff" }'
+    is_on_template: "{{ value_json.isPSUOn == true }}"
+    headers:
+      Content-Type: application/json
+      X-Api-Key: !secret octoprint_api_key
+
+sensor:
+  - platform: template
+    sensors:
+      ender_3_pro_actual_bed_temp_c:
+        friendly_name: Ender 3 Pro actual bed temp
+        entity_id: sensor.ender_3_pro_actual_bed_temp
+        icon_template: mdi:tray-full
+        value_template: "{{ ((states.sensor.ender_3_pro_actual_bed_temp.state | float - 32) * (5/9)) | round(1) }}"
+        unit_of_measurement: C
+
+      ender_3_pro_target_bed_temp_c:
+        friendly_name: Ender 3 Pro target bed temp
+        entity_id: sensor.ender_3_pro_target_bed_temp
+        icon_template: >
+          {%- if not is_state("sensor.ender_3_pro_actual_bed_temp", "unknown") -%}
+            {%- if states("sensor.ender_3_pro_target_bed_temp") > states("sensor.ender_3_pro_actual_bed_temp") -%}
+              mdi:thermometer-chevron-up
+            {%- elif states("sensor.ender_3_pro_target_bed_temp") < states("sensor.ender_3_pro_actual_bed_temp") -%}
+              mdi:thermometer-chevron-down
+            {%- else -%}
+              mdi:thermometer
+            {%- endif %}
+          {%- else -%}
+            mdi:thermometer
+          {%- endif %}
+        value_template: "{{ ((states.sensor.ender_3_pro_target_bed_temp.state | float - 32) * (5/9)) | round(1)  }}"
+        unit_of_measurement: C
+
+      ender_3_pro_actual_tool0_temp_c:
+        friendly_name: Ender 3 Pro actual tool0 temp
+        entity_id: sensor.ender_3_pro_actual_tool0_temp
+        icon_template: mdi:printer-3d-nozzle-outline
+        value_template: "{{ ((states.sensor.ender_3_pro_actual_tool0_temp.state | float - 32) * (5/9)) | round(1)  }}"
+        unit_of_measurement: C
+
+      ender_3_pro_target_tool0_temp_c:
+        friendly_name: Ender 3 Pro target tool0 temp
+        entity_id: sensor.ender_3_pro_target_tool0_temp
+        icon_template: >
+          {%- if not is_state("sensor.ender_3_pro_actual_tool0_temp", "unknown") -%}
+            {%- if states("sensor.ender_3_pro_target_tool0_temp") > states("sensor.ender_3_pro_actual_tool0_temp") -%}
+              mdi:thermometer-chevron-up
+            {%- elif states("sensor.ender_3_pro_target_tool0_temp") < states("sensor.ender_3_pro_actual_tool0_temp") -%}
+              mdi:thermometer-chevron-down
+            {%- else -%}
+              mdi:thermometer
+            {%- endif %}
+          {%- else -%}
+            mdi:thermometer
+          {%- endif %}
+        value_template: "{{ ((states.sensor.ender_3_pro_target_tool0_temp.state | float - 32) * (5/9)) | round(1)  }}"
+        unit_of_measurement: C
+
+      ender_3_pro_time_elapsed_format:
+        friendly_name: Ender 3 Pro Time Elapsed
+        entity_id: sensor.ender_3_pro_time_elapsed
+        icon_template: mdi:clock-start
+        value_template: >-
+          {% set sensor = states("sensor.ender_3_pro_time_elapsed") | float %}
+          {% set time = (sensor * 60) | int %}
+          {% set seconds = (time % 60) | int %}
+          {% set minutes = ((time % 3600) / 60) | int %}
+          {% set hours = ((time % 86400) / 3600) | int %}
+          {% set days = (time / 86400) | int %}
+          {%- if days > 0 -%}
+            {{ days }}d
+          {%- endif -%}
+          {%- if hours > 0 -%}
+            {%- if days > 0 %}, {% endif -%}
+            {{ hours }}h
+          {%- endif -%}
+          {%- if minutes > 0 -%}
+            {%- if hours > 0 or days > 0 %}, {% endif -%}
+            {{ minutes }}m
+          {%- endif -%}
+          {%- if seconds > 0 -%}
+            {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
+            {{ seconds }}s
+          {%- endif %}
+
+      ender_3_pro_time_remaining_format:
+        friendly_name: Ender 3 Pro Time Remaining
+        entity_id: sensor.ender_3_pro_time_remaining
+        icon_template: mdi:clock-start
+        value_template: >-
+          {% set sensor = states("sensor.ender_3_pro_time_remaining") | float %}
+          {% set time = (sensor * 60) | int %}
+          {% set seconds = (time % 60) | int %}
+          {% set minutes = ((time % 3600) / 60) | int %}
+          {% set hours = ((time % 86400) / 3600) | int %}
+          {% set days = (time / 86400) | int %}
+          {%- if days > 0 -%}
+            {{ days }}d
+          {%- endif -%}
+          {%- if hours > 0 -%}
+            {%- if days > 0 %}, {% endif -%}
+            {{ hours }}h
+          {%- endif -%}
+          {%- if minutes > 0 -%}
+            {%- if hours > 0 or days > 0 %}, {% endif -%}
+            {{ minutes }}m
+          {%- endif -%}
+          {%- if seconds > 0 -%}
+            {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
+            {{ seconds }}s
+          {%- endif %}
+
+  - platform: rest
+    name: ender_3_pro_job
+    resource: !secret octoprint_api_job
+    json_attributes:
+      - job
+    headers:
+      Content-Type: application/json
+      X-Api-Key: !secret octoprint_api_key
+    value_template: 'OK'
+
+  - platform: template
+    sensors:
+      ender_3_pro_stl_file:
+        friendly_name: STL File
+        entity_id: sensor.ender_3_pro_job
+        icon_template: mdi:file-outline
+        value_template: '{{ states.sensor.ender_3_pro_job.attributes["job"]["file"]["display"] }}'
+
+      ender_3_pro_stl_file_size:
+        friendly_name: STL Size
+        entity_id: sensor.ender_3_pro_job
+        icon_template: mdi:folder-text-outline
+        value_template: '{{ (states.sensor.ender_3_pro_job.attributes["job"]["file"]["size"] / 1049000) | round(2) }}'
+        unit_of_measurement: 'MB'
+
+      ender_3_pro_filament_length:
+        friendly_name: Filament Length
+        entity_id: sensor.ender_3_pro_job
+        icon_template: mdi:clock-start
+        value_template: '{{ (states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] | float / 1000) | round(2) }}'
+        unit_of_measurement: 'm'
+
+      ender_3_pro_filament_cost:
+        friendly_name: "Cost"
+        icon_template: mdi:currency-usd
+        value_template: '{{ ((states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] / 1000) | multiply(0.056)) | round(2) }}'
+        unit_of_measurement: '$'
