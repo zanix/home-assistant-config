@@ -171,6 +171,24 @@ sensor:
         value_template: '{{ ((states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] / 1000) | multiply(0.056)) | round(2) }}'
         unit_of_measurement: '$'
 
+  - platform: rest
+    name: ender_3_pro_layer_progress
+    resource: !secret octoprint_api_layer_progress
+    json_attributes:
+      - layer
+    headers:
+      Content-Type: application/json
+      X-Api-Key: !secret octoprint_api_key
+    value_template: 'OK'
+
+  - platform: template
+    sensors:
+      ender_3_pro_layer_status:
+        friendly_name: Layer Status
+        entity_id: sensor.ender_3_pro_layer_progress
+        icon_template: mdi:layers-triple-outline
+        value_template: '{{ states.sensor.ender_3_pro_layer_progress.attributes["layer"]["current"] }} / {{ states.sensor.ender_3_pro_layer_progress.attributes["layer"]["total"] }}'
+
 history:
   exclude:
     entities:
@@ -183,6 +201,7 @@ history:
       - sensor.ender_3_pro_time_elapsed_format
       - sensor.ender_3_pro_time_remaining
       - sensor.ender_3_pro_time_remaining_format
+      - sensor.ender_3_pro_layer_status
 
 recorder:
   exclude:
@@ -196,6 +215,7 @@ recorder:
       - sensor.ender_3_pro_time_elapsed_format
       - sensor.ender_3_pro_time_remaining
       - sensor.ender_3_pro_time_remaining_format
+      - sensor.ender_3_pro_layer_status
 
 influxdb:
   exclude:
@@ -209,3 +229,4 @@ influxdb:
       - sensor.ender_3_pro_time_elapsed_format
       - sensor.ender_3_pro_time_remaining
       - sensor.ender_3_pro_time_remaining_format
+      - sensor.ender_3_pro_layer_status
