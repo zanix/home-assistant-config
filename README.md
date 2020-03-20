@@ -1,15 +1,19 @@
-# [![Build Status](https://travis-ci.org/zanix/home-assistant-config.svg?branch=master)](https://travis-ci.org/zanix/home-assistant-config) Home-Assistant Config by [@zanixmechanix](https://twitter.com/zanixmechanix)
+# [Zanix's][zanix] [Home Assistant][home-assistant] Configuration
 
-[Home Assistant](https://home-assistant.io) configuration files (YAMLs)
+[![Home Assistant CI][githubci-shield]][githubci]
+[![GitHub Activity][commits-shield]][commits]
+[![GitHub Last Commit][last-commit-shield]][commits]
+
+[![Home Assistant Community Forum][forum-shield]][forum]
 
 This is my Home Assistant Configuration created for use with the [docker container](https://www.home-assistant.io/docs/installation/docker/)
-version of [Home Assistant](https://home-assistant.io) running on an Intel NUC5i5MYHE.
+version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 If you want to back up your own Home Assistant configuration to GitHub, follow [this guide](https://home-assistant.io/docs/ecosystem/backup/backup_github/).
 
 ## Software
 
-- [Home Assistant](https://home-assistant.io)
+- [Home Assistant][home-assistant]
 
 ### Add-Ons
 
@@ -85,6 +89,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
   - [Emby for Android](https://play.google.com/store/apps/details?id=com.mb.android)
   - [Emby for Android TV](https://play.google.com/store/apps/details?id=tv.emby.embyatv)
   - [Emby for Roku TV](https://channelstore.roku.com/details/44191/emby)
+- PlayStation 4
 
 ### Network
 
@@ -187,4 +192,17 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 
 **All files are edited with [Visual Studio Code](https://code.visualstudio.com).**
 
-**Configuration files are tested against the most stable version of Home Assistant using [Travis](https://travis-ci.org/zanix/home-assistant-config).**
+**Configuration files are tested against the stable and beta versions of Home Assistant using GitHub Action Workflows.**
+
+[githubci-shield]: https://github.com/zanix/home-assistant-config/workflows/Home%20Assistant%20CI/badge.svg?branch=master
+[githubci]: https://github.com/zanix/home-assistant-config/actions
+[commits-shield]: https://img.shields.io/github/commit-activity/y/zanix/home-assistant-config.svg
+[commits]: https://github.com/zanix/home-assistant-config/commits/master
+[forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
+[forum]: https://community.home-assistant.io
+[zanix]: https://github.com/zanix
+[home-assistant]: https://home-assistant.io
+[last-commit-shield]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg
+[stars-shield]: https://img.shields.io/github/stars/zanix/home-assistant-config.svg?style=social&label=Stars
+[forks-shield]: https://img.shields.io/github/forks/zanix/home-assistant-config.svg?style=social&label=Forks
+[watchers-shield]: https://img.shields.io/github/watchers/zanix/home-assistant-config.svg?style=social&label=Watchers
