@@ -22,21 +22,24 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Custom Elements
 
-- [Animated Weather Card](https://github.com/iammexx/home-assistant-config/tree/master/ui/darksky) ([Forum](https://community.home-assistant.io/t/custom-dark-sky-animated-weather-card/59816/272)) - Custom animated weather card
+- [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) - Automatically populate the entities-list of lovelace cards
 - [Battery Entity Card](https://github.com/cbulock/lovelace-battery-entity) ([Forum](https://community.home-assistant.io/t/lovelace-battery-entity-card/107500)) - Display battery levels for battery entities
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
+- [Card Mod](https://github.com/thomasloven/lovelace-card-mod) - Add CSS styles to (almost) any lovelace card
+- [Custom Header](https://github.com/maykar/custom-header) - Adds enhancements and customization options to Home Assistant's Lovelace header
+- [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) - Show basic attributes from multiple entities
 - [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)) - Interactive floorplan
-- [Lovelace Custom Cards](https://github.com/ciotlosm/custom-lovelace) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Custom cards for lovelace
 - [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card for Home Assistant Lovelace UI
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) ([Forum](https://community.home-assistant.io/t/lovelace-multiple-entity-row/109109)) - Show multiple entity states on entity rows
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
+- [Stack In Card](https://github.com/custom-cards/stack-in-card) - Similar to vertical-stack and horizontal-stack but removes card borders
+- [Weather Card](https://github.com/bramkragten/weather-card) - Custom animated weather card
 - [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
-- [Vertical Stack In Card](https://github.com/custom-cards/vertical-stack-in-card) - Similar to vertical-stack but removes card borders
 
 ### Custom Components
 
-- [Attributes as Sensors](https://github.com/pilotak/homeassistant-attributes) - Allows the creation of a sensor that breaks out attribute of defined entities. I use this to separate `battery_level` attributes into their own sensors
+- [Attributes as Sensors](https://github.com/pilotak/homeassistant-attributes) - (Disabled) Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
 - [DreamScreen](https://github.com/GregoryDosh/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com/) (HD & 4k)
 - JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Was used to gather solar production from SolarEdge, but now is inactive.
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
@@ -49,13 +52,13 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Lighting
 
-- GE Z-Wave Light Switch (12722) x5
-- [GE Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R) x4
-- GE Z-Wave Dimmer (12724) x2
-- [GE Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2) x3
-- [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK) x2
+- GE Z-Wave Light Switch (12722)
+- [GE Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R)
+- GE Z-Wave Dimmer (12724)
+- [GE Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2)
+- [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK)
   - Hard-wired into lamps with local control using a switch on the metal frame of a lamp
-- [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/) x4
+- [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/)
 - [DreamScreen](https://www.dreamscreentv.com/) 4K DIY
   - Responsive LED Backlighting for Video, Music & Games
 
@@ -66,8 +69,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - Various Z-Wave Door/Window sensors
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU)
   - Smart Sprinkler controller
-- [Forecast.io (Darksky)](https://darksky.net)
-- [System Resources](https://home-assistant.io/components/sensor.systemmonitor/)
+- [System Resources](https://www.home-assistant.io/integrations/systemmonitor)
 
 ### Camera
 
@@ -77,19 +79,15 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - [Google Home Mini](https://store.google.com/us/product/google_home_mini?hl=en-US) x3
 - [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/)
-- [TCL Roku TV](https://www.bestbuy.com/site/tcl-55-class-54-6-diag--led-2160p-smart-4k-ultra-hd-tv-with-high-dynamic-range-roku-tv/5878705.p?skuId=5878705)
-- [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/) x2
+- [TCL Roku TV](https://www.bestbuy.com/site/tcl-65-class-led-6-series-2160p-smart-4k-uhd-tv-with-hdr-roku-tv/6367717.p?skuId=6367717)
+- [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/)
 - [Roku Streaming Stick](https://www.amazon.com/gp/product/B075XN5L53/)
 - [ChromeCast](https://www.google.com/chromecast/)
-- [Harmony Hub](https://www.amazon.com/gp/product/B00BQ5RYI4/) x3
+- [Harmony Hub](https://www.amazon.com/gp/product/B00BQ5RYI4/)
 - [Plex](https://plex.tv)
   - [Plex for Android](https://play.google.com/store/apps/details?id=com.plexapp.android)
   - [Plex for Roku TV](https://channelstore.roku.com/details/13535/plex)
-- [Emby](https://emby.media) - Currently not in use
-  - [Emby for Android](https://play.google.com/store/apps/details?id=com.mb.android)
-  - [Emby for Android TV](https://play.google.com/store/apps/details?id=tv.emby.embyatv)
-  - [Emby for Roku TV](https://channelstore.roku.com/details/44191/emby)
-- PlayStation 4
+- PlayStation 4 Pro
 
 ### Network
 
