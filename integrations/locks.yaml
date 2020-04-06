@@ -726,13 +726,26 @@ automation:
       entity_id: sensor.lock_front_alarm_type
       to: "9"
     action:
-      service: notify.join_all
-      data_template:
-        title: Front Door Lock Jammed
-        message: "The front door lock is jammed and needs to be locked manually."
-        data:
-          icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock.png"
-          smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+      - service: notify.join_all
+        data_template:
+          title: Front Door Lock Jammed
+          message: "The front door lock is jammed and needs to be locked manually."
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: input_boolean.voice_alerts
+            state: "on"
+          - condition: time
+            after: "07:00:00"
+            before: "21:00:00"
+      - service: tts.google_cloud_say
+        entity_id: media_player.living_room_speaker
+        data_template:
+          message: "The front door lock is jammed and needs to be locked manually."
+          cache: false
 
   - alias: "[Lock] Front Door Lock at Night"
     trigger:
@@ -813,22 +826,36 @@ automation:
         {% set select_id = 'lock_keypad_' ~ code_slot ~ '_access_schedule' %}
         {{ states['input_select'][select_id].state == 'Always' }}
     action:
-      service: lock.set_usercode
-      data_template:
-        node_id: >-
-          {% set object_id = trigger.to_state.object_id %}
-          {% set lock_name = object_id.split('_')[3] %}
-          {% set lock_id = 'lock_' ~ lock_name %}
-          {{ states['lock'][lock_id].attributes.node_id }}
-        code_slot: >-
-          {% set object_id = trigger.to_state.object_id %}
-          {% set code_slot = object_id.split('_')[2] %}
-          {{ code_slot }}
-        usercode: >-
-          {% set object_id = trigger.to_state.object_id %}
-          {% set code_slot = object_id.split('_')[2] %}
-          {% set user_code_id = 'lock_keypad_' ~ code_slot ~ '_code' %}
-          {{ states['input_text'][user_code_id].state }}
+      - service: lock.set_usercode
+        data_template:
+          node_id: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set lock_name = object_id.split('_')[3] %}
+            {% set lock_id = 'lock_' ~ lock_name %}
+            {{ states['lock'][lock_id].attributes.node_id }}
+          code_slot: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set code_slot = object_id.split('_')[2] %}
+            {{ code_slot }}
+          usercode: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set code_slot = object_id.split('_')[2] %}
+            {% set user_code_id = 'lock_keypad_' ~ code_slot ~ '_code' %}
+            {{ states['input_text'][user_code_id].state }}
+      - service: notify.join_user1
+        data_template:
+          title: "Code Enabled"
+          message: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set code_slot = object_id.split('_')[2] %}
+            {% set usercode_input = 'lock_keypad_' ~ code_slot ~ '_code' %}
+            {% set usercode = states['input_text'][usercode_input].state %}
+            {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
+            {% set name = states['input_text'][name_input].state %}
+            The pin code {{ usercode }} for {{ name }} has now been enabled.
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
 
   - alias: "[Lock] Keypad Switch Off"
     trigger:
@@ -853,19 +880,34 @@ automation:
         {% set select_id = 'lock_keypad_' ~ code_slot ~ '_access_schedule' %}
         {{ states['input_select'][select_id].state == 'Always' }}
     action:
-      service: lock.clear_usercode
-      data_template:
-        node_id: >-
-          {% set object_id = trigger.to_state.object_id %}
-          {% set lock_name = object_id.split('_')[3] %}
-          {% set lock_id = 'lock_' ~ lock_name %}
-          {{ states['lock'][lock_id].attributes.node_id }}
-        code_slot: >-
-          {% set object_id = trigger.to_state.object_id %}
-          {% set code_slot = object_id.split('_')[2] %}
-          {{ code_slot }}
-        # usercode: >-
-        #   {{ range(1000, 9999) | random }}
+      - service: lock.clear_usercode
+        # service: lock.set_usercode
+        data_template:
+          node_id: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set lock_name = object_id.split('_')[3] %}
+            {% set lock_id = 'lock_' ~ lock_name %}
+            {{ states['lock'][lock_id].attributes.node_id }}
+          code_slot: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set code_slot = object_id.split('_')[2] %}
+            {{ code_slot }}
+          # usercode: >-
+          #   {{ range(1000, 9999) | random }}
+      - service: notify.join_user1
+        data_template:
+          title: "Code Disabled"
+          message: >-
+            {% set object_id = trigger.to_state.object_id %}
+            {% set code_slot = object_id.split('_')[2] %}
+            {% set usercode_input = 'lock_keypad_' ~ code_slot ~ '_code' %}
+            {% set usercode = states['input_text'][usercode_input].state %}
+            {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
+            {% set name = states['input_text'][name_input].state %}
+            The pin code for {{ name }} is now disabled.
+          data:
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
+            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
 
   - alias: "[Lock] Keypad Temporary Code Start"
     trigger:
@@ -939,6 +981,7 @@ automation:
       to: "True"
     action:
       - service: lock.clear_usercode
+      # service: lock.set_usercode
         data_template:
           node_id: >-
             {{ states['lock']['lock_front'].attributes.node_id }}
@@ -989,6 +1032,7 @@ automation:
         {{ input_value == 'One Time' and alarm_type_value == '19' }}
     action:
       - service: lock.clear_usercode
+      # service: lock.set_usercode
         data_template:
           node_id: >-
             {{ states['lock']['lock_front'].attributes.node_id }}
@@ -1006,7 +1050,7 @@ automation:
             {% set usercode = states['input_text'][usercode_input].state %}
             {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
             {% set name = states['input_text'][name_input].state %}
-            The pin code {{ usercode }} for {{ name }} has been used and removed.
+            The one time use pin code {{ usercode }} for {{ name }} has been used and removed.
           data:
             icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
