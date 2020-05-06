@@ -11,12 +11,11 @@ condition:
     {%- set ns = namespace(found=false) -%}
     {%- set current = as_timestamp(now()) -%}
     {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | map(attribute='entity_id') | list -%}
-    {%- for entity_id in open_doors -%}
+    {%- for entity_id in open_doors if not ns.found -%}
       {%- set parts = entity_id.split('.') -%}
       {%- set entity = states[parts[0]][parts[1]] -%}
-      {%- if ((current - as_timestamp(entity.last_changed) / 60) | int) > 5 and ((current - as_timestamp(entity.last_changed) / 60) | int) % 5 == false -%}
-        {%- set ns.found = true -%}
-      {%- endif -%}
+      {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60) | int -%}
+      {%- set ns.found = changed >= 5 and changed % 5 == 0 -%}
     {%- endfor -%}
     {{ ns.found }}
 action:
@@ -45,7 +44,7 @@ action:
         {%- endmacro -%}
         {%- set current = as_timestamp(now()) -%}
         {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | list -%}
-        {%- for entity in open_doors if ( (current - as_timestamp(entity.last_changed)) / 60 > 5 and (((current - as_timestamp(entity.last_changed)) / 60) | int) % 5 == false ) -%}
+        {%- for entity in open_doors if (((current - as_timestamp(entity.last_changed)) / 60) | int) >= 5 and (((current - as_timestamp(entity.last_changed)) / 60) | int) % 5 == 0 -%}
           {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
           {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
         {%- endfor %}
@@ -85,7 +84,7 @@ action:
         {%- endmacro -%}
         {%- set current = as_timestamp(now()) -%}
         {%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id')) | selectattr('state','eq','Open') | list -%}
-        {%- for entity in open_doors if ( (current - as_timestamp(entity.last_changed)) / 60 > 5 and (((current - as_timestamp(entity.last_changed)) / 60) | int) % 5 == false ) -%}
+        {%- for entity in open_doors if (((current - as_timestamp(entity.last_changed)) / 60) | int) >= 5 and (((current - as_timestamp(entity.last_changed)) / 60) | int) % 5 == 0 -%}
           {%- if loop.first %} Hey! The {% elif loop.last %}, and the {% else %}, the {% endif -%}
           {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
         {%- endfor %}

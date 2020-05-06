@@ -16,7 +16,12 @@ condition:
       state: "Clear"
     - condition: template
       value_template: >-
-        {{ ( (as_timestamp(now()) - as_timestamp(states.cover.garage_door.last_changed)) / 60 > 30 and (((as_timestamp(now()) - as_timestamp(states.cover.garage_door.last_changed)) / 60) | int) % 30 == false ) }}
+        {%- set entity = states.cover.garage_door -%}
+        {%- set current = as_timestamp(now()) -%}
+        {%- if entity.state -%}
+          {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60) | int -%}
+          {{ changed >= 30 and changed % 30 == 0 }}
+        {% endif -%}
 action:
   - service: notify.join_all
     data_template:
@@ -41,7 +46,7 @@ action:
             {%- endif -%}
           {% endif -%}
         {%- endmacro -%}
-        The {{ states.cover.garage_door.attributes.friendly_name }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
+        The {{ state_attr('cover.garage_door', 'friendly_name') }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
       data:
         icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/garage-open.png"
         smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
@@ -76,5 +81,5 @@ action:
             {%- endif -%}
           {% endif -%}
         {%- endmacro -%}
-        Hey! The {{ states.cover.garage_door.attributes.friendly_name }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
+        Hey! The {{ state_attr('cover.garage_door', 'friendly_name') }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
       cache: false
