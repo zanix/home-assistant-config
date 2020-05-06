@@ -102,7 +102,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Automations
 
-- See automation folder and automation blocks within packages
+Below is a short list of automations I have set up. For more details, see the automation folder and automation blocks within integrations.
 
 ### Areas
 
@@ -117,7 +117,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Harmony
 
-- Set Harmony activity when selected
+- Set Harmony activity when selected in the UI
 
 ### Lights
 
@@ -140,8 +140,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Media Control
 
-- (Disabled) Family room auto off
-- (Disabled) Shield master bedroom auto off
+- Living room set Harmony to "Power off" when Sony TV reports that it's off
+- Family room set Harmony to "Power off" when TCL TV reports that it's off
+- Master bedroom set Harmony to "Power off" when Shield TV reports that it's off
+- Various routines to handle devices powering on and off
 - (Disabled) Shield living room paused at night
 - (Disabled) Shield living room playing at night
 
@@ -168,11 +170,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### System
 
-- Clear tts cache
-- Notify on failed login
 - Notify when devices have low battery
+- Clear tts cache
 - Notify when disk space is low
-- Set theme at startup
+- Notify on failed login
+- Notify when RAM usage is high
 - Notify when update is available
 - Z-wave heal at night
 
