@@ -214,13 +214,15 @@ sensor:
     sensors:
       lock_front_status:
         friendly_name: Front Lock Status
+        availability_template: "{{ true if not is_state('lock.lock_front', 'unavailable') else false }}"
         value_template: >-
           {% set number = states('sensor.lock_front_alarm_level') %}
           {% set alarm_type_value = states('sensor.lock_front_alarm_type') %}
           {% set entity_id = 'input_text.lock_keypad_' + number + '_name' %}
           {% set user = 'Master' if number == '0' else states(entity_id) %}
-          {% set alarm_type_value = '24' if (as_timestamp(now())-as_timestamp(states.lock.lock_front.last_changed)) < 15 and (as_timestamp(now())-as_timestamp(states.sensor.lock_front_alarm_type.last_changed)) > 15  and (states.lock.lock_front.state) == 'locked' else alarm_type_value %}
-          {% set alarm_type_value = '25' if (as_timestamp(now())-as_timestamp(states.lock.lock_front.last_changed)) < 15 and (as_timestamp(now())-as_timestamp(states.sensor.lock_front_alarm_type.last_changed)) > 15  and (states.lock.lock_front.state) == 'unlocked' else alarm_type_value %}
+          {% set now = as_timestamp(now()) %}
+          {% set alarm_type_value = '24' if (now - as_timestamp(states.lock.lock_front.last_changed)) < 15 and (now - as_timestamp(states.sensor.lock_front_alarm_type.last_changed)) > 15  and (states('lock.lock_front')) == 'locked' else alarm_type_value %}
+          {% set alarm_type_value = '25' if (now - as_timestamp(states.lock.lock_front.last_changed)) < 15 and (now - as_timestamp(states.sensor.lock_front_alarm_type.last_changed)) > 15  and (states('lock.lock_front')) == 'unlocked' else alarm_type_value %}
           {% set alarm_type_general_actions = {
             '0':'No Status Reported',
             '9':'Lock Jammed',
