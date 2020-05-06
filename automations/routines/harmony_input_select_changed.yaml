@@ -1,11 +1,11 @@
 ---
 # Changes the Harmony remote activity when the input select is changed.
 #
-# Remote devices and input entities should be named as follows:
+# Remote devices and input select entities should be named as follows:
 #   - input_select.remote_living_room
 #   - remote.living_room
-# The automation parses out "input_select.remote_" and passes "living_room"
-# to the script which prepends "input_select.remote_" and "remote." as needed.
+# The automation replaces "input_select.remote_" with "remote.living_room" and
+# passes it to the script which sets the action and resets the input select.
 #
 alias: "[Harmony] Input Select Changed"
 trigger:
@@ -20,4 +20,11 @@ action:
     entity_id: script.remote_harmony_activity
     data_template:
       variables:
-        input_remote: "{{ trigger.to_state.object_id | replace('remote_', '') }}"
+        set_input: "{{ trigger.to_state.entity_id }}"
+        set_remote: "{{ trigger.to_state.object_id | replace('remote_', 'remote.') }}"
+        set_activity: >-
+          {% if trigger.to_state.state == "Power Off" %}
+            -1
+          {% else %}
+            {{ trigger.to_state.state }}
+          {% endif %}
