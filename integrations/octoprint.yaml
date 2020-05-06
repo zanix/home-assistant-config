@@ -29,18 +29,41 @@ switch:
       X-Api-Key: !secret octoprint_api_key
 
 sensor:
+  - platform: rest
+    name: ender_3_pro_job
+    resource: !secret octoprint_api_job
+    json_attributes:
+      - job
+    headers:
+      Content-Type: application/json
+      X-Api-Key: !secret octoprint_api_key
+    value_template: 'OK'
+
+  - platform: rest
+    name: ender_3_pro_layer_progress
+    resource: !secret octoprint_api_layer_progress
+    json_attributes:
+      - layer
+    headers:
+      Content-Type: application/json
+      X-Api-Key: !secret octoprint_api_key
+    value_template: 'OK'
+
   - platform: template
     sensors:
       ender_3_pro_actual_bed_temp_c:
         friendly_name: Ender 3 Pro actual bed temp
         entity_id: sensor.ender_3_pro_actual_bed_temp
-        icon_template: mdi:tray-full
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_actual_bed_temp', 'unavailable') else false }}"
         value_template: "{{ ((states.sensor.ender_3_pro_actual_bed_temp.state | float - 32) * (5/9)) | round(1) }}"
+        icon_template: mdi:tray-full
         unit_of_measurement: C
 
       ender_3_pro_target_bed_temp_c:
         friendly_name: Ender 3 Pro target bed temp
         entity_id: sensor.ender_3_pro_target_bed_temp
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_target_bed_temp', 'unavailable') else false }}"
+        value_template: "{{ ((states.sensor.ender_3_pro_target_bed_temp.state | float - 32) * (5/9)) | round(1) }}"
         icon_template: >-
           {%- if not is_state("sensor.ender_3_pro_actual_bed_temp", "unknown") -%}
             {%- if states("sensor.ender_3_pro_target_bed_temp") > states("sensor.ender_3_pro_actual_bed_temp") -%}
@@ -53,19 +76,21 @@ sensor:
           {%- else -%}
             mdi:thermometer
           {%- endif %}
-        value_template: "{{ ((states.sensor.ender_3_pro_target_bed_temp.state | float - 32) * (5/9)) | round(1)  }}"
         unit_of_measurement: C
 
       ender_3_pro_actual_tool0_temp_c:
         friendly_name: Ender 3 Pro actual tool0 temp
         entity_id: sensor.ender_3_pro_actual_tool0_temp
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_actual_tool0_temp', 'unavailable') else false }}"
+        value_template: "{{ ((states.sensor.ender_3_pro_actual_tool0_temp.state | float - 32) * (5/9)) | round(1) }}"
         icon_template: mdi:printer-3d-nozzle-outline
-        value_template: "{{ ((states.sensor.ender_3_pro_actual_tool0_temp.state | float - 32) * (5/9)) | round(1)  }}"
         unit_of_measurement: C
 
       ender_3_pro_target_tool0_temp_c:
         friendly_name: Ender 3 Pro target tool0 temp
         entity_id: sensor.ender_3_pro_target_tool0_temp
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_target_tool0_temp', 'unavailable') else false }}"
+        value_template: "{{ ((states.sensor.ender_3_pro_target_tool0_temp.state | float - 32) * (5/9)) | round(1) }}"
         icon_template: >-
           {%- if not is_state("sensor.ender_3_pro_actual_tool0_temp", "unknown") -%}
             {%- if states("sensor.ender_3_pro_target_tool0_temp") > states("sensor.ender_3_pro_actual_tool0_temp") -%}
@@ -78,13 +103,12 @@ sensor:
           {%- else -%}
             mdi:thermometer
           {%- endif %}
-        value_template: "{{ ((states.sensor.ender_3_pro_target_tool0_temp.state | float - 32) * (5/9)) | round(1)  }}"
         unit_of_measurement: C
 
       ender_3_pro_time_elapsed_format:
         friendly_name: Ender 3 Pro Time Elapsed
         entity_id: sensor.ender_3_pro_time_elapsed
-        icon_template: mdi:clock-start
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_time_elapsed', 'unavailable') else false }}"
         value_template: >-
           {% set time = states("sensor.ender_3_pro_time_elapsed") | int %}
           {% set seconds = (time % 60) | int %}
@@ -106,11 +130,12 @@ sensor:
             {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
             {{ seconds }}s
           {%- endif %}
+        icon_template: mdi:clock-start
 
       ender_3_pro_time_remaining_format:
         friendly_name: Ender 3 Pro Time Remaining
         entity_id: sensor.ender_3_pro_time_remaining
-        icon_template: mdi:clock-start
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_time_remaining', 'unavailable') else false }}"
         value_template: >-
           {% set time = states("sensor.ender_3_pro_time_remaining") | int %}
           {% set seconds = (time % 60) | int %}
@@ -132,62 +157,65 @@ sensor:
             {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
             {{ seconds }}s
           {%- endif %}
+        icon_template: mdi:clock-start
 
-  - platform: rest
-    name: ender_3_pro_job
-    resource: !secret octoprint_api_job
-    json_attributes:
-      - job
-    headers:
-      Content-Type: application/json
-      X-Api-Key: !secret octoprint_api_key
-    value_template: 'OK'
-
-  - platform: template
-    sensors:
       ender_3_pro_stl_file:
         friendly_name: STL File
         entity_id: sensor.ender_3_pro_job
-        icon_template: mdi:file-outline
+        availability_template: >-
+          {%- if not is_state('sensor.ender_3_pro_job', 'unavailable') and states.sensor.ender_3_pro_job.attributes["job"]["file"]["display"] != "undefined" -%}
+            {{ true }}
+          {%- else -%}
+            {{ false }}
+          {%- endif -%}
         value_template: '{{ states.sensor.ender_3_pro_job.attributes["job"]["file"]["display"] }}'
+        icon_template: mdi:file-outline
 
       ender_3_pro_stl_file_size:
         friendly_name: STL Size
         entity_id: sensor.ender_3_pro_job
-        icon_template: mdi:folder-text-outline
+        availability_template: >-
+          {%- if not is_state('sensor.ender_3_pro_job', 'unavailable') and states.sensor.ender_3_pro_job.attributes["job"]["file"]["size"] != "undefined" -%}
+            {{ true }}
+          {%- else -%}
+            {{ false }}
+          {%- endif -%}
         value_template: '{{ (states.sensor.ender_3_pro_job.attributes["job"]["file"]["size"] / 1049000) | round(2) }}'
+        icon_template: mdi:folder-text-outline
         unit_of_measurement: 'MB'
 
       ender_3_pro_filament_length:
         friendly_name: Filament Length
         entity_id: sensor.ender_3_pro_job
-        icon_template: mdi:clock-start
+        availability_template: >-
+          {%- if not is_state('sensor.ender_3_pro_job', 'unavailable') and states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] != "undefined" -%}
+            {{ true }}
+          {%- else -%}
+            {{ false }}
+          {%- endif -%}
         value_template: '{{ (states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] | float / 1000) | round(2) }}'
+        icon_template: mdi:clock-start
         unit_of_measurement: 'm'
 
       ender_3_pro_filament_cost:
         friendly_name: "Cost"
-        icon_template: mdi:currency-usd
+        entity_id: sensor.ender_3_pro_job
+        availability_template: >-
+          {%- if not is_state('sensor.ender_3_pro_job', 'unavailable') and states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] != "undefined" -%}
+            {{ true }}
+          {%- else -%}
+            {{ false }}
+          {%- endif -%}
         value_template: '{{ ((states.sensor.ender_3_pro_job.attributes["job"]["filament"]["tool0"]["length"] / 1000) | multiply(0.056)) | round(2) }}'
+        icon_template: mdi:currency-usd
         unit_of_measurement: '$'
 
-  - platform: rest
-    name: ender_3_pro_layer_progress
-    resource: !secret octoprint_api_layer_progress
-    json_attributes:
-      - layer
-    headers:
-      Content-Type: application/json
-      X-Api-Key: !secret octoprint_api_key
-    value_template: 'OK'
-
-  - platform: template
-    sensors:
       ender_3_pro_layer_status:
         friendly_name: Layer Status
         entity_id: sensor.ender_3_pro_layer_progress
-        icon_template: mdi:layers-triple-outline
+        availability_template: "{{ true if not is_state('sensor.ender_3_pro_layer_progress', 'unavailable') else false }}"
         value_template: '{{ states.sensor.ender_3_pro_layer_progress.attributes["layer"]["current"] }} / {{ states.sensor.ender_3_pro_layer_progress.attributes["layer"]["total"] }}'
+        icon_template: mdi:layers-triple-outline
 
 history:
   exclude:
