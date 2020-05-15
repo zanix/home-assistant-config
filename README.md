@@ -14,33 +14,64 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ## Software
 
 - [Home Assistant][home-assistant]
-
-### Add-Ons
-
-- [HACS](https://custom-components.github.io/hacs) - Home Assistant Community Store. Makes installing custom components and lovelace cars easy.
 - [MQTT Docker](https://forums.unraid.net/topic/36810-support-spants-nodered-mqtt-dashing-couchdb/) - MQTT Broker docker container in UnRaid
 
-### Custom Elements
+## Integrations
+
+Since most integrations can only be enabled from within the UI, here is a list of integrations that are enabled on my Home Assistant.
+
+- [Bravia TV](https://www.home-assistant.io/integrations/braviatv/) - The braviatv platform allows you to control a Sony Bravia TV
+- [Google Cast](https://www.home-assistant.io/integrations/cast/) - Google Cast integration
+- [EcoBee](https://www.home-assistant.io/integrations/ecobee/) - The ecobee integration lets you control and view sensor data from ecobee thermostats
+- [Logitech Harmony](https://www.home-assistant.io/integrations/harmony/) - The harmony remote platform allows you to control the state of your Harmony Hub Device
+- [IQVIA](https://www.home-assistant.io/integrations/iqvia/) - The iqvia sensor platform collects and displays allergy, asthma and disease information
+- [Mobile App](https://www.home-assistant.io/integrations/mobile_app/) - The Mobile App integration allows Home Assistant mobile apps to easily integrate with Home Assistant.
+- [MQTT](https://www.home-assistant.io/integrations/mqtt/) - Allows extremely lightweight publish/subscribe messaging transport
+- [National Weather Service](https://www.home-assistant.io/integrations/nws/) - The nws platform uses the National Weather Service web API as a source for meteorological data for your location
+- [Plex](https://www.home-assistant.io/integrations/plex/) - The plex integration allows you to connect to a Plex Media Server
+- [PS4](https://www.home-assistant.io/integrations/ps4/) - The ps4 integration allows you to control a Sony PlayStation 4 console
+- [Rachio](https://www.home-assistant.io/integrations/rachio/) - The rachio platform allows you to control your Rachio irrigation system
+- [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
+- [Roku](https://www.home-assistant.io/integrations/roku/) - The Roku integration allows you to control a Roku device
+- [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi/) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
+- [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
+- [Z-Wave](https://www.home-assistant.io/integrations/zwave/) - The Z-Wave integration for Home Assistant allows you to observe and control connected Z-Wave devices
+
+## HACS
+
+- [HACS](https://custom-components.github.io/hacs) - Home Assistant Community Store. Makes installing custom components and lovelace cards easy.
+
+### HACS Plugins
 
 - [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) - Automatically populate the entities-list of lovelace cards
-- [Battery Entity Card](https://github.com/cbulock/lovelace-battery-entity) ([Forum](https://community.home-assistant.io/t/lovelace-battery-entity-card/107500)) - Display battery levels for battery entities
+- [Banner Card](https://github.com/nervetattoo/banner-card) - A fluffy linkable banner with interactive glances to spice up your home dashboards
+- [Bar Card](https://github.com/custom-cards/bar-card) - Customizable Animated Bar card
+- [Battery State Card](https://github.com/maxwroc/battery-state-card) - Display battery levels for battery entities
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Card Mod](https://github.com/thomasloven/lovelace-card-mod) - Add CSS styles to (almost) any lovelace card
 - [Custom Header](https://github.com/maykar/custom-header) - Adds enhancements and customization options to Home Assistant's Lovelace header
 - [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) - Show basic attributes from multiple entities
 - [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)) - Interactive floorplan
-- [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card for Home Assistant Lovelace UI
+- [Layout Card](https://github.com/thomasloven/lovelace-layout-card) - Get more control over the placement of lovelace cards
+- [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) ([Forum](https://community.home-assistant.io/t/lovelace-multiple-entity-row/109109)) - Show multiple entity states on entity rows
+- [Paper Buttons Row](https://github.com/jcwillox/lovelace-paper-buttons-row) - Adds highly configurable buttons that use actions and per-state styling
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
+- [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
 - [Stack In Card](https://github.com/custom-cards/stack-in-card) - Similar to vertical-stack and horizontal-stack but removes card borders
 - [Weather Card](https://github.com/bramkragten/weather-card) - Custom animated weather card
-- [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
 
-### Custom Components
+### HACS Integrations
+
+- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com/) (HD & 4k)
+- [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
+
+## Disabled Integrations
+
+This is a list of integrations that are currently disabled, but have not been removed because I think I still might use them someday.
 
 - [Attributes as Sensors](https://github.com/pilotak/homeassistant-attributes) - (Disabled) Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
-- [DreamScreen](https://github.com/GregoryDosh/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com/) (HD & 4k)
 - JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Was used to gather solar production from SolarEdge, but now is inactive.
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
 
@@ -52,10 +83,12 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Lighting
 
-- GE Z-Wave Light Switch (12722)
-- [GE Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R)
-- GE Z-Wave Dimmer (12724)
-- [GE Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2)
+- GE/Jasco Z-Wave Light Switch (12722)
+- [GE/Jasco Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R)
+- GE/Jasco Z-Wave Dimmer (12724)
+- [GE/Jasco Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2)
+- [Inovelli LZW30 Black Series On/Off Switch](https://inovelli.com/black-series-on-off-switch-z-wave/)
+- [Honeywell 39348 / ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK)
   - Hard-wired into lamps with local control using a switch on the metal frame of a lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/)
@@ -77,7 +110,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ### Media
 
-- [Google Home Mini](https://store.google.com/us/product/google_home_mini?hl=en-US) x3
+- [Google Home Mini](https://store.google.com/us/product/google_home_mini?hl=en-US)
 - [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/)
 - [TCL Roku TV](https://www.bestbuy.com/site/tcl-65-class-led-6-series-2160p-smart-4k-uhd-tv-with-hdr-roku-tv/6367717.p?skuId=6367717)
 - [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/)
@@ -115,17 +148,33 @@ Below is a short list of automations I have set up. For more details, see the au
 - Set and update volume
 - Sleep on when Harmony activity is "Power Off"
 
+### Delivery
+
+- Send notification when mail will be delivered today
+- Send notification when packages are out for delivery
+- Send notification when packages have been delivered
+
+### Doors and Windows
+
+- Send notification when a door was left open
+- Send notification when a door was left open and leaving
+- Send notification when a door opened and away
+- Send notification when the garage door was left open
+- Send notification when the garage door was left open and leaving
+- Send notification when the garage door opened and away
+
 ### Harmony
 
 - Set Harmony activity when selected in the UI
 
 ### Lights
 
+- Change Dreamscreen mode when Family Room Harmony changes activities
 - Front lights on at sunset
 - Front lights dim at night
 - Front lights off at sunrise
 - Turn off all lights when away
-- Turn on some lights when arriving
+- Turn on entry lights when arriving
 
 ### Lock
 
@@ -133,33 +182,17 @@ Below is a short list of automations I have set up. For more details, see the au
 - Lock front door when away
 - Re-lock front door after unlock
 - Revoke one time use code when used
-- Set pass code when keypad is switched on
-- Revoke pass code when keypad is switched off
-- Set temporary pass code on set date start
-- Revoke temporary pass code on set date end
+- Set and revoke pass code when keypad is switched on and off
+- Set and revoke temporary pass code on set date start and end
+- Send notification when the lock is jammed
 
 ### Media Control
 
-- Living room set Harmony to "Power off" when Sony TV reports that it's off
-- Family room set Harmony to "Power off" when TCL TV reports that it's off
-- Master bedroom set Harmony to "Power off" when Shield TV reports that it's off
+- Living room and Master bedroom switch Harmony to "Power off" when Shield TV reports that it's off
+- Family room switch Harmony to "Power off" when TCL TV reports that it's off
 - Various routines to handle devices powering on and off
-- (Disabled) Shield living room paused at night
-- (Disabled) Shield living room playing at night
-
-### Notifications
-
-- Door was left open
-- Door was left open and leaving
-- Door opened and away
-- Garage door was left open
-- Garage door was left open and leaving
-- Garage door opened and away
-
-### Pi-hole
-
-- Disable when time is selected
-- Reset disable time after re-enabled
+- (Disabled) Shield TV paused at night
+- (Disabled) Shield TV playing at night
 
 ### Ring
 
@@ -178,11 +211,11 @@ Below is a short list of automations I have set up. For more details, see the au
 - Notify when update is available
 - Z-wave heal at night
 
-## Things to Buy
+## Things to Consider Buying
 
-- [Amazon Dash Buttons](https://www.amazon.com/dp/B01F6ETRNA)
+- More [Inovelli Switches](https://inovelli.com/products/switches/) because they are much nicer than the GE I currently have
 - [433Mhz Transmitter and receiver](https://www.amazon.com/dp/B00M2CUALS) - For 433Mhz based devices
-- [Amplifiers](https://www.amazon.com/dp/B006AMF2R8) - Power speakers for Dots, Chromecasts or other devices.
+- [Amplifiers](https://www.amazon.com/dp/B006AMF2R8) - Power speakers for Dots, Chromecasts or other devices
 - LED RGB [Wifi Controller](https://www.amazon.com/dp/B01JZ2SI6Q) flux_led compatible with [LED Strip kits](https://www.amazon.com/dp/B01CUILC3I) - ~100 Feet
 - [Withings](https://www.amazon.com/dp/B01F3LJ2RW) - Smart Weight scale
 
