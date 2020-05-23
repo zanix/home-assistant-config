@@ -18,6 +18,7 @@ common:
       - text-transform: uppercase
       - justify-self: start
       - font-weight: bold
+
 common_small:
   styles:
     card:
@@ -34,3 +35,99 @@ common_small:
       - justify-self: start
       - font-weight: bold
 
+person:
+  variables:
+    status: ""
+    battery: ""
+    charging: ""
+  aspect_ratio: 1/1
+  show_entity_picture: true
+  custom_fields:
+    status: |
+      [[[
+        if (variables.status) {
+          let status = states[variables.status].state === 'not_home' ? 'Away' : states[variables.status].state;
+          return `<span>${status}</span>`
+        }
+        else {
+          return `&nbsp;`
+        }
+      ]]]
+    # proximity: |
+    #   [[[
+    #     return `<ha-icon
+    #       icon="mdi:map-marker-distance"
+    #       style="width: 12px; height: 12px; color: var(--paper-item-icon-active-color);">
+    #       </ha-icon>  <span>\<span style="color: var(--text-color-sensor);">${states['proximity.joshua'].state} miles</span></span>`
+    #   ]]]
+    battery: |
+      [[[
+        let color = "var(--paper-item-icon-active-color)";
+        let icon = "cellphone";
+        if (variables.charging && states[variables.charging].state === 'charging') {
+          icon = "flash";
+          color = "var(--label-badge-green)";
+        }
+        if (variables.battery) {
+          return `<ha-icon
+            icon="mdi:${icon}"
+            style="width: 12px; height: 12px; color: ${color};">
+            </ha-icon> <span style="color: var(--text-color-sensor);">${states[variables.battery].state}% battery</span>`
+        }
+        else {
+          return `&nbsp;`
+        }
+      ]]]
+  styles:
+    card:
+      - padding: 10%
+      - font-size: 12px
+      - text-shadow: 0 0 0 black
+      - text-transform: capitalize
+      - justify-self: end
+      - align-self: middle
+      # - --mdc-ripple-color: blue
+      # - --mdc-ripple-press-opacity: 0.5
+    grid:
+      # - grid-template-areas: '"i status" "n n" "proximity proximity" "battery battery" "sd sd"'
+      - grid-template-areas: '"i status" "n n" "battery battery" "sd sd"'
+      - grid-template-columns: 1fr 1fr
+      - grid-template-rows: 1fr min-content min-content min-content min-content
+    name:
+      - font-size: 16px
+      - align-self: middle
+      - justify-self: start
+      - padding-bottom: 0
+    icon:
+      - width: 100%
+    img_cell:
+      - border-radius: 50%;
+    custom_fields:
+      status:
+        - align-self: start
+        - justify-self: end
+        - color: var(--text-medium-light-color)
+      # proximity:
+      #   - padding-bottom: 0
+      #   - align-self: middle
+      #   - justify-self: start
+      #   - color: var(--text-medium-light-color)
+      battery:
+        - padding-bottom: 0
+        - align-self: middle
+        - justify-self: start
+        - color: var(--text-medium-light-color)
+        - --text-color-sensor: '
+          [[[
+            if (variables.battery) {
+              if (states[variables.battery].state < 20) {
+                return "var(--label-badge-red)";
+              }
+              else if (states[variables.battery].state < 30) {
+                return "var(--label-badge-orange)";
+              }
+              else if (states[variables.battery].state < 40) {
+                return "var(--label-badge-yellow)";
+              }
+            }
+          ]]]'
