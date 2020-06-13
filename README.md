@@ -64,14 +64,14 @@ Since most integrations can only be enabled from within the UI, here is a list o
 
 ### HACS Integrations
 
-- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com/) (HD & 4k)
+- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
 - [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
 
 ## Disabled Integrations
 
 This is a list of integrations that are currently disabled, but have not been removed because I think I still might use them someday.
 
-- [Attributes as Sensors](https://github.com/pilotak/homeassistant-attributes) - (Disabled) Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
+- [Attributes](https://github.com/pilotak/homeassistant-attributes) - (Disabled) Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
 - JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Was used to gather solar production from SolarEdge, but now is inactive.
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
 
