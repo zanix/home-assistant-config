@@ -19,14 +19,6 @@ cards:
                 tap_action:
                   action: url
                   url_path: !secret octoprint_url
-              - entity: binary_sensor.ender_3_pro_printing
-                tap_action:
-                  action: url
-                  url_path: !secret octoprint_url
-              - entity: binary_sensor.ender_3_pro_printing_error
-                tap_action:
-                  action: url
-                  url_path: !secret octoprint_url
             double_tap_action:
               action: url
               url_path: !secret octoprint_url
@@ -57,12 +49,11 @@ cards:
               - entity: sensor.ender_3_pro_current_state
                 state_not: "unknown"
             card:
-              type: gauge
-              name: Completion
               entity: sensor.ender_3_pro_job_percentage
-              unit: '%'
-              min: 0
-              max: 100
+              type: custom:bar-card
+              name: Completion
+              positions:
+                icon: "off"
 
           - type: conditional
             conditions:
@@ -71,29 +62,58 @@ cards:
             card:
               type: entities
               entities:
-                - type: divider
-                - sensor.ender_3_pro_stl_file
-                - sensor.ender_3_pro_stl_file_size
-                - sensor.ender_3_pro_filament_length
-                - sensor.ender_3_pro_filament_cost
+                - entity: sensor.ender_3_pro_file
+                  type: custom:multiple-entity-row
+                  entities:
+                    - entity: sensor.ender_3_pro_file_size
+                      name: File Size
+                      unit: "MB"
+
+                - entity: sensor.ender_3_pro_time_elapsed_format
+                  type: custom:multiple-entity-row
+                  name: Time Elapsed
+                  entities:
+                    - entity: sensor.ender_3_pro_time_remaining_format
+                      name: Remaining
+
                 - entity: sensor.ender_3_pro_layer_status
                   name: Layer
-                - entity: sensor.ender_3_pro_time_elapsed_format
-                  name: Elapsed
-                - entity: sensor.ender_3_pro_time_remaining_format
-                  name: Remaining
-                - entity: sensor.ender_3_pro_actual_bed_temp_c
-                  name: Bed Temperature
+                - entity: sensor.ender_3_pro_filament_length
                   type: custom:multiple-entity-row
+                  name: Filament
                   entities:
-                    - entity: sensor.ender_3_pro_target_bed_temp_c
-                      name: Target
-                - entity: sensor.ender_3_pro_actual_tool0_temp_c
-                  name: Hot-end Temperature
-                  type: custom:multiple-entity-row
+                    - entity: sensor.ender_3_pro_filament_cost
+
+                - type: custom:mini-graph-card
+                  name: Temperature
+                  icon: mdi:thermometer
+                  decimals: 1
+                  hours_to_show: 1
+                  points_per_hour: 120
+                  animate: true
                   entities:
+                    - entity: sensor.ender_3_pro_actual_tool0_temp_c
+                      name: Nozzle
+                      show_state: true
+                      show_fill: false
                     - entity: sensor.ender_3_pro_target_tool0_temp_c
-                      name: Target
+                      name: Nozzle Target
+                      color: yellow
+                      show_legend: false
+                      show_line: false
+                      show_points: false
+                      smoothing: false
+                    - entity: sensor.ender_3_pro_actual_bed_temp_c
+                      name: Bed
+                      show_state: true
+                      show_fill: false
+                    - entity: sensor.ender_3_pro_target_bed_temp_c
+                      name: Bed Target
+                      color: purple
+                      show_legend: false
+                      show_line: false
+                      show_points: false
+                      smoothing: false
 
       - type: custom:stack-in-card
         cards:

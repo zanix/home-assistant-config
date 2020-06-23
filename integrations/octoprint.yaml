@@ -159,8 +159,8 @@ sensor:
           {%- endif %}
         icon_template: mdi:clock-start
 
-      ender_3_pro_stl_file:
-        friendly_name: STL File
+      ender_3_pro_file:
+        friendly_name: File
         entity_id: sensor.ender_3_pro_job
         availability_template: >-
           {%- if not is_state('sensor.ender_3_pro_job', 'unavailable') and states.sensor.ender_3_pro_job.attributes["job"]["file"]["display"] != "undefined" -%}
@@ -171,8 +171,8 @@ sensor:
         value_template: '{{ states.sensor.ender_3_pro_job.attributes["job"]["file"]["display"] }}'
         icon_template: mdi:file-outline
 
-      ender_3_pro_stl_file_size:
-        friendly_name: STL Size
+      ender_3_pro_file_size:
+        friendly_name: File Size
         entity_id: sensor.ender_3_pro_job
         availability_template: >-
           {%- if not is_state('sensor.ender_3_pro_job', 'unavailable') and states.sensor.ender_3_pro_job.attributes["job"]["file"]["size"] != "undefined" -%}
@@ -216,6 +216,22 @@ sensor:
         availability_template: "{{ true if not is_state('sensor.ender_3_pro_layer_progress', 'unavailable') else false }}"
         value_template: '{{ states.sensor.ender_3_pro_layer_progress.attributes["layer"]["current"] }} / {{ states.sensor.ender_3_pro_layer_progress.attributes["layer"]["total"] }}'
         icon_template: mdi:layers-triple-outline
+
+automation:
+  - alias: Ender 3 Pro
+    trigger:
+      - platform: state
+        entity_id: sensor.ender_3_pro_current_state
+        from: Printing
+        to: Operational
+    action:
+      - service: notify.join_user1
+        data_template:
+          title: 3D Printer
+          message: '{{ states("sensor.ender_3_pro_stl_file") }} finished printing in {{ states("sensor.ender_3_pro_time_elapsed_format") }}'
+          data:
+            icon: https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/printer-3d.png
+            small_icon: https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png
 
 history:
   exclude:
