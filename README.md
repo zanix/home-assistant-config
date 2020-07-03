@@ -18,21 +18,24 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Integrations
 
-Since most integrations can only be enabled from within the UI, here is a list of integrations that are enabled on my Home Assistant.
+Since some integrations can only be enabled from within the UI, here is a list of integrations that are enabled via the Integrations UI on my Home Assistant.
 
-- [Bravia TV](https://www.home-assistant.io/integrations/braviatv/) - The braviatv platform allows you to control a Sony Bravia TV
-- [Google Cast](https://www.home-assistant.io/integrations/cast/) - Google Cast integration
 - [EcoBee](https://www.home-assistant.io/integrations/ecobee/) - The ecobee integration lets you control and view sensor data from ecobee thermostats
-- [Logitech Harmony](https://www.home-assistant.io/integrations/harmony/) - The harmony remote platform allows you to control the state of your Harmony Hub Device
+- [ESPHome](https://www.home-assistant.io/integrations/esphome/) - Connect ESPHome devices directly to Home Assistant with the native ESPHome API
+- [Google Cast](https://www.home-assistant.io/integrations/cast/) - Google Cast integration
 - [IQVIA](https://www.home-assistant.io/integrations/iqvia/) - The iqvia sensor platform collects and displays allergy, asthma and disease information
+- [Logitech Harmony](https://www.home-assistant.io/integrations/harmony/) - The harmony remote platform allows you to control the state of your Harmony Hub Device
 - [Mobile App](https://www.home-assistant.io/integrations/mobile_app/) - The Mobile App integration allows Home Assistant mobile apps to easily integrate with Home Assistant.
 - [MQTT](https://www.home-assistant.io/integrations/mqtt/) - Allows extremely lightweight publish/subscribe messaging transport
 - [National Weather Service](https://www.home-assistant.io/integrations/nws/) - The nws platform uses the National Weather Service web API as a source for meteorological data for your location
 - [Plex](https://www.home-assistant.io/integrations/plex/) - The plex integration allows you to connect to a Plex Media Server
-- [PS4](https://www.home-assistant.io/integrations/ps4/) - The ps4 integration allows you to control a Sony PlayStation 4 console
 - [Rachio](https://www.home-assistant.io/integrations/rachio/) - The rachio platform allows you to control your Rachio irrigation system
 - [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
 - [Roku](https://www.home-assistant.io/integrations/roku/) - The Roku integration allows you to control a Roku device
+- [SolarEdge](https://www.home-assistant.io/integrations/solaredge/) - Get details from a SolarEdge solar power setup and integrate these into Home Assistant
+- [Sony Bravia TV](https://www.home-assistant.io/integrations/braviatv/) - The braviatv platform allows you to control a Sony Bravia TV
+- [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4/) - The ps4 integration allows you to control a Sony PlayStation 4 console
+- [Speedtest](https://www.home-assistant.io/integrations/speedtestdotnet/) - Uses the Speedtest.net web service to measure network bandwidth performance
 - [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi/) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
 - [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
 - [Z-Wave](https://www.home-assistant.io/integrations/zwave/) - The Z-Wave integration for Home Assistant allows you to observe and control connected Z-Wave devices
@@ -97,12 +100,14 @@ This is a list of integrations that are currently disabled, but have not been re
 
 ### Sensor / Switch
 
+- [ESPHome](https://esphome.io) - DIY devices
 - [OpenGarage](https://opengarage.io)
   - Opens, closes, and reads the status of my garage door as well detecting the presense of my car
 - Various Z-Wave Door/Window sensors
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU)
   - Smart Sprinkler controller
 - [System Resources](https://www.home-assistant.io/integrations/systemmonitor)
+- [Tasmoda](https://tasmota.github.io/docs/) - DIY devices
 
 ### Camera
 
