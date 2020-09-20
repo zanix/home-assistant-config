@@ -166,7 +166,7 @@ class WeatherCard extends LitElement {
           class="icon bigger"
           style="background: none, url('${this.getWeatherIcon(
             stateObj.state.toLowerCase(),
-            this.hass.states["sun.sun"].state
+            this.hass.states["sun.sun"]
           )}') no-repeat; background-size: contain;"
           >${stateObj.state}
         </span>
@@ -293,7 +293,16 @@ class WeatherCard extends LitElement {
                 daily.precipitation !== null
                   ? html`
                       <div class="precipitation">
-                        ${daily.precipitation} ${this.getUnit("precipitation")}
+                        ${Math.round(daily.precipitation*10)/10} ${this.getUnit("precipitation")}
+                      </div>
+                    `
+                  : ""}
+                ${!this._config.hide_precipitation &&
+                daily.precipitation_probability !== undefined &&
+                daily.precipitation_probability !== null
+                  ? html`
+                      <div class="precipitation_probability">
+                        ${Math.round(daily.precipitation_probability)} ${this.getUnit("precipitation_probability")}
                       </div>
                     `
                   : ""}
@@ -310,7 +319,7 @@ class WeatherCard extends LitElement {
         ? this._config.icons
         : "https://cdn.jsdelivr.net/gh/bramkragten/weather-card/dist/icons/"
     }${
-      sun && sun == "below_horizon"
+      sun && sun.state == "below_horizon"
         ? weatherIconsNight[condition]
         : weatherIconsDay[condition]
     }.svg`;
@@ -325,6 +334,8 @@ class WeatherCard extends LitElement {
         return lengthUnit;
       case "precipitation":
         return lengthUnit === "km" ? "mm" : "in";
+      case "precipitation_probability":
+        return "%";
       default:
         return this.hass.config.unit_system[measure] || "";
     }
@@ -343,6 +354,7 @@ class WeatherCard extends LitElement {
       ha-card {
         cursor: pointer;
         margin: auto;
+        overflow: hidden;
         padding-top: 1.3em;
         padding-bottom: 1.3em;
         padding-left: 1em;
