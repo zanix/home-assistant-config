@@ -1,0 +1,190 @@
+---
+# The open source modular smart mirror platform.
+# This is a bunch of rest sensors and switches to interact with the
+# Remote Contol module for MagicMirror
+#
+# https://magicmirror.builders
+# https://github.com/Jopyth/MMM-Remote-Control
+#
+sensor:
+  - platform: rest
+    name: "MagicMirror Brightness"
+    resource: http://192.168.1.9:8080/api/brightness
+    scan_interval: 10
+    value_template: '{{ value_json.result }}'
+
+switch:
+  - platform: rest
+    name: "MagicMirror Monitor"
+    resource: http://192.168.1.9:8080/api/monitor
+    body_on: '{"monitor": "on"}'
+    body_off: '{"monitor": "off"}'
+    is_on_template: '{{ value_json.monitor | replace("off", "false") | replace("on", "true") }}'
+    headers:
+      Content-Type: application/json
+
+rest_command:
+  magicmirror_brightness:
+    url: http://192.168.1.9:8080/api/brightness
+    method: POST
+    payload: '{"brightness": {{ brightness }}}'
+    content_type: "application/json; charset=utf-8"
+
+light:
+  - platform: template
+    lights:
+      magicmirror:
+        friendly_name: "MagicMirror"
+        value_template: >-
+          {%- if is_state('switch.magicmirror_monitor', 'on') -%}
+            on
+          {%- else -%}
+            off
+          {%- endif -%}
+        icon_template: >-
+          {% if is_state('switch.magicmirror_monitor', 'on') %}
+            mdi:monitor
+          {% else %}
+            mdi:monitor-off
+          {% endif %}
+        turn_on:
+          service: homeassistant.turn_on
+          data:
+            entity_id: switch.magicmirror_monitor
+        turn_off:
+          service: homeassistant.turn_off
+          data:
+            entity_id: switch.magicmirror_monitor
+        set_level:
+          service: rest_command.magicmirror_brightness
+          data:
+            brightness: "{{ (brightness * 100 / 255) | int }}"
+        level_template: >-
+          {%- if is_state('switch.magicmirror_monitor', 'on') -%}
+            {{ (states('sensor.magicmirror_brightness') | float * 2.55) | round() }}
+          {%- else -%}
+            0
+          {%- endif -%}
+
+automation:
+  - alias: "[MM] Bright when Kitchen Light On"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: light.kitchen
+        from: "off"
+        to: "on"
+      - platform: numeric_state
+        entity_id: light.kitchen
+        attribute: brightness
+        above: 45
+    condition:
+      - condition: numeric_state
+        entity_id: light.kitchen
+        attribute: brightness
+        above: 45
+      - condition: sun
+        after: sunset
+      - condition: time
+        before: "22:00:00"
+    action:
+      - service: rest_command.magicmirror_brightness
+        data:
+          brightness: 100
+
+  - alias: "[MM] Dim when Kitchen Light Off"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: light.kitchen
+        from: "on"
+        to: "off"
+      - platform: numeric_state
+        entity_id: light.kitchen
+        attribute: brightness
+        below: 45
+    condition:
+      - condition: sun
+        after: sunset
+      - condition: time
+        before: "22:00:00"
+    action:
+      - service: rest_command.magicmirror_brightness
+        data:
+          brightness: 40
+
+  - alias: "[MM] Dim at Sunset"
+    trigger:
+      platform: sun
+      event: sunset
+    condition:
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: light.kitchen
+            state: "off"
+          - condition: numeric_state
+            entity_id: light.kitchen
+            attribute: brightness
+            below: 45
+      - condition: time
+        before: "22:00:00"
+    action:
+      - service: rest_command.magicmirror_brightness
+        data:
+          brightness: 40
+
+  - alias: "[MM] On when Arrive"
+    trigger:
+      platform: state
+      entity_id: group.people
+      from: "not_home"
+      to: "home"
+    condition:
+      - condition: time
+        after: "07:00:00"
+      - condition: time
+        before: "22:00:00"
+    action:
+      - service: homeassistant.turn_on
+        data:
+          entity_id: switch.magicmirror_monitor
+
+  - alias: "[MM] Off when Away"
+    trigger:
+      platform: state
+      entity_id: group.people
+      from: "home"
+      to: "not_home"
+      for:
+        minutes: 10
+    condition:
+      - condition: time
+        after: "07:00:00"
+      - condition: time
+        before: "22:00:00"
+    action:
+      - service: homeassistant.turn_off
+        data:
+          entity_id: switch.magicmirror_monitor
+
+  - alias: "[MM] Off at Night"
+    trigger:
+      platform: time
+      at: "22:00:00"
+    action:
+      - service: homeassistant.turn_off
+        data:
+          entity_id: switch.magicmirror_monitor
+
+  - alias: "[MM] On at Morning"
+    trigger:
+      platform: time
+      at: "07:00:00"
+    action:
+      - service: homeassistant.turn_on
+        data:
+          entity_id: switch.magicmirror_monitor
+      - service: rest_command.magicmirror_brightness
+        data:
+          brightness: 100

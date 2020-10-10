@@ -125,6 +125,7 @@ This is a list of integrations that are currently disabled, but have not been re
 - [Plex](https://plex.tv)
   - [Plex for Android](https://play.google.com/store/apps/details?id=com.plexapp.android)
   - [Plex for Roku TV](https://channelstore.roku.com/details/13535/plex)
+- [MagicMirror](https://magicmirror.builders)
 - PlayStation 4 Pro
 
 ### Network
@@ -220,7 +221,6 @@ Below is a short list of automations I have set up. For more details, see the au
 
 - More [Inovelli Switches](https://inovelli.com/products/switches/) because they are much nicer than the GE I currently have
 - [433Mhz Transmitter and receiver](https://www.amazon.com/dp/B00M2CUALS) - For 433Mhz based devices
-- [Amplifiers](https://www.amazon.com/dp/B006AMF2R8) - Power speakers for Dots, Chromecasts or other devices
 - LED RGB [Wifi Controller](https://www.amazon.com/dp/B01JZ2SI6Q) flux_led compatible with [LED Strip kits](https://www.amazon.com/dp/B01CUILC3I) - ~100 Feet
 - [Withings](https://www.amazon.com/dp/B01F3LJ2RW) - Smart Weight scale
 
