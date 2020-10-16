@@ -9,14 +9,14 @@
 sensor:
   - platform: rest
     name: "MagicMirror Brightness"
-    resource: http://192.168.1.9:8080/api/brightness
+    resource: !secret magicmirror_api_brightness
     scan_interval: 10
     value_template: '{{ value_json.result }}'
 
 switch:
   - platform: rest
     name: "MagicMirror Monitor"
-    resource: http://192.168.1.9:8080/api/monitor
+    resource: !secret magicmirror_api_monitor
     scan_interval: 10
     body_on: '{"monitor": "on"}'
     body_off: '{"monitor": "off"}'
@@ -26,7 +26,7 @@ switch:
 
 rest_command:
   magicmirror_brightness:
-    url: http://192.168.1.9:8080/api/brightness
+    url: !secret magicmirror_api_brightness
     method: POST
     payload: '{"brightness": {{ brightness }}}'
     content_type: "application/json; charset=utf-8"
@@ -36,12 +36,7 @@ light:
     lights:
       magicmirror:
         friendly_name: "MagicMirror"
-        value_template: >-
-          {%- if is_state('switch.magicmirror_monitor', 'on') -%}
-            on
-          {%- else -%}
-            off
-          {%- endif -%}
+        value_template: "{{ states('switch.magicmirror_monitor') }}"
         icon_template: >-
           {% if is_state('switch.magicmirror_monitor', 'on') %}
             mdi:monitor
@@ -75,15 +70,29 @@ automation:
         entity_id: light.kitchen
         from: "off"
         to: "on"
+      - platform: state
+        entity_id: switch.dining_room_light
+        from: "off"
+        to: "on"
       - platform: numeric_state
         entity_id: light.kitchen
         attribute: brightness
         above: 45
     condition:
-      - condition: numeric_state
-        entity_id: light.kitchen
-        attribute: brightness
-        above: 45
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: switch.dining_room_light
+            state: "on"
+          - condition: and
+            conditions:
+              - condition: state
+                entity_id: light.kitchen
+                state: "on"
+              - condition: numeric_state
+                entity_id: light.kitchen
+                attribute: brightness
+                above: 45
       - condition: sun
         after: sunset
       - condition: time
@@ -100,11 +109,27 @@ automation:
         entity_id: light.kitchen
         from: "on"
         to: "off"
+      - platform: state
+        entity_id: switch.dining_room_light
+        from: "on"
+        to: "off"
       - platform: numeric_state
         entity_id: light.kitchen
         attribute: brightness
         below: 45
     condition:
+      - condition: state
+        entity_id: switch.dining_room_light
+        state: "off"
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: light.kitchen
+            state: "off"
+          - condition: numeric_state
+            entity_id: light.kitchen
+            attribute: brightness
+            below: 45
       - condition: sun
         after: sunset
       - condition: time
@@ -119,6 +144,9 @@ automation:
       platform: sun
       event: sunset
     condition:
+      - condition: state
+        entity_id: switch.dining_room_light
+        state: "off"
       - condition: or
         conditions:
           - condition: state
