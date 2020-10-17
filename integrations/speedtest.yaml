@@ -1,0 +1,159 @@
+---
+# Use the official Speedtest CLI to measure network bandwidth performance.
+#
+# This Speedtest template uses a command line integration to call the
+# official speedtest cli from Ookla.
+#
+# https://www.home-assistant.io/integrations/sensor.command_line/
+# https://www.home-assistant.io/integrations/template/
+# https://community.home-assistant.io/t/add-the-official-speedtest-cli/161915
+# https://community.openhab.org/t/speedtest-cli-by-ookla-internet-up-downlink-measurement-integration/94447/5
+
+recorder:
+  exclude:
+    entities:
+      - sensor.speedtest
+
+history:
+  exclude:
+    entities:
+      - sensor.speedtest
+
+influxdb:
+  exclude:
+    entities:
+      - sensor.speedtest
+
+sensor:
+  - platform: command_line
+    name: Speedtest
+    command: '/usr/bin/speedtest --f json'
+    json_attributes:
+      - timestamp
+      - ping
+      - download
+      - upload
+      - isp
+      - server
+      - result
+    value_template: '{{ value_json.type }}'
+    scan_interval: 3600
+    command_timeout: 30
+
+  - platform: template
+    sensors:
+      speedtest_last_updated:
+        friendly_name: "Last Updated"
+        availability_template: "{{ not is_state('sensor.speedtest', 'unknown') }}"
+        value_template: >-
+          {%- if not is_state('sensor.speedtest', 'unknown') -%}
+            {{ as_timestamp(state_attr('sensor.speedtest', 'timestamp')) | timestamp_custom('%m/%d/%Y %I:%M %p', True) }}
+          {%- else -%}
+            0
+          {%- endif -%}
+        icon_template: mdi:update
+
+      speedtest_server:
+        friendly_name: "SpeedTest Server"
+        availability_template: "{{ not is_state('sensor.speedtest', 'unknown') }}"
+        value_template: >-
+          {%- if not is_state('sensor.speedtest', 'unknown') -%}
+            {{ state_attr('sensor.speedtest', 'server')["name"] }}
+          {%- else -%}
+            unknown
+          {%- endif -%}
+        attribute_templates:
+          id: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'server')["id"] }}
+            {%- else -%}
+              unknown
+            {%- endif -%}
+          host: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'server')["host"] }}
+            {%- else -%}
+              unknown
+            {%- endif -%}
+          location: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'server')["location"] }}
+            {%- else -%}
+              unknown
+            {%- endif -%}
+          country: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'server')["country"] }}
+            {%- else -%}
+              unknown
+            {%- endif -%}
+          port: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'server')["port"] }}
+            {%- else -%}
+              unknown
+            {%- endif -%}
+          ip: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'server')["ip"] }}
+            {%- else -%}
+              unknown
+            {%- endif -%}
+        icon_template: mdi:server
+
+      speedtest_download:
+        friendly_name: "SpeedTest Download"
+        availability_template: "{{ not is_state('sensor.speedtest', 'unknown') }}"
+        value_template: >-
+          {%- if not is_state('sensor.speedtest', 'unknown') -%}
+            {{ (state_attr('sensor.speedtest', 'download')["bandwidth"] | float / 125000) | round(2) }}
+          {%- else -%}
+            0
+          {%- endif -%}
+        unit_of_measurement: "Mbps"
+        attribute_templates:
+          bytes_received: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'download')["bytes"] }}
+            {%- else -%}
+              0
+            {%- endif -%}
+        icon_template: mdi:progress-download
+
+      speedtest_upload:
+        friendly_name: "SpeedTest Upload"
+        availability_template: "{{ not is_state('sensor.speedtest', 'unknown') }}"
+        value_template: >-
+          {%- if not is_state('sensor.speedtest', 'unknown') -%}
+            {{ (state_attr('sensor.speedtest', 'upload')["bandwidth"] | float / 125000) | round(2) }}
+          {%- else -%}
+            0
+          {%- endif -%}
+        attribute_templates:
+          bytes_received: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'upload')["bytes"] }}
+            {%- else -%}
+              0
+            {%- endif -%}
+        unit_of_measurement: "Mbps"
+        icon_template: mdi:progress-upload
+
+      speedtest_ping:
+        friendly_name: "SpeedTest Ping"
+        availability_template: "{{ not is_state('sensor.speedtest', 'unknown') }}"
+        value_template: >-
+          {%- if not is_state('sensor.speedtest', 'unknown') -%}
+            {{ state_attr('sensor.speedtest', 'ping')["latency"] }}
+          {%- else -%}
+            0
+          {%- endif -%}
+        attribute_templates:
+          jitter: >-
+            {%- if not is_state('sensor.speedtest', 'unknown') -%}
+              {{ state_attr('sensor.speedtest', 'ping')["jitter"] | round(2) }}
+            {%- else -%}
+              0
+            {%- endif -%}
+        unit_of_measurement: "ms"
+        icon_template: mdi:radar

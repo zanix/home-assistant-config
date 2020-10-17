@@ -32,10 +32,8 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [Rachio](https://www.home-assistant.io/integrations/rachio/) - The rachio platform allows you to control your Rachio irrigation system
 - [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
 - [Roku](https://www.home-assistant.io/integrations/roku/) - The Roku integration allows you to control a Roku device
-- [SolarEdge](https://www.home-assistant.io/integrations/solaredge/) - Get details from a SolarEdge solar power setup and integrate these into Home Assistant
 - [Sony Bravia TV](https://www.home-assistant.io/integrations/braviatv/) - The braviatv platform allows you to control a Sony Bravia TV
 - [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4/) - The ps4 integration allows you to control a Sony PlayStation 4 console
-- [Speedtest](https://www.home-assistant.io/integrations/speedtestdotnet/) - Uses the Speedtest.net web service to measure network bandwidth performance
 - [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi/) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
 - [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
 - [Z-Wave](https://www.home-assistant.io/integrations/zwave/) - The Z-Wave integration for Home Assistant allows you to observe and control connected Z-Wave devices
@@ -74,9 +72,10 @@ Since some integrations can only be enabled from within the UI, here is a list o
 
 This is a list of integrations that are currently disabled, but have not been removed because I think I still might use them someday.
 
-- [Attributes](https://github.com/pilotak/homeassistant-attributes) - (Disabled) Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
-- JSONRest : [Forum Post on SolarEdge](https://community.home-assistant.io/t/solaredge-solar-panels-support/14340) : [Forum Post on JSONRest](https://community.home-assistant.io/t/solved-parsing-a-json-value-from-an-existing-entity-in-a-template-sensor/20490/17) - Was used to gather solar production from SolarEdge, but now is inactive.
+- [Attributes](https://github.com/pilotak/homeassistant-attributes) - Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
+- [SolarEdge](https://www.home-assistant.io/integrations/solaredge/) - (Using rest sensor + templates) Get details from a SolarEdge solar power setup and integrate these into Home Assistant
+- [Speedtest](https://www.home-assistant.io/integrations/speedtestdotnet/) - (Using command line sensor + templates) Uses the Speedtest.net web service to measure network bandwidth performance
 
 ## Devices
 
