@@ -1,0 +1,165 @@
+blueprint:
+  name: Nagging Alerting Notification Automation
+  description: 'Trigger an alert based on the state of a given sensor. The Alert is
+    send to a mobile app device and repeats as long as the sensor is in the given
+    state. An additonal action can be specified. This might be useful to tts the message.
+    Hint: the message variable can be re-used again in the action''s template as:
+    {{ message }}
+
+    '
+  domain: automation
+  source_url: https://gist.github.com/pavax/08705e383bdd3b58ea7b75a1f01c7e54
+  input:
+    sensor_entity:
+      name: Sensor Entity
+      description: Sensor that triggers an alert
+      default:
+      selector:
+        entity: {}
+    alert_state:
+      name: Sensor Alert state
+      description: Sensor state that triggers the alert notification
+      default: 'on'
+    alert_delay:
+      name: Alert Delay
+      description: Time to wait until an alert notification will be send (inital and
+        subsequently)
+      default: 120
+      selector:
+        number:
+          min: 0.0
+          max: 3600.0
+          unit_of_measurement: seconds
+          step: 1.0
+          mode: slider
+    max_alerts:
+      name: Max Alert Notifications
+      description: How often should the alert get triggered while the alert is active
+      default: 3
+      selector:
+        number:
+          min: 0.0
+          max: 100.0
+          unit_of_measurement: count
+          step: 1.0
+          mode: slider
+    notify_device:
+      name: Device to notify
+      description: Device needs to run the official Home Assistant app to receive
+        notifications.
+      selector:
+        device:
+          integration: mobile_app
+    notify_message:
+      name: Notifcation Message (Optional)
+      description: 'Default: "Alert {{ entity_name }} triggered"'
+      default: Alert {{ entity_name }} triggered
+    resolved_message:
+      name: Message when the alert is resolved (Optional)
+      description: 'Default: "Alert {{ entity_name }} resolved"'
+      default: Alert {{ entity_name }} resolved
+    alert_action:
+      name: Alert Action (Optional)
+      description: Action to run while the alert is active. You can reuse the {{ notify_message
+        }} variable
+      default: []
+      selector:
+        action: {}
+    resolved_action:
+      name: Resolved Action (Optional)
+      description: Action to run after an alert was resolved. You can reuse the {{
+        resolved_message }} variable
+      default: []
+      selector:
+        action: {}
+    dismiss_entity:
+      name: Dismiss Alert (Optional)
+      description: Input Boolean to dismiss an alert
+      default:
+      selector:
+        entity:
+          domain: input_boolean
+mode: restart
+max_exceeded: silent
+variables:
+  sensor_entity: !input 'sensor_entity'
+  notify_message: Alert {{ entity_name }} triggered
+  resolved_message: !input 'resolved_message'
+  entity_name: '{{ state_attr(sensor_entity,''friendly_name'') }}'
+  alert_action: !input 'alert_action'
+  alert_state: !input 'alert_state'
+  dismiss_entity: !input 'dismiss_entity'
+  resolved_action: !input 'resolved_action'
+  send_notification: 'false'
+trigger:
+- platform: state
+  entity_id: !input 'sensor_entity'
+  to: !input 'alert_state'
+- platform: homeassistant
+  event: start
+condition:
+- condition: template
+  value_template: '{{ is_state(sensor_entity, alert_state) }}'
+action:
+- choose:
+  - conditions: '{{ dismiss_entity != None }}'
+    sequence:
+    - service: input_boolean.turn_on
+      data:
+        entity_id: !input 'dismiss_entity'
+- wait_for_trigger:
+  - platform: template
+    value_template: '{{ not is_state(sensor_entity, alert_state)}}'
+  - platform: template
+    value_template: '{{ dismiss_entity != None and not is_state(dismiss_entity, ''on'')
+      }}'
+  timeout: !input 'alert_delay'
+- variables:
+    send_notification: '{{ wait.trigger == None }}'
+- repeat:
+    count: !input 'max_alerts'
+    sequence:
+    - condition: template
+      value_template: '{{ is_state(sensor_entity, alert_state)}}'
+    - condition: template
+      value_template: '{{ dismiss_entity == None or is_state(dismiss_entity, ''on'')
+        }}'
+    - domain: mobile_app
+      type: notify
+      device_id: !input 'notify_device'
+      message: !input 'notify_message'
+    - choose:
+      - conditions: '{{ alert_action is defined and alert_action|length > 0 }}'
+        sequence: !input 'alert_action'
+    - wait_for_trigger:
+      - platform: template
+        value_template: '{{ not is_state(sensor_entity, alert_state)}}'
+      - platform: template
+        value_template: '{{ dismiss_entity != None and not is_state(dismiss_entity,
+          ''on'') }}'
+      timeout: !input 'alert_delay'
+- choose:
+  - conditions: '{{ send_notification and dismiss_entity != None and not is_state(dismiss_entity,
+      ''on'') }}'
+    sequence:
+    - service: system_log.write
+      data:
+        message: Alert {{ entity_name }} dismissed
+        level: warning
+  - conditions: '{{ send_notification and not is_state(sensor_entity, alert_state)
+      }}'
+    sequence:
+    - domain: mobile_app
+      type: notify
+      device_id: !input 'notify_device'
+      message: !input 'resolved_message'
+    - choose:
+      - conditions: '{{ resolved_action is defined and resolved_action|length > 0
+          }}'
+        sequence: !input 'resolved_action'
+- choose:
+  - conditions: '{{ dismiss_entity != None }}'
+    sequence:
+    - service: input_boolean.turn_off
+      data:
+        entity_id: !input 'dismiss_entity'
