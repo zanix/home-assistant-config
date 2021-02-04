@@ -1,0 +1,49 @@
+---
+alias: Front Door Lock State Change
+initial_state: true
+trigger:
+  - platform: event
+    event_type: state_changed
+    event_data:
+      entity_id: lock.front_door
+
+variables:
+  # old_state: '{{ trigger.event.data.old_state.state|lower }}'
+  new_state: '{{ trigger.event.data.new_state.state|lower }}'
+
+action:
+  - choose:
+      - conditions:
+          - '{{ new_state == "locked" }}'
+        sequence:
+          # Update Light Switch LED Status Color.
+          - service: script.inovelli_led
+            data:
+              entity_id: zwave.inovelli_lzw31_sn_switch_red_series_living_room
+              effect: off
+
+      # Unlock the front door.
+      - conditions:
+          - '{{ new_state == "unlocked" }}'
+        sequence:
+          # Update Light Switch LED Status Color.
+          - service: script.inovelli_led
+            data:
+              entity_id: switch.living_room
+              color: red
+              level: 10
+              effect: pulse
+
+          # Change the notification animation.
+          - delay:
+              seconds: 60
+          - condition: state
+            entity_id: lock.front_door
+            state: "unlocked"
+          # Update Light Switch LED Status Color.
+          - service: script.inovelli_led
+            data:
+              entity_id: zwave.inovelli_lzw31_sn_switch_red_series_living_room
+              color: red
+              level: 4
+              effect: solid
