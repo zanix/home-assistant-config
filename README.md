@@ -14,7 +14,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ## Software
 
 - [Home Assistant][home-assistant]
-- [MQTT Docker](https://forums.unraid.net/topic/36810-support-spants-nodered-mqtt-dashing-couchdb/) - MQTT Broker docker container in UnRaid
+- [MQTT](https://mosquitto.org) - MQTT Broker docker container
 
 ## Integrations
 
@@ -33,8 +33,10 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
 - [Roku](https://www.home-assistant.io/integrations/roku/) - The Roku integration allows you to control a Roku device
 - [Sony Bravia TV](https://www.home-assistant.io/integrations/braviatv/) - The braviatv platform allows you to control a Sony Bravia TV
-- [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4/) - The ps4 integration allows you to control a Sony PlayStation 4 console
+- [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4/) - The PS4 integration allows you to control a Sony PlayStation 4 console
+- [Tasmota](https://www.home-assistant.io/integrations/tasmota) - This integration allows to control of Tasmota devices over MQTT
 - [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi/) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
+- [WLED](https://www.home-assistant.io/integrations/wled) - WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812, APA102, and similar) LED's
 - [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
 - [Z-Wave](https://www.home-assistant.io/integrations/zwave/) - The Z-Wave integration for Home Assistant allows you to observe and control connected Z-Wave devices
 
@@ -42,31 +44,31 @@ Since some integrations can only be enabled from within the UI, here is a list o
 
 - [HACS](https://custom-components.github.io/hacs) - Home Assistant Community Store. Makes installing custom components and lovelace cards easy.
 
+### HACS Integrations
+
+- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
+- [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
+
 ### HACS Plugins
 
-- [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) - Automatically populate the entities-list of lovelace cards
 - [Banner Card](https://github.com/nervetattoo/banner-card) - A fluffy linkable banner with interactive glances to spice up your home dashboards
 - [Bar Card](https://github.com/custom-cards/bar-card) - Customizable Animated Bar card
 - [Battery State Card](https://github.com/maxwroc/battery-state-card) - Display battery levels for battery entities
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Card Mod](https://github.com/thomasloven/lovelace-card-mod) - Add CSS styles to (almost) any lovelace card
-- [Custom Header](https://github.com/maykar/custom-header) - Adds enhancements and customization options to Home Assistant's Lovelace header
 - [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) - Show basic attributes from multiple entities
 - [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)) - Interactive floorplan
 - [Layout Card](https://github.com/thomasloven/lovelace-layout-card) - Get more control over the placement of lovelace cards
+- [Lovelace Swipe Navigation](https://github.com/maykar/lovelace-swipe-navigation) - Swipe through Lovelace views on mobile
 - [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) ([Forum](https://community.home-assistant.io/t/lovelace-multiple-entity-row/109109)) - Show multiple entity states on entity rows
 - [Paper Buttons Row](https://github.com/jcwillox/lovelace-paper-buttons-row) - Adds highly configurable buttons that use actions and per-state styling
+- [RGB Light Card](https://github.com/bokub/rgb-light-card) - A Lovelace custom card for RGB lights
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
 - [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
 - [Stack In Card](https://github.com/custom-cards/stack-in-card) - Similar to vertical-stack and horizontal-stack but removes card borders
 - [Weather Card](https://github.com/bramkragten/weather-card) - Custom animated weather card
-
-### HACS Integrations
-
-- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
-- [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
 
 ## Disabled Integrations
 
@@ -74,8 +76,6 @@ This is a list of integrations that are currently disabled, but have not been re
 
 - [Attributes](https://github.com/pilotak/homeassistant-attributes) - Allows the creation of a sensor that breaks out attribute of defined entities. Was used this to separate `battery_level` attributes into their own sensors, but now is inactive since Home Assistant does this natively.
 - Python Zwave Fade : [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) : [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py) - Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
-- [SolarEdge](https://www.home-assistant.io/integrations/solaredge/) - (Using rest sensor + templates) Get details from a SolarEdge solar power setup and integrate these into Home Assistant
-- [Speedtest](https://www.home-assistant.io/integrations/speedtestdotnet/) - (Using command line sensor + templates) Uses the Speedtest.net web service to measure network bandwidth performance
 
 ## Devices
 
@@ -90,12 +90,14 @@ This is a list of integrations that are currently disabled, but have not been re
 - GE/Jasco Z-Wave Dimmer (12724)
 - [GE/Jasco Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2)
 - [Inovelli LZW30 Black Series On/Off Switch](https://inovelli.com/black-series-on-off-switch-z-wave/)
+- [Inovelli LZW30 Red Series On/Off Switch](https://inovelli.com/red-series-on-off-switch-z-wave/)
 - [Honeywell 39348 / ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK)
   - Hard-wired into lamps with local control using a switch on the metal frame of a lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN/)
 - [DreamScreen](https://www.dreamscreentv.com/) 4K DIY
   - Responsive LED Backlighting for Video, Music & Games
+- [WLED](https://github.com/Aircoookie/WLED) Custom light strip
 
 ### Sensor / Switch
 
@@ -106,7 +108,7 @@ This is a list of integrations that are currently disabled, but have not been re
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU)
   - Smart Sprinkler controller
 - [System Resources](https://www.home-assistant.io/integrations/systemmonitor)
-- [Tasmoda](https://tasmota.github.io/docs/) - DIY devices
+- [Tasmota](https://tasmota.github.io/docs/) - DIY devices
 
 ### Camera
 
