@@ -1,22 +1,63 @@
 ---
 inovelli_led_status_start:
   alias: "Inovelli LED [Status Start]"
-  icon: mdi:led-on
+  description: "Set a LED effect and check for state "
+  icon: mdi:led-off
+
+  fields:
+    entity_id:
+      description: "ZWave entity"
+      example: "zwave.inovelli_lzw30_sn_switch_red_series"
+    model:
+      description: "Device type [ dimmer | switch | combo_light | combo_fan ]"
+      example: "dimmer"
+    color:
+      description: "LED Color [ 0-255 | Off | Red | Orange | Yellow | Green | Cyan | Teal | Blue | Purple | Light Pink | Pink | White ]"
+      example: "Red"
+    level:
+      description: "LED brightness [ 1-10 ]"
+      example: "10"
+    duration:
+      description: "How long to initially apply the effect"
+      example: "15 Seconds"
+    effect:
+      description: "Effect to use [ Off | Solid | Chase | Fast Blink | Blink | Pulse ]"
+      example: "Pulse"
+    state_entity:
+      description: "Entity to monitor"
+      example: "cover.garage_door"
+    state:
+      description: "State value"
+      example: "open"
+
   variables:
-    entity_id: '{{ entity_id|default("light.living_room") }}'
+    entity_id: '{{ entity_id|default("zwave.inovelli_lzw30_sn_switch_red_series") }}'
     model: |
-      {% set models = {
-        light.living_room: "dimmer",
-        switch.garage_light: "switch",
-        switch.office_switch: "switch"
-      } %}
-      {{ models[entity_id] }}
-    color: '{{ color|default("red") }}'
-    effect: '{{ effect|default("chase") }}'
-    duration: '{{ duration|default("15 seconds") }}'
-    level: '{{ level|default("8") }}'
+      {%- if model is string -%}
+        {{ model }}
+      {%- elif state_attr(entity_id, 'product_name') is string -%}
+        {%- if 'LZW31' in state_attr(entity_id, 'product_name') -%}
+          dimmer
+        {%- elif 'LZW36' in state_attr(entity_id, 'product_name') -%}
+          combo_light
+        {%- else -%}
+          switch
+        {%- endif -%}
+      {%- else -%}
+        dimmer
+      {%- endif -%}
+    color: |
+      {%- if color is not number -%}
+        {{ color|default("Yellow")|title }}
+      {%- else -%}
+        {{ color|int }}
+      {%- endif -%}
+    level: '{{ level|default("8")|int }}'
+    duration: '{{ duration|default("15 Seconds")|title }}'
+    effect: '{{ effect|default("Blink")|title }}'
     state_entity: '{{ state_entity|default("none") }}'
     state: '{{ state|default("false") }}'
+
   sequence:
     - service: script.inovelli_led
       data:
@@ -38,6 +79,6 @@ inovelli_led_status_start:
         entity_id: "{{ entity_id }}"
         model: "{{ model }}"
         color: "{{ color }}"
-        effect: solid
-        duration: indefinitely
+        effect: Solid
+        duration: Indefinitely
         level: 4

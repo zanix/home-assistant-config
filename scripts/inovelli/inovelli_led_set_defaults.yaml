@@ -1,28 +1,53 @@
 ---
 # Incorporates default LED color + dimmer brightness.
 # Originally in a script by Kevin Schlichter https://github.com/kschlichter/Home-Assistant-Inovelli-Red-Dimmer-Switch
+#
 inovelli_led_set_defaults:
   alias: "Inovelli LED [Set Defaults]"
-  icon: mdi:led-on
+  description: "Set the default/initial state of the LED light on Inovelli switches"
+  icon: mdi:led-outline
+
+  fields:
+    entity_id:
+      description: "ZWave entity"
+      example: "zwave.inovelli_lzw30_sn_switch_red_series"
+    model:
+      description: "Device type [ dimmer | switch | combo_light | combo_fan ]"
+      example: "dimmer"
+    color:
+      description: "LED Color [ 0-255 | Off | Red | Orange | Yellow | Green | Cyan | Teal | Blue | Purple | Light Pink | Pink | White ]"
+      example: "Red"
+    level_on:
+      description: "LED brightness when the switch is on [ 0-10 ]"
+      example: "10"
+    level_off:
+      description: "LED brightness when the switch is off [ 0-10 ]"
+      example: "10"
+
   variables:
     model: |
-      {% if model is string %}
+      {%- if model is string -%}
         {{ model }}
-      {%- elif state_attr(entity_id, 'product_name') is string %}
-        {%- if 'LZW31' in state_attr(entity_id, 'product_name') %}
+      {%- elif state_attr(entity_id, 'product_name') is string -%}
+        {%- if 'LZW31' in state_attr(entity_id, 'product_name') -%}
           dimmer
-        {%- elif 'LZW36' in state_attr(entity_id, 'product_name') %}
+        {%- elif 'LZW36' in state_attr(entity_id, 'product_name') -%}
           combo_light
-        {%- else %}
+        {%- else -%}
           switch
-        {%- endif %}
-      {%- else %}
+        {%- endif -%}
+      {%- else -%}
         dimmer
-      {%- endif %}
-    node_id: '{{ state_attr(entity_id,"node_id") }}'
-    color: '{{ color|default("Blue") }}'
-    level_on: '{{ level_on|default("10") }}'
-    level_off: '{{ level_off|default("3") }}'
+      {%- endif -%}
+    node_id: '{{ state_attr(entity_id, "node_id") }}'
+    color: |
+      {%- if color is not number -%}
+        {{ color|default("Yellow")|title }}
+      {%- else -%}
+        {{ color|int }}
+      {%- endif -%}
+    level_on: '{{ level_on|default("8")|int }}'
+    level_off: '{{ level_off|default("1")|int }}'
     parameters:
       dimmer:
         color: 13
@@ -53,6 +78,7 @@ inovelli_led_set_defaults:
       "Light Pink": 220
       "Pink": 234
       "White": 255
+
   sequence:
     # - service: script.debug
     #   data:

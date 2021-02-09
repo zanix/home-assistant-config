@@ -21,22 +21,44 @@
 #
 inovelli_led:
   alias: "Inovelli LED"
+  description: "Set a LED effect for Inovelli switches"
   icon: mdi:led-on
+
+  fields:
+    entity_id:
+      description: "ZWave entity"
+      example: "zwave.inovelli_lzw30_sn_switch_red_series"
+    model:
+      description: "Device type [ dimmer | switch | combo_light | combo_fan ]"
+      example: "dimmer"
+    color:
+      description: "LED Color [ 0-255 | Off | Red | Orange | Yellow | Green | Cyan | Teal | Blue | Purple | Light Pink | Pink | White ]"
+      example: "Red"
+    level:
+      description: "LED brightness [ 1-10 ]"
+      example: "10"
+    duration:
+      description: "How long to apply the effect"
+      example: "10 Seconds"
+    effect:
+      description: "Effect to use [ Off | Solid | Chase | Fast Blink | Blink | Pulse ]"
+      example: "Pulse"
+
   variables:
     model: |
-      {% if model is string %}
+      {%- if model is string -%}
         {{ model }}
-      {%- elif state_attr(entity_id, 'product_name') is string %}
-        {%- if 'LZW31' in state_attr(entity_id, 'product_name') %}
+      {%- elif state_attr(entity_id, 'product_name') is string -%}
+        {%- if 'LZW31' in state_attr(entity_id, 'product_name') -%}
           dimmer
-        {%- elif 'LZW36' in state_attr(entity_id, 'product_name') %}
+        {%- elif 'LZW36' in state_attr(entity_id, 'product_name') -%}
           combo_light
-        {%- else %}
+        {%- else -%}
           switch
-        {%- endif %}
-      {%- else %}
+        {%- endif -%}
+      {%- else -%}
         dimmer
-      {%- endif %}
+      {%- endif -%}
     node_id: '{{ state_attr(entity_id, "node_id") }}'
     parameters:
       dimmer: 16
@@ -44,12 +66,11 @@ inovelli_led:
       combo_fan: 25
       switch: 8
     color: |
-      {%- if color is not number %}
+      {%- if color is not number -%}
         {{ color|default("Yellow")|title }}
-      {%- else %}
+      {%- else -%}
         {{ color|int }}
-      {% endif %}
-    # 1-10
+      {%- endif -%}
     level: '{{ level|default(4)|int }}'
     duration: '{{ duration|default("Indefinitely")|title }}'
     effect: '{{ effect|default("Blink")|title }}'
@@ -103,18 +124,16 @@ inovelli_led:
       "Solid": 1
       "Chase": 2
       "Fast Blink": 3
-      "Slow Blink": 4
       "Blink": 4
       "Pulse": 5
-      "Breath": 5
     effects_switch:
       "Off": 0
       "Solid": 1
+      "Chase": 3
       "Fast Blink": 2
-      "Slow Blink": 3
       "Blink": 3
       "Pulse": 4
-      "Breath": 4
+
   sequence:
     # - service: script.debug
     #   data:
@@ -131,17 +150,17 @@ inovelli_led:
         color: '{{ colors[color|title]|int }}'
         duration: '{{ durations[duration|title] }}'
         effect: |
-          {% if model == "switch" %}
+          {%- if model == "switch" -%}
             {{- effects_switch[effect|title] }}
-          {%- else %}
+          {%- else -%}
             {{- effects_dimmer[effect|title] }}
-          {% endif %}
+          {%- endif -%}
         inovelli_math: |
-          {%- if effect|int > 0 %}
+          {%- if effect|int > 0 -%}
             {{ color|int + (level|int * 256) + (duration|int * 65536) + (effect|int * 16777216) }}
-          {%- else %}
+          {%- else -%}
             0
-          {% endif %}
+          {%- endif -%}
 
     # - service: script.debug
     #   data:
