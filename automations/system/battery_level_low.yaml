@@ -1,7 +1,6 @@
 ---
-# Sends a notification when a device battery level is low.
-#
 alias: "[System] Battery Level Low"
+description: "Sends a notification when a device battery level is low"
 trigger:
   - platform: time
     at: "10:00:00"
@@ -15,59 +14,46 @@ condition:
     {% macro battery_level() %}
       {% set domains = ['light', 'switch', 'sensor', 'lock'] %}
       {% for domain in domains -%}
-        {% for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level'] | int < threshold_high and entity.attributes['battery_level'] | int > threshold_low) or ('battery' in entity.name | lower and ((entity.state | int < threshold_high and entity.state | int > threshold_low and entity.state | int != 0) or entity.state | lower == 'low' or entity.state | lower == 'unknown'))) -%}
-          {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level'] | int < threshold_high and entity.attributes['battery_level'] | int > threshold_low) -%}
+        {% for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) or ('battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int > threshold_low and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown'))) -%}
+          {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) -%}
             {{ entity.name }}
           {% endif -%}
-          {% if 'battery' in entity.name | lower and ((entity.state | int < threshold_high and entity.state | int > threshold_low and entity.state | int != 0) or entity.state | lower == 'low' or entity.state | lower == 'unknown') -%}
+          {% if 'battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int > threshold_low and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown') -%}
             {{ entity.name }}
           {% endif -%}
         {% endfor %}
       {%- endfor %}
     {% endmacro %}
-    {{ battery_level() | trim != '' }}
+    {{ battery_level()|trim != '' }}
+variables:
+  message: >-
+    {%- set threshold_high = 30 -%}
+    {%- set threshold_low = 0 -%}
+    {% macro battery_level(domain) %}
+      {%- for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) or ('battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown'))) -%}
+        {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) -%}
+          {{ entity.attributes.friendly_name|replace(" [Battery Level]", "") }} ({{ entity.attributes['battery_level'] }}){%- if not loop.last %}, {% endif -%}
+        {%- endif -%}
+        {%- if 'battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int > threshold_low and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown') -%}
+          {{ entity.attributes.friendly_name|replace(" [Battery Level]", "") }} ({{ entity.state }}){% if not loop.last %}, {% endif %}
+        {% endif -%}
+      {%- endfor -%}
+    {% endmacro %}
+    {%- set domains = ['light', 'switch', 'sensor', 'lock'] -%}
+    {%- for domain in domains if battery_level(domain)|trim != '' -%}
+      {{ battery_level(domain) }}{%- if not loop.last %}, {% endif -%}
+    {%- endfor -%}
 action:
   - service: persistent_notification.create
     data_template:
       title: "Low Battery Levels"
       notification_id: low-battery-alert
-      message: >-
-        {%- set threshold_high = 30 -%}
-        {%- set threshold_low = 0 -%}
-        {% macro battery_level(domain) %}
-          {%- for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level'] | int < threshold_high and entity.attributes['battery_level'] | int > threshold_low) or ('battery' in entity.name | lower and ((entity.state | int < threshold_high and entity.state | int != 0) or entity.state | lower == 'low' or entity.state | lower == 'unknown'))) -%}
-            {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level'] | int < threshold_high and entity.attributes['battery_level'] | int > threshold_low) -%}
-              {{ entity.attributes.friendly_name | replace(" [Battery Level]", "") }} ({{ entity.attributes['battery_level'] }}){%- if not loop.last %}, {% endif -%}
-            {%- endif -%}
-            {%- if 'battery' in entity.name | lower and ((entity.state | int < threshold_high and entity.state | int > threshold_low and entity.state | int != 0) or entity.state | lower == 'low' or entity.state | lower == 'unknown') -%}
-              {{ entity.attributes.friendly_name | replace(" [Battery Level]", "") }} ({{ entity.state }}){% if not loop.last %}, {% endif %}
-            {% endif -%}
-          {%- endfor -%}
-        {% endmacro %}
-        {%- set domains = ['light', 'switch', 'sensor', 'lock'] -%}
-        {%- for domain in domains if battery_level(domain) | trim != '' -%}
-          {{ battery_level(domain) }}{%- if not loop.last %}, {% endif -%}
-        {%- endfor -%}
+      message: "{{ message }}"
+
   - service: notify.join_user1
     data_template:
       title: "Low Battery Levels"
-      message: >-
-        {%- set threshold_high = 30 -%}
-        {%- set threshold_low = 0 -%}
-        {% macro battery_level(domain) %}
-          {%- for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level'] | int < threshold_high and entity.attributes['battery_level'] | int > threshold_low) or ('battery' in entity.name | lower and ((entity.state | int < threshold_high and entity.state | int != 0) or entity.state | lower == 'low' or entity.state | lower == 'unknown'))) -%}
-            {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level'] | int < threshold_high and entity.attributes['battery_level'] | int > threshold_low) -%}
-              {{ entity.attributes.friendly_name | replace(" [Battery Level]", "") }} ({{ entity.attributes['battery_level'] }}){%- if not loop.last %}, {% endif -%}
-            {%- endif -%}
-            {%- if 'battery' in entity.name | lower and ((entity.state | int < threshold_high and entity.state | int > threshold_low and entity.state | int != 0) or entity.state | lower == 'low' or entity.state | lower == 'unknown') -%}
-              {{ entity.attributes.friendly_name | replace(" [Battery Level]", "") }} ({{ entity.state }}){% if not loop.last %}, {% endif %}
-            {% endif -%}
-          {%- endfor -%}
-        {% endmacro %}
-        {%- set domains = ['light', 'switch', 'sensor', 'lock'] -%}
-        {%- for domain in domains if battery_level(domain) | trim != '' -%}
-          {{ battery_level(domain) }}{%- if not loop.last %}, {% endif -%}
-        {%- endfor -%}
+      message: "{{ message }}"
       data:
         icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/battery-alert.png"
         smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
