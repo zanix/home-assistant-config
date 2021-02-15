@@ -1,0 +1,69 @@
+---
+alias: "[Notify] Window Left Open"
+description: "Sends notification if a window is open longer than 30 minutes"
+trigger:
+  platform: time_pattern
+  minutes: "*"
+condition:
+  condition: template
+  value_template: >-
+    {%- set ns = namespace(found=false) -%}
+    {%- set current = as_timestamp(now()) -%}
+    {%- set open_windows = states|selectattr('entity_id', 'in', state_attr('group.all_windows','entity_id'))|selectattr('state','eq','Open')|map(attribute='entity_id')|list -%}
+    {%- for entity_id in open_windows if not ns.found -%}
+      {%- set parts = entity_id.split('.') -%}
+      {%- set entity = states[parts[0]][parts[1]] -%}
+      {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
+      {%- set ns.found = changed >= 30 and changed % 30 == 0 -%}
+    {%- endfor -%}
+    {{ ns.found }}
+variables:
+  message: >-
+    {%- macro parse_last_changed(entity) -%}
+      {%- if entity.state -%}
+        {%- set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed))|int -%}
+        {%- set minutes = ((uptime % 3600) / 60)|int -%}
+        {%- set hours = ((uptime % 86400) / 3600)|int -%}
+        {%- set days = (uptime / 86400)|int -%}
+        {%- if days > 0 -%}
+          {{ days }} day{% if days > 1 %}s{% endif %}
+        {%- endif -%}
+        {%- if hours > 0 -%}
+          {%- if days > 0 %} {% endif -%}
+          {{ hours }} hour{% if hours > 1 %}s{% endif %}
+        {%- endif -%}
+        {%- if minutes > 0 -%}
+          {%- if hours > 0 or days > 0 %} {% endif -%}
+          {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
+        {%- endif -%}
+      {% endif -%}
+    {%- endmacro -%}
+    {%- set current = as_timestamp(now()) -%}
+    {%- set open_windows = states|selectattr('entity_id', 'in', state_attr('group.all_windows','entity_id'))|selectattr('state','eq','Open')|list -%}
+    {%- for entity in open_windows if (((current - as_timestamp(entity.last_changed)) / 60)|int) >= 30 and (((current - as_timestamp(entity.last_changed)) / 60)|int) % 30 == 0 -%}
+      {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
+      {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
+    {%- endfor %}
+action:
+  - service: notify.join_all
+    data_template:
+      title: Window Open
+      message: "{{ mesage }}"
+      data:
+        icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/door-open.png"
+        smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+
+  - condition: and
+    conditions:
+      - condition: state
+        entity_id: input_boolean.audio_notifications
+        state: "on"
+      - condition: time
+        after: "07:00:00"
+        before: "21:00:00"
+
+  - service: tts.cloud_say
+    entity_id: media_player.living_room_speaker
+    data_template:
+      message: "{{ mesage }}"
+      cache: false
