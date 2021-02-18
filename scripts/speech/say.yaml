@@ -1,0 +1,57 @@
+---
+say:
+  alias: "Say"
+  description: "Text-to-speech"
+  icon: mdi:text-to-speech
+  mode: parallel
+
+  fields:
+    media_player:
+      description: "Media Player"
+      example: media_player.living_room_speaker
+    message:
+      description: "Message of the notification"
+      example: "{{ trigger.to_state.state }}"
+
+  variables:
+    media_player: '{{ media_player|default("media_player.living_room_speaker") }}'
+    briefing: !include ../../templates/speech/briefing.yaml
+
+    mqtt_message_state: "{{ briefing|striptags }}"
+    mqtt_message_attributes: |
+      {
+        "target": "{{ media_player }}",
+        "timestamp": "{{ now()|as_local }}"
+      }
+
+  sequence:
+    - condition: state
+      entity_id: input_boolean.audio_notifications
+      state: "on"
+
+    # - condition: time
+    #   after: '08:00:00'
+    #   before: '22:00:00'
+
+    - service: script.say_cloud
+      data:
+        media_player: '{{ media_player }}'
+        message: '{{ briefing }}'
+
+    - service: script.toast
+      data:
+        message: "{{ mqtt_message_state }}"
+        duration: 30000
+
+    # Store Last Message
+    - service: script.store_mqtt_sensor
+      data:
+        name: 'last_message'
+        state: '{{ mqtt_message_state }}'
+        # attributes: '{{ mqtt_message_attributes }}'
+
+    # Store Last Speaker
+    - service: script.store_mqtt_sensor
+      data:
+        name: 'last_speaker'
+        state: '{{ media_player }}'

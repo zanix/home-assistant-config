@@ -650,26 +650,24 @@ automation:
       entity_id: sensor.lock_front_alarm_type
       to: "9"
     action:
-      - service: notify.join_all
-        data_template:
-          title: Front Door Lock Jammed
-          message: "The front door lock is jammed and needs to be locked manually."
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
+          title: "Front Door Lock Issue"
+          message: "Check the front door, something is wrong with the lock."
+          icon: "/local/icons/lock-smart.png"
+          group: 'lock-front'
+      - service: notify.shield_living_room
+        data:
+          title: "Front Door Lock Issue"
+          message: "Check the front door, something is wrong with the lock."
           data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock.png"
+            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
             smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
-      - condition: and
-        conditions:
-          - condition: state
-            entity_id: input_boolean.audio_notifications
-            state: "on"
-          - condition: time
-            after: "07:00:00"
-            before: "21:00:00"
-      - service: tts.cloud_say
-        entity_id: media_player.living_room_speaker
-        data_template:
-          message: "The front door lock is jammed and needs to be locked manually."
-          cache: false
+      - service: script.notify_speech
+        data:
+          media_player: media_player.living_room_speaker
+          message: "Check the front door, something is wrong with the lock."
 
   - alias: "[Lock] Front Door Lock at Night"
     trigger:
@@ -719,15 +717,16 @@ automation:
     action:
       - service: lock.lock
         entity_id: lock.lock_front
-      - service: notify.join_users
-        data_template:
-          title: Front Door Lock
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
+          title: "Front Door Lock"
           message: "The front door has been locked since no one is home."
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+          icon: '/local/icons/lock.png'
+          group: 'lock-front'
 
   - alias: "[Lock] Keypad Switch On"
+    mode: parallel
     trigger:
       platform: state
       entity_id:
@@ -766,8 +765,9 @@ automation:
             {% set code_slot = object_id.split('_')[2] %}
             {% set user_code_id = 'lock_keypad_' ~ code_slot ~ '_code' %}
             {{ states['input_text'][user_code_id].state }}
-      - service: notify.join_user1
-        data_template:
+      - service: script.notify_mobile
+        data:
+          who: 'josh'
           title: "Code Enabled"
           message: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -777,11 +777,11 @@ automation:
             {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
             {% set name = states['input_text'][name_input].state %}
             The pin code {{ usercode }} for {{ name }} has now been enabled.
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+          icon: "/local/icons/lock-smart.png"
+          group: 'lock-front'
 
   - alias: "[Lock] Keypad Switch Off"
+    mode: parallel
     trigger:
       platform: state
       entity_id:
@@ -818,8 +818,9 @@ automation:
             {{ code_slot }}
           # usercode: >-
           #   {{ range(1000, 9999)|random }}
-      - service: notify.join_user1
-        data_template:
+      - service: script.notify_mobile
+        data:
+          who: 'josh'
           title: "Code Disabled"
           message: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -829,11 +830,11 @@ automation:
             {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
             {% set name = states['input_text'][name_input].state %}
             The pin code for {{ name }} is now disabled.
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+          icon: "/local/icons/lock-smart.png"
+          group: 'lock-front'
 
   - alias: "[Lock] Keypad Temporary Code Start"
+    mode: parallel
     trigger:
       platform: state
       entity_id:
@@ -869,8 +870,9 @@ automation:
             {% set code_slot = object_id.split('_')[1] %}
             {% set input = 'lock_keypad_' ~ code_slot ~ '_code' %}
             {{ states['input_text'][input].state }}
-      - service: notify.join_users
-        data_template:
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
           title: "Temporary Code Enabled"
           message: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -884,11 +886,11 @@ automation:
             {% set end_input = 'lock_keypad_' ~ code_slot ~ '_date_end' %}
             {% set end = states['input_datetime'][end_input].state %}
             The pin code {{ usercode }} is now temporarily enabled for {{ name }} from {{ start }} to {{ end }}.
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+          icon: '/local/icons/lock-smart.png'
+          group: 'lock-front'
 
   - alias: "[Lock] Keypad Temporary Code End"
+    mode: parallel
     trigger:
       platform: state
       entity_id:
@@ -915,8 +917,9 @@ automation:
             {{ code_slot }}
           # usercode: >-
           #   {{ range(1000, 9999)|random }}
-      - service: notify.join_users
-        data_template:
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
           title: "Temporary Code Disabled"
           message: >-
             {% set object_id = trigger.to_state.object_id %}
@@ -926,9 +929,8 @@ automation:
             {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
             {% set name = states['input_text'][name_input].state %}
             The pin code {{ usercode }} for {{ name }} has now been removed.
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+          icon: '/local/icons/lock-smart.png'
+          group: 'lock-front'
       - condition: template
         value_template: >-
           {% set object_id = trigger.to_state.object_id %}
@@ -965,8 +967,9 @@ automation:
             {{ code_slot }}
           # usercode: >-
           #   {{ range(1000, 9999)|random }}
-      - service: notify.join_users
-        data_template:
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
           title: "One Time Use Code Used"
           message: >-
             {% set code_slot = trigger.to_state.state %}
@@ -975,9 +978,8 @@ automation:
             {% set name_input = 'lock_keypad_' ~ code_slot ~ '_name' %}
             {% set name = states['input_text'][name_input].state %}
             The one time use pin code {{ usercode }} for {{ name }} has been used and removed.
-          data:
-            icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/lock-smart.png"
-            smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+          icon: '/local/icons/lock-smart.png'
+          group: 'lock-front'
       - condition: template
         value_template: >-
           {% set code_slot = trigger.to_state.state %}

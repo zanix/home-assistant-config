@@ -15,18 +15,29 @@ action:
   - service: switch.turn_off
     entity_id: switch.water_main
 
-  - service: persistent_notification.create
-    data_template:
+  - service: script.notify_web
+    data:
       title: "Water Leak Detected"
-      notification_id: water-leak
-      message: >-
-        The {{ trigger.to_state.name }} has detected a water leak.
+      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
+      id: "water-leak"
 
-  - service: notify.join_all
+  - service: script.notify_mobile
+    data:
+      who: "parents"
+      title: "Water Leak Detected"
+      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
+      icon: "/local/icons/water-alert.png"
+      group: "water-leak"
+
+  - service: notify.shield_living_room
     data_template:
       title: "Water Leak Detected"
-      message: >-
-        The {{ trigger.to_state.name }} has detected a water leak.
+      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
       data:
-        icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/battery-alert.png"
+        icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/water-alert.png"
         smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+
+  - service: script.notify_speech
+    data:
+      media_player: group.google_speakers
+      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."

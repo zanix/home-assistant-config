@@ -1,0 +1,121 @@
+---
+notify_mobile_ios:
+  alias: "Notify Mobile (iOS)"
+  description: "Notify users via mobile devices"
+  icon: mdi:cellphone-message
+
+  fields:
+    title:
+      description: "Title of the notification"
+      example: "Startup: Home Assistant is Up and Running!"
+    message:
+      description: "Message of the notification"
+      example: "{{ trigger.to_state.state }}"
+    who:
+      description: "Which person to send to [ josh | amy | parents | kids | family ]"
+      example: "josh"
+    image:
+      description: "Image to attach"
+      example: "/local/josh.png"
+    camera:
+      description: "Camera stream to attach"
+      example: camera.front_door
+    sound:
+      description: "Sound for the notification"
+      example: ""
+    url:
+      description: ""
+      example: "{{ trigger.event.data.url }}"
+    category:
+      description: ""
+      example: "insecure_door"
+    id:
+      description: "Messages with same ID are grouped"
+      example: "HOMEASSISTANT"
+    replaceable_id:
+      description: "Unique tag for the notification"
+      example: ""
+
+  # Set local variables for reuse in this script.
+  variables:
+    notification_service: 'notify.{{ who|default("josh") }}'
+    url: |
+      {% if url is string %}
+        {% if url.startswith("http://") %}
+          {{ url }}?hide_header
+        {% else %}
+          {{ url }}
+        {% endif %}
+      {% endif %}
+    # Every notification should have a sound. Actionable notifications should grab your attention.
+    sound_file: |
+      {%- if sound is string %}
+        {{ sound }}
+      {%- else %}
+        {%- if category is string %}
+          Update.caf
+        {% else %}
+          sms-received1.caf
+        {% endif %}
+      {%- endif %}
+
+  sequence:
+    # Only send if globally enabled.
+    - condition: state
+      entity_id: input_boolean.mobile_notifications
+      state: "on"
+
+    - choose:
+        # Send camera stream.
+        - conditions:
+            - '{{ camera is string }}'
+          sequence:
+            - service: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  attachment:
+                    content-type: jpeg
+                  entity_id: '{{ camera }}'
+                  push:
+                    sound: '{{ sound_file }}'
+                    apns_headers:
+                      apns-collapse-id: 'camera'
+                    thread-id: '{{ id|upper|default("HOMEASSISTANT") }}'
+
+        # Send an image.
+        - conditions:
+            - '{{ image is string }}'
+          sequence:
+            - service: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  url: '{{ image }}'
+                  content-type: |
+                    {%- set filename = image.split(".") %}
+                    {%- set extension = filename[filename|length - 1] %}
+                    {{ extension|replace("jpg","jpeg") }}
+                  hide-thumbnail: false
+                  push:
+                    sound: '{{ sound_file }}'
+                    apns_headers:
+                      apns-collapse-id: 'image'
+                    thread-id: '{{ id|upper|default("HOMEASSISTANT") }}'
+
+      # Send a basic, link, or actionable notification message.
+      default:
+        - service: '{{ notification_service }}'
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            data:
+              push:
+                category: '{{ category }}'
+                sound: '{{ sound_file }}'
+                url: '{{ url }}'
+                apns_headers:
+                  apns-collapse-id: '{{ replaceable_id|default(category) }}'
+                thread-id: '{{ id|upper|default("HOMEASSISTANT") }}'

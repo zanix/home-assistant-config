@@ -1,0 +1,94 @@
+---
+notify_mobile:
+  alias: "Notify Mobile"
+  description: "Notify users via mobile devices"
+  icon: mdi:cellphone-message
+
+  fields:
+    title:
+      description: "Title of the notification"
+      example: "Startup: Home Assistant is Up and Running!"
+    message:
+      description: "Message of the notification"
+      example: "{{ trigger.to_state.state }}"
+    who:
+      description: "Which person to send to [ josh | amy | parents | kids | family ]"
+      example: "josh"
+    image:
+      description: "Image to attach"
+      example: "/local/josh.png"
+    icon:
+      description: "Image to use"
+      example: "/local/josh.png"
+    camera:
+      description: "Camera stream to attach"
+      example: "camera.front_door"
+    url:
+      description: "Action when clicking main notification"
+      example: "{{ trigger.event.data.url }}"
+    group:
+      description: "Messages with same ID are grouped"
+      example: "HOMEASSISTANT"
+    tag:
+      description: "Unique tag for the notification"
+      example: "tag"
+
+  # Set local variables for reuse in this script.
+  variables:
+    notification_service: 'notify.{{ who|default("josh") }}'
+    url: |
+      {% if url is string %}
+        {% if url.startswith("http://") %}
+          {{ url }}?hide_header
+        {% else %}
+          {{ url }}
+        {% endif %}
+      {% endif %}
+    group: '{{ group|upper|default("HOMEASSISTANT") }}'
+
+  sequence:
+    # Only send if enabled.
+    - condition: state
+      entity_id: input_boolean.mobile_notifications
+      state: "on"
+
+    - choose:
+        # Send camera stream.
+        - conditions:
+            - '{{ camera is string }}'
+          sequence:
+            - service: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  image: '/api/camera_proxy/{{ camera }}'
+                  clickAction: '{{ url|default("/lovelace/cameras") }}'
+                  group: '{{ group }}'
+                  # tag: '{{ camera }}'
+
+        # Send an image.
+        - conditions:
+            - '{{ image is string }}'
+          sequence:
+            - service: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  image: '{{ image }}'
+                  clickAction: '{{ url|default("/lovelace/home") }}'
+                  group: '{{ group }}'
+                  # tag: '{{ tag }}'
+
+      # Send a basic, link, or actionable notification message.
+      default:
+        - service: '{{ notification_service }}'
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            data:
+              icon_url: '{{ icon|default("/local/icons/home-assistant.png") }}'
+              clickAction: '{{ url|default("/lovelace/home") }}'
+              group: '{{ group }}'
+              # tag: '{{ tag }}'
