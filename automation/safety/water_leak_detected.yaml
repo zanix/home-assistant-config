@@ -1,6 +1,6 @@
 ---
-alias: "[Water] Leak Detected"
-description: "Shuts off the water main and sends a notification when a water leak is detected"
+alias: '[Water] Leak Detected'
+description: 'Shuts off the water main and sends a notification when a water leak is detected'
 trigger:
   platform: state
   entity_id:
@@ -10,34 +10,37 @@ trigger:
     - binary_sensor.leak_master_bathroom
     - binary_sensor.leak_water_heater
     # - binary_sensor.leak_washer
-  to: "on"
+  to: 'on'
+variables:
+  location: '{{ trigger.to_state.name|replace(" Leak Sensor", "")|replace(" Leak", "")|trim }}'
+  message: 'A water leak was detected in the {{ location }} and the water main has been shut off.'
 action:
   - service: switch.turn_off
     entity_id: switch.water_main
 
   - service: script.notify_web
     data:
-      title: "Water Leak Detected"
-      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
-      id: "water-leak"
+      title: 'Water Leak Detected'
+      message: '{{ message }}'
+      id: 'water-leak'
 
   - service: script.notify_mobile
     data:
-      who: "parents"
-      title: "Water Leak Detected"
-      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
-      icon: "/local/icons/water-alert.png"
-      group: "water-leak"
+      who: 'parents'
+      title: 'Water Leak Detected'
+      message: '{{ message }}'
+      icon: '/local/icons/water-alert.png'
+      group: 'water-leak'
 
   - service: notify.shield_living_room
     data_template:
-      title: "Water Leak Detected"
-      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
+      title: 'Water Leak Detected'
+      message: '{{ message }}'
       data:
-        icon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/water-alert.png"
-        smallicon: "https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png"
+        icon: 'https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/water-alert.png'
+        smallicon: 'https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png'
 
   - service: script.notify_speech
     data:
       media_player: group.google_speakers
-      message: "The {{ trigger.to_state.name }} has detected a water leak and the water main has been shut off."
+      message: '{{ message }}'
