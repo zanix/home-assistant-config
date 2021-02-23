@@ -47,14 +47,15 @@ Since some integrations can only be enabled from within the UI, here is a list o
 ### HACS Integrations
 
 - [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
+- [Browser Mod](https://github.com/thomasloven/hass-browser_mod) - Turn a browser into a controllable entity and an audio player
 - [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
+- [Unifi Gateway](https://github.com/custom-components/sensor.unifigateway) - High level health status of UniFi Security Gateway devices via UniFi Controller
 
-### HACS Plugins
+### HACS Frontend
 
 - [Banner Card](https://github.com/nervetattoo/banner-card) - A fluffy linkable banner with interactive glances to spice up your home dashboards
 - [Bar Card](https://github.com/custom-cards/bar-card) - Customizable Animated Bar card
 - [Battery State Card](https://github.com/maxwroc/battery-state-card) - Display battery levels for battery entities
-- [Browser Mod](https://github.com/thomasloven/hass-browser_mod) - Turn a browser into a controllable entity and an audio player
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Card Mod](https://github.com/thomasloven/lovelace-card-mod) - Add CSS styles to (almost) any lovelace card
 - [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) - Show basic attributes from multiple entities
