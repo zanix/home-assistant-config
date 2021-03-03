@@ -8,14 +8,16 @@ condition:
   - condition: template
     value_template: '{{ states(trigger.entity_id) != "unknown" }}'
   - condition: template
-    value_template: '{{ (states(trigger.entity_id) | float) != 0}}'
+    value_template: '{{ (states(trigger.entity_id) | float) != 0 }}'
 action:
 - service: script.notify_web
   data:
     title: 'Updates Pending in HACS'
     message: >-
       {% for repo in state_attr(trigger.entity_id, 'repositories') %}
-        **{{ repo.display_name }}** _{{ repo["installed_version"] }}_ -> _{{ repo["available_version"] }}_
+        {% if repo["installed_version"] != repo["available_version"] %}
+          **{{ repo.display_name }}** _{{ repo["installed_version"] }}_ -> _{{ repo["available_version"] }}_
+        {% endif %}
       {% endfor %}
     id: 'hacs-update'
 
@@ -25,7 +27,9 @@ action:
     title: 'Updates Pending in HACS'
     message: >-
       {% for repo in state_attr(trigger.entity_id, 'repositories') %}
-        <b>{{ repo.display_name }}</b> <em>{{ repo["installed_version"] }}</em> -> <em>{{ repo["available_version"] }}</em>
+        {% if repo["installed_version"] != repo["available_version"] %}
+          <b>{{ repo.display_name }}</b> <em>{{ repo["installed_version"] }}</em> -> <em>{{ repo["available_version"] }}</em>
+        {% endif %}
       {% endfor %}
     icon: '/local/icons/update.png'
     group: 'upgrade-available'

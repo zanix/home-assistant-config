@@ -105,7 +105,7 @@ This is a list of integrations that are currently disabled, but have not been re
 
 - [ESPHome](https://esphome.io) - DIY devices
 - [OpenGarage](https://opengarage.io)
-  - Opens, closes, and reads the status of my garage door as well detecting the presense of my car
+  - Opens, closes, and reads the status of my garage door as well detecting the presence of my car
 - Various Z-Wave Door/Window sensors
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU)
   - Smart Sprinkler controller

@@ -1,39 +1,41 @@
 ---
-alias: '[Presense] Leaving Daycare'
+alias: '[Presence] Leaving Daycare'
 description: 'Sends a notification when someone is leaving Daycare'
 mode: single
 trigger:
-  platform: zone
-  event: leave
-  zone: zone.daycare
+  platform: state
   entity_id:
     - person.joshua
     - person.amy
+
+variables:
+  zone_state: '{{ states["zone.daycare"].name }}'
+  name: '{{ trigger.to_state.name }}'
+  message: >-
+    {{ [
+      "Just a head's up, {{ trigger.to_state.name }} is leaving from Daycare.",
+      "{{ trigger.to_state.name }} is on their way home from Daycare."
+    ]|random }}
+
 condition:
-  condition: time
-  after: '06:00'
-  before: '21:00'
+  - condition: template
+    value_template: '{{ trigger.from_state.state == zone_state and trigger.to_state.state != zone_state }}'
+  - condition: time
+    after: '06:00'
+    before: '21:00'
+
 action:
   - service: script.notify_mobile
     data:
       who: 'parents'
-      title: '{{ trigger.to_state.friendly_name }} Leaving Daycare'
-      message: >
-        {{ [
-          "Just a head's up, {{ trigger.to_state.friendly_name }} is leaving from Daycare.",
-          "Your {{ trigger.to_state.friendly_name }} is on the way home from Daycare."
-        ]|random }}
-      image: '/media/local/photos/{{ trigger.to_state.friendly_name|lower }}.jpg'
-      group: 'presense'
+      title: '{{ name }} Leaving Daycare'
+      message: '{{ message }}'
+      group: 'presence'
 
   - service: script.notify_speech
     data:
       media_player: media_player.living_room_speaker
-      message: >-
-        {{ [
-          "Just a head's up, {{ trigger.to_state.friendly_name }} is leaving from Daycare.",
-          "{{ trigger.to_state.friendly_name }} is on the way home from Daycare."
-        ]|random }}
+      message: '{{ message }}'
 
   # Cool down timer. When "mode: single" this stops this automation from running more often than this.
   - delay:

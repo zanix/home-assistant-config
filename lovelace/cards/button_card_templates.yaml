@@ -38,6 +38,7 @@ common_small:
 person:
   variables:
     status: ""
+    proximity: ""
     battery: ""
     charging: ""
   aspect_ratio: 1/1
@@ -53,17 +54,42 @@ person:
           return `&nbsp;`
         }
       ]]]
-    # proximity: |
-    #   [[[
-    #     return `<ha-icon
-    #       icon="mdi:map-marker-distance"
-    #       style="width: 12px; height: 12px; color: var(--paper-item-icon-active-color);">
-    #       </ha-icon>  <span>\<span style="color: var(--text-color-sensor);">${states['proximity.joshua'].state} miles</span></span>`
-    #   ]]]
+    proximity: |
+      [[[
+        if (variables.proximity && states[variables.proximity].state > 400) {
+          let icon = "map-marker-distance";
+          let color = "var(--paper-item-icon-active-color)";
+          let location = (states[variables.proximity].state / 5280).toFixed(1);
+
+          switch (states[variables.proximity].attributes.dir_of_travel) {
+            case "towards":
+              icon = "map-marker-left";
+              color = "var(--label-badge-green)";
+              break;
+            case "away_from":
+              icon = "map-marker-right";
+              color = "var(--paper-orange-400)";
+              break;
+            case "not set":
+            case "unknown":
+              icon = "map-marker-right";
+              color = "var(--label-badge-red)";
+              break;
+          }
+
+          return `<ha-icon
+            icon="mdi:${icon}"
+            style="width: 12px; height: 12px; color: ${color};">
+            </ha-icon> <span>\<span style="color: var(--text-color-sensor);">${location} mi</span></span>`
+        }
+        else {
+          return `&nbsp;`
+        }
+      ]]]
     battery: |
       [[[
-        let color = "var(--paper-item-icon-active-color)";
         let icon = "cellphone";
+        let color = "var(--paper-item-icon-active-color)";
         if (variables.charging && states[variables.charging].state === 'charging') {
           icon = "flash";
           color = "var(--label-badge-green)";
@@ -89,8 +115,7 @@ person:
       # - --mdc-ripple-color: blue
       # - --mdc-ripple-press-opacity: 0.5
     grid:
-      # - grid-template-areas: '"i status" "n n" "proximity proximity" "battery battery" "sd sd"'
-      - grid-template-areas: '"i status" "n n" "battery battery" "sd sd"'
+      - grid-template-areas: '"i status" "n n" "battery battery" "proximity proximity" "sd sd"'
       - grid-template-columns: 1fr 1fr
       - grid-template-rows: 1fr min-content min-content min-content min-content
     name:
@@ -107,11 +132,30 @@ person:
         - align-self: start
         - justify-self: end
         - color: var(--text-medium-light-color)
-      # proximity:
-      #   - padding-bottom: 0
-      #   - align-self: middle
-      #   - justify-self: start
-      #   - color: var(--text-medium-light-color)
+      proximity:
+        - padding-bottom: 0
+        - align-self: middle
+        - justify-self: start
+        - color: var(--text-medium-light-color)
+        - --text-color-sensor: '
+          [[[
+            if (variables.battery) {
+              if (states[variables.proximity].state > 400) {
+                switch(states[variables.proximity].attributes.dir_of_travel) {
+                  case "towards":
+                    return "var(--label-badge-green)";
+                    break;
+                  case "away_from":
+                    return "var(--paper-orange-400)";
+                    break;
+                  case "not set":
+                  case "unknown":
+                    return "var(--label-badge-red)";
+                    break;
+                }
+              }
+            }
+          ]]]'
       battery:
         - padding-bottom: 0
         - align-self: middle
@@ -124,7 +168,7 @@ person:
                 return "var(--label-badge-red)";
               }
               else if (states[variables.battery].state < 30) {
-                return "var(--label-badge-orange)";
+                return "var(--paper-orange-400)";
               }
               else if (states[variables.battery].state < 40) {
                 return "var(--label-badge-yellow)";

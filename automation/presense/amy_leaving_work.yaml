@@ -1,20 +1,18 @@
 ---
-alias: '[Presence] Leaving WinCo'
-description: 'Sends a notification when someone is leaving WinCo'
+alias: '[Presence] Amy Leaving Work'
+description: 'Sends a notification when Amy leaves work'
 mode: single
 trigger:
   platform: state
-  entity_id:
-    - person.joshua
-    - person.amy
+  entity_id: person.amy
 variables:
-  zone_state: '{{ states["zone.winco"].name }}'
+  zone_state: '{{ states["zone.cabelas"].name }}'
   name: '{{ trigger.to_state.name }}'
   message: >-
     {% set name = trigger.to_state.name %}
     {% set message = [
-      "Just a head's up, [name1] is done at Win-Co.",
-      "Your [name2] is on the way home from Win-Co."
+      "Just a head's up, [name1] is heading home from work.",
+      "Your [name2] is on the way home from work."
     ]|random %}
     {% if '[name2]' in message %}
       {% if name == "Amy" %}
@@ -28,14 +26,18 @@ condition:
   - condition: template
     value_template: '{{ trigger.from_state.state == zone_state and trigger.to_state.state != zone_state }}'
   - condition: time
-    after: '08:00'
-    before: '21:00'
+    after: '15:00'
+    before: '19:00'
 action:
   - service: script.notify_mobile
     data:
-      who: 'parents'
-      title: '{{ name }} Leaving Win-Co'
-      message: '{{ message }}'
+      who: 'josh'
+      title: '{{ name }} Leaving Work'
+      message: >
+        {{ [
+          "Just a head's up, {{ name }} is heading home from work.",
+          "{{ name }} is on their way home from work."
+        ]|random }}
       group: 'presence'
 
   - service: script.notify_speech
@@ -45,4 +47,4 @@ action:
 
   # Cool down timer. When "mode: single" this stops this automation from running more often than this.
   - delay:
-      minutes: 5
+      minutes: 60
