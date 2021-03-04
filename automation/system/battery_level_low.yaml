@@ -6,54 +6,44 @@ trigger:
     at: '10:00:00'
   - platform: time
     at: '18:00:00'
-condition:
-  condition: template
-  value_template: >-
-    {%- set threshold_high = 30 -%}
-    {%- set threshold_low = 0 -%}
-    {% macro battery_level() %}
-      {% set domains = ['light', 'switch', 'sensor', 'lock'] %}
-      {% for domain in domains -%}
-        {% for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) or ('battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int > threshold_low and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown'))) -%}
-          {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) -%}
-            {{ entity.name }}
-          {% endif -%}
-          {% if 'battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int > threshold_low and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown') -%}
-            {{ entity.name }}
-          {% endif -%}
-        {% endfor %}
-      {%- endfor %}
-    {% endmacro %}
-    {{ battery_level()|trim != '' }}
+
 variables:
-  message: >-
-    {%- set threshold_high = 30 -%}
-    {%- set threshold_low = 0 -%}
-    {% macro battery_level(domain) %}
-      {%- for entity in states[domain] if ((entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) or ('battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown'))) -%}
-        {% if (entity.attributes.battery_level is defined and entity.attributes['battery_level']|int < threshold_high and entity.attributes['battery_level']|int > threshold_low) -%}
-          {{ entity.attributes.friendly_name|replace(" [Battery Level]", "") }} ({{ entity.attributes['battery_level'] }}){%- if not loop.last %}, {% endif -%}
-        {%- endif -%}
-        {%- if 'battery' in entity.name|lower and ((entity.state|int < threshold_high and entity.state|int > threshold_low and entity.state|int != 0) or entity.state|lower == 'low' or entity.state|lower == 'unknown') -%}
-          {{ entity.attributes.friendly_name|replace(" [Battery Level]", "") }} ({{ entity.state }}){% if not loop.last %}, {% endif %}
-        {% endif -%}
-      {%- endfor -%}
-    {% endmacro %}
-    {%- set domains = ['light', 'switch', 'sensor', 'lock'] -%}
-    {%- for domain in domains if battery_level(domain)|trim != '' -%}
-      {{ battery_level(domain) }}{%- if not loop.last %}, {% endif -%}
-    {%- endfor -%}
+  sensors: >-
+    {% set threshold = 20 %}
+    {% set result = namespace(sensors=[]) %}
+    {% set exclude = namespace(entity_id=[
+      "sensor.galaxy_s21_battery_level",
+      "sensor.oneplus_6_battery_level",
+      "sensor.ipad_josh_battery_level",
+    ]) %}
+    {% for state in states.sensor | selectattr('attributes.device_class', '==', 'battery') %}
+      {% if 0 <= state.state | int(-1) < threshold | int and not state.entity_id in exclude.entity_id %}
+        {% set name = state.name|replace(" [Battery Level]", "")|replace(" Battery Level", "") %}
+        {% set result.sensors = result.sensors + [name ~ ' (' ~ state.state ~ '%)'] %}
+      {% endif %}
+    {% endfor %}
+    {% for state in states.binary_sensor | selectattr('attributes.device_class', '==', 'battery') | selectattr('state', '==', 'on') %}
+      {% if not state.entity_id in exclude.entity_id %}
+        {% set result.sensors = result.sensors + [state.name] %}
+      {% endif %}
+    {% endfor %}
+    {{result.sensors|join(', ')}}
+
+condition:
+  - condition: template
+    value_template: '{{ sensors != "" }}'
+
 action:
   - service: script.notify_web
     data:
       title: 'Low Battery Levels'
-      message: '{{ message }}'
+      message: '{{ sensors }}'
       id: 'low-battery-alert'
 
   - service: script.notify_mobile
     data:
       who: 'josh'
       title: 'Low Battery Levels'
-      message: '{{ message }}'
+      message: '{{ sensors }}'
       icon: '/local/icons/battery-alert.png'
       group: 'low-battery-alert'
