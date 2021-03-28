@@ -4,6 +4,7 @@ description: 'Sends notification if the garage door is open longer than 30 minut
 trigger:
   platform: time_pattern
   minutes: '*'
+
 condition:
   condition: and
   conditions:
@@ -21,6 +22,7 @@ condition:
           {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
           {{ changed >= 30 and changed % 30 == 0 }}
         {% endif -%}
+
 variables:
   message: >-
     {%- macro parse_last_changed(entity) -%}
@@ -43,6 +45,7 @@ variables:
       {% endif -%}
     {%- endmacro -%}
     The {{ state_attr('cover.garage_door', 'friendly_name') }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
+
 action:
   - service: script.notify_mobile
     data:
@@ -56,13 +59,12 @@ action:
         - action: 'close_garage'
           title: 'Close'
 
-  - service: notify.shield_living_room
+  - service: script.notify_join
     data:
+      who: 'shield_all'
       title: 'Garage Door Open'
       message: '{{ message }}'
-      data:
-        icon: 'https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/garage-open.png'
-        smallicon: 'https://raw.githubusercontent.com/zanix/home-assistant-config/master/www/icons/home-assistant.png'
+      icon: 'local/icons/garage-open.png'
 
   - service: script.notify_speech
     data:

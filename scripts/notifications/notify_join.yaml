@@ -1,0 +1,83 @@
+---
+notify_join:
+  alias: '[Notify] Join'
+  description: 'Notify Join devices'
+  icon: mdi:content-copy
+
+  fields:
+    who:
+      description: 'Which device to send to [ shield_living_room, shield_family_room, shield_master_bedroom, shield_all ]'
+      example: 'shield_all'
+    title:
+      description: 'Title of the notification'
+      example: 'Startup: Home Assistant is Up and Running!'
+    message:
+      description: 'Message of the notification'
+      example: 'Message text'
+    icon:
+      description: 'Notification icon. If this image has transparency, it will also be used as the status bar icon if smallicon is not set.'
+      example: 'local/image.png'
+    smallicon:
+      description: 'Notification status bar icon'
+      example: 'local/image.png'
+    image:
+      description: 'Publicly available URL for an image to show up in the notification'
+      example: 'local/image.png'
+      # url:
+      #   description: 'Action when clicking main notification'
+      #   example: 'lovelace/home'
+      # sound:
+      #   description: 'Publicly available URL for an image to show up in the notification'
+      #   example: 'local/sound.mp3'
+      # group:
+      #   description: 'Message group'
+      #   example: 'HOMEASSISTANT'
+
+  # Set local variables for reuse in this script.
+  variables:
+    notification_service: 'notify.{{ who|default("shield_living_room", true) }}'
+    image: |
+      {%- if image is string -%}
+        {%- if image.startswith("http://") -%}
+          {{ image }}
+        {%- else -%}
+          {{ states.sensor.base_url.state }}/{{ image }}
+        {%- endif -%}
+      {%- endif -%}
+    # group: '{{ group|upper|default("HOMEASSISTANT") }}'
+
+  sequence:
+    # Only send if enabled.
+    # - condition: state
+    #   entity_id: input_boolean.mobile_notifications
+    #   state: 'on'
+
+    - choose:
+        # Send a notificaiton with an image.
+        - conditions:
+            - '{{ image is string }}'
+          sequence:
+            - service: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  icon: '{{ icon }}'
+                  smallicon: '{{ smallicon|default(states.sensor.base_url.state ~ "/local/icons/home-assistant.png", true) }}'
+                  image: '{{ image }}'
+                  # sound: '{{ sound }}'
+                  # url: '{{ url }}'
+                  # notification_id: '{{ group }}'
+
+      # Send a basic notification.
+      default:
+        - service: '{{ notification_service }}'
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            data:
+              icon: '{{ icon }}'
+              smallicon: '{{ smallicon|default(states.sensor.base_url.state ~ "/local/icons/home-assistant.png", true) }}'
+              # sound: '{{ sound }}'
+              # url: '{{ url }}'
+              # notification_id: '{{ group }}'

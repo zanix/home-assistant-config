@@ -32,10 +32,10 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [Rachio](https://www.home-assistant.io/integrations/rachio/) - The rachio platform allows you to control your Rachio irrigation system
 - [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
 - [Roku](https://www.home-assistant.io/integrations/roku/) - The Roku integration allows you to control a Roku device
-- [Sony Bravia TV](https://www.home-assistant.io/integrations/braviatv/) - The braviatv platform allows you to control a Sony Bravia TV
 - [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4/) - The PS4 integration allows you to control a Sony PlayStation 4 console
 - [Tasmota](https://www.home-assistant.io/integrations/tasmota) - This integration allows to control of Tasmota devices over MQTT
 - [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi/) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
+- [Vizio SmartCast](https://www.home-assistant.io/integrations/vizio/) - The vizio integration allows you to control SmartCast-compatible TVs and sound bars.
 - [WLED](https://www.home-assistant.io/integrations/wled) - WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812, APA102, and similar) LED's
 - [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
 - [Z-Wave](https://www.home-assistant.io/integrations/zwave/) - The Z-Wave integration for Home Assistant allows you to observe and control connected Z-Wave devices
@@ -118,13 +118,13 @@ This is a list of integrations that are currently disabled, but have not been re
 
 ### Media
 
-- [Google Home Mini](https://store.google.com/us/product/google_home_mini?hl=en-US)
-- [Sony Bravia TV](https://www.amazon.com/dp/B01MZF81NS/)
-- [TCL Roku TV](https://www.bestbuy.com/site/tcl-65-class-led-6-series-2160p-smart-4k-uhd-tv-with-hdr-roku-tv/6367717.p?skuId=6367717)
-- [nVidia Shield](https://www.amazon.com/dp/B01N1NT9Y6/)
+- [Google Home Mini](https://store.google.com/us/product/google_nest_mini)
+- [Vizio P-Series Quantum X](https://www.vizio.com/en/tv/p-series-quantum-x)
+- [Vizio P-Series Quantum](https://www.vizio.com/en/tv/p-series-quantum)
+- [nVidia Shield](https://www.nvidia.com/en-us/shield/)
 - [Roku Streaming Stick](https://www.amazon.com/gp/product/B075XN5L53/)
 - [ChromeCast](https://www.google.com/chromecast/)
-- [Harmony Hub](https://www.amazon.com/gp/product/B00BQ5RYI4/)
+- [Harmony Hub](https://www.logitech.com/en-us/products/harmony/harmony-hub.html)
 - [Plex](https://plex.tv)
   - [Plex for Android](https://play.google.com/store/apps/details?id=com.plexapp.android)
   - [Plex for Roku TV](https://channelstore.roku.com/details/13535/plex)
@@ -197,8 +197,7 @@ Below is a short list of automations I have set up. For more details, see the au
 
 ### Media Control
 
-- Living room and Master bedroom switch Harmony to "Power off" when Shield TV reports that it's off
-- Family room switch Harmony to "Power off" when TCL TV reports that it's off
+- Living room, Family room, and Master bedroom switch Harmony to "Power off" when Shield TV reports that it's off
 - Various routines to handle devices powering on and off
 - (Disabled) Shield TV paused at night
 - (Disabled) Shield TV playing at night

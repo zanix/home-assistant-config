@@ -1,22 +1,27 @@
 ---
 alias: '[Media] Family Room Auto Off'
 description: 'Automatically turn off the Media Center in the Family Room at night'
+
 trigger:
   platform: state
-  entity_id: media_player.family_room
+  entity_id: media_player.family_room_shield
   to: 'standby'
+
 condition:
   - condition: template
     value_template: '{{ trigger.from_state.state != "unavailable" }}'
-  - condition: template
-    value_template: '{{ is_state_attr("media_player.family_room", "source", "Roku") }}'
   - condition: state
     entity_id: remote.family_room
     state: 'on'
+  - condition: state
+    entity_id: sensor.remote_family_room
+    state: "Shield TV"
+
 action:
-  - service: remote.turn_off
-    entity_id: remote.family_room
-  - service: input_select.select_option
-    entity_id: input_select.remote_family_room
+  - service: script.turn_on
+    entity_id: script.remote_harmony_activity
     data_template:
-      option: Select Activity
+      variables:
+        input: 'input_select.remote_family_room'
+        remote: 'remote.family_room'
+        activity: 'PowerOff'
