@@ -27,81 +27,86 @@ cards:
         #         - layer-hidden
         #       default_class: layer-visible
 
-        # - name: Date
-        #   entities:
-        #     - sensor.floorplan_date
-        #   text_template: '${entity.state ? entity.state : "undefined"}'
-        #   class_template: 'return "static-text";'
+        - name: Date
+          entities:
+            - sensor.date
+          text_template: '${entity.state ? entity.state : "undefined"}'
+          class_template: 'return "static-text";'
 
-        # - name: Time
-        #   entities:
-        #     - sensor.floorplan_time
-        #   text_template: '${entity.state ? entity.state : "undefined"}'
-        #   class_template: 'return "static-text";'
+        - name: Time
+          entities:
+            - sensor.time
+          text_template: '${entity.state ? entity.state : "undefined"}'
+          class_template: 'return "static-text";'
 
-        # - name: Weather Icon
-        #   entities:
-        #     - weather.kida.daynight
-        #   image_template: '
-        #     var imageName = "";
-        #     switch (entity.state) {
-        #       case "clear-day":
-        #         imageName = "day";
-        #         break;
-        #       case "clear-night":
-        #         imageName = "night";
-        #         break;
-        #       case "rain":
-        #         imageName = "rainy-6";
-        #         break;
-        #       case "snow":
-        #         imageName = "snowy-6";
-        #         break;
-        #       case "sleet":
-        #         imageName = "rainy-7.svg";
-        #         break;
-        #       case "wind":
-        #         imageName = "";
-        #         break;
-        #       case "fog":
-        #         imageName = "";
-        #         break;
-        #       case "cloudy":
-        #         imageName = "cloudy";
-        #         break;
-        #       case "partly-cloudy-day":
-        #         imageName = "cloudy-day-3";
-        #         break;
-        #       case "partly-cloudy-night":
-        #         imageName = "cloudy-night-3";
-        #         break;
-        #       case "hail":
-        #         imageName = "rainy-7.svg";
-        #         break;
-        #       case "thunderstorm":
-        #         imageName = "thunder";
-        #         break;
-        #       default:
-        #         imageName = "cloudy";
-        #         break;
-        #     }
-        #     return "/local/icons/weather_icons/animated/" + imageName + ".svg";
-        #    '
+        - name: Weather Icon
+          entities:
+            - weather.kida_daynight
+            - sensor.openweathermap_condition
+          image_template: '
+            var imageName = "";
+            switch (entity.state) {
+              case "sunny":
+              case "clr":
+              case "exceptional":
+                imageName = "clear-day";
+                break;
+              case "clear-night":
+                imageName = "clear-night";
+                break;
+              case "rainy":
+                imageName = "rain";
+                break;
+              case "snowy":
+                imageName = "snow";
+                break;
+              case "sleet":
+                imageName = "sleet";
+                break;
+              case "windy":
+              case "windy-variant":
+              case "wind_":
+                imageName = "wind";
+                break;
+              case "fog":
+                imageName = "fog";
+                break;
+              case "cloudy":
+                imageName = "cloudy";
+                break;
+              case "partlycloudy":
+                imageName = "partly-cloudy-day";
+                break;
+              case "partly-cloudy-night":
+                imageName = "partly-cloudy-night";
+                break;
+              case "hail":
+                imageName = "hail";
+                break;
+              case "thunderstorm":
+                imageName = "thunderstorm";
+                break;
+              default:
+                imageName = "cloudy";
+                break;
+            }
+            return "/local/icons/weather_icons/1c/" + imageName + ".svg";
+           '
 
-        # - name: Weather
-        #   entities:
-        #     - weather.kida_daynight
-        #   text_template: '${entity.attributes.temperature ? entity.attributes.temperature : "undefined"}'
-        #   class_template: '
-        #     if (entity.state < 32)
-        #       return "temp-very-low-background";
-        #     else if (entity.state < 50)
-        #       return "temp-below-average-background";
-        #     else if (entity.state < 80)
-        #       return "temp-average-background";
-        #     else
-        #       return "temp-very-high-background";
-        #     '
+        - name: Weather
+          entities:
+            - weather.kida_daynight
+          text_template: '${entity.attributes.temperature ? entity.attributes.temperature + "°F" : "undefined"}'
+          class_template: '
+            if (entity.state < 32)
+              return "temp-very-low-background";
+            else if (entity.state < 50)
+              return "temp-below-average-background";
+            else if (entity.state < 80)
+              return "temp-average-background";
+            else
+              return "temp-very-high-background";
+            '
 
         - name: Lights
           entities:
@@ -216,6 +221,31 @@ cards:
             - state: 'Opening'
               class: 'closed'
 
+        - name: Leak Sensors
+          entities:
+            - binary_sensor.leak_basement_bathroom
+            - binary_sensor.leak_bathroom
+            # - binary_sensor.leak_dishwasher
+            # - binary_sensor.leak_laundry_room
+            - binary_sensor.leak_master_bathroom
+            - binary_sensor.leak_water_heater
+          states:
+            - state: 'off'
+              class: 'leak-off'
+            - state: 'on'
+              class: 'leak-on'
+
+        # - name: Fans
+        #   entities:
+        #     - fan.fan
+        #   states:
+        #     - state: 'low'
+        #       class: 'spin-low'
+        #     - state: 'medium'
+        #       class: 'spin-medium'
+        #     - state: 'high'
+        #       class: 'spin-high'
+
         - name: Motion
           entities:
             - binary_sensor.home_occupancy
@@ -228,8 +258,12 @@ cards:
             - binary_sensor.office_occupancy
             - sensor.occupancy_garage
           states:
+            - state: 'off'
+              class: 'room-no-motion'
             - state: 'Clear'
               class: 'room-no-motion'
+            - state: 'on'
+              class: 'room-motion'
             - state: 'Detected'
               class: 'room-motion'
 
@@ -237,14 +271,12 @@ cards:
           entities:
             - binary_sensor.device_athos
             - binary_sensor.device_erebus
-            - binary_sensor.device_google_mini_living_room
-            - binary_sensor.device_google_mini_family_room
-            - binary_sensor.device_google_mini_office
-            # - binary_sensor.device_sony_tv
-            # - binary_sensor.device_tcl_tv
             - binary_sensor.device_nasya
-            - binary_sensor.device_lenovo
+            - binary_sensor.device_madrona
+            - binary_sensor.device_canon_mf743c
             - switch.ender_3_pro
+            - media_player.vizio_living_room
+            - media_player.vizio_family_room
           states:
             - state: 'Offline'
               class: 'device-off'
@@ -258,17 +290,17 @@ cards:
         - name: Media Players
           entities:
             - media_player.plex_living_room
-            - media_player.plex_master_bedroom
             - media_player.plex_family_room
-            - media_player.plex_guest_roku
+            - media_player.plex_master_bedroom
             - media_player.living_room_shield
-            - media_player.sony_bravia_tv
+            - media_player.family_room_shield
             - media_player.master_bedroom_shield
-            - media_player.family_room
-            - media_player.guest_roku
+            - media_player.living_room_speaker
+            - media_player.family_room_speaker
+            - media_player.office_speaker
             - media_player.cast_living_room
+            - media_player.cast_family_room
             - media_player.cast_master_bedroom
-            - media_player.chromecast_ultra
             - media_player.onkyo_receiver
             - media_player.yamaha_receiver
           states:
@@ -308,55 +340,26 @@ cards:
             else
               return "temp-very-high-background";'
 
-          # - name: Switches
-          #   entities:
-          #     - switch.doorbell
-          #   states:
-          #     - state: 'on'
-          #       class: 'doorbell-on'
-          #     - state: 'off'
-          #       class: 'doorbell-off'
+        - name: Cameras
+          entities:
+            - camera.doorbell
+            - camera.emma
+            - camera.ethan
+            - camera.garage
+            - camera.ender_3_pro
+          states:
+            - state: 'idle'
+              class: 'camera-idle'
 
-          # - name: NVR
-          #   entities:
-          #     - binary_sensor.blue_iris_nvr
-          #   text_template: '${(entity.state === "on") ? "online" : "offline"}'
-          #   states:
-          #     - state: 'off'
-          #       class: 'danger-text'
-          #     - state: 'on'
-          #       class: 'success-text'
+#       - name: thermostat_temp
+#         entities:
+#           - climate.downstairs
+#           - climate.upstairs
+#         text_template: '${entity.attributes.current_temperature ? entity.attributes.current_temperature : "undefined"}'
 
-          # - name: Alarm Panel
-          #   entities:
-          #     - alarm_control_panel.alarm
-          #   states:
-          #     - state: 'armed_away'
-          #       class: 'alarm-armed'
-          #     - state: 'armed_home'
-          #       class: 'alarm-armed'
-          #     - state: 'disarmed'
-          #       class: 'alarm-disarmed'
-
-          # - name: Cameras
-          #   entities:
-          #     - camera.hallway
-          #     - camera.driveway
-          #     - camera.doorbell
-          #     - camera.backyard
-          #   states:
-          #     - state: 'idle'
-          #       class: 'camera-idle'
-
-          # - name: thermostat_temp
-          #   entities:
-          #     - climate.downstairs
-          #     - climate.upstairs
-          #   text_template: '${entity.attributes.current_temperature ? entity.attributes.current_temperature : "undefined"}'
-
-          # - name: text_states
-          #   entities:
-          #     - sensor.downstairs_thermostat_humidity
-          #     - sensor.dark_sky_temperature
-          #     - sensor.last_message
-          #   text_template: '${entity.state ? entity.state.replace(/\s{2,}/g,"") : "undefined"}'
+#       - name: text_states
+#         entities:
+#           - sensor.downstairs_thermostat_humidity
+#           - sensor.dark_sky_temperature
+#           - sensor.last_message
+#         text_template: '${entity.state ? entity.state.replace(/\s{2,}/g,"") : "undefined"}'
