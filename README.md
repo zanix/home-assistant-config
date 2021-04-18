@@ -48,6 +48,7 @@ Since some integrations can only be enabled from within the UI, here is a list o
 
 - [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
 - [Browser Mod](https://github.com/thomasloven/hass-browser_mod) - Turn a browser into a controllable entity and an audio player
+- [Keymaster](https://github.com/FutureTense/keymaster) - This integration allows you to control one (or more) Z-Wave enabled locks that have been added to your Z-Wave network.
 - [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
 - [Unifi Gateway](https://github.com/custom-components/sensor.unifigateway) - High level health status of UniFi Security Gateway devices via UniFi Controller
 
