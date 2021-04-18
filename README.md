@@ -38,7 +38,7 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [Vizio SmartCast](https://www.home-assistant.io/integrations/vizio/) - The vizio integration allows you to control SmartCast-compatible TVs and sound bars.
 - [WLED](https://www.home-assistant.io/integrations/wled) - WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812, APA102, and similar) LED's
 - [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
-- [Z-Wave](https://www.home-assistant.io/integrations/zwave/) - The Z-Wave integration for Home Assistant allows you to observe and control connected Z-Wave devices
+- [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js/) - The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](https://zwave-js.github.io/zwavejs2mqtt) JS driver. This is the recommended Z-Wave integration for Home Assistant.
 
 ## HACS
 

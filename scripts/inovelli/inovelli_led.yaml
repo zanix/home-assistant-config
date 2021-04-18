@@ -2,7 +2,7 @@
 # Calculation References:
 #   https://nathanfiscus.github.io/inovelli-notification-calc/
 #   https://community.inovelli.com/t/home-assistant-2nd-gen-switch-rgb-working/168/62
-#   https://docs.google.com/spreadsheets/u/1/d/1SGJrJHCUtz8AzznWL_mLCTJjjr2U0IpltcUkRr7N_6M/edit?usp=sharing
+#   https://docs.google.com/spreadsheets/d/1bEpujdvBPZY9Fl61PZLUWuHanD2VAkRORFZ5D9xjLzA/edit?usp=sharing
 #
 # Changes:
 #   July 22, 2020: Incorporating changes from Kevin Schlichter.
@@ -19,105 +19,44 @@
 #   September 18, 2020: Added "model" parameter with options of dimmer, switch, combo_light, combo_fan. This replaces
 #     supported_features as the combo fan/light switch also had the same supported_features value.
 #
+#   February 24, 2021: Added support for Z-Wave JS in place of OpenZwave (ozw).
+#     The ozw code is remarked out for those that still need it.
+#
+#   February 27, 2021:
+#     1. Added zwave_integration at top of "variables:" section to allow users to define which integration is
+#        installed ("zwave", "ozw", "zwave_js"). I just don't see a simple way to auto-detect this.
+#     2. Added a comment describing the "model" variable.
+#     3. Replaced personal "script.debug" service call with universal "persistent_notification.create".
+#        Unremarking these lines could help you troubleshoot why something isn't working as expected.
+#     4. Updated broken spreadsheet link with public copy stored in my Google Docs account.
+#        Thanks for the heads up Kevin Schlichter!
+#
+#   March 26, 2021
+#     1. Added fields to help users experimenting in the Services Developer Tool.
+#
+#   April 3, 2021
+#   Incorporated @firstof9's changes:
+#     1. Set execution mode to "parallel" to all this script to potentially run on more than one devices simultaneously.
+#     2. Implement ZWave JS's new zwave_js.bulk_set_partial_config_parameters command.
+#   Source: https://gist.github.com/firstof9/b88d072a81c54b314fe7ddb901fc5c29
+#
 inovelli_led:
   alias: 'Inovelli LED'
   description: 'Set a LED effect for Inovelli switches'
   icon: mdi:led-on
-
-  fields:
-    entity_id:
-      description: 'ZWave entity'
-      example: 'zwave.inovelli_lzw30_sn_switch_red_series'
-      selector:
-        entity:
-          integration: zwave
-    model:
-      description: 'Device type [ dimmer | switch | combo_light | combo_fan ]'
-      example: 'dimmer'
-      selector:
-        select:
-          options:
-            - dimmer
-            - switch
-            - combo_light
-            - combo_fan
-    color:
-      description: 'LED Color [ 0-255 or Color Name ]'
-      example: 'Red'
-      selector:
-        select:
-          options:
-            - "Off"
-            - Red
-            - Orange
-            - Yellow
-            - Green
-            - Cyan
-            - Teal
-            - Blue
-            - Purple
-            - Light Pink
-            - Pink
-            - White
-    effect:
-      description: 'Effect to use [ Off | Solid | Chase | Fast Blink | Blink | Pulse ]'
-      example: 'Pulse'
-      selector:
-        select:
-          options:
-            - "Off"
-            - Solid
-            - Chase
-            - Fast Blink
-            - Blink
-            - Pulse
-    duration:
-      description: 'How long to apply the effect'
-      example: '10 Seconds'
-      selector:
-        select:
-          options:
-            - "Off"
-            - 1 Second
-            - 2 Seconds
-            - 3 Seconds
-            - 4 Seconds
-            - 5 Seconds
-            - 6 Seconds
-            - 7 Seconds
-            - 8 Seconds
-            - 9 Seconds
-            - 10 Seconds
-            - 15 Seconds
-            - 20 Seconds
-            - 25 Seconds
-            - 30 Seconds
-            - 35 Seconds
-            - 40 Seconds
-            - 45 Seconds
-            - 50 Seconds
-            - 55 Seconds
-            - 60 Seconds
-            - 2 Minutes
-            - 3 Minutes
-            - 4 Minutes
-            - 10 Minutes
-            - 15 Minutes
-            - 30 Minutes
-            - 45 Minutes
-            - 1 Hour
-            - 2 Hours
-            - Indefinitely
-    level:
-      description: 'LED brightness [ 1-10 ]'
-      example: '10'
-      selector:
-        number:
-          min: 1
-          max: 10
+  mode: parallel
 
   variables:
     # Todo: Fix variables since they do not override fields.
+    # REQUIRED to be one of these options: "zwave", "ozw", "zwave_js"
+    # Advanced: If you'd like to have your device list filtered in the Services Developer Tool,
+    # then unremark out "integration: zwave_js" under the fields section, and change the integration
+    # name to match.
+    zwave_integration: 'zwave_js'
+    # * Strongly recommended -> Use the passed model type ("dimmer", "switch", "combo_light") when present.
+    # * If not present, then attempt to identify the type using the "product_name" attribute (which is only
+    #   unfortunately only available in the original zwave integration).
+    # * Finally, assume the model type is "dimmer".
     model: |
       {%- if model is string -%}
         {{ model }}
@@ -132,12 +71,13 @@ inovelli_led:
       {%- else -%}
         dimmer
       {%- endif -%}
-    node_id: '{{ state_attr(entity_id, "node_id") }}'
     parameters:
       dimmer: 16
       combo_light: 24
       combo_fan: 25
       switch: 8
+    # Only used in the original zwave integration.
+    node_id: '{{ state_attr(entity_id, "node_id") }}'
     color: |
       {%- if color is not number -%}
         {{ color|default("Yellow")|title }}
@@ -208,74 +148,162 @@ inovelli_led:
       'Pulse': 4
 
   sequence:
-    # - service: script.debug
-    #   data:
-    #     id: 'inovelli_led'
-    #     message: |
-    #       color: '{{ color|title }}'
-    #       level: '{{ level }}'
-    #       duration: '{{ duration|title }}'
-    #       effect: '{{ effect|title }}'
-
-    # Preform the Inovelli math.
+    # Perform the Inovelli math.
     - variables:
         parameter: '{{ parameters[model|lower] }}'
         color: '{{ colors[color|title]|int }}'
         duration: '{{ durations[duration|title] }}'
         effect: |
           {%- if model == "switch" -%}
-            {{- effects_switch[effect|title] }}
+            {{ effects_switch[effect|title] }}
           {%- else -%}
-            {{- effects_dimmer[effect|title] }}
+            {{ effects_dimmer[effect|title] }}
           {%- endif -%}
-        inovelli_math: |
-          {%- if effect|int > 0 -%}
-            {{ color|int + (level|int * 256) + (duration|int * 65536) + (effect|int * 16777216) }}
-          {%- else -%}
-            0
-          {%- endif -%}
+        inovelli_math: '{{ color|int + (level|int * 256) + (duration|int * 65536) + (effect|int * 16777216) }}'
 
+    # Uncomment to provide an notification with troubleshooting information.
     # - service: script.debug
     #   data:
     #     id: 'inovelli_led'
+    #     title: 'DEBUG: script.inovelli_led'
     #     message: |
+    #       zwave_integration: {{ zwave_integration }}
+    #       model: {{ model }}
+    #       color: '{{ color|title }}'
+    #       level: '{{ level }}'
+    #       duration: '{{ duration|title }}'
+    #       effect: '{{ effect|title }}'
     #       node_id: '{{ node_id }}'
     #       parameter: '{{ parameter }}'
     #       value: '{{ inovelli_math }}'
 
     - choose:
-        # The Z-wave integration requires this service call.
+        # The Z-Wave JS integration requires this service call.
         - conditions:
-            - '{{ entity_id.split(".")[0] == "zwave" }}'
+            - '{{ zwave_integration == "zwave_js" }}'
           sequence:
             # Clear the previous effect.
-            - service: zwave.set_config_parameter
+            - service: zwave_js.bulk_set_partial_config_parameters
+              target:
+                entity_id: '{{ entity_id }}'
               data:
-                node_id: '{{ node_id }}'
                 parameter: '{{ parameter }}'
-                size: 4
                 value: 0
 
             # Start the new effect.
-            - service: zwave.set_config_parameter
+            - service: zwave_js.bulk_set_partial_config_parameters
+              target:
+                entity_id: '{{ entity_id }}'
               data:
-                node_id: '{{ node_id }}'
                 parameter: '{{ parameter }}'
-                size: 4
                 value: '{{ inovelli_math }}'
 
-      # The OZW integration requires this service call.
+      # The Z-wave integration requires this service call.
       default:
         # Clear the previous effect.
-        - service: ozw.set_config_parameter
+        - service: zwave.set_config_parameter
           data:
             node_id: '{{ node_id }}'
             parameter: '{{ parameter }}'
+            size: 4
             value: 0
 
         # Start the new effect.
-        - service: ozw.set_config_parameter
+        - service: zwave.set_config_parameter
           data:
             node_id: '{{ node_id }}'
             parameter: '{{ parameter }}'
+            size: 4
             value: '{{ inovelli_math }}'
+
+  fields:
+    entity_id:
+      description: 'Light or switch'
+      example: light.family_room
+      selector:
+        entity:
+          integration: zwave_js
+    model:
+      description: 'Device type'
+      example: dimmer
+      selector:
+        select:
+          options:
+            - dimmer
+            - switch
+            - combo_light
+            - combo_fan
+    color:
+      description: 'LED Color'
+      example: Red
+      selector:
+        select:
+          options:
+            - "Off"
+            - Red
+            - Orange
+            - Yellow
+            - Green
+            - Cyan
+            - Teal
+            - Blue
+            - Purple
+            - Light Pink
+            - Pink
+            - White
+    effect:
+      description: 'Effect to use'
+      example: Pulse
+      selector:
+        select:
+          options:
+            - "Off"
+            - Solid
+            - Chase
+            - Fast Blink
+            - Blink
+            - Pulse
+    duration:
+      description: 'How long should the effect run?'
+      example: 10 seconds
+      selector:
+        select:
+          options:
+            - "Off"
+            - 1 Second
+            - 2 Seconds
+            - 3 Seconds
+            - 4 Seconds
+            - 5 Seconds
+            - 6 Seconds
+            - 7 Seconds
+            - 8 Seconds
+            - 9 Seconds
+            - 10 Seconds
+            - 15 Seconds
+            - 20 Seconds
+            - 25 Seconds
+            - 30 Seconds
+            - 35 Seconds
+            - 40 Seconds
+            - 45 Seconds
+            - 50 Seconds
+            - 55 Seconds
+            - 60 Seconds
+            - 2 Minutes
+            - 3 Minutes
+            - 4 Minutes
+            - 10 Minutes
+            - 15 Minutes
+            - 30 Minutes
+            - 45 Minutes
+            - 1 Hour
+            - 2 Hours
+            - Indefinitely
+    level:
+      description: 'LED brightness'
+      example: '10'
+      selector:
+        number:
+          min: 1
+          max: 10
