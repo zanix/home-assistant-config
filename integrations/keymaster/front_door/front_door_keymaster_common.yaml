@@ -1,0 +1,253 @@
+## WARNING ##
+# This file is auotmaticly generated, any changes
+# will be overwritten.
+
+##################################################
+################  COMMON ENTITIES  ###############
+##################################################
+
+###############  input_boolean:  #################
+input_boolean:
+  front_door_lock_notifications:
+    name: Front Door Lock Notifications
+  front_door_dooraccess_notifications:
+    name: Front Door Notifications
+  front_door_reset_lock:
+    name: Front Door Reset Lock
+
+###################  script:  ####################
+script:
+  front_door_manual_notify:
+    alias: '[Lock] Front Door Manual Notify'
+    description: 'Sends notifications on Front Door lock events'
+    icon: mdi:lock-smart
+    sequence:
+      - service: script.notify_mobile
+        data:
+          who: 'josh'
+          title: '{{ title }}'
+          message: '{{ message }}'
+          icon: '/local/icons/lock-smart.png'
+          group: 'lock-front'
+
+  front_door_reset_lock:
+    alias: '[Lock] Front Door Reset Lock'
+    description: 'Sends a notificaiton when the lock is reset'
+    icon: mdi:lock-smart
+    sequence:
+      - service: script.front_door_manual_notify
+        data_template:
+          title: "Front Door Lock"
+          message: "System Reset"
+
+  front_door_reset_codeslot:
+    alias: '[Lock] Front Door Reset Code Slot'
+    description: 'Resets a code slot'
+    icon: mdi:lock-smart
+    mode: parallel
+    fields:
+      code_slot:
+        description: The code slot to reset
+        example: "1"
+    variables:
+      # Constant used later to loop through day specific entities
+      days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+    sequence:
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: "input_boolean.enabled_front_door_{{ code_slot | string }}"
+      - service: input_text.set_value
+        data_template:
+          entity_id: "input_text.front_door_name_{{ code_slot | string }}"
+          value: ""
+      - service: input_text.set_value
+        data_template:
+          entity_id: "input_text.front_door_pin_{{ code_slot | string }}"
+          value: ""
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: "input_boolean.notify_front_door_{{ code_slot | string }}"
+      - service: input_number.set_value
+        data_template:
+          entity_id: "input_number.accesscount_front_door_{{ code_slot | string }}"
+          value: "0"
+      - service: input_datetime.set_datetime
+        data_template:
+          entity_id: "input_datetime.start_date_front_door_{{ code_slot | string }}"
+          date: >-
+            {{ now().strftime('%Y-%m-%d') }}
+      - service: input_datetime.set_datetime
+        data_template:
+          entity_id: "input_datetime.end_date_front_door_{{ code_slot | string }}"
+          date: >-
+            {{ now().strftime('%Y-%m-%d') }} 
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: "input_boolean.daterange_front_door_{{ code_slot | string }}"
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: "input_boolean.accesslimit_front_door_{{ code_slot | string }}"
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: "input_boolean.reset_codeslot_front_door_{{ code_slot | string }}"
+      # Loop through each day of the week and reset the entities related to each one
+      - repeat:
+          count: 7
+          sequence:
+            - service: input_datetime.set_datetime
+              data_template:
+                entity_id: "input_datetime.{{ days[repeat.index - 1] }}_start_date_front_door_{{ code_slot | string }}"
+                time: "{{ '00:00' | timestamp_custom('%H:%M') }}"
+            - service: input_datetime.set_datetime
+              data_template:
+                entity_id: "input_datetime.{{ days[repeat.index - 1] }}_end_date_front_door_{{ code_slot | string }}"
+                time: "{{ '00:00' | timestamp_custom('%H:%M') }}"
+            - service: input_boolean.turn_on
+              data_template:
+                entity_id: "input_boolean.{{ days[repeat.index - 1] }}_front_door_{{ code_slot | string }}"
+            - service: input_boolean.turn_on
+              data_template:
+                entity_id: "input_boolean.{{ days[repeat.index - 1] }}_inc_front_door_{{ code_slot | string }}"
+
+  front_door_refreshnodeinfo:
+    alias: '[Lock] Front Door RefreshNodeInfo'
+    description: 'Send MQTT RefreshNodeInfo command'
+    icon: mdi:lock-smart
+    sequence:
+      - service: system_log.write
+        data_template:
+          message: "front_door_TEMPLATENUM started noderefreshinfo: {{ now() }}"
+          level: debug  
+      - service: mqtt.publish
+        data:
+          topic: 'OpenZWave/1/command/refreshnodeinfo/'
+          payload: >-
+            {% set node_id = state_attr('lock.lock_front','node_id') %}
+            { "node": {{ node_id }} }
+          retain: true
+          
+###################  automation:  ####################
+automation:
+
+  - id: reset_codeslot_front_door
+    alias: "[Lock] Reset Codeslot Front Door"
+    trigger:
+      entity_id: input_boolean.reset_codeslot_front_door_1,input_boolean.reset_codeslot_front_door_2,input_boolean.reset_codeslot_front_door_3,input_boolean.reset_codeslot_front_door_4,input_boolean.reset_codeslot_front_door_5,input_boolean.reset_codeslot_front_door_6,input_boolean.reset_codeslot_front_door_7,input_boolean.reset_codeslot_front_door_8
+      platform: state
+      to: 'on'
+    action:
+      - service: script.front_door_reset_codeslot
+        data_template:
+          code_slot: "{{ trigger.entity_id.split('_')[-1] }}"
+
+  - id: front_door_lock_notifications
+    alias: "[Lock] Front Door Lock Notifications"
+    trigger:
+      platform: event
+      event_type: keymaster_lock_state_changed
+      event_data:
+        lockname: front_door
+    condition:
+      - condition: state
+        entity_id: input_boolean.front_door_lock_notifications
+        state: "on"
+    action:
+      - service: script.front_door_manual_notify
+        data_template:
+          title: Front Door Lock
+          message: "{{ trigger.event.data.action_text }}"
+
+  - id: front_door_user_notifications
+    alias: "[Lock] Front Door User Notifications"
+    trigger:
+      platform: event
+      event_type: keymaster_lock_state_changed
+      event_data:
+        lockname: front_door
+    condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.code_slot > 0 }}"
+      - condition: template
+        value_template: "{{ is_state('input_boolean.notify_front_door_' + trigger.event.data.code_slot | string, 'on') }}"
+    action:
+      - service: script.front_door_manual_notify
+        data_template:
+          title: Front Door Lock
+          message: "{{ trigger.event.data.action_text }} ({{ trigger.event.data.code_slot_name }})"
+
+  - id: front_door_open_and_close
+    alias: "[Lock] Front Door Open and Close"
+    trigger:
+      entity_id: binary_sensor.front_door_is_open
+      platform: state
+    condition:
+      - condition: state
+        entity_id: "input_boolean.front_door_dooraccess_notifications"
+        state: "on"
+      - condition: template
+        value_template: "{{ trigger.from_state.state in ('on', 'off') and trigger.to_state.state in ('on', 'off') }}"
+    action:
+      - service: script.front_door_manual_notify
+        data_template:
+          title: Front Door Lock
+          message: "{% if trigger.to_state.state == 'on' %}Door Opened{% else %}Door Closed{% endif %}"
+
+  - id: front_door_changed_code
+    alias: "[Lock] Front Door Changed Code"
+    trigger:
+      entity_id: input_text.front_door_pin_1,input_text.front_door_pin_2,input_text.front_door_pin_3,input_text.front_door_pin_4,input_text.front_door_pin_5,input_text.front_door_pin_6,input_text.front_door_pin_7,input_text.front_door_pin_8
+      platform: state
+    condition:
+      - condition: template
+        value_template: >-
+          {{
+            is_state('input_boolean.front_door_enabled_' + trigger.entity_id.split('_')[-1], 'on')
+            and
+            (trigger.from_state.state != trigger.to_state.state)
+          }}
+    action:
+      - service: persistent_notification.create
+        data_template:
+          title: Front Door LOCK MANAGER
+          message: >-
+            {{ 'You changed the PIN for front_door code slot ' + trigger.entity_id.split('_')[-1] + '. Please enable it in order to make it active.'}}
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: >-
+            {{ 'input_boolean.enabled_front_door_' + trigger.entity_id.split('_')[-1] }}
+
+  - id: front_door_reset
+    alias: "[Lock] Front Door Reset"
+    trigger:
+      entity_id: input_boolean.front_door_reset_lock
+      platform: state
+      from: "off"
+      to: "on"
+    action:
+      - service: script.front_door_reset_lock
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.front_door_reset_lock
+
+  - id: front_door_decrement_access_count
+    alias: "[Lock] Front Door Decrement Access Count"
+    trigger:
+      platform: event
+      event_type: keymaster_lock_state_changed
+      event_data:
+        lockname: front_door
+    condition:
+      - condition: template
+        # make sure decrementing access entries is enabled 
+        value_template: "{{ is_state('input_boolean.accesslimit_front_door_' + trigger.event.data.code_slot | string, 'on') }}"
+      - condition: template
+        # Check for Keypad Unlock code
+        value_template: >-
+          {{
+            trigger.event.data.code_slot > 0
+            and
+            (trigger.event.data.action_code is undefined or trigger.event.data.action_code in (6, 19))
+          }}
+    action:
+      - service: input_number.decrement
+        data_template:
+          entity_id: "{{ 'input_number.accesscount_front_door_' + trigger.event.data.code_slot | string }}"
