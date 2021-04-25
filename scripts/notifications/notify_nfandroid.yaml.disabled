@@ -1,0 +1,140 @@
+---
+notify_nfandroid:
+  alias: '[Notify] NFAndroidTV'
+  description: 'Notify NFAndroidTV devices'
+  icon: mdi:android
+
+  fields:
+    who:
+      description: 'Which device to send to [ shield_living_room, shield_family_room, shield_master_bedroom, shield_all ]'
+      example: 'shield_all'
+      selector:
+        text:
+    title:
+      description: 'Title of the notification'
+      example: 'Startup: Home Assistant is Up and Running!'
+      selector:
+        text:
+    message:
+      description: 'Message of the notification'
+      example: 'Message text'
+      selector:
+        text:
+    image:
+      description: 'Image image to attach'
+      example: 'local/image.png'
+      selector:
+        text:
+    duration:
+      description: 'The duration in seconds for which the notification will be displayed. Optional, default: 5'
+      example: '5'
+      selector:
+        number:
+          mode: box
+    fontsize:
+      description: 'Font size [ small, medium, large, max ]. Optional, default: medium'
+      example: 'medium'
+      selector:
+        select:
+          options:
+            - small
+            - medium
+            - large
+            - max
+    position:
+      description: 'Location of the notificaiton [ bottom-right, bottom-left, top-right, top-left, center ]. Optional, default: bottom-right'
+      example: 'bottom-right'
+      selector:
+        select:
+          options:
+            - bottom-right
+            - bottom-left
+            - top-right
+            - top-left
+            - center
+    color:
+      description: 'Background color [ grey, black, indigo, green, red, cyan, teal, amber, pink ]. Optional, default: grey'
+      example: 'grey'
+      selector:
+        select:
+          options:
+            - grey
+            - black
+            - indigo
+            - green
+            - red
+            - cyan
+            - teal
+            - amber
+            - pink
+    transparency:
+      description: 'Notification transparency. Optional, default 25%'
+      example: '25%'
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 25
+          unit_of_measurement: '%'
+    timeout:
+      description: 'The timeout in seconds. Optional, default: 5'
+      example: '5'
+      selector:
+        number:
+          mode: box
+    interrupt:
+      description: 'If set to true, 1, on etc., the notification is interactive and can be dismissed or selected to display more details. Depending on the running app (e.g., Netflix), this may stop playback. Optional, default: false'
+      example: '0'
+      selector:
+        boolean:
+
+  # Set local variables for reuse in this script.
+  variables:
+    notification_service: 'notify.{{ who|default("shield_living_room", true) }}'
+    image_path: |
+      {%- if image is string -%}
+        {%- if image.startswith("http") -%}
+          {{ image }}
+        {%- else -%}
+          {{ states.sensor.base_url.state }}/{{ image }}
+        {%- endif -%}
+      {%- endif -%}
+
+  sequence:
+    # Only send if enabled.
+    - condition: state
+      entity_id: input_boolean.mobile_notifications
+      state: 'on'
+
+    - choose:
+        # Send a notificaiton with an image.
+        - conditions:
+            - '{{ image_path is string }}'
+          sequence:
+            - service: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  file:
+                    url: '{{ image_path }}'
+                  fontsize: '{{ fontsize|default("medium", true) }}'
+                  position: '{{ position|default("top-right", true) }}'
+                  duration: '{{ duration|default("5", true) }}'
+                  transparency: '{{ transparency|default("50%", true) }}'
+                  color: '{{ color|default("grey", true) }}'
+                  interrupt: '{{ interrupt|default("0", true) }}'
+
+      # Send a basic notification.
+      default:
+        - service: '{{ notification_service }}'
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            data:
+              fontsize: '{{ fontsize|default("medium", true) }}'
+              position: '{{ position|default("top-right", true) }}'
+              duration: '{{ duration|default("5", true) }}'
+              transparency: '{{ transparency|default("50%", true) }}'
+              color: '{{ color|default("grey", true) }}'
+              interrupt: '{{ interrupt|default("0", true) }}'
