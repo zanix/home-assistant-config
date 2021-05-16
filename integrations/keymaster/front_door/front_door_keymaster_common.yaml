@@ -74,13 +74,13 @@ script:
       - service: input_datetime.set_datetime
         data_template:
           entity_id: "input_datetime.start_date_front_door_{{ code_slot | string }}"
-          date: >-
-            {{ now().strftime('%Y-%m-%d') }}
+          datetime: >-
+            {{ now().strftime('%Y-%m-%d 00:00') }}
       - service: input_datetime.set_datetime
         data_template:
           entity_id: "input_datetime.end_date_front_door_{{ code_slot | string }}"
-          date: >-
-            {{ now().strftime('%Y-%m-%d') }}
+          datetime: >-
+            {{ now().strftime('%Y-%m-%d 00:00') }}
       - service: input_boolean.turn_off
         data_template:
           entity_id: "input_boolean.daterange_front_door_{{ code_slot | string }}"
@@ -155,7 +155,7 @@ automation:
       - service: script.front_door_manual_notify
         data_template:
           title: Front Door Lock
-          message: "{{ trigger.event.data.action_text }}"
+          message: "{{ trigger.event.data.action_text }} {% if trigger.event.data.code_slot > 0 %}({{ trigger.event.data.code_slot_name }}){% endif %}"
 
   - id: front_door_user_notifications
     alias: "[Lock] Front Door User Notifications"
@@ -169,6 +169,9 @@ automation:
         value_template: "{{ trigger.event.data.code_slot > 0 }}"
       - condition: template
         value_template: "{{ is_state('input_boolean.notify_front_door_' + trigger.event.data.code_slot | string, 'on') }}"
+      - condition: state
+        entity_id: input_boolean.front_door_lock_notifications
+        state: "off"
     action:
       - service: script.front_door_manual_notify
         data_template:
