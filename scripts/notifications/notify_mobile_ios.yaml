@@ -25,59 +25,48 @@ notify_mobile_ios:
       example: '/local/image.png'
       selector:
         text:
+    sound:
+      description: 'Sound for the notification'
+      example: ''
+      selector:
+        text:
     camera:
       description: 'Camera stream to attach'
       example: camera.front_door
       selector:
         entity:
           domain: camera
-    sound:
-      description: 'Sound for the notification'
-      example: ''
-      selector:
-        text:
     url:
       description: 'Action when clicking main notification'
       example: 'lovelace/home'
       selector:
         text:
-    category:
-      description: ''
-      example: 'insecure_door'
-      selector:
-        text:
-    id:
+    group:
       description: 'Message group'
       example: 'HOMEASSISTANT'
       selector:
         text:
-    replaceable_id:
+    tag:
       description: 'Unique tag for the notification'
       example: 'tag'
       selector:
         text:
+    actions:
+      description: 'A list of actions for actionable notifications'
+      example: ''
+      selector:
+        action:
 
   # Set local variables for reuse in this script.
   variables:
     notification_service: 'notify.{{ who|default("josh", true) }}'
-    url_path: |
-      {% if url is string %}
-        {% if url.startswith("http") %}
-          {{ url }}?hide_header
-        {% else %}
-          {{ url }}
-        {% endif %}
-      {% endif %}
+    group_id: '{{ group|upper|default("HOMEASSISTANT") }}'
     # Every notification should have a sound. Actionable notifications should grab your attention.
     sound_file: |
       {%- if sound is string %}
         {{ sound }}
       {%- else %}
-        {%- if category is string %}
-          Update.caf
-        {% else %}
-          sms-received1.caf
-        {% endif %}
+        sms-received1.caf
       {%- endif %}
 
   sequence:
@@ -96,14 +85,12 @@ notify_mobile_ios:
                 title: '{{ title }}'
                 message: '{{ message }}'
                 data:
-                  attachment:
-                    content-type: jpeg
                   entity_id: '{{ camera }}'
-                  push:
-                    sound: '{{ sound_file }}'
-                    apns_headers:
-                      apns-collapse-id: 'camera'
-                    thread-id: '{{ id|upper|default("HOMEASSISTANT") }}'
+                  url: '{{ url|default("/lovelace/cameras", true) }}'
+                  group: '{{ group_id }}'
+                  tag: '{{ camera }}'
+                  actions: '{{ actions }}'
+                  push: '{{ sound_file }}'
 
         # Send an image.
         - conditions:
@@ -114,17 +101,12 @@ notify_mobile_ios:
                 title: '{{ title }}'
                 message: '{{ message }}'
                 data:
-                  url: '{{ image }}'
-                  content-type: |
-                    {%- set filename = image.split(".") %}
-                    {%- set extension = filename[filename|length - 1] %}
-                    {{ extension|replace("jpg","jpeg") }}
-                  hide-thumbnail: false
-                  push:
-                    sound: '{{ sound_file }}'
-                    apns_headers:
-                      apns-collapse-id: 'image'
-                    thread-id: '{{ id|upper|default("HOMEASSISTANT") }}'
+                  image: '{{ image }}'
+                  url: '{{ url|default("/lovelace/home", true) }}'
+                  group: '{{ group_id }}'
+                  tag: '{{ tag|default("", true) }}'
+                  actions: '{{ actions }}'
+                  audio: '{{ sound_file }}'
 
       # Send a basic, link, or actionable notification message.
       default:
@@ -133,10 +115,9 @@ notify_mobile_ios:
             title: '{{ title }}'
             message: '{{ message }}'
             data:
-              push:
-                category: '{{ category }}'
-                sound: '{{ sound_file }}'
-                url: '{{ url_path }}'
-                apns_headers:
-                  apns-collapse-id: '{{ replaceable_id|default(category) }}'
-                thread-id: '{{ id|upper|default("HOMEASSISTANT") }}'
+              image: '{{ icon|default("/local/icons/home-assistant.png") }}'
+              url: '{{ url|default("/lovelace/home", true) }}'
+              group: '{{ group_id }}'
+              tag: '{{ tag|default("", true) }}'
+              actions: '{{ actions }}'
+              audio: '{{ sound_file }}'
