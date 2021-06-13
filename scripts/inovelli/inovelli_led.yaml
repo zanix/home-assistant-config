@@ -38,6 +38,7 @@
 #   Incorporated @firstof9's changes:
 #     1. Set execution mode to "parallel" to all this script to potentially run on more than one devices simultaneously.
 #     2. Implement ZWave JS's new zwave_js.bulk_set_partial_config_parameters command.
+#
 #   Source: https://gist.github.com/firstof9/b88d072a81c54b314fe7ddb901fc5c29
 #
 inovelli_led:
@@ -47,12 +48,6 @@ inovelli_led:
   mode: parallel
 
   variables:
-    # Todo: Fix variables since they do not override fields.
-    # REQUIRED to be one of these options: "zwave", "ozw", "zwave_js"
-    # Advanced: If you'd like to have your device list filtered in the Services Developer Tool,
-    # then unremark out "integration: zwave_js" under the fields section, and change the integration
-    # name to match.
-    zwave_integration: 'zwave_js'
     # * Strongly recommended -> Use the passed model type ("dimmer", "switch", "combo_light") when present.
     # * If not present, then attempt to identify the type using the "product_name" attribute (which is only
     #   unfortunately only available in the original zwave integration).
@@ -167,7 +162,6 @@ inovelli_led:
     #     id: 'inovelli_led'
     #     title: 'DEBUG: script.inovelli_led'
     #     message: |
-    #       zwave_integration: {{ zwave_integration }}
     #       model: {{ model }}
     #       color: '{{ color|title }}'
     #       level: '{{ level }}'
@@ -177,44 +171,21 @@ inovelli_led:
     #       parameter: '{{ parameter }}'
     #       value: '{{ inovelli_math }}'
 
-    - choose:
-        # The Z-Wave JS integration requires this service call.
-        - conditions:
-            - '{{ zwave_integration == "zwave_js" }}'
-          sequence:
-            # Clear the previous effect.
-            - service: zwave_js.bulk_set_partial_config_parameters
-              target:
-                entity_id: '{{ entity_id }}'
-              data:
-                parameter: '{{ parameter }}'
-                value: 0
+    # Clear the previous effect.
+    - service: zwave_js.bulk_set_partial_config_parameters
+      target:
+        entity_id: '{{ entity_id }}'
+      data:
+        parameter: '{{ parameter }}'
+        value: 0
 
-            # Start the new effect.
-            - service: zwave_js.bulk_set_partial_config_parameters
-              target:
-                entity_id: '{{ entity_id }}'
-              data:
-                parameter: '{{ parameter }}'
-                value: '{{ inovelli_math }}'
-
-      # The Z-wave integration requires this service call.
-      default:
-        # Clear the previous effect.
-        - service: zwave.set_config_parameter
-          data:
-            node_id: '{{ node_id }}'
-            parameter: '{{ parameter }}'
-            size: 4
-            value: 0
-
-        # Start the new effect.
-        - service: zwave.set_config_parameter
-          data:
-            node_id: '{{ node_id }}'
-            parameter: '{{ parameter }}'
-            size: 4
-            value: '{{ inovelli_math }}'
+    # Start the new effect.
+    - service: zwave_js.bulk_set_partial_config_parameters
+      target:
+        entity_id: '{{ entity_id }}'
+      data:
+        parameter: '{{ parameter }}'
+        value: '{{ inovelli_math }}'
 
   fields:
     entity_id:
