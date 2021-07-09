@@ -9,16 +9,19 @@
 ###############  input_boolean:  #################
 input_boolean:
   front_door_lock_notifications:
-    name: Front Door Lock Notifications
+    name: Lock Notifications
+    icon: mdi:lock-alert
   front_door_dooraccess_notifications:
-    name: Front Door Notifications
+    name: Door Notifications
+    icon: mdi:door-closed-lock
   front_door_reset_lock:
-    name: Front Door Reset Lock
+    name: Reset Lock
+    icon: mdi:lock-reset
 
 ###################  script:  ####################
 script:
-  front_door_manual_notify:
-    alias: '[Lock] Front Door Manual Notify'
+  keymaster_front_door_manual_notify:
+    alias: '[Keymaster] Front Door Manual Notify'
     description: 'Sends notifications on Front Door lock events'
     icon: mdi:lock-smart
     sequence:
@@ -30,18 +33,18 @@ script:
           icon: '/local/icons/lock-smart.png'
           group: 'lock-front'
 
-  front_door_reset_lock:
-    alias: '[Lock] Front Door Reset Lock'
+  keymaster_front_door_reset_lock:
+    alias: '[Keymaster] Front Door Reset Lock'
     description: 'Sends a notificaiton when the lock is reset'
     icon: mdi:lock-smart
     sequence:
-      - service: script.front_door_manual_notify
+      - service: script.keymaster_front_door_manual_notify
         data_template:
           title: "Front Door Lock"
           message: "System Reset"
 
-  front_door_reset_codeslot:
-    alias: '[Lock] Front Door Reset Code Slot'
+  keymaster_front_door_reset_codeslot:
+    alias: '[Keymaster] Front Door Reset Code Slot'
     description: 'Resets a code slot'
     icon: mdi:lock-smart
     mode: parallel
@@ -109,8 +112,8 @@ script:
               data_template:
                 entity_id: "input_boolean.{{ days[repeat.index - 1] }}_inc_front_door_{{ code_slot | string }}"
 
-  front_door_refreshnodeinfo:
-    alias: '[Lock] Front Door RefreshNodeInfo'
+  keymaster_front_door_refreshnodeinfo:
+    alias: '[Keymaster] Front Door RefreshNodeInfo'
     description: 'Send MQTT RefreshNodeInfo command'
     icon: mdi:lock-smart
     sequence:
@@ -129,19 +132,19 @@ script:
 ###################  automation:  ####################
 automation:
 
-  - id: reset_codeslot_front_door
-    alias: "[Lock] Reset Codeslot Front Door"
+  - id: keymaster_reset_codeslot_front_door
+    alias: "[Keymaster] Reset Codeslot Front Door"
     trigger:
       entity_id: input_boolean.reset_codeslot_front_door_1,input_boolean.reset_codeslot_front_door_2,input_boolean.reset_codeslot_front_door_3,input_boolean.reset_codeslot_front_door_4,input_boolean.reset_codeslot_front_door_5,input_boolean.reset_codeslot_front_door_6,input_boolean.reset_codeslot_front_door_7,input_boolean.reset_codeslot_front_door_8
       platform: state
       to: 'on'
     action:
-      - service: script.front_door_reset_codeslot
+      - service: script.keymaster_front_door_reset_codeslot
         data_template:
           code_slot: "{{ trigger.entity_id.split('_')[-1] }}"
 
-  - id: front_door_lock_notifications
-    alias: "[Lock] Front Door Lock Notifications"
+  - id: keymaster_front_door_lock_notifications
+    alias: "[Keymaster] Front Door Lock Notifications"
     trigger:
       platform: event
       event_type: keymaster_lock_state_changed
@@ -152,13 +155,13 @@ automation:
         entity_id: input_boolean.front_door_lock_notifications
         state: "on"
     action:
-      - service: script.front_door_manual_notify
+      - service: script.keymaster_front_door_manual_notify
         data_template:
           title: Front Door Lock
           message: "{{ trigger.event.data.action_text }} {% if trigger.event.data.code_slot > 0 %}({{ trigger.event.data.code_slot_name }}){% endif %}"
 
-  - id: front_door_user_notifications
-    alias: "[Lock] Front Door User Notifications"
+  - id: keymaster_front_door_user_notifications
+    alias: "[Keymaster] Front Door User Notifications"
     trigger:
       platform: event
       event_type: keymaster_lock_state_changed
@@ -173,13 +176,13 @@ automation:
         entity_id: input_boolean.front_door_lock_notifications
         state: "off"
     action:
-      - service: script.front_door_manual_notify
+      - service: script.keymaster_front_door_manual_notify
         data_template:
           title: Front Door Lock
           message: "{{ trigger.event.data.action_text }} ({{ trigger.event.data.code_slot_name }})"
 
-  - id: front_door_open_and_close
-    alias: "[Lock] Front Door Open and Close"
+  - id: keymaster_front_door_open_and_close
+    alias: "[Keymaster] Front Door Open and Close"
     trigger:
       entity_id: binary_sensor.front_door_is_open
       platform: state
@@ -190,13 +193,13 @@ automation:
       - condition: template
         value_template: "{{ trigger.from_state.state in ('on', 'off') and trigger.to_state.state in ('on', 'off') }}"
     action:
-      - service: script.front_door_manual_notify
+      - service: script.keymaster_front_door_manual_notify
         data_template:
           title: Front Door Lock
           message: "{% if trigger.to_state.state == 'on' %}Door Opened{% else %}Door Closed{% endif %}"
 
-  - id: front_door_changed_code
-    alias: "[Lock] Front Door Changed Code"
+  - id: keymaster_front_door_changed_code
+    alias: "[Keymaster] Front Door Changed Code"
     trigger:
       entity_id: input_text.front_door_pin_1,input_text.front_door_pin_2,input_text.front_door_pin_3,input_text.front_door_pin_4,input_text.front_door_pin_5,input_text.front_door_pin_6,input_text.front_door_pin_7,input_text.front_door_pin_8
       platform: state
@@ -219,20 +222,20 @@ automation:
           entity_id: >-
             {{ 'input_boolean.enabled_front_door_' + trigger.entity_id.split('_')[-1] }}
 
-  - id: front_door_reset
-    alias: "[Lock] Front Door Reset"
+  - id: keymaster_front_door_reset
+    alias: "[Keymaster] Front Door Reset"
     trigger:
       entity_id: input_boolean.front_door_reset_lock
       platform: state
       from: "off"
       to: "on"
     action:
-      - service: script.front_door_reset_lock
+      - service: script.keymaster_front_door_reset_lock
       - service: input_boolean.turn_off
         entity_id: input_boolean.front_door_reset_lock
 
-  - id: front_door_decrement_access_count
-    alias: "[Lock] Front Door Decrement Access Count"
+  - id: keymaster_front_door_decrement_access_count
+    alias: "[Keymaster] Front Door Decrement Access Count"
     trigger:
       platform: event
       event_type: keymaster_lock_state_changed
