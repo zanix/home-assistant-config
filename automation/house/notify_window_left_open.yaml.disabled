@@ -10,19 +10,21 @@ trigger:
 condition:
   condition: template
   value_template: >-
+    {%- set time = 30 %}
     {%- set ns = namespace(found=false) -%}
     {%- set current = as_timestamp(now()) -%}
-    {%- set open_windows = states|selectattr('entity_id', 'in', state_attr('group.all_windows','entity_id'))|selectattr('state','eq','Open')|map(attribute='entity_id')|list -%}
+    {%- set open_windows = states|selectattr('entity_id', 'in', state_attr('group.all_windows','entity_id'))|selectattr('state','eq','on')|map(attribute='entity_id')|list -%}
     {%- for entity_id in open_windows if not ns.found -%}
       {%- set parts = entity_id.split('.') -%}
       {%- set entity = states[parts[0]][parts[1]] -%}
       {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
-      {%- set ns.found = changed >= 30 and changed % 30 == 0 -%}
+      {%- set ns.found = changed >= time and changed % time == 0 -%}
     {%- endfor -%}
     {{ ns.found }}
 
 variables:
   message: >-
+    {%- set time = 30 %}
     {%- macro parse_last_changed(entity) -%}
       {%- if entity.state -%}
         {%- set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed))|int -%}
@@ -43,8 +45,8 @@ variables:
       {% endif -%}
     {%- endmacro -%}
     {%- set current = as_timestamp(now()) -%}
-    {%- set open_windows = states|selectattr('entity_id', 'in', state_attr('group.all_windows','entity_id'))|selectattr('state','eq','Open')|list -%}
-    {%- for entity in open_windows if (((current - as_timestamp(entity.last_changed)) / 60)|int) >= 30 and (((current - as_timestamp(entity.last_changed)) / 60)|int) % 30 == 0 -%}
+    {%- set open_windows = states|selectattr('entity_id', 'in', state_attr('group.all_windows','entity_id'))|selectattr('state','eq','on')|list -%}
+    {%- for entity in open_windows if (((current - as_timestamp(entity.last_changed)) / 60)|int) >= time and (((current - as_timestamp(entity.last_changed)) / 60)|int) % time == 0 -%}
       {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
       {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
     {%- endfor %}
