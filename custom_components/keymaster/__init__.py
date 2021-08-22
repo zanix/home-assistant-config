@@ -3,7 +3,7 @@ import asyncio
 from datetime import timedelta
 import functools
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Union
 
 import voluptuous as vol
 
@@ -75,6 +75,7 @@ from .helpers import (
     delete_folder,
     delete_lock_and_base_folder,
     generate_keymaster_locks,
+    get_code_slots_list,
     get_node_id,
     handle_state_change,
     handle_zwave_js_event,
@@ -93,7 +94,11 @@ from .services import (
 # of code.
 try:
     from zwave_js_server.const import ATTR_IN_USE, ATTR_USERCODE
-    from zwave_js_server.util.lock import get_usercodes
+    from zwave_js_server.model.node import Node as ZwaveJSNode
+    from zwave_js_server.util.lock import (
+        get_usercodes,
+        get_usercode_from_node,
+    )
 
     from homeassistant.components.zwave_js import ZWAVE_JS_NOTIFICATION_EVENT
 except (ModuleNotFoundError, ImportError):
@@ -421,13 +426,8 @@ async def update_listener(hass: HomeAssistant, config_entry: ConfigEntry) -> Non
             config_entry.data[CONF_LOCK_NAME],
         )
 
-    start_from = config_entry.data[CONF_START]
-    code_slots = config_entry.data[CONF_SLOTS]
-    old_slots = list(range(start_from, start_from + code_slots))
-
-    start_from = config_entry.options[CONF_START]
-    code_slots = config_entry.options[CONF_SLOTS]
-    new_slots = list(range(start_from, start_from + code_slots))
+    old_slots = get_code_slots_list(config_entry.data)
+    new_slots = get_code_slots_list(config_entry.options)
 
     new_data = config_entry.options.copy()
     new_data.pop(CONF_GENERATE, None)
@@ -518,8 +518,10 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
         self._child_locks: List[KeymasterLock] = hass.data[DOMAIN][
             config_entry.entry_id
         ][CHILD_LOCKS]
+        self.config_entry = config_entry
         self.ent_reg = ent_reg
         self.network_sensor = None
+        self.slots = None
         super().__init__(
             hass,
             _LOGGER,
@@ -556,8 +558,9 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
 
         return data
 
-    async def async_update_usercodes(self) -> Dict[str, Any]:
+    async def async_update_usercodes(self) -> Dict[Union[str, int], Any]:
         """Wrapper to update usercodes."""
+        self.slots = get_code_slots_list(self.config_entry.data)
         if not self.network_sensor:
             self.network_sensor = self.ent_reg.async_get_entity_id(
                 "binary_sensor",
@@ -589,7 +592,7 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
                 return {}
             raise UpdateFailed from err
 
-    async def _async_update(self) -> Dict[str, Any]:
+    async def _async_update(self) -> Dict[Union[str, int], Any]:
         """Update usercodes."""
         # loop to get user code data from entity_id node
         instance_id = 1  # default
@@ -602,15 +605,21 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
         # )
 
         if async_using_zwave_js(lock=self._primary_lock):
-            node = self._primary_lock.zwave_js_lock_node
+            node: ZwaveJSNode = self._primary_lock.zwave_js_lock_node
             if node is None:
                 raise NativeNotFoundError
             code_slot = 1
 
             for slot in get_usercodes(node):
                 code_slot = int(slot[ATTR_CODE_SLOT])
-                usercode = slot[ATTR_USERCODE]
-                if not slot[ATTR_IN_USE]:
+                usercode: Optional[str] = slot[ATTR_USERCODE]
+                in_use: Optional[bool] = slot[ATTR_IN_USE]
+                # Retrieve code slots that haven't been populated yet
+                if in_use is None and code_slot in self.slots:
+                    usercode_resp = await get_usercode_from_node(node, code_slot)
+                    usercode = slot[ATTR_USERCODE] = usercode_resp[ATTR_USERCODE]
+                    in_use = slot[ATTR_IN_USE] = usercode_resp[ATTR_IN_USE]
+                if not in_use:
                     _LOGGER.debug("DEBUG: Code slot %s not enabled", code_slot)
                     data[code_slot] = ""
                 elif usercode and "*" in str(usercode):
@@ -622,7 +631,6 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
                 else:
                     _LOGGER.debug("DEBUG: Code slot %s value: %s", code_slot, usercode)
                     data[code_slot] = usercode
-            return data
 
         # pull the codes for ozw
         elif async_using_ozw(lock=self._primary_lock):
@@ -658,8 +666,6 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
                     data[code_slot] = self._invalid_code(code_slot)
                 else:
                     data[code_slot] = value.value
-
-            return data
 
         # pull codes for zwave
         elif async_using_zwave(lock=self._primary_lock):
@@ -710,6 +716,7 @@ class LockUsercodeUpdateCoordinator(DataUpdateCoordinator):
 
                 data[int(value.index)] = code
 
-            return data
         else:
             raise ZWaveIntegrationNotConfiguredError
+
+        return data
