@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Optional, Union
 
 import voluptuous as vol
 
-from homeassistant.components.ozw import DOMAIN as OZW_DOMAIN
 from homeassistant.components.persistent_notification import async_create, async_dismiss
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -93,7 +92,7 @@ from .services import (
 # At that point, we will not need this try except logic and can remove a bunch
 # of code.
 try:
-    from zwave_js_server.const import ATTR_IN_USE, ATTR_USERCODE
+    from zwave_js_server.const.command_class.lock import ATTR_IN_USE, ATTR_USERCODE
     from zwave_js_server.model.node import Node as ZwaveJSNode
     from zwave_js_server.util.lock import (
         get_usercodes,
@@ -101,6 +100,11 @@ try:
     )
 
     from homeassistant.components.zwave_js import ZWAVE_JS_NOTIFICATION_EVENT
+except (ModuleNotFoundError, ImportError):
+    pass
+
+try:
+    from homeassistant.components.ozw import DOMAIN as OZW_DOMAIN
 except (ModuleNotFoundError, ImportError):
     pass
 
