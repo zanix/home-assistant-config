@@ -1,0 +1,408 @@
+---
+# Floorplan
+#
+
+image: /local/floorplan/floorplan.svg?v=1.1.14
+stylesheet: /local/floorplan/floorplan.css?v=1.1.14
+
+defaults:
+  hover_action: hover-info
+  tap_action: more-info
+
+# log_level: debug
+console_log_level: warn
+
+rules:
+  - name: Date
+    entities:
+      - sensor.date
+    state_action:
+      - service: floorplan.text_set
+        service_data: '${entity.state ? entity.state : "undefined"}'
+      - service: floorplan.class_set
+        service_data:
+          class: 'static-text'
+
+  - name: Time
+    entities:
+      - sensor.time
+    state_action:
+      - service: floorplan.text_set
+        service_data: '${entity.state ? entity.state : "undefined"}'
+      - service: floorplan.class_set
+        service_data:
+          class: 'static-text'
+
+  - name: Weather Icon
+    entities:
+      - sensor.openweathermap_condition
+    state_action:
+      - service: floorplan.image_set
+        service_data: |
+          >
+          var imageName = "";
+          switch (entity.state) {
+            case "sunny":
+            case "clr":
+            case "exceptional":
+              imageName = "clear-day";
+              break;
+            case "clear-night":
+              imageName = "clear-night";
+              break;
+            case "rainy":
+              imageName = "rain";
+              break;
+            case "snowy":
+              imageName = "snow";
+              break;
+            case "sleet":
+              imageName = "sleet";
+              break;
+            case "windy":
+            case "windy-variant":
+            case "wind_":
+              imageName = "wind";
+              break;
+            case "fog":
+              imageName = "fog";
+              break;
+            case "cloudy":
+              imageName = "cloudy";
+              break;
+            case "partlycloudy":
+              imageName = "partly-cloudy-day";
+              break;
+            case "partly-cloudy-night":
+              imageName = "partly-cloudy-night";
+              break;
+            case "hail":
+              imageName = "hail";
+              break;
+            case "thunderstorm":
+              imageName = "thunderstorm";
+              break;
+            default:
+              imageName = "cloudy";
+              break;
+          }
+          return "/local/icons/weather_icons/1c/" + imageName + ".svg";
+
+  - name: Weather
+    entities:
+      - weather.kida_daynight
+    state_action:
+      - service: floorplan.text_set
+        service_data: '${entity.attributes.temperature ? Math.round(entity.attributes.temperature) + "°F" : "undefined"}'
+      - service: floorplan.class_set
+        service_data: |
+          >
+          if (entity.state < 32)
+            return "temp-very-low-background";
+          else if (entity.state < 50)
+            return "temp-below-average-background";
+          else if (entity.state < 80)
+            return "temp-average-background";
+          else
+            return "temp-very-high-background";
+
+  - name: Lights
+    entities:
+      - light.kitchen
+      - switch.dining_room_light
+      - light.living_room
+      - switch.front_entry_light
+      - switch.garage_entry_light
+      - switch.garage_light
+      # - light.lamp_left
+      # - light.lamp_right
+      - switch.hallway_light
+      - switch.basement_hallway_light
+      - light.family_room
+      - light.play_space
+      # - light.theater_room
+      # - light.theater_walls
+      # - light.bedroom_master
+      # - switch.bedroom1_light
+      - switch.ethans_lamp
+      # - switch.bedroom2_light
+      # - switch.bedroom3_light
+      - switch.office_shelf_led
+      - light.outside_front
+      - switch.outside_side_light
+      - switch.outside_back_light
+      - switch.xmas_light
+    tap_action:
+      service: homeassistant.toggle
+    state_action:
+      - service: floorplan.class_set
+        service_data: '${entity.state === "on" ? "light-on" : "light-off"}'
+
+  - name: Color Lights
+    entities:
+      - light.office_light
+      - light.office_lamp
+      - light.office_desk_led
+    tap_action:
+      service: homeassistant.toggle
+    state_action:
+      service: floorplan.style_set
+      service_data: |
+        >
+        var elements = [
+          `${entity.entity_id}`,
+        ];
+
+        var color = 'rgb(0, 0, 0)';
+        var opacity = 0;
+
+        if (entity.state === 'on') {
+          if (entity.attributes.color_temp) {
+            var rgb = util.color.miredToRGB(entity.attributes.color_temp);
+            color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            opacity = 1;
+          }
+          else if (entity.attributes.rgb_color) {
+            var rgb = entity.attributes.rgb_color;
+            color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            opacity = 1;
+          }
+        }
+        var style = `fill: ${color};`;
+
+        return {
+          elements: elements,
+          style: style,
+        };
+
+  - name: Doors
+    entities:
+      - binary_sensor.front_door_is_open
+      - binary_sensor.sliding_door_is_open
+      - binary_sensor.garage_entry_door_is_open
+      - binary_sensor.garage_side_door_is_open
+      # - binary_sensor.entry_closet_door_is_open
+      # - binary_sensor.laundry_door_is_open
+      # - binary_sensor.master_bathroom_door_is_open
+      # - binary_sensor.master_bedroom_closet_door_is_open
+      # - binary_sensor.master_bedroom_door_is_open
+      # - binary_sensor.bathroom_door_is_open
+      # - binary_sensor.bathroom_closet_door_is_open
+      # - binary_sensor.basement_bathroom_door_is_open
+      # - binary_sensor.bedroom_1_door_is_open
+      # - binary_sensor.bedroom_2_door_is_open
+      # - binary_sensor.bedroom_3_door_is_open
+      # - binary_sensor.bedroom_4_door_is_open
+      # - binary_sensor.pantry_door_is_open
+      # - binary_sensor.storage_closet_door_is_open
+      # - binary_sensor.theater_room_door_is_open
+      # - binary_sensor.utility_room_door_is_open
+    tap_action: false
+    hover_action: false
+    state_action:
+      service: floorplan.class_set
+      service_data: |
+        >
+        var floorplan = element.dataset.floorplan;
+        var state = entity.state === "on" ? "open" : "closed";
+        return `${floorplan} ${state}`;
+
+  # - name: Windows
+  #   entities:
+  #     - sensor.window_bedroom_m
+  #     - sensor.window_bathroom_m
+  #     - sensor.window_living_room_1
+  #     - sensor.window_living_room_2
+  #     - sensor.window_dining_room_1
+  #     - sensor.window_dining_room_2
+  #     - sensor.window_kitchen
+  #     - sensor.window_bedroom_1
+  #     - sensor.window_bedroom_2
+  #     - sensor.window_garage
+  #     - sensor.window_family_room_1
+  #     - sensor.window_family_room_2
+  #     - sensor.window_bedroom_3
+  #     - sensor.window_bedroom_4
+  #   tap_action: false
+  #   hover_action: false
+  #   state_action:
+  #     service: floorplan.class_set
+  #     service_data: '${entity.state === "on" ? "window-open" : "window-closed"}'
+
+  - name: Locks
+    entities:
+      - lock.lock_front
+    state_action:
+      service: floorplan.class_set
+      service_data: '${entity.state === "locked" ? "locked" : "unlocked"}'
+
+  - name: Covers
+    entities:
+      - cover.garage_door
+    tap_action: false
+    double_tap_action:
+      service: homeassistant.toggle
+    state_action:
+      service: floorplan.class_set
+      service_data: |
+        >
+        var floorplan = element.dataset.floorplan;
+        var state = ["Open", "Closing"].includes(entity.state) ? "open" : "closed";
+        return `${floorplan} ${state}`;
+
+  - name: Leak Sensors
+    entities:
+      - binary_sensor.basement_bathroom_leak_sensor_water_alarm_water_leak_detected
+      - binary_sensor.bathroom_leak_sensor_water_alarm_water_leak_detected
+      # - binary_sensor.dishwasher_leak_sensor_water_alarm_water_leak_detected
+      # - binary_sensor.laundry_room_leak_sensor_water_alarm_water_leak_detected
+      - binary_sensor.master_bathroom_leak_sensor_water_alarm_water_leak_detected
+      - binary_sensor.water_heater_leak_sensor_water_alarm_water_leak_detected
+    state_action:
+      service: floorplan.class_set
+      service_data: '${(entity.state === "on") ? "leak-on" : "leak-off"}'
+
+  # - name: Fans
+  #   entities:
+  #     - fan.fan
+  #   states:
+  #     - state: 'low'
+  #       class: 'spin-low'
+  #     - state: 'medium'
+  #       class: 'spin-medium'
+  #     - state: 'high'
+  #       class: 'spin-high'
+  #   state_action:
+  #     service: floorplan.class_set
+  #     service_data: |
+  #       >
+  #       if (entity.state === "high")
+  #         return "spin-high";
+  #       else if (entity.state === "medium")
+  #         return "spin-medium";
+  #       else if (entity.state === "low")
+  #         return "spin-low";
+
+  - name: Motion
+    entities:
+      - binary_sensor.home_occupancy
+      - binary_sensor.kitchen_occupancy
+      - binary_sensor.family_room_occupancy
+      - binary_sensor.master_bedroom_occupancy
+      - binary_sensor.emma_occupancy
+      - binary_sensor.ethan_occupancy
+      - binary_sensor.tempy_occupancy
+      - binary_sensor.office_occupancy
+      - binary_sensor.garage_multisensor_home_security_motion_detection
+    hover_action: false
+    tap_action: false
+    state_action:
+      service: floorplan.class_set
+      service_data: |
+        >
+        if (["on", "Detected"].includes(entity.state))
+          return "room-motion";
+        else
+          return "room-no-motion";
+
+  - name: Devices
+    entities:
+      - binary_sensor.device_ardena
+      - binary_sensor.device_athos
+      - binary_sensor.device_erebus
+      - binary_sensor.device_nasya
+      - binary_sensor.device_madrona
+      - binary_sensor.device_lantea
+      - binary_sensor.device_canon_mf743c
+      - switch.ender_3_pro
+      - media_player.vizio_living_room
+      - media_player.vizio_family_room
+    state_action:
+      service: floorplan.class_set
+      service_data: |
+        >
+        if (["on", "Online"].includes(entity.state))
+          return "device-on";
+        else
+          return "device-off";
+
+  - name: Media Players
+    entities:
+      - media_player.plex_living_room
+      - media_player.plex_family_room
+      - media_player.plex_master_bedroom
+      - media_player.living_room_shield
+      - media_player.family_room_shield
+      - media_player.master_bedroom_shield
+      - media_player.living_room_speaker
+      - media_player.family_room_speaker
+      - media_player.office_speaker
+      - media_player.cast_living_room
+      - media_player.cast_family_room
+      - media_player.cast_master_bedroom
+      - media_player.onkyo_receiver
+      - media_player.yamaha_receiver
+    state_action:
+      service: floorplan.class_set
+      service_data: |
+        >
+        if (entity.state == "on")
+          return "mediaplayer-on";
+        else if (entity.state == "playing")
+          return "mediaplayer-playing";
+        else if (entity.state == "standby")
+          return "mediaplayer-standby";
+        else if (entity.state == "idle")
+          return "mediaplayer-idle";
+        else if (entity.state == "paused")
+          return "mediaplayer-paused";
+        else
+          return "mediaplayer-off";
+
+  - name: Temperature
+    entities:
+      - sensor.home_temperature
+      - sensor.kitchen_temperature
+      - sensor.family_room_temperature
+      - sensor.master_bedroom_temperature
+      - sensor.emma_temperature
+      - sensor.ethan_temperature
+      - sensor.tempy_temperature
+      - sensor.office_temperature
+      - sensor.garage_multisensor_air_temperature
+    state_action:
+      - service: floorplan.text_set
+        service_data: '${entity.state ? Math.round(entity.state) + "°F" : "undefined"}'
+      - service: floorplan.class_set
+        service_data: |
+          >
+          var temp = parseFloat(entity.state.replace("°", ""));
+          if (temp < 65)
+            return "temp-very-low-background";
+          else if (temp < 70)
+            return "temp-below-average-background";
+          else if (temp < 74)
+            return "temp-average-background";
+          else
+            return "temp-very-high-background";
+
+  - name: Cameras
+    entities:
+      - camera.doorbell
+      - camera.emma
+      - camera.ethan
+      - camera.tempy
+      - camera.family
+      - camera.garage
+      - camera.ender_3_pro
+    state_action:
+      service: floorplan.class_set
+      service_data: '${(entity.state === "idle") ? "camera-idle" : ""}'
+
+  - name: Cars
+    entities:
+      - sensor.garage_car_present
+    hover_action: false
+    state_action:
+      service: floorplan.class_set
+      service_data: '${(entity.state === "Yes") ? "layer-visible" : "layer-hidden"}'
