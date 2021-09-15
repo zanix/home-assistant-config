@@ -1,0 +1,87 @@
+---
+id: led_garage_door_and_light_status
+alias: '[LED] Garage Door and Light Status'
+description: 'Set Garage light switch LED when Garage Door and light status'
+mode: restart
+
+trigger:
+  - platform: state
+    entity_id: cover.garage_door
+    to: 'open'
+  - platform: state
+    entity_id: cover.garage_door
+    to: 'closed'
+  - platform: state
+    entity_id: switch.garage_light
+    to: 'on'
+  - platform: state
+    entity_id: switch.garage_light
+    to: 'off'
+
+action:
+  # - service: script.inovelli_led
+  #   data:
+  #     entity_id: switch.garage_light
+  #     model: switch
+  #     color: red
+  #     level: 10
+  #     effect: pulse
+
+  - choose:
+      - conditions:  # Light off / Garage closed
+          - condition: state
+            entity_id: cover.garage_door
+            state: 'closed'
+          - condition: state
+            entity_id: switch.garage_light
+            state: 'off'
+        sequence:
+          - service: script.inovelli_led
+            data:
+              entity_id: switch.garage_light
+              model: switch
+              effect: 'off'
+
+      - conditions:  # Light on / Garage closed
+          - condition: state
+            entity_id: cover.garage_door
+            state: 'closed'
+          - condition: state
+            entity_id: switch.garage_light
+            state: 'on'
+        sequence:
+          - service: script.inovelli_led
+            data:
+              entity_id: switch.garage_light
+              model: switch
+              effect: 'off'
+
+      - conditions:  # Light off / Garage open
+          - condition: state
+            entity_id: cover.garage_door
+            state: 'open'
+          - condition: state
+            entity_id: switch.garage_light
+            state: 'off'
+        sequence:
+          - service: script.inovelli_led
+            data:
+              entity_id: switch.garage_light
+              color: red
+              effect: pulse
+              level: 10
+
+      - conditions:  # Light on / Garage open
+          - condition: state
+            entity_id: cover.garage_door
+            state: 'open'
+          - condition: state
+            entity_id: switch.garage_light
+            state: 'on'
+        sequence:
+          - service: script.inovelli_led
+            data:
+              entity_id: switch.garage_light
+              color: yellow
+              effect: pulse
+              level: 10

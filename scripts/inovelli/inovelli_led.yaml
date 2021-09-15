@@ -38,8 +38,11 @@
 #   Incorporated @firstof9's changes:
 #     1. Set execution mode to "parallel" to all this script to potentially run on more than one devices simultaneously.
 #     2. Implement ZWave JS's new zwave_js.bulk_set_partial_config_parameters command.
-#
 #   Source: https://gist.github.com/firstof9/b88d072a81c54b314fe7ddb901fc5c29
+#
+#   May 10, 2021
+#   Incorporated @koconut's corrected "Off code".
+#   Source: https://community.home-assistant.io/t/inovelli-z-wave-red-series-notification-led/165483/146
 #
 inovelli_led:
   alias: 'Inovelli LED'
@@ -49,16 +52,15 @@ inovelli_led:
 
   variables:
     # * Strongly recommended -> Use the passed model type ("dimmer", "switch", "combo_light") when present.
-    # * If not present, then attempt to identify the type using the "product_name" attribute (which is only
-    #   unfortunately only available in the original zwave integration).
+    # * If not present, then attempt to identify the type using the device "model" attribute.
     # * Finally, assume the model type is "dimmer".
     model: |
       {%- if model is string -%}
         {{ model }}
-      {%- elif state_attr(entity_id, "product_name") is string -%}
-        {%- if "LZW31" in state_attr(entity_id, "product_name") -%}
+      {%- elif device_attr(entity_id, "model") is string -%}
+        {%- if "LZW31" in device_attr(entity_id, "model") -%}
           dimmer
-        {%- elif "LZW36" in state_attr(entity_id, "product_name") -%}
+        {%- elif "LZW36" in device_attr(entity_id, "model") -%}
           combo_light
         {%- else -%}
           switch
@@ -177,15 +179,19 @@ inovelli_led:
         entity_id: '{{ entity_id }}'
       data:
         parameter: '{{ parameter }}'
-        value: 0
+        value: '16714410'
 
-    # Start the new effect.
-    - service: zwave_js.bulk_set_partial_config_parameters
-      target:
-        entity_id: '{{ entity_id }}'
-      data:
-        parameter: '{{ parameter }}'
-        value: '{{ inovelli_math }}'
+    # Start the new effect, unless we were just turning it off.
+    - choose:
+        - conditions:
+            - '{{ inovelli_math > 0 }}'
+          sequence:
+            - service: zwave_js.bulk_set_partial_config_parameters
+              target:
+                entity_id: "{{ entity_id }}"
+              data:
+                parameter: "{{ parameter }}"
+                value: "{{ inovelli_math }}"
 
   fields:
     entity_id:
