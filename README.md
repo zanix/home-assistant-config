@@ -23,11 +23,12 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [EcoBee](https://www.home-assistant.io/integrations/ecobee/) - The ecobee integration lets you control and view sensor data from ecobee thermostats
 - [ESPHome](https://www.home-assistant.io/integrations/esphome/) - Connect ESPHome devices directly to Home Assistant with the native ESPHome API
 - [Google Cast](https://www.home-assistant.io/integrations/cast/) - Google Cast integration
+- [Internet Printing Protocol](https://www.home-assistant.io/integrations/ipp) - Read current data from your networked printer that supports the Internet Printing Protocol.
 - [IQVIA](https://www.home-assistant.io/integrations/iqvia/) - The iqvia sensor platform collects and displays allergy, asthma and disease information
 - [Logitech Harmony](https://www.home-assistant.io/integrations/harmony/) - The harmony remote platform allows you to control the state of your Harmony Hub Device
 - [Mobile App](https://www.home-assistant.io/integrations/mobile_app/) - The Mobile App integration allows Home Assistant mobile apps to easily integrate with Home Assistant.
 - [MQTT](https://www.home-assistant.io/integrations/mqtt/) - Allows extremely lightweight publish/subscribe messaging transport
-- [National Weather Service](https://www.home-assistant.io/integrations/nws/) - The nws platform uses the National Weather Service web API as a source for meteorological data for your location
+- [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap) - The OpenWeatherMap weather integrations uses OpenWeatherMap as a source for current meteorological data for your location.
 - [Plex](https://www.home-assistant.io/integrations/plex/) - The plex integration allows you to connect to a Plex Media Server
 - [Rachio](https://www.home-assistant.io/integrations/rachio/) - The rachio platform allows you to control your Rachio irrigation system
 - [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
@@ -48,29 +49,38 @@ Since some integrations can only be enabled from within the UI, here is a list o
 
 - [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
 - [Browser Mod](https://github.com/thomasloven/hass-browser_mod) - Turn a browser into a controllable entity and an audio player
-- [Keymaster](https://github.com/FutureTense/keymaster) - This integration allows you to control one (or more) Z-Wave enabled locks that have been added to your Z-Wave network.
+- [Emporia Vue](https://github.com/magico13/ha-emporia-vue) - Reads data from the Emporia Vue energy monitor. Creates a sensor for each device channel showing average usage over each minute.
+- [Keymaster](https://github.com/FutureTense/keymaster) - This integration allows you to control one (or more) Z-Wave enabled locks that have been added to your Z-Wave network
 - [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
+- [Subaru](https://github.com/G-Two/homeassistant-subaru) - Retrieves information provided by Subaru connected vehicle services
 - [Unifi Gateway](https://github.com/custom-components/sensor.unifigateway) - High level health status of UniFi Security Gateway devices via UniFi Controller
 
 ### HACS Frontend
 
+- [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) - Automatically populate lovelace cards with entities matching certain criteria
 - [Banner Card](https://github.com/nervetattoo/banner-card) - A fluffy linkable banner with interactive glances to spice up your home dashboards
 - [Bar Card](https://github.com/custom-cards/bar-card) - Customizable Animated Bar card
 - [Battery State Card](https://github.com/maxwroc/battery-state-card) - Display battery levels for battery entities
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Card Mod](https://github.com/thomasloven/lovelace-card-mod) - Add CSS styles to (almost) any lovelace card
+- [Card Tools](https://github.com/thomasloven/lovelace-card-tools) - Collection of tools to simplify creating custom cards
 - [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) - Show basic attributes from multiple entities
-- [Floorplan](https://github.com/pkozul/ha-floorplan) ([Forum](https://community.home-assistant.io/c/third-party/floorplan)) - Interactive floorplan
+- [Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) - Floorplan for Home Assistant
+- [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) - Fold away and hide rows in lovelace entities cards
 - [Layout Card](https://github.com/thomasloven/lovelace-layout-card) - Get more control over the placement of lovelace cards
 - [Lovelace Swipe Navigation](https://github.com/maykar/lovelace-swipe-navigation) - Swipe through Lovelace views on mobile
 - [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) ([Forum](https://community.home-assistant.io/t/lovelace-multiple-entity-row/109109)) - Show multiple entity states on entity rows
+- [Number Box](https://github.com/htmltiger/numberbox-card) - NumberBox for input sliders and number entities
 - [Paper Buttons Row](https://github.com/jcwillox/lovelace-paper-buttons-row) - Adds highly configurable buttons that use actions and per-state styling
 - [RGB Light Card](https://github.com/bokub/rgb-light-card) - A Lovelace custom card for RGB lights
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
 - [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
 - [Stack In Card](https://github.com/custom-cards/stack-in-card) - Similar to vertical-stack and horizontal-stack but removes card borders
+- [Template Entity Row](https://github.com/thomasloven/lovelace-template-entity-row) - Display whatever you want in an entities card row
+- [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) - Time Picker Card.
+- [Uptime Card](https://github.com/dylandoamaral/uptime-card) - A minimalist card inspired by the reddit status UI to display binary sensors in a nice way
 - [Weather Card](https://github.com/bramkragten/weather-card) - Custom animated weather card
 
 ## Disabled Integrations
