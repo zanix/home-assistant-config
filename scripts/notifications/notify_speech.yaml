@@ -1,8 +1,8 @@
 ---
 notify_speech:
   alias: '[Notify] Speech'
-  description: 'Notify users via speech'
-  icon: mdi:message-processing
+  description: 'Notify users via Text-to-speech'
+  icon: mdi:text-to-speech
   mode: parallel
 
   fields:
@@ -19,13 +19,20 @@ notify_speech:
         text:
 
   sequence:
-    choose:
-      conditions:
-        - condition: template
-          value_template: '{{ message is not undefined }}'
-      sequence:
-        - service: script.say
-          data_template:
-            media_player: '{{ media_player|default("media_player.living_room_speaker", true) }}'
-            message: '{{ message }}'
-            say_greeting: 'false'
+    - condition: state
+      entity_id: input_boolean.audio_notifications
+      state: 'on'
+
+    - condition: template
+      value_template: >-
+        {% set current_time = (now().second + (now().minute * 60) + (now().hour * 3600)) %}
+        {% set start = state_attr('input_datetime.audio_notifications_start', 'timestamp') | int %}
+        {% set end = state_attr('input_datetime.audio_notifications_end', 'timestamp') | int %}
+        {% set nap_start = state_attr('input_datetime.nap_time_start', 'timestamp') | int %}
+        {% set nap_end = state_attr('input_datetime.nap_time_end', 'timestamp') | int %}
+        {{ (start <= current_time <= end) and (nap_start > current_time or current_time > nap_end) }}
+
+    - service: script.say
+      data:
+        media_player: '{{ media_player }}'
+        message: '{{ message }}'

@@ -4,12 +4,12 @@
   {%- macro get_friendly_names(entity_list) -%}
     {% set comma = joiner(', ') -%}
     {%- for entity_id in entity_list -%}
-      {{ ' and ' if loop.last and not loop.first else comma() }}
+      {{ ', and ' if loop.last and not loop.first else comma() }}
       {%- set name = entity_id.name -%}
       {%- if name is string -%}
-        {{ name|trim|title }}
+        {{ name|trim }}
       {%- else -%}
-        {{ entity_id|replace('light.','')|replace('_',' ')|trim|title }}
+        {{ entity_id|replace('light.','')|replace('switch.','')||replace('sensor.','')replace('_',' ')|trim|title }}
       {%- endif -%}
     {%- endfor -%}
   {%- endmacro -%}
@@ -42,20 +42,19 @@
 
   {%- macro door_window_check() -%}
     {%- set entities = [
-      'lock.lock_front',
       'cover.garage_door',
       'binary_sensor.front_door_is_open',
       'binary_sensor.sliding_door_is_open',
       'binary_sensor.garage_entry_door_is_open',
-      'binary_sensor.garage_side_door_is_open'
+      'binary_sensor.garage_side_door_is_open',
+      'lock.lock_front'
     ] -%}
     {%- set open_states = ['open','on','unlocked'] -%}
     {%- set open_entities = states|selectattr('entity_id','in',entities)|selectattr('state','in',open_states)|map(attribute='entity_id')|list -%}
 
     {%- if open_entities|length > 0 -%}
-      There is something you should know,
       {%- for entity in open_entities -%}
-        {{ 'T' if entity == open_entities|first else 't' }}he {{ state_attr(entity,'friendly_name') }} was left {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == open_entities|last else ', ' }}{{ 'and ' if open_entities|length > 1 and entity != open_entities|last }}
+        {{ 'T' if entity == open_entities|first else 't' }}he {{ state_attr(entity,'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == open_entities|last else ', ' }}{{ 'and ' if open_entities|length > 1 and entity != open_entities|last }}
       {%- endfor -%}
       {{ " " }}
     {%- endif -%}
