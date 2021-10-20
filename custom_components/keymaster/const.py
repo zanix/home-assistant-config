@@ -2,11 +2,12 @@
 from homeassistant.const import STATE_LOCKED, STATE_UNLOCKED
 
 DOMAIN = "keymaster"
-VERSION = "v.0.0.71"
+VERSION = "v0.0.74"
 ISSUE_URL = "https://github.com/FutureTense/keymaster"
 PLATFORMS = ["binary_sensor", "sensor"]
 ZWAVE_NETWORK = "zwave_network"
 MANAGER = "manager"
+INTEGRATION = "zwave_integration"
 
 # hass.data attributes
 CHILD_LOCKS = "child_locks"

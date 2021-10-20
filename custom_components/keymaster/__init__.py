@@ -50,6 +50,7 @@ from .const import (
     COORDINATOR,
     DEFAULT_HIDE_PINS,
     DOMAIN,
+    INTEGRATION,
     ISSUE_URL,
     MANAGER,
     PLATFORMS,
@@ -84,8 +85,8 @@ from .services import (
     add_code,
     clear_code,
     generate_package_files,
-    refresh_codes,
     init_child_locks,
+    refresh_codes,
 )
 
 # TODO: At some point we should deprecate ozw and zwave and require zwave_js.
@@ -94,10 +95,7 @@ from .services import (
 try:
     from zwave_js_server.const.command_class.lock import ATTR_IN_USE, ATTR_USERCODE
     from zwave_js_server.model.node import Node as ZwaveJSNode
-    from zwave_js_server.util.lock import (
-        get_usercodes,
-        get_usercode_from_node,
-    )
+    from zwave_js_server.util.lock import get_usercode_from_node, get_usercodes
 
     from homeassistant.components.zwave_js import ZWAVE_JS_NOTIFICATION_EVENT
 except (ModuleNotFoundError, ImportError):
@@ -299,6 +297,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
                 functools.partial(handle_zwave_js_event, hass, config_entry),
             )
         )
+        await system_health_check(hass, config_entry)
         return True
 
     # We only get here if we are not using zwave_js
@@ -336,7 +335,24 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
             config_entry.data[CONF_LOCK_NAME],
         )
 
+    await system_health_check(hass, config_entry)
     return True
+
+
+async def system_health_check(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
+    """Update system health check data."""
+    primary_lock = hass.data[DOMAIN][config_entry.entry_id][PRIMARY_LOCK]
+
+    if async_using_zwave_js(lock=primary_lock):
+        hass.data[DOMAIN][INTEGRATION] = "zwave_js"
+    elif async_using_ozw(lock=primary_lock):
+        hass.data[DOMAIN][INTEGRATION] = "ozw"
+    elif async_using_zwave(lock=primary_lock):
+        hass.data[DOMAIN][INTEGRATION] = "zwave"
+    else:
+        hass.data[DOMAIN][INTEGRATION] = "unknown"
+
+    hass.data[DOMAIN]["network_sensor"] = slugify(f"{primary_lock.lock_name}: Network")
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
