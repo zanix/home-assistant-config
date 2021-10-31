@@ -2,7 +2,7 @@
 import logging
 import os
 import random
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 from homeassistant.components.input_text import MODE_PASSWORD, MODE_TEXT
 from homeassistant.components.lock import DOMAIN as LOCK_DOMAIN
@@ -11,6 +11,7 @@ from homeassistant.components.script import DOMAIN as SCRIPT_DOMAIN
 from homeassistant.const import ATTR_ENTITY_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
+from homeassistant.util import slugify
 
 from .const import (
     ATTR_CODE_SLOT,
@@ -239,7 +240,8 @@ def generate_package_files(hass: HomeAssistant, name: str) -> None:
         (
             hass.config_entries.async_get_entry(entry_id)
             for entry_id in hass.data[DOMAIN]
-            if hass.data[DOMAIN][entry_id][PRIMARY_LOCK].lock_name == name
+            if isinstance(hass.data[DOMAIN][entry_id], Mapping)
+            and hass.data[DOMAIN][entry_id][PRIMARY_LOCK].lock_name == name
         ),
         None,
     )
@@ -253,7 +255,7 @@ def generate_package_files(hass: HomeAssistant, name: str) -> None:
     if primary_lock.parent is not None:
         child_file = "_child"
 
-    lockname = primary_lock.lock_name
+    lockname = slugify(primary_lock.lock_name)
 
     _LOGGER.debug("Starting file generation...")
 
