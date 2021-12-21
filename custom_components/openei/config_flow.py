@@ -140,6 +140,8 @@ class OpenEIOptionsFlowHandler(config_entries.OptionsFlow):
         """Handle a flow initialized by the user."""
         _LOGGER.debug("data: %s", self._data)
         if user_input is not None:
+            if user_input[CONF_MANUAL_PLAN] == '""':
+                user_input[CONF_MANUAL_PLAN] = ""
             self._data.update(user_input)
             return self.async_create_entry(title="", data=self._data)
 
@@ -251,10 +253,10 @@ def _get_schema_step_3(
 
     return vol.Schema(
         {
-            vol.Required(CONF_PLAN, default=_get_default(CONF_PLAN, "")): vol.In(
-                plan_list
-            ),
-            vol.Optional(CONF_MANUAL_PLAN, default=_get_default(CONF_PLAN, "")): str,
+            vol.Optional(CONF_PLAN, default=_get_default(CONF_PLAN)): vol.In(plan_list),
+            vol.Optional(
+                CONF_MANUAL_PLAN, default=_get_default(CONF_MANUAL_PLAN, "")
+            ): str,
             vol.Required(
                 CONF_SENSOR, default=_get_default(CONF_SENSOR, "(none)")
             ): vol.In(_get_entities(hass, SENSORS_DOMAIN, "energy", "(none)")),

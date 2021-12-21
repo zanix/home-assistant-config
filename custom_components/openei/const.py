@@ -1,11 +1,14 @@
 """Constants for integration_blueprint."""
-from homeassistant.const import DEVICE_CLASS_MONETARY
+from __future__ import annotations
+from homeassistant.components.sensor import SensorEntityDescription
+
+from typing import Final
 
 # Base component constants
 NAME = "OpenEI"
 DOMAIN = "openei"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.1.5"
+VERSION = "0.1.6"
 ATTRIBUTION = "Data provided by OpenEI.org"
 ISSUE_URL = "https://github.com/firstof9/ha-openei/issues"
 PLATFORMS = ["binary_sensor", "sensor"]
@@ -39,23 +42,37 @@ If you have any issues with this you need to open an issue here:
 -------------------------------------------------------------------
 """
 # property: name, icon, unit_of_measurement, device_class
-SENSOR_TYPES = {
-    "current_rate": [
-        "Current Energy Rate",
-        "mdi:cash-multiple",
-        None,
-        DEVICE_CLASS_MONETARY,
-    ],
-    "distributed_generation": ["Distributed Generation", "mdi:gauge", None, None],
-    "rate_name": ["Plan Name", "mdi:tag", None, None],
-    "all_rates": ["All Listed Rates", "mdi:format-list-bulleted", None, None],
-    "monthly_tier_rate": [
-        "Monthly Energy Rate",
-        "mdi:cash-multiple",
-        None,
-        DEVICE_CLASS_MONETARY,
-    ],
-    "mincharge": ["Minimum Charge", "mdi:cash-multiple", None, DEVICE_CLASS_MONETARY],
+SENSOR_TYPES: Final[dict[str, SensorEntityDescription]] = {
+    "current_rate": SensorEntityDescription(
+        key="current_rate",
+        name="Current Energy Rate",
+        icon="mdi:cash-multiple",
+    ),
+    "distributed_generation": SensorEntityDescription(
+        key="distributed_generation",
+        name="Distributed Generation",
+        icon="mdi:gauge",
+    ),
+    "rate_name": SensorEntityDescription(
+        key="rate_name",
+        name="Plan Name",
+        icon="mdi:tag",
+    ),
+    "all_rates": SensorEntityDescription(
+        key="all_rates",
+        name="All Listed Rates",
+        icon="mdi:format-list-bulleted",
+    ),
+    "monthly_tier_rate": SensorEntityDescription(
+        key="monthly_tier_rate",
+        name="Monthly Energy Rate",
+        icon="mdi:cash-multiple",
+    ),
+    "mincharge": SensorEntityDescription(
+        key="mincharge",
+        name="Minimum Charge",
+        icon="mdi:cash-multiple",
+    ),
 }
 
 BINARY_SENSORS = {

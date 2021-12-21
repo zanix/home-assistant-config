@@ -1,5 +1,4 @@
 """Custom integration to integrate OpenEI with Home Assistant."""
-import asyncio
 from datetime import datetime, timedelta
 import logging
 
@@ -13,7 +12,6 @@ import openeihttp
 from .const import (
     BINARY_SENSORS,
     CONF_API_KEY,
-    CONF_LOCATION,
     CONF_MANUAL_PLAN,
     CONF_PLAN,
     CONF_SENSOR,
@@ -46,9 +44,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     if CONF_SENSOR in updated_config.keys() and updated_config[CONF_SENSOR] == "(none)":
         updated_config.pop(CONF_SENSOR, None)
 
-    if CONF_MANUAL_PLAN in updated_config.keys() and updated_config[CONF_MANUAL_PLAN]:
-        updated_config[CONF_PLAN] = updated_config[CONF_MANUAL_PLAN]
-        updated_config.pop(CONF_MANUAL_PLAN, None)
+    if CONF_MANUAL_PLAN not in updated_config.keys():
+        updated_config[CONF_MANUAL_PLAN] = ""
+
+    if CONF_PLAN not in updated_config.keys():
+        updated_config[CONF_PLAN] = ""
+
+    if not any([updated_config[CONF_MANUAL_PLAN], updated_config[CONF_PLAN]]):
+        _LOGGER.error("Plan configuration missing.")
+        raise ConfigEntryNotReady
 
     _LOGGER.debug("updated_config: %s", updated_config)
     if updated_config != entry.data:
@@ -123,6 +127,9 @@ def get_sensors(hass, config) -> dict:
     meter = config.data.get(CONF_SENSOR)
     reading = None
 
+    if config.data.get(CONF_MANUAL_PLAN):
+        plan = config.data.get(CONF_MANUAL_PLAN)
+
     if meter:
         _LOGGER.debug("Using meter data from sensor: %s", meter)
         reading = hass.states.get(meter)
@@ -142,12 +149,12 @@ def get_sensors(hass, config) -> dict:
 
     for sensor in SENSOR_TYPES:
         _sensor = {}
-        value = getattr(rate, sensor)
+        value = getattr(rate, SENSOR_TYPES[sensor].key)
         if isinstance(value, tuple):
             _sensor[sensor] = value[0]
             _sensor[f"{sensor}_uom"] = value[1]
         else:
-            _sensor[sensor] = getattr(rate, sensor)
+            _sensor[sensor] = getattr(rate, SENSOR_TYPES[sensor].key)
         data.update(_sensor)
 
     for sensor in BINARY_SENSORS:
