@@ -1,0 +1,53 @@
+---
+id: presence_leaving_walmart
+alias: '[Presence] Leaving Wal-Mart'
+description: 'Sends a notification when someone is leaving Wal-Mart'
+mode: single
+
+trigger:
+  platform: state
+  entity_id:
+    - person.joshua
+    - person.amy
+
+variables:
+  zone_state: '{{ states["zone.wal_mart"].name }}'
+  name: '{{ trigger.to_state.name }}'
+  message: >-
+    {% set name = trigger.to_state.name %}
+    {% set message = [
+      "Just a head's up, [name1] is done at Wal-Mart.",
+      "Your [name2] is on the way home from Wal-Mart."
+    ]|random %}
+    {% if '[name2]' in message %}
+      {% if name == "Amy" %}
+        {% set name = "mom" %}
+      {% elif name == "Joshua" %}
+        {% set name = "dad" %}
+      {% endif %}
+    {% endif %}
+    {{ message|replace("[name1]",name)|replace("[name2]",name) }}
+
+condition:
+  - condition: template
+    value_template: '{{ trigger.from_state.state == zone_state and trigger.to_state.state != zone_state }}'
+  - condition: time
+    after: '08:00'
+    before: '21:00'
+
+action:
+  - service: script.notify_mobile
+    data:
+      who: 'parents'
+      title: '{{ name }} Leaving Wal-Mart'
+      message: '{{ message }}'
+      group: 'presence'
+
+  - service: script.notify_speech
+    data:
+      media_player: media_player.living_room_speaker
+      message: '{{ message }}'
+
+  # Cool down timer. When "mode: single" this stops this automation from running more often than this.
+  - delay:
+      minutes: 5
