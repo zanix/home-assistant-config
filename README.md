@@ -20,26 +20,35 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Since some integrations can only be enabled from within the UI, here is a list of integrations that are enabled via the Integrations UI on my Home Assistant.
 
-- [EcoBee](https://www.home-assistant.io/integrations/ecobee/) - The ecobee integration lets you control and view sensor data from ecobee thermostats
-- [ESPHome](https://www.home-assistant.io/integrations/esphome/) - Connect ESPHome devices directly to Home Assistant with the native ESPHome API
-- [Google Cast](https://www.home-assistant.io/integrations/cast/) - Google Cast integration
+- [Android TV](https://www.home-assistant.io/integrations/androidtv) - The androidtv platform allows you to control an Android TV device or Amazon Fire TV device
+- [EcoBee](https://www.home-assistant.io/integrations/ecobee) - The ecobee integration lets you control and view sensor data from ecobee thermostats
+- [ESPHome](https://www.home-assistant.io/integrations/esphome) - Connect ESPHome devices directly to Home Assistant with the native ESPHome API
+- [Forecast.Solar](https://www.home-assistant.io/integrations/forecast_solar) - The Forecast.Solar service provides solar production forecasting for your solar panel system, based on historic averages combined with weather forecasting
+- [Google Cast](https://www.home-assistant.io/integrations/cast) - Google Cast integration
+- [InfluxDB](https://www.home-assistant.io/integrations/influxdb) - The influxdb integration makes it possible to transfer all state changes to an external InfluxDB database
 - [Internet Printing Protocol](https://www.home-assistant.io/integrations/ipp) - Read current data from your networked printer that supports the Internet Printing Protocol.
-- [IQVIA](https://www.home-assistant.io/integrations/iqvia/) - The iqvia sensor platform collects and displays allergy, asthma and disease information
-- [Logitech Harmony](https://www.home-assistant.io/integrations/harmony/) - The harmony remote platform allows you to control the state of your Harmony Hub Device
-- [Mobile App](https://www.home-assistant.io/integrations/mobile_app/) - The Mobile App integration allows Home Assistant mobile apps to easily integrate with Home Assistant.
-- [MQTT](https://www.home-assistant.io/integrations/mqtt/) - Allows extremely lightweight publish/subscribe messaging transport
+- [IQVIA](https://www.home-assistant.io/integrations/iqvia) - The iqvia sensor platform collects and displays allergy, asthma and disease information
+- [Joaoapps Join](https://www.home-assistant.io/integrations/joaoapps_join) - The joaoapps_join integration exposes services from [Join](https://joaoapps.com/join)
+- [Logitech Harmony](https://www.home-assistant.io/integrations/harmony) - The harmony remote platform allows you to control the state of your Harmony Hub Device
+- [Mobile App](https://www.home-assistant.io/integrations/mobile_app) - The Mobile App integration allows Home Assistant mobile apps to easily integrate with Home Assistant.
+- [MQTT](https://www.home-assistant.io/integrations/mqtt) - Allows extremely lightweight publish/subscribe messaging transport
+- [Onkyo](https://www.home-assistant.io/integrations/onkyo) - The onkyo platform allows you to control a Onkyo, Integra and some recent Pioneer receivers
+- [OpenGarage](https://www.home-assistant.io/integrations/opengarage) - The OpenGarage integration lets you control the open-source OpenGarage.io device
 - [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap) - The OpenWeatherMap weather integrations uses OpenWeatherMap as a source for current meteorological data for your location.
-- [Plex](https://www.home-assistant.io/integrations/plex/) - The plex integration allows you to connect to a Plex Media Server
-- [Rachio](https://www.home-assistant.io/integrations/rachio/) - The rachio platform allows you to control your Rachio irrigation system
-- [Ring](https://www.home-assistant.io/integrations/ring/) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
-- [Roku](https://www.home-assistant.io/integrations/roku/) - The Roku integration allows you to control a Roku device
-- [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4/) - The PS4 integration allows you to control a Sony PlayStation 4 console
+- [Plex](https://www.home-assistant.io/integrations/plex) - The plex integration allows you to connect to a Plex Media Server
+- [Rachio](https://www.home-assistant.io/integrations/rachio) - The rachio platform allows you to control your Rachio irrigation system
+- [Ring](https://www.home-assistant.io/integrations/ring) - The ring implementation allows you to integrate your Ring.com devices in Home Assistant
+- [Roku](https://www.home-assistant.io/integrations/roku) - The Roku integration allows you to control a Roku device
+- [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4) - The PS4 integration allows you to control a Sony PlayStation 4 console
+- [Spotify](https://www.home-assistant.io/integrations/spotify) - The Spotify media player integration allows you to control Spotify playback
 - [Tasmota](https://www.home-assistant.io/integrations/tasmota) - This integration allows to control of Tasmota devices over MQTT
-- [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi/) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
-- [Vizio SmartCast](https://www.home-assistant.io/integrations/vizio/) - The vizio integration allows you to control SmartCast-compatible TVs and sound bars.
+- [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi) - The unifi integration allows you to connects to a UniFi controller and gather device tracking data
+- [UPnP/IGD](https://www.home-assistant.io/integrations/upnp) - The upnp integration enables you to collect network statistics from your router such as bytes in/out and packets in/out, uptime, WAN IP address, and WAN connectivity status
+- [Vizio SmartCast](https://www.home-assistant.io/integrations/vizio) - The vizio integration allows you to control SmartCast-compatible TVs and sound bars.
 - [WLED](https://www.home-assistant.io/integrations/wled) - WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812, APA102, and similar) LED's
-- [ZigBee](https://www.home-assistant.io/integrations/zigbee/) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
-- [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js/) - The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](https://zwave-js.github.io/zwavejs2mqtt) JS driver. This is the recommended Z-Wave integration for Home Assistant.
+- [Yamaha](https://www.home-assistant.io/integrations/yamaha) - The yamaha platform allows you to control Yamaha Network Receivers
+- [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js) - The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](https://zwave-js.github.io/zwavejs2mqtt) JS driver. This is the recommended Z-Wave integration for Home Assistant.
+- [ZigBee](https://www.home-assistant.io/integrations/zigbee) - Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
 
 ## HACS
 
@@ -47,16 +56,21 @@ Since some integrations can only be enabled from within the UI, here is a list o
 
 ### HACS Integrations
 
-- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
 - [Browser Mod](https://github.com/thomasloven/hass-browser_mod) - Turn a browser into a controllable entity and an audio player
+- [DreamScreen](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) - Controls Wifi enabled [DreamScreens](https://www.dreamscreentv.com) (HD & 4k)
 - [Emporia Vue](https://github.com/magico13/ha-emporia-vue) - Reads data from the Emporia Vue energy monitor. Creates a sensor for each device channel showing average usage over each minute.
+- [FontAwesome](https://github.com/thomasloven/hass-fontawesome) - Use free icons from the fontawesome set in Home-assistant
+- [Govee](https://github.com/LaggAt/hacs-govee) - Govee integration allows you to control and monitor lights using the Govee API
+- [Helium Blockchain](https://github.com/rsnodgrass/hass-helium) - Sensors for monitoring individual Helium hotspots, Helium blockchain wallets, and the Helium HNT/USD Oracle price
 - [Keymaster](https://github.com/FutureTense/keymaster) - This integration allows you to control one (or more) Z-Wave enabled locks that have been added to your Z-Wave network
 - [Mail and Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) - This provides a Custom Component for getting UPS, USPS, and FedEx delivery information in Home Assistant
+- [OpenEI](https://github.com/firstof9/ha-openei) - Component to integrate with [OpenEI.org](https://openei.org/)
 - [Subaru](https://github.com/G-Two/homeassistant-subaru) - Retrieves information provided by Subaru connected vehicle services
 - [Unifi Gateway](https://github.com/custom-components/sensor.unifigateway) - High level health status of UniFi Security Gateway devices via UniFi Controller
 
 ### HACS Frontend
 
+- [ApexCharts Card](https://github.com/RomRider/apexcharts-card) - A higly customizable graph card based on ApexCharts.js
 - [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) - Automatically populate lovelace cards with entities matching certain criteria
 - [Banner Card](https://github.com/nervetattoo/banner-card) - A fluffy linkable banner with interactive glances to spice up your home dashboards
 - [Bar Card](https://github.com/custom-cards/bar-card) - Customizable Animated Bar card
@@ -64,18 +78,21 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [Button Card](https://github.com/kuuji/button-card) ([Forum](https://community.home-assistant.io/t/lovelace-button-card/65981)) - Simple button card for entities
 - [Card Mod](https://github.com/thomasloven/lovelace-card-mod) - Add CSS styles to (almost) any lovelace card
 - [Card Tools](https://github.com/thomasloven/lovelace-card-tools) - Collection of tools to simplify creating custom cards
+- [Config Template Card Card](https://github.com/iantrich/config-template-card) - This card is for Lovelace on Home Assistant that allows you to use pretty much any valid Javascript on the hass object in your configuration
 - [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) - Show basic attributes from multiple entities
-- [Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) - Floorplan for Home Assistant
 - [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) - Fold away and hide rows in lovelace entities cards
+- [HA Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) - Floorplan for Home Assistant
 - [Layout Card](https://github.com/thomasloven/lovelace-layout-card) - Get more control over the placement of lovelace cards
 - [Lovelace Swipe Navigation](https://github.com/maykar/lovelace-swipe-navigation) - Swipe through Lovelace views on mobile
 - [Mini Graph Card](https://github.com/kalkih/mini-graph-card) - Minimalistic graph card
 - [Mini Media Player](https://github.com/kalkih/mini-media-player) ([Forum](https://community.home-assistant.io/t/lovelace-mini-media-player/68459)) - A minified version of the default lovelace media player card
 - [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) ([Forum](https://community.home-assistant.io/t/lovelace-multiple-entity-row/109109)) - Show multiple entity states on entity rows
+- [Mushroom](https://github.com/piitaya/lovelace-mushroom) - Mushroom is a collection of cards for Home Assistant Lovelace UI
 - [Number Box](https://github.com/htmltiger/numberbox-card) - NumberBox for input sliders and number entities
 - [Paper Buttons Row](https://github.com/jcwillox/lovelace-paper-buttons-row) - Adds highly configurable buttons that use actions and per-state styling
 - [RGB Light Card](https://github.com/bokub/rgb-light-card) - A Lovelace custom card for RGB lights
 - [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) ([Forum](https://community.home-assistant.io/t/lovelace-simple-thermostat-card/82659)) - A simpler thermostat card in terms of interactions and usability
+- [Slider Button Card](https://github.com/mattieha/slider-button-card) - A button card with integrated slider for light, switch, fan, cover, input_boolean, media_player, climate, lock entities
 - [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) - Add sliders to entity cards
 - [Stack In Card](https://github.com/custom-cards/stack-in-card) - Similar to vertical-stack and horizontal-stack but removes card borders
 - [Template Entity Row](https://github.com/thomasloven/lovelace-template-entity-row) - Display whatever you want in an entities card row
@@ -83,7 +100,7 @@ Since some integrations can only be enabled from within the UI, here is a list o
 - [Uptime Card](https://github.com/dylandoamaral/uptime-card) - A minimalist card inspired by the reddit status UI to display binary sensors in a nice way
 - [Weather Card](https://github.com/bramkragten/weather-card) - Custom animated weather card
 
-## Disabled Integrations
+## Unused Integrations
 
 This is a list of integrations that are currently disabled, but have not been removed because I think I still might use them someday.
 
@@ -102,6 +119,7 @@ This is a list of integrations that are currently disabled, but have not been re
 - [GE/Jasco Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R)
 - GE/Jasco Z-Wave Dimmer (12724)
 - [GE/Jasco Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2)
+- [Govee Smart LED Floor Lamp](https://www.amazon.com/gp/product/B097T5YFZ3/)
 - [Inovelli LZW30 Black Series On/Off Switch](https://inovelli.com/black-series-on-off-switch-z-wave/)
 - [Inovelli LZW30 Red Series On/Off Switch](https://inovelli.com/red-series-on-off-switch-z-wave/)
 - [Honeywell 39348 / ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
