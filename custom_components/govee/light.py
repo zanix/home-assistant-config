@@ -1,6 +1,6 @@
 """Govee platform."""
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 import logging
 
 from govee_api_laggat import Govee, GoveeDevice, GoveeError
@@ -304,14 +304,14 @@ class GoveeLightEntity(LightEntity):
         return color.color_temperature_kelvin_to_mired(COLOR_TEMP_KELVIN_MIN)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the device state attributes."""
         return {
             # rate limiting information on Govee API
             "rate_limit_total": self._hub.rate_limit_total,
             "rate_limit_remaining": self._hub.rate_limit_remaining,
-            "rate_limit_reset_seconds": self._hub.rate_limit_reset_seconds,
-            "rate_limit_reset": self._hub.rate_limit_reset,
+            "rate_limit_reset_seconds": round(self._hub.rate_limit_reset_seconds, 2),
+            "rate_limit_reset": datetime.fromtimestamp(self._hub.rate_limit_reset).isoformat(),
             "rate_limit_on": self._hub.rate_limit_on,
             # general information
             "manufacturer": "Govee",
