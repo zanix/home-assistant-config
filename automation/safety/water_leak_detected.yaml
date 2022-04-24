@@ -6,6 +6,7 @@ description: 'Shuts off the water main and sends a notification when a water lea
 trigger:
   platform: state
   entity_id:
+    - binary_sensor.water_main_water_alarm_water_leak_detected
     - binary_sensor.basement_bathroom_leak_sensor_water_alarm_water_leak_detected
     - binary_sensor.bathroom_leak_sensor_water_alarm_water_leak_detected
     - binary_sensor.fridge_leak_sensor_water_alarm_water_leak_detected
@@ -16,35 +17,36 @@ trigger:
   to: 'on'
 
 variables:
+  title: 'Water Leak Detected'
   location: '{{ trigger.to_state.name|replace(" Leak Sensor", "")|replace(" Leak", "")|trim }}'
   message: 'A water leak was detected in the {{ location }} and the water main has been shut off.'
 
 action:
-  # - service: switch.turn_off
-  #   entity_id: switch.water_main
+  - service: switch.turn_off
+    entity_id: switch.water_main
 
   - service: script.notify_web
     data:
-      title: 'Water Leak Detected'
+      title: '{{ title }}'
       message: '{{ message }}'
       id: 'water-leak'
 
   - service: script.notify_mobile
     data:
       who: 'parents'
-      title: 'Water Leak Detected'
+      title: '{{ title }}'
       message: '{{ message }}'
       icon: '/local/icons/water-alert.png'
       group: 'water-leak'
       url: 'lovelace/utilities'
-      # actions:
-      #   - action: 'turn_on_water'
-      #     title: 'Turn Water Main On'
+      actions:
+        - action: 'turn_on_water'
+          title: 'Turn Water Main On'
 
   - service: script.notify_join
     data:
       who: 'shield_all'
-      title: 'Water Leak Detected'
+      title: '{{ title }}'
       message: '{{ message }}'
       icon: 'local/icons/water-alert.png'
 

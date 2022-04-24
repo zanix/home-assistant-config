@@ -26,11 +26,20 @@ condition:
     - condition: state
       entity_id: binary_sensor.garage_side_door_is_open
       state: 'on'
+
+variables:
+  message: >-
+    {%- set open_doors = states|selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id'))|selectattr('state','eq','on')|list -%}
+    {%- for entity in open_doors -%}
+      {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
+      {{ entity.name }} was left open when you left!
+    {%- endfor %}
+
 action:
   - service: script.notify_mobile
     data:
       who: 'parents'
       title: 'Door Left Open'
-      message: 'The {{ trigger.to_state.attributes.friendly_name }} was left open when you left!'
+      message: '{{ message }}'
       icon: '/local/icons/door-open.png'
       group: 'door'
