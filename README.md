@@ -485,10 +485,10 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [commits-shield]: https://img.shields.io/github/commit-activity/m/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [commits]: https://github.com/zanix/home-assistant-config/commits/master
 
-[github-build-status-shield]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yml/badge.svg
-[github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yml
-[github-linter-status-shield]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yml/badge.svg
-[github-linter-status]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yml
+[github-build-status-shield]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml/badge.svg
+[github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
+[github-linter-status-shield]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yaml/badge.svg
+[github-linter-status]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yaml
 
 [code-lines-shield]: https://img.shields.io/badge/lines%20of%20code-unknown-informational
 [code-link]: https://github.com/zanix/home-assistant-config/pulse
