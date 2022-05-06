@@ -8,22 +8,20 @@ trigger:
   minutes: '*'
 
 condition:
-  condition: and
-  conditions:
-    - condition: state
-      entity_id: cover.garage_door
-      state: 'open'
-    - condition: state
-      entity_id: binary_sensor.garage_occupancy
-      state: 'off'
-    - condition: template
-      value_template: >-
-        {%- set entity = states.cover.garage_door -%}
-        {%- set current = as_timestamp(now()) -%}
-        {%- if entity.state -%}
-          {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
-          {{ changed >= 30 and changed % 30 == 0 }}
-        {% endif -%}
+  - condition: state
+    entity_id: cover.garage_door
+    state: 'open'
+  - condition: state
+    entity_id: binary_sensor.garage_occupancy
+    state: 'off'
+  - condition: template
+    value_template: >-
+      {%- set entity = states.cover.garage_door -%}
+      {%- set current = as_timestamp(now()) -%}
+      {%- if entity.state -%}
+        {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
+        {{ changed >= 30 and changed % 30 == 0 }}
+      {% endif -%}
 
 variables:
   message: >-
@@ -49,27 +47,28 @@ variables:
     The {{ state_attr('cover.garage_door', 'friendly_name') }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
 
 action:
-  - service: script.notify_mobile
-    data:
-      who: 'parents'
-      title: 'Garage Door Open'
-      message: '{{ message }}'
-      icon: '/local/icons/garage-open.png'
-      group: 'garage-door'
-      tag: 'garage-door'
-      url: 'lovelace/doors'
-      actions:
-        - action: 'close_garage'
-          title: 'Close'
+  - parallel:
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
+          title: 'Garage Door Open'
+          message: '{{ message }}'
+          icon: '/local/icons/garage-open.png'
+          group: 'garage-door'
+          tag: 'garage-door'
+          url: 'lovelace/doors'
+          actions:
+            - action: 'close_garage'
+              title: 'Close'
 
-  - service: script.notify_join
-    data:
-      who: 'shield_all'
-      title: 'Garage Door Open'
-      message: '{{ message }}'
-      icon: 'local/icons/garage-open.png'
+      - service: script.notify_join
+        data:
+          who: 'shield_all'
+          title: 'Garage Door Open'
+          message: '{{ message }}'
+          icon: 'local/icons/garage-open.png'
 
-  - service: script.notify_speech
-    data:
-      media_player: group.google_speakers
-      message: '{{ message }}'
+      - service: script.notify_speech
+        data:
+          media_player: group.google_speakers
+          message: '{{ message }}'

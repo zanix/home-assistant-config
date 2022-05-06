@@ -23,16 +23,18 @@ store_mqtt_sensor:
         text:
 
   sequence:
-    - service: mqtt.publish
-      data:
-        topic: 'custom/sensor/{{ name }}/state'
-        payload: '{{ state }}'
-        retain: true
+    - parallel:
+        - service: mqtt.publish
+          data:
+            topic: 'custom/sensor/{{ name }}/state'
+            payload: '{{ state }}'
+            retain: true
 
-    # Only add attributes if they are present.
-    - choose:
-        - conditions: '{{ attributes != "" }}'
-          sequence:
+        # Only add attributes if they are present.
+        - if:
+            - condition: template
+              value_template: '{{ attributes != "" }}'
+          then:
             - service: mqtt.publish
               data:
                 topic: 'custom/sensor/{{ name }}/attributes'

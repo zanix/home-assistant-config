@@ -64,51 +64,50 @@ notify_mobile:
     group_id: '{{ group|upper|default("HOMEASSISTANT") }}'
 
   sequence:
-    # Only send if enabled.
-    - condition: state
-      entity_id: input_boolean.mobile_notifications
-      state: 'on'
+    - if:
+        - condition: state
+          entity_id: input_boolean.mobile_notifications
+          state: 'on'
 
-    - choose:
-        # Send camera stream.
-        - conditions:
-            - '{{ camera is string }}'
-          sequence:
+      then:
+        - choose:
+            # Send camera stream.
+            - conditions: '{{ camera is string }}'
+              sequence:
+                - service: '{{ notification_service }}'
+                  data:
+                    title: '{{ title }}'
+                    message: '{{ message }}'
+                    data:
+                      image: '/api/camera_proxy/{{ camera }}'
+                      clickAction: '{{ url|default("/lovelace/cameras", true) }}'
+                      group: '{{ group_id }}'
+                      tag: '{{ camera }}'
+                      actions: '{{ actions|default("", true) }}'
+
+            # Send an image.
+            - conditions: '{{ image is string }}'
+              sequence:
+                - service: '{{ notification_service }}'
+                  data:
+                    title: '{{ title }}'
+                    message: '{{ message }}'
+                    data:
+                      image: '{{ image }}'
+                      clickAction: '{{ url|default("/lovelace/home", true) }}'
+                      group: '{{ group_id }}'
+                      tag: '{{ tag|default("", true) }}'
+                      actions: '{{ actions|default("", true) }}'
+
+          # Send a basic, link, or actionable notification message.
+          default:
             - service: '{{ notification_service }}'
               data:
                 title: '{{ title }}'
                 message: '{{ message }}'
                 data:
-                  image: '/api/camera_proxy/{{ camera }}'
-                  clickAction: '{{ url|default("/lovelace/cameras", true) }}'
-                  group: '{{ group_id }}'
-                  tag: '{{ camera }}'
-                  actions: '{{ actions|default("", true) }}'
-
-        # Send an image.
-        - conditions:
-            - '{{ image is string }}'
-          sequence:
-            - service: '{{ notification_service }}'
-              data:
-                title: '{{ title }}'
-                message: '{{ message }}'
-                data:
-                  image: '{{ image }}'
+                  icon_url: '{{ icon|default("/local/icons/home-assistant.png") }}'
                   clickAction: '{{ url|default("/lovelace/home", true) }}'
                   group: '{{ group_id }}'
                   tag: '{{ tag|default("", true) }}'
                   actions: '{{ actions|default("", true) }}'
-
-      # Send a basic, link, or actionable notification message.
-      default:
-        - service: '{{ notification_service }}'
-          data:
-            title: '{{ title }}'
-            message: '{{ message }}'
-            data:
-              icon_url: '{{ icon|default("/local/icons/home-assistant.png") }}'
-              clickAction: '{{ url|default("/lovelace/home", true) }}'
-              group: '{{ group_id }}'
-              tag: '{{ tag|default("", true) }}'
-              actions: '{{ actions|default("", true) }}'
