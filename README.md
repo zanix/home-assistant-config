@@ -14,7 +14,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - [Home Assistant][home-assistant]
 - [MQTT](https://mosquitto.org) - MQTT Broker docker container
-- [Zwavejs2Mqtt](https://zwave-js.github.io/zwavejs2mqtt)
+- [Zigbee2MQTT](https://zwave-js.github.io/zwavejs2mqtt) - Zigbee to MQTT bridge, get rid of your proprietary Zigbee bridges
+- [Zwavejs2Mqtt](https://zwave-js.github.io/zwavejs2mqtt) - Fully configurable Z-Wave to MQTT Gateway and Control Panel.
 
 ## Technical Details
 
@@ -140,10 +141,6 @@ The yamaha platform allows you to control Yamaha Network Receivers
 ### [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js)
 
 The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](https://zwave-js.github.io/zwavejs2mqtt) JS driver. This is the recommended Z-Wave integration for Home Assistant.
-
-### [ZigBee](https://www.home-assistant.io/integrations/zigbee)
-
-Zigbee integration for Home Assistant allows you to utilize modules such as the XBee as wireless General Purpose Input/Output (GPIO) devices
 
 </details>
 
