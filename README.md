@@ -182,7 +182,7 @@ Helium blockchain sensors for Home AssistantAuthors:[@rsnodgrass](https://github
 
 Home Assistant integration for managing Z-Wave enabled locksAuthors:[@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.4-b23]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.4-b24]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.Authors:[@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
@@ -198,7 +198,7 @@ High level health status of UniFi Security Gateway devices via UniFi ControllerA
 
 Subaru STARLINK custom component for Home Assistant.Authors:[@G-Two](https://github.com/G-Two).
 
-### [Watchman](https://github.com/dummylabs/thewatchman) [v.0.5.2]
+### [Watchman](https://github.com/dummylabs/thewatchman) [v0.5.3]
 
 Home Assistant custom integration to keep track of missing entities and services in your config filesAuthors:[@dummylabs](https://github.com/dummylabs).
 </details>
@@ -265,7 +265,7 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 Minimalistic graph card for Home Assistant Lovelace UI
 
-### [Mini Media Player](https://github.com/kalkih/mini-media-player) [v1.16.3]
+### [Mini Media Player](https://github.com/kalkih/mini-media-player) [v1.16.4]
 
 Minimalistic media card for Home Assistant Lovelace UI
 
@@ -273,17 +273,13 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.7.4]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.8.3]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
 ### [Number Box](https://github.com/htmltiger/numberbox-card) [v3.10]
 
 Replace input_number sliders with plus and minus buttons
-
-### [Paper Buttons Row](https://github.com/jcwillox/lovelace-paper-buttons-row) [v1.0.0]
-
-Adds highly configurable buttons that use actions and per-state styling.
 
 ### [Rgb Light Card](https://github.com/bokub/rgb-light-card) [v1.11.0]
 
@@ -320,19 +316,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 ### [Weather Card](https://github.com/bramkragten/weather-card) [v1.5.0]
 
 Weather Card with animated icons for Home Assistant Lovelace
-</details><details><summary>10 Themes</summary>
-
-### [Clear Theme](https://github.com/naofireblade/clear-theme) [v1.1]
-
-Clear Theme for Home Assistant
-
-### [Clear Theme Dark](https://github.com/naofireblade/clear-theme-dark) [v1.3]
-
-Dark variant of Clear Theme for Home Assistant
-
-### [Midnight Blue Theme](https://github.com/home-assistant-community-themes/midnight-blue)
-
-Midnight Blue theme for Home Assistant
+</details><details><summary>5 Themes</summary>
 
 ### [Midnight Theme](https://github.com/home-assistant-community-themes/midnight)
 
@@ -353,14 +337,6 @@ Dark Grey Theme for Home Assistant
 ### [Noctis Solarized](https://github.com/williamahartman/noctis-solarized)
 
 Noctis theme made Solarized
-
-### [Stell Blue With Colors Theme](https://github.com/home-assistant-community-themes/stell-blue-with-colors)
-
-Stell Blue with Colors theme for Home Assistant
-
-### [Waves](https://github.com/tgcowell/waves) [v.2.2.0]
-
-This is a blend of 2 themes found within the Home Assistant community. Inspired mostly by Noctis, I've adjust colours slightly and have also opted to pull some features from Caule Theme packs to build my own 'ultimate' theme. I will continue to update overtime and do my best to credit those whom I have 'referenced'
 </details>
 
 <details><summary>Unused Integrations</summary>
@@ -474,7 +450,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.5.2-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.5.4-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master

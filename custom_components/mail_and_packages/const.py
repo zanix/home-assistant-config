@@ -8,7 +8,7 @@ from homeassistant.helpers.entity import EntityCategory
 
 DOMAIN = "mail_and_packages"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.3.4-b23"
+VERSION = "0.3.4-b24"
 ISSUE_URL = "http://github.com/moralmunky/Home-Assistant-Mail-And-Packages"
 PLATFORM = "sensor"
 PLATFORMS = ["camera", "sensor"]
@@ -146,6 +146,7 @@ SENSOR_DATA = {
             "USPSInformedDelivery@usps.gov",
             "USPSInformeddelivery@email.informeddelivery.usps.com",
             "USPSInformeddelivery@informeddelivery.usps.com",
+            "USPS Informed Delivery",
         ],
         "subject": ["Your Daily Digest"],
     },
