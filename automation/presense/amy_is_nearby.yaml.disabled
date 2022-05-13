@@ -11,6 +11,14 @@ trigger:
     value_template: '{{ states("proximity.amy_home")|float(default=0) }}'
     below: 2500
 
+variables:
+  message: >
+    {{ [
+      "Your mom is almost home. Be ready to give her a big hug!",
+      "One of your favorite people is almost here! Mah, ma, mama, mom.",
+      "Guess what? ... Your mom is almost home."
+    ]|random }}
+
 condition:
   # Only make an announcement if the person has been Away.
   - condition: state
@@ -18,15 +26,17 @@ condition:
     state: Away
 
 action:
-  - service: script.notify_speech
-    data:
-      media_player: media_player.living_room_speaker
-      message: >
-        {{ [
-          "Your mom is almost home. Be ready to give her a big hug!",
-          "One of your favorite people is almost here! Mah, ma, mama, mom.",
-          "Guess what? ... Your mom is almost home."
-        ]|random }}
+  - parallel:
+      - service: script.notify_mobile
+        data:
+          who: 'josh'
+          title: 'Amy Almost Home'
+          message: '{{ message }}'
+          group: 'presence'
+      - service: script.notify_speech
+        data:
+          media_player: media_player.living_room_speaker
+          message: '{{ message }}'
 
   # Cool down timer. When "mode: single" this stops this automation from running more often than this.
   - delay:
