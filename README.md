@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1319 total entities**,
-including **570 sensors**.
+This Home Assistant install has approximately **1328 total entities**,
+including **576 sensors**.
 
 <details><summary>29 Stock Integrations</summary>
 
@@ -144,7 +144,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](h
 
 </details>
 
-<details><summary>14 Custom Integrations</summary>
+<details><summary>16 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v1.5.3]
 
@@ -198,9 +198,17 @@ High level health status of UniFi Security Gateway devices via UniFi ControllerA
 
 Subaru STARLINK custom component for Home Assistant.Authors:[@G-Two](https://github.com/G-Two).
 
+### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v0.0.8]
+
+UI-Lovelace-Minimalist is a "theme" for HomeAssistantAuthors:[@stokkie90](https://github.com/stokkie90).
+
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.5.3]
 
 Home Assistant custom integration to keep track of missing entities and services in your config filesAuthors:[@dummylabs](https://github.com/dummylabs).
+
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v2.3.0]
+
+Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technologyAuthors:[@AlexxIT](https://github.com/AlexxIT).
 </details>
 
 <details><summary>29 Lovelace Plugins</summary>
@@ -253,13 +261,17 @@ Entity Attributes
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
+### [Kiosk Mode](https://github.com/maykar/kiosk-mode) [v1.7.2]
+
+🙈 Hides the Home Assistant header and/or sidebar
+
 ### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.2]
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Lovelace Swipe Navigation](https://github.com/maykar/lovelace-swipe-navigation) [v1.3.6]
+### [Light Entity Card](https://github.com/ljmerza/light-entity-card) [v5.0.0]
 
-↔️ Swipe through Lovelace views on mobile.
+Control any light or switch entity
 
 ### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.11.0]
 

@@ -1,0 +1,282 @@
+---
+title: Overview
+path: overview
+icon: mdi:cog
+panel: true
+cards:
+  - type: custom:layout-card
+    layout_type: horizontal
+    layout_options:
+      max_cols: 3
+    cards:
+
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: System Status
+            show_header_toggle: false
+            entities:
+              - sensor.date
+              - sensor.time
+              - type: section
+              - sensor.current_version
+              - sensor.available_version
+              - sensor.ha_uptime
+              - type: section
+              - sensor.external_ip
+
+          - type: custom:button-card
+            template: common
+            entity: script.readme_generate
+            icon: mdi:page-next
+            name: Generate Readme
+            tap_action:
+              action: toggle
+            styles:
+              icon:
+                - width: 100%
+            state:
+              - value: 'on'
+                styles:
+                  icon:
+                    - color: var(--paper-green-400)
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:mini-graph-card
+                show:
+                  labels: false
+                  labels_secondary: false
+                entities:
+                  - entity: sensor.processor_use
+                    name: CPU
+                line_color: blue
+                line_width: 8
+                font_size: 75
+                points_per_hour: 2
+              - type: custom:mini-graph-card
+                show:
+                  labels: false
+                  labels_secondary: false
+                entities:
+                  - entity: sensor.memory_use_percent
+                    name: RAM
+                line_color: '#e74c3c'
+                line_width: 8
+                font_size: 75
+                points_per_hour: 2
+              - type: custom:mini-graph-card
+                show:
+                  labels: false
+                  labels_secondary: false
+                entities:
+                  - entity: sensor.disk_use_percent_config
+                    name: Disk
+                line_color: var(--accent-color)
+                line_width: 8
+                font_size: 75
+                points_per_hour: 2
+
+      - type: custom:battery-state-card
+        title: Battery Levels
+        sort_by_level: "asc"
+        secondary_info: last_updated
+        bulk_rename:
+          - from: ": Battery level"
+          - from: " Battery Level"
+        tap_action:
+          action: more-info
+        collapse:
+          - name: "Computers [{count}] (min: {min}%)"
+            secondary_info: "Battery levels {range}%"
+            icon: mdi:desktop-tower
+            entities:
+              - sensor.ardena_battery_remaining
+              - sensor.athos_battery_remaining
+          - name: "Door Sensors [{count}] (min: {min}%)"
+            secondary_info: "Battery levels {range}%"
+            icon: mdi:door
+            entities:
+              - sensor.front_door_battery_level
+              - sensor.sliding_door_battery_level
+              - sensor.garage_side_door_battery_level
+              - sensor.garage_entry_door_battery_level
+          - name: "Leak Sensors [{count}] (min: {min}%)"
+            secondary_info: "Battery levels {range}%"
+            icon: mdi:water-off
+            entities:
+              - sensor.bathroom_leak_sensor_battery_level
+              - sensor.master_bathroom_leak_sensor_battery_level
+              - sensor.basement_bathroom_leak_sensor_battery_level
+              - sensor.fridge_leak_sensor_battery_level
+              - sensor.laundry_leak_sensor_battery_level
+              - sensor.water_heater_leak_sensor_battery_level
+          - name: "Mobile Devices [{count}] (min: {min}%)"
+            secondary_info: "Battery levels {range}%"
+            icon: mdi:cellphone
+            entities:
+              - sensor.pixel_6_battery_level
+              - sensor.galaxy_s21_battery_level
+              - sensor.ipad_josh_battery_level
+              - sensor.quest_battery_level
+        entities:
+          - sensor.lock_front_battery_level
+          - sensor.garage_multisensor_battery_level
+          - entity: sensor.pixel_6_battery_level
+            charging_state:
+              entity_id: binary_sensor.pixel_6_is_charging
+              state: "on"
+          - entity: sensor.galaxy_s21_battery_level
+            charging_state:
+              entity_id: binary_sensor.galaxy_s21_is_charging
+              state: "on"
+          - entity: sensor.ipad_josh_battery_level
+            charging_state:
+              entity_id: sensor.ipad_josh_battery_state
+              state: "Charging"
+          - entity: sensor.quest_battery_level
+            charging_state:
+              entity_id: binary_sensor.quest_is_charging
+              state: "on"
+
+      - type: entities
+        title: Configuration
+        show_header_toggle: false
+        entities:
+          - input_boolean.mobile_notifications
+          - input_boolean.audio_notifications
+
+          - type: 'custom:fold-entity-row'
+            head:
+              type: section
+              label: Audio Notification Options
+            entities:
+              - type: custom:time-picker-card
+                entity: input_datetime.audio_notifications_start
+                hour_mode: 12
+                layout:
+                  name: inside
+                  hour_mode: 'single'
+                  align_controls: right
+                  embedded: true
+              - type: custom:time-picker-card
+                entity: input_datetime.audio_notifications_end
+                hour_mode: 12
+                layout:
+                  name: inside
+                  hour_mode: 'single'
+                  align_controls: right
+                  embedded: true
+              - type: custom:time-picker-card
+                entity: input_datetime.nap_time_start
+                hour_mode: 12
+                layout:
+                  name: inside
+                  hour_mode: 'single'
+                  align_controls: right
+                  embedded: true
+              - type: custom:time-picker-card
+                entity: input_datetime.nap_time_end
+                hour_mode: 12
+                layout:
+                  name: inside
+                  hour_mode: 'single'
+                  align_controls: right
+                  embedded: true
+
+          - type: 'custom:fold-entity-row'
+            head:
+              type: section
+              label: Energy Rates
+            entities:
+              - select.monthly_energy
+              - input_text.tariff_summer_offpeak
+              - input_text.tariff_summer_peak
+              - input_text.tariff_winter_offpeak
+              - input_text.tariff_winter_peak
+
+      - type: custom:stack-in-card
+        cards:
+
+          - type: entities
+            title: Database Info
+            show_header_toggle: false
+            entities:
+              - sensor.influxdb_database_size
+              - type: section
+              - entity: sensor.database_size
+                name: MariaDB Database Size
+              - type: 'custom:fold-entity-row'
+                head:
+                  type: section
+                  label: MariaDB
+                entities:
+                  - sensor.table_size_states
+                  - sensor.table_size_events
+                  - sensor.table_size_recorder_runs
+                  - sensor.table_size_schema_changes
+                  - type: section
+                  - input_number.sql_purge_keep
+
+                  - type: custom:button-card
+                    template: common
+                    tap_action:
+                      action: none
+                    double_tap_action:
+                      action: toggle
+                    entity: script.sql_purge
+                    icon: mdi:delete-variant
+                    name: Purge MariaDB
+                    styles:
+                      icon:
+                        - width: 100%
+                    state:
+                      - value: 'on'
+                        styles:
+                          icon:
+                            - color: var(--paper-green-400)
+
+      - type: map
+        aspect_ratio: 16:9
+        default_zoom: 12
+        hours_to_show: 2
+        dark_mode: true
+        entities:
+          - person.joshua
+          - person.amy
+
+      - type: markdown
+        content: >-
+          <h2><ha-icon icon="mdi:shield-half-full"></ha-icon> Entities Report<h2>
+          <h3>Missing Entities: {{ states.sensor.watchman_missing_entities.state }}</h3>
+          {%- for item in state_attr("sensor.watchman_missing_entities", "entities") %}
+            <hr><table><tr><td>
+            <ha-icon icon="mdi:{%- if item.state=="missing" -%}cloud-alert{%- elif item.state=="unavail" -%}cloud-off-outline{%- else -%}cloud-question{%- endif -%}"></ha-icon>
+            {{ item.id }} [{{ item.state }}] <a title="{{ item.occurrences }}">{{ item.occurrences.split('/')[-1].split(':')[0] }}</a>
+            </td></tr></table>
+          {%- endfor %}
+        card_mod:
+          style:
+            ha-markdown:
+              $: |
+                ha-markdown-element:first-of-type hr {
+                  border-color: #303030;
+                }
+
+      - type: markdown
+        content: >-
+          <h2 class="some"><ha-icon icon="mdi:shield-half-full"></ha-icon> Services Report<h2>
+          <h3>Missing Services: {{ states.sensor.watchman_missing_services.state }} </h3>
+          {%- for item in state_attr("sensor.watchman_missing_services", "services") %}
+            <hr><table><tr><td>
+            <ha-icon icon="mdi:cloud-alert"></ha-icon> {{ item.id }}
+            <a title="{{ item.occurrences }}">{{ item.occurrences.split('/')[-1].split(':')[0] }}</a>
+            </td></tr></table>
+          {%- endfor %}
+        card_mod:
+          style:
+            ha-markdown:
+              $: |
+                ha-markdown-element:first-of-type hr {
+                  border-color: #303030;
+                }
