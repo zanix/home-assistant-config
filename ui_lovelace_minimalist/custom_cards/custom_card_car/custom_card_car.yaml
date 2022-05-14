@@ -1,0 +1,176 @@
+---
+widget_icon_state:
+  template:
+    - icon_info_bg
+    - ulm_language_variables
+  label: |
+    [[[
+      var unit = entity.attributes.unit_of_measurement != null ? " " + entity.attributes.unit_of_measurement : ""
+      if (entity.state == "on") {
+        return variables.ulm_on;
+      } else if (entity.state == "off") {
+        return variables.ulm_off;
+      } else if (entity.state == "unavailable") {
+        return variables.ulm_unavailable;
+      } else if (entity.state == "idle") {
+        return variables.ulm_idle;
+      } else if (entity.state == "open") {
+        return variables.ulm_open;
+      } else if (entity.state == "closed") {
+        return variables.ulm_closed;
+      } else {
+        return entity.state + unit;
+      }
+    ]]]
+  styles:
+    card:
+      - box-shadow: none
+      - padding: 0px
+      - background-color: rgba(var(--color-theme), 0.05)
+      - border-radius: 14px
+      - place-self: center
+      - height: 42px
+    img_cell:
+      - background-color: none
+    icon:
+      - color: rgba(var(--color-theme),0.9)
+    label:
+      - align-self: end
+      - justify-self: start
+      - font-weight: bold
+      - font-size: 14px
+      - margin-left: 12px
+      - filter: opacity(100%)
+    name:
+      - justify-self: start
+      - align-self: start
+      - font-weight: bolder
+      - font-size: 12px
+      - filter: opacity(40%)
+      - margin-left: 12px
+    grid:
+      - grid-template-areas: '''i l'' ''i n'''
+      - grid-template-columns: min-content auto
+      - grid-template-rows: min-content min-content
+  size: 20px
+  color: var(--color-grey)
+car_icon:
+  template:
+    - icon_info
+  tap_action:
+    action: navigate
+    navigation_path: subaru
+  show_name: true
+  show_last_changed: true
+  name: '[[[ return variables.name ]]]'
+  entity: '[[[ return entity.entity_id ]]]'
+  icon: '[[[ return variables.icon ]]]'
+  styles:
+    icon:
+      - color: rgba(var(--color-theme),0.9)
+      - width: 20px
+      - place-self: center
+    custom_fields:
+      tracker:
+        - border-radius: 50%
+        - position: absolute
+        - left: 30px
+        - top: '-2px'
+        - height: 16px
+        - width: 16px
+        - border: 2px solid var(--card-background-color)
+        - font-size: 12px
+        - line-height: 14px
+        - background-color: |
+            [[[
+              if (states[variables.tracker].state == 'home') {
+                return 'rgba(var(--color-cyan), 1)';
+              } else {
+                return 'rgba(var(--color-amber), 1)';
+              }
+            ]]]
+  custom_fields:
+    tracker: |
+      [[[
+        let icon = "mdi:road-variant";
+        if (states[variables.tracker].state == 'home') {
+          icon = "mdi:home-variant";
+        }
+        return '<ha-icon icon="' + icon + '" style="width: 10px; height: 10px; color: var(--primary-background-color);"></ha-icon>';
+      ]]]
+custom_card_car:
+  variables:
+    name: ''
+    tap_action:
+      action: more-info
+    hold_action:
+      action: none
+  tap_action:
+    action: >
+      [[[ if (variables?.tap_action?.action) return
+      variables.tap_action.action; else return 'none'; ]]]
+    entity: '[[[ return variables.tap_action.entity; ]]]'
+    navigation_path: '[[[ return variables.tap_action.navigation_path; ]]]'
+    url_path: '[[[ return variables.tap_action.url_path; ]]]'
+    service: '[[[ return variables.tap_action.service; ]]]'
+    service_data: '[[[ return variables.tap_action.service_data; ]]]'
+  show_icon: false
+  show_name: false
+  show_label: false
+  styles:
+    grid:
+      - grid-template-areas: '"item1" "item2"'
+      - grid-template-columns: 1fr
+      - grid-template-rows: min-content min-content
+      - row-gap: 12px
+    card:
+      - border-radius: var(--border-radius)
+      - box-shadow: var(--box-shadow)
+      - padding: 12px
+  custom_fields:
+    item1:
+      card:
+        type: custom:button-card
+        template: car_icon
+        entity: '[[[ return variables.tracker ]]]'
+        variables:
+          name: '[[[ return variables.name ]]]'
+          icon: '[[[ return variables.icon ]]]'
+          tracker: '[[[ return variables.tracker ]]]'
+    item2:
+      card:
+        template: list_2_items
+        type: custom:button-card
+        custom_fields:
+          item1:
+            card:
+              type: custom:button-card
+              template: widget_icon_state
+              entity: '[[[ return variables.item_1.entity ]]]'
+              state_display: |
+                [[[
+                  return parseFloat(states[variables.item_1.entity].state).toFixed(1);
+                ]]]
+              name: |-
+                [[[
+                  if (variables?.item_1?.name) {
+                    return variables.item_1.name;
+                  }
+                  return states[variables.item_1.entity].friendly_name
+                ]]]
+          item2:
+            card:
+              type: custom:button-card
+              template: widget_icon_state
+              entity: '[[[ return variables.item_2.entity ]]]'
+              state_display: |
+                [[[
+                  return parseFloat(states[variables.item_2.entity].state).toFixed(1);
+                ]]]
+              name: |-
+                [[[
+                  if (variables?.item_2?.name) {
+                    return variables.item_2.name;
+                  }
+                  return states[variables.item_2.entity].friendly_name
+                ]]]
