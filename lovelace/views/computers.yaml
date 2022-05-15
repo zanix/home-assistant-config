@@ -10,7 +10,7 @@ cards:
       max_cols: 3
     cards:
 
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
 
           - type: custom:apexcharts-card
@@ -77,33 +77,22 @@ cards:
                 toolbar:
                   show: false
 
-          - type: entities
-            show_header_toggle: false
-            entities:
-              - entity: sensor.speedtest_server
-                type: custom:multiple-entity-row
-                secondary_info:
-                  attribute: host
+          - type: custom:mushroom-template-card
+            primary: '{{ state_attr(entity, "host") }}'
+            secondary: '{{ state_attr(entity, "friendly_name") }}'
+            entity: sensor.speedtest_server
+            icon: mdi:speedometer
+            tap_action:
+              action: more-info
 
-                  # - type: custom:button-card
-                  #   template: common
-                  #   confirmation:
-                  #     text: '[[[ return `Run a speed test now?` ]]]'
-                  #   icon: mdi:cloud-download-outline
-                  #   name: Test Speed
-                  #   styles:
-                  #     icon:
-                  #       - width: 100%
-                  #   tap_action:
-                  #     action: call-service
-                  #     service: speedtestdotnet.speedtest
-
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
+
+          - type: custom:mushroom-title-card
+            subtitle: Canon Toner
 
           - type: custom:apexcharts-card
             header:
-              title: Canon Toner
               show: true
               show_states: true
               colorize_states: true
@@ -158,25 +147,18 @@ cards:
                 toolbar:
                   show: false
 
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
+          - type: custom:mushroom-light-card
+            entity: light.magicmirror
+            show_brightness_control: true
+            layout: horizontal
 
-          - type: entities
-            title: MagicMirror
-            show_header_toggle: false
-            entities:
-              - entity: light.magicmirror
-                type: custom:slider-entity-row
-                name: Monitor
-                toggle: true
-                step: 10
-
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
-          - type: markdown
-            content: >-
-              ## Oculus Quest 2
-
+          - type: custom:mushroom-title-card
+            subtitle: |-
+              Oculus Quest 2
           - type: custom:uptime-card
             entity: binary_sensor.quest_interactive
             name: Quest 2 Interactive
@@ -184,18 +166,18 @@ cards:
             hours_to_show: 120
             update_interval: 30
             ko_icon: mdi:exclamation-thick
-            ko: "off"
-            ok: "on"
+            ko: 'off'
+            ok: 'on'
             alias:
-              ok: "Playing"
-              ko: "Standby"
+              ok: 'Playing'
+              ko: 'Standby'
             icon_adaptive_color: true
             title_adaptive_color: true
             color:
-              ok: '#66CC00'
-              ko: '#555555'
-              half: orange
-              none: black
+              ok: rgb(var(--color-green))
+              ko: rgba(var(--color-grey),50%)
+              half: rgb(var(--color-orange))
+              none: rgb(var(--color-black))
             bar:
               spacing: 1
               height: 20
@@ -227,29 +209,30 @@ cards:
               }
               bar-card-currentbar,
               bar-card-backgroundbar {
-                border-radius: 4px;
+                border-radius: var(--ha-card-border-radius, 4px);
               }
-            entity: sensor.quest_battery_level
             name: Quest 2 Battery Level
+            entities:
+              - entity: sensor.quest_battery_level
             animation:
               state: 'on'
             positions:
               indicator: inside
             decimal: 0
             severity:
-              - color: red
+              - color: rgb(244,67,54)
                 from: 0
                 to: 9
-              - color: orange
+              - color: rgb(255,152,0)
                 from: 10
                 to: 29
-              - color: "#f1de00"
+              - color: rgb(255,193,7)
                 from: 30
                 to: 49
-              - color: yellowgreen
+              - color: rgb(205,220,57)
                 from: 50
                 to: 69
-              - color: green
+              - color: rgb(76,175,80)
                 from: 80
                 to: 100
 
@@ -308,145 +291,142 @@ cards:
                 toolbar:
                   show: false
 
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
-          - type: markdown
-            content: >-
-              ## Ardena
+          - type: custom:mushroom-title-card
+            subtitle: |-
+              Ardena
+              R5-5600X | RTX 3080 | 750W
 
-              ## R5-5600X | RTX 3080 | 750W
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.ardena_connected
+                state: "off"
+            card:
+              type: custom:mushroom-template-card
+              primary: Power
+              entity: switch.ardena
+              icon: |-
+                {%- if is_state(entity, "on") -%}
+                  mdi:power
+                {%- else -%}
+                  mdi:power-off
+                {%- endif -%}
+              icon_color: |-
+                {%- if is_state(entity, "on") -%}
+                  green
+                {%- else -%}
+                  red
+                {%- endif -%}
+              tap_action:
+                action: none
+              hold_action:
+                action: call-service
+                service: switch.toggle
+                service_data: {}
+                target:
+                  entity_id: switch.ardena
 
-          - type: horizontal-stack
-            cards:
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.ardena_connected
+                state: "on"
+            card:
+              type: horizontal-stack
+              cards:
+                - type: custom:mushroom-template-card
+                  primary: Power
+                  entity: switch.ardena
+                  icon: |-
+                    {%- if is_state(entity, "on") -%}
+                      mdi:power
+                    {%- else -%}
+                      mdi:power-off
+                    {%- endif -%}
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      red
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: switch.toggle
+                    service_data: {}
+                    target:
+                      entity_id: switch.ardena
 
-              - type: conditional
-                conditions:
-                  - entity: binary_sensor.ardena_connected
-                    state: "off"
-                card:
-                  type: horizontal-stack
-                  cards:
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: toggle
-                      entity: switch.ardena
-                      icon: mdi:power
-                      name: Power
-                      styles:
-                        icon:
-                          - width: 100%
-                            color: var(--label-badge-red)
-                      state:
-                        - value: 'off'
-                          icon: mdi:power-off
-                        - value: 'on'
-                          styles:
-                            icon:
-                              - color: var(--label-badge-green)
+                - type: custom:mushroom-template-card
+                  primary: Lock
+                  entity: script.iotlink_lock
+                  icon: |-
+                    {%- if is_state(entity, "on") -%}
+                      mdi:lock
+                    {%- else -%}
+                      mdi:lock-open
+                    {%- endif -%}
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      grey
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data:
+                      computer: ardena
+                    target:
+                      entity_id: script.iotlink_lock
 
-              - type: conditional
-                conditions:
-                  - entity: binary_sensor.ardena_connected
-                    state: "on"
-                card:
-                  type: horizontal-stack
-                  cards:
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: toggle
-                      entity: switch.ardena
-                      icon: mdi:power
-                      name: Power
-                      styles:
-                        icon:
-                          - width: 100%
-                            color: var(--label-badge-red)
-                      state:
-                        - value: 'off'
-                          icon: mdi:power-off
-                        - value: 'on'
-                          styles:
-                            icon:
-                              - color: var(--label-badge-green)
+                - type: custom:mushroom-template-card
+                  primary: Sleep
+                  entity: script.iotlink_lock
+                  icon: mdi:sleep
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      grey
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data:
+                      computer: ardena
+                    target:
+                      entity_id: script.iotlink_lock
 
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: call-service
-                        service: script.iotlink_lock
-                        service_data:
-                          computer: ardena
-                      entity: script.iotlink_lock
-                      icon: mdi:lock
-                      name: Lock
-                      state:
-                        - value: 'off'
-                          icon: mdi:lock-open
-                        - value: 'on'
-                          styles:
-                            icon:
-                              - color: var(--label-badge-red)
+                - type: custom:mushroom-template-card
+                  primary: Reboot
+                  entity: script.iotlink_reboot
+                  icon: mdi:reload
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      grey
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data:
+                      computer: ardena
+                    target:
+                      entity_id: script.iotlink_reboot
 
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: call-service
-                        service: script.iotlink_suspend
-                        service_data:
-                          computer: ardena
-                      entity: script.iotlink_suspend
-                      icon: mdi:sleep
-                      name: Sleep
-                      styles:
-                        icon:
-                          - color: var(--paper-item-icon-color)
-
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: call-service
-                        service: script.iotlink_reboot
-                        service_data:
-                          computer: ardena
-                      entity: script.iotlink_reboot
-                      icon: mdi:reload
-                      name: Reboot
-                      styles:
-                        icon:
-                          - color: var(--paper-item-icon-color)
-
-          - type: custom:button-card
-            template: common
+          - type: custom:mushroom-fan-card
             entity: switch.computer_exhaust_fan
             icon: mdi:fan
-            name: Fan
-            styles:
-              icon:
-                - with: 100%
-                  color: var(--label-badge-red)
-                - animation: |
-                    [[[
-                      if (states['switch.computer_exhaust_fan'].state == 'on')
-                        return 'rotating 1.5s linear infinite';
-                      return null;
-                    ]]]
-            state:
-              - value: 'on'
-                styles:
-                  icon:
-                    - color: var(--label-badge-green)
+            icon_animation: true
 
           - type: custom:uptime-card
             entity: binary_sensor.ardena_connected
@@ -455,18 +435,18 @@ cards:
             hours_to_show: 120
             update_interval: 30
             ko_icon: mdi:exclamation-thick
-            ko: "off"
-            ok: "on"
+            ko: 'off'
+            ok: 'on'
             alias:
-              ok: "Online"
-              ko: "Offline"
+              ok: Online
+              ko: Offline
             icon_adaptive_color: true
             title_adaptive_color: true
             color:
-              ok: '#66CC00'
-              ko: '#555555'
-              half: orange
-              none: black
+              ok: rgb(var(--color-green))
+              ko: rgba(var(--color-grey),50%)
+              half: rgb(var(--color-orange))
+              none: rgb(var(--color-black))
             bar:
               spacing: 1
               height: 20
@@ -490,124 +470,137 @@ cards:
               animation: true
               hour24: false
 
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
-          - type: markdown
-            content: >-
-              ## Athos
+          - type: custom:mushroom-title-card
+            subtitle: |-
+              Athos
+              i5-6500 | GTX 1070 | 500W
 
-              ## i5-6500 | GTX 1070 | 500W
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.athos_connected
+                state: "off"
+            card:
+              type: custom:mushroom-template-card
+              primary: Power
+              entity: switch.athos
+              icon: |-
+                {%- if is_state(entity, "on") -%}
+                  mdi:power
+                {%- else -%}
+                  mdi:power-off
+                {%- endif -%}
+              icon_color: |-
+                {%- if is_state(entity, "on") -%}
+                  green
+                {%- else -%}
+                  red
+                {%- endif -%}
+              tap_action:
+                action: none
+              hold_action:
+                action: call-service
+                service: switch.toggle
+                service_data: {}
+                target:
+                  entity_id: switch.athos
 
-          - type: horizontal-stack
-            cards:
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.athos_connected
+                state: "on"
+            card:
+              type: horizontal-stack
+              cards:
+                - type: custom:mushroom-template-card
+                  primary: Power
+                  entity: switch.athos
+                  icon: |-
+                    {%- if is_state(entity, "on") -%}
+                      mdi:power
+                    {%- else -%}
+                      mdi:power-off
+                    {%- endif -%}
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      red
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: switch.toggle
+                    service_data: {}
+                    target:
+                      entity_id: switch.athos
 
-              - type: conditional
-                conditions:
-                  - entity: binary_sensor.athos_connected
-                    state: "off"
-                card:
-                  type: horizontal-stack
-                  cards:
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: toggle
-                      entity: switch.athos
-                      icon: mdi:power
-                      name: Power
-                      styles:
-                        icon:
-                          - width: 100%
-                            color: var(--label-badge-red)
-                      state:
-                        - value: 'off'
-                          icon: mdi:power-off
-                        - value: 'on'
-                          styles:
-                            icon:
-                              - color: var(--label-badge-green)
+                - type: custom:mushroom-template-card
+                  primary: Lock
+                  entity: script.iotlink_lock
+                  icon: |-
+                    {%- if is_state(entity, "on") -%}
+                      mdi:lock
+                    {%- else -%}
+                      mdi:lock-open
+                    {%- endif -%}
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      grey
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data:
+                      computer: athos
+                    target:
+                      entity_id: script.iotlink_lock
 
-              - type: conditional
-                conditions:
-                  - entity: binary_sensor.athos_connected
-                    state: "on"
-                card:
-                  type: horizontal-stack
-                  cards:
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: toggle
-                      entity: switch.athos
-                      icon: mdi:power
-                      name: Power
-                      styles:
-                        icon:
-                          - width: 100%
-                            color: var(--label-badge-red)
-                      state:
-                        - value: 'off'
-                          icon: mdi:power-off
-                        - value: 'on'
-                          styles:
-                            icon:
-                              - color: var(--label-badge-green)
+                - type: custom:mushroom-template-card
+                  primary: Sleep
+                  entity: script.iotlink_lock
+                  icon: mdi:sleep
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      grey
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data:
+                      computer: athos
+                    target:
+                      entity_id: script.iotlink_lock
 
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: call-service
-                        service: script.iotlink_lock
-                        service_data:
-                          computer: athos
-                      entity: script.iotlink_lock
-                      icon: mdi:lock
-                      name: Lock
-                      state:
-                        - value: 'off'
-                          icon: mdi:lock-open
-                        - value: 'on'
-                          styles:
-                            icon:
-                              - color: var(--label-badge-red)
-
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: call-service
-                        service: script.iotlink_suspend
-                        service_data:
-                          computer: athos
-                      entity: script.iotlink_suspend
-                      icon: mdi:sleep
-                      name: Sleep
-                      styles:
-                        icon:
-                          - color: var(--paper-item-icon-color)
-
-                    - type: custom:button-card
-                      template: common
-                      tap_action:
-                        action: none
-                      double_tap_action:
-                        action: call-service
-                        service: script.iotlink_reboot
-                        service_data:
-                          computer: athos
-                      entity: script.iotlink_reboot
-                      icon: mdi:reload
-                      name: Reboot
-                      styles:
-                        icon:
-                          - color: var(--paper-item-icon-color)
+                - type: custom:mushroom-template-card
+                  primary: Reboot
+                  entity: script.iotlink_reboot
+                  icon: mdi:reload
+                  icon_color: |-
+                    {%- if is_state(entity, "on") -%}
+                      green
+                    {%- else -%}
+                      grey
+                    {%- endif -%}
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data:
+                      computer: athos
+                    target:
+                      entity_id: script.iotlink_reboot
 
           - type: custom:uptime-card
             entity: binary_sensor.athos_connected
@@ -616,18 +609,18 @@ cards:
             hours_to_show: 120
             update_interval: 30
             ko_icon: mdi:exclamation-thick
-            ko: "off"
-            ok: "on"
+            ko: 'off'
+            ok: 'on'
             alias:
-              ok: "Online"
-              ko: "Offline"
+              ok: Online
+              ko: Offline
             icon_adaptive_color: true
             title_adaptive_color: true
             color:
-              ok: '#66CC00'
-              ko: '#555555'
-              half: orange
-              none: black
+              ok: rgb(var(--color-green))
+              ko: rgba(var(--color-grey),50%)
+              half: rgb(var(--color-orange))
+              none: rgb(var(--color-black))
             bar:
               spacing: 1
               height: 20
@@ -651,57 +644,56 @@ cards:
               animation: true
               hour24: false
 
-      - type: custom:stack-in-card
+      - type: vertical-stack
         cards:
-          - type: markdown
-            content: >-
-              ## Erebus
-
-              ## R7-2700 | RX 580 | 650W
-
-          - type: custom:stack-in-card
-            mode: horizontal
+          - type: custom:mushroom-title-card
+            subtitle: |-
+              Erebus
+              R7-2700 | RX 580 | 650W
+          - type: horizontal-stack
             cards:
-              - type: custom:button-card
-                template: common
+              - type: custom:mushroom-template-card
+                primary: Power
+                entity: switch.erebus
+                icon: |-
+                  {%- if is_state(entity, "on") -%}
+                    mdi:power
+                  {%- else -%}
+                    mdi:power-off
+                  {%- endif -%}
+                icon_color: |-
+                  {%- if is_state(entity, "on") -%}
+                    green
+                  {%- else -%}
+                    red
+                  {%- endif -%}
                 tap_action:
                   action: none
-                double_tap_action:
-                  action: toggle
-                entity: switch.erebus
-                icon: mdi:power
-                name: Power
-                styles:
-                  icon:
-                    - width: 100%
-                      color: var(--label-badge-red)
-                state:
-                  - value: 'off'
-                    icon: mdi:power-off
-                  - value: 'on'
-                    styles:
-                      icon:
-                        - color: var(--label-badge-green)
-
+                hold_action:
+                  action: call-service
+                  service: switch.toggle
+                  service_data: {}
+                  target:
+                    entity_id: switch.erebus
           - type: custom:uptime-card
-            entity: binary_sensor.device_erebus
+            entity: switch.erebus
             name: Erebus Up-Time
             icon: mdi:connection
             hours_to_show: 120
             update_interval: 30
             ko_icon: mdi:exclamation-thick
-            ko: "off"
-            ok: "on"
+            ko: 'off'
+            ok: 'on'
             alias:
-              ok: "Online"
-              ko: "Offline"
+              ok: Online
+              ko: Offline
             icon_adaptive_color: true
             title_adaptive_color: true
             color:
-              ok: '#66CC00'
-              ko: '#555555'
-              half: orange
-              none: black
+              ok: rgb(var(--color-green))
+              ko: rgba(var(--color-grey),50%)
+              half: rgb(var(--color-orange))
+              none: rgb(var(--color-black))
             bar:
               spacing: 1
               height: 20
