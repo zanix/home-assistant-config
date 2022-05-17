@@ -1,0 +1,44 @@
+---
+id: washer_running
+alias: '[Laundry] Washer Running'
+description: 'Actions when the washer is running and is done'
+
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.washer_5_1min
+    for:
+      minutes: 5
+    above: 10
+
+action:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.washer
+
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: sensor.washer_5_1min
+        below: 10
+        for:
+          minutes: 3
+
+  - parallel:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.washer
+
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
+          title: 'Laundry'
+          message: 'The washer is done! Forward the clothes to the dryer.'
+          icon: '/local/icons/washing-machine.png'
+          group: 'laundry'
+          tag: 'laundry-washer'
+
+      - service: script.notify_join
+        data:
+          who: 'shield_all'
+          title: 'Laundry'
+          message: 'The washer is done!'
+          icon: 'local/icons/washing-machine.png'

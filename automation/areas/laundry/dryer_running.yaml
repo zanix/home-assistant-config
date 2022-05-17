@@ -1,0 +1,44 @@
+---
+id: dryer_running
+alias: '[Laundry] Dryer Running'
+description: 'Actions when the dryer is running and is done'
+
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.dryer_10_1min
+    for:
+      minutes: 5
+    above: 10
+
+action:
+  - service: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.dryer
+
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: sensor.dryer_10_1min
+        below: 10
+        for:
+          minutes: 3
+
+  - parallel:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.dryer
+
+      - service: script.notify_mobile
+        data:
+          who: 'parents'
+          title: 'Laundry'
+          message: 'The dryer is done! Take the clothes out of the dryer.'
+          icon: '/local/icons/washing-machine.png'
+          group: 'laundry'
+          tag: 'laundry-dryer'
+
+      - service: script.notify_join
+        data:
+          who: 'shield_all'
+          title: 'Laundry'
+          message: 'The dryer is done!'
+          icon: 'local/icons/washing-machine.png'
