@@ -8,7 +8,7 @@ from homeassistant.helpers.entity import EntityCategory
 
 DOMAIN = "mail_and_packages"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.3.4-b24"
+VERSION = "0.3.4-2"
 ISSUE_URL = "http://github.com/moralmunky/Home-Assistant-Mail-And-Packages"
 PLATFORM = "sensor"
 PLATFORMS = ["camera", "sensor"]
