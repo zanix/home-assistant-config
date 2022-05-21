@@ -6522,40 +6522,6 @@ views:
         navigation_path: lights
       type: template
     type: custom:mushroom-chips-card
-  - cards:
-    - cards:
-      - card:
-          entity: input_boolean.washer
-          icon: mdi:washing-machine
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
-          primary: "{%- if is_state(entity, \"on\") -%}\n  Washing\n{%- else -%}\n\
-            \  Idle\n{%- endif -%}"
-          secondary: Washer
-          tap_action:
-            action: more-info
-          type: custom:mushroom-template-card
-        conditions:
-        - entity: input_boolean.washer
-          state: 'on'
-        type: conditional
-      - card:
-          entity: input_boolean.dryer
-          icon: mdi:tumble-dryer
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
-          primary: "{%- if is_state(entity, \"on\") -%}\n  Drying\n{%- else -%}\n\
-            \  Idle\n{%- endif -%}"
-          secondary: Dryer
-          tap_action:
-            action: more-info
-          type: custom:mushroom-template-card
-        conditions:
-        - entity: input_boolean.dryer
-          state: 'on'
-        type: conditional
-      type: horizontal-stack
-    type: vertical-stack
   - primary: "{%- set time = now().hour -%}\n{%- if (time >= 18) -%}\n  Good Evening,\
       \ {{user}}!\n{%- elif (time >= 12) -%}\n  Good Afternoon, {{user}}!\n{%- elif\
       \ (time >= 5) -%}\n  Good Morning, {{user}}!\n{%- elif (time < 5) -%}\n  WTF\
@@ -7267,6 +7233,30 @@ views:
     columns: 3
     square: false
     type: grid
+  - cards:
+    - cards:
+      - entity: input_boolean.washer
+        icon: mdi:washing-machine
+        icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n \
+          \ grey\n{%- endif -%}"
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Washing\n{%- else -%}\n \
+          \ Washer Idle\n{%- endif -%}"
+        secondary: '{{ relative_time(states[entity].last_changed) }}'
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      - entity: input_boolean.dryer
+        icon: mdi:tumble-dryer
+        icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
+          \  grey\n{%- endif -%}"
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Drying\n{%- else -%}\n  Dryer\
+          \ Idle\n{%- endif -%}"
+        secondary: '{{ relative_time(states[entity].last_changed) }}'
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      type: horizontal-stack
+    type: vertical-stack
   - tap_action:
       action: navigate
       navigation_path: subaru
@@ -7284,77 +7274,156 @@ views:
       tracker: device_tracker.ascent_location
   - card:
       cards:
-      - subtitle: Mail
-        type: custom:mushroom-title-card
-      - entity: sensor.mail_usps_mail
-        icon_color: grey
-        name: Mail
-        tap_action:
-          action: fire-dom-event
-          browser_mod:
-            card:
-              elements:
-              - camera_image: camera.mail_usps
-                camera_view: live
-                style:
-                  left: 50%
-                  top: 50%
-                  width: 100%
-                type: image
-              - image: /local/mail_and_packages/overlay.png
-                style:
-                  left: 50%
-                  top: 50%
-                  width: 101%
-                type: image
-              - entity: camera.mail_usps
-                image: /local/mail_and_packages/vignette.png
-                style:
-                  left: 50%
-                  top: 50%
-                  width: 101%
-                type: image
-              entity: camera.mail_usps
-              image: local/mail_and_packages/white.png
-              type: picture-elements
-            command: popup
-            large: true
-            title: Mail
-          target: {}
-        type: custom:mushroom-entity-card
-      type: vertical-stack
-    conditions:
-    - entity: sensor.mail_usps_mail
-      state_not: '0'
-    type: conditional
-  - card:
-      cards:
-      - subtitle: Packages
+      - subtitle: Mail / Deliveries
         type: custom:mushroom-title-card
       - cards:
-        - entity: sensor.mail_usps_delivering
-          icon: fab:usps
-          icon_color: blue
-          layout: vertical
-          name: USPS
-          type: custom:mushroom-entity-card
-        - entity: sensor.mail_ups_delivering
-          icon: fab:ups
-          icon_color: brown
-          layout: vertical
-          name: UPS
-          type: custom:mushroom-entity-card
-        - entity: sensor.mail_fedex_delivering
-          icon: fab:fedex
-          icon_color: purple
-          layout: vertical
-          name: FedEx
-          type: custom:mushroom-entity-card
-        type: horizontal-stack
+        - card:
+            entity: sensor.mail_usps_mail
+            icon_color: grey
+            name: Mail
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  elements:
+                  - camera_image: camera.mail_usps
+                    camera_view: live
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    type: image
+                  - image: /local/mail_and_packages/overlay.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 101%
+                    type: image
+                  - entity: camera.mail_usps
+                    image: /local/mail_and_packages/vignette.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 101%
+                    type: image
+                  entity: camera.mail_usps
+                  image: local/mail_and_packages/white.png
+                  type: picture-elements
+                command: popup
+                large: true
+                title: Mail
+              target: {}
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_usps_mail
+            state_not: '0'
+          type: conditional
+        - card:
+            entity: sensor.mail_usps_delivering
+            icon: fab:usps
+            icon_color: blue
+            name: USPS
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.mail_usps_delivering
+                    icon_color: grey
+                    type: custom:mushroom-entity-card
+                  - entities:
+                    - entity: sensor.mail_usps_delivering
+                    type: history-graph
+                  - card:
+                      content: '{%- for trk_number in state_attr(''sensor.mail_usps_delivering'',
+                        ''tracking_#'') %} - [{{ trk_number }}](https://tools.usps.com/go/TrackConfirmAction?tLabels={{
+                        trk_number }}) {%- endfor -%}'
+                      type: markdown
+                    conditions:
+                    - entity: sensor.mail_usps_delivering
+                      state_not: '0'
+                    type: conditional
+                  type: vertical-stack
+                command: popup
+                title: USPS Tracking
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_usps_delivering
+            state_not: '0'
+          type: conditional
+        - card:
+            entity: sensor.mail_ups_delivering
+            icon: fab:ups
+            icon_color: brown
+            name: UPS
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.mail_ups_delivering
+                    icon_color: grey
+                    type: custom:mushroom-entity-card
+                  - entities:
+                    - entity: sensor.mail_ups_delivering
+                    type: history-graph
+                  - card:
+                      content: '{%- for trk_number in state_attr(''sensor.mail_ups_delivering'',
+                        ''tracking_#'') %} - [{{ trk_number }}](https://www.ups.com/track?loc=en_US&tracknum={{
+                        trk_number }}) {%- endfor -%}'
+                      type: markdown
+                    conditions:
+                    - entity: sensor.mail_ups_delivering
+                      state_not: '0'
+                    type: conditional
+                  type: vertical-stack
+                command: popup
+                title: UPS Tracking
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_ups_delivering
+            state_not: '0'
+          type: conditional
+        - card:
+            entity: sensor.mail_fedex_delivering
+            icon: fab:fedex
+            icon_color: purple
+            name: FedEx
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.mail_fedex_delivering
+                    icon_color: grey
+                    type: custom:mushroom-entity-card
+                  - entities:
+                    - entity: sensor.mail_fedex_delivering
+                    type: history-graph
+                  - card:
+                      content: '{%- for trk_number in state_attr(''sensor.mail_fedex_delivering'',
+                        ''tracking_#'') %} - [{{ trk_number }}](https://www.fedex.com/fedextrack/?trknbr={{
+                        trk_number }}) {%- endfor -%}'
+                      type: markdown
+                    conditions:
+                    - entity: sensor.mail_fedex_delivering
+                      state_not: '0'
+                    type: conditional
+                  type: vertical-stack
+                command: popup
+                title: FedEx Tracking
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_fedex_delivering
+            state_not: '0'
+          type: conditional
+        columns: 2
+        square: false
+        type: grid
       type: vertical-stack
     conditions:
-    - entity: sensor.mail_packages_in_transit
-      state_not: '0'
+    - entity: binary_sensor.out_for_delivery
+      state: 'on'
     type: conditional
   icon: mdi:home-assistant
   layout:
@@ -7932,11 +8001,11 @@ views:
       tap_action:
         action: more-info
       type: template
+    - entity: sensor.office_temperature
+      type: entity
     - entity: switch.erebus
       tap_action:
         action: more-info
-      type: entity
-    - entity: sensor.office_temperature
       type: entity
     type: custom:mushroom-chips-card
   - title: Office
@@ -8005,52 +8074,22 @@ views:
               - color_temp: 370
               - color_temp: 250
               - color_temp: 181
-              - icon_color: linear-gradient(15deg, rgba(144,0,0,1) 0%, rgba(255,0,0,1)
-                  100%)
-                rgb_color:
+              - rgb_color:
                 - 255
-                - 30
-                - 0
-              - icon_color: linear-gradient(15deg, rgba(16,101,54,1) 0%, rgba(102,211,151,1)
-                  100%)
-                rgb_color:
-                - 8
-                - 224
-                - 9
-              - icon_color: linear-gradient(15deg, rgba(46,217,8,1) 0%, rgba(176,255,59,1)
-                  100%)
-                rgb_color:
-                - 153
+                - 255
+                - 255
+              - rgb_color:
                 - 255
                 - 0
-              - icon_color: linear-gradient(15deg, rgba(26,87,130,1) 0%, rgba(0,149,255,1)
-                  100%)
-                rgb_color:
-                - 29
-                - 187
-                - 255
-              - icon_color: linear-gradient(15deg, rgba(96,21,149,1) 0%, rgba(181,126,220,1)
-                  100%)
-                rgb_color:
-                - 169
-                - 3
-                - 255
-              - icon_color: linear-gradient(15deg, rgba(255,59,39,1) 0%, rgba(255,116,64,1)
-                  100%)
-                rgb_color:
-                - 255
-                - 116
-                - 64
-              - icon_color: linear-gradient(15deg, rgba(201,38,101,1) 0%, rgba(255,0,100,1)
-                  100%)
-                rgb_color:
+                - 0
+              - rgb_color:
                 - 255
                 - 0
                 - 100
               - rgb_color:
                 - 255
-                - 0
-                - 0
+                - 116
+                - 64
               - rgb_color:
                 - 255
                 - 165
@@ -8060,12 +8099,28 @@ views:
                 - 255
                 - 0
               - rgb_color:
+                - 8
+                - 224
+                - 9
+              - rgb_color:
                 - 0
                 - 255
                 - 0
               - rgb_color:
+                - 153
+                - 255
+                - 0
+              - rgb_color:
+                - 29
+                - 187
+                - 255
+              - rgb_color:
                 - 0
                 - 255
+                - 255
+              - rgb_color:
+                - 169
+                - 3
                 - 255
               - rgb_color:
                 - 255
@@ -8986,133 +9041,6 @@ views:
       type: custom:mushroom-light-card
     type: vertical-stack
   - cards:
-    - subtitle: Oculus Quest 2
-      type: custom:mushroom-title-card
-    - alias:
-        ko: Standby
-        ok: Playing
-      alignment:
-        header: left
-        icon_first: true
-        status: spaced
-      bar:
-        amount: 60
-        height: 20
-        round: 0
-        spacing: 1
-      color:
-        half: rgb(var(--color-orange))
-        ko: rgba(var(--color-grey),50%)
-        none: rgb(var(--color-black))
-        ok: rgb(var(--color-green))
-      entity: binary_sensor.quest_interactive
-      hours_to_show: 120
-      icon: fas:vr-cardboard
-      icon_adaptive_color: true
-      ko: 'off'
-      ko_icon: mdi:exclamation-thick
-      name: Quest 2 Interactive
-      ok: 'on'
-      show:
-        average: true
-        footer: true
-        header: true
-        icon: true
-        status: true
-        timeline: true
-        title: true
-      tap_action:
-        action: more-info
-      title_adaptive_color: true
-      tooltip:
-        animation: true
-        hour24: false
-      type: custom:uptime-card
-      update_interval: 30
-    - animation:
-        state: 'on'
-      decimal: 0
-      entities:
-      - entity: sensor.quest_battery_level
-      name: Quest 2 Battery Level
-      positions:
-        indicator: inside
-      severity:
-      - color: rgb(244,67,54)
-        from: 0
-        to: 9
-      - color: rgb(255,152,0)
-        from: 10
-        to: 29
-      - color: rgb(255,193,7)
-        from: 30
-        to: 49
-      - color: rgb(205,220,57)
-        from: 50
-        to: 69
-      - color: rgb(76,175,80)
-        from: 80
-        to: 100
-      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}\n\
-        bar-card-currentbar,\nbar-card-backgroundbar {\n  border-radius: var(--ha-card-border-radius,\
-        \ 4px);\n}"
-      type: custom:bar-card
-    - all_series_config:
-        curve: stepline
-        extend_to: now
-        stroke_width: 4
-        type: line
-      apex_config:
-        chart:
-          foreColor: '#7B7B7B'
-          toolbar:
-            show: false
-        grid:
-          borderColor: '#7B7B7B'
-        xaxis:
-          tooltip:
-            enabled: false
-      brush:
-        apex_config:
-          chart:
-            foreColor: '#7B7B7B'
-            toolbar:
-              show: false
-          grid:
-            borderColor: '#7B7B7B'
-          xaxis:
-            tooltip:
-              enabled: false
-        selection_span: 1h
-      experimental:
-        brush: true
-      header:
-        colorize_states: true
-        show: true
-        show_states: true
-        title: Quest WiFi
-      series:
-      - entity: sensor.quest_wifi_link_speed
-        name: WiFi Speed
-        show:
-          in_brush: true
-        yaxis_id: speed
-      - entity: sensor.quest_wifi_signal_strength
-        name: WiFi Signal
-        show:
-          in_brush: true
-        yaxis_id: strength
-      type: custom:apexcharts-card
-      yaxis:
-      - apex_config:
-          tickAmount: 4
-        id: speed
-      - apex_config:
-          tickAmount: 4
-        id: strength
-        opposite: true
-    type: vertical-stack
-  - cards:
     - subtitle: 'Ardena
 
         R5-5600X | RTX 3080 | 750W'
@@ -9252,6 +9180,197 @@ views:
       update_interval: 30
     type: vertical-stack
   - cards:
+    - subtitle: 'Erebus
+
+        R7-2700 | RX 580 | 650W'
+      type: custom:mushroom-title-card
+    - cards:
+      - entity: switch.erebus
+        hold_action:
+          action: call-service
+          service: switch.toggle
+          service_data: {}
+          target:
+            entity_id: switch.erebus
+        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n  mdi:power-off\n\
+          {%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
+          \  red\n{%- endif -%}"
+        primary: Power
+        tap_action:
+          action: none
+        type: custom:mushroom-template-card
+      type: horizontal-stack
+    - alias:
+        ko: Offline
+        ok: Online
+      alignment:
+        header: left
+        icon_first: true
+        status: spaced
+      bar:
+        amount: 60
+        height: 20
+        round: 0
+        spacing: 1
+      color:
+        half: rgb(var(--color-orange))
+        ko: rgba(var(--color-grey),50%)
+        none: rgb(var(--color-black))
+        ok: rgb(var(--color-green))
+      entity: switch.erebus
+      hours_to_show: 120
+      icon: mdi:connection
+      icon_adaptive_color: true
+      ko: 'off'
+      ko_icon: mdi:exclamation-thick
+      name: Erebus Up-Time
+      ok: 'on'
+      show:
+        average: true
+        footer: true
+        header: true
+        icon: true
+        status: true
+        timeline: true
+        title: true
+      tap_action:
+        action: more-info
+      title_adaptive_color: true
+      tooltip:
+        animation: true
+        hour24: false
+      type: custom:uptime-card
+      update_interval: 30
+    type: vertical-stack
+  - cards:
+    - subtitle: Oculus Quest 2
+      type: custom:mushroom-title-card
+    - alias:
+        ko: Standby
+        ok: Playing
+      alignment:
+        header: left
+        icon_first: true
+        status: spaced
+      bar:
+        amount: 60
+        height: 20
+        round: 0
+        spacing: 1
+      color:
+        half: rgb(var(--color-orange))
+        ko: rgba(var(--color-grey),50%)
+        none: rgb(var(--color-black))
+        ok: rgb(var(--color-green))
+      entity: binary_sensor.quest_interactive
+      hours_to_show: 120
+      icon: fas:vr-cardboard
+      icon_adaptive_color: true
+      ko: 'off'
+      ko_icon: mdi:exclamation-thick
+      name: Quest 2 Interactive
+      ok: 'on'
+      show:
+        average: true
+        footer: true
+        header: true
+        icon: true
+        status: true
+        timeline: true
+        title: true
+      tap_action:
+        action: more-info
+      title_adaptive_color: true
+      tooltip:
+        animation: true
+        hour24: false
+      type: custom:uptime-card
+      update_interval: 30
+    - animation:
+        state: 'on'
+      decimal: 0
+      entities:
+      - entity: sensor.quest_battery_level
+      name: Quest 2 Battery Level
+      positions:
+        indicator: inside
+      severity:
+      - color: rgb(244,67,54)
+        from: 0
+        to: 9
+      - color: rgb(255,152,0)
+        from: 10
+        to: 29
+      - color: rgb(255,193,7)
+        from: 30
+        to: 49
+      - color: rgb(205,220,57)
+        from: 50
+        to: 69
+      - color: rgb(76,175,80)
+        from: 80
+        to: 100
+      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}\n\
+        bar-card-currentbar,\nbar-card-backgroundbar {\n  border-radius: var(--ha-card-border-radius,\
+        \ 4px);\n}"
+      type: custom:bar-card
+    - all_series_config:
+        curve: stepline
+        extend_to: now
+        stroke_width: 4
+        type: line
+      apex_config:
+        chart:
+          foreColor: '#7B7B7B'
+          toolbar:
+            show: false
+        grid:
+          borderColor: '#7B7B7B'
+        xaxis:
+          tooltip:
+            enabled: false
+      brush:
+        apex_config:
+          chart:
+            foreColor: '#7B7B7B'
+            toolbar:
+              show: false
+          grid:
+            borderColor: '#7B7B7B'
+          xaxis:
+            tooltip:
+              enabled: false
+        selection_span: 1h
+      experimental:
+        brush: true
+      header:
+        colorize_states: true
+        show: true
+        show_states: true
+        title: Quest WiFi
+      series:
+      - entity: sensor.quest_wifi_link_speed
+        name: WiFi Speed
+        show:
+          in_brush: true
+        yaxis_id: speed
+      - entity: sensor.quest_wifi_signal_strength
+        name: WiFi Signal
+        show:
+          in_brush: true
+        yaxis_id: strength
+      type: custom:apexcharts-card
+      yaxis:
+      - apex_config:
+          tickAmount: 4
+        id: speed
+      - apex_config:
+          tickAmount: 4
+        id: strength
+        opposite: true
+    type: vertical-stack
+  - cards:
     - subtitle: 'Athos
 
         i5-6500 | GTX 1070 | 500W'
@@ -9368,70 +9487,6 @@ views:
       ko: 'off'
       ko_icon: mdi:exclamation-thick
       name: Athos Up-Time
-      ok: 'on'
-      show:
-        average: true
-        footer: true
-        header: true
-        icon: true
-        status: true
-        timeline: true
-        title: true
-      tap_action:
-        action: more-info
-      title_adaptive_color: true
-      tooltip:
-        animation: true
-        hour24: false
-      type: custom:uptime-card
-      update_interval: 30
-    type: vertical-stack
-  - cards:
-    - subtitle: 'Erebus
-
-        R7-2700 | RX 580 | 650W'
-      type: custom:mushroom-title-card
-    - cards:
-      - entity: switch.erebus
-        hold_action:
-          action: call-service
-          service: switch.toggle
-          service_data: {}
-          target:
-            entity_id: switch.erebus
-        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n  mdi:power-off\n\
-          {%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-          \  red\n{%- endif -%}"
-        primary: Power
-        tap_action:
-          action: none
-        type: custom:mushroom-template-card
-      type: horizontal-stack
-    - alias:
-        ko: Offline
-        ok: Online
-      alignment:
-        header: left
-        icon_first: true
-        status: spaced
-      bar:
-        amount: 60
-        height: 20
-        round: 0
-        spacing: 1
-      color:
-        half: rgb(var(--color-orange))
-        ko: rgba(var(--color-grey),50%)
-        none: rgb(var(--color-black))
-        ok: rgb(var(--color-green))
-      entity: switch.erebus
-      hours_to_show: 120
-      icon: mdi:connection
-      icon_adaptive_color: true
-      ko: 'off'
-      ko_icon: mdi:exclamation-thick
-      name: Erebus Up-Time
       ok: 'on'
       show:
         average: true
@@ -10282,7 +10337,7 @@ views:
         secondary: '{{ states("sensor.tariff_price") }} {{ state_attr("sensor.tariff_price",
           "unit_of_measurement") }}'
         tap_action:
-          action: none
+          action: more-info
         type: custom:mushroom-template-card
       - entity: sensor.current_monthly_energy
         icon: mdi:flash
@@ -10291,7 +10346,7 @@ views:
           }}'
         secondary: Monthly Energy
         tap_action:
-          action: none
+          action: more-info
         type: custom:mushroom-template-card
       columns: 2
       square: false
@@ -10321,7 +10376,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Power
+    - subtitle: Power Usage
       type: custom:mushroom-title-card
     - animation:
         state: 'on'
@@ -10399,8 +10454,7 @@ views:
   - cards:
     - subtitle: Map
       type: custom:mushroom-title-card
-    - aspect_ratio: '16:9'
-      dark_mode: true
+    - dark_mode: true
       default_zoom: 12
       entities:
       - person.joshua
