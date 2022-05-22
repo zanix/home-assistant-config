@@ -6393,6 +6393,8 @@ views:
               type: custom:weather-card
             - type: iframe
               url: https://embed.windy.com/embed2.html?lat=43.241&lon=-112.143&zoom=7&level=surface&overlay=wind&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=43.490&detailLon=-112.040&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1
+            - darkMode: true
+              type: custom:sun-card
             type: vertical-stack
           command: popup
           title: Weather
@@ -6470,10 +6472,7 @@ views:
           title: Allergy / Asthma
         target: {}
       type: template
-    - content: "{%- if is_state_attr(entity, \"hvac_action\", \"heating\") -%}\n \
-        \ Heat\n{%- elif is_state_attr(entity, \"hvac_action\", \"cooling\") -%}\n\
-        \  Cool\n{%- elif is_state_attr(entity, \"hvac_action\", \"fan\") -%}\n  Fan\n\
-        {%- else -%}\n  Idle\n{%- endif -%}"
+    - content: '{{ state_attr("climate.home", "hvac_action")|capitalize }}'
       entity: climate.home
       icon: mdi:thermostat-box
       icon_color: "{%- if is_state_attr(entity, \"hvac_action\", \"heating\") -%}\n\
@@ -7240,7 +7239,12 @@ views:
           \ grey\n{%- endif -%}"
         primary: "{%- if is_state(entity, \"on\") -%}\n  Washing\n{%- else -%}\n \
           \ Washer Idle\n{%- endif -%}"
-        secondary: '{{ relative_time(states[entity].last_changed) }}'
+        secondary: "{% set last_changed = states[entity].last_changed -%}\n{%- if\
+          \ last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
+          \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
+          \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
@@ -7250,7 +7254,12 @@ views:
           \  grey\n{%- endif -%}"
         primary: "{%- if is_state(entity, \"on\") -%}\n  Drying\n{%- else -%}\n  Dryer\
           \ Idle\n{%- endif -%}"
-        secondary: '{{ relative_time(states[entity].last_changed) }}'
+        secondary: "{% set last_changed = states[entity].last_changed -%}\n{%- if\
+          \ last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
+          \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
+          \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
@@ -9526,7 +9535,7 @@ views:
         action: navigate
         navigation_path: main
       type: template
-    - entity: sensor.house_thermostat_away_mode
+    - entity: binary_sensor.ecobee_away_mode
       icon_color: cyan
       type: entity
     type: custom:mushroom-chips-card
@@ -9550,10 +9559,11 @@ views:
         name: Temperature
       - entity: sensor.home_humidity
         name: Humidity
-      - entity: sensor.house_thermostat_away_mode
-        name: Away Mode
       step_size: 1
       type: custom:simple-thermostat
+    - entities:
+      - entity: sensor.ecobee_mode
+      type: history-graph
     type: vertical-stack
   - cards:
     - subtitle: Temperatures
@@ -10053,12 +10063,12 @@ views:
   - entity: lock.lock_front
     name: Front Door
     tap_action:
-      action: none
+      action: more-info
     type: custom:mushroom-lock-card
   - entity: cover.garage_door
     show_buttons_control: true
     tap_action:
-      action: none
+      action: more-info
     type: custom:mushroom-cover-card
   - cards:
     - subtitle: Cameras
@@ -10193,9 +10203,15 @@ views:
           \  mdi:door-closed\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else -%}\n  grey\n\
           {%- endif -%}"
+        multiline_secondary: true
         primary: '{{ state_attr(entity, "friendly_name") }}'
         secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif -%},\n{{ relative_time(states[entity].last_changed) }}"
+          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
+          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
+          \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
+          \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
@@ -10204,9 +10220,15 @@ views:
           \  mdi:door-closed\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else -%}\n  grey\n\
           {%- endif -%}"
+        multiline_secondary: true
         primary: '{{ state_attr(entity, "friendly_name") }}'
         secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif -%},\n{{ relative_time(states[entity].last_changed) }}"
+          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
+          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
+          \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
+          \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
@@ -10215,9 +10237,15 @@ views:
           \  mdi:door-closed\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else -%}\n  grey\n\
           {%- endif -%}"
+        multiline_secondary: true
         primary: '{{ state_attr(entity, "friendly_name") }}'
         secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif -%},\n{{ relative_time(states[entity].last_changed) }}"
+          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
+          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
+          \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
+          \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
@@ -10226,9 +10254,15 @@ views:
           \  mdi:door-closed\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else -%}\n  grey\n\
           {%- endif -%}"
+        multiline_secondary: true
         primary: '{{ state_attr(entity, "friendly_name") }}'
         secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif -%},\n{{ relative_time(states[entity].last_changed) }}"
+          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
+          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
+          \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
+          \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card

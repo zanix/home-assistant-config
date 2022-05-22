@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1328 total entities**,
-including **576 sensors**.
+This Home Assistant install has approximately **1305 total entities**,
+including **547 sensors**.
 
 <details><summary>29 Stock Integrations</summary>
 
@@ -150,7 +150,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](h
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity - and also an audio player
 
-### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service) [vNone]
+### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
 
 Home Assistant Service for sending commands to a Wifi enabled DreamScreenAuthors:[https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
 
@@ -170,7 +170,7 @@ Use Jinja and data from Home Assistant to generate your README.md fileAuthors:[@
 
 A HACS repository for Govee light integrationAuthors:[@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.24.5]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.Authors:[@ludeeus](https://github.com/ludeeus).
 
@@ -182,7 +182,7 @@ Helium blockchain sensors for Home AssistantAuthors:[@rsnodgrass](https://github
 
 Home Assistant integration for managing Z-Wave enabled locksAuthors:[@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.4-b24]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.4-2]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.Authors:[@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
@@ -211,7 +211,7 @@ Home Assistant custom integration to keep track of missing entities and services
 Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technologyAuthors:[@AlexxIT](https://github.com/AlexxIT).
 </details>
 
-<details><summary>29 Lovelace Plugins</summary>
+<details><summary>28 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -220,10 +220,6 @@ Home Assistant custom component for viewing IP cameras RTSP stream in real time 
 ### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.11.0]
 
 🔹Automatically populate the entities-list of lovelace cards
-
-### [Banner Card](https://github.com/rosskyl/banner-card) [v0.13.0]
-
-A fluffy banner card for Home Assistant 🥰
 
 ### [Bar Card](https://github.com/custom-cards/bar-card) [v3.2.0]
 
@@ -245,10 +241,6 @@ Battery state card for Home Assistant
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Config Template Card](https://github.com/iantrich/config-template-card) [v1.3.6]
-
-📝 Templatable Lovelace Configurations
-
 ### [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) [v0.1.2]
 
 Entity Attributes
@@ -261,6 +253,10 @@ Entity Attributes
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
+### [Kibibit Better Graph Colors](https://github.com/Kibibit/kb-better-graph-colors) [v1.1.0]
+
+Replace the history graph colors with a material design color palette.
+
 ### [Kiosk Mode](https://github.com/maykar/kiosk-mode) [v1.7.2]
 
 🙈 Hides the Home Assistant header and/or sidebar
@@ -268,10 +264,6 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 ### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.2]
 
 🔹 Get more control over the placement of lovelace cards.
-
-### [Light Entity Card](https://github.com/ljmerza/light-entity-card) [v5.0.0]
-
-Control any light or switch entity
 
 ### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.11.0]
 
@@ -285,7 +277,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.8.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.8.8]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -312,6 +304,10 @@ A button card with integrated slider
 ### [Stack In Card](https://github.com/custom-cards/stack-in-card) [v0.2.0]
 
 🛠 group multiple cards into one card without the borders
+
+### [Sun Card](https://github.com/AitorDB/home-assistant-sun-card) [v0.1.4]
+
+Home assistant sun card based on Google weather design
 
 ### [Template Entity Row](https://github.com/thomasloven/lovelace-template-entity-row) [v1.3.0]
 
@@ -462,7 +458,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.5.4-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.5.5-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
