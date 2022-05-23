@@ -211,7 +211,7 @@ Home Assistant custom integration to keep track of missing entities and services
 Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technologyAuthors:[@AlexxIT](https://github.com/AlexxIT).
 </details>
 
-<details><summary>28 Lovelace Plugins</summary>
+<details><summary>27 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -252,10 +252,6 @@ Entity Attributes
 ### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.30]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
-
-### [Kibibit Better Graph Colors](https://github.com/Kibibit/kb-better-graph-colors) [v1.1.0]
-
-Replace the history graph colors with a material design color palette.
 
 ### [Kiosk Mode](https://github.com/maykar/kiosk-mode) [v1.7.2]
 
