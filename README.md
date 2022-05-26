@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1305 total entities**,
-including **547 sensors**.
+This Home Assistant install has approximately **1309 total entities**,
+including **548 sensors**.
 
 <details><summary>29 Stock Integrations</summary>
 
@@ -170,7 +170,7 @@ Use Jinja and data from Home Assistant to generate your README.md fileAuthors:[@
 
 A HACS repository for Govee light integrationAuthors:[@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.1]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.Authors:[@ludeeus](https://github.com/ludeeus).
 
@@ -428,7 +428,7 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 
 ## Automations
 
-This Home Assistant install has approximately **121 automations**.
+This Home Assistant install has approximately **124 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
