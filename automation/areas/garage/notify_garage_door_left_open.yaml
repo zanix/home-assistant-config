@@ -1,76 +1,69 @@
 ---
 id: notify_garage_door_left_open
 alias: '[Notify] Garage Door Left Open'
-description: 'Sends notification if the garage door is open longer than 30 minutes'
+description: 'Sends notification if the garage door is left open'
 
 trigger:
-  platform: time_pattern
-  minutes: '*'
+  platform: state
+  entity_id:
+    - cover.garage_door
+  from: 'closed'
+  to: 'open'
+  for:
+    minutes: 30
 
 condition:
   - condition: state
-    entity_id: cover.garage_door
-    state: 'open'
-  - condition: state
     entity_id: binary_sensor.garage_occupancy
     state: 'off'
-  - condition: template
-    value_template: >-
-      {%- set entity = states.cover.garage_door -%}
-      {%- set current = as_timestamp(now()) -%}
-      {%- if entity.state -%}
-        {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
-        {{ changed >= 30 and changed % 30 == 0 }}
-      {% endif -%}
-
-variables:
-  message: >-
-    {%- macro parse_last_changed(entity) -%}
-      {%- if entity.state -%}
-        {%- set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed))|int -%}
-        {%- set minutes = ((uptime % 3600) / 60)|int -%}
-        {%- set hours = ((uptime % 86400) / 3600)|int -%}
-        {%- set days = (uptime / 86400)|int -%}
-        {%- if days > 0 -%}
-          {{ days }} day{% if days > 1 %}s{% endif %}
-        {%- endif -%}
-        {%- if hours > 0 -%}
-          {%- if days > 0 %} {% endif -%}
-          {{ hours }} hour{% if hours > 1 %}s{% endif %}
-        {%- endif -%}
-        {%- if minutes > 0 -%}
-          {%- if hours > 0 or days > 0 %} {% endif -%}
-          {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
-        {%- endif -%}
-      {% endif -%}
-    {%- endmacro -%}
-    The {{ state_attr('cover.garage_door', 'friendly_name') }} has been open for {{ parse_last_changed(states.cover.garage_door) }}.
+  - condition: state
+    entity_id: input_boolean.ignore_alert_garage_door
+    state: 'off'
 
 action:
-  - parallel:
-      - service: script.notify_mobile
-        data:
-          who: 'parents'
-          title: 'Garage Door Open'
-          message: '{{ message }}'
-          icon: '/local/icons/garage-open.png'
-          group: 'Security'
-          tag: 'garage-door'
-          url: 'lovelace/security'
-          actions:
-            - action: 'close_garage'
-              title: 'Close'
+  - repeat:
+      until:
+        - or:
+            - condition: state
+              entity_id: input_boolean.ignore_alert_garage_door
+              state: 'on'
+            - condition: template
+              value_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
+      sequence:
+        - variables:
+            name: '{{ trigger.to_state.name }}'
+            message: >-
+              The {{ name }} has been open for {{ trigger.to_state.last_changed|relative_time }}.
 
-      - service: script.notify_join
-        data:
-          who: 'shield_all'
-          title: 'Garage Door Open'
-          message: '{{ message }}'
-          icon: 'local/icons/garage-open.png'
-          group: 'Security'
-          tag: 'garage-door'
+        - parallel:
+            - service: script.notify_mobile
+              data:
+                who: 'parents'
+                title: '{{ name }}'
+                message: '{{ message }}'
+                icon: '/local/icons/garage-open.png'
+                group: 'Security'
+                tag: 'garage-door'
+                url: 'lovelace/security'
+                actions:
+                  - action: 'ignore_garage_door_alerts'
+                    title: 'Ignore Alerts'
+                  - action: 'close_garage_door'
+                    title: 'Close'
 
-      - service: script.notify_speech
-        data:
-          media_player: group.google_speakers
-          message: '{{ message }}'
+            - service: script.notify_join
+              data:
+                who: 'shield_all'
+                title: '{{ name }}'
+                message: '{{ message }}'
+                icon: 'local/icons/garage-open.png'
+                group: 'Security'
+                tag: 'garage-door'
+
+            - service: script.notify_speech
+              data:
+                media_player: group.google_speakers
+                message: '{{ message }}'
+
+        - delay:
+            minutes: 30

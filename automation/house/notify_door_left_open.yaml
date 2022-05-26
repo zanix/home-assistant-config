@@ -1,75 +1,63 @@
 ---
 id: notify_door_left_open
 alias: '[Notify] Door Left Open'
-description: 'Sends notification if a door is open longer than 5 minutes'
+description: 'Sends notification when a door is left open'
+mode: parallel
 
 trigger:
-  platform: time_pattern
-  minutes: '*'
+  platform: state
+  entity_id: !include ../../templates/doors.yaml
+  from: 'off'
+  to: 'on'
+  for:
+    minutes: 5
 
 condition:
-  condition: template
-  value_template: >-
-    {%- set time = 5 -%}
-    {%- set ns = namespace(found=false) -%}
-    {%- set current = as_timestamp(now()) -%}
-    {%- set open_doors = states|selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id'))|selectattr('state','eq','on')|map(attribute='entity_id')|list -%}
-    {%- for entity_id in open_doors if not ns.found -%}
-      {%- set parts = entity_id.split('.') -%}
-      {%- set entity = states[parts[0]][parts[1]] -%}
-      {%- set changed = ((current - as_timestamp(entity.last_changed)) / 60)|int -%}
-      {%- set ns.found = changed >= time and changed % time == 0 -%}
-    {%- endfor -%}
-    {{ ns.found }}
-
-variables:
-  message: >-
-    {%- set time = 5 -%}
-    {%- macro parse_last_changed(entity) -%}
-      {%- if entity.state -%}
-        {%- set uptime = (as_timestamp(now()) - as_timestamp(entity.last_changed))|int -%}
-        {%- set minutes = ((uptime % 3600) / 60)|int -%}
-        {%- set hours = ((uptime % 86400) / 3600)|int -%}
-        {%- set days = (uptime / 86400)|int -%}
-        {%- if days > 0 -%}
-          {{ days }} day{% if days > 1 %}s{% endif %}
-        {%- endif -%}
-        {%- if hours > 0 -%}
-          {%- if days > 0 %} {% endif -%}
-          {{ hours }} hour{% if hours > 1 %}s{% endif %}
-        {%- endif -%}
-        {%- if minutes > 0 -%}
-          {%- if hours > 0 or days > 0 %} {% endif -%}
-          {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
-        {%- endif -%}
-      {% endif -%}
-    {%- endmacro -%}
-    {%- set current = as_timestamp(now()) -%}
-    {%- set open_doors = states|selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id'))|selectattr('state','eq','on')|list -%}
-    {%- for entity in open_doors if (((current - as_timestamp(entity.last_changed)) / 60)|int) >= time and (((current - as_timestamp(entity.last_changed)) / 60)|int) % time == 0 -%}
-      {%- if loop.first %} The {% elif loop.last %}, and the {% else %}, the {% endif -%}
-      {{ entity.name }} has been open for {{ parse_last_changed(entity) }}
-    {%- endfor %}
+  - condition: state
+    entity_id: input_boolean.ignore_alert_doors
+    state: 'off'
 
 action:
-  - parallel:
-      - service: script.notify_mobile
-        data:
-          who: 'parents'
-          title: 'Door Open'
-          message: '{{ message }}'
-          icon: '/local/icons/door-open.png'
-          group: 'Security'
+  - repeat:
+      until:
+        - or:
+            - condition: state
+              entity_id: input_boolean.ignore_alert_doors
+              state: 'on'
+            - condition: template
+              value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+      sequence:
+        - variables:
+            name: '{{ trigger.to_state.name }}'
+            message: >-
+              The {{ name }} has been open for {{ trigger.to_state.last_changed|relative_time }}.
 
-      - service: script.notify_join
-        data:
-          who: 'shield_all'
-          title: 'Door Open'
-          message: '{{ message }}'
-          icon: 'local/icons/door-open.png'
-          group: 'Security'
+        - parallel:
+            - service: script.notify_mobile
+              data:
+                who: 'parents'
+                title: '{{ name }}'
+                message: '{{ message }}'
+                icon: '/local/icons/door-open.png'
+                group: 'Security'
+                tag: 'door-{{ trigger.to_state.object_id }}'
+                actions:
+                  - action: 'ignore_door_alerts'
+                    title: 'Ignore'
 
-      - service: script.notify_speech
-        data:
-          media_player: group.google_speakers
-          message: '{{ message }}'
+            - service: script.notify_join
+              data:
+                who: 'shield_all'
+                title: '{{ name }}'
+                message: '{{ message }}'
+                icon: 'local/icons/door-open.png'
+                group: 'Security'
+                tag: 'door-{{ trigger.to_state.object_id }}'
+
+            - service: script.notify_speech
+              data:
+                media_player: group.google_speakers
+                message: '{{ message }}'
+
+        - delay:
+            minutes: 5

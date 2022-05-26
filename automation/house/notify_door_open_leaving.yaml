@@ -12,19 +12,14 @@ trigger:
     minutes: 1
 
 condition:
-  or:
-    - condition: state
-      entity_id: binary_sensor.front_door_is_open
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.sliding_door_is_open
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.garage_entry_door_is_open
-      state: 'on'
-    - condition: state
-      entity_id: binary_sensor.garage_side_door_is_open
-      state: 'on'
+  - condition: template
+    value_template: >-
+      {%- set ns = namespace(found=false) -%}
+      {%- set open_doors = states|selectattr('entity_id', 'in', state_attr('group.all_doors','entity_id'))|selectattr('state','eq','on')|list -%}
+      {%- for entity_id in open_doors if not ns.found -%}
+        {%- set ns.found = true -%}
+      {%- endfor -%}
+      {{ ns.found }}
 
 variables:
   message: >-
