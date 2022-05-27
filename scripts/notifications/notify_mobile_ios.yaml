@@ -16,9 +16,19 @@ notify_mobile_ios:
       example: 'Startup: Home Assistant is Up and Running!'
       selector:
         text:
+    subtitle:
+      description: 'Subtitle of the notification'
+      example: 'Subject for long text'
+      selector:
+        text:
     message:
       description: 'Message of the notification'
       example: 'Message text'
+      selector:
+        text:
+    icon:
+      description: 'Icon to use'
+      example: '/local/image.png'
       selector:
         text:
     image:
@@ -27,13 +37,18 @@ notify_mobile_ios:
       selector:
         text:
     sound:
+      description: 'Publicly available URL for a sound to play with the notification'
+      example: 'local/sound.mp3'
+      selector:
+        text:
+    notification_sound:
       description: 'Sound for the notification'
-      example: ''
+      example: 'Stockholm_Haptic.caf'
       selector:
         text:
     camera:
       description: 'Camera stream to attach'
-      example: 'camera.front_door'
+      example: 'camera.doorbell'
       selector:
         entity:
           domain: camera
@@ -44,7 +59,7 @@ notify_mobile_ios:
         text:
     group:
       description: 'Message group'
-      example: 'HOMEASSISTANT'
+      example: 'Home Assistant'
       selector:
         text:
     tag:
@@ -62,12 +77,20 @@ notify_mobile_ios:
   variables:
     notification_service: 'notify.{{ who|default("josh", true) }}'
     group_id: '{{ group|default("Home Assistant") }}'
+    sound_path: |
+      {%- if sound is string -%}
+        {%- if sound.startswith("http") -%}
+          {{ sound }}
+        {%- else -%}
+          {{ states.sensor.base_url.state }}/{{ sound }}
+        {%- endif -%}
+      {%- endif -%}
     # Every notification should have a sound. Actionable notifications should grab your attention.
     sound_file: |
-      {%- if sound is string %}
-        {{ sound }}
+      {%- if notification_sound is string %}
+        {{ notification_sound }}
       {%- else %}
-        sms-received1.caf
+        Stockholm_Haptic.caf
       {%- endif %}
 
   sequence:
@@ -79,36 +102,40 @@ notify_mobile_ios:
       then:
         - choose:
             # Send camera stream.
-            - conditions:
-                - '{{ camera is string }}'
+            - conditions: '{{ camera is string }}'
               sequence:
                 - service: '{{ notification_service }}'
                   data:
                     title: '{{ title }}'
                     message: '{{ message }}'
                     data:
+                      subtitle: '{{ subtitle|default(none, true) }}'
                       entity_id: '{{ camera }}'
-                      url: '{{ url|default("lovelace/security", true) }}'
+                      url: '{{ url|default("lovelace/main", true) }}'
+                      audio: '{{ sound_path|default(none, true) }}'
                       group: '{{ group_id }}'
-                      tag: '{{ camera }}'
-                      actions: '{{ actions|default("", true) }}'
-                      push: '{{ sound_file }}'
+                      tag: '{{ tag|default(none, true) }}'
+                      actions: '{{ actions|default(none, true) }}'
+                      push:
+                        sound: '{{ sound_file }}'
 
             # Send an image.
-            - conditions:
-                - '{{ image is string }}'
+            - conditions: '{{ image is string }}'
               sequence:
                 - service: '{{ notification_service }}'
                   data:
                     title: '{{ title }}'
                     message: '{{ message }}'
                     data:
+                      subtitle: '{{ subtitle|default(none, true) }}'
                       image: '{{ image }}'
                       url: '{{ url|default("lovelace/main", true) }}'
+                      audio: '{{ sound_path|default(none, true) }}'
                       group: '{{ group_id }}'
-                      tag: '{{ tag|default("", true) }}'
-                      actions: '{{ actions|default("", true) }}'
-                      audio: '{{ sound_file }}'
+                      tag: '{{ tag|default(none, true) }}'
+                      actions: '{{ actions|default(none, true) }}'
+                      push:
+                        sound: '{{ sound_file }}'
 
           # Send a basic, link, or actionable notification message.
           default:
@@ -117,9 +144,12 @@ notify_mobile_ios:
                 title: '{{ title }}'
                 message: '{{ message }}'
                 data:
+                  subtitle: '{{ subtitle|default(none, true) }}'
                   image: '{{ icon|default("/local/icons/home-assistant.png") }}'
                   url: '{{ url|default("lovelace/main", true) }}'
+                  audio: '{{ sound_path|default(none, true) }}'
                   group: '{{ group_id }}'
-                  tag: '{{ tag|default("", true) }}'
-                  actions: '{{ actions|default("", true) }}'
-                  audio: '{{ sound_file }}'
+                  tag: '{{ tag|default(none, true) }}'
+                  actions: '{{ actions|default(none, true) }}'
+                  push:
+                    sound: '{{ sound_file }}'

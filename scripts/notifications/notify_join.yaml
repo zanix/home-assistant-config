@@ -46,7 +46,7 @@ notify_join:
         text:
     group:
       description: 'Message group'
-      example: 'HOMEASSISTANT'
+      example: 'Home Assistant'
       selector:
         text:
     tag:
@@ -103,16 +103,21 @@ notify_join:
     #   entity_id: input_boolean.mobile_notifications
     #   state: 'on'
 
-    - service: '{{ notification_service }}'
-      data:
-        title: '{{ title }}'
-        message: '{{ message }}'
-        data:
-          icon: '{{ icon_path }}'
-          smallicon: '{{ smallicon_path|default(states.sensor.base_url.state ~ "/local/icons/home-assistant.png", true) }}'
-          image: '{{ image_path }}'
-          sound: '{{ sound_path }}'
-          url: '{{ url|default("", true) }}'
-          category: '{{ group_id }}'
-          notification_id: '{{ tag|default("", true) }}'
-          actions: '{{ actions|default("", true) }}'
+    - if:
+        - condition: template
+          value_template: '{{ message not in ["clear_notification", "remove_channel", "TTS"] }}'
+
+      then:
+        - service: '{{ notification_service }}'
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            data:
+              icon: '{{ icon_path|default(none, true) }}'
+              smallicon: '{{ smallicon_path|default(states.sensor.base_url.state ~ "/local/icons/home-assistant.png", true) }}'
+              image: '{{ image_path|default(none, true) }}'
+              sound: '{{ sound_path|default(none, true) }}'
+              url: '{{ url|default(none, true) }}'
+              category: '{{ group_id }}'
+              notification_id: '{{ tag|default(none, true) }}'
+              actions: '{{ actions|default(none, true) }}'
