@@ -170,7 +170,7 @@ Use Jinja and data from Home Assistant to generate your README.md fileAuthors:[@
 
 A HACS repository for Govee light integrationAuthors:[@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.1]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.2]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.Authors:[@ludeeus](https://github.com/ludeeus).
 
@@ -198,7 +198,7 @@ High level health status of UniFi Security Gateway devices via UniFi ControllerA
 
 Subaru STARLINK custom component for Home Assistant.Authors:[@G-Two](https://github.com/G-Two).
 
-### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v0.0.8]
+### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v0.0.9]
 
 UI-Lovelace-Minimalist is a "theme" for HomeAssistantAuthors:[@stokkie90](https://github.com/stokkie90).
 
