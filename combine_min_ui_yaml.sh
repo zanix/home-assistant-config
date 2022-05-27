@@ -3,7 +3,6 @@
 #
 
 SOURCE=custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/
-SOURCE2=ui_lovelace_minimalist/custom_cards/colors/
 DEST=lovelace/minimalist.yaml
 
 # Cat all ui_minimalist yaml files into one.
