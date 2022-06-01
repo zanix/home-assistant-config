@@ -19,10 +19,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1309 total entities**,
-including **548 sensors**.
+This Home Assistant install has approximately **1314 total entities**,
+including **550 sensors**.
 
-<details><summary>29 Stock Integrations</summary>
+<details><summary>Stock Integrations</summary>
 
 Since some integrations can only be enabled from within the UI, here is a list of integrations that are enabled via the Integrations UI on my Home Assistant.
 
@@ -162,7 +162,7 @@ Home Assistant Integration for Emporia Vue Energy MonitorAuthors:[@magico13](htt
 
 🔹 Use icons from fontawesome in home-assistant
 
-### [Generate Readme](https://github.com/custom-components/readme) [v0.4.0]
+### [Generate Readme](https://github.com/custom-components/readme) [v0.5.0]
 
 Use Jinja and data from Home Assistant to generate your README.md fileAuthors:[@ludeeus](https://github.com/ludeeus).
 
@@ -170,7 +170,7 @@ Use Jinja and data from Home Assistant to generate your README.md fileAuthors:[@
 
 A HACS repository for Govee light integrationAuthors:[@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.2]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.5]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.Authors:[@ludeeus](https://github.com/ludeeus).
 
@@ -178,7 +178,7 @@ HACS gives you a powerful UI to handle downloads of all your custom needs.Author
 
 Helium blockchain sensors for Home AssistantAuthors:[@rsnodgrass](https://github.com/rsnodgrass).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.79]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.80]
 
 Home Assistant integration for managing Z-Wave enabled locksAuthors:[@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
@@ -233,7 +233,7 @@ Battery state card for Home Assistant
 
 ❇️ Lovelace button-card for home assistant
 
-### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.1.4]
+### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.1.5]
 
 🔹 Add CSS styles to (almost) any lovelace card
 
