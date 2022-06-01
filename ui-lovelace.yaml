@@ -3409,8 +3409,6 @@ button_card_templates:
       - grid-template-areas: '"item1 radial" "item2 radial" "item3 radial"'
       - grid-template-columns: 35% 65%
       - grid-template-rows: 1fr 1fr 1fr
-    tap_action:
-      action: none
     variable: spin
     variables:
       entity_1:
@@ -6683,19 +6681,19 @@ views:
               positions:
                 indicator: inside
               severity:
-              - color: rgb(76,175,80)
+              - color: rgb(var(--color-green))
                 from: '0'
                 to: '2.4'
-              - color: rgb(205,220,57)
+              - color: rgb(var(--color-lime))
                 from: '2.5'
                 to: '4.8'
-              - color: rgb(255,193,7)
+              - color: rgb(var(--color-amber))
                 from: '4.9'
                 to: '7.2'
-              - color: rgb(255,152,0)
+              - color: rgb(var(--color-orange))
                 from: '7.3'
                 to: '9.6'
-              - color: rgb(244,67,54)
+              - color: rgb(var(--color-red))
                 from: '9.7'
                 to: '12'
               style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n\
@@ -6706,13 +6704,15 @@ views:
           title: Allergy / Asthma
         target: {}
       type: template
-    - content: '{{ state_attr("climate.home", "hvac_action")|capitalize }}'
+    - content: "{%- if is_state(entity, \"off\") -%}\n  Off\n{%- else -%}\n  {{ state_attr(\"\
+        climate.home\", \"hvac_action\")|capitalize }}\n{%- endif -%}"
       entity: climate.home
       icon: mdi:thermostat-box
       icon_color: "{%- if is_state_attr(entity, \"hvac_action\", \"heating\") -%}\n\
         \  red\n{%- elif is_state_attr(entity, \"hvac_action\", \"cooling\") -%}\n\
         \  light-blue\n{%- elif is_state_attr(entity, \"hvac_action\", \"fan\") -%}\n\
-        \  amber\n{%- else -%}\n  blue-grey\n{%- endif -%}"
+        \  amber\n{%- elif is_state(entity, \"off\") -%}\n  grey\n{%- else -%}\n \
+        \ blue-grey\n{%- endif -%}"
       tap_action:
         action: navigate
         navigation_path: climate
@@ -6754,184 +6754,187 @@ views:
         navigation_path: lights
       type: template
     type: custom:mushroom-chips-card
-  - primary: "{%- set time = now().hour -%}\n{%- if (time >= 18) -%}\n  Good Evening,\
-      \ {{user}}!\n{%- elif (time >= 12) -%}\n  Good Afternoon, {{user}}!\n{%- elif\
-      \ (time >= 5) -%}\n  Good Morning, {{user}}!\n{%- elif (time < 5) -%}\n  WTF\
-      \ {{user}}?! GO TO BED!\n{%- else -%}\n  Hello, {{user}}\n{%- endif -%}"
-    type: custom:mushroom-template-card
   - cards:
-    - entity: person.joshua
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          card:
-            cards:
-            - double_tap_action:
-                action: none
-              entity: person.joshua
-              hold_action:
-                action: none
-              primary_info: state
-              secondary_info: last-changed
-              type: custom:mushroom-entity-card
-              use_entity_picture: true
-            - entities:
-              - entity: person.joshua
-              type: history-graph
-            - cards:
-              - entity: sensor.pixel_6_battery_level
-                icon: "{%- set value = states(entity)|int -%} {%- set state = \"\"\
-                  \ -%} {%- if is_state(\"sensor.pixel_6_battery_state\", \"charging\"\
-                  ) -%}\n  {%- set state = \"-charging\" -%}\n  {%- if is_state(\"\
-                  sensor.pixel_6_charger_type\", \"wireless\") -%}\n    {%- set state\
-                  \ = state ~ \"-wireless\" -%}\n  {%- endif -%}\n{%- endif -%} {%-\
-                  \ if value == 100 -%}\n  mdi:battery{{ state }}\n{%- else -%}\n\
-                  \  mdi:battery{{ state }}-{{ value // 10 * 10 }}\n{%- endif -%}"
-                icon_color: "{%- set value = states(entity)|int -%} {%- if is_state(\"\
-                  sensor.pixel_6_battery_state\", \"charging\") -%}\n  light-blue\n\
-                  {%- elif (value >= 75) -%}\n  green\n{%- elif (value >= 65) -%}\n\
-                  \  light-green\n{%- elif (value >= 55) -%}\n  lime\n{%- elif (value\
-                  \ >= 45) -%}\n  yellow\n{%- elif (value >= 35) -%}\n  amber\n{%-\
-                  \ elif (value >= 25) -%}\n  orange\n{%- elif (value >= 15) -%}\n\
-                  \  deep-orange\n{%- else -%}\n  red\n{%- endif -%}"
-                layout: vertical
-                primary: Battery
-                secondary: '{{ states(entity) }}%'
-                tap_action:
-                  action: more-info
-                type: custom:mushroom-template-card
+    - primary: "{%- set time = now().hour -%}\n{%- if (time >= 18) -%}\n  Good Evening,\
+        \ {{user}}!\n{%- elif (time >= 12) -%}\n  Good Afternoon, {{user}}!\n{%- elif\
+        \ (time >= 5) -%}\n  Good Morning, {{user}}!\n{%- elif (time < 5) -%}\n  WTF\
+        \ {{user}}?! GO TO BED!\n{%- else -%}\n  Hello, {{user}}\n{%- endif -%}"
+      type: custom:mushroom-template-card
+    - cards:
+      - entity: person.joshua
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            card:
+              cards:
               - double_tap_action:
                   action: none
-                entity: proximity.joshua_home
+                entity: person.joshua
                 hold_action:
                   action: none
-                icon: "{%- set icon = \"map-marker-distance\" -%} {%- if is_state_attr(entity,\
-                  \ \"dir_of_travel\", \"towards\") -%}\n  mdi:map-marker-left\n{%-\
-                  \ elif is_state_attr(entity, \"dir_of_travel\", \"away_from\") -%}\n\
-                  \  mdi:map-marker-right\n{%- else -%}\n  mdi:map-marker-distance\n\
-                  {%- endif -%}"
-                icon_color: "{%- if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
-                  ) -%}\n  green\n{%- elif is_state_attr(entity, \"dir_of_travel\"\
-                  , \"away_from\") -%}\n  orange\n{%- else -%}\n  grey\n{%- endif\
-                  \ -%}"
-                layout: vertical
-                primary: "{%- if is_state(\"person.joshua\", \"home\") -%}\n  Home\n\
-                  {%- elif is_state(\"person.joshua\", \"not_home\") -%}\n  Away\n\
-                  {%- else -%}\n  {{ states(\"person.joshua\") }}\n{%- endif -%}"
-                secondary: '{{ ((states(entity)|float) / 5280)|round(1) }} mi'
-                tap_action:
-                  action: none
-                type: custom:mushroom-template-card
-              - double_tap_action:
-                  action: none
-                entity: sensor.pixel_6_geocoded_location
-                hold_action:
-                  action: none
-                layout: vertical
-                name: Location
-                tap_action:
-                  action: none
+                primary_info: state
+                secondary_info: last-changed
                 type: custom:mushroom-entity-card
-              type: horizontal-stack
-            - dark_mode: true
-              default_zoom: 14
-              entities:
-              - entity: person.joshua
-              type: map
-            type: vertical-stack
-          command: popup
-          title: Joshua
-        target: {}
-      type: custom:mushroom-person-card
-      use_entity_picture: true
-    - entity: person.amy
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          card:
-            cards:
-            - double_tap_action:
-                action: none
-              entity: person.amy
-              hold_action:
-                action: none
-              primary_info: state
-              secondary_info: last-changed
-              type: custom:mushroom-entity-card
-              use_entity_picture: true
-            - entities:
-              - entity: person.amy
-              type: history-graph
-            - cards:
-              - entity: sensor.galaxy_s21_battery_level
-                icon: "{%- set value = states(entity)|int -%} {%- set state = \"\"\
-                  \ -%} {%- if is_state(\"sensor.galaxy_s21_battery_state\", \"charging\"\
-                  ) -%}\n  {%- set state = \"-charging\" -%}\n  {%- if is_state(\"\
-                  sensor.galaxy_s21_charger_type\", \"wireless\") -%}\n    {%- set\
-                  \ state = state ~ \"-wireless\" -%}\n  {%- endif -%}\n{%- endif\
-                  \ -%} {%- if value == 100 -%}\n  mdi:battery{{ state }}\n{%- else\
-                  \ -%}\n  mdi:battery{{ state }}-{{ value // 10 * 10 }}\n{%- endif\
-                  \ -%}"
-                icon_color: "{%- set value = states(entity)|int %} {%- if is_state(\"\
-                  sensor.galaxy_s21_battery_state\", \"charging\") -%}\n  light-blue\n\
-                  {%- elif (value >= 75) -%}\n  green\n{%- elif (value >= 65) -%}\n\
-                  \  light-green\n{%- elif (value >= 55) -%}\n  lime\n{%- elif (value\
-                  \ >= 45) -%}\n  yellow\n{%- elif (value >= 35) -%}\n  amber\n{%-\
-                  \ elif (value >= 25) -%}\n  orange\n{%- elif (value >= 15) -%}\n\
-                  \  deep-orange\n{%- else -%}\n  red\n{%- endif -%}"
-                layout: vertical
-                primary: Battery
-                secondary: '{{ states(entity) }}%'
-                tap_action:
-                  action: more-info
-                type: custom:mushroom-template-card
+                use_entity_picture: true
+              - entities:
+                - entity: person.joshua
+                type: history-graph
+              - cards:
+                - entity: sensor.pixel_6_battery_level
+                  icon: "{%- set value = states(entity)|int -%} {%- set state = \"\
+                    \" -%} {%- if is_state(\"sensor.pixel_6_battery_state\", \"charging\"\
+                    ) -%}\n  {%- set state = \"-charging\" -%}\n  {%- if is_state(\"\
+                    sensor.pixel_6_charger_type\", \"wireless\") -%}\n    {%- set\
+                    \ state = state ~ \"-wireless\" -%}\n  {%- endif -%}\n{%- endif\
+                    \ -%} {%- if value == 100 -%}\n  mdi:battery{{ state }}\n{%- else\
+                    \ -%}\n  mdi:battery{{ state }}-{{ value // 10 * 10 }}\n{%- endif\
+                    \ -%}"
+                  icon_color: "{%- set value = states(entity)|int -%} {%- if is_state(\"\
+                    sensor.pixel_6_battery_state\", \"charging\") -%}\n  light-blue\n\
+                    {%- elif (value >= 75) -%}\n  green\n{%- elif (value >= 65) -%}\n\
+                    \  light-green\n{%- elif (value >= 55) -%}\n  lime\n{%- elif (value\
+                    \ >= 45) -%}\n  yellow\n{%- elif (value >= 35) -%}\n  amber\n\
+                    {%- elif (value >= 25) -%}\n  orange\n{%- elif (value >= 15) -%}\n\
+                    \  deep-orange\n{%- else -%}\n  red\n{%- endif -%}"
+                  layout: vertical
+                  primary: Battery
+                  secondary: '{{ states(entity) }}%'
+                  tap_action:
+                    action: more-info
+                  type: custom:mushroom-template-card
+                - double_tap_action:
+                    action: none
+                  entity: proximity.joshua_home
+                  hold_action:
+                    action: none
+                  icon: "{%- set icon = \"map-marker-distance\" -%} {%- if is_state_attr(entity,\
+                    \ \"dir_of_travel\", \"towards\") -%}\n  mdi:map-marker-left\n\
+                    {%- elif is_state_attr(entity, \"dir_of_travel\", \"away_from\"\
+                    ) -%}\n  mdi:map-marker-right\n{%- else -%}\n  mdi:map-marker-distance\n\
+                    {%- endif -%}"
+                  icon_color: "{%- if is_state_attr(entity, \"dir_of_travel\", \"\
+                    towards\") -%}\n  green\n{%- elif is_state_attr(entity, \"dir_of_travel\"\
+                    , \"away_from\") -%}\n  orange\n{%- else -%}\n  grey\n{%- endif\
+                    \ -%}"
+                  layout: vertical
+                  primary: "{%- if is_state(\"person.joshua\", \"home\") -%}\n  Home\n\
+                    {%- elif is_state(\"person.joshua\", \"not_home\") -%}\n  Away\n\
+                    {%- else -%}\n  {{ states(\"person.joshua\") }}\n{%- endif -%}"
+                  secondary: '{{ ((states(entity)|float) / 5280)|round(1) }} mi'
+                  tap_action:
+                    action: none
+                  type: custom:mushroom-template-card
+                - double_tap_action:
+                    action: none
+                  entity: sensor.pixel_6_geocoded_location
+                  hold_action:
+                    action: none
+                  layout: vertical
+                  name: Location
+                  tap_action:
+                    action: none
+                  type: custom:mushroom-entity-card
+                type: horizontal-stack
+              - dark_mode: true
+                default_zoom: 14
+                entities:
+                - entity: person.joshua
+                type: map
+              type: vertical-stack
+            command: popup
+            title: Joshua
+          target: {}
+        type: custom:mushroom-person-card
+        use_entity_picture: true
+      - entity: person.amy
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            card:
+              cards:
               - double_tap_action:
                   action: none
-                entity: proximity.amy_home
+                entity: person.amy
                 hold_action:
                   action: none
-                icon: "{%- set icon = \"map-marker-distance\" -%} {%- if is_state_attr(entity,\
-                  \ \"dir_of_travel\", \"towards\") -%}\n  mdi:map-marker-left\n{%-\
-                  \ elif is_state_attr(entity, \"dir_of_travel\", \"away_from\") -%}\n\
-                  \  mdi:map-marker-right\n{%- else -%}\n  mdi:map-marker-distance\n\
-                  {%- endif -%}"
-                icon_color: "{%- if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
-                  ) -%}\n  green\n{%- elif is_state_attr(entity, \"dir_of_travel\"\
-                  , \"away_from\") -%}\n  orange\n{%- else -%}\n  grey\n{%- endif\
-                  \ -%}"
-                layout: vertical
-                primary: "{%- if is_state(\"person.amy\", \"home\") -%}\n  Home\n\
-                  {%- elif is_state(\"person.amy\", \"not_home\") -%}\n  Away\n{%-\
-                  \ else -%}\n  {{ states(\"person.amy\") }}\n{%- endif -%}"
-                secondary: '{{ ((states(entity)|float) / 5280)|round(1) }} mi'
-                tap_action:
-                  action: none
-                type: custom:mushroom-template-card
-              - double_tap_action:
-                  action: none
-                entity: sensor.galaxy_s21_geocoded_location
-                hold_action:
-                  action: none
-                layout: vertical
-                name: Location
-                tap_action:
-                  action: none
+                primary_info: state
+                secondary_info: last-changed
                 type: custom:mushroom-entity-card
-              type: horizontal-stack
-            - dark_mode: true
-              default_zoom: 14
-              entities:
-              - entity: person.amy
-              type: map
-            type: vertical-stack
-          command: popup
-          title: Amy
-        target: {}
-      type: custom:mushroom-person-card
-      use_entity_picture: true
-    columns: 2
-    square: false
-    type: grid
+                use_entity_picture: true
+              - entities:
+                - entity: person.amy
+                type: history-graph
+              - cards:
+                - entity: sensor.galaxy_s21_battery_level
+                  icon: "{%- set value = states(entity)|int -%} {%- set state = \"\
+                    \" -%} {%- if is_state(\"sensor.galaxy_s21_battery_state\", \"\
+                    charging\") -%}\n  {%- set state = \"-charging\" -%}\n  {%- if\
+                    \ is_state(\"sensor.galaxy_s21_charger_type\", \"wireless\") -%}\n\
+                    \    {%- set state = state ~ \"-wireless\" -%}\n  {%- endif -%}\n\
+                    {%- endif -%} {%- if value == 100 -%}\n  mdi:battery{{ state }}\n\
+                    {%- else -%}\n  mdi:battery{{ state }}-{{ value // 10 * 10 }}\n\
+                    {%- endif -%}"
+                  icon_color: "{%- set value = states(entity)|int %} {%- if is_state(\"\
+                    sensor.galaxy_s21_battery_state\", \"charging\") -%}\n  light-blue\n\
+                    {%- elif (value >= 75) -%}\n  green\n{%- elif (value >= 65) -%}\n\
+                    \  light-green\n{%- elif (value >= 55) -%}\n  lime\n{%- elif (value\
+                    \ >= 45) -%}\n  yellow\n{%- elif (value >= 35) -%}\n  amber\n\
+                    {%- elif (value >= 25) -%}\n  orange\n{%- elif (value >= 15) -%}\n\
+                    \  deep-orange\n{%- else -%}\n  red\n{%- endif -%}"
+                  layout: vertical
+                  primary: Battery
+                  secondary: '{{ states(entity) }}%'
+                  tap_action:
+                    action: more-info
+                  type: custom:mushroom-template-card
+                - double_tap_action:
+                    action: none
+                  entity: proximity.amy_home
+                  hold_action:
+                    action: none
+                  icon: "{%- set icon = \"map-marker-distance\" -%} {%- if is_state_attr(entity,\
+                    \ \"dir_of_travel\", \"towards\") -%}\n  mdi:map-marker-left\n\
+                    {%- elif is_state_attr(entity, \"dir_of_travel\", \"away_from\"\
+                    ) -%}\n  mdi:map-marker-right\n{%- else -%}\n  mdi:map-marker-distance\n\
+                    {%- endif -%}"
+                  icon_color: "{%- if is_state_attr(entity, \"dir_of_travel\", \"\
+                    towards\") -%}\n  green\n{%- elif is_state_attr(entity, \"dir_of_travel\"\
+                    , \"away_from\") -%}\n  orange\n{%- else -%}\n  grey\n{%- endif\
+                    \ -%}"
+                  layout: vertical
+                  primary: "{%- if is_state(\"person.amy\", \"home\") -%}\n  Home\n\
+                    {%- elif is_state(\"person.amy\", \"not_home\") -%}\n  Away\n\
+                    {%- else -%}\n  {{ states(\"person.amy\") }}\n{%- endif -%}"
+                  secondary: '{{ ((states(entity)|float) / 5280)|round(1) }} mi'
+                  tap_action:
+                    action: none
+                  type: custom:mushroom-template-card
+                - double_tap_action:
+                    action: none
+                  entity: sensor.galaxy_s21_geocoded_location
+                  hold_action:
+                    action: none
+                  layout: vertical
+                  name: Location
+                  tap_action:
+                    action: none
+                  type: custom:mushroom-entity-card
+                type: horizontal-stack
+              - dark_mode: true
+                default_zoom: 14
+                entities:
+                - entity: person.amy
+                type: map
+              type: vertical-stack
+            command: popup
+            title: Amy
+          target: {}
+        type: custom:mushroom-person-card
+        use_entity_picture: true
+      columns: 2
+      square: false
+      type: grid
+    type: custom:stack-in-card
   - cards:
     - entity: sensor.home_temperature
       icon: mdi:sofa-single
@@ -7078,23 +7081,6 @@ views:
             action: none
           templates:
           - media_on
-    - entity: sensor.emma_temperature
-      icon: mdi:bed
-      name: Emma
-      tap_action:
-        action: navigate
-        navigation_path: emma
-      template:
-      - card_room
-      - purple_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.emma_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
     - entity: sensor.ethan_temperature
       icon: mdi:bed
       name: Ethan
@@ -7118,6 +7104,23 @@ views:
             action: none
           templates:
           - yellow_on
+    - entity: sensor.emma_temperature
+      icon: mdi:bed
+      name: Emma
+      tap_action:
+        action: navigate
+        navigation_path: emma
+      template:
+      - card_room
+      - purple_no_state
+      type: custom:button-card
+      variables:
+        entity_1:
+          entity_id: binary_sensor.emma_occupancy
+          tap_action:
+            action: none
+          templates:
+          - blue_on
     - entity: sensor.garage_multisensor_air_temperature
       icon: mdi:garage-variant
       name: Garage
@@ -7561,8 +7564,13 @@ views:
                     type: history-graph
                   - card:
                       content: '{%- for trk_number in state_attr(''sensor.mail_usps_delivering'',
-                        ''tracking_#'') %} [{{ trk_number }}](https://tools.usps.com/go/TrackConfirmAction?tLabels={{
-                        trk_number }}) {%- endfor -%}'
+                        ''tracking_#'') %}
+
+                        [{{ trk_number }}](https://tools.usps.com/go/TrackConfirmAction?tLabels={{
+
+                        trk_number }})
+
+                        {%- endfor -%}'
                       type: markdown
                     conditions:
                     - entity: sensor.mail_usps_delivering
@@ -7594,8 +7602,12 @@ views:
                     type: history-graph
                   - card:
                       content: '{%- for trk_number in state_attr(''sensor.mail_ups_delivering'',
-                        ''tracking_#'') %} [{{ trk_number }}](https://www.ups.com/track?loc=en_US&tracknum={{
-                        trk_number }}) {%- endfor -%}'
+                        ''tracking_#'') %}
+
+                        [{{ trk_number }}](https://www.ups.com/track?loc=en_US&tracknum={{
+                        trk_number }})
+
+                        {%- endfor -%}'
                       type: markdown
                     conditions:
                     - entity: sensor.mail_ups_delivering
@@ -7627,8 +7639,12 @@ views:
                     type: history-graph
                   - card:
                       content: '{%- for trk_number in state_attr(''sensor.mail_fedex_delivering'',
-                        ''tracking_#'') %} [{{ trk_number }}](https://www.fedex.com/fedextrack/?trknbr={{
-                        trk_number }}) {%- endfor -%}'
+                        ''tracking_#'') %}
+
+                        [{{ trk_number }}](https://www.fedex.com/fedextrack/?trknbr={{
+                        trk_number }})
+
+                        {%- endfor -%}'
                       type: markdown
                     conditions:
                     - entity: sensor.mail_fedex_delivering
@@ -7679,10 +7695,9 @@ views:
     - entity: sensor.home_humidity
       type: entity
     type: custom:mushroom-chips-card
-  - title: Living Room
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Living Room
       type: custom:mushroom-title-card
     - entity: light.living_room
       layout: horizontal
@@ -7876,10 +7891,9 @@ views:
       name: Quest
       type: entity
     type: custom:mushroom-chips-card
-  - title: Family Room
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Family Room
       type: custom:mushroom-title-card
     - entity: light.family_room
       layout: horizontal
@@ -8229,10 +8243,9 @@ views:
         action: more-info
       type: entity
     type: custom:mushroom-chips-card
-  - title: Office
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Office
       type: custom:mushroom-title-card
     - entity: light.office_light
       hold_action:
@@ -8404,10 +8417,9 @@ views:
     - entity: sensor.kitchen_temperature
       type: entity
     type: custom:mushroom-chips-card
-  - title: Kitchen
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Kitchen
       type: custom:mushroom-title-card
     - entity: light.kitchen
       layout: horizontal
@@ -8448,10 +8460,9 @@ views:
     - entity: sensor.master_bedroom_temperature
       type: entity
     type: custom:mushroom-chips-card
-  - title: Master Bedroom
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Master Bedroom
       type: custom:mushroom-title-card
     - entity: light.master_bedroom_floor_lamp
       hold_action:
@@ -8608,10 +8619,9 @@ views:
     - entity: sensor.ethan_temperature
       type: entity
     type: custom:mushroom-chips-card
-  - title: Ethan
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Ethan
       type: custom:mushroom-title-card
     - entity: switch.ethans_lamp
       icon_color: amber
@@ -8647,10 +8657,9 @@ views:
     - entity: sensor.emma_temperature
       type: entity
     type: custom:mushroom-chips-card
-  - title: Emma
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Emma
       type: custom:mushroom-title-card
     type: vertical-stack
   icon: mdi:unicorn-variant
@@ -8684,10 +8693,9 @@ views:
     - entity: sensor.garage_multisensor_illuminance
       type: entity
     type: custom:mushroom-chips-card
-  - title: Garage
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Garage
       type: custom:mushroom-title-card
     - entity: switch.garage_light
       icon_color: amber
@@ -9038,10 +9046,9 @@ views:
         navigation_path: main
       type: template
     type: custom:mushroom-chips-card
-  - title: Outside
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Lights
+      title: Outside
       type: custom:mushroom-title-card
     - entity: light.outside_front
       layout: horizontal
@@ -9081,10 +9088,9 @@ views:
         navigation_path: main
       type: template
     type: custom:mushroom-chips-card
-  - title: Utility
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Water
+      title: Utility
       type: custom:mushroom-title-card
     - cards:
       - entity: binary_sensor.water_main_water_alarm_water_leak_detected
@@ -9122,14 +9128,13 @@ views:
       hold_action:
         action: toggle
       icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:valve-open\n{%- elif is_state(entity,\
-        \ \"off\") -%} -%}\n  mdi:valve-closed\n{%- else -%}\n  mdi:valve\n{%- endif\
-        \ -%}"
+        \ \"off\") -%}\n  mdi:valve-closed\n{%- else -%}\n  mdi:valve\n{%- endif -%}"
       icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- elif is_state(entity,\
-        \ \"off\") -%} -%}\n  red\n{%- else -%}\n  grey\n{%- endif -%}"
+        \ \"off\") -%}\n  red\n{%- else -%}\n  grey\n{%- endif -%}"
       primary: Water Main Valve
       secondary: "{%- if is_state(entity, \"on\") -%}\n  Press and Hold to close\n\
-        {%- elif is_state(entity, \"off\") -%} -%}\n  Press and Hold to open\n{%-\
-        \ endif -%}"
+        {%- elif is_state(entity, \"off\") -%}\n  Press and Hold to open\n{%- endif\
+        \ -%}"
       tap_action:
         action: more-info
       type: custom:mushroom-template-card
@@ -9144,19 +9149,19 @@ views:
         icon: 'off'
         indicator: 'off'
       severity:
-      - color: rgb(244,67,54)
+      - color: rgb(var(--color-red))
         from: 0
         to: 19
-      - color: rgb(255,152,0)
+      - color: rgb(var(--color-orange))
         from: 20
         to: 39
-      - color: rgb(255,193,7)
+      - color: rgb(var(--color-amber))
         from: 40
         to: 59
-      - color: rgb(205,220,57)
+      - color: rgb(var(--color-lime))
         from: 60
         to: 79
-      - color: rgb(76,175,80)
+      - color: rgb(var(--color-green))
         from: 80
         to: 100
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}"
@@ -9518,77 +9523,47 @@ views:
       positions:
         indicator: inside
       severity:
-      - color: rgb(244,67,54)
+      - color: rgb(var(--color-red))
         from: 0
         to: 9
-      - color: rgb(255,152,0)
+      - color: rgb(var(--color-orange))
         from: 10
         to: 29
-      - color: rgb(255,193,7)
+      - color: rgb(var(--color-amber))
         from: 30
         to: 49
-      - color: rgb(205,220,57)
+      - color: rgb(var(--color-lime))
         from: 50
         to: 69
-      - color: rgb(76,175,80)
+      - color: rgb(var(--color-green))
         from: 80
         to: 100
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}"
       type: custom:bar-card
-    - all_series_config:
-        curve: stepline
-        extend_to: now
-        stroke_width: 4
-        type: line
-      apex_config:
-        chart:
-          foreColor: '#7B7B7B'
-          toolbar:
-            show: false
-        grid:
-          borderColor: '#7B7B7B'
-        xaxis:
-          tooltip:
-            enabled: false
-      brush:
-        apex_config:
-          chart:
-            foreColor: '#7B7B7B'
-            toolbar:
-              show: false
-          grid:
-            borderColor: '#7B7B7B'
-          xaxis:
-            tooltip:
-              enabled: false
-        selection_span: 1h
-      experimental:
-        brush: true
-      header:
-        colorize_states: true
-        show: true
-        show_states: true
-        title: Quest WiFi
-      series:
-      - entity: sensor.quest_wifi_link_speed
-        name: WiFi Speed
+    - cards:
+      - entities:
+        - entity: sensor.quest_wifi_link_speed
+          name: WiFi Speed
+        font_size: 75
+        line_color: rgb(var(--color-blue))
+        line_width: 8
+        points_per_hour: 1
         show:
-          in_brush: true
-        yaxis_id: speed
-      - entity: sensor.quest_wifi_signal_strength
-        name: WiFi Signal
+          labels: false
+          labels_secondary: false
+        type: custom:mini-graph-card
+      - entities:
+        - entity: sensor.quest_wifi_signal_strength
+          name: WiFi Signal
+        font_size: 75
+        line_color: rgb(var(--color-yellow))
+        line_width: 8
+        points_per_hour: 1
         show:
-          in_brush: true
-        yaxis_id: strength
-      type: custom:apexcharts-card
-      yaxis:
-      - apex_config:
-          tickAmount: 4
-        id: speed
-      - apex_config:
-          tickAmount: 4
-        id: strength
-        opposite: true
+          labels: false
+          labels_secondary: false
+        type: custom:mini-graph-card
+      type: horizontal-stack
     type: vertical-stack
   - cards:
     - subtitle: 'Athos
@@ -9748,10 +9723,9 @@ views:
       icon_color: cyan
       type: entity
     type: custom:mushroom-chips-card
-  - title: Climate
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Thermostat
+      title: Climate
       type: custom:mushroom-title-card
     - decimals: 0
       entity: climate.home
@@ -9893,10 +9867,9 @@ views:
         action: more-info
       type: template
     type: custom:mushroom-chips-card
-  - title: Light Control
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Living Room
+      title: Light Control
       type: custom:mushroom-title-card
     - entity: light.living_room
       layout: horizontal
@@ -10416,9 +10389,10 @@ views:
           {%- else -%}\n  grey\n{%- endif -%}"
         multiline_secondary: true
         primary: '{{ state_attr(entity, "friendly_name") }}'
-        secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
-          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
+        secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- elif is_state(\"\
+          lock.lock_front\", \"locked\") -%}\n  Locked\n{%- else -%}\n  Closed\n{%-\
+          \ endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%- if\
+          \ last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
           \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
           \ last_changed.strftime('%A at %-I:%M %p') }}\n{%- elif last_changed < today_at()\
           \ -%}\n  {{ last_changed.strftime('Yesterday at %-I:%M %p') }}\n{%- else\
@@ -10544,10 +10518,9 @@ views:
         navigation_path: main
       type: template
     type: custom:mushroom-chips-card
-  - title: Power
-    type: custom:mushroom-title-card
   - cards:
     - subtitle: Cost
+      title: Power
       type: custom:mushroom-title-card
     - cards:
       - entity: sensor.minute_power_cost
@@ -10676,19 +10649,19 @@ views:
         icon: 'off'
         indicator: inside
       severity:
-      - color: rgb(76,175,80)
+      - color: rgb(var(--color-green))
         from: 0
         to: 200
-      - color: rgb(205,220,57)
+      - color: rgb(var(--color-lime))
         from: 201
         to: 500
-      - color: rgb(255,193,7)
+      - color: rgb(var(--color-amber))
         from: 501
         to: 1000
-      - color: rgb(255,152,0)
+      - color: rgb(var(--color-orange))
         from: 1001
         to: 2000
-      - color: rgb(244,67,54)
+      - color: rgb(var(--color-red))
         from: 2001
         to: 9000
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}"
