@@ -273,7 +273,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.8.8]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.9.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -454,7 +454,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.6.1-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.6.2-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
