@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1309 total entities**,
-including **540 sensors**.
+This Home Assistant install has approximately **1307 total entities**,
+including **537 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -202,7 +202,7 @@ Subaru STARLINK custom component for Home Assistant.Authors:[@G-Two](https://git
 
 UI-Lovelace-Minimalist is a "theme" for HomeAssistantAuthors:[@stokkie90](https://github.com/stokkie90).
 
-### [Watchman](https://github.com/dummylabs/thewatchman) [v0.5.3]
+### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.0]
 
 Home Assistant custom integration to keep track of missing entities and services in your config filesAuthors:[@dummylabs](https://github.com/dummylabs).
 
@@ -313,7 +313,7 @@ Home assistant sun card based on Google weather design
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
-### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.11.0]
+### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.11.1]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
@@ -454,7 +454,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.6.2-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.6.5-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
