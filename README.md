@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1307 total entities**,
+This Home Assistant install has approximately **1310 total entities**,
 including **537 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -253,7 +253,7 @@ Entity Attributes
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [Kiosk Mode](https://github.com/maykar/kiosk-mode) [v1.7.2]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.3]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -273,7 +273,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.9.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.10.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -454,7 +454,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.6.5-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.6.7-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
