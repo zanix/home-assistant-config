@@ -1,4 +1,612 @@
 button_card_templates:
+  ulm_translation_engine:
+    variables:
+      ulm_translation_back: "[[[ return hass.resources[hass['language']]['ui.common.back']; ]]]"
+      ulm_translation_brightness: "[[[ return hass.resources[hass['language']]['ui.card.light.brightness']; ]]]"
+      ulm_translation_color_temperature: "[[[ return hass.resources[hass['language']]['ui.card.light.color_temperature']; ]]]"
+      ulm_translation_status: "[[[ return hass.resources[hass['language']]['ui.dialogs.more_info_control.vacuum.status']; ]]]"
+      ulm_translation_scenes: "[[[ return hass.resources[hass['language']]['ui.dialogs.quick-bar.commands.reload.scene']; ]]]"
+      ulm_translation_source: "[[[ return hass.resources[hass['language']]['ui.card.media_player.source']; ]]]"
+      ulm_translation_history: "[[[ return hass.resources[hass['language']]['ui.dialogs.more_info_control.history']; ]]]"
+      ulm_translation_hour: >
+        [[[
+          var number = hass.resources[hass['language']]["ui.duration.hour"];
+          var matches = number.match(/[^{\}]+(?=})/g);
+          var hour = "Hour";
+          if (matches) {
+            var hour = matches[1];
+          }
+          return(hour);
+        ]]]
+      ulm_translation_hours: >
+        [[[
+          var number = hass.resources[hass['language']]["ui.duration.hour"];
+          var matches = number.match(/[^{\}]+(?=})/g);
+          var hour = "Hours";
+          if (matches) {
+            var hour = matches[2];
+          }
+          return(hour);
+        ]]]
+      ulm_translation_hvac: >
+        [[[
+          if (typeof(entity) !== 'undefined' && entity !== undefined){
+            let state = entity.state;
+            let d_class = entity.attributes.device_class;
+            let def = ["unknown", "unavailable"];
+            let lang = hass["language"];
+            let action = entity.attributes.hvac_action;
+            let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+            var mode = hass.resources[lang]["state_attributes." + domain + ".hvac_action." + action];
+            if (def.includes(state)) {
+              var mode = hass.resources[lang]["state.default." + state ];
+            }
+            var label = hass.resources[lang]["component." + domain + ".state._." + state] || state;
+            return (entity.attributes.current_temperature ) + '°' + ' • ' + label + (entity.state !='off' ? ' (' + mode + ')' : '');
+            }
+        ]]]
+      ulm_translation_off: "[[[ return hass.resources[hass['language']]['state.default.off']; ]]]"
+      ulm_translation_on: "[[[ return hass.resources[hass['language']]['state.default.on']; ]]]"
+      ulm_translation_state: >
+        [[[
+          if (typeof(entity) !== 'undefined' && entity !== undefined){
+            let state = entity.state;
+            let d_class = entity.attributes.device_class;
+            let def = ["unknown", "unavailable"];
+            let lang = hass["language"];
+            let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+            var translation = hass.resources[lang]["component." + domain + ".state._." + state] || state;
+            if (def.includes(state)) {
+              var translation = hass.resources[lang]["state.default." + state ];
+            }
+            else if (domain == "binary_sensor" && d_class != ''){
+              var translation = hass.resources[lang]["component." + domain + ".state." + d_class + "." + state] || state;
+            }
+            return translation;
+          }
+        ]]]
+      ulm_translation_state_reverse: >
+        [[[
+          if (typeof(entity) !== 'undefined' && entity !== undefined){
+            let state = entity.state;
+            let def = ["unknown", "unavailable"];
+            let lang = hass["language"];
+            if (state === "on"){
+              var translation = hass.resources[lang]["state.default.off"];
+            } else if (state === "off"){
+              var translation = hass.resources[lang]["state.default.on"];
+            }
+            if (def.includes(state)) {
+              var translation = hass.resources[lang]["state.default." + state ];
+            }
+            return translation;
+          }
+        ]]]
+      ulm_translation_state_unit: >
+        [[[
+          if (typeof(entity) !== 'undefined' && entity !== undefined){
+            let state = entity.state;
+            let d_class = entity.attributes.device_class;
+            let def = ["unknown", "unavailable"];
+            let lang = hass["language"];
+            let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+            let unit = entity.attributes.unit_of_measurement != null ? " " + entity.attributes.unit_of_measurement : "";
+  
+            if(hass.resources[lang]["component." + domain + ".state._." + state]){
+            var translation = hass.resources[lang]["component." + domain + ".state._." + state] + unit
+            } else {
+            var translation =  state + unit;
+            }
+            if (def.includes(state)) {
+              var translation = hass.resources[lang]["state.default." + state ];
+            }
+            else if (domain == "binary_sensor" && d_class != ''){
+              var translation = hass.resources[lang]["component." + domain + ".state." + d_class + "." + state] || state;
+            }
+            else if (domain == "media_player" && d_class != ''){
+              if (state == 'idle' || state == 'paused')
+                var translation = hass.resources[lang]["component." + domain + ".state." + state]  || state;
+              else {
+                var translation = (entity.attributes.source) + ' • ' +  ( Math.round(entity.attributes.volume_level / 0.01)) + '%' ;
+              }
+            }
+            return translation;
+          }
+        ]]]
+      ulm_translation_statistics: "[[[ return hass.resources[hass['language']]['ui.components.statistic-picker.statistic']; ]]]"
+      ulm_translation_unavailable: "[[[ return hass.resources[hass['language']]['state.default.unavailable']; ]]]"
+  ### Actions icon ###
+  ulm_actions_icon:
+    template:
+      - "ulm_custom_actions"
+    tap_action:
+      action: >
+        [[[
+          var action = variables.ulm_icon_tap_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+  
+    hold_action:
+      action: >
+        [[[
+          var action = variables.ulm_icon_hold_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+    double_tap_action:
+      action: >
+        [[[
+          var action = variables.ulm_icon_double_tap_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+  ### Actions name ###
+  ulm_actions_name:
+    template:
+      - "ulm_custom_actions"
+    tap_action:
+      action: >
+        [[[
+          var action = variables.ulm_name_tap_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+  
+    hold_action:
+      action: >
+        [[[
+          var action = variables.ulm_name_hold_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+    double_tap_action:
+      action: >
+        [[[
+          var action = variables.ulm_name_double_tap_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+  ### Actions card ###
+  ulm_actions_card:
+    template:
+      - "ulm_custom_actions"
+    tap_action:
+      action: >
+        [[[
+          var action = variables.ulm_card_tap_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+  
+    hold_action:
+      action: >
+        [[[
+          var action = variables.ulm_card_hold_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
+    double_tap_action:
+      action: >
+        [[[
+          var action = variables.ulm_card_double_tap_action;
+          let domain = entity.entity_id.substr(0, entity.entity_id.indexOf("."));
+  
+          if (domain == "binary_sensor" || domain == "sensor"){
+            if (action == 'toggle')
+              action = 'none';
+          }
+  
+          if (action == 'adaptive' && !(variables.ulm_input_select_option) ){
+            action = 'popup'
+          }
+          if (action == 'adaptive'){
+            action = 'call-service'
+          }
+  
+          if (action == 'popup' && (variables.ulm_card_light_enable_popup || variables.ulm_card_media_player_enable_popup || variables.ulm_card_thermostat_enable_popup) ){
+            action = 'fire-dom-event'
+          }
+          if (action == 'popup'){
+            action = 'more-info'
+          }
+  
+          return action
+        ]]]
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
+      browser_mod:
+        command: "popup"
+        large: true
+        hide_header: true
+        card:
+          type: "custom:button-card"
+          template: >
+            [[[
+              if (variables.ulm_card_light_enable_popup){
+                return 'popup_light_brightness'
+              }
+              if (variables.ulm_card_thermostat_enable_popup){
+                return 'popup_thermostat_temperature'
+              }
+              if (variables.ulm_card_media_player_enable_popup){
+                return 'popup_media_player_infos'
+              }
+            ]]]
+          variables:
+            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
+            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
   widget_icon_state:
     template:
       - icon_info_bg
@@ -877,271 +1485,137 @@ button_card_templates:
               name: '[[[ return variables.entity_3_name ]]]'
               color: '[[[ return `rgb(${variables.entity_3.color})`;]]]'
               max: '[[[ return variables.entity_3.max_value ]]]'
-  custom_card_mpse_printer:
+  custom_card_sisimomo_printer:
+    template: "ulm_language_variables"
     show_icon: false
-    show_name: false
     show_label: false
+    show_name: false
+    triggers_update: "all"
+    tap_action:
+      action: ""
     styles:
-      card:
-        - border-radius: var(--border-radius)
-        - box-shadow: var(--box-shadow)
-        - padding: 0px
       grid:
-        - grid-template-areas: '''item1'' ''item2'' ''item3'' ''item4'' ''item5'''
-        - grid-template-columns: 1fr
-        - grid-template-rows: min-content
+        - grid-template-areas: "'printer_state' 'cartridges'"
+        - grid-template-columns: "1fr"
+        - grid-template-rows: "min-content"
+      card:
+        - border-radius: "var(--border-radius)"
+        - box-shadow: "var(--box-shadow)"
+        - padding: "12px"
+        - "--mdc-ripple-press-opacity": 0
+        - cursor: "default"
     custom_fields:
-      item1:
+      printer_state:
         card:
-          entity: '[[[ return entity.entity_id ]]]'
-          name: '[[[ return variables.ulm_card_printer_name ]]]'
-          label: '[[[ return entity.state; ]]]'
-          template:
-            - icon_info
-            - custom_card_mpse_printer_blue
+          type: "custom:button-card"
+          template: |
+            [[[
+              return entity.state.toLowerCase() != variables.ulm_idle && entity.state.toLowerCase() != variables.ulm_unavailable ? [ "icon_info", "blue_no_state" ] : [ "icon_info" ];
+            ]]]
+          tap_action:
+            action: "more-info"
+          label: "[[[ return entity.state; ]]]"
+          name: "[[[ return variables.printer_name !== undefined ? variables.printer_name : entity.attributes.friendly_name; ]]]"
+          entity: "[[[ return entity.entity_id; ]]]"
           styles:
             card:
-              - padding: 12px
-          type: custom:button-card
-      item2:
-        card:
-          type: custom:bar-card
-          height: 20px
-          positions:
-            name: 'off'
-            value: inside
-            icon: 'off'
-            indicator: 'off'
-            minmax: 'off'
-          color: black
-          entities:
-            - entity: '[[[ return variables.ulm_card_printer_black_name ]]]'
-          style: |
-            bar-card-currentbar{
-              border: 0.01rem solid rgba(var(--color-theme),.4);
+              - padding: "0"
+              - "--mdc-ripple-press-opacity": 0.12
+              - cursor: "pointer"
+      cartridges: |
+        [[[
+          // Source: https://stackoverflow.com/a/56266358
+          const isColor = (strColor) => {
+            const s = new Option().style;
+            s.color = strColor;
+            return s.color !== '';
+          }
+
+          if (variables.cartridges !== undefined ? Array.isArray(variables.cartridges) && variables.cartridges.length > 0 : false) {
+            let errorArray = [];
+            variables.cartridges.forEach(cartridge => {
+              let index = variables.cartridges.indexOf(cartridge);
+              // Confirm that the label is provided.
+              if (cartridge.label === undefined) {
+                errorArray.push(`cartridges.[${index}].label: You must provide a value.`);
+              }
+              // Confirm that the color is provided and is a valid color css.
+              if (cartridge.color === undefined) {
+                errorArray.push(`cartridges.[${index}].color: You must provide a value.`);
+              } else if (!isColor(cartridge.color)) {
+                errorArray.push(`cartridges.[${index}].color: You must provide a valid css color value.`);
+              }
+              // Confirm that the entity_id is provided, is a valid entity_id, a integer and a value between 0 and 100 inclusively.
+              if (cartridge.entity_id === undefined) {
+                errorArray.push(`cartridges.[${index}].entity_id: You must provide a value.`);
+              } else if (states[cartridge.entity_id] === undefined) {
+                errorArray.push(`cartridges.[${index}].entity_id: You must provide a existing entity_id.`);
+              } else if (isNaN(states[cartridge.entity_id].state) || typeof states[cartridge.entity_id].state === "boolean") {
+                errorArray.push(`cartridges.[${index}].entity_id: You must provide a entity representing an integer.`);
+              } else if (states[cartridge.entity_id].state < 0 || states[cartridge.entity_id].state > 100) {
+                errorArray.push(`cartridges.[${index}].entity_id: You must provide a entity representing an integer between 0 and 100 inclusively.`);
+              }
+            });
+            if (errorArray.length > 0) {
+              return `<div style="padding: 1em;background-color: rgba(219, 68, 55, 0.75);white-space: normal;">
+                ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+                <ul style="list-style: none;padding-left: 0;">
+                  ${errorArray.map(error => `<li style="margin-top: 0.5em;">${error}</li>`).join("")}
+                </ul>
+                ⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+              </div>`;
             }
-            bar-card-backgroundbar{
-              display: none;
-            }
-            bar-card-name{
-              width: 2rem;
-              margin-right: 40px !important;
-            }
-            bar-card-value{
-              width: 2rem;
-              margin-left: 40px !important;
-              justify-content: center;
-              display: flex;
-              color: grey;
-            }
-            bar-card-background{
-              margin: 4px 0 4px 0 !important;
-              text-align: initial;
-            }
-            ha-card{
-              --bar-card-border-radius: 5px;
-              border-radius: 0px;
-              box-shadow: none;
-            }
-            #states{
-              padding: 0 16px;
-            }
-      item3:
-        card:
-          type: custom:bar-card
-          height: 20px
-          positions:
-            name: 'off'
-            value: inside
-            icon: 'off'
-            indicator: 'off'
-            minmax: 'off'
-          color: rgb(250,255,0)
-          entities:
-            - entity: '[[[ return variables.ulm_card_printer_yellow_name ]]]'
-          style: |
-            bar-card-currentbar{
-              border: 0.01rem solid rgba(var(--color-theme),.4);
-            }
-            bar-card-backgroundbar{
-              display: none;
-            }
-              bar-card-name{
-              width: 2rem;
-              margin-right: 40px !important;
-            }
-            bar-card-value{
-              width: 2rem;
-              margin-left: 40px !important;
-              justify-content: center;
-              display: flex;
-              color: grey;
-            }
-            bar-card-background{
-              margin: 4px 0 4px 0 !important;
-              text-align: initial;
-            }
-            ha-card{
-              --bar-card-border-radius: 5px;
-              border-radius: 0px;
-              box-shadow: none;
-            }
-            #states{
-              padding: 0 16px;
-            }
-      item4:
-        card:
-          type: custom:bar-card
-          height: 20px
-          positions:
-            name: 'off'
-            value: inside
-            icon: 'off'
-            indicator: 'off'
-            minmax: 'off'
-          color: rgb(248,0,255)
-          entities:
-            - entity: '[[[ return variables.ulm_card_printer_magenta_name ]]]'
-          style: |
-            bar-card-currentbar{
-              border: 0.01rem solid rgba(var(--color-theme),.4);
-            }
-            bar-card-backgroundbar{
-              display: none;
-            }
-            bar-card-name{
-              width: 2rem;
-              margin-right: 40px !important;
-            }
-            bar-card-value{
-              width: 2rem;
-              margin-left: 40px !important;
-              justify-content: center;
-              display: flex;
-              color: grey;
-            }
-            bar-card-background{
-              margin: 4px 0 4px 0 !important;
-              text-align: initial;
-            }
-            ha-card{
-              --bar-card-border-radius: 5px;
-              border-radius: 0px;
-              box-shadow: none;
-            }
-            #states{
-              padding: 0 16px;
-            }
-      item5:
-        card:
-          type: custom:bar-card
-          height: 20px
-          positions:
-            name: 'off'
-            value: inside
-            icon: 'off'
-            indicator: 'off'
-            minmax: 'off'
-          color: rgb(0,255,255)
-          entities:
-            - entity: '[[[ return variables.ulm_card_printer_cyan_name ]]]'
-          style: |
-            bar-card-currentbar{
-              border: 0.01rem solid rgba(var(--color-theme),.4);
-            }
-            bar-card-backgroundbar{
-              display: none;
-            }
-            bar-card-name{
-              width: 2rem;
-              margin-right: 40px !important;
-            }
-            bar-card-value{
-              width: 2rem;
-              margin-left: 40px !important;
-              justify-content: center;
-              display: flex;
-              color: grey;
-            }
-              bar-card-background{
-              margin: 4px 0 4px 0 !important;
-              text-align: initial;
-            }
-            ha-card{
-              --bar-card-border-radius: 5px;
-              border-radius: 0px;
-              box-shadow: none;
-            }
-            #states{
-              padding: 0 16px 16px 16px;
-            }
-  custom_card_mpse_printer_blue:
-    state:
-      - styles:
-          icon:
-            - color: rgba(var(--color-blue),1)
-          label:
-            - color: rgba(var(--color-blue-text),1)
-          name:
-            - color: rgba(var(--color-blue-text),1)
-          img_cell:
-            - background-color: rgba(var(--color-blue), 0.2)
-          card:
-            - background-color: rgba(var(--color-background-blue), var(--opacity-bg))
-        operator: template
-        value: |
-          [[[
-            return entity.state!="idle" ? true : false
-          ]]]
+
+            return '<div class="wrapper">' +
+              variables.cartridges.map(cartridge => {
+                return `<div class="label">${cartridge.label}</div>
+                  <div class="container-bar">
+                    <div class="bar" style="background-color: ${cartridge.color};width: ${states[cartridge.entity_id].state}%;"></div>
+                  </div>
+                <div class="state">${states[cartridge.entity_id].state}%</div>`;
+              }).join("") +
+            '</div>';
+          } else {
+
+          }
+        ]]]
+    style: |
+      div#cartridges .wrapper {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-gap: 1rem;
+        padding: 12px 8px 8px 8px;
+      }
+      div#cartridges .wrapper > *:nth-child(3n-2), .wrapper > *:nth-child(3n) {
+        place-self: center start;
+      }
+      div#cartridges .wrapper > .label {
+        filter: opacity(70%);
+        font-size: medium;
+      }
+      div#cartridges .wrapper > .container-bar {
+        position: relative;
+        border-radius: 4px;
+        border: 0.01rem solid rgba(var(--color-theme),.35);
+      }
+      div#cartridges .wrapper > .container-bar .bar {
+        height: 20px;
+        border-radius: 4px;
+      }
+      div#cartridges .wrapper > .state {
+        filter: opacity(40%);
+        font-size: medium;
+      }
   ulm_language_variables:
     variables:
-      ulm_on: "on"
-      ulm_off: "off"
-      ulm_open: "open"
-      ulm_closed: "closed"
-      ulm_unavailable: "unavailable"
-      ulm_standby: "standby"
-      ulm_idle: "idle"
       ulm_currency: "$"
-      ulm_auto: "Auto"
-      ulm_heat: "Heat"
-      ulm_cool: "Cool"
-      ulm_dry: "Dry"
-      ulm_fan_only: "Fan only"
-      ulm_heat_cool: "Heat/Cool"
-      ulm_heating: "Heating"
-      ulm_cooling: "Cooling"
-      ulm_person_state_home: "home"
-      ulm_person_state_away: "away"
-      ulm_person_state_not_home: "away"
-      ulm_device_state_home: "Online"
-      ulm_device_state_not_home: "Offline"
-      ulm_popups_back: "Back"
-      ulm_popups_toggle: "Toggle"
-      ulm_popups_statistics: "Statistics"
-      ulm_popups_history: "History"
-      ulm_popups_brightness: "Brightness"
-      ulm_popups_color_temp: "Color temp"
-      ulm_popups_color: "Color"
-      ulm_unknown: "unknown"
-      ulm_alarm_armed_home: "Armed home"
-      ulm_alarm_armed_away: "Armed away"
-      ulm_alarm_armed_night: "Armed night"
-      ulm_alarm_disarmed: "Disarmed"
-      ulm_alarm_arming: "Arming"
-      ulm_alarm_triggered: "TRIGGERED"
-      ulm_playing: "Playing"
-      ulm_paused: "Paused"
       ulm_updates_available: "Updates available!"
       ulm_no_updates_available: "No updates available"
       ulm_morning: "Good morning"
       ulm_afternoon: "Good afternoon"
       ulm_evening: "Good evening"
       ulm_hello: "Hello"
-      ulm_cleaning: "Cleaning"
-      ulm_returning: "Returning"
-      ulm_docked: "Docked"
-      ulm_mopping: "Mopping"
+      ulm_volume: "Volume"
   popup_item4_back_toggle:
     template: "popup_list_items"
     custom_fields:
@@ -2213,6 +2687,11 @@ button_card_templates:
         #content3 {
           display: none !important;
         }
+        #card {
+          height: 100vh;
+          overflow: hidden;
+          position: fixed;
+        }
       }
     custom_fields:
       header:
@@ -2635,9 +3114,9 @@ button_card_templates:
   popup_button_power:
     template:
       - "popup_button"
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
     icon: "mdi:power"
-    name: "[[[ return variables.ulm_popups_toggle ]]]"
+    name: "[[[ return variables.ulm_translation_state; ]]]"
     styles:
       name:
         - text-transform: "uppercase"
@@ -2652,9 +3131,9 @@ button_card_templates:
   popup_button_source:
     template:
       - "popup_button"
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
     icon: "mdi:playlist-music"
-    name: "Source"
+    name: "[[[ return variables.ulm_translation_source ]]]"
     styles:
       name:
         - text-transform: "uppercase"
@@ -2688,7 +3167,7 @@ button_card_templates:
   popup_header:
     template:
       - "popup_button"
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
     show_name: true
     show_label: true
     styles:
@@ -2705,26 +3184,19 @@ button_card_templates:
         - margin-top: "6px"
       icon:
         - color: "var(--color-theme)"
-    label: |-
-      [[[
-        if (entity.state == 'off') {
-          return variables.ulm_off;
-        } else {
-          return variables.ulm_on;
-        }
-      ]]]
+    label: "[[[ return variables.ulm_translation_state; ]]]"
   popup_button_color_temp:
-    template: "ulm_language_variables"
-    name: "[[[ return variables.ulm_popups_color_temp ]]]"
+    template: "ulm_translation_engine"
+    name: "[[[ return variables.ulm_translation_color_temperature; ]]]"
   popup_button_brightness:
-    template: "ulm_language_variables"
-    name: "[[[ return variables.ulm_popups_brightness ]]]"
+    template: "ulm_translation_engine"
+    name: "[[[ return variables.ulm_translation_brightness; ]]]"
   popup_button_volume:
     template:
       - "popup_button"
       - "ulm_language_variables"
     icon: "mdi:volume-high"
-    name: "Volume"
+    name: "[[[ return variables.ulm_volume; ]]]"
     styles:
       name:
         - text-transform: "uppercase"
@@ -2972,18 +3444,17 @@ button_card_templates:
         - width: "30px"
     size: "80%"
   popup_button_playing:
-    template: "ulm_language_variables"
     icon: "mdi:play-circle"
     name: "Playback"
   popup_button_stats:
-    template: "ulm_language_variables"
-    name: "[[[ return variables.ulm_popups_statistics ]]]"
+    template: "ulm_translation_engine"
+    name: "[[[ return variables.ulm_translation_statistics ]]]"
   popup_button_back:
     template:
       - "popup_button"
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
     icon: "mdi:arrow-left"
-    name: "[[[ return variables.ulm_popups_back ]]]"
+    name: "[[[ return variables.ulm_translation_back; ]]]"
     styles:
       name:
         - text-transform: "uppercase"
@@ -3026,10 +3497,10 @@ button_card_templates:
         - margin-top: "12px"
   popup_button_color:
     template: "ulm_language_variables"
-    name: "[[[ return variables.ulm_popups_color ]]]"
+    name: "[[[ return variables.ulm_popups_color; ]]]"
   popup_button_history:
-    template: "ulm_language_variables"
-    name: "[[[ return variables.ulm_popups_history ]]]"
+    template: "ulm_translation_engine"
+    name: "[[[ return variables.ulm_translation_history; ]]]"
   popup_subtitle:
     template: "title"
     styles:
@@ -3067,6 +3538,17 @@ button_card_templates:
         item4:
           - align-self: "end"
           - margin-top: "25px"
+  ulm_custom_actions:
+    variables:
+      ulm_card_tap_action: "toggle"
+      ulm_card_hold_action: "more-info"
+      ulm_card_double_tap_action: "adaptive"
+      ulm_icon_tap_action: "toggle"
+      ulm_icon_hold_action: "more-info"
+      ulm_icon_double_tap_action: "adaptive"
+      ulm_name_tap_action: "toggle"
+      ulm_name_hold_action: "more-info"
+      ulm_name_double_tap_action: "adaptive"
   ### Icon ###
   icon:
     color: "var(--google-grey)"
@@ -3118,6 +3600,7 @@ button_card_templates:
     size: "20px"
   ### Icon Info Alert ###
   icon_info_alert:
+    template: "ulm_custom_actions"
     color: "var(--google-grey)"
     show_icon: true
     show_label: true
@@ -3196,6 +3679,12 @@ button_card_templates:
           }
         ]]]
     size: "20px"
+    tap_action:
+      action: "[[[ return variables.ulm_card_tap_action ]]]"
+    hold_action:
+      action: "[[[ return variables.ulm_card_hold_action ]]]"
+    double_tap_action:
+      action: "[[[ return variables.ulm_card_double_tap_action ]]]"
   ### Icon Info Line ###s
   icon_info_line:
     show_icon: true
@@ -3229,6 +3718,66 @@ button_card_templates:
     styles:
       card:
         - width: "0px"
+  ### Icon Alert ###
+  icon_alert:
+    color: "var(--google-grey)"
+    show_icon: true
+    show_label: false
+    show_name: false
+    state:
+      - operator: "template"
+        value: "[[[ if (entity.state == 'unavailable' || entity.state == 'on'){ return true; } ]]]"
+        styles:
+          icon:
+            - color: "rgba(var(--color-blue),1)"
+          label:
+            - color: "rgba(var(--color-blue-text),1)"
+          name:
+            - color: "rgba(var(--color-blue-text),1)"
+          img_cell:
+            - background-color: "rgba(var(--color-blue), 0.2)"
+          card:
+            - background-color: "rgba(var(--color-background-blue), var(--opacity-bg))"
+          custom_fields:
+            notification:
+              - border-radius: "50%"
+              - position: "absolute"
+              - left: "24px"
+              - top: "-2px"
+              - height: "16px"
+              - width: "16px"
+              - border: "2px solid var(--card-background-color)"
+              - font-size: "12px"
+              - line-height: "14px"
+              - background-color: >
+                  [[[
+                    return "rgba(var(--color-red),1)";
+                  ]]]
+    styles:
+      icon:
+        - color: "rgba(var(--color-theme),0.2)"
+      img_cell:
+        - background-color: "rgba(var(--color-theme),0.05)"
+        - border-radius: "50%"
+        - place-self: "center"
+        - width: "42px"
+        - height: "42px"
+      grid:
+        - grid-template-areas: "'i'"
+        - grid-template-columns: "min-content"
+        - grid-template-rows: "min-content"
+      card:
+        - border-radius: "21px"
+        - box-shadow: "none"
+        - padding: "0px"
+    custom_fields:
+      notification: >
+        [[[
+          if (entity.state =="unavailable" || entity.state == "on"){
+            return `<ha-icon icon="mdi:exclamation" style="width: 12px; height: 12px; color: var(--primary-background-color);"></ha-icon>`
+          }
+        ]]]
+    size: "20px"
   ### List Items Line ###
   list_items_line:
     styles:
@@ -3240,6 +3789,60 @@ button_card_templates:
       card:
         - box-shadow: "none"
         - padding: "0px"
+  ### Icon More Info Alert ###
+  icon_more_info_alert:
+    show_icon: false
+    show_name: false
+    show_label: false
+    styles:
+      grid:
+        - grid-template-areas: "'item1'"
+        - grid-template-columns: "1fr"
+        - grid-template-rows: "1fr"
+        - column-gap: "0px"
+      card:
+        - border-radius: "var(--border-radius)"
+        - box-shadow: "var(--box-shadow)"
+        - padding: "12px"
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          show_icon: false
+          show_name: false
+          show_label: false
+          template:
+            - "list_2_items"
+          styles:
+            grid:
+              - grid-template-columns: "min-content auto"
+              - column-gap: "0px"
+            card:
+              - background-color: "rgba(0,0,0,0)"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                template:
+                  - "icon_alert"
+                  - "ulm_actions_icon"
+                styles:
+                  card:
+                    - overflow: "visible"
+            item2:
+              card:
+                type: "custom:button-card"
+                show_icon: false
+                entity: "[[[ return entity.entity_id ]]]"
+                template:
+                  - "icon_info"
+                  - "ulm_actions_name"
+                styles:
+                  card:
+                    - padding: "6px"
+                    - margin-left: "-6px"
+                    - background-color: "rgba(0,0,0,0)"
   ### Icon Only ###
   icon_only:
     color: "var(--google-grey)"
@@ -3284,6 +3887,7 @@ button_card_templates:
         - padding: "0px"
   ### Icon Info Bg ###
   icon_info_bg:
+    template: "ulm_custom_actions"
     color: "var(--google-grey)"
     show_icon: true
     show_label: true
@@ -3351,6 +3955,12 @@ button_card_templates:
           }
         ]]]
     size: "20px"
+    tap_action:
+      action: "[[[ return variables.ulm_card_tap_action ]]]"
+    hold_action:
+      action: "[[[ return variables.ulm_card_hold_action ]]]"
+    double_tap_action:
+      action: "[[[ return variables.ulm_card_double_tap_action ]]]"
   ### Widget Icon ###s
   widget_icon:
     tap_action:
@@ -3525,14 +4135,14 @@ button_card_templates:
           var icon = "mdi:help-circle";
           if (typeof states[entity.entity_id].attributes.current_position === "undefined"){
             if (states[entity.entity_id].state == "closed"){
-              return variables.ulm_closed;
+              return variables.ulm_translation_state;
             } else
-              return variables.ulm_open;
+              return variables.ulm_translation_state;
           } else {
             if (states[entity.entity_id].attributes.current_position == 0){
-              return variables.ulm_closed;
+              return variables.ulm_translation_state;
             } else {
-              return variables.ulm_open + " • " + (states[entity.entity_id].attributes.current_position) + "%" ;
+              return variables.ulm_translation_state + " • " + (states[entity.entity_id].attributes.current_position) + "%" ;
             }
           }
           return icon ;
@@ -3557,6 +4167,60 @@ button_card_templates:
         - box-shadow: "none"
         - padding: "0px"
   ### Icon More Info ###
+  icon_more_info_new:
+    show_icon: false
+    show_name: false
+    show_label: false
+    styles:
+      grid:
+        - grid-template-areas: "'item1'"
+        - grid-template-columns: "1fr"
+        - grid-template-rows: "1fr"
+        - column-gap: "0px"
+      card:
+        - border-radius: "var(--border-radius)"
+        - box-shadow: "var(--box-shadow)"
+        - padding: "12px"
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          show_icon: false
+          show_name: false
+          show_label: false
+          template:
+            - "list_2_items"
+          styles:
+            grid:
+              - grid-template-columns: "min-content auto"
+              - column-gap: "0px"
+            card:
+              - background-color: "rgba(0,0,0,0)"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                template:
+                  - "icon"
+                  - "ulm_actions_icon"
+                styles:
+                  card:
+                    - overflow: "visible"
+            item2:
+              card:
+                type: "custom:button-card"
+                show_icon: false
+                entity: "[[[ return entity.entity_id ]]]"
+                template:
+                  - "icon_info"
+                  - "ulm_actions_name"
+                styles:
+                  card:
+                    - padding: "6px"
+                    - margin-left: "-6px"
+                    - background-color: "rgba(0,0,0,0)"
+  ### Icon More Info ###
   icon_more_info:
     show_icon: false
     show_name: false
@@ -3569,8 +4233,6 @@ button_card_templates:
         - column-gap: "0px"
       card:
         - background-color: "rgba(0,0,0,0)"
-    hold_action:
-      action: "more-info"
     custom_fields:
       item1:
         card:
@@ -3578,11 +4240,10 @@ button_card_templates:
           entity: "[[[ return entity.entity_id ]]]"
           template:
             - "icon"
+            - "ulm_actions_icon"
           styles:
             card:
               - overflow: "visible"
-          tap_action:
-            action: "more-info"
       item2:
         card:
           type: "custom:button-card"
@@ -3590,6 +4251,7 @@ button_card_templates:
           entity: "[[[ return entity.entity_id ]]]"
           template:
             - "icon_info"
+            - "ulm_actions_name"
           styles:
             card:
               - padding: "6px"
@@ -3606,6 +4268,7 @@ button_card_templates:
       ulm_card_graph_entity2: ""
       ulm_card_graph_hours: 24
       ulm_card_graph_type: "fill"
+      ulm_card_graph_points: "0.5"
     triggers_update: "all"
     styles:
       grid:
@@ -3657,6 +4320,7 @@ button_card_templates:
             graph: "[[[ return variables.ulm_card_graph_type=='fill'?'line':variables.ulm_card_graph_type; ]]]"
             fill: "[[[ return variables.ulm_card_graph_type=='fill'?true:false; ]]]"
           hours_to_show: "[[[ return variables.ulm_card_graph_hours; ]]]"
+          points_per_hour: "[[[ return variables.ulm_card_graph_points; ]]]"
           style: |
             ha-card {
               box-shadow: none;
@@ -3773,6 +4437,22 @@ button_card_templates:
             - background-color: "rgba(var(--color-red), 0.2)"
         value: "on"
         id: "on"
+  ### Blue No Card ###
+  blue_no_card:
+    state:
+      - styles:
+          icon:
+            - color: "rgba(var(--color-blue),1)"
+          label:
+            - color: "rgba(var(--color-blue-text),1)"
+          name:
+            - color: "rgba(var(--color-blue-text),1)"
+          img_cell:
+            - background-color: "rgba(var(--color-blue), 0.2)"
+          card:
+            - background-color: "rgba(0,0,0,0)"
+        id: "on"
+        value: "on"
   ### Yellow Slider ###
   yellow_slider:
     state:
@@ -3811,6 +4491,22 @@ button_card_templates:
         - color: "rgba(var(--color-pink-text),1)"
       img_cell:
         - background-color: "rgba(var(--color-pink), 0.2)"
+  ### Yellow No Card ###
+  yellow_no_card:
+    state:
+      - styles:
+          icon:
+            - color: "rgba(var(--color-yellow),1)"
+          label:
+            - color: "rgba(var(--color-yellow-text),1)"
+          name:
+            - color: "rgba(var(--color-yellow-text),1)"
+          img_cell:
+            - background-color: "rgba(var(--color-yellow), 0.2)"
+          card:
+            - background-color: "rgba(0,0,0,0)"
+        value: "on"
+        id: "on"
   red_no_state:
     styles:
       icon:
@@ -4145,62 +4841,37 @@ button_card_templates:
   chip_alarm:
     template:
       - "chip_icon_label"
-      - "ulm_language_variables"
-    label: |
-      [[[
-        var alarm_label = variables.ulm_unknown;
-        if (entity.state == "armed_home"){
-          var alarm_label = variables.ulm_alarm_armed_home;
-        } else if(entity.state == "armed_away"){
-          var alarm_label = variables.ulm_alarm_armed_away;
-        } else if(entity.state == "armed_night"){
-          var alarm_label = variables.ulm_alarm_armed_night;
-        } else if(entity.state == "disarmed"){
-          var alarm_label = variables.ulm_alarm_disarmed;
-        } else if(entity.state == "arming"){
-          var alarm_label = variables.ulm_alarm_arming;
-        } else if(entity.state == "triggered"){
-          var alarm_label = variables.ulm_alarm_triggered;
-        }
-        return alarm_label;
-      ]]]
+      - "ulm_translation_engine"
+    label: "[[[ return variables.ulm_translation_state ]]]"
     icon: |
       [[[
-        var alarm_icon = "mdi:shield-outline";
-        if (entity.state == "armed_home"){
-          var alarm_icon = "mdi:shield-home";
-        } else if(entity.state == "armed_away"){
-          var alarm_icon = "mdi:shield-lock";
-        } else if(entity.state == "armed_night"){
-          var alarm_icon = "mdi:shield-moon";
-        } else if(entity.state == "disarmed"){
-          var alarm_icon = "mdi:shield-off";
-        } else if(entity.state == "arming"){
-          var alarm_icon = "mdi:shield";
-        } else if(entity.state == "triggered"){
-          var alarm_icon = "mdi:shield-alert";
+        var state = entity.state.toLowerCase();
+        var alarm_icon = {
+          "default": "mdi:shield-outline",
+          "armed_home": "mdi:shield-home",
+          "armed_away": "mdi:shield-lock",
+          "armed_night": "mdi:shield-moon",
+          "disarmed": "mdi:shield-off",
+          "arming": "mdi:shield",
+          "triggered": "mdi:shield-alert"
         }
-        return alarm_icon;
+        return (alarm_icon[state] || alarm_icon["default"]);
       ]]]
     styles:
       icon:
         - color: |
             [[[
-              var alarm_color = "var(--google-yellow)";
-              if (entity.state == "armed_home"){
-                var alarm_color = "var(--google-red)";
-              } else if(entity.state == "armed_away"){
-                var alarm_color = "var(--google-red)";
-              } else if(entity.state == "armed_night"){
-                var alarm_color = "var(--google-red)";
-              } else if(entity.state == "disarmed"){
-                var alarm_color = "var(--google-green)";
-              } else if(entity.state == "arming"){
-                var alarm_color = "var(--google-yellow)";
-              } else if(entity.state == "triggered"){
-                var alarm_color = "var(--google-red)";
+              var state = entity.state.toLowerCase();
+              var alarm_color = {
+                "default": "var(--google-yellow)",
+                "armed_home": "var(--google-red)",
+                "armed_away": "var(--google-red)",
+                "armed_night": "var(--google-red)",
+                "disarmed": "var(--google-green)",
+                "arming": "var(--google-yellow)",
+                "triggered": "var(--google-red)"
               }
-              return alarm_color;
+              return (alarm_color[state] || alarm_color["default"]);
             ]]]
   ### Chip Navigate ###
   chip_navigate:
@@ -4233,7 +4904,10 @@ button_card_templates:
     template: "chips"
     entity: "[[[ return variables.ulm_weather]]]"
     variables:
-      ulm_language: "[[[return window.navigator.language ]]]"
+      ulm_language: >
+        [[[
+          return hass["language"];
+        ]]]
     triggers_update: "all"
     tap_action:
       action: "more-info"
@@ -4243,42 +4917,34 @@ button_card_templates:
         const options = {month: 'short', day: 'numeric' };
         var locale = variables.ulm_language;
         let formatted_date = event.toLocaleDateString(locale, options);
-  
-        var icon = '🌡️';
-        if (states[variables.ulm_weather].state == 'clear-night'){
-          var icon = '🌙';
-        } else if(states[variables.ulm_weather].state == 'cloudy'){
-          var icon = '☁️';
-        } else if(states[variables.ulm_weather].state == 'exceptional'){
-          var icon = '🌞';
-        } else if(states[variables.ulm_weather].state == 'fog'){
-          var icon = '🌫️';
-        } else if(states[variables.ulm_weather].state == 'hail'){
-          var icon = '⛈️';
-        } else if(states[variables.ulm_weather].state == 'lightning'){
-          var icon = '⚡';
-        } else if(states[variables.ulm_weather].state == 'lightning-rainy'){
-          var icon = '⛈️';
-        } else if(states[variables.ulm_weather].state == 'partlycloudy'){
-          var icon = '⛅';
-        } else if(states[variables.ulm_weather].state == 'pouring'){
-          var icon = '🌧️';
-        } else if(states[variables.ulm_weather].state == 'rainy'){
-          var icon = '💧';
-        } else if(states[variables.ulm_weather].state == 'snowy'){
-          var icon = '❄️';
-        } else if(states[variables.ulm_weather].state == 'snowy-rainy'){
-          var icon = '🌨️';
-        } else if(states[variables.ulm_weather].state == 'sunny'){
-          var icon = '☀️';
-        } else if(states[variables.ulm_weather].state == 'windy'){
-          var icon = '🌪️';
-        }
-        return icon + ' ' + formatted_date
+        var state = states[variables.ulm_weather].state;
+        var icon = {
+          "clear-night": "🌙",
+          "cloudy": "☁️",
+          "exceptional": "🌞",
+          "fog": "🌫️",
+          "hail": "⛈️",
+          "lightning": "⚡",
+          "lightning-rainy": "⛈️",
+          "partlycloudy": "⛅",
+          "pouring": "🌧️",
+          "rainy": "💧",
+          "snowy": "❄️",
+          "snowy-rainy": "🌨️",
+          "sunny": "☀️",
+          "windy": "🌪️",
+          "default": "🌡️"
+          }
+        return (icon[state] || icon["default"]) + ' ' + formatted_date
       ]]]
   ### Chip Back ###
   chip_back:
     template: "chips"
+    variables:
+      ulm_chip_back_path: >
+        [[[
+          return hass["panelUrl"];
+        ]]]
     tap_action:
       action: "navigate"
       navigation_path: "[[[ return variables.ulm_chip_back_path; ]]]"
@@ -4306,16 +4972,12 @@ button_card_templates:
   chip_icon_label:
     template: "chips"
     show_icon: true
-    show_name: false
-    show_label: true
     size: "100%"
     styles:
       card:
-        - box-shadow: "var(--box-shadow)"
         - padding-top: "6px"
         - padding-button: "6px"
         - padding-left: "12px"
-        - padding-right: "6px"
       grid:
         - grid-template-areas: "'i l'"
         - grid-template-columns: "max_content auto"
@@ -4325,8 +4987,6 @@ button_card_templates:
         - width: "14px"
         - height: "24px"
       label:
-        - justify-self: "center"
-        - font-weight: "bold"
         - font-size: "12px"
         - margin-left: "0px"
   ### Chip Icon Only ###
@@ -4365,37 +5025,24 @@ button_card_templates:
     triggers_update: "all"
     label: |
       [[[
-        var icon = "🌡️";
-        var weather_state = states[variables.ulm_chip_temperature_weather].state;
-        if (weather_state == "clear-night"){
-          var icon = "🌙";
-        } else if(weather_state == "cloudy"){
-          var icon = "☁️";
-        } else if(weather_state == "exceptional"){
-          var icon = "🌞";
-        } else if(weather_state == "fog"){
-          var icon = "🌫️";
-        } else if(weather_state == "hail"){
-          var icon = "⛈️";
-        } else if(weather_state == "lightning"){
-          var icon = "⚡";
-        } else if(weather_state == "lightning-rainy"){
-          var icon = "⛈️";
-        } else if(weather_state == "partlycloudy"){
-          var icon = "⛅";
-        } else if(weather_state == "pouring"){
-          var icon = "🌧️";
-        } else if(weather_state == "rainy"){
-          var icon = "💧";
-        } else if(weather_state == "snowy"){
-          var icon = "❄️";
-        } else if(weather_state == "snowy-rainy"){
-          var icon = "🌨️";
-        } else if(weather_state == "sunny"){
-          var icon = "☀️";
-        } else if(weather_state == "windy"){
-          var icon = "🌪️";
-        }
+        var state = states[variables.ulm_chip_temperature_weather].state;
+        var icon = {
+          "clear-night": "🌙",
+          "cloudy": "☁️",
+          "exceptional": "🌞",
+          "fog": "🌫️",
+          "hail": "⛈️",
+          "lightning": "⚡",
+          "lightning-rainy": "⛈️",
+          "partlycloudy": "⛅",
+          "pouring": "🌧️",
+          "rainy": "💧",
+          "snowy": "❄️",
+          "snowy-rainy": "🌨️",
+          "sunny": "☀️",
+          "windy": "🌪️",
+          "default": "🌡️"
+          }
         function convertTemperature(temp) {
           if (parseFloat(temp) == temp && Math.floor(temp) != temp) {
               return parseFloat(temp).toFixed(1);
@@ -4404,7 +5051,7 @@ button_card_templates:
         }
         var outside_temp = states[variables.ulm_chip_temperature_outside].state;
         var inside_temp = states[variables.ulm_chip_temperature_inside].state;
-        return icon + " " + convertTemperature(outside_temp) + "° / " + convertTemperature(inside_temp) + "°" ;
+        return (icon[state] || icon["default"]) + " " + convertTemperature(outside_temp) + "° / " + convertTemperature(inside_temp) + "°" ;
       ]]]
   ### Chip Mdi Icon State ###
   chip_mdi_icon_state:
@@ -4548,49 +5195,258 @@ button_card_templates:
   ### Card Generic Swap ###
   card_generic_swap:
     template:
-      - "icon_info_bg"
-      - "ulm_language_variables"
-    label: >
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                styles:
+                  icon:
+                    - color: "rgba(var(--color-theme),0.9)"
+            item2:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                label: "[[[ return variables.ulm_translation_state_unit ]]]"
+  ### Card Script ###
+  card_script:
+    template:
+      - "icon_only"
+    label: "[[[ return variables.ulm_card_script_title; ]]]"
+    icon: "[[[ return variables.ulm_card_script_icon; ]]]"
+    styles:
+      icon:
+        - color: "rgba(var(--color-blue),0.7)"
+      label:
+        - align-self: "center"
+        - font-size: "14px"
+        - filter: "opacity(100%)"
+      img_cell:
+        - background-color: "rgba(var(--color-blue), 0.2)"
+      grid:
+        - grid-template-columns: "min-content min-content"
+  ### VERTICAL BUTTONS (fka SCENES) ###
+  card_vertical_button:
+    variables:
+      ulm_card_vertical_button_color: "blue"
+      ulm_card_vertical_button_state: "on"
+    show_label: true
+    label: ""
+    name: |
       [[[
-        var unit = entity.attributes.unit_of_measurement != null ? " " + entity.attributes.unit_of_measurement : ""
-        if (entity.state == "on") {
-          return variables.ulm_on;
-        } else if (entity.state == "off") {
-          return variables.ulm_off;
-        } else if (entity.state == "unavailable") {
-          return variables.ulm_unavailable;
-        } else if (entity.state == "idle") {
-          return variables.ulm_idle;
-        } else if (entity.state == "open") {
-          return variables.ulm_open;
-        } else if (entity.state == "closed") {
-          return variables.ulm_closed;
-        } else {
-          return entity.state + unit;
-        }
+        if( entity.entity_id.startsWith("input_select.") )
+          return variables.ulm_card_vertical_button_state;
+        else if( entity.entity_id.startsWith("input_boolean.") )
+          return "";
+        return entity.state;
       ]]]
     styles:
       icon:
-        - color: "rgba(var(--color-theme),0.9)"
+        - color: "rgba(var(--color-theme),0.2)"
       label:
-        - justify-self: "start"
+        - justify-self: "center"
         - align-self: "start"
         - font-weight: "bolder"
         - font-size: "12px"
         - filter: "opacity(40%)"
-        - margin-left: "12px"
       name:
-        - align-self: "end"
-        - justify-self: "start"
+        - margin-top: "10px"
+        - justify-self: "center"
         - font-weight: "bold"
         - font-size: "14px"
-        - margin-left: "12px"
-        - filter: "opacity(100%)"
+      img_cell:
+        - background-color: "rgba(var(--color-theme),0.05)"
+        - border-radius: "50%"
+        - place-self: "center"
+        - width: "42px"
+        - height: "42px"
       grid:
-        - grid-template-areas: "'i n' 'i l'"
-        - grid-template-columns: "min-content auto"
-        - grid-template-rows: "min-content min-content"
-  card_scenes:
+        - grid-template-areas: "'i' 'n' 'l'"
+      card:
+        - border-radius: "var(--border-radius)"
+        - box-shadow: "var(--box-shadow)"
+        - padding: "10px 0px 8px 0px"
+    size: "20px"
+    state:
+      - operator: "template"
+        value: |
+          [[[
+            return entity.state == variables.ulm_card_vertical_button_state;
+          ]]]
+        styles:
+          icon:
+            - color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}), 1)`; ]]]"
+          label:
+            - color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}-text), 1)`; ]]]"
+          name:
+            - color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}-text), 1)`; ]]]"
+          img_cell:
+            - background-color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}), 0.2)`; ]]]"
+          card:
+            - background-color: "[[[ return `rgba(var(--color-background-${variables.ulm_card_vertical_button_color}), var(--opacity-bg))`; ]]]"
+    tap_action:
+      action: "call-service"
+      service: |
+        [[[
+          if( entity.entity_id.startsWith("input_select.") )
+            return "input_select.select_option";
+          if( entity.entity_id.startsWith("input_boolean.") )
+            return "input_boolean.toggle";
+          if( entity.entity_id.startsWith("switch.") )
+            return "switch.toggle";
+          if( entity.entity_id.startsWith("light.") )
+            return "light.toggle";
+          if( entity.entity_id.startsWith("automation.") )
+            return "automation.toggle";
+          if( entity.entity_id.startsWith("input_button.") )
+            return "input_button.press";
+          // If we need to support other entities we can add these options here.
+          return "";
+        ]]]
+      service_data: |
+        [[[
+          var obj;
+          if( entity.entity_id.startsWith("input_select.") )
+            obj = { entity_id: entity.entity_id, option: variables.ulm_card_vertical_button_state };
+          else
+            obj = { entity_id: entity.entity_id };
+          return obj;
+        ]]]
+  ### Card Battery ###
+  card_battery:
+    template:
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
+    variables:
+      ulm_card_battery_attribute:
+      ulm_card_battery_battery_state_entity_id:
+      ulm_card_battery_charger_type_entity_id:
+      ulm_card_battery_battery_level_danger:
+      ulm_card_battery_battery_level_warning:
+      ulm_card_battery_color_battery_level_danger: "var(--google-red)"
+      ulm_card_battery_color_battery_level_warning: "var(--google-yellow)"
+      ulm_card_battery_color_battery_level_ok: "var(--google-green)"
+    triggers_update: "all"
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+                icon: |
+                  [[[
+                    // Get battery level
+                    const battery_level = variables.ulm_card_battery_attribute !== null ?
+                      states[entity.entity_id].attributes[variables.ulm_card_battery_attribute] :
+                      states[entity.entity_id].state;
+                    // Generate icon infix
+                    let infix = "";
+                    if (variables.ulm_card_battery_charger_type_entity_id == null) {
+                      // Check wether the battery state is charging
+                      infix = variables.ulm_card_battery_battery_state_entity_id !== null &&
+                        states[variables.ulm_card_battery_battery_state_entity_id].state.toLowerCase() === "charging" ?
+                        "-charging" : ""
+                    } else {
+                      // Select the infix based on the entity charging state
+                      switch (states[variables.ulm_card_battery_charger_type_entity_id].state.toLowerCase()) {
+                        case "wireless":
+                          infix = "-charging-wireless";
+                          break;
+                        case "charging":
+                          infix = "-charging";
+                          break;
+                        case "ac":
+                          infix = "-charging";
+                          break;
+                        case "usb":
+                          infix = "-charging";
+                          break;
+                        default:
+                          infix = "";
+                      }
+                    }
+                    // Generate the icon based on the battery_level
+                    let icon = "mdi:help-circle-outline";
+                    if (battery_level == 100) {
+                      icon = "mdi:battery";
+                    } else if (battery_level < 10) {
+                      icon = "mdi:battery" + infix + "-outline";
+                    } else if (battery_level == "unknown" || battery_level == "unavailable") {
+                      icon = "mdi:battery-off";
+                    } else {
+                      icon = "mdi:battery" + infix + "-" + Math.floor(battery_level / 10) * 10;
+                    }
+                    return icon;
+                  ]]]
+                styles:
+                  icon:
+                    - color: |
+                        [[[
+                          const battery_level = variables.ulm_card_battery_attribute !== null ?
+                            states[entity.entity_id].attributes[variables.ulm_card_battery_attribute] :
+                            states[entity.entity_id].state;
+                          // Get the color based on battery_level
+                          let color = "rgba(var(--color-theme), 0.9)";
+                          if (battery_level !== "unavailable" && (variables.ulm_card_battery_battery_level_danger !== null || variables.ulm_card_battery_battery_level_warning !== null)) {
+                            if (battery_level <= variables.ulm_card_battery_battery_level_danger) {
+                              color = variables.ulm_card_battery_color_battery_level_danger;
+                            } else if (battery_level <= variables.ulm_card_battery_battery_level_warning) {
+                              color = variables.ulm_card_battery_color_battery_level_warning;
+                            } else if (battery_level == "unknown" || battery_level == "unavailable") {
+                              color = variables.ulm_card_battery_color_battery_level_danger;
+                            } else {
+                              color = variables.ulm_card_battery_color_battery_level_ok;
+                            }
+                          }
+                          return color;
+                        ]]]
+            item2:
+              card:
+                type: "custom:button-card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+                label: |
+                  [[[
+                    const battery_level = variables.ulm_card_battery_attribute !== null
+                      ? states[entity.entity_id].attributes[variables.ulm_card_battery_attribute]
+                      : states[entity.entity_id].state;
+                    return battery_level + "%";
+                    if(battery_level == "unknown")
+                    { return variables.ulm_translation_state; }
+                    else
+                    { return battery_level + "%"; }
+                  ]]]
+                name: |
+                  [[[
+                    return states[entity.entity_id].attributes.friendly_name;
+                  ]]]
+  card_scenes_welcome:
     show_icon: false
     show_name: true
     show_label: false
@@ -4808,236 +5664,6 @@ button_card_templates:
                 type: "custom:button-card"
                 entity: "[[[ return variables.entity_7.entity_id ]]]"
                 name: "[[[ return variables.entity_7.name ]]]"
-  ### Card Script ###
-  card_script:
-    template:
-      - "icon_only"
-    label: "[[[ return variables.ulm_card_script_title; ]]]"
-    icon: "[[[ return variables.ulm_card_script_icon; ]]]"
-    styles:
-      icon:
-        - color: "rgba(var(--color-blue),0.7)"
-      label:
-        - align-self: "center"
-        - justify-self: "start"
-        - font-weight: "bold"
-        - font-size: "14px"
-        - margin-left: "12px"
-        - filter: "opacity(100%)"
-      img_cell:
-        - background-color: "rgba(var(--color-blue), 0.2)"
-      grid:
-        - grid-template-areas: "'i l'"
-        - grid-template-columns: "min-content min-content"
-        - grid-template-rows: "min-content"
-  ### VERTICAL BUTTONS (fka SCENES) ###
-  card_vertical_button:
-    variables:
-      ulm_card_vertical_button_color: "blue"
-      ulm_card_vertical_button_state: "on"
-    show_label: true
-    label: ""
-    name: |
-      [[[
-        if( entity.entity_id.startsWith("input_select.") )
-          return variables.ulm_card_vertical_button_state;
-        else if( entity.entity_id.startsWith("input_boolean.") )
-          return "";
-        return entity.state;
-      ]]]
-    styles:
-      icon:
-        - color: "rgba(var(--color-theme),0.2)"
-      label:
-        - justify-self: "center"
-        - align-self: "start"
-        - font-weight: "bolder"
-        - font-size: "12px"
-        - filter: "opacity(40%)"
-      name:
-        - margin-top: "10px"
-        - justify-self: "center"
-        - font-weight: "bold"
-        - font-size: "14px"
-      img_cell:
-        - background-color: "rgba(var(--color-theme),0.05)"
-        - border-radius: "50%"
-        - place-self: "center"
-        - width: "42px"
-        - height: "42px"
-      grid:
-        - grid-template-areas: "'i' 'n' 'l'"
-      card:
-        - border-radius: "var(--border-radius)"
-        - box-shadow: "var(--box-shadow)"
-        - padding: "10px 0px 8px 0px"
-    size: "20px"
-    state:
-      - operator: "template"
-        value: |
-          [[[
-            return entity.state == variables.ulm_card_vertical_button_state;
-          ]]]
-        styles:
-          icon:
-            - color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}), 1)`; ]]]"
-          label:
-            - color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}-text), 1)`; ]]]"
-          name:
-            - color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}-text), 1)`; ]]]"
-          img_cell:
-            - background-color: "[[[ return `rgba(var(--color-${variables.ulm_card_vertical_button_color}), 0.2)`; ]]]"
-          card:
-            - background-color: "[[[ return `rgba(var(--color-background-${variables.ulm_card_vertical_button_color}), var(--opacity-bg))`; ]]]"
-    tap_action:
-      action: "call-service"
-      service: |
-        [[[
-          if( entity.entity_id.startsWith("input_select.") )
-            return "input_select.select_option";
-          if( entity.entity_id.startsWith("input_boolean.") )
-            return "input_boolean.toggle";
-          if( entity.entity_id.startsWith("switch.") )
-            return "switch.toggle";
-          if( entity.entity_id.startsWith("light.") )
-            return "light.toggle";
-          if( entity.entity_id.startsWith("automation.") )
-            return "automation.toggle";
-          if( entity.entity_id.startsWith("input_button.") )
-            return "input_button.press";
-          // If we need to support other entities we can add these options here.
-          return "";
-        ]]]
-      service_data: |
-        [[[
-          var obj;
-          if( entity.entity_id.startsWith("input_select.") )
-            obj = { entity_id: entity.entity_id, option: variables.ulm_card_vertical_button_state };
-          else
-            obj = { entity_id: entity.entity_id };
-          return obj;
-        ]]]
-  ### Card Battery ###
-  card_battery:
-    template:
-      - "icon_info_bg"
-      - "ulm_language_variables"
-    tap_action:
-      action: "more-info"
-    variables:
-      ulm_card_battery_attribute:
-      ulm_card_battery_battery_state_entity_id:
-      ulm_card_battery_charger_type_entity_id:
-      ulm_card_battery_battery_level_danger:
-      ulm_card_battery_battery_level_warning:
-      ulm_card_battery_color_battery_level_danger: "var(--google-red)"
-      ulm_card_battery_color_battery_level_warning: "var(--google-yellow)"
-      ulm_card_battery_color_battery_level_ok: "var(--google-green)"
-    triggers_update: "all"
-    icon: |
-      [[[
-        // Get battery level
-        const battery_level = variables.ulm_card_battery_attribute !== null ?
-          states[entity.entity_id].attributes[variables.ulm_card_battery_attribute] :
-          states[entity.entity_id].state;
-  
-        // Generate icon infix
-        let infix = "";
-        if (variables.ulm_card_battery_charger_type_entity_id == null) {
-          // Check wether the battery state is charging
-          infix = variables.ulm_card_battery_battery_state_entity_id !== null &&
-            states[variables.ulm_card_battery_battery_state_entity_id].state.toLowerCase() === "charging" ?
-            "-charging" : ""
-        } else {
-          // Select the infix based on the entity charging state
-          switch (states[variables.ulm_card_battery_charger_type_entity_id].state.toLowerCase()) {
-            case "wireless":
-              infix = "-charging-wireless";
-              break;
-            case "charging":
-              infix = "-charging";
-              break;
-            case "ac":
-              infix = "-charging";
-              break;
-            case "usb":
-              infix = "-charging";
-              break;
-            default:
-              infix = "";
-          }
-        }
-  
-        // Generate the icon based on the battery_level
-        let icon = "mdi:help-circle-outline";
-        if (battery_level == 100) {
-          icon = "mdi:battery";
-        } else if (battery_level < 10) {
-          icon = "mdi:battery" + infix + "-outline";
-        } else if (battery_level == "unknown" || battery_level == "unavailable") {
-          icon = "mdi:battery-off";
-        } else {
-          icon = "mdi:battery" + infix + "-" + Math.floor(battery_level / 10) * 10;
-        }
-  
-        return icon;
-      ]]]
-    label: |
-      [[[
-        const battery_level = variables.ulm_card_battery_attribute !== null
-          ? states[entity.entity_id].attributes[variables.ulm_card_battery_attribute]
-          : states[entity.entity_id].state;
-        if(battery_level == "unknown")
-        { return variables.ulm_unavailable; }
-        else
-        { return battery_level + "%"; }
-      ]]]
-    name: |
-      [[[
-        return states[entity.entity_id].attributes.friendly_name;
-      ]]]
-    styles:
-      icon:
-        - color: |
-            [[[
-              const battery_level = variables.ulm_card_battery_attribute !== null ?
-                states[entity.entity_id].attributes[variables.ulm_card_battery_attribute] :
-                states[entity.entity_id].state;
-  
-              // Get the color based on battery_level
-              let color = "rgba(var(--color-theme), 0.9)";
-              if (battery_level !== "unavailable" && (variables.ulm_card_battery_battery_level_danger !== null || variables.ulm_card_battery_battery_level_warning !== null)) {
-                if (battery_level <= variables.ulm_card_battery_battery_level_danger) {
-                  color = variables.ulm_card_battery_color_battery_level_danger;
-                } else if (battery_level <= variables.ulm_card_battery_battery_level_warning) {
-                  color = variables.ulm_card_battery_color_battery_level_warning;
-                } else if (battery_level == "unknown" || battery_level == "unavailable") {
-                  color = variables.ulm_card_battery_color_battery_level_danger;
-                } else {
-                  color = variables.ulm_card_battery_color_battery_level_ok;
-                }
-              }
-  
-              return color;
-            ]]]
-      label:
-        - align-self: "end"
-        - justify-self: "start"
-        - font-weight: "bold"
-        - font-size: "14px"
-        - margin-left: "12px"
-        - filter: "opacity(100%)"
-      name:
-        - justify-self: "start"
-        - align-self: "start"
-        - font-weight: "bolder"
-        - font-size: "12px"
-        - filter: "opacity(40%)"
-        - margin-left: "12px"
-      grid:
-        - grid-template-areas: "'i l' 'i n'"
-        - grid-template-columns: "min-content auto"
-        - grid-template-rows: "min-content min-content"
   ### Card Navigate ###
   card_navigate:
     template:
@@ -5053,23 +5679,19 @@ button_card_templates:
         - color: "rgba(var(--color-blue),0.7)"
       label:
         - align-self: "center"
-        - justify-self: "start"
-        - font-weight: "bold"
         - font-size: "14px"
-        - margin-left: "12px"
         - filter: "opacity(100%)"
-      img_cell:
-        - background-color: "rgba(var(--color-blue), 0.2)"
       grid:
-        - grid-template-areas: "'i l'"
         - grid-template-columns: "min-content min-content"
-        - grid-template-rows: "min-content"
+  ### Card Vacuum ###
   card_vacuum:
     show_name: false
     show_icon: false
     show_label: false
     template:
-      - "ulm_language_variables"
+      - "icon_more_info_new"
+      - "ulm_translation_engine"
+      - "ulm_actions_card"
     variables:
       ulm_card_vacuum_name: "[[[ return entity.attributes.friendly_name ]]]"
       ulm_card_vacuum_icon: "[[[ return entity.attributes.icon ]]]"
@@ -5077,41 +5699,42 @@ button_card_templates:
       ulm_card_vacuum_room_icon: "[[[ return entity.attributes.icon ]]]"
       ulm_card_vacuum_camera:
       ulm_card_vacuum_camera_toggle:
+      ulm_card_vacuum_light_color: >
+        [[[
+          var state = entity.state.toLowerCase();
+          var colors = {
+            "cleaning": "rgba(var(--color-blue)",
+            "paused": "rgba(var(--color-green)",
+            "mopping": "rgba(var(--color-yellow)",
+            "returning": "rgba(var(--color-purple)",
+            "error": "rgba(var(--color-red)",
+            "default": "rgba(var(--color-theme)"
+          }
+          return (colors[state] || colors["default"]);
+        ]]]
+      ulm_card_vacuum_camera_display: >
+        [[[
+          if (variables?.ulm_card_vacuum_camera){
+            if (variables?.ulm_card_vacuum_camera_toggle) {
+              if (entity.state.toLowerCase() === 'cleaning'){
+                return "true";
+              }
+            } else {
+              return "true";
+            }
+          }
+        ]]]
     triggers_update: "all"
     styles:
       grid:
         - grid-template-areas: >
             [[[
-              if( variables.ulm_card_vacuum_camera ){
-                if ( variables.ulm_card_vacuum_camera_toggle ) {
-                  if( entity.state.toLowerCase() === 'cleaning' ){
-                    return "'item1' 'item3' 'item2'";
-                  } else {
-                    return "'item1' 'item2'";
-                  }
-                } else {
-                  return "'item1' 'item3' 'item2'";
-                }
-              } else {
-                return "'item1' 'item2'";
-              }
+              return variables.ulm_card_vacuum_camera_display ? "'item1' 'item3' 'item2'" : "'item1' 'item2'";
             ]]]
         - grid-template-columns: "1fr"
         - grid-template-rows: >
             [[[
-              if( variables.ulm_card_vacuum_camera ){
-                if ( variables.ulm_card_vacuum_camera_toggle ) {
-                  if( entity.state.toLowerCase() === 'cleaning' ){
-                    return "repeat(3, min-content)";
-                  } else {
-                    return "repeat(2, min-content)";
-                  }
-                } else {
-                  return "repeat(3, min-content)";
-                }
-              } else {
-                return "repeat(2, min-content)";
-              }
+              return variables.ulm_card_vacuum_camera_display ? "repeat(3, min-content)" : "repeat(2, min-content)";
             ]]]
         - row-gap: "12px"
       card:
@@ -5120,86 +5743,48 @@ button_card_templates:
         - padding: "12px"
         - background-color: >
             [[[
-              if(hass.themes.darkMode)
-                if( entity.state.toLowerCase() === 'cleaning' ){
-                  return 'rgba(var(--color-blue),0.1)'
-                } else if( entity.state.toLowerCase() === 'paused' ){
-                  return 'rgba(var(--color-green),0.1)'
-                } else if( entity.state.toLowerCase() === 'mopping' ){
-                  return 'rgba(var(--color-yellow),0.1)'
-                } else if( entity.state.toLowerCase() === 'returning' ){
-                  return 'rgba(var(--color-purple),0.1)'
+              if(hass.themes.darkMode){
+                return "variables.ulm_card_vacuum_light_color" + ", 0.1)";
                 }
             ]]]
       custom_fields:
         item3:
           - display: >
               [[[
-                if( variables.ulm_card_vacuum_camera ){
-                  if ( variables.ulm_card_vacuum_camera_toggle ) {
-                    if( entity.state.toLowerCase() === 'cleaning' ){
-                      return "block";
-                    } else {
-                      return "none";
-                    }
-                  } else {
-                    return "block";
-                  }
-                } else {
-                  return "none";
-                }
+                return variables.ulm_card_vacuum_camera_display ? "block" : "none";
               ]]]
     custom_fields:
       item1:
         card:
           type: "custom:button-card"
-          template: "icon_more_info"
+          template:
+            - "icon_more_info"
           custom_fields:
             item1:
               card:
                 type: "custom:button-card"
                 entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
                 icon: "[[[ return variables.ulm_card_vacuum_icon ]]]"
                 styles:
                   icon:
                     - color: >
                         [[[
-                          if( entity.state.toLowerCase() === 'cleaning' ){
-                            return 'rgba(var(--color-blue),1)'
-                          } else if( entity.state.toLowerCase() === 'paused' ){
-                            return 'rgba(var(--color-green),1)'
-                          } else if( entity.state.toLowerCase() === 'mopping' ){
-                            return 'rgba(var(--color-yellow),1)'
-                          } else if( entity.state.toLowerCase() === 'returning' ){
-                            return 'rgba(var(--color-purple),1)'
-                          } else if( entity.state.toLowerCase() === 'error' ){
-                            return 'rgba(var(--color-red),1)'
-                          } else {
-                          return 'rgba(var(--color-theme),0.2)'
-                          }
+                          return variables.ulm_card_vacuum_light_color + ", 1)";
                         ]]]
                   img_cell:
                     - background-color: >
                         [[[
-                          if( entity.state.toLowerCase() === 'cleaning' ){
-                            return 'rgba(var(--color-blue),0.2)'
-                          } else if( entity.state.toLowerCase() === 'paused' ){
-                            return 'rgba(var(--color-green),0.2)'
-                          } else if( entity.state.toLowerCase() === 'mopping' ){
-                            return 'rgba(var(--color-yellow),0.2)'
-                          } else if( entity.state.toLowerCase() === 'returning' ){
-                            return 'rgba(var(--color-purple),0.2)'
-                          } else if( entity.state.toLowerCase() === 'error' ){
-                            return 'rgba(var(--color-red),0.2)'
-                          } else {
-                          return 'rgba(var(--color-theme),0.05)'
-                          }
+                          return variables.ulm_card_vacuum_light_color + ", 0.05)";
                         ]]]
             item2:
               card:
                 type: "custom:button-card"
-                templates:
-                  - "ulm_language_variables"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
                 entity: "[[[ return entity.entity_id ]]]"
                 name: "[[[ return variables.ulm_card_vacuum_name ]]]"
                 label: >
@@ -5207,60 +5792,24 @@ button_card_templates:
                     let label = entity.attributes.friendly_name
                     if(variables.ulm_card_vacuum_label){
                       label = variables.ulm_card_vacuum_label;
-                    } else if(entity.state.toLowerCase() === 'cleaning'){
-                      label = variables.ulm_cleaning;
-                    } else if(entity.state.toLowerCase() === 'idle'){
-                      label = variables.ulm_idle;
-                    } else if(entity.state.toLowerCase() === 'paused'){
-                      label = variables.ulm_paused;
-                    } else if(entity.state.toLowerCase() === 'returning'){
-                      label = variables.ulm_returning;
-                    } else if(entity.state.toLowerCase() === 'docked'){
-                      label = variables.ulm_docked;
-                    } else if(entity.state.toLowerCase() === 'mopping'){
-                      label = variables.ulm_mopping;
                     } else {
-                      label = entity.state;
+                      label = variables.ulm_translation_state;
                     }
-                    return label
+                    return label;
                   ]]]
       item2:
         card:
           type: "custom:button-card"
-          template: "list_4_items"
+          template: >
+            [[[ return variables.ulm_card_vacuum_room ? "list_4_items" : "list_3_items"; ]]]
           styles:
             card:
-              - padding: "0px"
               - background: "none"
               - border-radius: "0"
-              - box-shadow: "none"
-            grid:
-              - grid-template-areas: >
-                  [[[
-                    if(variables.ulm_card_vacuum_room){
-                      return "'item1 item2 item3 item4'";
-                    } else {
-                      return "'item1 item2 item3'";
-                    }
-                  ]]]
-              - grid-template-columns: >
-                  [[[
-                    if(variables.ulm_card_vacuum_room){
-                      return "1fr 1fr 1fr 1fr";
-                    } else {
-                      return "1fr 1fr 1fr";
-                    }
-                  ]]]
             custom_fields:
               item4:
                 - display: >
-                    [[[
-                      if(variables.ulm_card_vacuum_room){
-                        return "block";
-                      } else {
-                        return "none";
-                      }
-                    ]]]
+                    [[[ return variables.ulm_card_vacuum_room ? "block" : "none"; ]]]
           custom_fields:
             item1:
               card:
@@ -5281,11 +5830,7 @@ button_card_templates:
                   action: "call-service"
                   service: >
                     [[[
-                      if (entity.state.toLowerCase() === 'cleaning'){
-                        return "vacuum.stop"
-                      } else {
-                        return "vacuum.start"
-                      }
+                      return entity.state.toLowerCase() === 'cleaning' ? "vacuum.stop" : "vacuum.start";
                     ]]]
                   service_data:
                     entity_id: "[[[ return entity.entity_id ]]]"
@@ -5375,102 +5920,157 @@ button_card_templates:
   ### Card Power Outlet ###
   card_power_outlet:
     template:
-      - "icon_info_bg"
+      - "icon_more_info_new"
       - "yellow"
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
+      - "ulm_actions_card"
     variables:
       ulm_card_power_outlet_consumption_sensor:
     triggers_update: "all"
-    label: |-
-      [[[
-        if (entity.state === "on" && variables.ulm_card_power_outlet_consumption_sensor !== null) {
-          return variables.ulm_on + " • " + states[variables.ulm_card_power_outlet_consumption_sensor].state + "W";
-        } else if (entity.state === "on") {
-          return variables.ulm_on;
-        } else if (entity.state === "off") {
-          return variables.ulm_off;
-        } else if (entity.state === "unavailable") {
-          return variables.ulm_unavailable;
-        } else {
-          return entity.state;
-        }
-      ]]]
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+            - "yellow"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "yellow"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+            item2:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "yellow_no_card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+                label: |-
+                  [[[
+                    if (entity.state === "on" && variables.ulm_card_power_outlet_consumption_sensor !== null) {
+                      return variables.ulm_translation_state + " • " + states[variables.ulm_card_power_outlet_consumption_sensor].state + "W";
+                    } else {
+                      return variables.ulm_translation_state;
+                    }
+                  ]]]
   ### Card Binary Sensor ###
   card_binary_sensor:
     template:
-      - "icon_info_bg"
+      - "icon_more_info_new"
       - "blue"
-    name: "[[[ return entity.attributes.friendly_name != '' ? entity.attributes.friendly_name : entity.entity_id ]]]"
-    show_last_changed: true
+      - "ulm_language_variables"
+      - "ulm_actions_card"
+    show_last_changed: false
+    variables:
+      ulm_show_last_changed: false
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+            - "blue"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "blue"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+            item2:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "blue_no_card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+                name: "[[[ return entity.attributes.friendly_name != '' ? entity.attributes.friendly_name : entity.entity_id ]]]"
+                show_last_changed: "[[[ return variables.ulm_show_last_changed; ]]]"
   ### Card Input Boolean ###
   card_input_boolean:
     template:
-      - "icon_info_bg"
-      - "ulm_language_variables"
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
       - "blue"
-    name: "[[[ return entity.attributes.friendly_name != '' ? entity.attributes.friendly_name : entity.entity_id ]]]"
-    label: >
-      [[[
-        if (entity.state != "unavailable"){
-          if (entity.state == "on"){
-            return variables.ulm_on;
-          } else {
-            return variables.ulm_off;
-          }
-        } else {
-          return variables.ulm_unavailable;
-        }
-      ]]]
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+            - "blue"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "blue"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+            item2:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "blue_no_card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+                name: "[[[ return entity.attributes.friendly_name != '' ? entity.attributes.friendly_name : entity.entity_id ]]]"
+                label: "[[[ return variables.ulm_translation_state ]]]"
   ### Card Generic ###
   card_generic:
     template:
-      - "icon_info_bg"
-      - "ulm_language_variables"
-    label: >
-      [[[
-        var unit = entity.attributes.unit_of_measurement != null ? " " + entity.attributes.unit_of_measurement : ""
-        if (entity.state == "on") {
-          return variables.ulm_on;
-        } else if (entity.state == "off") {
-          return variables.ulm_off;
-        } else if (entity.state == "unavailable") {
-          return variables.ulm_unavailable;
-        } else if (entity.state == "idle") {
-          return variables.ulm_idle;
-        } else if (entity.state == "open") {
-          return variables.ulm_open;
-        } else if (entity.state == "closed") {
-          return variables.ulm_closed;
-        } else {
-          return entity.state + unit;
-        }
-      ]]]
-    styles:
-      icon:
-        - color: "rgba(var(--color-theme),0.9)"
-      label:
-        - align-self: "end"
-        - justify-self: "start"
-        - font-weight: "bold"
-        - font-size: "14px"
-        - margin-left: "12px"
-        - filter: "opacity(100%)"
-      name:
-        - justify-self: "start"
-        - align-self: "start"
-        - font-weight: "bolder"
-        - font-size: "12px"
-        - filter: "opacity(40%)"
-        - margin-left: "12px"
-      grid:
-        - grid-template-areas: "'i l' 'i n'"
-        - grid-template-columns: "min-content auto"
-        - grid-template-rows: "min-content min-content"
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                styles:
+                  icon:
+                    - color: "rgba(var(--color-theme),0.9)"
+            item2:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                name: "[[[ return variables.ulm_translation_state_unit ]]]"
+                label: "[[[ return entity.attributes.friendly_name; ]]]"
   ### Card Person ###
   card_person:
     template:
       - "icon_info_bg"
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
     variables:
       ulm_card_person_use_entity_picture: false
       ulm_card_person_zone1: ""
@@ -5484,37 +6084,30 @@ button_card_templates:
     show_name: true
     label: >
       [[[
-        if (variables.ulm_address !== ''){
+        if (variables.ulm_address){
           return states[variables.ulm_address].state
         } else {
           let state = states[variables.ulm_card_person_entity].state;
-          return variables["ulm_person_state_" + state] ? variables["ulm_person_state_" + state] : state;
+          let option = ["home", "not_home", "unavailable", "unknown"]
+          return (option.includes(state)) ? variables.ulm_translation_state : state
         }
       ]]]
     name: "[[[ return states[variables.ulm_card_person_entity].attributes.friendly_name ]]]"
     entity: "[[[ return variables.ulm_card_person_entity; ]]]"
     icon: "mdi:face-man"
     show_entity_picture: "[[[ return variables.ulm_card_person_use_entity_picture ]]]"
-    entity_picture: "[[[ return variables.ulm_card_person_use_entity_picture != false ? states[variables.ulm_card_person_entity].attributes.entity_picture\
+    entity_picture: "[[[ return variables.ulm_card_person_use_entity_picture ? states[variables.ulm_card_person_entity].attributes.entity_picture\
       \ : null ]]]"
     styles:
       icon:
         - color: "rgba(var(--color-theme),0.9)"
         - width: >
             [[[
-              if (variables.ulm_card_person_use_entity_picture !== true){
-                return "20px";
-              } else {
-                return "42px";
-              }
+              return !variables.ulm_card_person_use_entity_picture ? "20px" : "42px";
             ]]]
         - place-self: >
             [[[
-              if (variables.ulm_card_person_use_entity_picture !== true){
-                return "center";
-              } else {
-                return "stretch stretch";
-              }
+              return !variables.ulm_card_person_use_entity_picture ? "center" : "stretch stretch";
             ]]]
       custom_fields:
         notification:
@@ -5529,11 +6122,7 @@ button_card_templates:
           - line-height: "14px"
           - background-color: >
               [[[
-                if (states[variables.ulm_card_person_entity].state !== 'home') {
-                  return "rgba(var(--color-green),1)";
-                } else {
-                  return "rgba(var(--color-blue),1)";
-                }
+                return (states[variables.ulm_card_person_entity].state !== 'home') ? "rgba(var(--color-green),1)" : "rgba(var(--color-blue),1)";
               ]]]
     custom_fields:
       notification: >
@@ -5555,7 +6144,9 @@ button_card_templates:
   ### Card Cover ###
   card_cover:
     template:
-      - "ulm_language_variables"
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
     variables:
       ulm_card_cover_name: "[[[ return entity.attributes.friendly_name ]]]"
       ulm_card_cover_display_left_right: false
@@ -5569,25 +6160,6 @@ button_card_templates:
     show_icon: false
     show_name: false
     show_label: false
-    # hold_action:
-    #   action: >
-    #     [[[
-    #         if (variables.ulm_card_cover_enable_popup){
-    #           return 'fire-dom-event'
-    #         }
-    #         else{
-    #           return 'more-info'
-    #         }
-    #     ]]]
-    #   browser_mod:
-    #     command: "popup"
-    #     large: true
-    #     hide_header: true
-    #     card:
-    #       type: "custom:button-card"
-    #       template: "popup_cover_brightness"
-    #       variables:
-    #         ulm_popup_cover_entity: "[[[ return entity.entity_id ]]]"
     styles:
       grid:
         - grid-template-areas: >
@@ -5621,7 +6193,7 @@ button_card_templates:
                     if ( variables.ulm_card_cover_enable_controls) {
                         rows.push("min-content");
                     }
-                    if ( variables.ulm_card_cover_enable_sliderdf) {
+                    if ( variables.ulm_card_cover_enable_slider) {
                         rows.push("min-content");
                     }
                   }
@@ -5661,6 +6233,9 @@ button_card_templates:
             item1:
               card:
                 type: "custom:button-card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
                 entity: "[[[ return entity.entity_id ]]]"
                 icon: |
                   [[[
@@ -5707,25 +6282,6 @@ button_card_templates:
                       }
                       return icon ;
                   ]]]
-                # hold_action:
-                #   action: >
-                #     [[[
-                #         if (variables.ulm_card_cover_enable_popup){
-                #           return 'fire-dom-event'
-                #         }
-                #         else{
-                #           return 'more-info'
-                #         }
-                #     ]]]
-                # browser_mod:
-                #   command: "popup"
-                #   large: true
-                #   hide_header: true
-                #   card:
-                #     type: "custom:button-card"
-                #     template: "popup_cover_brightness"
-                #     variables:
-                #       ulm_popup_cover_entity: "[[[ return entity.entity_id ]]]"
                 styles:
                   icon:
                     - color: >
@@ -5762,44 +6318,28 @@ button_card_templates:
             item2:
               card:
                 type: "custom:button-card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
                 entity: "[[[ return entity.entity_id ]]]"
                 name: "[[[ return variables.ulm_card_cover_name ]]]"
-                # hold_action:
-                #   action: >
-                #     [[[
-                #         if (variables.ulm_card_cover_enable_popup){
-                #           return 'fire-dom-event'
-                #         }
-                #         else{
-                #           return 'more-info'
-                #         }
-                #     ]]]
-                #   browser_mod:
-                #     command: "popup"
-                #     large: true
-                #     hide_header: true
-                #     card:
-                #       type: "custom:button-card"
-                #       template: "popup_cover_brightness"
-                #       variables:
-                #         ulm_popup_cover_entity: "[[[ return entity.entity_id ]]]"
                 label: >-
                   [[[
                       if (entity.state !="unavailable"){
                         if (typeof states[entity.entity_id].attributes.current_position === "undefined"){
                           if (states[entity.entity_id].state == "closed"){
-                            return variables.ulm_closed;
+                            return variables.ulm_translation_state;
                           } else
-                            return variables.ulm_open;
+                            return variables.ulm_translation_state;
                         } else {
                           if (states[entity.entity_id].attributes.current_position == 0){
-                            return variables.ulm_closed;
+                            return variables.ulm_translation_state;
                           } else {
-                            return variables.ulm_open + " • " + (states[entity.entity_id].attributes.current_position) + "%" ;
+                            return variables.ulm_translation_state + " • " + (states[entity.entity_id].attributes.current_position) + "%" ;
                           }
                         }
                     } else {
-                      return variables.ulm_unavailable;
+                      return variables.ulm_translation_state;
                     }
                   ]]]
       item2:
@@ -5903,7 +6443,9 @@ button_card_templates:
   ### Card Light ###
   card_light:
     template:
-      - "ulm_language_variables"
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
     variables:
       ulm_card_light_name: "[[[ return entity.attributes.friendly_name ]]]"
       ulm_card_light_icon: "[[[ return entity.attributes.icon ]]]"
@@ -5916,30 +6458,10 @@ button_card_templates:
       ulm_card_light_enable_color: false
       ulm_card_light_force_background_color: false
       ulm_card_light_enable_popup: false
+      ulm_card_light_enable_popup_tap: false
     show_icon: false
     show_name: false
     show_label: false
-    tap_action:
-      action: "toggle"
-    hold_action:
-      action: >
-        [[[
-            if (variables.ulm_card_light_enable_popup){
-              return 'fire-dom-event'
-            }
-            else{
-              return 'more-info'
-            }
-        ]]]
-      browser_mod:
-        command: "popup"
-        large: true
-        hide_header: true
-        card:
-          type: "custom:button-card"
-          template: "popup_light_brightness"
-          variables:
-            ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
     state:
       - value: "on"
         styles:
@@ -6025,25 +6547,10 @@ button_card_templates:
                 type: "custom:button-card"
                 entity: "[[[ return entity.entity_id ]]]"
                 icon: "[[[ return variables.ulm_card_light_icon ]]]"
-                hold_action:
-                  action: >
-                    [[[
-                        if (variables.ulm_card_light_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
-                    ]]]
-                  browser_mod:
-                    command: "popup"
-                    large: true
-                    hide_header: true
-                    card:
-                      type: "custom:button-card"
-                      template: "popup_light_brightness"
-                      variables:
-                        ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                  ulm_card_light_enable_popup: "[[[ return variables.ulm_card_light_enable_popup; ]]]"
                 styles:
                   icon:
                     - color: >
@@ -6077,42 +6584,19 @@ button_card_templates:
               card:
                 type: "custom:button-card"
                 entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                  ulm_card_light_enable_popup: "[[[ return variables.ulm_card_light_enable_popup; ]]]"
                 name: "[[[ return variables.ulm_card_light_name ]]]"
-                hold_action:
-                  action: >
-                    [[[
-                        if (variables.ulm_card_light_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
-                    ]]]
-                  browser_mod:
-                    command: "popup"
-                    large: true
-                    hide_header: true
-                    card:
-                      type: "custom:button-card"
-                      template: "popup_light_brightness"
-                      variables:
-                        ulm_popup_light_entity: "[[[ return entity.entity_id ]]]"
                 label: >-
                   [[[
-                    if (entity.state !="unavailable"){
-                      if (entity.state =="off"){
-                        return variables.ulm_off;
-                      } else if (entity.state == "on"){
-                        if (entity.attributes.brightness != null){
-                          var bri = Math.round(entity.attributes.brightness / 2.55);
-                          return (bri ? bri : "0") + "%";
-                        } else {
-                          return variables.ulm_on
-                        }
+                    var label = variables.ulm_translation_state
+                      if (entity.attributes.brightness != null && entity.state === 'on'){
+                        var bri = Math.round(entity.attributes.brightness / 2.55);
+                        var label = (bri ? bri : "0") + "%";
                       }
-                    } else {
-                      return variables.ulm_unavailable;
-                    }
+                    return label;
                   ]]]
                 state:
                   - value: "on"
@@ -6181,11 +6665,24 @@ button_card_templates:
                   return "rgba(var(--color-yellow),0.2)";
                 }
             ]]]
+          thumbColor: >
+            [[[
+                var color = entity.attributes.rgb_color;
+                if (entity.state == "unavailable"){
+                   return "rgba(var(--color-grey),1)";
+                }
+                else if (color && variables.ulm_card_light_enable_color){
+                   return "rgba(" + color + ",1)";
+                }
+                else{
+                  return "rgba(var(--color-yellow),1)";
+                }
+            ]]]
           mainSliderColorOff: "rgba(var(--color-theme),0.05)"
           secondarySliderColorOff: "rgba(var(--color-theme),0.05)"
           thumbHorizontalPadding: "0px"
           thumbVerticalPadding: "0px"
-          thumbWidth: "0px"
+          thumbWidth: "12px"
           card_mod:
           style: |
             ha-card {
@@ -6194,7 +6691,7 @@ button_card_templates:
             }
   card_room:
     template:
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
     variables:
       label_use_temperature: true
       label_use_brightness: false
@@ -6203,6 +6700,12 @@ button_card_templates:
     show_name: true
     show_label: true
     size: "45%"
+    double_tap_action:
+      action: "call-service"
+      service: "input_select.select_option"
+      service_data:
+        option: "[[[ return variables.ulm_input_select_option ]]]"
+        entity_id: "[[[ return variables.ulm_input_select ]]]"
     aspect_ratio: "1/1"
     label: |-
       [[[
@@ -6211,24 +6714,20 @@ button_card_templates:
         } else if (variables.label_use_brightness) {
           if (entity.state){
             if (entity.state == "off"){
-              return variables.ulm_off;
+              return variables.ulm_translation_state;
             } else if (entity.state == "on"){
               if (entity.attributes.brightness != null){
                 var bri = Math.round(entity.attributes.brightness / 2.55);
                 return (bri ? bri : "0") + "%";
               } else {
-                return variables.ulm_on
+                return variables.ulm_translation_state;
               }
             }
           } else {
-            return variables.ulm_unavailable;
+            return variables.ulm_translation_state;
           }
-        } else if (entity.state == "on") {
-            return variables.ulm_on
-        } else if (entity.state == "off") {
-            return variables.ulm_off
         } else {
-          return entity.state
+            return variables.ulm_translation_state;
         }
       ]]]
     state:
@@ -6474,7 +6973,9 @@ button_card_templates:
   ### Card Thermostat ###
   card_thermostat:
     template:
-      - "ulm_language_variables"
+      - "ulm_translation_engine"
+      - "icon_more_info_new"
+      - "ulm_actions_card"
     variables:
       ulm_card_thermostat_name: "[[[ return entity.attributes.friendly_name ]]]"
       ulm_card_thermostat_icon: "[[[ return 'mdi:thermometer' ]]]"
@@ -6489,25 +6990,6 @@ button_card_templates:
     show_icon: false
     show_name: false
     show_label: false
-    hold_action:
-      action: >
-        [[[
-            if (variables.ulm_card_thermostat_enable_popup){
-              return 'fire-dom-event'
-            }
-            else{
-              return 'more-info'
-            }
-        ]]]
-      browser_mod:
-        command: "popup"
-        large: true
-        hide_header: true
-        card:
-          type: "custom:button-card"
-          template: "popup_thermostat_temperature"
-          variables:
-            ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
     state:
       - operator: "template"
         value: >
@@ -6559,11 +7041,7 @@ button_card_templates:
             ]]]
         - grid-template-columns: >
             [[[
-                  if (variables.ulm_card_thermostat_enable_horizontal) {
-                    return "1fr 1fr";
-                  } else {
-                    return "2fr 1fr";
-                  }
+                    return variables.ulm_card_thermostat_enable_horizontal ? "1fr 1fr" : "2fr 1fr";
             ]]]
         - grid-template-rows: >
             [[[
@@ -6642,26 +7120,11 @@ button_card_templates:
               card:
                 type: "custom:button-card"
                 entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                  ulm_card_thermostat_enable_popup: "[[[ return variables.ulm_card_thermostat_enable_popup; ]]]"
                 icon: "[[[ return variables.ulm_card_thermostat_icon ]]]"
-                hold_action:
-                  action: >
-                    [[[
-                        if (variables.ulm_card_thermostat_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
-                    ]]]
-                  browser_mod:
-                    command: "popup"
-                    large: true
-                    hide_header: true
-                    card:
-                      type: "custom:button-card"
-                      template: "popup_thermostat_temperature"
-                      variables:
-                        ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
                 state:
                   - operator: "template"
                     value: >
@@ -6687,71 +7150,16 @@ button_card_templates:
               card:
                 type: "custom:button-card"
                 entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                  ulm_card_thermostat_enable_popup: "[[[ return variables.ulm_card_thermostat_enable_popup; ]]]"
                 name: "[[[ return variables.ulm_card_thermostat_name ]]]"
-                tap_action:
-                  action: "call-service"
-                  service: >
-                    [[[
-                          if (entity.state =='off'){
-                              return "climate.turn_on";
-                          } else {
-                              return "climate.turn_off";
-                          }
-                    ]]]
-                  service_data:
-                    entity_id: "[[[ return entity.entity_id ]]]"
-                hold_action:
-                  action: >
-                    [[[
-                        if (variables.ulm_card_thermostat_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
-                    ]]]
-                  browser_mod:
-                    command: "popup"
-                    large: true
-                    hide_header: true
-                    card:
-                      type: "custom:button-card"
-                      template: "popup_thermostat_temperature"
-                      variables:
-                        ulm_popup_thermostat_entity: "[[[ return entity.entity_id ]]]"
                 label: >-
                   [[[
-                      var label = variables.ulm_off ;
-                      if (entity.state =='off'){
-                        label = variables.ulm_off ;
-                      }else if (entity.state == 'auto'){
-                        label = variables.ulm_auto ;
-                      }else if (entity.state == 'heat'){
-                        label = variables.ulm_heat ;
-                      }else if (entity.state == 'cool'){
-                        label = variables.ulm_cool ;
-                      }else if (entity.state == 'dry'){
-                        label = variables.ulm_dry ;
-                      }else if (entity.state == 'heat_cool'){
-                        label = variables.ulm_heat_cool ;
-                      }else if (entity.state == 'fan_only' || ((variables.ulm_card_thermostat_fan_entity !== null) && states[variables.ulm_card_thermostat_fan_entity].state == 'on')){
-                        label = variables.ulm_fan_only ;
-                      }else{
-                        label = variables.ulm_idle;
-                      }
-  
-                      if (entity.attributes.hvac_action == 'heating'){
-                        var mode = variables.ulm_heating ;
-                      }else if (entity.attributes.hvac_action == 'cooling'){
-                        var mode = variables.ulm_cooling ;
-                      }else if (entity.attributes.hvac_action == 'idle'){
-                        var mode = variables.ulm_idle ;
-                      }else{
-                        var mode = variables.ulm_unavailable;
-                      }
-  
+                      var label = variables.ulm_translation_state;
                       if((entity.attributes.temperature || entity.attributes.target_temp_high != null) && !variables.ulm_card_thermostat_enable_display_temperature){
-                        return (entity.attributes.current_temperature ) + '°' + ' • ' + label + (entity.state !='off' ? ' (' + mode + ')' : '');
+                        return variables.ulm_translation_hvac;
                       }
                       return label;
                   ]]]
@@ -7327,13 +7735,45 @@ button_card_templates:
   ### Card Binary Sensor Alert ###
   card_binary_sensor_alert:
     template:
-      - "icon_info_alert"
-    name: "[[[ return entity.attributes.friendly_name != '' ? entity.attributes.friendly_name : entity.entity_id ]]]"
-    show_last_changed: true
+      - "icon_more_info_alert"
+      - "blue"
+      - "ulm_language_variables"
+      - "ulm_actions_card"
+    show_last_changed: false
+    variables:
+      ulm_show_last_changed: false
+    custom_fields:
+      item1:
+        card:
+          type: "custom:button-card"
+          template:
+            - "icon_more_info"
+            - "blue"
+          custom_fields:
+            item1:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "blue"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+            item2:
+              card:
+                type: "custom:button-card"
+                template:
+                  - "blue_no_card"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                entity: "[[[ return entity.entity_id ]]]"
+                name: "[[[ return entity.attributes.friendly_name != '' ? entity.attributes.friendly_name : entity.entity_id ]]]"
+                show_last_changed: "[[[ return variables.ulm_show_last_changed; ]]]"
   card_welcome_scenes:
     variables:
       ulm_weather: "[[[ return variables.ulm_weather]]]"
-      ulm_language: "[[[ return window.navigator.language ]]]"
+      ulm_language: "[[[ return hass['language']; ]]]"
       entity_1:
         entity_id: ""
         color: >
@@ -7392,6 +7832,7 @@ button_card_templates:
           ]]]
     template:
       - "ulm_language_variables"
+      - "ulm_translation_engine"
     show_icon: false
     show_name: false
     show_label: true
@@ -7490,7 +7931,7 @@ button_card_templates:
           show_label: true
           show_name: true
           show_entity_picture: false
-          name: "Scenes"
+          name: "[[[ return variables.ulm_translation_scenes ]]]"
           icon: "mdi:dots-vertical"
           styles:
             icon:
@@ -7517,7 +7958,7 @@ button_card_templates:
           template: >
             [[[
               if(variables?.entity_1?.entity_id != ""){
-                return 'card_scenes'
+                return 'card_scenes_welcome'
               } else {
                 return 'card_scenes_welcome_auto'
               }
@@ -7886,7 +8327,9 @@ button_card_templates:
   ### Card Media Player ###
   card_media_player:
     template:
-      - "ulm_language_variables"
+      - "icon_more_info_new"
+      - "ulm_actions_card"
+      - "ulm_translation_engine"
     variables:
       ulm_card_media_player_name: "[[[ return entity.attributes.friendly_name ]]]"
       ulm_card_media_player_icon: false
@@ -7901,25 +8344,6 @@ button_card_templates:
     show_icon: false
     show_name: false
     show_label: false
-    hold_action:
-      action: >
-        [[[
-            if (variables.ulm_card_media_player_enable_popup){
-              return 'fire-dom-event'
-            }
-            else{
-              return 'more-info'
-            }
-        ]]]
-      browser_mod:
-        command: "popup"
-        large: true
-        hide_header: true
-        card:
-          type: "custom:button-card"
-          template: "popup_media_player_infos"
-          variables:
-            ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
     styles:
       grid:
         - grid-template-areas: |
@@ -7992,159 +8416,125 @@ button_card_templates:
         card:
           type: "custom:button-card"
           template:
-            - "icon_info_bg"
-            - "ulm_language_variables"
-          entity: "[[[ return entity.entity_id ]]]"
-          hold_action:
-            action: >
-              [[[
-                  if (variables.ulm_card_media_player_enable_popup){
-                    return 'fire-dom-event'
-                  }
-                  else{
-                    return 'more-info'
-                  }
-              ]]]
-            browser_mod:
-              command: "popup"
-              large: true
-              hide_header: true
+            - "icon_more_info"
+          custom_fields:
+            item1:
               card:
                 type: "custom:button-card"
-                template: "popup_media_player_infos"
+                entity: "[[[ return entity.entity_id ]]]"
                 variables:
-                  ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
-          icon: |
-            [[[
-              var icon =  entity.attributes.icon || "mdi:speaker";
-              if(entity.attributes.app_name){
-                var app = entity.attributes.app_name.toLowerCase();
-                if(app == "spotify"){
-                  var icon = "mdi:spotify";
-                } else if(app == "google podcasts"){
-                  var icon = "mdi:google-podcast";
-                } else if(app == "plex"){
-                  var icon = "mdi:plex";
-                } else if(app == "soundcloud"){
-                  var icon = "mdi:soundcloud";
-                } else if(app == "youtube music"){
-                  var icon = "mdi:youtube";
-                } else if (app == "oto music"){
-                  var icon = "mdi:music-circle";
-                } else if(app == "pandora"){
-                  var icon = "mdi:pandora";
-                } else if(app == "netflix"){
-                  var icon = "mdi:netflix";
-                } else if(app == "bluetooth audio"){
-                  var icon = "mdi:bluetooth";
-                }
-              }
-              return variables.ulm_card_media_player_icon || icon;
-            ]]]
-          label: |
-            [[[
-                let state = entity.state;
-                return variables["ulm_" + state] ? variables["ulm_" + state] : state;
-            ]]]
-          state:
-            - operator: "template"
-              value: "[[[ return entity.state == 'off' ]]]"
-              name: |
-                [[[
-                  let name = variables.ulm_card_media_player_name || states[entity.entity_id].attributes.friendly_name;
-                  return name;
-                ]]]
-            - operator: "template"
-              value: "[[[ return entity.state != 'off' ]]]"
-              name: |
-                [[[
-                  let name = variables.ulm_card_media_player_name || states[entity.entity_id].attributes.friendly_name;
-                  if(states[entity.entity_id].attributes.media_title){
-                      name = states[entity.entity_id].attributes.media_title;
-                  }
-                  return name;
-                ]]]
-              label: |
-                [[[
-                  let label = variables.ulm_on;
-                  if (variables.ulm_card_media_player_more_info && states[entity.entity_id].attributes.media_artist
-                      && states[entity.entity_id].attributes.media_album_name) {
-                      label = states[entity.entity_id].attributes.media_artist + " • " + states[entity.entity_id].attributes.media_album_name;
-                  } else if(states[entity.entity_id].attributes.media_album_name) {
-                      label = states[entity.entity_id].attributes.media_album_name;
-                  } else if (states[entity.entity_id].attributes.media_artist) {
-                      label = states[entity.entity_id].attributes.media_artist
-                  } else {
-                      label = variables.ulm_on;
-                  }
-                  return label;
-                ]]]
-          styles:
-            label:
-              - opacity: "1"
-              - filter: "opacity(100%)"
-              - text-shadow: |
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                  ulm_card_media_player_enable_popup: "[[[ return variables.ulm_card_media_player_enable_popup; ]]]"
+                icon: |
                   [[[
-                    return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
-                    ? '0 0 black'
-                    : 'none'
+                    var icon =  entity.attributes.icon || "mdi:speaker";
+                    if(entity.attributes.app_name){
+                      var app = entity.attributes.app_name.toLowerCase();
+                      var icon = {
+                        "spotify": "mdi:spotify",
+                        "google podcasts": "mdi:google-podcast",
+                        "plex": "mdi:plex",
+                        "soundcloud": "mdi:soundcloud",
+                        "youtube music": "mdi:youtube",
+                        "oto music": "mdi:music-circle",
+                        "pandora": "mdi:pandora",
+                        "netflix": "mdi:netflix",
+                        "bluetooth audio": "mdi:bluetooth"
+                      }
+                    }
+                    return variables.ulm_card_media_player_icon || icon[app];
                   ]]]
-              - color: |
-                  [[[
-                    return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
-                    ? 'white'
-                    : 'rgba(var(--color-theme), .5)'
-                  ]]]
-            name:
-              - color: |
-                  [[[
-                    return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
-                    ? 'white'
-                    : 'rgba(var(--color-theme), 1)'
-                  ]]]
-              - text-shadow: "0 0 black"
-            icon:
-              - color: |
-                  [[[
-                    return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
-                    ? 'white'
-                    : 'rgba(var(--color-theme), 0.2)'
-                  ]]]
-            img_cell:
-              - background-color: |
-                  [[[
-                    return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
-                    ? 'rgba(0, 0, 0, 0.2)'
-                    : 'rgba(var(--color-theme), 0.05)'
-                  ]]]
-            card:
-              - padding: "0px"
-              - background: "none"
-              - border-radius: "0"
-              - box-shadow: "none"
+                styles:
+                  icon:
+                    - color: |
+                        [[[
+                          return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
+                          ? 'white'
+                          : 'rgba(var(--color-theme), 0.2)'
+                        ]]]
+                  img_cell:
+                    - background-color: |
+                        [[[
+                          return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
+                          ? 'rgba(0, 0, 0, 0.2)'
+                          : 'rgba(var(--color-theme), 0.05)'
+                        ]]]
+                  card:
+                    - background: "none"
+            item2:
+              card:
+                type: "custom:button-card"
+                entity: "[[[ return entity.entity_id ]]]"
+                variables:
+                  ulm_input_select_option: "[[[ return variables.ulm_input_select_option; ]]]"
+                  ulm_input_select: "[[[ return variables.ulm_input_select; ]]]"
+                  ulm_card_media_player_enable_popup: "[[[ return variables.ulm_card_media_player_enable_popup; ]]]"
+                label: "[[[ return variables.ulm_translation_state ]]]"
+                state:
+                  - operator: "template"
+                    value: "[[[ return entity.state == 'off' ]]]"
+                    name: |
+                      [[[
+                        let name = variables.ulm_card_media_player_name || states[entity.entity_id].attributes.friendly_name;
+                        return name;
+                      ]]]
+                  - operator: "template"
+                    value: "[[[ return entity.state != 'off' ]]]"
+                    name: |
+                      [[[
+                        let name = variables.ulm_card_media_player_name || states[entity.entity_id].attributes.friendly_name;
+                        if(states[entity.entity_id].attributes.media_title){
+                            name = states[entity.entity_id].attributes.media_title;
+                        }
+                        return name;
+                      ]]]
+                    label: |
+                      [[[
+                        let label = variables.ulm_translation_on;
+                        if (variables.ulm_card_media_player_more_info && states[entity.entity_id].attributes.media_artist
+                            && states[entity.entity_id].attributes.media_album_name) {
+                            label = states[entity.entity_id].attributes.media_artist + " • " + states[entity.entity_id].attributes.media_album_name;
+                        } else if(states[entity.entity_id].attributes.media_album_name) {
+                            label = states[entity.entity_id].attributes.media_album_name;
+                        } else if (states[entity.entity_id].attributes.media_artist) {
+                            label = states[entity.entity_id].attributes.media_artist
+                        }
+                        return label;
+                      ]]]
+                styles:
+                  label:
+                    - opacity: "1"
+                    - filter: "opacity(100%)"
+                    - text-shadow: |
+                        [[[
+                          return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
+                          ? '0 0 black'
+                          : 'none'
+                        ]]]
+                    - color: |
+                        [[[
+                          return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
+                          ? 'white'
+                          : 'rgba(var(--color-theme), .5)'
+                        ]]]
+                  name:
+                    - color: |
+                        [[[
+                          return variables.ulm_card_media_player_enable_art && states[entity.entity_id].attributes.entity_picture != null
+                          ? 'white'
+                          : 'rgba(var(--color-theme), 1)'
+                        ]]]
+                    - text-shadow: "0 0 black"
+                  card:
+                    - padding: "0px"
+                    - background: "none"
+                    - border-radius: "0"
+                    - box-shadow: "none"
       item2:
         card:
           type: "custom:button-card"
           template: "list_3_items"
-          hold_action:
-            action: >
-              [[[
-                  if (variables.ulm_card_media_player_enable_popup){
-                    return 'fire-dom-event'
-                  }
-                  else{
-                    return 'more-info'
-                  }
-              ]]]
-            browser_mod:
-              command: "popup"
-              large: true
-              hide_header: true
-              card:
-                type: "custom:button-card"
-                template: "popup_media_player_infos"
-                variables:
-                  ulm_popup_media_player_entity: "[[[ return entity.entity_id ]]]"
           styles:
             card:
               - padding: "0px"
@@ -8159,12 +8549,7 @@ button_card_templates:
                 hold_action:
                   action: >
                     [[[
-                        if (variables.ulm_card_media_player_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
+                        return variables.ulm_card_media_player_enable_popup ? "fire-dom-event" : "more-info";
                     ]]]
                   browser_mod:
                     command: "popup"
@@ -8205,12 +8590,7 @@ button_card_templates:
                 hold_action:
                   action: >
                     [[[
-                        if (variables.ulm_card_media_player_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
+                        return variables.ulm_card_media_player_enable_popup ? "fire-dom-event" : "more-info";
                     ]]]
                   browser_mod:
                     command: "popup"
@@ -8254,12 +8634,7 @@ button_card_templates:
                 hold_action:
                   action: >
                     [[[
-                        if (variables.ulm_card_media_player_enable_popup){
-                          return 'fire-dom-event'
-                        }
-                        else{
-                          return 'more-info'
-                        }
+                        return variables.ulm_card_media_player_enable_popup ? "fire-dom-event" : "more-info";
                     ]]]
                   browser_mod:
                     command: "popup"

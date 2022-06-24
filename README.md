@@ -142,6 +142,8 @@ The yamaha platform allows you to control Yamaha Network Receivers
 
 The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](https://zwave-js.github.io/zwavejs2mqtt) JS driver. This is the recommended Z-Wave integration for Home Assistant.
 
+---
+
 </details>
 
 <details><summary>16 Custom Integrations</summary>
@@ -152,11 +154,15 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](h
 
 ### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
 
-Home Assistant Service for sending commands to a Wifi enabled DreamScreenAuthors:[https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
+Home Assistant Service for sending commands to a Wifi enabled DreamScreen
+
+Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
 
 ### [Emporia Vue](https://github.com/magico13/ha-emporia-vue) [v0.7.3]
 
-Home Assistant Integration for Emporia Vue Energy MonitorAuthors:[@magico13](https://github.com/magico13).
+Home Assistant Integration for Emporia Vue Energy Monitor
+
+Authors: [@magico13](https://github.com/magico13).
 
 ### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.1.5]
 
@@ -164,51 +170,78 @@ Home Assistant Integration for Emporia Vue Energy MonitorAuthors:[@magico13](htt
 
 ### [Generate Readme](https://github.com/custom-components/readme) [v0.5.0]
 
-Use Jinja and data from Home Assistant to generate your README.md fileAuthors:[@ludeeus](https://github.com/ludeeus).
+Use Jinja and data from Home Assistant to generate your README.md file
+
+Authors: [@ludeeus](https://github.com/ludeeus).
 
 ### [Govee](https://github.com/LaggAt/hacs-govee) [v0.2.2]
 
-A HACS repository for Govee light integrationAuthors:[@LaggAt](https://github.com/LaggAt).
+A HACS repository for Govee light integration
+
+Authors: [@LaggAt](https://github.com/LaggAt).
 
 ### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.5]
 
-HACS gives you a powerful UI to handle downloads of all your custom needs.Authors:[@ludeeus](https://github.com/ludeeus).
+HACS gives you a powerful UI to handle downloads of all your custom needs.
+
+Authors: [@ludeeus](https://github.com/ludeeus).
 
 ### [Helium Blockchain](https://github.com/rsnodgrass/hass-helium) [v0.3.8]
 
-Helium blockchain sensors for Home AssistantAuthors:[@rsnodgrass](https://github.com/rsnodgrass).
+Helium blockchain sensors for Home Assistant
+
+Authors: [@rsnodgrass](https://github.com/rsnodgrass).
 
 ### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.80]
 
-Home Assistant integration for managing Z-Wave enabled locksAuthors:[@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
+Home Assistant integration for managing Z-Wave enabled locks
+
+Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
 ### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.4-2]
 
-Home Assistant integration providing day of package counts and USPS informed delivery images.Authors:[@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
+Home Assistant integration providing day of package counts and USPS informed delivery images.
+
+Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
 ### [Openei](https://github.com/firstof9/ha-openei) [v0.1.7]
 
-OpenEI integration for Home AssistantAuthors:[@firstof9](https://github.com/firstof9).
+OpenEI integration for Home Assistant
+
+Authors: [@firstof9](https://github.com/firstof9).
 
 ### [Sensor.Unifigateway](https://github.com/custom-components/sensor.unifigateway) [v0.3.3]
 
-High level health status of UniFi Security Gateway devices via UniFi ControllerAuthors:[@jchasey](https://github.com/jchasey).
+High level health status of UniFi Security Gateway devices via UniFi Controller
+
+Authors: [@jchasey](https://github.com/jchasey).
 
 ### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.2]
 
-Subaru STARLINK custom component for Home Assistant.Authors:[@G-Two](https://github.com/G-Two).
+Subaru STARLINK custom component for Home Assistant.
 
-### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v0.0.9]
+Authors: [@G-Two](https://github.com/G-Two).
 
-UI-Lovelace-Minimalist is a "theme" for HomeAssistantAuthors:[@stokkie90](https://github.com/stokkie90).
+### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v1.0.1]
+
+UI-Lovelace-Minimalist is a "theme" for HomeAssistant
+
+Authors: [@stokkie90](https://github.com/stokkie90).
 
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.0]
 
-Home Assistant custom integration to keep track of missing entities and services in your config filesAuthors:[@dummylabs](https://github.com/dummylabs).
+Home Assistant custom integration to keep track of missing entities and services in your config files
+
+Authors: [@dummylabs](https://github.com/dummylabs).
 
 ### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v2.3.0]
 
-Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technologyAuthors:[@AlexxIT](https://github.com/AlexxIT).
+Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technology
+
+Authors: [@AlexxIT](https://github.com/AlexxIT).
+
+---
+
 </details>
 
 <details><summary>27 Lovelace Plugins</summary>
@@ -320,6 +353,9 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 ### [Weather Card](https://github.com/bramkragten/weather-card) [v1.5.0]
 
 Weather Card with animated icons for Home Assistant Lovelace
+
+---
+
 </details><details><summary>5 Themes</summary>
 
 ### [Midnight Theme](https://github.com/home-assistant-community-themes/midnight)
@@ -341,6 +377,9 @@ Dark Grey Theme for Home Assistant
 ### [Noctis Solarized](https://github.com/williamahartman/noctis-solarized)
 
 Noctis theme made Solarized
+
+---
+
 </details>
 
 <details><summary>Unused Integrations</summary>
@@ -353,9 +392,9 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 [Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) | [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py)
 
-</details>
-
 ---
+
+</details>
 
 ## Devices
 
