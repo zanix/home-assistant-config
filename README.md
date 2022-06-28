@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1310 total entities**,
-including **537 sensors**.
+This Home Assistant install has approximately **1316 total entities**,
+including **538 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -222,7 +222,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v1.0.1]
+### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v1.0.2]
 
 UI-Lovelace-Minimalist is a "theme" for HomeAssistant
 
@@ -244,7 +244,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>27 Lovelace Plugins</summary>
+<details><summary>28 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -306,7 +306,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v1.10.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.0.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -345,6 +345,10 @@ Home assistant sun card based on Google weather design
 ### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.2.1]
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
+
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.18]
+
+A progress bar display for Home Assistant timers
 
 ### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.11.1]
 
@@ -467,7 +471,7 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 
 ## Automations
 
-This Home Assistant install has approximately **124 automations**.
+This Home Assistant install has approximately **125 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
