@@ -1,0 +1,103 @@
+---
+id: dishwasher_running
+alias: '[Notify] Dishwasher is Running'
+description: 'Sets dishewaher status and sends notification when the dishwasher is done'
+
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.dishwasher_disposal_2_1min
+    for:
+      minutes: 2
+    above: 40
+
+condition:
+  or:
+    - condition: state
+      entity_id: input_select.dishwasher_status
+      state: 'Off'
+    - condition: state
+      entity_id: input_select.dishwasher_status
+      state: 'Clean'
+
+action:
+  - service: timer.start
+    target:
+      entity_id: timer.dishwasher_timer
+
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.dishwasher_status
+    data:
+      option: Washing
+
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: sensor.dishwasher_disposal_2_1min
+        below: 20
+        for:
+          minutes: 2
+
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.dishwasher_status
+    data:
+      option: Draining
+
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: sensor.dishwasher_disposal_2_1min
+        below: 20
+        for:
+          minutes: 2
+
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.dishwasher_status
+    data:
+      option: Rinsing
+
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: sensor.dishwasher_disposal_2_1min
+        below: 20
+        for:
+          minutes: 2
+
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.dishwasher_status
+    data:
+      option: Drying
+
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: sensor.dishwasher_disposal_2_1min
+        below: 20
+        for:
+          minutes: 5
+
+  - service: input_select.select_option
+    target:
+      entity_id: input_select.dishwasher_status
+    data:
+      option: 'Off'
+
+  - service: timer.finish
+    target:
+      entity_id: timer.dishwasher_timer
+
+  - service: script.notify_mobile
+    data:
+      who: 'parents'
+      title: 'Dishwasher'
+      message: 'The dishwasher is done!'
+      icon: '/local/icons/dishwasher.png'
+      tag: 'dishwasher'
+
+  - service: script.notify_join
+    data:
+      who: 'shield_all'
+      title: 'Dishwasher'
+      message: 'The dishwasher is done!'
+      icon: 'local/icons/dishwasher.png'
+      tag: 'dishwasher'

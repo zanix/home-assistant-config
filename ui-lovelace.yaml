@@ -7914,42 +7914,82 @@ views:
     square: false
     type: grid
   - cards:
-    - subtitle: Laundry
+    - subtitle: Laundry / Dishes
       type: custom:mushroom-title-card
     - cards:
       - entity: input_boolean.washer
-        icon: mdi:washing-machine
+        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:washing-machine\n{%- else\
+          \ -%}\n  mdi:washing-machine-off\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n \
           \ grey\n{%- endif -%}"
+        multiline_secondary: true
         primary: "{%- if is_state(entity, \"on\") -%}\n  Washing\n{%- else -%}\n \
-          \ Washer Idle\n{%- endif -%}"
-        secondary: "{% set last_changed = states[entity].last_changed -%}\n{%- if\
-          \ last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
-          \ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n{%- elif\
-          \ last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+          \ Off\n{%- endif -%}"
+        secondary: "Washer\n{% set last_changed = states[entity].last_changed -%}\n\
+          {%- if last_changed < today_at() - timedelta(days=6) -%}\n  More than a\
+          \ week ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n\
+          \  {{ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n\
+          {%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
           \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
           {%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
       - entity: input_boolean.dryer
-        icon: mdi:tumble-dryer
+        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:tumble-dryer\n{%- else -%}\n\
+          \  mdi:tumble-dryer-off\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
           \  grey\n{%- endif -%}"
-        primary: "{%- if is_state(entity, \"on\") -%}\n  Drying\n{%- else -%}\n  Dryer\
-          \ Idle\n{%- endif -%}"
-        secondary: "{% set last_changed = states[entity].last_changed -%}\n{%- if\
-          \ last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
-          \ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n{%- elif\
-          \ last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+        multiline_secondary: true
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Drying\n{%- else -%}\n  Off\n\
+          {%- endif -%}"
+        secondary: "Dryer\n{% set last_changed = states[entity].last_changed -%}\n\
+          {%- if last_changed < today_at() - timedelta(days=6) -%}\n  More than a\
+          \ week ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n\
+          \  {{ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n\
+          {%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
           \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
           {%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
-      type: horizontal-stack
+      - entity: input_select.dishwasher_status
+        icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
+          \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  purple\n{%- elif\
+          \ is_state(entity, \"Draining\") -%}\n  blue-grey\n{%- elif is_state(entity,\
+          \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
+          \  red\n{%- elif is_state(entity, \"Clean\") -%}\n  lime\n{%- else -%}\n\
+          \  grey\n{%- endif -%}"
+        multiline_secondary: true
+        primary: '{{ states(entity) }}'
+        secondary: "Dishwasher\n{% set last_changed = states[entity].last_changed\
+          \ -%}\n{%- if last_changed < today_at() - timedelta(days=6) -%}\n  More\
+          \ than a week ago\n{%- elif last_changed < today_at() - timedelta(days=1)\
+          \ -%}\n  {{ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p')\
+          \ }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+          \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
+          {%- endif -%}"
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      - card:
+          bar_background: rgba(var(--color-grey),50%)
+          bar_direction: rtl
+          bar_height: 20px
+          bar_radius: var(--border-radius)
+          entity: timer.dishwasher_run_time
+          invert: true
+          layout: hide_name
+          text_width: 4em
+          type: custom:timer-bar-card
+        conditions:
+        - entity: input_select.dishwasher_status
+          state_not: 'Off'
+        type: conditional
+      columns: 2
+      square: false
+      type: grid
     type: vertical-stack
   - tap_action:
       action: navigate
@@ -7972,9 +8012,13 @@ views:
         type: custom:mushroom-title-card
       - cards:
         - card:
+            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ 'mdi:numeric-' + states(entity)\
+              \ + '-circle' }}\n{% endif %}"
             entity: sensor.mail_usps_mail
+            icon: mdi:mailbox-up
             icon_color: grey
-            name: Mail
+            primary: Mail
+            secondary: ''
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -8006,17 +8050,19 @@ views:
                 command: popup
                 large: true
                 title: Mail
-              target: {}
-            type: custom:mushroom-entity-card
+            type: custom:mushroom-template-card
           conditions:
           - entity: sensor.mail_usps_mail
             state_not: '0'
           type: conditional
         - card:
+            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ 'mdi:numeric-' + states(entity)\
+              \ + '-circle' }}\n{% endif %}"
             entity: sensor.mail_usps_delivering
             icon: fab:usps
             icon_color: blue
-            name: USPS
+            primary: USPS
+            secondary: ''
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -8045,16 +8091,19 @@ views:
                   type: vertical-stack
                 command: popup
                 title: USPS Tracking
-            type: custom:mushroom-entity-card
+            type: custom:mushroom-template-card
           conditions:
           - entity: sensor.mail_usps_delivering
             state_not: '0'
           type: conditional
         - card:
+            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ 'mdi:numeric-' + states(entity)\
+              \ + '-circle' }}\n{% endif %}"
             entity: sensor.mail_ups_delivering
             icon: fab:ups
             icon_color: brown
-            name: UPS
+            primary: UPS
+            secondary: ''
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -8083,16 +8132,19 @@ views:
                   type: vertical-stack
                 command: popup
                 title: UPS Tracking
-            type: custom:mushroom-entity-card
+            type: custom:mushroom-template-card
           conditions:
           - entity: sensor.mail_ups_delivering
             state_not: '0'
           type: conditional
         - card:
+            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ 'mdi:numeric-' + states(entity)\
+              \ + '-circle' }}\n{% endif %}"
             entity: sensor.mail_fedex_delivering
             icon: fab:fedex
             icon_color: purple
-            name: FedEx
+            primary: FedEx
+            secondary: ''
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -8121,7 +8173,7 @@ views:
                   type: vertical-stack
                 command: popup
                 title: FedEx Tracking
-            type: custom:mushroom-entity-card
+            type: custom:mushroom-template-card
           conditions:
           - entity: sensor.mail_fedex_delivering
             state_not: '0'
@@ -10984,14 +11036,14 @@ views:
           , \"on\") -%}\n  yellow\n{%- elif is_state(entity, \"on\") -%}\n  red\n\
           {%- else -%}\n  grey\n{%- endif -%}"
         multiline_secondary: true
-        primary: '{{ state_attr(entity, "friendly_name") }}'
-        secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- elif is_state(\"\
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- elif is_state(\"\
           lock.lock_front\", \"locked\") -%}\n  Locked\n{%- else -%}\n  Closed\n{%-\
-          \ endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%- if\
-          \ last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
-          \ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n{%- elif\
-          \ last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+          \ endif %}"
+        secondary: "{{ state_attr(entity, \"friendly_name\") }}\n{% set last_changed\
+          \ = states[entity].last_changed -%}\n{%- if last_changed < today_at() -\
+          \ timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed <\
+          \ today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp()|timestamp_custom('%A\
+          \ at %-I:%M %p') }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
           \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
           {%- endif -%}"
         tap_action:
@@ -11004,13 +11056,13 @@ views:
           , \"on\") -%}\n  yellow\n{%- elif is_state(entity, \"on\") -%}\n  red\n\
           {%- else -%}\n  grey\n{%- endif -%}"
         multiline_secondary: true
-        primary: '{{ state_attr(entity, "friendly_name") }}'
-        secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
-          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
-          \ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n{%- elif\
-          \ last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
+          {%- endif %}"
+        secondary: "{{ state_attr(entity, \"friendly_name\") }}\n{% set last_changed\
+          \ = states[entity].last_changed -%}\n{%- if last_changed < today_at() -\
+          \ timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed <\
+          \ today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp()|timestamp_custom('%A\
+          \ at %-I:%M %p') }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
           \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
           {%- endif -%}"
         tap_action:
@@ -11023,13 +11075,13 @@ views:
           , \"on\") -%}\n  yellow\n{%- elif is_state(entity, \"on\") -%}\n  red\n\
           {%- else -%}\n  grey\n{%- endif -%}"
         multiline_secondary: true
-        primary: '{{ state_attr(entity, "friendly_name") }}'
-        secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
-          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
-          \ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n{%- elif\
-          \ last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
+          {%- endif %}"
+        secondary: "{{ state_attr(entity, \"friendly_name\") }}\n{% set last_changed\
+          \ = states[entity].last_changed -%}\n{%- if last_changed < today_at() -\
+          \ timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed <\
+          \ today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp()|timestamp_custom('%A\
+          \ at %-I:%M %p') }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
           \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
           {%- endif -%}"
         tap_action:
@@ -11042,13 +11094,13 @@ views:
           , \"on\") -%}\n  yellow\n{%- elif is_state(entity, \"on\") -%}\n  red\n\
           {%- else -%}\n  grey\n{%- endif -%}"
         multiline_secondary: true
-        primary: '{{ state_attr(entity, "friendly_name") }}'
-        secondary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
-          {%- endif %}\n{% set last_changed = states[entity].last_changed -%}\n{%-\
-          \ if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-          \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{\
-          \ last_changed.timestamp()|timestamp_custom('%A at %-I:%M %p') }}\n{%- elif\
-          \ last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
+        primary: "{%- if is_state(entity, \"on\") -%}\n  Open\n{%- else -%}\n  Closed\n\
+          {%- endif %}"
+        secondary: "{{ state_attr(entity, \"friendly_name\") }}\n{% set last_changed\
+          \ = states[entity].last_changed -%}\n{%- if last_changed < today_at() -\
+          \ timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed <\
+          \ today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp()|timestamp_custom('%A\
+          \ at %-I:%M %p') }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom('Yesterday\
           \ at %-I:%M %p') }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n\
           {%- endif -%}"
         tap_action:
@@ -11432,6 +11484,174 @@ views:
       hours_to_show: 2
       type: map
     type: vertical-stack
+  - card:
+      cards:
+      - subtitle: Mail / Deliveries
+        type: custom:mushroom-title-card
+      - cards:
+        - card:
+            entity: sensor.mail_usps_mail
+            icon_color: grey
+            name: Mail
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  elements:
+                  - camera_image: camera.mail_usps
+                    camera_view: live
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 100%
+                    type: image
+                  - image: /local/mail_and_packages/overlay.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 101%
+                    type: image
+                  - entity: camera.mail_usps
+                    image: /local/mail_and_packages/vignette.png
+                    style:
+                      left: 50%
+                      top: 50%
+                      width: 101%
+                    type: image
+                  entity: camera.mail_usps
+                  image: local/mail_and_packages/white.png
+                  type: picture-elements
+                command: popup
+                large: true
+                title: Mail
+              target: {}
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_usps_mail
+            state_not: '0'
+          type: conditional
+        - card:
+            entity: sensor.mail_usps_delivering
+            icon: fab:usps
+            icon_color: blue
+            name: USPS
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.mail_usps_delivering
+                    icon_color: grey
+                    type: custom:mushroom-entity-card
+                  - card:
+                      cards:
+                      - subtitle: Tracking Numbers
+                        type: custom:mushroom-title-card
+                      - content: '{%- for trk_number in state_attr(''sensor.mail_usps_delivering'',
+                          ''tracking_#'') %}
+
+                          [{{ trk_number }}](https://tools.usps.com/go/TrackConfirmAction?tLabels={{
+                          trk_number }})
+
+                          {%- endfor -%}'
+                        type: markdown
+                      type: vertical-stack
+                    conditions:
+                    - entity: sensor.mail_usps_delivering
+                      state_not: '0'
+                    type: conditional
+                  type: vertical-stack
+                command: popup
+                title: USPS Tracking
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_usps_delivering
+            state_not: '0'
+          type: conditional
+        - card:
+            entity: sensor.mail_ups_delivering
+            icon: fab:ups
+            icon_color: brown
+            name: UPS
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.mail_ups_delivering
+                    icon_color: grey
+                    type: custom:mushroom-entity-card
+                  - card:
+                      cards:
+                      - subtitle: Tracking Numbers
+                        type: custom:mushroom-title-card
+                      - content: '{%- for trk_number in state_attr(''sensor.mail_ups_delivering'',
+                          ''tracking_#'') %}
+
+                          [{{ trk_number }}](https://www.ups.com/track?loc=en_US&tracknum={{
+                          trk_number }})
+
+                          {%- endfor -%}'
+                        type: markdown
+                      type: vertical-stack
+                    conditions:
+                    - entity: sensor.mail_ups_delivering
+                      state_not: '0'
+                    type: conditional
+                  type: vertical-stack
+                command: popup
+                title: UPS Tracking
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_ups_delivering
+            state_not: '0'
+          type: conditional
+        - card:
+            entity: sensor.mail_fedex_delivering
+            icon: fab:fedex
+            icon_color: purple
+            name: FedEx
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.mail_fedex_delivering
+                    icon_color: grey
+                    type: custom:mushroom-entity-card
+                  - card:
+                      cards:
+                      - subtitle: Tracking Numbers
+                        type: custom:mushroom-title-card
+                      - content: '{%- for trk_number in state_attr(''sensor.mail_fedex_delivering'',
+                          ''tracking_#'') %}
+
+                          [{{ trk_number }}](https://www.fedex.com/fedextrack/?trknbr={{
+                          trk_number }})
+
+                          {%- endfor -%}'
+                        type: markdown
+                      type: vertical-stack
+                    conditions:
+                    - entity: sensor.mail_fedex_delivering
+                      state_not: '0'
+                    type: conditional
+                  type: vertical-stack
+                command: popup
+                title: FedEx Tracking
+            type: custom:mushroom-entity-card
+          conditions:
+          - entity: sensor.mail_fedex_delivering
+            state_not: '0'
+          type: conditional
+        columns: 2
+        square: false
+        type: grid
+      type: vertical-stack
+    conditions:
+    - entity: binary_sensor.out_for_delivery
+      state: 'on'
+    type: conditional
   icon: mdi:test-tube
   layout:
     max_cols: 3
