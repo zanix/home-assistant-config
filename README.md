@@ -34,6 +34,8 @@ The androidtv platform allows you to control an Android TV device or Amazon Fire
 
 The ecobee integration lets you control and view sensor data from ecobee thermostats
 
+(Connected via HomeKit Controller integration for local control)
+
 ### [ESPHome](https://www.home-assistant.io/integrations/esphome)
 
 Connect ESPHome devices directly to Home Assistant with the native ESPHome API
@@ -45,6 +47,10 @@ The Forecast.Solar service provides solar production forecasting for your solar 
 ### [Google Cast](https://www.home-assistant.io/integrations/cast)
 
 Google Cast integration
+
+### [HomeKit Controller](https://www.home-assistant.io/integrations/homekit_controller)
+
+The HomeKit controller integration allows you to connect accessories with the "Works with HomeKit" logo to Home Assistant.
 
 ### [InfluxDB](https://www.home-assistant.io/integrations/influxdb)
 

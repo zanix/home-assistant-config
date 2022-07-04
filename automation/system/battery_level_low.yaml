@@ -18,13 +18,13 @@ variables:
       "sensor.pixel_6_battery_level",
       "sensor.ipad_josh_battery_level",
     ]) %}
-    {% for state in states.sensor | selectattr('attributes.device_class', '==', 'battery') %}
+    {% for state in states.sensor | rejectattr('attributes.device_class', 'undefined') | selectattr('attributes.device_class', '==', 'battery') %}
       {% if 0 <= state.state | int(-1) < threshold | int and not state.entity_id in exclude.entity_id %}
-        {% set name = state.name|replace(" [Battery Level]", "")|replace(" Battery Level", "") %}
+        {% set name = state.name|replace(" [Battery Level]", "")|replace(" Battery Level", "")|replace(": Battery level", "") %}
         {% set result.sensors = result.sensors + [name ~ ' (' ~ state.state ~ '%)'] %}
       {% endif %}
     {% endfor %}
-    {% for state in states.binary_sensor | selectattr('attributes.device_class', '==', 'battery') | selectattr('state', '==', 'on') %}
+    {% for state in states.binary_sensor | rejectattr('attributes.device_class', 'undefined') | selectattr('attributes.device_class', '==', 'battery') | selectattr('state', '==', 'on') %}
       {% if not state.entity_id in exclude.entity_id %}
         {% set result.sensors = result.sensors + [state.name] %}
       {% endif %}
