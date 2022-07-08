@@ -198,7 +198,7 @@ Helium blockchain sensors for Home Assistant
 
 Authors: [@rsnodgrass](https://github.com/rsnodgrass).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.80]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.82]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
@@ -316,7 +316,7 @@ Show multiple entity states and attributes on entity rows in Home Assistant's Lo
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v3.10]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v3.12]
 
 Replace input_number sliders with plus and minus buttons
 
@@ -328,7 +328,7 @@ Replace input_number sliders with plus and minus buttons
 
 A different take on the thermostat card for Home Assistant ♨️
 
-### [Slider Button Card](https://github.com/mattieha/slider-button-card) [v1.10.3]
+### [Slider Button Card](https://github.com/custom-cards/slider-button-card) [v1.10.9]
 
 A button card with integrated slider
 
