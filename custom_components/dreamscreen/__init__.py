@@ -173,7 +173,7 @@ async def async_setup(hass, config):
             updates.append(entity.async_update_ha_state(True))
 
         if updates:
-            await asyncio.wait(updates, loop=hass.loop)
+            await asyncio.wait(updates)
 
     for service_name in SERVICE_TO_ATTRIBUTE:
         schema = SERVICE_TO_ATTRIBUTE[service_name].get("schema")
