@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1347 total entities**,
-including **559 sensors**.
+This Home Assistant install has approximately **1369 total entities**,
+including **568 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -152,7 +152,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](h
 
 </details>
 
-<details><summary>16 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v1.5.3]
 
@@ -174,6 +174,12 @@ Authors: [@magico13](https://github.com/magico13).
 
 🔹 Use icons from fontawesome in home-assistant
 
+### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.8.1]
+
+🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
+
+Authors: [@bruxy70](https://github.com/bruxy70).
+
 ### [Generate Readme](https://github.com/custom-components/readme) [v0.5.0]
 
 Use Jinja and data from Home Assistant to generate your README.md file
@@ -186,7 +192,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.25.5]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.26.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -197,6 +203,12 @@ Authors: [@ludeeus](https://github.com/ludeeus).
 Helium blockchain sensors for Home Assistant
 
 Authors: [@rsnodgrass](https://github.com/rsnodgrass).
+
+### [Holidays](https://github.com/bruxy70/Holidays) [v1.8.0]
+
+📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
+
+Authors: [@bruxy70](https://github.com/bruxy70).
 
 ### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.82]
 
@@ -352,7 +364,7 @@ Home assistant sun card based on Google weather design
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.18]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.20]
 
 A progress bar display for Home Assistant timers
 
@@ -477,7 +489,7 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 
 ## Automations
 
-This Home Assistant install has approximately **125 automations**.
+This Home Assistant install has approximately **134 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
