@@ -7332,6 +7332,237 @@ views:
         action: navigate
         navigation_path: lights
       type: template
+    - content: "{% set progress = states(\"sensor.octoprint_layer_progress\") %}\n\
+        {% set format = states(\"sensor.octoprint_print_time_left_format\") %}\n{%\
+        \ if is_state(entity, \"on\") %}\n  {{ progress if progress != \"unknown\"\
+        \ else \"\" }} | {{ format if format != \"unavailable\" else \"\" }}\n{% endif\
+        \ %}"
+      entity: switch.octoprint_psu
+      hold_action:
+        action: none
+      icon: "{% if is_state(entity, \"on\") %}\n  mdi:printer-3d\n{% else %}\n  mdi:printer-3d-off\n\
+        {% endif %}"
+      icon_color: "{% if is_state(entity, \"on\") %}\n  green\n{% else %}\n  disabled\n\
+        {% endif %}"
+      tap_action:
+        action: fire-dom-event
+        browser_mod:
+          card:
+            cards:
+            - camera_view: live
+              entity: camera.ender_3_pro
+              show_name: false
+              show_state: false
+              type: picture-entity
+            - entity: switch.octoprint_psu
+              hold_action:
+                action: toggle
+              icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n\
+                \  mdi:power-off\n{%- endif -%}"
+              icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else\
+                \ -%}\n  grey\n{%- endif -%}"
+              primary: Power
+              secondary: "{%- if is_state(entity, \"on\") -%}\n  Press and hold to\
+                \ power off\n{%- else -%}\n  Press and hold to power on\n{%- endif\
+                \ -%}"
+              type: custom:mushroom-template-card
+            - card:
+                cards:
+                - cards:
+                  - entity: switch.octoprint_pause_print
+                    hold_action:
+                      action: toggle
+                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:play\n{%- else\
+                      \ -%}\n  mdi:pause\n{%- endif -%}"
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
+                      \ -%}\n  yellow\n{%- endif -%}"
+                    layout: vertical
+                    primary: Pause
+                    tap_action:
+                      action: none
+                    type: custom:mushroom-template-card
+                  - entity: button.octoprint_cancel_print
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      target:
+                        entity_id: button.octoprint_cancel_print
+                    icon: mdi:cancel
+                    icon_color: grey
+                    layout: vertical
+                    primary: Cancel
+                    tap_action:
+                      action: none
+                    type: custom:mushroom-template-card
+                  - entity: button.octoprint_emergency_stop
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      target:
+                        entity_id: button.octoprint_emergency_stop
+                    icon: mdi:alert-octagon
+                    icon_color: red
+                    layout: vertical
+                    multiline_secondary: false
+                    primary: E-Stop
+                    tap_action:
+                      action: none
+                    type: custom:mushroom-template-card
+                  - entity: button.octoprint_shutdown_system
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      target:
+                        entity_id: button.octoprint_shutdown_system
+                    icon: mdi:power
+                    icon_color: orange
+                    layout: vertical
+                    primary: Shutdown
+                    tap_action:
+                      action: none
+                    type: custom:mushroom-template-card
+                  type: horizontal-stack
+                - animation:
+                    state: 'on'
+                  entities:
+                  - entity: sensor.octoprint_print_progress
+                  name: Completion
+                  positions:
+                    icon: 'off'
+                    indicator: inside
+                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                    \ #0005;\n}"
+                  type: custom:bar-card
+                - cards:
+                  - entity: sensor.octoprint_layer_progress
+                    layout: vertical
+                    name: Layer
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  - entity: sensor.octoprint_print_time_format
+                    layout: vertical
+                    name: Print Time
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  - entity: sensor.octoprint_print_time_left_format
+                    layout: vertical
+                    name: Time Left
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  type: horizontal-stack
+                - subtitle: Print Info
+                  type: custom:mushroom-title-card
+                - cards:
+                  - entity: sensor.octoprint_print_file
+                    name: File
+                    type: custom:mushroom-entity-card
+                  - entity: sensor.octoprint_print_file_size
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  - entity: sensor.octoprint_filament_cost
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  - entity: sensor.octoprint_filament_length
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  columns: 2
+                  square: false
+                  type: grid
+                - subtitle: Temperature
+                  type: custom:mushroom-title-card
+                - all_series_config:
+                    curve: stepline
+                    extend_to: now
+                    float_precision: 2
+                  apex_config:
+                    chart:
+                      foreColor: '#7B7B7B'
+                      toolbar:
+                        show: false
+                    grid:
+                      borderColor: '#7B7B7B'
+                    xaxis:
+                      tooltip:
+                        enabled: false
+                  brush:
+                    apex_config:
+                      chart:
+                        foreColor: '#7B7B7B'
+                        toolbar:
+                          show: false
+                      grid:
+                        borderColor: '#7B7B7B'
+                      xaxis:
+                        tooltip:
+                          enabled: false
+                    selection_span: 1h
+                  experimental:
+                    brush: true
+                  header:
+                    colorize_states: true
+                    show: true
+                    show_states: true
+                  series:
+                  - color: rgb(244,67,54)
+                    entity: sensor.octoprint_tool_0_temperature
+                    name: Nozzle
+                    show:
+                      in_brush: true
+                    stroke_width: 4
+                  - color: rgb(3,169,244)
+                    entity: sensor.octoprint_bed_temperature
+                    name: Bed
+                    stroke_width: 4
+                  - color: rgb(255,235,59)
+                    entity: sensor.octoprint_tool_0_target
+                    name: Nozzle Target
+                    stroke_width: 1
+                    type: area
+                  - color: rgb(233,30,99)
+                    entity: sensor.octoprint_bed_target
+                    name: Bed Target
+                    stroke_width: 1
+                    type: area
+                  type: custom:apexcharts-card
+                type: vertical-stack
+              conditions:
+              - entity: binary_sensor.octoprint_connected
+                state: 'on'
+              type: conditional
+            type: vertical-stack
+          command: popup
+          title: 3D Printer
+      type: template
+    - content: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"\
+        binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\",\n\
+        \  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
+        ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n  {% if\
+        \ is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities + [\
+        \ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ ns.entities|count }}"
+      icon: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"binary_sensor.erebus_connected\"\
+        ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
+        ,\n  \"binary_sensor.quest_interactive\",\n  \"light.magicmirror\"\n] %}\n\
+        {% for entity_id in computers %}\n  {% if is_state(entity_id, \"on\") %}\n\
+        \    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {% endif %}\n\
+        {% endfor %}\n{{ \"mdi:server\" if ns.entities|count > 0 else \"mdi:server-off\"\
+        \ }}"
+      icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n \
+        \ \"binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
+        ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
+        ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n  {% if\
+        \ is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities + [\
+        \ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"teal\" if ns.entities|count\
+        \ > 0 else \"disabled\" }}"
+      tap_action:
+        action: navigate
+        navigation_path: computer
+      type: template
     type: custom:mushroom-chips-card
   - cards:
     - primary: "{% set time = now().hour %}\n{% if (time >= 18) %}\n  Good Evening,\
@@ -7721,12 +7952,24 @@ views:
             hold_action:
               action: none
             icon: mdi:desktop-tower
-            icon_color: disabled
+            icon_color: teal
             tap_action:
               action: none
             type: template
           conditions:
           - entity: binary_sensor.ardena_connected
+            state: 'on'
+          type: conditional
+        - chip:
+            hold_action:
+              action: none
+            icon: mdi:desktop-tower
+            icon_color: lime
+            tap_action:
+              action: none
+            type: template
+          conditions:
+          - entity: binary_sensor.athos_connected
             state: 'on'
           type: conditional
         - chip:
@@ -7799,12 +8042,12 @@ views:
             hold_action:
               action: none
             icon: mdi:desktop-tower
-            icon_color: disabled
+            icon_color: blue
             tap_action:
               action: none
             type: template
           conditions:
-          - entity: switch.erebus
+          - entity: binary_sensor.erebus_connected
             state: 'on'
           type: conditional
         type: custom:mushroom-chips-card
@@ -7859,6 +8102,18 @@ views:
             type: template
           conditions:
           - entity: group.lights_kitchen
+            state: 'on'
+          type: conditional
+        - chip:
+            hold_action:
+              action: none
+            icon: mdi:mirror-rectangle
+            icon_color: disabled
+            tap_action:
+              action: none
+            type: template
+          conditions:
+          - entity: light.magicmirror
             state: 'on'
           type: conditional
         type: custom:mushroom-chips-card
@@ -8072,7 +8327,7 @@ views:
         fill_container: true
         hold_action:
           action: toggle
-        icon: "{% if is_state(\"cover.garage_door\", \"open\") %}\n  mdi:garage-variant-open\n\
+        icon: "{% if is_state(\"cover.garage_door\", \"open\") %}\n  mdi:garage-open-variant\n\
           {% else %}\n  mdi:garage-variant\n{% endif %}"
         icon_color: blue-grey
         primary: Garage
@@ -8241,328 +8496,6 @@ views:
           type: template
         type: custom:mushroom-chips-card
       type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.octoprint_psu\"\
-          , \"on\") %}\n    background: rgba(var(--color-background-teal), var(--opacity-bg));\n\
-          \  {% else %}\n    background: var(--card-background-color);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  height: 66px;\n  margin-left:\
-            \ -18px !important;\n}\n"
-        entity: binary_sensor.octoprint_connected
-        fill_container: true
-        hold_action:
-          action: none
-        icon: mdi:printer-3d
-        icon_color: teal
-        primary: 3D Printer
-        secondary: "{% if is_state(\"binary_sensor.octoprint_connected\", \"on\")\
-          \ %}\n  {{ states(\"octoprint_tool_0_temperature\")|round(1) }}\n{% endif\
-          \ %}"
-        tap_action:
-          action: fire-dom-event
-          browser_mod:
-            card:
-              cards:
-              - camera_view: live
-                entity: camera.ender_3_pro
-                show_name: false
-                show_state: false
-                type: picture-entity
-              - entity: switch.octoprint_psu
-                hold_action:
-                  action: toggle
-                icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else\
-                  \ -%}\n  mdi:power-off\n{%- endif -%}"
-                icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else\
-                  \ -%}\n  grey\n{%- endif -%}"
-                primary: Power
-                secondary: "{%- if is_state(entity, \"on\") -%}\n  Press and hold\
-                  \ to power off\n{%- else -%}\n  Press and hold to power on\n{%-\
-                  \ endif -%}"
-                type: custom:mushroom-template-card
-              - card:
-                  cards:
-                  - cards:
-                    - entity: switch.octoprint_pause_print
-                      hold_action:
-                        action: toggle
-                      icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:play\n{%-\
-                        \ else -%}\n  mdi:pause\n{%- endif -%}"
-                      icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%-\
-                        \ else -%}\n  yellow\n{%- endif -%}"
-                      layout: vertical
-                      primary: Pause
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-template-card
-                    - entity: button.octoprint_cancel_print
-                      hold_action:
-                        action: call-service
-                        service: button.press
-                        target:
-                          entity_id: button.octoprint_cancel_print
-                      icon: mdi:cancel
-                      icon_color: grey
-                      layout: vertical
-                      primary: Cancel
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-template-card
-                    - entity: button.octoprint_emergency_stop
-                      hold_action:
-                        action: call-service
-                        service: button.press
-                        target:
-                          entity_id: button.octoprint_emergency_stop
-                      icon: mdi:alert-octagon
-                      icon_color: red
-                      layout: vertical
-                      multiline_secondary: false
-                      primary: E-Stop
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-template-card
-                    - entity: button.octoprint_shutdown_system
-                      hold_action:
-                        action: call-service
-                        service: button.press
-                        target:
-                          entity_id: button.octoprint_shutdown_system
-                      icon: mdi:power
-                      icon_color: orange
-                      layout: vertical
-                      primary: Shutdown
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-template-card
-                    type: horizontal-stack
-                  - animation:
-                      state: 'on'
-                    entities:
-                    - entity: sensor.octoprint_print_progress
-                    name: Completion
-                    positions:
-                      icon: 'off'
-                      indicator: inside
-                    style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
-                      \ #0005;\n}"
-                    type: custom:bar-card
-                  - cards:
-                    - entity: sensor.octoprint_layer_progress
-                      layout: vertical
-                      name: Layer
-                      primary_info: state
-                      secondary_info: name
-                      type: custom:mushroom-entity-card
-                    - entity: sensor.octoprint_print_time_format
-                      layout: vertical
-                      name: Print Time
-                      primary_info: state
-                      secondary_info: name
-                      type: custom:mushroom-entity-card
-                    - entity: sensor.octoprint_print_time_left_format
-                      layout: vertical
-                      name: Time Left
-                      primary_info: state
-                      secondary_info: name
-                      type: custom:mushroom-entity-card
-                    type: horizontal-stack
-                  - subtitle: Print Info
-                    type: custom:mushroom-title-card
-                  - cards:
-                    - entity: sensor.octoprint_print_file
-                      name: File
-                      type: custom:mushroom-entity-card
-                    - entity: sensor.octoprint_print_file_size
-                      primary_info: state
-                      secondary_info: name
-                      type: custom:mushroom-entity-card
-                    type: horizontal-stack
-                  - cards:
-                    - entity: sensor.octoprint_filament_cost
-                      primary_info: state
-                      secondary_info: name
-                      type: custom:mushroom-entity-card
-                    - entity: sensor.octoprint_filament_length
-                      primary_info: state
-                      secondary_info: name
-                      type: custom:mushroom-entity-card
-                    type: horizontal-stack
-                  - subtitle: Temperature
-                    type: custom:mushroom-title-card
-                  - all_series_config:
-                      curve: stepline
-                      extend_to: now
-                      float_precision: 2
-                    apex_config:
-                      chart:
-                        foreColor: '#7B7B7B'
-                        toolbar:
-                          show: false
-                      grid:
-                        borderColor: '#7B7B7B'
-                      xaxis:
-                        tooltip:
-                          enabled: false
-                    brush:
-                      apex_config:
-                        chart:
-                          foreColor: '#7B7B7B'
-                          toolbar:
-                            show: false
-                        grid:
-                          borderColor: '#7B7B7B'
-                        xaxis:
-                          tooltip:
-                            enabled: false
-                      selection_span: 1h
-                    experimental:
-                      brush: true
-                    header:
-                      colorize_states: true
-                      show: true
-                      show_states: true
-                    series:
-                    - color: rgb(244,67,54)
-                      entity: sensor.octoprint_tool_0_temperature
-                      name: Nozzle
-                      show:
-                        in_brush: true
-                      stroke_width: 4
-                    - color: rgb(3,169,244)
-                      entity: sensor.octoprint_bed_temperature
-                      name: Bed
-                      stroke_width: 4
-                    - color: rgb(255,235,59)
-                      entity: sensor.octoprint_tool_0_target
-                      name: Nozzle Target
-                      stroke_width: 1
-                      type: area
-                    - color: rgb(233,30,99)
-                      entity: sensor.octoprint_bed_target
-                      name: Bed Target
-                      stroke_width: 1
-                      type: area
-                    type: custom:apexcharts-card
-                  type: vertical-stack
-                conditions:
-                - entity: binary_sensor.octoprint_connected
-                  state: 'on'
-                type: conditional
-              type: vertical-stack
-            command: popup
-            title: 3D Printer
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:connection
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.octoprint_connected
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  background: rgba(var(--color-background-grey),\
-          \ var(--opacity-bg));\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
-          }\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  height: 66px;\n  margin-left:\
-            \ -18px !important;\n}\n"
-        fill_container: true
-        hold_action:
-          action: none
-        icon: mdi:desktop-tower
-        icon_color: grey
-        primary: Computers
-        tap_action:
-          action: navigate
-          navigation_path: computer
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:mirror-rectangle
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: light.magicmirror
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:desktop-tower
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: switch.erebus
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:desktop-tower
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.ardena_connected
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:desktop-tower
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.athos_connected
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: fas:vr-cardboard
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.quest_interactive
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
     columns: 2
     square: false
     type: grid
@@ -8635,8 +8568,8 @@ views:
           entity: input_select.dishwasher_status
           icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
             \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  purple\n{%- elif\
-            \ is_state(entity, \"Draining\") -%}\n  blue-grey\n{%- elif is_state(entity,\
+          icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif\
+            \ is_state(entity, \"Draining\") -%}\n  brown\n{%- elif is_state(entity,\
             \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
             \  red\n{%- elif is_state(entity, \"Clean\") -%}\n  lime\n{%- else -%}\n\
             \  grey\n{%- endif -%}"
@@ -8678,12 +8611,14 @@ views:
     - subtitle: Garbage / Recycling
       type: custom:mushroom-title-card
     - cards:
-      - entity: sensor.garbage
-        icon: mdi:delete
-        icon_color: "{% if is_state(entity, \"0\") %}\n  green\n{% elif is_state(entity,\
+      - entity: sensor.recycling
+        icon: mdi:recycle
+        icon_color: "{% if is_state(\"input_boolean.recycling_collection\", \"on\"\
+          ) %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
           \ \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif %}"
-        primary: Garbage
-        secondary: "{% if is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
+        primary: Recycling
+        secondary: "{% if is_state(\"input_boolean.recycling_collection\", \"on\"\
+          ) %}\n  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
           \ \"1\") %}\n  Tomorrow\n{% else %}\n  In {{ state_attr(entity, \"days\"\
           ) }} {{ \"Day\" if is_state_attr(entity, \"days\", 1) else \"Days\" }},\n\
           \  {{ state_attr(entity, \"next_date\")|as_timestamp|timestamp_custom(\"\
@@ -8691,12 +8626,14 @@ views:
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
-      - entity: sensor.recycling
-        icon: mdi:recycle
-        icon_color: "{% if is_state(entity, \"0\") %}\n  green\n{% elif is_state(entity,\
+      - entity: sensor.garbage
+        icon: mdi:delete
+        icon_color: "{% if is_state(\"input_boolean.garbage_collection\", \"1\") %}\n\
+          \  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
           \ \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif %}"
-        primary: Recycling
-        secondary: "{% if is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
+        primary: Garbage
+        secondary: "{% if is_state(\"input_boolean.garbage_collection\", \"1\") %}\n\
+          \  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
           \ \"1\") %}\n  Tomorrow\n{% else %}\n  In {{ state_attr(entity, \"days\"\
           ) }} {{ \"Day\" if is_state_attr(entity, \"days\", 1) else \"Days\" }},\n\
           \  {{ state_attr(entity, \"next_date\")|as_timestamp|timestamp_custom(\"\
@@ -9498,7 +9435,7 @@ views:
       type: template
     - entity: sensor.office_temperature
       type: entity
-    - entity: switch.erebus
+    - entity: binary_sensor.erebus_connected
       tap_action:
         action: more-info
       type: entity
@@ -12247,7 +12184,7 @@ views:
           templates:
           - yellow_on
         entity_4:
-          entity_id: switch.erebus
+          entity_id: binary_sensor.erebus_connected
           tap_action:
             action: none
           templates:
@@ -12647,7 +12584,7 @@ views:
       type: custom:button-card
       variables:
         entity_1:
-          entity_id: switch.erebus
+          entity_id: binary_sensor.erebus_connected
           tap_action:
             action: none
           templates:
