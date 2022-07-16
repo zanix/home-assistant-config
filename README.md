@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1369 total entities**,
-including **568 sensors**.
+This Home Assistant install has approximately **1372 total entities**,
+including **574 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -71,6 +71,10 @@ The joaoapps_join integration exposes services from [Join](https://joaoapps.com/
 ### [Logitech Harmony](https://www.home-assistant.io/integrations/harmony)
 
 The harmony remote platform allows you to control the state of your Harmony Hub Device
+
+### [Meater](https://www.home-assistant.io/integrations/meater)
+
+The Meater Smart Meat Thermometer integration allows for communicating with the Meater Temperature Probe from Apption Labs.
 
 ### [Mobile App](https://www.home-assistant.io/integrations/mobile_app)
 
