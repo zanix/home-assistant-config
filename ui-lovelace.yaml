@@ -10384,10 +10384,6 @@ views:
       title: Utility
       type: custom:mushroom-title-card
     - cards:
-      - entity: binary_sensor.water_main_water_alarm_water_leak_detected
-        icon_color: pink
-        name: Water Main
-        type: custom:mushroom-entity-card
       - entity: binary_sensor.fridge_leak_sensor_water_alarm_water_leak_detected
         icon_color: pink
         name: Fridge
@@ -10415,6 +10411,10 @@ views:
       columns: 2
       square: false
       type: grid
+    - entity: binary_sensor.water_main_water_alarm_water_leak_detected
+      icon_color: pink
+      name: Utility
+      type: custom:mushroom-entity-card
     - entity: switch.water_main
       hold_action:
         action: toggle
@@ -10559,67 +10559,57 @@ views:
 
         R5-5600X | RTX 3080 | 750W'
       type: custom:mushroom-title-card
-    - card:
-        entity: switch.ardena
-        hold_action:
-          action: call-service
-          data: {}
-          service: switch.toggle
-          target:
-            entity_id: switch.ardena
-        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n  mdi:power-off\n\
-          {%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-          \  red\n{%- endif -%}"
-        primary: Power
-        tap_action:
-          action: none
-        type: custom:mushroom-template-card
-      conditions:
-      - entity: binary_sensor.ardena_connected
-        state: 'off'
-      type: conditional
+    - entity: switch.ardena
+      hold_action:
+        action: call-service
+        data: {}
+        service: switch.toggle
+        target:
+          entity_id: switch.ardena
+      icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n  mdi:power-off\n\
+        {%- endif -%}"
+      icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n  red\n\
+        {%- endif -%}"
+      primary: Power
+      tap_action:
+        action: none
+      type: custom:mushroom-template-card
     - card:
         cards:
-        - entity: switch.ardena
+        - entity: button.ardena_lock
           hold_action:
             action: call-service
-            data: {}
-            service: switch.toggle
+            service: button.press
             target:
-              entity_id: switch.ardena
-          icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n\
-            \  mdi:power-off\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-            \  red\n{%- endif -%}"
-          layout: vertical
-          primary: Power
-          tap_action:
-            action: none
-          type: custom:mushroom-template-card
-        - entity: script.iotlink_lock
-          hold_action:
-            action: call-service
-            data:
-              computer: ardena
-            service: script.iotlink_lock
-            target: {}
-          icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:lock\n{%- else -%}\n \
-            \ mdi:lock-open\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
+              entity_id: button.ardena_lock
+          icon: "{%- if is_state(\"sensor.ardena_session_state\", \"Locked\") -%}\n\
+            \  mdi:lock-open\n{%- else -%}\n  mdi:lock\n{%- endif -%}"
+          icon_color: "{%- if is_state(\"sensor.ardena_session_state\", \"Locked\"\
+            ) -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
           layout: vertical
           primary: Lock
           tap_action:
             action: none
           type: custom:mushroom-template-card
-        - entity: script.iotlink_suspend
+        - entity: button.ardena_logoff
           hold_action:
             action: call-service
-            data:
-              computer: ardena
-            service: script.iotlink_suspend
-            target: {}
+            service: button.press
+            target:
+              entity_id: button.ardena_logoff
+          icon: mdi:logout
+          icon_color: grey
+          layout: vertical
+          primary: Logoff
+          tap_action:
+            action: none
+          type: custom:mushroom-template-card
+        - entity: button.ardena_sleep
+          hold_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.ardena_sleep
           icon: mdi:sleep
           icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
             \  grey\n{%- endif -%}"
@@ -10628,13 +10618,12 @@ views:
           tap_action:
             action: none
           type: custom:mushroom-template-card
-        - entity: script.iotlink_reboot
+        - entity: button.ardena_restart
           hold_action:
             action: call-service
-            data:
-              computer: ardena
-            service: script.iotlink_reboot
-            target: {}
+            service: button.press
+            target:
+              entity_id: button.ardena_restart
           icon: mdi:reload
           icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
             \  grey\n{%- endif -%}"
@@ -10693,6 +10682,59 @@ views:
         hour24: false
       type: custom:uptime-card
       update_interval: 30
+    - card:
+        cards:
+        - entities:
+          - color: rgb(var(--color-blue))
+            entity: sensor.ardena_cpu_load
+            name: Usage
+            show_points: false
+            show_state: true
+          - color: rgb(var(--color-orange))
+            entity: sensor.ardena_cpu_clock_speed
+            name: Speed
+            show_points: false
+            show_state: true
+            y_axis: secondary
+          font_size: 75
+          hours_to_show: 1
+          icon: mdi:cpu-64-bit
+          line_width: 8
+          name: CPU
+          points_per_hour: 30
+          show:
+            labels: false
+            labels_secondary: false
+          type: custom:mini-graph-card
+        - entities:
+          - color: rgb(var(--color-green))
+            entity: sensor.ardena_gpu_load
+            name: Load
+            show_points: false
+            show_state: true
+          - color: rgb(var(--color-pink))
+            entity: sensor.ardena_gpu_temperature
+            name: Temp
+            show_points: false
+            show_state: true
+            y_axis: secondary
+          font_size: 75
+          hours_to_show: 1
+          icon: mdi:expansion-card
+          line_width: 8
+          name: GPU
+          points_per_hour: 30
+          show:
+            labels: false
+            labels_secondary: false
+          type: custom:mini-graph-card
+        columns: 2
+        square: false
+        type: grid
+      conditions:
+      - entity: binary_sensor.ardena_connected
+        state: 'on'
+      type: conditional
     type: vertical-stack
   - cards:
     - subtitle: 'Erebus
@@ -10716,6 +10758,69 @@ views:
           action: none
         type: custom:mushroom-template-card
       type: horizontal-stack
+    - card:
+        cards:
+        - entity: button.erebus_lock
+          hold_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.erebus_lock
+          icon: "{%- if is_state(\"sensor.erebus_session_state\", \"Locked\") -%}\n\
+            \  mdi:lock-open\n{%- else -%}\n  mdi:lock\n{%- endif -%}"
+          icon_color: "{%- if is_state(\"sensor.erebus_session_state\", \"Locked\"\
+            ) -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
+          layout: vertical
+          primary: Lock
+          tap_action:
+            action: none
+          type: custom:mushroom-template-card
+        - entity: button.erebus_logoff
+          hold_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.erebus_logoff
+          icon: mdi:logout
+          icon_color: grey
+          layout: vertical
+          primary: Logoff
+          tap_action:
+            action: none
+          type: custom:mushroom-template-card
+        - entity: button.erebus_sleep
+          hold_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.erebus_sleep
+          icon: mdi:sleep
+          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
+            \  grey\n{%- endif -%}"
+          layout: vertical
+          primary: Sleep
+          tap_action:
+            action: none
+          type: custom:mushroom-template-card
+        - entity: button.erebus_restart
+          hold_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.erebus_restart
+          icon: mdi:reload
+          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
+            \  grey\n{%- endif -%}"
+          layout: vertical
+          primary: Reboot
+          tap_action:
+            action: none
+          type: custom:mushroom-template-card
+        type: horizontal-stack
+      conditions:
+      - entity: binary_sensor.erebus_connected
+        state: 'on'
+      type: conditional
     - alias:
         ko: Offline
         ok: Online
@@ -10733,7 +10838,7 @@ views:
         ko: rgba(var(--color-grey),50%)
         none: rgb(var(--color-black))
         ok: rgb(var(--color-green))
-      entity: switch.erebus
+      entity: binary_sensor.erebus_connected
       hours_to_show: 120
       icon: mdi:connection
       icon_adaptive_color: true
@@ -10757,6 +10862,29 @@ views:
         hour24: false
       type: custom:uptime-card
       update_interval: 30
+    - card:
+        entities:
+        - color: rgb(var(--color-blue))
+          entity: sensor.erebus_cpu_load
+          name: Usage
+          show_points: false
+          show_state: true
+        - color: rgb(var(--color-orange))
+          entity: sensor.erebus_cpu_clock_speed
+          name: Speed
+          show_points: false
+          show_state: true
+          y_axis: secondary
+        icon: mdi:cpu-64-bit
+        name: CPU
+        show:
+          labels: false
+          labels_secondary: false
+        type: custom:mini-graph-card
+      conditions:
+      - entity: binary_sensor.erebus_connected
+        state: 'on'
+      type: conditional
     type: vertical-stack
   - cards:
     - subtitle: Oculus Quest 2
@@ -10858,67 +10986,57 @@ views:
 
         i5-6500 | GTX 1070 | 500W'
       type: custom:mushroom-title-card
-    - card:
-        entity: switch.athos
-        hold_action:
-          action: call-service
-          data: {}
-          service: switch.toggle
-          target:
-            entity_id: switch.athos
-        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n  mdi:power-off\n\
-          {%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-          \  red\n{%- endif -%}"
-        primary: Power
-        tap_action:
-          action: none
-        type: custom:mushroom-template-card
-      conditions:
-      - entity: binary_sensor.athos_connected
-        state: 'off'
-      type: conditional
+    - entity: switch.athos
+      hold_action:
+        action: call-service
+        data: {}
+        service: switch.toggle
+        target:
+          entity_id: switch.athos
+      icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n  mdi:power-off\n\
+        {%- endif -%}"
+      icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n  red\n\
+        {%- endif -%}"
+      primary: Power
+      tap_action:
+        action: none
+      type: custom:mushroom-template-card
     - card:
         cards:
-        - entity: switch.athos
+        - entity: button.athos_lock
           hold_action:
             action: call-service
-            data: {}
-            service: switch.toggle
+            service: button.press
             target:
-              entity_id: switch.athos
-          icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n\
-            \  mdi:power-off\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-            \  red\n{%- endif -%}"
-          layout: vertical
-          primary: Power
-          tap_action:
-            action: none
-          type: custom:mushroom-template-card
-        - entity: script.iotlink_lock
-          hold_action:
-            action: call-service
-            data:
-              computer: athos
-            service: script.iotlink_lock
-            target: {}
-          icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:lock\n{%- else -%}\n \
-            \ mdi:lock-open\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
+              entity_id: button.athos_lock
+          icon: "{%- if is_state(\"sensor.athos_session_state\", \"Locked\") -%}\n\
+            \  mdi:lock-open\n{%- else -%}\n  mdi:lock\n{%- endif -%}"
+          icon_color: "{%- if is_state(\"sensor.athos_session_state\", \"Locked\"\
+            ) -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
           layout: vertical
           primary: Lock
           tap_action:
             action: none
           type: custom:mushroom-template-card
-        - entity: script.iotlink_suspend
+        - entity: button.athos_logoff
           hold_action:
             action: call-service
-            data:
-              computer: athos
-            service: script.iotlink_suspend
-            target: {}
+            service: button.press
+            target:
+              entity_id: button.athos_logoff
+          icon: mdi:logout
+          icon_color: grey
+          layout: vertical
+          primary: Logoff
+          tap_action:
+            action: none
+          type: custom:mushroom-template-card
+        - entity: button.athos_sleep
+          hold_action:
+            action: call-service
+            service: button.press
+            target:
+              entity_id: button.athos_sleep
           icon: mdi:sleep
           icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
             \  grey\n{%- endif -%}"
@@ -10927,13 +11045,12 @@ views:
           tap_action:
             action: none
           type: custom:mushroom-template-card
-        - entity: script.iotlink_reboot
+        - entity: button.athos_restart
           hold_action:
             action: call-service
-            data:
-              computer: athos
-            service: script.iotlink_reboot
-            target: {}
+            service: button.press
+            target:
+              entity_id: button.athos_restart
           icon: mdi:reload
           icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
             \  grey\n{%- endif -%}"
@@ -10988,6 +11105,59 @@ views:
         hour24: false
       type: custom:uptime-card
       update_interval: 30
+    - card:
+        cards:
+        - entities:
+          - color: rgb(var(--color-blue))
+            entity: sensor.athos_cpu_load
+            name: Usage
+            show_points: false
+            show_state: true
+          - color: rgb(var(--color-orange))
+            entity: sensor.athos_cpu_clock_speed
+            name: Speed
+            show_points: false
+            show_state: true
+            y_axis: secondary
+          font_size: 75
+          hours_to_show: 1
+          icon: mdi:cpu-64-bit
+          line_width: 8
+          name: CPU
+          points_per_hour: 30
+          show:
+            labels: false
+            labels_secondary: false
+          type: custom:mini-graph-card
+        - entities:
+          - color: rgb(var(--color-green))
+            entity: sensor.athos_gpu_load
+            name: Load
+            show_points: false
+            show_state: true
+          - color: rgb(var(--color-pink))
+            entity: sensor.athos_gpu_temperature
+            name: Temp
+            show_points: false
+            show_state: true
+            y_axis: secondary
+          font_size: 75
+          hours_to_show: 1
+          icon: mdi:expansion-card
+          line_width: 8
+          name: GPU
+          points_per_hour: 30
+          show:
+            labels: false
+            labels_secondary: false
+          type: custom:mini-graph-card
+        columns: 2
+        square: false
+        type: grid
+      conditions:
+      - entity: binary_sensor.athos_connected
+        state: 'on'
+      type: conditional
     type: vertical-stack
   icon: mdi:desktop-tower
   layout:
@@ -12183,35 +12353,6 @@ views:
       type: map
     type: vertical-stack
   - cards:
-    - entity: sensor.home_temperature
-      icon: mdi:sofa-single
-      name: Living Room
-      tap_action:
-        action: navigate
-        navigation_path: living
-      template:
-      - card_room
-      - orange_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.home_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: group.lights_living_room
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-        entity_4:
-          entity_id: media_player.living_room_universal
-          tap_action:
-            action: none
-          templates:
-          - media_on
     - entity: sensor.family_room_temperature
       icon: mdi:gamepad-circle
       name: Family Room
@@ -12247,454 +12388,6 @@ views:
             action: none
           templates:
           - media_on
-    - entity: sensor.office_temperature
-      icon: mdi:chair-rolling
-      name: Office
-      tap_action:
-        action: navigate
-        navigation_path: office
-      template:
-      - card_room
-      - blue_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.office_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: group.lights_office
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-        entity_4:
-          entity_id: binary_sensor.erebus_connected
-          tap_action:
-            action: none
-          templates:
-          - pink_on
-    - entity: sensor.kitchen_temperature
-      icon: mdi:fridge-variant
-      name: Kitchen
-      tap_action:
-        action: navigate
-        navigation_path: kitchen
-      template:
-      - card_room
-      - lime_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.kitchen_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: group.lights_kitchen
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-    - entity: sensor.master_bedroom_temperature
-      icon: mdi:bed-king
-      name: Master Bed
-      tap_action:
-        action: navigate
-        navigation_path: master
-      template:
-      - card_room
-      - deep-purple_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.master_bedroom_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: light.master_bedroom_floor_lamp
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-        entity_4:
-          entity_id: media_player.master_bedroom_universal
-          tap_action:
-            action: none
-          templates:
-          - media_on
-    - entity: sensor.ethan_temperature
-      icon: mdi:bed
-      name: Ethan
-      tap_action:
-        action: navigate
-        navigation_path: ethan
-      template:
-      - card_room
-      - green_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.ethan_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: switch.ethans_lamp
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-    - entity: sensor.emma_temperature
-      icon: mdi:bed
-      name: Emma
-      tap_action:
-        action: navigate
-        navigation_path: emma
-      template:
-      - card_room
-      - purple_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.emma_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-    - entity: sensor.garage_multisensor_air_temperature
-      icon: mdi:garage-variant
-      name: Garage
-      tap_action:
-        action: navigate
-        navigation_path: garage
-      template:
-      - card_room
-      - blue-grey_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.garage_occupancy
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: switch.garage_light
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-        entity_3:
-          entity_id: cover.garage_door
-          tap_action:
-            action: none
-          templates:
-          - red_on
-    - entity: sensor.openweathermap_temperature
-      icon: mdi:spa
-      name: Outside
-      tap_action:
-        action: navigate
-        navigation_path: outside
-      template:
-      - card_room
-      - light-green_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.doorbell_motion
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: group.lights_outside
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-    - entity: sensor.water_main_air_temperature
-      icon: mdi:progress-wrench
-      name: Utility
-      tap_action:
-        action: navigate
-        navigation_path: utility
-      template:
-      - card_room
-      - brown_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: switch.water_main
-          tap_action:
-            action: none
-          templates:
-          - green_on
-        entity_2:
-          entity_id: binary_sensor.water_leak_detected
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-    - entity: sensor.octoprint_tool_0_temperature
-      icon: mdi:printer-3d
-      label: null
-      name: 3D Printer
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          card:
-            cards:
-            - camera_view: live
-              entity: camera.ender_3_pro
-              show_name: false
-              show_state: false
-              type: picture-entity
-            - entity: switch.octoprint_psu
-              hold_action:
-                action: toggle
-              icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:power\n{%- else -%}\n\
-                \  mdi:power-off\n{%- endif -%}"
-              icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else\
-                \ -%}\n  grey\n{%- endif -%}"
-              primary: Power
-              secondary: "{%- if is_state(entity, \"on\") -%}\n  Press and hold to\
-                \ power off\n{%- else -%}\n  Press and hold to power on\n{%- endif\
-                \ -%}"
-              type: custom:mushroom-template-card
-            - card:
-                cards:
-                - cards:
-                  - entity: switch.octoprint_pause_print
-                    hold_action:
-                      action: toggle
-                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:play\n{%- else\
-                      \ -%}\n  mdi:pause\n{%- endif -%}"
-                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
-                      \ -%}\n  yellow\n{%- endif -%}"
-                    layout: vertical
-                    primary: Pause
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  - entity: button.octoprint_cancel_print
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.octoprint_cancel_print
-                    icon: mdi:cancel
-                    icon_color: grey
-                    layout: vertical
-                    primary: Cancel
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  - entity: button.octoprint_emergency_stop
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.octoprint_emergency_stop
-                    icon: mdi:alert-octagon
-                    icon_color: red
-                    layout: vertical
-                    multiline_secondary: false
-                    primary: E-Stop
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  - entity: button.octoprint_shutdown_system
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.octoprint_shutdown_system
-                    icon: mdi:power
-                    icon_color: orange
-                    layout: vertical
-                    primary: Shutdown
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  type: horizontal-stack
-                - animation:
-                    state: 'on'
-                  entities:
-                  - entity: sensor.octoprint_print_progress
-                  name: Completion
-                  positions:
-                    icon: 'off'
-                    indicator: inside
-                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
-                    \ #0005;\n}"
-                  type: custom:bar-card
-                - cards:
-                  - entity: sensor.octoprint_layer_progress
-                    layout: vertical
-                    name: Layer
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_print_time_format
-                    layout: vertical
-                    name: Print Time
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_print_time_left_format
-                    layout: vertical
-                    name: Time Left
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  type: horizontal-stack
-                - subtitle: Print Info
-                  type: custom:mushroom-title-card
-                - cards:
-                  - entity: sensor.octoprint_print_file
-                    name: File
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_print_file_size
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  type: horizontal-stack
-                - cards:
-                  - entity: sensor.octoprint_filament_cost
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_filament_length
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  type: horizontal-stack
-                - subtitle: Temperature
-                  type: custom:mushroom-title-card
-                - all_series_config:
-                    curve: stepline
-                    extend_to: now
-                    float_precision: 2
-                  apex_config:
-                    chart:
-                      foreColor: '#7B7B7B'
-                      toolbar:
-                        show: false
-                    grid:
-                      borderColor: '#7B7B7B'
-                    xaxis:
-                      tooltip:
-                        enabled: false
-                  brush:
-                    apex_config:
-                      chart:
-                        foreColor: '#7B7B7B'
-                        toolbar:
-                          show: false
-                      grid:
-                        borderColor: '#7B7B7B'
-                      xaxis:
-                        tooltip:
-                          enabled: false
-                    selection_span: 1h
-                  experimental:
-                    brush: true
-                  header:
-                    colorize_states: true
-                    show: true
-                    show_states: true
-                  series:
-                  - color: rgb(244,67,54)
-                    entity: sensor.octoprint_tool_0_temperature
-                    name: Nozzle
-                    show:
-                      in_brush: true
-                    stroke_width: 4
-                  - color: rgb(3,169,244)
-                    entity: sensor.octoprint_bed_temperature
-                    name: Bed
-                    stroke_width: 4
-                  - color: rgb(255,235,59)
-                    entity: sensor.octoprint_tool_0_target
-                    name: Nozzle Target
-                    stroke_width: 1
-                    type: area
-                  - color: rgb(233,30,99)
-                    entity: sensor.octoprint_bed_target
-                    name: Bed Target
-                    stroke_width: 1
-                    type: area
-                  type: custom:apexcharts-card
-                type: vertical-stack
-              conditions:
-              - entity: binary_sensor.octoprint_connected
-                state: 'on'
-              type: conditional
-            type: vertical-stack
-          command: popup
-          title: 3D Printer
-      template:
-      - card_room
-      - teal_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: switch.octoprint_psu
-          tap_action:
-            action: none
-          templates:
-          - lime_on
-        entity_2:
-          entity_id: binary_sensor.octoprint_connected
-          tap_action:
-            action: none
-          templates:
-          - amber_on
-    - entity: light.magicmirror
-      icon: mdi:desktop-tower
-      label: null
-      name: Computers
-      tap_action:
-        action: navigate
-        navigation_path: computer
-      template:
-      - card_room
-      - grey_no_state
-      type: custom:button-card
-      variables:
-        entity_1:
-          entity_id: binary_sensor.erebus_connected
-          tap_action:
-            action: none
-          templates:
-          - blue_on
-        entity_2:
-          entity_id: binary_sensor.ardena_connected
-          tap_action:
-            action: none
-          templates:
-          - orange_on
-        entity_3:
-          entity_id: binary_sensor.athos_connected
-          tap_action:
-            action: none
-          templates:
-          - yellow_on
-        entity_4:
-          entity_id: binary_sensor.quest_interactive
-          tap_action:
-            action: none
-          templates:
-          - lime_on
-        label_use_temperature: false
     columns: 3
     square: false
     type: grid

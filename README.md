@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1372 total entities**,
-including **574 sensors**.
+This Home Assistant install has approximately **1378 total entities**,
+including **575 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -156,7 +156,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](h
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>20 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v1.5.3]
 
@@ -201,6 +201,18 @@ Authors: [@LaggAt](https://github.com/LaggAt).
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
 Authors: [@ludeeus](https://github.com/ludeeus).
+
+### [Hass.Agent Mediaplayer](https://github.com/LAB02-Research/HASS.Agent-MediaPlayer) [v2022.5.7]
+
+HASS.Agent MediaPlayer integrations. Adds TTS and the ability to control local media to HASS.Agent - a Windows based client for Home Assistant.
+
+Authors: [@LAB02-Admin](https://github.com/LAB02-Admin).
+
+### [Hass.Agent Notifier](https://github.com/LAB02-Research/HASS.Agent-Notifier) [v2022.3.15]
+
+HASS.Agent Notifier integration. Adds notifications to HASS.Agent - a Windows based client for Home Assistant.
+
+Authors: [@LAB02-Admin](https://github.com/LAB02-Admin).
 
 ### [Helium Blockchain](https://github.com/rsnodgrass/hass-helium) [v0.3.8]
 
@@ -441,7 +453,7 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 - [Inovelli LZW30 Black Series On/Off Switch](https://inovelli.com/black-series-on-off-switch-z-wave/)
 - [Inovelli LZW30 Red Series On/Off Switch](https://inovelli.com/red-series-on-off-switch-z-wave/)
 - [Honeywell 39348 / ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
-- [Aeotec Z-Wave Micro Dimmer](https://www.amazon.com/dp/B00IRI1CEK) - Hard-wired into lamps with local control using a switch on the metal frame of a lamp
+- [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
 - [Govee Smart LED Floor Lamp](https://www.amazon.com/gp/product/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN)
 - [DreamScreen](https://www.dreamscreentv.com/) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
@@ -472,8 +484,6 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 - [ChromeCast](https://www.google.com/chromecast/)
 - [Harmony Hub](https://www.logitech.com/en-us/products/harmony/harmony-hub.html)
 - [Plex](https://plex.tv)
-  - [Plex for Android](https://play.google.com/store/apps/details?id=com.plexapp.android)
-  - [Plex for Roku TV](https://channelstore.roku.com/details/13535/plex)
 - [MagicMirror](https://magicmirror.builders)
 - PlayStation 4 Pro
 
