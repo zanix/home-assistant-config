@@ -174,7 +174,7 @@ Authors: [@magico13](https://github.com/magico13).
 
 🔹 Use icons from fontawesome in home-assistant
 
-### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.8.1]
+### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.8.2]
 
 🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
 
@@ -192,7 +192,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.26.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.26.2]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -252,7 +252,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v2.3.0]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v2.3.1]
 
 Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technology
 
@@ -515,7 +515,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.7.3-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.7.5-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
