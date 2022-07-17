@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1378 total entities**,
-including **575 sensors**.
+This Home Assistant install has approximately **1385 total entities**,
+including **576 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -55,10 +55,6 @@ The HomeKit controller integration allows you to connect accessories with the "W
 ### [InfluxDB](https://www.home-assistant.io/integrations/influxdb)
 
 The influxdb integration makes it possible to transfer all state changes to an external InfluxDB database
-
-### [Internet Printing Protocol](https://www.home-assistant.io/integrations/ipp)
-
-Read current data from your networked printer that supports the Internet Printing Protocol.
 
 ### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
 
@@ -112,6 +108,12 @@ The ring implementation allows you to integrate your Ring.com devices in Home As
 
 The Roku integration allows you to control a Roku device
 
+### [SNMP](https://www.home-assistant.io/integrations/snmp)
+
+This is a standardized method for monitoring/managing network connected devices. SNMP uses a tree-like hierarchy where each node is an object.
+
+This is used to get printer status data.
+
 ### [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4)
 
 The PS4 integration allows you to control a Sony PlayStation 4 console
@@ -150,7 +152,7 @@ The yamaha platform allows you to control Yamaha Network Receivers
 
 ### [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js)
 
-The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave](https://zwave-js.github.io/zwavejs2mqtt) JS driver. This is the recommended Z-Wave integration for Home Assistant.
+The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS](https://zwave-js.github.io/zwavejs2mqtt) driver. This is the recommended Z-Wave integration for Home Assistant.
 
 ---
 
