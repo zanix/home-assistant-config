@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1427 total entities**,
-including **580 sensors**.
+This Home Assistant install has approximately **1383 total entities**,
+including **576 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -180,7 +180,7 @@ Authors: [@magico13](https://github.com/magico13).
 
 🔹 Use icons from fontawesome in home-assistant
 
-### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.8.2]
+### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.8.3]
 
 🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
 
@@ -280,7 +280,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>28 Lovelace Plugins</summary>
+<details><summary>29 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -322,6 +322,10 @@ Entity Attributes
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.23]
+
+A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
+
 ### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.3]
 
 🙈 Hides the Home Assistant header and/or sidebar
@@ -342,7 +346,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.0.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.1.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
