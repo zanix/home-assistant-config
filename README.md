@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1385 total entities**,
-including **576 sensors**.
+This Home Assistant install has approximately **1384 total entities**,
+including **575 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -358,7 +358,7 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) [v2.4.3]
+### [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) [v2.5.0]
 
 A different take on the thermostat card for Home Assistant ♨️
 
