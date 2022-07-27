@@ -1,0 +1,49 @@
+---
+collection_at_curb:
+  alias: Collection At Curb
+  description: 'Confirm collection can is on the curb'
+  icon: mdi:trash-can
+  mode: single
+
+  fields:
+    entity:
+      name: 'Entity'
+      description: 'Collection entity to set at curb.'
+      required: true
+      selector:
+        entity:
+          include_entities:
+            - sensor.garbage
+            - sensor.recycling
+
+  variables:
+    name: '{{ states[entity].name }}'
+    object_id: '{{ states[entity].object_id }}'
+
+  sequence:
+    - if:
+        - condition: template
+          value_template: '{{ states(entity)|int < 2 }}'
+        - condition: template
+          value_template: '{{ is_state("input_boolean." ~ object_id ~ "_collection", "off") }}'
+
+      then:
+        - service: input_boolean.turn_on
+          target:
+            entity_id: 'input_boolean.{{ object_id}}_collection'
+
+        - service: script.notify_mobile
+          data:
+            who: 'parents'
+            title: ''
+            message: 'clear_notification'
+            tag: '{{ object_id}}-collection'
+
+        - service: script.notify_mobile
+          data:
+            who: 'parents'
+            title: '{{ name }}'
+            message: 'The {{ name }} can is at the curb'
+            icon: '/local/icons/{{ states[entity].attributes.icon|replace("mdi:", "") }}.png'
+            group: 'Garbage'
+            tag: '{{ object_id }}-collection-out'
