@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1384 total entities**,
+This Home Assistant install has approximately **1386 total entities**,
 including **575 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -318,7 +318,7 @@ Entity Attributes
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.31]
+### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.32]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
@@ -535,7 +535,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.7.6-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.7.7-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
