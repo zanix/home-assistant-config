@@ -7054,14 +7054,17 @@ views:
         action: navigate
         navigation_path: climate
       type: template
-    - content: "{% set power = states(\"sensor.home_123_1min\")|int|abs %}\n{% if\
-        \ power > 1000 %}\n  {{ (power|float * 0.001)|round(2) }} kWh\n{% else %}\n\
-        \  {{ power }} W\n{% endif %}"
+    - content: "{% if not is_state(entity, 'unavailable') %}\n  {% set power = states(entity)|int|abs\
+        \ %}\n  {% if power > 1000 %}\n    {{ (power|float * 0.001)|round(2) }} kWh\n\
+        \  {% else %}\n    {{ power }} W\n  {% endif %}\n{% endif %}"
       entity: sensor.home_123_1min
-      icon: "{% set power = states(entity)|int %}\n{% if power < 0 %}\n  mdi:transmission-tower-import\n\
-        {% else %}\n  mdi:transmission-tower-export\n{% endif %}"
-      icon_color: "{% set power = states(entity)|int %}\n{% if power < 0 %}\n  lime\n\
-        {% else %}\n  deep-orange\n{% endif %}"
+      icon: "{% if is_state(entity, 'unavailable') %}\n  mdi:transmission-tower-off\n\
+        {% else %}\n  {% if states(entity)|int < 0 %}\n    mdi:transmission-tower-import\n\
+        \  {% else %}\n    mdi:transmission-tower-export\n  {% endif %}\n{% endif\
+        \ %}"
+      icon_color: "{% if is_state(entity, 'unavailable') %}\n  disabled\n{% else %}\n\
+        \  {% if states(entity)|int < 0 %}\n    lime\n  {% else %}\n    deep-orange\n\
+        \  {% endif %}\n{% endif %}"
       tap_action:
         action: navigate
         navigation_path: power
@@ -7530,6 +7533,7 @@ views:
                   entity: media_player.spotify_josh
                   hide:
                     power: true
+                    progress: true
                     volume: true
                   icon: mdi:spotify
                   info: scroll
@@ -7631,9 +7635,8 @@ views:
               \  top: -22px;\n} \n"
           chips:
           - entity: media_player.spotify_josh
-            icon: "{% set state = states(entity) %}\n{% if state == \"playing\" %}\n\
-              \  mdi:spotify\n{% elif state == \"paused\" %}\n  mdi:spotify\n{% endif\
-              \ %}"
+            icon: "{% set state = states(entity) %}\n{% if state in(\"playing\", \"\
+              paused\") %}\n  mdi:spotify\n{% endif %}"
             icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
               \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
               \  disabled\n{% endif %}"
@@ -7647,8 +7650,7 @@ views:
             tap_action:
               action: none
             type: template
-          - content: '{{ states(entity) }}%'
-            entity: sensor.pixel_6_battery_level
+          - entity: sensor.pixel_6_battery_level
             icon: "{% set value = states(entity)|int %}\n{% set state = \"\" %}\n\
               {% if is_state(\"sensor.pixel_6_battery_state\", \"charging\") %}\n\
               \  {% set state = \"-charging\" %}\n  {% if is_state(\"sensor.pixel_6_charger_type\"\
@@ -7689,6 +7691,7 @@ views:
                   entity: media_player.spotify_amy
                   hide:
                     power: true
+                    progress: true
                     volume: true
                   icon: mdi:spotify
                   info: scroll
@@ -7789,6 +7792,15 @@ views:
               \  --chip-spacing: 0;\n  --chip-height: 32px;\n  --chip-padding: 0 0.15em;\n\
               \  top: -22px;\n} \n"
           chips:
+          - entity: media_player.spotify_amy
+            icon: "{% set state = states(entity) %}\n{% if state in(\"playing\", \"\
+              paused\") %}\n  mdi:spotify\n{% endif %}"
+            icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
+              \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
+              \  disabled\n{% endif %}"
+            tap_action:
+              action: none
+            type: template
           - entity: sensor.galaxy_s21_wifi_connection
             icon: "{% if not is_state(entity, \"<not connected>\") %}\n  mdi:wifi\n\
               {% else %}\n  mdi:signal\n{% endif %}"
@@ -7796,8 +7808,7 @@ views:
             tap_action:
               action: none
             type: template
-          - content: '{{ states(entity) }}%'
-            entity: sensor.galaxy_s21_battery_level
+          - entity: sensor.galaxy_s21_battery_level
             icon: "{% set value = states(entity)|int %}\n{% set state = \"\" %}\n\
               {% if is_state(\"sensor.galaxy_s21_battery_state\", \"charging\") %}\n\
               \  {% set state = \"-charging\" %}\n  {% if is_state(\"sensor.galaxy_s21_charger_type\"\
@@ -8658,40 +8669,40 @@ views:
           state: 'on'
         type: conditional
       - card:
-          entity: input_select.dishwasher_status
-          icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
-            \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif\
-            \ is_state(entity, \"Draining\") -%}\n  brown\n{%- elif is_state(entity,\
-            \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
-            \  red\n{%- elif is_state(entity, \"Clean\") -%}\n  lime\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
-          multiline_secondary: true
-          primary: '{{ states(entity) }}'
-          secondary: "Dishwasher\n{% set last_changed = states[entity].last_changed\
-            \ -%}\n{%- if last_changed < today_at() - timedelta(days=6) -%}\n  More\
-            \ than a week ago\n{%- elif last_changed < today_at() - timedelta(days=1)\
-            \ -%}\n  {{ last_changed.timestamp()|timestamp_custom(\"%A at %-I:%M %p\"\
-            ) }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom(\"\
-            Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed)\
-            \ }} ago\n{%- endif -%}"
-          tap_action:
-            action: more-info
-          type: custom:mushroom-template-card
-        conditions:
-        - entity: input_select.dishwasher_status
-          state_not: 'Off'
-        type: conditional
-      - card:
-          bar_background: rgba(var(--color-grey),50%)
-          bar_direction: rtl
-          bar_height: 20px
-          bar_radius: var(--border-radius)
-          entity: timer.dishwasher_run_time
-          invert: true
-          layout: hide_name
-          text_width: 4em
-          type: custom:timer-bar-card
+          card_mod:
+            style: "ha-card {\n  height: 82px;\n}\n"
+          cards:
+          - card_mod:
+              style: ":host {\n  height: 58px;\n}\n"
+            entity: input_select.dishwasher_status
+            icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%-\
+              \ else -%}\n  mdi:dishwasher-off\n{%- endif -%}"
+            icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif\
+              \ is_state(entity, \"Draining\") -%}\n  brown\n{%- elif is_state(entity,\
+              \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
+              \  red\n{%- elif is_state(entity, \"Clean\") -%}\n  lime\n{%- else -%}\n\
+              \  grey\n{%- endif -%}"
+            multiline_secondary: true
+            primary: '{{ states(entity) }}'
+            secondary: "Dishwasher\n{% set last_changed = states[entity].last_changed\
+              \ -%}\n{%- if last_changed < today_at() - timedelta(days=6) -%}\n  More\
+              \ than a week ago\n{%- elif last_changed < today_at() - timedelta(days=1)\
+              \ -%}\n  {{ last_changed.timestamp()|timestamp_custom(\"%A at %-I:%M\
+              \ %p\") }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()|timestamp_custom(\"\
+              Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed)\
+              \ }} ago\n{%- endif -%}"
+            tap_action:
+              action: more-info
+            type: custom:mushroom-template-card
+          - bar_background: rgba(var(--color-grey), 50%)
+            bar_direction: rtl
+            bar_height: 5px
+            entity: timer.dishwasher_run_time
+            invert: true
+            layout: full_row
+            text_width: 0em
+            type: custom:timer-bar-card
+          type: custom:stack-in-card
         conditions:
         - entity: input_select.dishwasher_status
           state_not: 'Off'
@@ -12318,7 +12329,7 @@ views:
             large: true
             title: Garage
         type: picture-entity
-      - aspect_ratio: '16:9'
+      - aspect_ratio: '16:10'
         camera_image: camera.doorbell
         camera_view: auto
         entities:
@@ -12327,9 +12338,20 @@ views:
         type: picture-glance
       - cards:
         - entity: sensor.doorbell_last_ding
-          name: Last Ding
-          type: custom:mushroom-entity-card
+          icon: mdi:bell-ring
+          icon_color: disabled
+          primary: Last Ding
+          secondary: "{% set state = states(entity)|as_datetime -%}\n{%- if state\
+            \ < today_at() - timedelta(days=6) -%}\n  More than a week ago\n{%- elif\
+            \ state < today_at() - timedelta(days=1) -%}\n  {{ state.timestamp()|timestamp_custom(\"\
+            %A at %-I:%M %p\") }}\n{%- elif state < today_at() -%}\n  {{ state.timestamp()|timestamp_custom(\"\
+            Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{ relative_time(state)\
+            \ }} ago\n{%- endif -%}"
+          tap_action:
+            action: more-info
+          type: custom:mushroom-template-card
         - entity: sensor.doorbell_last_motion
+          icon: mdi:motion-sensor
           icon_color: disabled
           name: Last Motion
           type: custom:mushroom-entity-card
@@ -12499,7 +12521,8 @@ views:
       - entity: sensor.minute_power_cost
         icon: mdi:currency-usd
         icon_color: grey
-        primary: ${{ states(entity)|float }}
+        primary: '{{ "$" ~ states(entity)|float if not is_state(entity, "unavailable")
+          }}'
         secondary: Minute
         tap_action:
           action: more-info
@@ -12507,7 +12530,8 @@ views:
       - entity: sensor.day_power_cost
         icon: mdi:currency-usd
         icon_color: grey
-        primary: ${{ states(entity)|float }}
+        primary: '{{ "$" ~ states(entity)|float if not is_state(entity, "unavailable")
+          }}'
         secondary: Day
         tap_action:
           action: more-info
@@ -12515,7 +12539,8 @@ views:
       - entity: sensor.month_power_cost
         icon: mdi:currency-usd
         icon_color: grey
-        primary: ${{ states(entity)|float }}
+        primary: '{{ "$" ~ states(entity)|float if not is_state(entity, "unavailable")
+          }}'
         secondary: Month
         tap_action:
           action: more-info
@@ -12540,15 +12565,12 @@ views:
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
-      - entity: sensor.current_monthly_energy
-        icon: mdi:flash
+      - entity: sensor.home_123_1mon
         icon_color: orange
-        primary: '{{ (states(entity)|float)|round(2) }} {{ state_attr(entity, "unit_of_measurement")
-          }}'
-        secondary: Monthly Energy
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
+        name: Monthly Energy
+        primary_info: state
+        secondary_info: name
+        type: custom:mushroom-entity-card
       columns: 2
       square: false
       type: grid
@@ -12558,21 +12580,31 @@ views:
       type: custom:mushroom-title-card
     - entity: sensor.solar_1min
       name: Current
+      primary_info: state
+      secondary_info: name
       type: custom:mushroom-entity-card
     - cards:
       - entity: sensor.solar_1d
         icon: mdi:calendar-today
         name: Today
+        primary_info: state
+        secondary_info: name
         type: custom:mushroom-entity-card
       - entity: sensor.solar_1mon
         icon: mdi:calendar-month
         name: This Month
+        primary_info: state
+        secondary_info: name
         type: custom:mushroom-entity-card
       - entity: sensor.solar_this_year
         name: This Year
+        primary_info: state
+        secondary_info: name
         type: custom:mushroom-entity-card
       - entity: sensor.solar_lifetime
         name: Lifetime
+        primary_info: state
+        secondary_info: name
         type: custom:mushroom-entity-card
       columns: 2
       square: false
