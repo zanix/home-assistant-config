@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1385 total entities**,
-including **575 sensors**.
+This Home Assistant install has approximately **1412 total entities**,
+including **609 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -535,7 +535,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.7.7-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.8.0-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
