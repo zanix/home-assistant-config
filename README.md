@@ -400,7 +400,11 @@ Weather Card with animated icons for Home Assistant Lovelace
 
 ---
 
-</details><details><summary>5 Themes</summary>
+</details><details><summary>6 Themes</summary>
+
+### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v1.5]
+
+🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 
 ### [Midnight Theme](https://github.com/home-assistant-community-themes/midnight)
 
