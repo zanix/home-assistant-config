@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1412 total entities**,
-including **609 sensors**.
+This Home Assistant install has approximately **1428 total entities**,
+including **617 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
