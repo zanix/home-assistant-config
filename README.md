@@ -158,7 +158,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>20 Custom Integrations</summary>
+<details><summary>19 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v1.5.3]
 
@@ -257,12 +257,6 @@ Authors: [@jchasey](https://github.com/jchasey).
 Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
-
-### [Ui Lovelace Minimalist](https://github.com/UI-Lovelace-Minimalist/UI) [v1.1.0]
-
-UI-Lovelace-Minimalist is a "theme" for HomeAssistant
-
-Authors: [@stokkie90](https://github.com/stokkie90).
 
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.0]
 
@@ -400,15 +394,11 @@ Weather Card with animated icons for Home Assistant Lovelace
 
 ---
 
-</details><details><summary>6 Themes</summary>
+</details><details><summary>5 Themes</summary>
 
 ### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v1.5]
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
-
-### [Midnight Theme](https://github.com/home-assistant-community-themes/midnight)
-
-Midnight theme for Home Assistant
 
 ### [Mushroom Themes](https://github.com/piitaya/lovelace-mushroom-themes) [v0.0.2]
 
