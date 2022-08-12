@@ -6,439 +6,563 @@ title: Mechanix
 views:
 - badges: []
   cards:
-  - alignment: justify
-    card_mod:
-      style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-        \  --chip-spacing: 0;\n  background: var(--ha-card-background) !important;\n\
-        \  border-radius: var(--border-radius) !important;\n}\n"
-    chips:
-    - type: menu
-    - content: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = states|selectattr(\"\
-        entity_id\", \"in\", state_attr(\"group.all_doors\",\"entity_id\"))|map(attribute=\"\
-        entity_id\")|list %}\n{% for entity_id in open_doors %}\n  {% if is_state(entity_id,\
-        \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-        \ endif %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\",\n  \"\
-        cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {% if is_state(entity_id,\
-        \ \"open\") or is_state(entity_id, \"unlocked\") %}\n    {% set ns.entities\
-        \ = ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"Secure\"\
-        \ if ns.entities|count == 0 else \"Not Secure\" }}"
-      entity: lock.lock_front
-      icon: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = states|selectattr(\"\
-        entity_id\", \"in\", state_attr(\"group.all_doors\",\"entity_id\"))|map(attribute=\"\
-        entity_id\")|list %}\n{% for entity_id in open_doors %}\n  {% if is_state(entity_id,\
-        \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-        \ endif %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\",\n  \"\
-        cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {% if is_state(entity_id,\
-        \ \"open\") or is_state(entity_id, \"unlocked\") %}\n    {% set ns.entities\
-        \ = ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"mdi:shield-check\"\
-        \ if ns.entities|count == 0 else \"mdi:shield-alert\" }}"
-      icon_color: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = states|selectattr(\"\
-        entity_id\", \"in\", state_attr(\"group.all_doors\",\"entity_id\"))|map(attribute=\"\
-        entity_id\")|list %}\n{% for entity_id in open_doors %}\n  {% if is_state(entity_id,\
-        \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-        \ endif %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\",\n  \"\
-        cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {% if is_state(entity_id,\
-        \ \"open\") or is_state(entity_id, \"unlocked\") %}\n    {% set ns.entities\
-        \ = ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"green\"\
-        \ if ns.entities|count == 0 else \"red\" }}"
-      tap_action:
-        action: navigate
-        navigation_path: security
-      type: template
-    - entity: weather.openweathermap
-      show_conditions: true
-      show_temperature: true
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          card:
-            cards:
-            - current: true
-              entity: weather.openweathermap
-              forecast: true
-              icons: /local/icons/weather_icons/animated/
-              number_of_forecasts: 6
-              type: custom:weather-card
-            - type: iframe
-              url: https://embed.windy.com/embed2.html?lat=43.241&lon=-112.143&zoom=7&level=surface&overlay=wind&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=43.490&detailLon=-112.040&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1
-            - darkMode: true
-              type: custom:sun-card
-            type: vertical-stack
-          command: popup
-          title: Weather
-        target: {}
-      type: weather
-    - content: '{{ states(entity)|float }}'
-      entity: sensor.allergy_index_today
-      icon: mdi:flower-pollen
-      icon_color: "{% set level = states(entity)|float %}\n{% if level >= 9.7 %}\n\
-        \  red\n{% elif level >= 7.3 %}\n  orange\n{% elif level >= 4.9 %}\n  yellow\n\
-        {% elif level >= 2.5 %}\n  lime\n{% else %}\n  green\n{% endif %}"
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          card:
-            cards:
-            - subtitle: Allergens
-              type: custom:mushroom-title-card
-            - double_tap_action:
-                action: none
-              entity: sensor.allergy_index_today
-              fill_container: false
-              hold_action:
-                action: none
-              multiline_secondary: true
-              secondary: '{{ state_attr(entity, "allergen_name_1") }}, {{ state_attr(entity,
-                "allergen_name_2") }}, {{ state_attr(entity, "allergen_name_3") }}
-
-                {{ state_attr("sensor.allergy_index_forecasted_average", "outlook")
-                }}'
-              tap_action:
-                action: none
-              type: custom:mushroom-template-card
-            - subtitle: Forecast
-              type: custom:mushroom-title-card
-            - animation:
-                state: 'on'
-              decimal: 1
-              entities:
-              - entity: sensor.allergy_index_today
-              - entity: sensor.allergy_index_tomorrow
-              - entity: sensor.allergy_index_forecasted_average
-              - entity: sensor.asthma_index_today
-              - entity: sensor.asthma_index_tomorrow
-              - entity: sensor.asthma_index_forecasted_average
-              - entity: sensor.cold_flu_index_today
-              - entity: sensor.cold_flu_forecasted_average
-              max: 12
-              min: 0
-              positions:
-                indicator: inside
-              severity:
-              - color: rgb(var(--mush-rgb-green))
-                from: '0'
-                to: '2.4'
-              - color: rgb(var(--mush-rgb-light-green))
-                from: '2.5'
-                to: '4.8'
-              - color: rgb(var(--mush-rgb-amber))
-                from: '4.9'
-                to: '7.2'
-              - color: rgb(var(--mush-rgb-orange))
-                from: '7.3'
-                to: '9.6'
-              - color: rgb(var(--mush-rgb-red))
-                from: '9.7'
-                to: '12'
-              style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n\
-                }"
-              type: custom:bar-card
-            type: vertical-stack
-          command: popup
-          title: Allergy / Asthma
-        target: {}
-      type: template
-    type: custom:mushroom-chips-card
-  - alignment: justify
-    card_mod:
-      style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-        \  --chip-spacing: 0;\n  background: var(--ha-card-background) !important;\n\
-        \  border-radius: var(--border-radius) !important;\n}\n"
-    chips:
-    - content: "{% if is_state(entity, \"off\") %}\n  Off\n{% else %}\n  {{ state_attr(\"\
-        climate.home\", \"hvac_action\")|capitalize }}\n{% endif %}"
-      entity: climate.home
-      icon: mdi:thermostat-box
-      icon_color: "{% if is_state_attr(entity, \"hvac_action\", \"heating\") %}\n\
-        \  red\n{% elif is_state_attr(entity, \"hvac_action\", \"cooling\") %}\n \
-        \ light-blue\n{% elif is_state_attr(entity, \"hvac_action\", \"fan\") %}\n\
-        \  amber\n{% elif is_state(entity, \"off\") %}\n  grey\n{% else %}\n  blue-grey\n\
-        {% endif %}"
-      tap_action:
-        action: navigate
-        navigation_path: climate
-      type: template
-    - content: "{% if not is_state(entity, 'unavailable') %}\n  {% set power = states(entity)|int|abs\
-        \ %}\n  {% if power > 1000 %}\n    {{ (power|float * 0.001)|round(2) }} kWh\n\
-        \  {% else %}\n    {{ power }} W\n  {% endif %}\n{% endif %}"
-      entity: sensor.home_123_1min
-      icon: "{% if is_state(entity, 'unavailable') %}\n  mdi:transmission-tower-off\n\
-        {% else %}\n  {% if states(entity)|int < 0 %}\n    mdi:transmission-tower-import\n\
-        \  {% else %}\n    mdi:transmission-tower-export\n  {% endif %}\n{% endif\
-        \ %}"
-      icon_color: "{% if is_state(entity, 'unavailable') %}\n  disabled\n{% else %}\n\
-        \  {% if states(entity)|int < 0 %}\n    lime\n  {% else %}\n    deep-orange\n\
-        \  {% endif %}\n{% endif %}"
-      tap_action:
-        action: navigate
-        navigation_path: power
-      type: template
-    - content: "{% set ns = namespace(lights=[]) %}\n{% for entity_id in states[entity].attributes.entity_id\
-        \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.lights = ns.lights\
-        \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ ns.lights|count }}"
-      entity: group.all_light_switches
-      hold_action:
-        action: call-service
-        data: {}
-        service: homeassistant.turn_off
-        target:
-          entity_id: group.all_light_switches
-      icon: "{% set ns = namespace(lights=[]) %}\n{% for entity_id in states[entity].attributes.entity_id\
-        \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.lights = ns.lights\
-        \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{% if ns.lights|count >\
-        \ 0 %}\n  mdi:lightbulb-group\n{% else %}\n  mdi:lightbulb-group-off\n{% endif\
-        \ %}"
-      icon_color: "{% set ns = namespace(lights=[]) %}\n{% for entity_id in states[entity].attributes.entity_id\
-        \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.lights = ns.lights\
-        \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{% if ns.lights|count >\
-        \ 0 %}\n  amber\n{% else %}\n  grey\n{% endif %}"
-      tap_action:
-        action: navigate
-        navigation_path: lights
-      type: template
-    - content: "{% set progress = states(\"sensor.octoprint_layer_progress\") %}\n\
-        {% if progress != \"unknown\" %}\n  {{ progress if progress != \"unknown\"\
-        \ else \"\" }}\n{% endif %}"
-      entity: switch.octoprint_psu
-      hold_action:
-        action: none
-      icon: "{% if is_state(entity, \"on\") %}\n  mdi:printer-3d\n{% else %}\n  mdi:printer-3d-off\n\
-        {% endif %}"
-      icon_color: "{% if is_state(entity, \"on\") %}\n  green\n{% else %}\n  disabled\n\
-        {% endif %}"
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          card:
-            cards:
-            - entity: switch.octoprint_psu
-              hold_action:
-                action: toggle
-              icon: "{% if is_state(entity, \"on\") %}\n  mdi:power\n{% else %}\n\
-                \  mdi:power-off\n{% endif %}"
-              icon_color: "{% if is_state(entity, \"on\") %}\n  green\n{% else %}\n\
-                \  grey\n{% endif %}"
-              primary: Power
-              secondary: "{% if is_state(entity, \"on\") %}\n  Press and hold to power\
-                \ off\n{% else %}\n  Press and hold to power on\n{% endif %}"
-              type: custom:mushroom-template-card
-            - camera_view: live
-              entity: camera.ender_3_pro
-              show_name: false
-              show_state: false
-              type: picture-entity
-            - card:
+  - cards:
+    - cards:
+      - alignment: justify
+        card_mod:
+          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+            \  --chip-spacing: 0;\n  background: var(--ha-card-background) !important;\n\
+            \  border-radius: var(--border-radius) !important;\n}\n"
+        chips:
+        - type: menu
+        - content: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = states|selectattr(\"\
+            entity_id\", \"in\", state_attr(\"group.all_doors\",\"entity_id\"))|map(attribute=\"\
+            entity_id\")|list %}\n{% for entity_id in open_doors %}\n  {% if is_state(entity_id,\
+            \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n\
+            \  {% endif %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\"\
+            ,\n  \"cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {%\
+            \ if is_state(entity_id, \"open\") or is_state(entity_id, \"unlocked\"\
+            ) %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {% endif\
+            \ %}\n{% endfor %}\n{{ \"Secure\" if ns.entities|count == 0 else \"Not\
+            \ Secure\" }}"
+          entity: lock.lock_front
+          icon: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = states|selectattr(\"\
+            entity_id\", \"in\", state_attr(\"group.all_doors\",\"entity_id\"))|map(attribute=\"\
+            entity_id\")|list %}\n{% for entity_id in open_doors %}\n  {% if is_state(entity_id,\
+            \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n\
+            \  {% endif %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\"\
+            ,\n  \"cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {%\
+            \ if is_state(entity_id, \"open\") or is_state(entity_id, \"unlocked\"\
+            ) %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {% endif\
+            \ %}\n{% endfor %}\n{{ \"mdi:shield-check\" if ns.entities|count == 0\
+            \ else \"mdi:shield-alert\" }}"
+          icon_color: "{% set ns = namespace(entities=[]) %}\n{% set open_doors =\
+            \ states|selectattr(\"entity_id\", \"in\", state_attr(\"group.all_doors\"\
+            ,\"entity_id\"))|map(attribute=\"entity_id\")|list %}\n{% for entity_id\
+            \ in open_doors %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set\
+            \ ns.entities = ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor\
+            \ %}\n{% set security = [\n  \"lock.lock_front\",\n  \"cover.garage_door\"\
+            \n] %}\n{% for entity_id in security %}\n  {% if is_state(entity_id, \"\
+            open\") or is_state(entity_id, \"unlocked\") %}\n    {% set ns.entities\
+            \ = ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"\
+            green\" if ns.entities|count == 0 else \"red\" }}"
+          tap_action:
+            action: navigate
+            navigation_path: security
+          type: template
+        - entity: weather.openweathermap
+          show_conditions: true
+          show_temperature: true
+          tap_action:
+            action: fire-dom-event
+            browser_mod:
+              card:
                 cards:
-                - card_mod:
-                    style: "ha-card {\n  #background: none;\n  --ha-card-box-shadow:\
-                      \ 0px;\n}\n"
-                  cards:
-                  - card_mod:
-                      style: "ha-card {\n  {% if is_state(\"switch.octoprint_pause_print\"\
-                        , \"on\") %}\n    background: rgba(var(--rgb-color-amber),\
-                        \ 0.1);\n  {% else %}\n    background: rgba(var(--rgb-color-yellow),\
-                        \ 0.1);\n  {% endif %}\n  width: 74px;\n  border-radius: 50%;\n\
-                        \  margin-left: auto;\n  margin-right: auto;\n}\n"
-                    entity: switch.octoprint_pause_print
-                    hold_action:
-                      action: toggle
-                    icon: "{% if is_state(entity, \"on\") %}\n  mdi:play\n{% else\
-                      \ %}\n  mdi:pause\n{% endif %}"
-                    icon_color: "{% if is_state(entity, \"on\") %}\n  amber\n{% else\
-                      \ %}\n  yellow\n{% endif %}"
-                    layout: vertical
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  - card_mod:
-                      style: "ha-card {\n  background: rgba(var(--rgb-color-grey),\
-                        \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n  margin-left:\
-                        \ auto;\n  margin-right: auto;\n}\n"
-                    entity: button.octoprint_cancel_print
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.octoprint_cancel_print
-                    icon: mdi:cancel
-                    icon_color: grey
-                    layout: vertical
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  - card_mod:
-                      style: "ha-card {\n  background: rgba(var(--rgb-color-red),\
-                        \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n  margin-left:\
-                        \ auto;\n  margin-right: auto;\n}\n"
-                    entity: button.octoprint_emergency_stop
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.octoprint_emergency_stop
-                    icon: mdi:alert-octagon
-                    icon_color: red
-                    layout: vertical
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  - card_mod:
-                      style: "ha-card {\n  background: rgba(var(--rgb-color-red),\
-                        \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n  margin-left:\
-                        \ auto;\n  margin-right: auto;\n}\n"
-                    entity: button.octoprint_shutdown_system
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.octoprint_shutdown_system
-                    icon: mdi:power
-                    icon_color: orange
-                    layout: vertical
-                    tap_action:
-                      action: none
-                    type: custom:mushroom-template-card
-                  keep:
-                    background: true
-                    border_radius: true
-                    margin: true
-                  mode: horizontal
-                  type: custom:stack-in-card
-                - cards:
-                  - card_mod:
-                      style: "ha-card {\n  margin-top: 6px;\n  background: none;\n\
-                        \  --ha-card-box-shadow: 0px;\n}\n"
+                - current: true
+                  entity: weather.openweathermap
+                  forecast: true
+                  icons: /local/icons/weather_icons/animated/
+                  number_of_forecasts: 6
+                  type: custom:weather-card
+                - type: iframe
+                  url: https://embed.windy.com/embed2.html?lat=43.241&lon=-112.143&zoom=7&level=surface&overlay=wind&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=43.490&detailLon=-112.040&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1
+                - darkMode: true
+                  type: custom:sun-card
+                type: vertical-stack
+              command: popup
+              title: Weather
+            target: {}
+          type: weather
+        - content: '{{ states(entity)|float }}'
+          entity: sensor.allergy_index_today
+          icon: mdi:flower-pollen
+          icon_color: "{% set level = states(entity)|float %}\n{% if level >= 9.7\
+            \ %}\n  red\n{% elif level >= 7.3 %}\n  orange\n{% elif level >= 4.9 %}\n\
+            \  yellow\n{% elif level >= 2.5 %}\n  lime\n{% else %}\n  green\n{% endif\
+            \ %}"
+          tap_action:
+            action: fire-dom-event
+            browser_mod:
+              card:
+                cards:
+                - subtitle: Allergens
+                  type: custom:mushroom-title-card
+                - double_tap_action:
+                    action: none
+                  entity: sensor.allergy_index_today
+                  fill_container: false
+                  hold_action:
+                    action: none
+                  multiline_secondary: true
+                  secondary: '{{ state_attr(entity, "allergen_name_1") }}, {{ state_attr(entity,
+                    "allergen_name_2") }}, {{ state_attr(entity, "allergen_name_3")
+                    }}
+
+                    {{ state_attr("sensor.allergy_index_forecasted_average", "outlook")
+                    }}'
+                  tap_action:
+                    action: none
+                  type: custom:mushroom-template-card
+                - subtitle: Forecast
+                  type: custom:mushroom-title-card
+                - animation:
+                    state: 'on'
+                  decimal: 1
+                  entities:
+                  - entity: sensor.allergy_index_today
+                  - entity: sensor.allergy_index_tomorrow
+                  - entity: sensor.allergy_index_forecasted_average
+                  - entity: sensor.asthma_index_today
+                  - entity: sensor.asthma_index_tomorrow
+                  - entity: sensor.asthma_index_forecasted_average
+                  - entity: sensor.cold_flu_index_today
+                  - entity: sensor.cold_flu_forecasted_average
+                  max: 12
+                  min: 0
+                  positions:
+                    indicator: inside
+                  severity:
+                  - color: rgb(var(--mush-rgb-green))
+                    from: '0'
+                    to: '2.4'
+                  - color: rgb(var(--mush-rgb-light-green))
+                    from: '2.5'
+                    to: '4.8'
+                  - color: rgb(var(--mush-rgb-amber))
+                    from: '4.9'
+                    to: '7.2'
+                  - color: rgb(var(--mush-rgb-orange))
+                    from: '7.3'
+                    to: '9.6'
+                  - color: rgb(var(--mush-rgb-red))
+                    from: '9.7'
+                    to: '12'
+                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                    \ #0005;\n}"
+                  type: custom:bar-card
+                type: vertical-stack
+              command: popup
+              title: Allergy / Asthma
+          type: template
+        type: custom:mushroom-chips-card
+      - alignment: justify
+        card_mod:
+          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+            \  --chip-spacing: 0;\n  background: var(--ha-card-background) !important;\n\
+            \  border-radius: var(--border-radius) !important;\n}\n"
+        chips:
+        - content: "{% if is_state(entity, \"off\") %}\n  Off\n{% else %}\n  {{ state_attr(\"\
+            climate.home\", \"hvac_action\")|capitalize }}\n{% endif %}"
+          entity: climate.home
+          icon: mdi:thermostat-box
+          icon_color: "{% if is_state_attr(entity, \"hvac_action\", \"heating\") %}\n\
+            \  red\n{% elif is_state_attr(entity, \"hvac_action\", \"cooling\") %}\n\
+            \  light-blue\n{% elif is_state_attr(entity, \"hvac_action\", \"fan\"\
+            ) %}\n  amber\n{% elif is_state(entity, \"off\") %}\n  grey\n{% else %}\n\
+            \  blue-grey\n{% endif %}"
+          tap_action:
+            action: navigate
+            navigation_path: climate
+          type: template
+        - content: "{% if not is_state(entity, 'unavailable') %}\n  {% set power =\
+            \ states(entity)|int|abs %}\n  {% if power > 1000 %}\n    {{ (power|float\
+            \ * 0.001)|round(2) }} kWh\n  {% else %}\n    {{ power }} W\n  {% endif\
+            \ %}\n{% endif %}"
+          entity: sensor.home_123_1min
+          icon: "{% if is_state(entity, 'unavailable') %}\n  mdi:transmission-tower-off\n\
+            {% else %}\n  {% if states(entity)|int < 0 %}\n    mdi:transmission-tower-import\n\
+            \  {% else %}\n    mdi:transmission-tower-export\n  {% endif %}\n{% endif\
+            \ %}"
+          icon_color: "{% if is_state(entity, 'unavailable') %}\n  disabled\n{% else\
+            \ %}\n  {% if states(entity)|int < 0 %}\n    lime\n  {% else %}\n    deep-orange\n\
+            \  {% endif %}\n{% endif %}"
+          tap_action:
+            action: navigate
+            navigation_path: power
+          type: template
+        - content: "{% set ns = namespace(lights=[]) %}\n{% for entity_id in states[entity].attributes.entity_id\
+            \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.lights = ns.lights\
+            \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ ns.lights|count\
+            \ }}"
+          entity: group.all_light_switches
+          hold_action:
+            action: call-service
+            data: {}
+            service: homeassistant.turn_off
+            target:
+              entity_id: group.all_light_switches
+          icon: "{% set ns = namespace(lights=[]) %}\n{% for entity_id in states[entity].attributes.entity_id\
+            \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.lights = ns.lights\
+            \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{% if ns.lights|count\
+            \ > 0 %}\n  mdi:lightbulb-group\n{% else %}\n  mdi:lightbulb-group-off\n\
+            {% endif %}"
+          icon_color: "{% set ns = namespace(lights=[]) %}\n{% for entity_id in states[entity].attributes.entity_id\
+            \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.lights = ns.lights\
+            \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{% if ns.lights|count\
+            \ > 0 %}\n  amber\n{% else %}\n  grey\n{% endif %}"
+          tap_action:
+            action: navigate
+            navigation_path: lights
+          type: template
+        - content: "{% set progress = states(\"sensor.octoprint_layer_progress\")\
+            \ %}\n{% if progress != \"unknown\" %}\n  {{ progress if progress != \"\
+            unknown\" else \"\" }}\n{% endif %}"
+          entity: switch.octoprint_psu
+          hold_action:
+            action: none
+          icon: "{% if is_state(entity, \"on\") %}\n  mdi:printer-3d\n{% else %}\n\
+            \  mdi:printer-3d-off\n{% endif %}"
+          icon_color: "{% if is_state(entity, \"on\") %}\n  green\n{% else %}\n  disabled\n\
+            {% endif %}"
+          tap_action:
+            action: fire-dom-event
+            browser_mod:
+              card:
+                cards:
+                - entity: switch.octoprint_psu
+                  hold_action:
+                    action: toggle
+                  icon: "{% if is_state(entity, \"on\") %}\n  mdi:power\n{% else %}\n\
+                    \  mdi:power-off\n{% endif %}"
+                  icon_color: "{% if is_state(entity, \"on\") %}\n  green\n{% else\
+                    \ %}\n  grey\n{% endif %}"
+                  primary: Power
+                  secondary: "{% if is_state(entity, \"on\") %}\n  Press and hold\
+                    \ to power off\n{% else %}\n  Press and hold to power on\n{% endif\
+                    \ %}"
+                  type: custom:mushroom-template-card
+                - camera_view: live
+                  entity: camera.ender_3_pro
+                  show_name: false
+                  show_state: false
+                  type: picture-entity
+                - card:
                     cards:
                     - card_mod:
-                        style: "ha-card {\n  --badge-size: 0px !important;\n}\n"
-                      entity: sensor.octoprint_print_status
-                      icon: fab:github
-                      icon_color: green
-                      name: Status
-                      primary_info: state
-                      secondary_info: name
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-entity-card
-                    - entity: sensor.octoprint_print_time_left_format
-                      icon_color: light-blue
-                      name: Est. Finish Time
-                      primary_info: state
-                      secondary_info: name
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-entity-card
-                    - entity: sensor.octoprint_layer_progress
-                      icon_color: lime
-                      name: Layer
-                      primary_info: state
-                      secondary_info: name
-                      tap_action:
-                        action: none
-                      type: custom:mushroom-entity-card
-                    type: custom:stack-in-card
-                  - card_mod:
-                      style: "ha-card {\n  background: none;\n  --ha-card-box-shadow:\
-                        \ 0px;\n}\n"
-                    cards:
-                    - apex_config:
+                        style: "ha-card {\n  background: none;\n  --ha-card-box-shadow:\
+                          \ 0px;\n}\n"
+                      cards:
+                      - card_mod:
+                          style: "ha-card {\n  {% if is_state(\"switch.octoprint_pause_print\"\
+                            , \"on\") %}\n    background: rgba(var(--rgb-color-amber),\
+                            \ 0.1);\n  {% else %}\n    background: rgba(var(--rgb-color-yellow),\
+                            \ 0.1);\n  {% endif %}\n  width: 74px;\n  border-radius:\
+                            \ 50%;\n  margin-left: auto;\n  margin-right: auto;\n\
+                            }\n"
+                        entity: switch.octoprint_pause_print
+                        hold_action:
+                          action: toggle
+                        icon: "{% if is_state(entity, \"on\") %}\n  mdi:play\n{% else\
+                          \ %}\n  mdi:pause\n{% endif %}"
+                        icon_color: "{% if is_state(entity, \"on\") %}\n  amber\n\
+                          {% else %}\n  yellow\n{% endif %}"
+                        layout: vertical
+                        tap_action:
+                          action: none
+                        type: custom:mushroom-template-card
+                      - card_mod:
+                          style: "ha-card {\n  background: rgba(var(--rgb-color-grey),\
+                            \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n  margin-left:\
+                            \ auto;\n  margin-right: auto;\n}\n"
+                        entity: button.octoprint_cancel_print
+                        hold_action:
+                          action: call-service
+                          service: button.press
+                          target:
+                            entity_id: button.octoprint_cancel_print
+                        icon: mdi:cancel
+                        icon_color: grey
+                        layout: vertical
+                        tap_action:
+                          action: none
+                        type: custom:mushroom-template-card
+                      - card_mod:
+                          style: "ha-card {\n  background: rgba(var(--rgb-color-red),\
+                            \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n  margin-left:\
+                            \ auto;\n  margin-right: auto;\n}\n"
+                        entity: button.octoprint_emergency_stop
+                        hold_action:
+                          action: call-service
+                          service: button.press
+                          target:
+                            entity_id: button.octoprint_emergency_stop
+                        icon: mdi:alert-octagon
+                        icon_color: red
+                        layout: vertical
+                        tap_action:
+                          action: none
+                        type: custom:mushroom-template-card
+                      - card_mod:
+                          style: "ha-card {\n  background: rgba(var(--rgb-color-red),\
+                            \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n  margin-left:\
+                            \ auto;\n  margin-right: auto;\n}\n"
+                        entity: button.octoprint_shutdown_system
+                        hold_action:
+                          action: call-service
+                          service: button.press
+                          target:
+                            entity_id: button.octoprint_shutdown_system
+                        icon: mdi:power
+                        icon_color: orange
+                        layout: vertical
+                        tap_action:
+                          action: none
+                        type: custom:mushroom-template-card
+                      keep:
+                        background: true
+                        border_radius: true
+                        margin: true
+                      mode: horizontal
+                      type: custom:stack-in-card
+                    - cards:
+                      - card_mod:
+                          style: "ha-card {\n  margin-top: 6px;\n  background: none;\n\
+                            \  --ha-card-box-shadow: 0px;\n}\n"
+                        cards:
+                        - card_mod:
+                            style: "ha-card {\n  --badge-size: 0px !important;\n}\n"
+                          entity: sensor.octoprint_print_status
+                          icon: fab:github
+                          icon_color: green
+                          name: Status
+                          primary_info: state
+                          secondary_info: name
+                          tap_action:
+                            action: none
+                          type: custom:mushroom-entity-card
+                        - entity: sensor.octoprint_print_time_left_format
+                          icon_color: light-blue
+                          name: Est. Finish Time
+                          primary_info: state
+                          secondary_info: name
+                          tap_action:
+                            action: none
+                          type: custom:mushroom-entity-card
+                        - entity: sensor.octoprint_layer_progress
+                          icon_color: lime
+                          name: Layer
+                          primary_info: state
+                          secondary_info: name
+                          tap_action:
+                            action: none
+                          type: custom:mushroom-entity-card
+                        type: custom:stack-in-card
+                      - card_mod:
+                          style: "ha-card {\n  background: none;\n  --ha-card-box-shadow:\
+                            \ 0px;\n}\n"
+                        cards:
+                        - apex_config:
+                            chart:
+                              height: 230px
+                            fill:
+                              gradient:
+                                inverseColors: false
+                                opacityFrom: 1
+                                opacityTo: 1
+                                shade: light
+                                shadeIntensity: 0.3
+                                stops:
+                                - 0
+                                - 50
+                                - 55
+                                - 90
+                                type: horizontal
+                              type: gradient
+                            legend:
+                              show: false
+                            plotOptions:
+                              radialBar:
+                                dataLabels:
+                                  name:
+                                    show: false
+                                  value:
+                                    show: false
+                                hollow:
+                                  size: 80%
+                                track:
+                                  margin: 0
+                                  strokeWidth: 80%
+                          chart_type: radialBar
+                          header:
+                            show: false
+                          series:
+                          - color: rgb(3, 169, 244)
+                            entity: sensor.octoprint_print_progress
+                            name: Job Progress
+                            show:
+                              legend_value: false
+                          type: custom:apexcharts-card
+                        - card_mod:
+                            style: "ha-card {\n  margin-top: -165px;\n  width: 140px;\n\
+                              \  margin-left: auto;\n  margin-right: auto;\n}\n"
+                          entity: sensor.octoprint_print_progress
+                          icon_color: light-blue
+                          layout: vertical
+                          name: Job Progress
+                          primary_info: state
+                          secondary_info: name
+                          type: custom:mushroom-entity-card
+                        type: custom:stack-in-card
+                      layout:
+                        grid-template-columns: 197px auto
+                        margin: -4px -4px -8px -4px
+                      layout_type: custom:grid-layout
+                      type: custom:layout-card
+                    - subtitle: Print Info
+                      type: custom:mushroom-title-card
+                    - cards:
+                      - entity: sensor.octoprint_print_file
+                        name: File
+                        type: custom:mushroom-entity-card
+                      - entity: sensor.octoprint_print_file_size
+                        name: Print File Size
+                        primary_info: state
+                        secondary_info: name
+                        type: custom:mushroom-entity-card
+                      - entity: sensor.octoprint_filament_cost
+                        name: Filament Cost
+                        primary_info: state
+                        secondary_info: name
+                        type: custom:mushroom-entity-card
+                      - entity: sensor.octoprint_filament_length
+                        name: Filament Length
+                        primary_info: state
+                        secondary_info: name
+                        type: custom:mushroom-entity-card
+                      columns: 2
+                      square: false
+                      type: grid
+                    - subtitle: Temperature
+                      type: custom:mushroom-title-card
+                    - all_series_config:
+                        curve: stepline
+                        extend_to: now
+                        float_precision: 2
+                      apex_config:
                         chart:
-                          height: 230px
-                        fill:
-                          gradient:
-                            inverseColors: false
-                            opacityFrom: 1
-                            opacityTo: 1
-                            shade: light
-                            shadeIntensity: 0.3
-                            stops:
-                            - 0
-                            - 50
-                            - 55
-                            - 90
-                            type: horizontal
-                          type: gradient
-                        legend:
-                          show: false
-                        plotOptions:
-                          radialBar:
-                            dataLabels:
-                              name:
-                                show: false
-                              value:
-                                show: false
-                            hollow:
-                              size: 80%
-                            track:
-                              margin: 0
-                              strokeWidth: 80%
-                      chart_type: radialBar
+                          foreColor: '#7B7B7B'
+                          toolbar:
+                            show: false
+                        grid:
+                          borderColor: '#7B7B7B'
+                        xaxis:
+                          tooltip:
+                            enabled: false
+                      brush:
+                        apex_config:
+                          chart:
+                            foreColor: '#7B7B7B'
+                            toolbar:
+                              show: false
+                          grid:
+                            borderColor: '#7B7B7B'
+                          xaxis:
+                            tooltip:
+                              enabled: false
+                        selection_span: 1h
+                      experimental:
+                        brush: true
                       header:
-                        show: false
+                        colorize_states: true
+                        show: true
+                        show_states: true
                       series:
-                      - color: rgb(3, 169, 244)
-                        entity: sensor.octoprint_print_progress
-                        name: Job Progress
+                      - color: rgb(244,67,54)
+                        entity: sensor.octoprint_tool_0_temperature
+                        name: Nozzle
                         show:
-                          legend_value: false
+                          in_brush: true
+                        stroke_width: 4
+                      - color: rgb(3,169,244)
+                        entity: sensor.octoprint_bed_temperature
+                        name: Bed
+                        stroke_width: 4
+                      - color: rgb(255,235,59)
+                        entity: sensor.octoprint_tool_0_target
+                        name: Nozzle Target
+                        stroke_width: 1
+                        type: area
+                      - color: rgb(233,30,99)
+                        entity: sensor.octoprint_bed_target
+                        name: Bed Target
+                        stroke_width: 1
+                        type: area
                       type: custom:apexcharts-card
-                    - card_mod:
-                        style: "ha-card {\n  margin-top: -165px;\n  width: 140px;\n\
-                          \  margin-left: auto;\n  margin-right: auto;\n}\n"
-                      entity: sensor.octoprint_print_progress
-                      icon_color: light-blue
-                      layout: vertical
-                      name: Job Progress
+                    type: custom:stack-in-card
+                  conditions:
+                  - entity: binary_sensor.octoprint_connected
+                    state: 'on'
+                  type: conditional
+                type: custom:stack-in-card
+              command: popup
+              title: 3D Printer
+          type: template
+        - content: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n\
+            \  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
+            ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
+            ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n \
+            \ {% if is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities\
+            \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ ns.entities|count\
+            \ }}"
+          icon: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"\
+            binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
+            ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
+            ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n \
+            \ {% if is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities\
+            \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"mdi:server\" if\
+            \ ns.entities|count > 0 else \"mdi:server-off\" }}"
+          icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n\
+            \  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
+            ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
+            ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n \
+            \ {% if is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities\
+            \ + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"teal\" if ns.entities|count\
+            \ > 0 else \"disabled\" }}"
+          tap_action:
+            action: navigate
+            navigation_path: computer
+          type: template
+        - chip:
+            content: "{{ states(\"sensor.meater_probe_internal\") }} °F\n{% if states(\"\
+              sensor.meater_probe_remaining_time\") != \"unknown\" %}\n  {% set t\
+              \ = (states(\"sensor.meater_probe_remaining_time\") | as_datetime -\
+              \ now()).total_seconds() %}\n  | {{ t | timestamp_custom('%-H hr %-M\
+              \ min' if t > 3600 else '%-M min', false) }}\n{% endif %}"
+            entity: sensor.meater_probe_cook_state
+            icon: "{% if not is_state(entity, \"unavailable\") %}\n  mdi:food-drumstick\n\
+              {% else %}\n  mdi:food-drumstick-off\n{% endif %}"
+            icon_color: brown
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                card:
+                  cards:
+                  - entity: sensor.meater_probe_cooking
+                    icon: mdi:food-steak
+                    name: Cooking
+                    primary_info: state
+                    secondary_info: name
+                    type: custom:mushroom-entity-card
+                  - cards:
+                    - entity: sensor.meater_probe_elapsed_time
+                      name: Elapsed Time
                       primary_info: state
                       secondary_info: name
                       type: custom:mushroom-entity-card
-                    type: custom:stack-in-card
-                  layout:
-                    grid-template-columns: 197px auto
-                    margin: -4px -4px -8px -4px
-                  layout_type: custom:grid-layout
-                  type: custom:layout-card
-                - subtitle: Print Info
-                  type: custom:mushroom-title-card
-                - cards:
-                  - entity: sensor.octoprint_print_file
-                    name: File
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_print_file_size
-                    name: Print File Size
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_filament_cost
-                    name: Filament Cost
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  - entity: sensor.octoprint_filament_length
-                    name: Filament Length
-                    primary_info: state
-                    secondary_info: name
-                    type: custom:mushroom-entity-card
-                  columns: 2
-                  square: false
-                  type: grid
-                - subtitle: Temperature
-                  type: custom:mushroom-title-card
-                - all_series_config:
-                    curve: stepline
-                    extend_to: now
-                    float_precision: 2
-                  apex_config:
-                    chart:
-                      foreColor: '#7B7B7B'
-                      toolbar:
-                        show: false
-                    grid:
-                      borderColor: '#7B7B7B'
-                    xaxis:
-                      tooltip:
-                        enabled: false
-                  brush:
+                    - entity: sensor.meater_probe_remaining_time
+                      name: Remaining Time
+                      primary_info: state
+                      secondary_info: name
+                      type: custom:mushroom-entity-card
+                    columns: 2
+                    square: false
+                    type: grid
+                  - subtitle: Temperature
+                    type: custom:mushroom-title-card
+                  - all_series_config:
+                      curve: stepline
+                      extend_to: now
+                      float_precision: 2
                     apex_config:
                       chart:
                         foreColor: '#7B7B7B'
@@ -449,171 +573,58 @@ views:
                       xaxis:
                         tooltip:
                           enabled: false
-                    selection_span: 1h
-                  experimental:
-                    brush: true
-                  header:
-                    colorize_states: true
-                    show: true
-                    show_states: true
-                  series:
-                  - color: rgb(244,67,54)
-                    entity: sensor.octoprint_tool_0_temperature
-                    name: Nozzle
-                    show:
-                      in_brush: true
-                    stroke_width: 4
-                  - color: rgb(3,169,244)
-                    entity: sensor.octoprint_bed_temperature
-                    name: Bed
-                    stroke_width: 4
-                  - color: rgb(255,235,59)
-                    entity: sensor.octoprint_tool_0_target
-                    name: Nozzle Target
-                    stroke_width: 1
-                    type: area
-                  - color: rgb(233,30,99)
-                    entity: sensor.octoprint_bed_target
-                    name: Bed Target
-                    stroke_width: 1
-                    type: area
-                  type: custom:apexcharts-card
-                type: custom:stack-in-card
-              conditions:
-              - entity: binary_sensor.octoprint_connected
-                state: 'on'
-              type: conditional
-            type: custom:stack-in-card
-          command: popup
-          title: 3D Printer
-      type: template
-    - content: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"\
-        binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\",\n\
-        \  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
-        ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n  {% if\
-        \ is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities + [\
-        \ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ ns.entities|count }}"
-      icon: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"binary_sensor.erebus_connected\"\
-        ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
-        ,\n  \"binary_sensor.quest_interactive\",\n  \"light.magicmirror\"\n] %}\n\
-        {% for entity_id in computers %}\n  {% if is_state(entity_id, \"on\") %}\n\
-        \    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {% endif %}\n\
-        {% endfor %}\n{{ \"mdi:server\" if ns.entities|count > 0 else \"mdi:server-off\"\
-        \ }}"
-      icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n \
-        \ \"binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
-        ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
-        ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n  {% if\
-        \ is_state(entity_id, \"on\") %}\n    {% set ns.entities = ns.entities + [\
-        \ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{ \"teal\" if ns.entities|count\
-        \ > 0 else \"disabled\" }}"
-      tap_action:
-        action: navigate
-        navigation_path: computer
-      type: template
-    - chip:
-        content: "{{ states(\"sensor.meater_probe_internal\") }} °F\n{% if states(\"\
-          sensor.meater_probe_remaining_time\") != \"unknown\" %}\n  {% set t = (states(\"\
-          sensor.meater_probe_remaining_time\") | as_datetime - now()).total_seconds()\
-          \ %}\n  | {{ t | timestamp_custom('%-H hr %-M min' if t > 3600 else '%-M\
-          \ min', false) }}\n{% endif %}"
-        entity: sensor.meater_probe_cook_state
-        icon: "{% if not is_state(entity, \"unavailable\") %}\n  mdi:food-drumstick\n\
-          {% else %}\n  mdi:food-drumstick-off\n{% endif %}"
-        icon_color: brown
-        tap_action:
-          action: fire-dom-event
-          browser_mod:
-            card:
-              cards:
-              - entity: sensor.meater_probe_cooking
-                icon: mdi:food-steak
-                name: Cooking
-                primary_info: state
-                secondary_info: name
-                type: custom:mushroom-entity-card
-              - cards:
-                - entity: sensor.meater_probe_elapsed_time
-                  name: Elapsed Time
-                  primary_info: state
-                  secondary_info: name
-                  type: custom:mushroom-entity-card
-                - entity: sensor.meater_probe_remaining_time
-                  name: Remaining Time
-                  primary_info: state
-                  secondary_info: name
-                  type: custom:mushroom-entity-card
-                columns: 2
-                square: false
-                type: grid
-              - subtitle: Temperature
-                type: custom:mushroom-title-card
-              - all_series_config:
-                  curve: stepline
-                  extend_to: now
-                  float_precision: 2
-                apex_config:
-                  chart:
-                    foreColor: '#7B7B7B'
-                    toolbar:
-                      show: false
-                  grid:
-                    borderColor: '#7B7B7B'
-                  xaxis:
-                    tooltip:
-                      enabled: false
-                brush:
-                  apex_config:
-                    chart:
-                      foreColor: '#7B7B7B'
-                      toolbar:
-                        show: false
-                    grid:
-                      borderColor: '#7B7B7B'
-                    xaxis:
-                      tooltip:
-                        enabled: false
-                  selection_span: 1h
-                experimental:
-                  brush: true
-                header:
-                  colorize_states: true
-                  show: true
-                  show_states: true
-                series:
-                - color: rgb(33,150,243)
-                  entity: sensor.meater_probe_internal
-                  name: Internal
-                  show:
-                    in_brush: true
-                  stroke_width: 4
-                - color: rgb(139,195,74)
-                  entity: sensor.meater_probe_ambient
-                  name: Ambient
-                  stroke_width: 4
-                - color: rgb(233,30,99)
-                  entity: sensor.meater_probe_target
-                  name: Target
-                  stroke_width: 1
-                  type: area
-                type: custom:apexcharts-card
-              type: vertical-stack
-            command: popup
-            title: Meater
-        type: template
-      conditions:
-      - entity: sensor.meater_probe_cook_state
-        state_not: unknown
-      - entity: sensor.meater_probe_cook_state
-        state_not: unavailable
-      type: conditional
-    type: custom:mushroom-chips-card
-  - cards:
-    - primary: "{% set time = now().hour %}\n{% if (time >= 18) %}\n  Good Evening,\
-        \ {{user}}!\n{% elif (time >= 12) %}\n  Good Afternoon, {{user}}!\n{% elif\
-        \ (time >= 5) %}\n  Good Morning, {{user}}!\n{% elif (time < 5) %}\n  WTF\
-        \ {{user}}?! GO TO BED!\n{% else %}\n  Hello, {{user}}\n{% endif %}"
-      type: custom:mushroom-template-card
+                    brush:
+                      apex_config:
+                        chart:
+                          foreColor: '#7B7B7B'
+                          toolbar:
+                            show: false
+                        grid:
+                          borderColor: '#7B7B7B'
+                        xaxis:
+                          tooltip:
+                            enabled: false
+                      selection_span: 1h
+                    experimental:
+                      brush: true
+                    header:
+                      colorize_states: true
+                      show: true
+                      show_states: true
+                    series:
+                    - color: rgb(33,150,243)
+                      entity: sensor.meater_probe_internal
+                      name: Internal
+                      show:
+                        in_brush: true
+                      stroke_width: 4
+                    - color: rgb(139,195,74)
+                      entity: sensor.meater_probe_ambient
+                      name: Ambient
+                      stroke_width: 4
+                    - color: rgb(233,30,99)
+                      entity: sensor.meater_probe_target
+                      name: Target
+                      stroke_width: 1
+                      type: area
+                    type: custom:apexcharts-card
+                  type: vertical-stack
+                command: popup
+                title: Meater
+            type: template
+          conditions:
+          - entity: sensor.meater_probe_cook_state
+            state_not: unknown
+          - entity: sensor.meater_probe_cook_state
+            state_not: unavailable
+          type: conditional
+        type: custom:mushroom-chips-card
+      - primary: "{% set time = now().hour %}\n{% if (time >= 18) %}\n  Good Evening,\
+          \ {{user}}!\n{% elif (time >= 12) %}\n  Good Afternoon, {{user}}!\n{% elif\
+          \ (time >= 5) %}\n  Good Morning, {{user}}!\n{% elif (time < 5) %}\n  WTF\
+          \ {{user}}?! GO TO BED!\n{% else %}\n  Hello, {{user}}\n{% endif %}"
+        type: custom:mushroom-template-card
+      type: custom:stack-in-card
     - cards:
       - card_mod:
           style: "ha-card {\n  height: 102px;\n  {% if not is_state(\"person.joshua\"\
@@ -622,8 +633,11 @@ views:
             }\n"
         cards:
         - card_mod:
-            style: ":host {\n  --mush-icon-size: 60px;\n  --mush-icon-border-radius:\
-              \ 50%;\n  height: 66px;\n  margin-left: -15px !important;\n}\n"
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 66px;\n  --mush-icon-border-radius: 50%;\n\
+              \  --mush-badge-size: 22px;\n  height: 66px;\n  margin-left: -14px !important;\n\
+              }\n"
           entity: person.joshua
           tap_action:
             action: fire-dom-event
@@ -656,15 +670,15 @@ views:
                   type: history-graph
                 - cards:
                   - entity: sensor.pixel_6_battery_level
-                    icon: "{% set value = states(entity)|int %}\n{% set state = \"\
-                      \" %}\n{% if is_state(\"sensor.pixel_6_battery_state\", \"charging\"\
+                    icon: "{% set value = states(entity)|int %} {% set state = \"\"\
+                      \ %} {% if is_state(\"sensor.pixel_6_battery_state\", \"charging\"\
                       ) %}\n  {% set state = \"-charging\" %}\n  {% if is_state(\"\
                       sensor.pixel_6_charger_type\", \"wireless\") %}\n    {% set\
                       \ state = state ~ \"-wireless\" %}\n  {% endif %}\n{% endif\
                       \ %}\n{% if value == 100 %}\n  mdi:battery{{ state }}\n{% else\
                       \ %}\n  mdi:battery{{ state }}-{{ value // 10 * 10 }}\n{% endif\
                       \ %}"
-                    icon_color: "{% set value = states(entity)|int %}\n{% if is_state(\"\
+                    icon_color: "{% set value = states(entity)|int %} {% if is_state(\"\
                       sensor.pixel_6_battery_state\", \"charging\") %}\n  light-blue\n\
                       {% elif (value >= 75) %}\n  green\n{% elif (value >= 65) %}\n\
                       \  light-green\n{% elif (value >= 55) %}\n  lime\n{% elif (value\
@@ -744,15 +758,36 @@ views:
             style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
               \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
           chips:
-          - entity: media_player.spotify_josh
-            icon: "{% set state = states(entity) %}\n{% if state in(\"playing\", \"\
-              paused\") %}\n  mdi:spotify\n{% endif %}"
-            icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
-              \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
-              \  disabled\n{% endif %}"
-            tap_action:
-              action: none
-            type: template
+          - chip:
+              entity: proximity.joshua_home
+              icon: "{% set icon = \"map-marker-distance\" %}\n{% if is_state_attr(entity,\
+                \ \"dir_of_travel\", \"towards\") %}\n  mdi:map-marker-left\n{% elif\
+                \ is_state_attr(entity, \"dir_of_travel\", \"away_from\") %}\n  mdi:map-marker-right\n\
+                {% else %}\n  mdi:map-marker-distance\n{% endif %}"
+              icon_color: "{% if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
+                ) %}\n  green\n{% elif is_state_attr(entity, \"dir_of_travel\", \"\
+                away_from\") %}\n  orange\n{% else %}\n  grey\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: person.joshua
+              state_not: home
+            type: conditional
+          - chip:
+              entity: media_player.spotify_josh
+              icon: "{% set state = states(entity) %}\n{% if state in(\"playing\"\
+                , \"paused\") %}\n  mdi:spotify\n{% endif %}"
+              icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
+                \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
+                \  disabled\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: media_player.spotify_josh
+              state_not: unavailable
+            type: conditional
           - entity: sensor.pixel_6_wifi_connection
             icon: "{% if not is_state(entity, \"<not connected>\") %}\n  mdi:wifi\n\
               {% else %}\n  mdi:signal\n{% endif %}"
@@ -786,8 +821,11 @@ views:
             }\n"
         cards:
         - card_mod:
-            style: ":host {\n  --mush-icon-size: 60px;\n  --mush-icon-border-radius:\
-              \ 50%;\n  height: 66px;\n  margin-left: -15px !important;\n}\n"
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 66px;\n  --mush-icon-border-radius: 50%;\n\
+              \  --mush-badge-size: 22px;\n  height: 66px;\n  margin-left: -14px !important;\n\
+              }\n"
           entity: person.amy
           tap_action:
             action: fire-dom-event
@@ -820,15 +858,15 @@ views:
                   type: history-graph
                 - cards:
                   - entity: sensor.galaxy_s21_battery_level
-                    icon: "{% set value = states(entity)|int %}\n{% set state = \"\
-                      \" %}\n{% if is_state(\"sensor.galaxy_s21_battery_state\", \"\
+                    icon: "{% set value = states(entity)|int %} {% set state = \"\"\
+                      \ %} {% if is_state(\"sensor.galaxy_s21_battery_state\", \"\
                       charging\") %}\n  {% set state = \"-charging\" %}\n  {% if is_state(\"\
                       sensor.galaxy_s21_charger_type\", \"wireless\") %}\n    {% set\
                       \ state = state ~ \"-wireless\" %}\n  {% endif %}\n{% endif\
                       \ %}\n{% if value == 100 %}\n  mdi:battery{{ state }}\n{% else\
                       \ %}\n  mdi:battery{{ state }}-{{ value // 10 * 10 }}\n{% endif\
                       \ %}"
-                    icon_color: "{% set value = states(entity)|int %}\n{% if is_state(\"\
+                    icon_color: "{% set value = states(entity)|int %} {% if is_state(\"\
                       sensor.galaxy_s21_battery_state\", \"charging\") %}\n  light-blue\n\
                       {% elif (value >= 75) %}\n  green\n{% elif (value >= 65) %}\n\
                       \  light-green\n{% elif (value >= 55) %}\n  lime\n{% elif (value\
@@ -908,15 +946,36 @@ views:
             style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
               \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
           chips:
-          - entity: media_player.spotify_amy
-            icon: "{% set state = states(entity) %}\n{% if state in(\"playing\", \"\
-              paused\") %}\n  mdi:spotify\n{% endif %}"
-            icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
-              \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
-              \  disabled\n{% endif %}"
-            tap_action:
-              action: none
-            type: template
+          - chip:
+              entity: proximity.amy_home
+              icon: "{% set icon = \"map-marker-distance\" %}\n{% if is_state_attr(entity,\
+                \ \"dir_of_travel\", \"towards\") %}\n  mdi:map-marker-left\n{% elif\
+                \ is_state_attr(entity, \"dir_of_travel\", \"away_from\") %}\n  mdi:map-marker-right\n\
+                {% else %}\n  mdi:map-marker-distance\n{% endif %}"
+              icon_color: "{% if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
+                ) %}\n  green\n{% elif is_state_attr(entity, \"dir_of_travel\", \"\
+                away_from\") %}\n  orange\n{% else %}\n  grey\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: person.amy
+              state_not: home
+            type: conditional
+          - chip:
+              entity: media_player.spotify_amy
+              icon: "{% set state = states(entity) %}\n{% if state in(\"playing\"\
+                , \"paused\") %}\n  mdi:spotify\n{% endif %}"
+              icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
+                \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
+                \  disabled\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: media_player.spotify_amy
+              state_not: unavailable
+            type: conditional
           - entity: sensor.galaxy_s21_wifi_connection
             icon: "{% if not is_state(entity, \"<not connected>\") %}\n  mdi:wifi\n\
               {% else %}\n  mdi:signal\n{% endif %}"
@@ -946,860 +1005,873 @@ views:
       columns: 2
       square: false
       type: grid
-    type: custom:stack-in-card
-  - card_mod:
-      style: "ha-card {\n  height: 102px;\n  {% if not is_state(\"device_tracker.ascent_location\"\
-        , \"home\") %}\n    background: rgba(var(--mush-rgb-red), 0.1);\n  {% endif\
-        \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-    cards:
     - card_mod:
-        style: ":host {\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-          \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-      entity: device_tracker.ascent_location
-      icon: mdi:car-estate
-      name: Ascent
-      tap_action:
-        action: navigate
-        navigation_path: subaru
-      type: custom:mushroom-person-card
-    - alignment: end
-      card_mod:
-        style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-          \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
-      chips:
-      - content: '{{ states(entity) }} mi'
-        entity: sensor.ascent_range
-        icon: mdi:gas-station
-        icon_color: "{% if not is_state(entity, 'unavailable') %}\n  {% set range\
-          \ = states(entity)|int %}\n  {% if range > 300 %}\n    green\n  {% elif\
-          \ range > 200 %}\n    light-green\n  {% elif range > 100 %}\n    amber\n\
-          \  {% elif range > 50 %}\n    orange\n  {% else %}\n    red\n  {% endif\
-          \ %}\n{% endif %}"
-        tap_action:
-          action: more-info
-        type: template
-      - entity: sensor.ascent_odometer
-        type: entity
-      type: custom:mushroom-chips-card
-    type: custom:stack-in-card
-  - cards:
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_living_room\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-orange), 0.1);\n  {% endif\
+        style: "ha-card {\n  height: 102px;\n  {% if not is_state(\"device_tracker.ascent_location\"\
+          , \"home\") %}\n    background: rgba(var(--mush-rgb-red), 0.1);\n  {% endif\
           \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
       cards:
       - card_mod:
           style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
             \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: group.lights_living_room
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:sofa-single
-        icon_color: orange
-        primary: Living Room
-        secondary: '{{ states("sensor.home_temperature") }} °F'
+            \ 0.025);\n  --mush-icon-size: 66px;\n  --mush-icon-border-radius: 50%;\n\
+            \  --mush-badge-size: 22px;\n  height: 66px;\n  margin-left: -18px !important;\n\
+            }\n"
+        entity: device_tracker.ascent_location
+        icon: mdi:car-estate
+        name: Ascent
         tap_action:
           action: navigate
-          navigation_path: living
-        type: custom:mushroom-template-card
+          navigation_path: subaru
+        type: custom:mushroom-person-card
       - alignment: end
         card_mod:
           style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
             \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
         chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.home_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: group.lights_living_room
-            state: 'on'
-          type: conditional
-        - chip:
-            entity: media_player.living_room_universal
-            hold_action:
-              action: none
-            icon: "{% set app = state_attr(entity, \"source\") %} {% if app == \"\
-              com.plexapp.android\" %}\n  {% set media_type = state_attr(entity, \"\
-              media_content_type\") %}\n  {% if media_type == \"tvshow\" %}\n    mdi:television\n\
-              \  {% elif media_type == \"movie\" %}\n    mdi:movie-open\n  {% elif\
-              \ media_type == \"music\" %}\n    mdi:music\n  {% elif media_type ==\
-              \ \"playlist\" %}\n    mdi:music\n  {% else %}\n    mdi:plex\n  {% endif\
-              \ %}\n{% elif app == \"com.netflix.ninja\" %}\n  mdi:netflix\n{% elif\
-              \ app == \"com.amazon.amazonvideo.livingroom\" %}\n  fab:amazon\n{%\
-              \ elif app == \"com.hulu.livingroomplus\" %}\n  mdi:hulu\n{% elif app\
-              \ == \"com.google.android.youtube.tv\" %}\n  mdi:youtube\n{% elif app\
-              \ == \"com.spotify.tv.android\" %}\n  mdi:spotify\n{% elif app == \"\
-              tv.twitch.android.viewer\" %}\n  mdi:twitch\n{% else %}\n  mdi:motion-play-outline\n\
-              {% endif %}"
-            icon_color: "{% set state = states(entity) %} {% if state == \"playing\"\
-              \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
-              \  white\n{% endif %}"
-            picture: "{% set app = state_attr(entity, \"source\") %} {% if app ==\
-              \ \"com.google.android.youtube.tvkids\" %}\n  /local/icons/media/youtube-kids.svg\n\
-              {% elif app == \"org.pbskids.video\" %}\n  /local/icons/media/pbs-kids.svg\n\
-              {% elif app == \"com.disney.datg.videoplatforms.android.watchdc\" %}\n\
-              \  /local/icons/media/disney-now.svg\n{% endif %}"
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: media_player.living_room_universal
-            state_not: 'off'
-          - entity: media_player.living_room_universal
-            state_not: unavailable
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_family_room\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-yellow), 0.1);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: group.lights_family_room
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:gamepad-circle
-        icon_color: yellow
-        primary: Family Room
-        secondary: '{{ states("sensor.family_room_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: family
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-avatar-padding: 0.2375em;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.family_room_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: group.lights_family_room
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:sony-playstation
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: select.family_room_activities
-            state: PS3
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:sony-playstation
-            icon_color: blue
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: select.family_room_activities
-            state: PS4
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:microsoft-xbox
-            icon_color: green
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: select.family_room_activities
-            state: XBox
-          type: conditional
-        - chip:
-            entity: media_player.family_room_universal
-            hold_action:
-              action: none
-            icon: "{% set app = state_attr(entity, \"source\") %} {% if app == \"\
-              com.plexapp.android\" %}\n  {% set media_type = state_attr(entity, \"\
-              media_content_type\") %}\n  {% if media_type == \"tvshow\" %}\n    mdi:television\n\
-              \  {% elif media_type == \"movie\" %}\n    mdi:movie-open\n  {% elif\
-              \ media_type == \"music\" %}\n    mdi:music\n  {% elif media_type ==\
-              \ \"playlist\" %}\n    mdi:music\n  {% else %}\n    mdi:plex\n  {% endif\
-              \ %}\n{% elif app == \"com.netflix.ninja\" %}\n  mdi:netflix\n{% elif\
-              \ app == \"com.amazon.amazonvideo.livingroom\" %}\n  fab:amazon\n{%\
-              \ elif app == \"com.hulu.livingroomplus\" %}\n  mdi:hulu\n{% elif app\
-              \ == \"com.google.android.youtube.tv\" %}\n  mdi:youtube\n{% elif app\
-              \ == \"com.spotify.tv.android\" %}\n  mdi:spotify\n{% elif app == \"\
-              tv.twitch.android.viewer\" %}\n  mdi:twitch\n{% else %}\n  mdi:motion-play-outline\n\
-              {% endif %}"
-            icon_color: "{% set state = states(entity) %} {% if state == \"playing\"\
-              \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
-              \  white\n{% endif %}"
-            picture: "{% set app = state_attr(entity, \"source\") %} {% if app ==\
-              \ \"com.google.android.youtube.tvkids\" %}\n  /local/icons/media/youtube-kids.svg\n\
-              {% elif app == \"org.pbskids.video\" %}\n  /local/icons/media/pbs-kids.svg\n\
-              {% elif app == \"com.disney.datg.videoplatforms.android.watchdc\" %}\n\
-              \  /local/icons/media/disney-now.svg\n{% endif %}"
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: media_player.family_room_universal
-            state_not: 'off'
-          - entity: media_player.family_room_universal
-            state_not: unavailable
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:desktop-tower
-            icon_color: teal
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.ardena_connected
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:desktop-tower
-            icon_color: lime
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.athos_connected
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: fas:vr-cardboard
-            icon_color: disabled
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.quest_interactive
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_office\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-blue), 0.1);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: group.lights_office
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:chair-rolling
-        icon_color: blue
-        primary: Office
-        secondary: '{{ states("sensor.office_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: office
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.office_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: group.lights_office
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:desktop-tower
-            icon_color: blue
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.erebus_connected
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_kitchen\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-lime), 0.1);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: group.lights_kitchen
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:fridge-variant
-        icon_color: lime
-        primary: Kitchen
-        secondary: '{{ states("sensor.kitchen_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: kitchen
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.kitchen_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: group.lights_kitchen
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:mirror-rectangle
-            icon_color: blue
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: light.magicmirror
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"light.master_bedroom_floor_lamp\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-deep-purple), 0.1);\n\
-          \  {% endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
-          }\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: light.master_bedroom_floor_lamp
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:bed-king
-        icon_color: deep-purple
-        primary: Master Bed
-        secondary: '{{ states("sensor.master_bedroom_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: master
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.master_bedroom_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: light.master_bedroom_floor_lamp
-            state: 'on'
-          type: conditional
-        - chip:
-            entity: media_player.master_bedroom_universal
-            hold_action:
-              action: none
-            icon: "{% set app = state_attr(entity, \"source\") %} {% if app == \"\
-              com.plexapp.android\" %}\n  {% set media_type = state_attr(entity, \"\
-              media_content_type\") %}\n  {% if media_type == \"tvshow\" %}\n    mdi:television\n\
-              \  {% elif media_type == \"movie\" %}\n    mdi:movie-open\n  {% elif\
-              \ media_type == \"music\" %}\n    mdi:music\n  {% elif media_type ==\
-              \ \"playlist\" %}\n    mdi:music\n  {% else %}\n    mdi:plex\n  {% endif\
-              \ %}\n{% elif app == \"com.netflix.ninja\" %}\n  mdi:netflix\n{% elif\
-              \ app == \"com.amazon.amazonvideo.livingroom\" %}\n  fab:amazon\n{%\
-              \ elif app == \"com.hulu.livingroomplus\" %}\n  mdi:hulu\n{% elif app\
-              \ == \"com.google.android.youtube.tv\" %}\n  mdi:youtube\n{% elif app\
-              \ == \"com.spotify.tv.android\" %}\n  mdi:spotify\n{% elif app == \"\
-              tv.twitch.android.viewer\" %}\n  mdi:twitch\n{% else %}\n  mdi:motion-play-outline\n\
-              {% endif %}"
-            icon_color: "{% set state = states(entity) %} {% if state == \"playing\"\
-              \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
-              \  white\n{% endif %}"
-            picture: "{% set app = state_attr(entity, \"source\") %} {% if app ==\
-              \ \"com.google.android.youtube.tvkids\" %}\n  /local/icons/media/youtube-kids.svg\n\
-              {% elif app == \"org.pbskids.video\" %}\n  /local/icons/media/pbs-kids.svg\n\
-              {% elif app == \"com.disney.datg.videoplatforms.android.watchdc\" %}\n\
-              \  /local/icons/media/disney-now.svg\n{% endif %}"
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: media_player.master_bedroom_universal
-            state_not: 'off'
-          - entity: media_player.master_bedroom_universal
-            state_not: unavailable
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.ethans_lamp\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-green), 0.1);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: switch.ethans_lamp
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:robot
-        icon_color: green
-        primary: Ethan
-        secondary: '{{ states("sensor.ethan_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: ethan
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.ethan_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: switch.ethans_lamp
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.emmas_lamp\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-purple), 0.1);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: switch.emmas_lamp
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:unicorn-variant
-        icon_color: purple
-        primary: Emma
-        secondary: '{{ states("sensor.emma_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: emma
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.emma_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: switch.emmas_lamp
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.guest_room_lamp\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-cyan), 0.1);\n  {% endif\
-          \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: switch.guest_room_lamp
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:account-outline
-        icon_color: cyan
-        primary: Guest
-        secondary: '{{ states("sensor.guest_room_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: guest-room
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.guest_room_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: switch.guest_room_lamp
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.garage_light\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-blue-grey), 0.1);\n  {%\
-          \ endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
-          }\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: switch.garage_light
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: "{% if is_state(\"cover.garage_door\", \"open\") %}\n  mdi:garage-open-variant\n\
-          {% else %}\n  mdi:garage-variant\n{% endif %}"
-        icon_color: blue-grey
-        primary: Garage
-        secondary: '{{ states("sensor.garage_multisensor_air_temperature")|round(1)
-          }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: garage
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.garage_occupancy
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: switch.garage_light
-            state: 'on'
-          type: conditional
-        - chip:
-            card_mod:
-              style: "ha-card {\n  animation: blink 1s ease-out infinite;\n}\n@keyframes\
-                \ blink {\n  50% {opacity: 0;}\n}\n"
-            hold_action:
-              action: none
-            icon: mdi:garage-open-variant
-            icon_color: red
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: cover.garage_door
-            state: open
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_outside\"\
-          , \"on\") %}\n    background: rgba(var(--mush-rgb-light-green), 0.1);\n\
-          \  {% endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
-          }\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        entity: group.lights_outside
-        fill_container: true
-        hold_action:
-          action: toggle
-        icon: mdi:spa
-        icon_color: light-green
-        primary: Outside
-        secondary: '{{ states("sensor.openweathermap_temperature")|round(1) }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: outside
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:motion-sensor
-            icon_color: cyan
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.doorbell_motion
-            state: 'on'
-          type: conditional
-        - chip:
-            hold_action:
-              action: none
-            icon: mdi:lightbulb
-            icon_color: amber
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: group.lights_outside
-            state: 'on'
-          type: conditional
-        type: custom:mushroom-chips-card
-      type: custom:stack-in-card
-    - card_mod:
-        style: "ha-card {\n  height: 102px;\n  background: rgba(var(--mush-rgb-brown),\
-          \ 0.1);\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
-      cards:
-      - card_mod:
-          style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
-            \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
-            \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
-            \  height: 66px;\n  margin-left: -18px !important;\n}\n"
-        fill_container: true
-        hold_action:
-          action: none
-        icon: mdi:progress-wrench
-        icon_color: brown
-        primary: Utility
-        secondary: '{{ states("sensor.water_main_air_temperature") }} °F'
-        tap_action:
-          action: navigate
-          navigation_path: utility
-        type: custom:mushroom-template-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-            \  --chip-spacing: 0;\n}\n"
-        chips:
-        - chip:
-            card_mod:
-              style: "ha-card {\n  animation: blink 1s ease-out infinite;\n}\n@keyframes\
-                \ blink {\n  50% {opacity: 0;}\n}\n"
-            hold_action:
-              action: none
-            icon: mdi:valve-closed
-            icon_color: red
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: switch.water_main
-            state: 'off'
-          type: conditional
-        - chip:
-            card_mod:
-              style: "ha-card {\n  animation: blink 1s ease-out infinite;\n}\n@keyframes\
-                \ blink {\n  50% {opacity: 0;}\n}\n"
-            hold_action:
-              action: none
-            icon: mdi:water
-            icon_color: blue
-            tap_action:
-              action: none
-            type: template
-          conditions:
-          - entity: binary_sensor.water_leak_detected
-            state: 'on'
-          type: conditional
-        - hold_action:
-            action: none
-          icon: "{% for id in range(1,8) %}\n  {% set entity_id = \"switch.rachio_zone_\"\
-            \ ~ id %}\n  {% if is_state(entity_id, \"on\") %}\n    mdi:numeric-{{\
-            \ id }}-circle\n  {% endif %}\n{% endfor %}"
-          icon_color: light-blue
+        - content: '{{ states(entity) }} mi'
+          entity: sensor.ascent_range
+          icon: mdi:gas-station
+          icon_color: "{% if not is_state(entity, 'unavailable') %}\n  {% set range\
+            \ = states(entity)|int %}\n  {% if range > 200 %}\n    green\n  {% elif\
+            \ range > 100 %}\n    light-green\n  {% elif range > 50 %}\n    amber\n\
+            \  {% elif range > 20 %}\n    orange\n  {% else %}\n    red\n  {% endif\
+            \ %}\n{% endif %}"
           tap_action:
-            action: none
+            action: more-info
           type: template
+        - entity: sensor.ascent_odometer
+          type: entity
         type: custom:mushroom-chips-card
       type: custom:stack-in-card
-    columns: 2
-    square: false
-    type: grid
+    type: vertical-stack
+  - cards:
+    - subtitle: Rooms
+      title: ''
+      type: custom:mushroom-title-card
+    - cards:
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_living_room\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-orange), 0.1);\n  {%\
+            \ endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: group.lights_living_room
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:sofa-single
+          icon_color: orange
+          primary: Living Room
+          secondary: '{{ states("sensor.home_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: living
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.home_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: group.lights_living_room
+              state: 'on'
+            type: conditional
+          - chip:
+              entity: media_player.living_room_universal
+              hold_action:
+                action: none
+              icon: "{% set app = state_attr(entity, \"source\") %} {% if app == \"\
+                com.plexapp.android\" %}\n  {% set media_type = state_attr(entity,\
+                \ \"media_content_type\") %}\n  {% if media_type == \"tvshow\" %}\n\
+                \    mdi:television\n  {% elif media_type == \"movie\" %}\n    mdi:movie-open\n\
+                \  {% elif media_type == \"music\" %}\n    mdi:music\n  {% elif media_type\
+                \ == \"playlist\" %}\n    mdi:music\n  {% else %}\n    mdi:plex\n\
+                \  {% endif %}\n{% elif app == \"com.netflix.ninja\" %}\n  mdi:netflix\n\
+                {% elif app == \"com.amazon.amazonvideo.livingroom\" %}\n  fab:amazon\n\
+                {% elif app == \"com.hulu.livingroomplus\" %}\n  mdi:hulu\n{% elif\
+                \ app == \"com.google.android.youtube.tv\" %}\n  mdi:youtube\n{% elif\
+                \ app == \"com.spotify.tv.android\" %}\n  mdi:spotify\n{% elif app\
+                \ == \"tv.twitch.android.viewer\" %}\n  mdi:twitch\n{% else %}\n \
+                \ mdi:motion-play-outline\n{% endif %}"
+              icon_color: "{% set state = states(entity) %} {% if state == \"playing\"\
+                \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
+                \  white\n{% endif %}"
+              picture: "{% set app = state_attr(entity, \"source\") %} {% if app ==\
+                \ \"com.google.android.youtube.tvkids\" %}\n  /local/icons/media/youtube-kids.svg\n\
+                {% elif app == \"org.pbskids.video\" %}\n  /local/icons/media/pbs-kids.svg\n\
+                {% elif app == \"com.disney.datg.videoplatforms.android.watchdc\"\
+                \ %}\n  /local/icons/media/disney-now.svg\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: media_player.living_room_universal
+              state_not: 'off'
+            - entity: media_player.living_room_universal
+              state_not: unavailable
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_family_room\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-yellow), 0.1);\n  {%\
+            \ endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: group.lights_family_room
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:gamepad-circle
+          icon_color: yellow
+          primary: Family Room
+          secondary: '{{ states("sensor.family_room_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: family
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-avatar-padding: 0.2375em;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.family_room_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: group.lights_family_room
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:sony-playstation
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: select.family_room_activities
+              state: PS3
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:sony-playstation
+              icon_color: blue
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: select.family_room_activities
+              state: PS4
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:microsoft-xbox
+              icon_color: green
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: select.family_room_activities
+              state: XBox
+            type: conditional
+          - chip:
+              entity: media_player.family_room_universal
+              hold_action:
+                action: none
+              icon: "{% set app = state_attr(entity, \"source\") %} {% if app == \"\
+                com.plexapp.android\" %}\n  {% set media_type = state_attr(entity,\
+                \ \"media_content_type\") %}\n  {% if media_type == \"tvshow\" %}\n\
+                \    mdi:television\n  {% elif media_type == \"movie\" %}\n    mdi:movie-open\n\
+                \  {% elif media_type == \"music\" %}\n    mdi:music\n  {% elif media_type\
+                \ == \"playlist\" %}\n    mdi:music\n  {% else %}\n    mdi:plex\n\
+                \  {% endif %}\n{% elif app == \"com.netflix.ninja\" %}\n  mdi:netflix\n\
+                {% elif app == \"com.amazon.amazonvideo.livingroom\" %}\n  fab:amazon\n\
+                {% elif app == \"com.hulu.livingroomplus\" %}\n  mdi:hulu\n{% elif\
+                \ app == \"com.google.android.youtube.tv\" %}\n  mdi:youtube\n{% elif\
+                \ app == \"com.spotify.tv.android\" %}\n  mdi:spotify\n{% elif app\
+                \ == \"tv.twitch.android.viewer\" %}\n  mdi:twitch\n{% else %}\n \
+                \ mdi:motion-play-outline\n{% endif %}"
+              icon_color: "{% set state = states(entity) %} {% if state == \"playing\"\
+                \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
+                \  white\n{% endif %}"
+              picture: "{% set app = state_attr(entity, \"source\") %} {% if app ==\
+                \ \"com.google.android.youtube.tvkids\" %}\n  /local/icons/media/youtube-kids.svg\n\
+                {% elif app == \"org.pbskids.video\" %}\n  /local/icons/media/pbs-kids.svg\n\
+                {% elif app == \"com.disney.datg.videoplatforms.android.watchdc\"\
+                \ %}\n  /local/icons/media/disney-now.svg\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: media_player.family_room_universal
+              state_not: 'off'
+            - entity: media_player.family_room_universal
+              state_not: unavailable
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:desktop-tower
+              icon_color: teal
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.ardena_connected
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:desktop-tower
+              icon_color: lime
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.athos_connected
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: fas:vr-cardboard
+              icon_color: disabled
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.quest_interactive
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_office\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-blue), 0.1);\n  {% endif\
+            \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: group.lights_office
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:chair-rolling
+          icon_color: blue
+          primary: Office
+          secondary: '{{ states("sensor.office_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: office
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.office_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: group.lights_office
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:desktop-tower
+              icon_color: blue
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.erebus_connected
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_kitchen\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-lime), 0.1);\n  {% endif\
+            \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: group.lights_kitchen
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:fridge-variant
+          icon_color: lime
+          primary: Kitchen
+          secondary: '{{ states("sensor.kitchen_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: kitchen
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.kitchen_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: group.lights_kitchen
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:mirror-rectangle
+              icon_color: blue
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: light.magicmirror
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"light.master_bedroom_floor_lamp\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-deep-purple), 0.1);\n\
+            \  {% endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: light.master_bedroom_floor_lamp
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:bed-king
+          icon_color: deep-purple
+          primary: Master Bed
+          secondary: '{{ states("sensor.master_bedroom_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: master
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.master_bedroom_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: light.master_bedroom_floor_lamp
+              state: 'on'
+            type: conditional
+          - chip:
+              entity: media_player.master_bedroom_universal
+              hold_action:
+                action: none
+              icon: "{% set app = state_attr(entity, \"source\") %} {% if app == \"\
+                com.plexapp.android\" %}\n  {% set media_type = state_attr(entity,\
+                \ \"media_content_type\") %}\n  {% if media_type == \"tvshow\" %}\n\
+                \    mdi:television\n  {% elif media_type == \"movie\" %}\n    mdi:movie-open\n\
+                \  {% elif media_type == \"music\" %}\n    mdi:music\n  {% elif media_type\
+                \ == \"playlist\" %}\n    mdi:music\n  {% else %}\n    mdi:plex\n\
+                \  {% endif %}\n{% elif app == \"com.netflix.ninja\" %}\n  mdi:netflix\n\
+                {% elif app == \"com.amazon.amazonvideo.livingroom\" %}\n  fab:amazon\n\
+                {% elif app == \"com.hulu.livingroomplus\" %}\n  mdi:hulu\n{% elif\
+                \ app == \"com.google.android.youtube.tv\" %}\n  mdi:youtube\n{% elif\
+                \ app == \"com.spotify.tv.android\" %}\n  mdi:spotify\n{% elif app\
+                \ == \"tv.twitch.android.viewer\" %}\n  mdi:twitch\n{% else %}\n \
+                \ mdi:motion-play-outline\n{% endif %}"
+              icon_color: "{% set state = states(entity) %} {% if state == \"playing\"\
+                \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% else %}\n\
+                \  white\n{% endif %}"
+              picture: "{% set app = state_attr(entity, \"source\") %} {% if app ==\
+                \ \"com.google.android.youtube.tvkids\" %}\n  /local/icons/media/youtube-kids.svg\n\
+                {% elif app == \"org.pbskids.video\" %}\n  /local/icons/media/pbs-kids.svg\n\
+                {% elif app == \"com.disney.datg.videoplatforms.android.watchdc\"\
+                \ %}\n  /local/icons/media/disney-now.svg\n{% endif %}"
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: media_player.master_bedroom_universal
+              state_not: 'off'
+            - entity: media_player.master_bedroom_universal
+              state_not: unavailable
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.ethans_lamp\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-green), 0.1);\n  {%\
+            \ endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: switch.ethans_lamp
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:robot
+          icon_color: green
+          primary: Ethan
+          secondary: '{{ states("sensor.ethan_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: ethan
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.ethan_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: switch.ethans_lamp
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.emmas_lamp\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-purple), 0.1);\n  {%\
+            \ endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: switch.emmas_lamp
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:unicorn-variant
+          icon_color: purple
+          primary: Emma
+          secondary: '{{ states("sensor.emma_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: emma
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.emma_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: switch.emmas_lamp
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.guest_room_lamp\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-cyan), 0.1);\n  {% endif\
+            \ %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n}\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: switch.guest_room_lamp
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:account-outline
+          icon_color: cyan
+          primary: Guest
+          secondary: '{{ states("sensor.guest_room_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: guest-room
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.guest_room_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: switch.guest_room_lamp
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"switch.garage_light\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-blue-grey), 0.1);\n\
+            \  {% endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: switch.garage_light
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: "{% if is_state(\"cover.garage_door\", \"open\") %}\n  mdi:garage-open-variant\n\
+            {% else %}\n  mdi:garage-variant\n{% endif %}"
+          icon_color: blue-grey
+          primary: Garage
+          secondary: '{{ states("sensor.garage_multisensor_air_temperature")|round(1)
+            }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: garage
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.garage_occupancy
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: switch.garage_light
+              state: 'on'
+            type: conditional
+          - chip:
+              card_mod:
+                style: "ha-card {\n  animation: blink 1s ease-out infinite;\n}\n@keyframes\
+                  \ blink {\n  50% {opacity: 0;}\n}\n"
+              hold_action:
+                action: none
+              icon: mdi:garage-open-variant
+              icon_color: red
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: cover.garage_door
+              state: open
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  {% if is_state(\"group.lights_outside\"\
+            , \"on\") %}\n    background: rgba(var(--mush-rgb-light-green), 0.1);\n\
+            \  {% endif %}\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          entity: group.lights_outside
+          fill_container: true
+          hold_action:
+            action: toggle
+          icon: mdi:spa
+          icon_color: light-green
+          primary: Outside
+          secondary: '{{ states("sensor.openweathermap_temperature")|round(1) }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: outside
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:motion-sensor
+              icon_color: cyan
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.doorbell_motion
+              state: 'on'
+            type: conditional
+          - chip:
+              hold_action:
+                action: none
+              icon: mdi:lightbulb
+              icon_color: amber
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: group.lights_outside
+              state: 'on'
+            type: conditional
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      - card_mod:
+          style: "ha-card {\n  height: 102px;\n  background: rgba(var(--mush-rgb-brown),\
+            \ 0.1);\n}\n:host {\n  border-radius: var(--ha-card-border-radius);\n\
+            }\n"
+        cards:
+        - card_mod:
+            style: ":host([dark-mode]) {\n  background: rgba(var(--rgb-primary-background-color),\
+              \ 0.2);\n}\n:host {\n  background: rgba(var(--rgb-primary-text-color),\
+              \ 0.025);\n  --mush-icon-size: 76px;\n  --mush-icon-border-radius: 50%;\n\
+              \  height: 66px;\n  margin-left: -18px !important;\n}\n"
+          fill_container: true
+          hold_action:
+            action: none
+          icon: mdi:progress-wrench
+          icon_color: brown
+          primary: Utility
+          secondary: '{{ states("sensor.water_main_air_temperature") }} °F'
+          tap_action:
+            action: navigate
+            navigation_path: utility
+          type: custom:mushroom-template-card
+        - alignment: end
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-spacing: 0;\n}\n"
+          chips:
+          - chip:
+              card_mod:
+                style: "ha-card {\n  animation: blink 1s ease-out infinite;\n}\n@keyframes\
+                  \ blink {\n  50% {opacity: 0;}\n}\n"
+              hold_action:
+                action: none
+              icon: mdi:valve-closed
+              icon_color: red
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: switch.water_main
+              state: 'off'
+            type: conditional
+          - chip:
+              card_mod:
+                style: "ha-card {\n  animation: blink 1s ease-out infinite;\n}\n@keyframes\
+                  \ blink {\n  50% {opacity: 0;}\n}\n"
+              hold_action:
+                action: none
+              icon: mdi:water
+              icon_color: blue
+              tap_action:
+                action: none
+              type: template
+            conditions:
+            - entity: binary_sensor.water_leak_detected
+              state: 'on'
+            type: conditional
+          - hold_action:
+              action: none
+            icon: "{% for id in range(1,8) %}\n  {% set entity_id = \"switch.rachio_zone_\"\
+              \ ~ id %}\n  {% if is_state(entity_id, \"on\") %}\n    mdi:numeric-{{\
+              \ id }}-circle\n  {% endif %}\n{% endfor %}"
+            icon_color: light-blue
+            tap_action:
+              action: none
+            type: template
+          type: custom:mushroom-chips-card
+        type: custom:stack-in-card
+      columns: 2
+      square: false
+      type: grid
+    type: vertical-stack
   - cards:
     - subtitle: Laundry / Dishes
       type: custom:mushroom-title-card
@@ -3272,14 +3344,30 @@ views:
     tap_action:
       action: more-info
     type: custom:mushroom-cover-card
-  - entity: binary_sensor.opengarage_vehicle_present
-    icon: mdi:car-estate
-    icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n  red\n\
-      {%- endif -%}"
-    primary: Ascent {{ "not" if not is_state(entity, "on") }} in Garage
-    tap_action:
-      action: more-info
-    type: custom:mushroom-template-card
+  - card_mod:
+      style: "ha-card {\n  height: 72px;\n}\n"
+    cards:
+    - entity: binary_sensor.opengarage_vehicle_present
+      icon: mdi:car-estate
+      icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n  red\n\
+        {%- endif -%}"
+      primary: Ascent {{ "not" if not is_state(entity, "on") }} in Garage
+      tap_action:
+        action: more-info
+      type: custom:mushroom-template-card
+    - alignment: end
+      card_mod:
+        style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+          \  --chip-spacing: 0;\n  --chip-avatar-padding: 0.2375em;\n  top: -34px\n\
+          }\n"
+      chips:
+      - entity: sensor.opengarage_distance
+        icon: mdi:arrow-collapse-vertical
+        type: entity
+      - entity: sensor.opengarage_rssi
+        type: entity
+      type: custom:mushroom-chips-card
+    type: custom:stack-in-card
   icon: mdi:garage-variant
   layout:
     max_cols: 2
@@ -3550,18 +3638,18 @@ views:
       severity:
       - color: rgb(var(--mush-rgb-red))
         from: 0
-        to: 50
+        to: 20
       - color: rgb(var(--mush-rgb-orange))
+        from: 21
+        to: 50
+      - color: rgb(var(--mush-rgb-amber))
         from: 51
         to: 100
-      - color: rgb(var(--mush-rgb-amber))
+      - color: rgb(var(--mush-rgb-light-green))
         from: 101
         to: 200
-      - color: rgb(var(--mush-rgb-light-green))
-        from: 201
-        to: 300
       - color: rgb(var(--mush-rgb-green))
-        from: 301
+        from: 201
         to: 390
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}"
       type: custom:bar-card
@@ -4104,7 +4192,7 @@ views:
   - cards:
     - subtitle: 'Erebus
 
-        R7-2700 | RX 580 | 650W'
+        R5-5600X | RX 580 | 650W'
       type: custom:mushroom-title-card
     - cards:
       - entity: switch.erebus
@@ -4680,7 +4768,15 @@ views:
     type: vertical-stack
   - cards:
     - cards:
-      - entity: climate.home
+      - card_mod:
+          style: "mushroom-shape-icon {\n  --card-mod-icon: \n  {% if is_state(config.entity,\
+            \ 'heat_cool') %}\n    mdi:autorenew\n  {% elif is_state(config.entity,\
+            \ 'heat') %}\n    mdi:fire\n  {% elif is_state(config.entity, 'cool')\
+            \ %}\n    mdi:snowflake\n  {% elif is_state(config.entity, 'dry') %}\n\
+            \    mdi:water-percent\n  {% elif is_state(config.entity, 'fan_only')\
+            \ %}\n    mdi:fan\n  {% else %}\n    mdi:air-conditioner \n  {% endif\
+            \ %};\n}\n"
+        entity: climate.home
         hvac_modes:
         - heat_cool
         - heat
