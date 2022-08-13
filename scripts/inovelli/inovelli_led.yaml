@@ -1,89 +1,43 @@
 ---
+# Source: https://github.com/brianhanifin/Home-Assistant-Config/blob/master/scripts/notifications/inovelli_led/inovelli_led.yaml
+#
 # Calculation References:
 #   https://nathanfiscus.github.io/inovelli-notification-calc/
 #   https://community.inovelli.com/t/home-assistant-2nd-gen-switch-rgb-working/168/62
-#   https://docs.google.com/spreadsheets/d/1bEpujdvBPZY9Fl61PZLUWuHanD2VAkRORFZ5D9xjLzA/edit?usp=sharing
+#   https://docs.google.com/spreadsheets/d/14wTP4OL4hkDK3Et5kYL4fyxPIK_R9JR3cgFxSa6dhyw/edit?usp=sharing
 #
 # Changes:
-#   July 22, 2020: Incorporating changes from Kevin Schlichter.
-#     https://github.com/kschlichter/Home-Assistant-Inovelli-Red-Dimmer-Switch
-#
-#   September 17, 2020: There are some massive improvements to my version of this code. Here are the highlights:
-#     1. Choose - using the recently added choose: feature a separate call has been created for the Z-wave and OZW
-#        versions of the service call.
-#     2. Variables - using 0.115’s new variables: feature the variables sent each service call only have to be
-#        calculated once.
-#     3. Supported Features - I realized that I could probably tell the difference between modules using the
-#        “supported_features” attribute of each switch. For example my dimmer’s supported features is “33”.
-#
-#   September 18, 2020: Added "model" parameter with options of dimmer, switch, combo_light, combo_fan. This replaces
-#     supported_features as the combo fan/light switch also had the same supported_features value.
-#
-#   February 24, 2021: Added support for Z-Wave JS in place of OpenZwave (ozw).
-#     The ozw code is remarked out for those that still need it.
-#
-#   February 27, 2021:
-#     1. Added zwave_integration at top of "variables:" section to allow users to define which integration is
-#        installed ("zwave", "ozw", "zwave_js"). I just don't see a simple way to auto-detect this.
-#     2. Added a comment describing the "model" variable.
-#     3. Replaced personal "script.debug" service call with universal "persistent_notification.create".
-#        Unremarking these lines could help you troubleshoot why something isn't working as expected.
-#     4. Updated broken spreadsheet link with public copy stored in my Google Docs account.
-#        Thanks for the heads up Kevin Schlichter!
-#
-#   March 26, 2021
-#     1. Added fields to help users experimenting in the Services Developer Tool.
-#
-#   April 3, 2021
-#   Incorporated @firstof9's changes:
-#     1. Set execution mode to "parallel" to all this script to potentially run on more than one devices simultaneously.
-#     2. Implement ZWave JS's new zwave_js.bulk_set_partial_config_parameters command.
-#   Source: https://gist.github.com/firstof9/b88d072a81c54b314fe7ddb901fc5c29
-#
-#   May 10, 2021
-#   Incorporated @koconut's corrected "Off code".
-#   Source: https://community.home-assistant.io/t/inovelli-z-wave-red-series-notification-led/165483/146
+#   May 26, 2022
+#   1. First release removing support for the deprecated OpenZWave and ZWave integrations.
+#   2. Added support for the White LED color.
+#     * @kschlichter and @mwav3 thank you for your help.
+#     * Support for the color white was supposedly added to the LZW31-SN dimmer
+#       in Firmware 1.45 accoding to Inovelli <https://support.inovelli.com/portal/en/kb/articles/firmware-change-log-lzw31-sn-dimmer-switch-red-series>.
+#     * I ended up having to flash both LZW31-SN Z-Wave 1.61 and LZW31-SN Holtek 1.45 firmware twice
+#       before I could see white light.
+#   3. Added support Added support to send the same notification to multiple Inovelli switches and dimmers.
+#      (Thanks to Danny Schuh)'s contribution to the blueprint.)
 #
 inovelli_led:
   alias: 'Inovelli LED'
-  description: 'Set a LED effect for Inovelli switches.'
+  description: 'Set LED effects for Inovelli switches and dimmers.'
   icon: mdi:led-on
   mode: parallel
 
   variables:
-    # * Use the passed model type ("dimmer", "switch", "combo_light") when present.
-    # * If not present, then attempt to identify the type using the device "model" attribute.
-    # * Otherwise assume the model type is "dimmer".
-    model: |
-      {%- if model is string -%}
-        {{ model }}
-      {%- elif device_attr(entity_id, "model") is string -%}
-        {%- if "LZW31" in device_attr(entity_id, "model") -%}
-          dimmer
-        {%- elif "LZW36" in device_attr(entity_id, "model") -%}
-          combo_light
-        {%- else -%}
-          switch
-        {%- endif -%}
-      {%- else -%}
-        dimmer
-      {%- endif -%}
+    # Set to true to create a "persistent_notification" with debugging information.
+    debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+
+    entity_list: '{{ entity_id }}'
+    level: "{{ level|default(4)|int(default=0) }}"
+    duration: '{{ duration|default("Indefinitely")|title }}'
+    effect: '{{ effect|default("Blink")|title }}'
+
     parameters:
       dimmer: 16
       combo_light: 24
       combo_fan: 25
       switch: 8
-    # Only used for debug output.
-    node_id: '{{ state_attr(entity_id, "node_id") }}'
-    color: |
-      {%- if color is not number -%}
-        {{ color|default("Yellow")|title }}
-      {%- else -%}
-        {{ color|int }}
-      {%- endif -%}
-    level: '{{ level|default(4)|int }}'
-    duration: '{{ duration|default("Indefinitely")|title }}'
-    effect: '{{ effect|default("Blink")|title }}'
     colors: !include ../../templates/inovelli_colors_values.yaml
     durations: !include ../../templates/inovelli_durations_values.yaml
     effects_dimmer:
@@ -102,83 +56,133 @@ inovelli_led:
       'Pulse': 4
 
   sequence:
-    # Perform the Inovelli math.
     - variables:
-        parameter: '{{ parameters[model|lower] }}'
-        color: '{{ colors[color|title]|int }}'
-        duration: '{{ durations[duration|title] }}'
-        effect: |
-          {%- if model == "switch" -%}
-            {{ effects_switch[effect|title] }}
-          {%- else -%}
-            {{ effects_dimmer[effect|title] }}
-          {%- endif -%}
-        inovelli_math: '{{ color|int + (level|int * 256) + (duration|int * 65536) + (effect|int * 16777216) }}'
+        level: '{{ level|default(4)|int(default=0) }}'
+        duration: '{{ durations[duration] }}'
+        color: |-
+          {% if color is not number %}
+            {% set color = color|default("Yellow")|title %}
+          {% else %}
+            {% set color = color|int(default=0) %}
+          {% endif %}
+          {{ colors[color|title]|int(default=0) }}
 
-    # Set enabled to true to provide a notification with troubleshooting information.
-    - service: script.debug
-      enabled: false
-      data:
-        id: 'inovelli_led'
-        title: 'DEBUG: script.inovelli_led'
-        message: |
-          model: {{ model }}
-          color: '{{ color|title }}'
-          level: '{{ level }}'
-          duration: '{{ duration|title }}'
-          effect: '{{ effect|title }}'
-          node_id: '{{ node_id }}'
-          parameter: '{{ parameter }}'
-          value: '{{ inovelli_math }}'
+    # Loop through each entity_id
+    - repeat:
+        for_each: '{{ entity_list }}'
+        sequence:
+          - variables:
+              # Automatically extract the model name.
+              model_name: |-
+                {% set model_name = device_attr(repeat.item, "model") %}
+                {% if "-" in model_name %}
+                  {{ model_name.split("-")[0] }}
+                {% else %}
+                  {{ model_name }}
+                {% endif %}
+              # 1st. Use the automatically detected "model_name".
+              # 2nd. Assume the model type is "dimmer".
+              model_type: |-
+                {% if model_name is string %}
+                  {% if "LZW31" in model_name %}
+                    dimmer
+                  {% elif "LZW36" in model_name %}
+                    {% set domain = repeat.item.split(".")[0] %}
+                    {% if domain == "fan" %}
+                      combo_fan
+                    {% else %}
+                      combo_light
+                    {% endif %}
+                  {% else %}
+                    switch
+                  {% endif %}
+                {% else %}
+                  dimmer
+                {% endif %}
+              parameter: "{{ parameters[model_type|lower]|int(default=0) }}"
+              effect: |-
+                {% if model_type == "switch" %}
+                  {{- effects_switch[effect|default("Blink")|title] }}
+                {% else %}
+                  {{- effects_dimmer[effect|default("Blink")|title] }}
+                {% endif %}
 
-    # Clear the previous effect.
-    - service: zwave_js.bulk_set_partial_config_parameters
-      target:
-        entity_id: '{{ entity_id }}'
-      data:
-        parameter: '{{ parameter }}'
-        value: '16714410'
+              # Perform the Inovelli math.
+              inovelli_math: |-
+                {% if effect|int(default=0) > 0 %}
+                  {{ color|int(default=0) + (level|int(default=0) * 256) + (duration|int(default=0) * 65536) + (effect|int(default=0) * 16777216) }}
+                {% else %}
+                  0
+                {% endif %}
 
-    # Start the new effect, unless we were just turning it off.
-    - if:
-        - condition: template
-          value_template: '{{ inovelli_math > 0 }}'
-      then:
-        - service: zwave_js.bulk_set_partial_config_parameters
-          target:
-            entity_id: "{{ entity_id }}"
-          data:
-            parameter: "{{ parameter }}"
-            value: "{{ inovelli_math }}"
+          # Set debug = true above to provide output troubleshooting information.
+          - choose:
+              - conditions:
+                  - '{{ debug == true }}'
+                sequence:
+                  - service: script.debug
+                    data:
+                      id: 'inovelli_led'
+                      title: 'DEBUG: script.inovelli_led'
+                      message: |
+                        device: {{ repeat.item }}
+                        model_name: {{ model_name }}
+                        model_type: {{ model_type }}
+                        color: {{ color|title }}
+                        level: {{ level }}
+                        duration: {{ duration|title }}
+                        effect: {{ effect|title }}
+                        parameter: {{ parameter }}
+                        inovelli_math: {{ inovelli_math }}
+
+          # Clear the previous effect.
+          - service: zwave_js.bulk_set_partial_config_parameters
+            target:
+              entity_id: "{{ repeat.item }}"
+            data:
+              parameter: "{{ parameter }}"
+              value: '16714410'
+
+          # Start the new effect, unless we were just turning it off.
+          - choose:
+              - conditions: '{{ inovelli_math > 0 }}'
+                sequence:
+                  - service: zwave_js.bulk_set_partial_config_parameters
+                    target:
+                      entity_id: "{{ repeat.item }}"
+                    data:
+                      parameter: "{{ parameter }}"
+                      value: "{{ inovelli_math }}"
 
   fields:
     entity_id:
-      name: Light switch
-      description: 'Light or switch entity.'
-      example: 'switch.inovelli_lzw30_sn_switch_red_series'
+      name: Entities
+      description: Inovelli devices to set effects.
+      example: light.family_room
       required: true
       selector:
-        device:
-          integration: zwave_js
-          manufacturer: Inovelli
-    model:
-      name: 'Device type'
-      example: dimmer
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - dimmer
+        entity:
+          domain:
+            - light
             - switch
-            - combo_light
-            - combo_fan
+          integration: zwave_js
+          multiple: true
     color:
       name: 'LED Color'
-      default: Red
-      example: Red
+      default: Yellow
+      example: Yellow
       selector:
         select:
           options: !include ../../templates/inovelli_colors_select.yaml
+    level:
+      name: Brightness level
+      description: Value from 0 (off) to 10 (100% brightness).
+      default: 4
+      example: '4'
+      selector:
+        number:
+          min: 0
+          max: 10
     effect:
       name: 'Effect'
       default: Blink
@@ -194,11 +198,8 @@ inovelli_led:
       selector:
         select:
           options: !include ../../templates/inovelli_durations_select.yaml
-    level:
-      name: 'LED brightness'
-      default: 4
-      example: '4'
+    enable_debug:
+      name: Enable debug output?
+      default: false
       selector:
-        number:
-          min: 1
-          max: 10
+        boolean:

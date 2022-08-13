@@ -1,23 +1,27 @@
 ---
 inovelli_led_status_start:
   alias: 'Inovelli LED (Status Start)'
-  description: 'Set a LED effect and check for state.'
+  description: 'Set a LED effect, wait for a delay, and set to a new effect.'
   icon: mdi:led-off
   mode: parallel
 
   fields:
     entity_id:
-      name: Light switch
-      description: 'Light or switch entity.'
-      example: 'switch.inovelli_lzw30_sn_switch_red_series'
+      name: Entities
+      description: Inovelli devices to set effects.
+      example: light.family_room
       required: true
       selector:
-        device:
+        entity:
+          domain:
+            - light
+            - switch
           integration: zwave_js
-          manufacturer: Inovelli
+          multiple: true
     color_start:
       name: '[Start] LED Color'
-      example: 'Red'
+      default: Yellow
+      example: Yellow
       required: true
       selector:
         select:
@@ -46,7 +50,8 @@ inovelli_led_status_start:
           options: !include ../../templates/inovelli_durations_select.yaml
     color_end:
       name: '[End] LED Color'
-      example: 'Red'
+      default: Yellow
+      example: Yellow
       required: true
       selector:
         select:
@@ -66,8 +71,17 @@ inovelli_led_status_start:
         number:
           min: 1
           max: 10
+    enable_debug:
+      name: Enable debug output?
+      default: false
+      selector:
+        boolean:
 
   variables:
+    # Set to true to create a "persistent_notification" with debugging information.
+    debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+
+    entity_list: '{{ entity_id }}'
     durations: !include ../../templates/inovelli_durations_values.yaml
     duration: '{{ duration|default("15 Seconds",true)|title }}'
 
@@ -77,19 +91,21 @@ inovelli_led_status_start:
 
     - service: script.inovelli_led
       data:
-        entity_id: '{{ entity_id }}'
+        entity_id: '{{ entity_list }}'
         color: '{{ color_start }}'
         effect: '{{ effect_start }}'
         duration: '{{ duration }}'
         level: '{{ level_start }}'
+        enable_debug: '{{ debug }}'
 
     - delay:
         seconds: '{{ duration_int }}'
 
     - service: script.inovelli_led
       data:
-        entity_id: '{{ entity_id }}'
+        entity_id: '{{ entity_list }}'
         color: '{{ color_end }}'
         effect: '{{ effect_end }}'
-        duration: 'Indefinately'
+        duration: 'Indefinitely'
         level: '{{ level_end }}'
+        enable_debug: '{{ debug }}'

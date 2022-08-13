@@ -4,40 +4,32 @@
 #
 inovelli_led_set_defaults:
   alias: 'Inovelli LED (Set Defaults)'
-  description: 'Set the default/initial state of the LED light on Inovelli switches.'
+  description: 'Set the default/initial state of the LED light on Inovelli devices.'
   icon: mdi:led-outline
 
   fields:
     entity_id:
-      name: Light switch
-      description: 'Light or switch entity.'
-      example: 'switch.inovelli_lzw30_sn_switch_red_series'
+      name: Entities
+      description: Inovelli devices to set defaults.
+      example: light.family_room
       required: true
       selector:
-        device:
-          integration: zwave_js
-          manufacturer: Inovelli
-    model:
-      name: 'Device type'
-      example: dimmer
-      selector:
-        select:
-          mode: dropdown
-          options:
-            - dimmer
+        entity:
+          domain:
+            - light
             - switch
-            - combo_light
-            - combo_fan
+          integration: zwave_js
+          multiple: true
     color:
       name: 'LED Color'
-      default: 'Yellow'
-      example: 'Red'
+      default: Yellow
+      example: Yellow
       selector:
         select:
           options: !include ../../templates/inovelli_colors_select.yaml
     level_on:
-      name: 'Level on'
-      description: 'LED brightness when the switch is on.'
+      name: 'Brightness level on'
+      description: 'LED brightness when the switch is on. Value from 0 (off) to 10 (100% brightness).'
       default: 8
       example: '10'
       selector:
@@ -45,42 +37,29 @@ inovelli_led_set_defaults:
           min: 1
           max: 10
     level_off:
-      name: 'Level off'
-      description: 'LED brightness when the switch is off.'
+      name: 'Brightness level off'
+      description: 'LED brightness when the switch is off. Value from 0 (off) to 10 (100% brightness).'
       default: 1
       example: '10'
       selector:
         number:
           min: 1
           max: 10
+    enable_debug:
+      name: Enable debug output?
+      default: false
+      selector:
+        boolean:
 
   variables:
-    # * Use the passed model type ("dimmer", "switch", "combo_light") when present.
-    # * If not present, then attempt to identify the type using the device "model" attribute.
-    # * Otherwise assume the model type is "dimmer".
-    model: |
-      {%- if model is string -%}
-        {{ model }}
-      {%- elif device_attr(entity_id, "model") is string -%}
-        {%- if "LZW31" in device_attr(entity_id, "model") -%}
-          dimmer
-        {%- elif "LZW36" in device_attr(entity_id, "model") -%}
-          combo_light
-        {%- else -%}
-          switch
-        {%- endif -%}
-      {%- else -%}
-        dimmer
-      {%- endif -%}
-    node_id: '{{ state_attr(entity_id, "node_id") }}'
-    color: |
-      {%- if color is not number -%}
-        {{ color|default("Yellow")|title }}
-      {%- else -%}
-        {{ color|int }}
-      {%- endif -%}
+    # Set to true to create a "persistent_notification" with debugging information.
+    debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+
+    entity_list: '{{ entity_id }}'
     level_on: '{{ level_on|default("8")|int }}'
     level_off: '{{ level_off|default("1")|int }}'
+    colors: !include ../../templates/inovelli_colors_values.yaml
+
     parameters:
       dimmer:
         color: 13
@@ -98,45 +77,82 @@ inovelli_led_set_defaults:
         color: 5
         level_on: 6
         level_off: 7
-    colors: !include ../../templates/inovelli_colors_values.yaml
 
   sequence:
     - variables:
-        color: '{{ colors[color|title] }}'
-        color_parameter: '{{ parameters[model]["color"] }}'
-        level_on_parameter: '{{ parameters[model]["level_on"] }}'
-        level_off_parameter: '{{ parameters[model]["level_off"] }}'
+        color: |-
+          {% if color is not number %}
+            {% set color = color|default("Yellow")|title %}
+          {% else %}
+            {% set color = color|int(default=0) %}
+          {% endif %}
+          {{ colors[color|title]|int(default=0) }}
 
-    # Set enabled to true to provide an notification with troubleshooting information.
-    - service: script.debug
-      enabled: false
-      data:
-        id: 'inovelli_led_set_defaults'
-        title: 'DEBUG: script.inovelli_led_set_defaults'
-        message: |
-          node_id: '{{ node_id }}'
-          parameter: '{{ parameters[model]["color"] }}'
-          color: '{{ color }}'
-          level_on: '{{ level_on }}'
-          level_off: '{{ level_off }}'
+    # Loop through each entity_id
+    - repeat:
+        for_each: '{{ entity_list }}'
+        sequence:
+          - variables:
+              # Automatically extract the model name.
+              model_name: |-
+                {% set model_name = device_attr(repeat.item, "model") %}
+                {% if "-" in model_name %}
+                  {{ model_name.split("-")[0] }}
+                {% else %}
+                  {{ model_name }}
+                {% endif %}
+              # 1st. Use the automatically detected "model_name".
+              # 2nd. Assume the model type is "dimmer".
+              model_type: |-
+                {% if model_name is string %}
+                  {% if "LZW31" in model_name %}
+                    dimmer
+                  {% elif "LZW36" in model_name %}
+                    {% set domain = repeat.item.split(".")[0] %}
+                    {% if domain == "fan" %}
+                      combo_fan
+                    {% else %}
+                      combo_light
+                    {% endif %}
+                  {% else %}
+                    switch
+                  {% endif %}
+                {% else %}
+                  dimmer
+                {% endif %}
+              color_parameter: '{{ parameters[model_type]["color"] }}'
+              level_on_parameter: '{{ parameters[model_type]["level_on"] }}'
+              level_off_parameter: '{{ parameters[model_type]["level_off"] }}'
 
-    - service: zwave_js.set_config_parameter
-      target:
-        entity_id: '{{ entity_id }}'
-      data:
-        parameter: '{{ color_parameter }}'
-        value: '{{ color }}'
+          # Set enabled to true to provide an notification with troubleshooting information.
+          - service: script.debug
+            data:
+              id: 'inovelli_led_set_defaults_{{ repeat.item }}'
+              title: 'DEBUG: script.inovelli_led_set_defaults_'
+              message: |
+                device: {{ repeat.item }}
+                parameter: {{ color_parameter }}
+                color: {{ color }}
+                level_on: {{ level_on }}
+                level_off: {{ level_off }}
 
-    - service: zwave_js.set_config_parameter
-      target:
-        entity_id: '{{ entity_id }}'
-      data:
-        parameter: '{{ level_on_parameter }}'
-        value: '{{ level_on }}'
+          - service: zwave_js.set_config_parameter
+            target:
+              entity_id: '{{ repeat.item }}'
+            data:
+              parameter: '{{ color_parameter }}'
+              value: '{{ color }}'
 
-    - service: zwave_js.set_config_parameter
-      target:
-        entity_id: '{{ entity_id }}'
-      data:
-        parameter: '{{ level_off_parameter }}'
-        value: '{{ level_off }}'
+          - service: zwave_js.set_config_parameter
+            target:
+              entity_id: '{{ repeat.item }}'
+            data:
+              parameter: '{{ level_on_parameter }}'
+              value: '{{ level_on }}'
+
+          - service: zwave_js.set_config_parameter
+            target:
+              entity_id: '{{ repeat.item }}'
+            data:
+              parameter: '{{ level_off_parameter }}'
+              value: '{{ level_off }}'
