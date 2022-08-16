@@ -10,9 +10,12 @@ sensor:
     unit_of_measurement: "USD"
     icon: mdi:currency-usd
     availability: "{{ not is_state('sensor.home_123_1mon', 'unavailable') }}"
-    state: >
-      {%- set summer_offpeak = (states('sensor.monthly_energy_summer_offpeak')|float) * (states('input_text.tariff_summer_offpeak')|float) -%}
-      {%- set summer_peak = (states('sensor.monthly_energy_summer_peak')|float) * (states('input_text.tariff_summer_peak')|float) -%}
-      {%- set winter_offpeak = (states('sensor.monthly_energy_winter_offpeak')|float) * (states('input_text.tariff_winter_offpeak')|float) -%}
-      {%- set winter_peak = (states('sensor.monthly_energy_winter_peak')|float) * (states('input_text.tariff_winter_peak')|float) -%}
-      {{ (summer_offpeak + summer_peak + winter_offpeak + winter_peak)|round(2) }}
+    state: >-
+      {% set tariffs = ["summer_offpeak","summer_peak","winter_offpeak","winter_peak"] %}
+      {%- set ns = namespace(cost=0) -%}
+      {% for tariff in tariffs -%}
+        {%- set usage = states('sensor.monthly_energy_' ~ tariff)|float(default=0) -%}
+        {%- set rate = states('input_text.tariff_' ~ tariff)|float(default=0) -%}
+        {%- set ns.cost = ns.cost + (usage * rate) %}
+      {%- endfor %}
+      {{ ns.cost|round(2) }}

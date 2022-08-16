@@ -10,13 +10,10 @@ sensor:
     unit_of_measurement: "USD/kWh"
     icon: mdi:currency-usd
     availability: "{{ not is_state('select.monthly_energy', 'unavailable') }}"
-    state: >
-      {%- if is_state('select.monthly_energy', 'summer_offpeak') -%}
-        {{ states('input_text.tariff_summer_offpeak')|float(default=0) }}
-      {%- elif is_state('select.monthly_energy', 'summer_peak') -%}
-        {{ states('input_text.tariff_summer_peak')|float(default=0) }}
-      {%- elif is_state('select.monthly_energy', 'winter_offpeak') -%}
-        {{ states('input_text.tariff_winter_offpeak')|float(default=0) }}
-      {%- elif is_state('select.monthly_energy', 'winter_peak') -%}
-        {{ states('input_text.tariff_winter_peak')|float(default=0) }}
-      {%- endif -%}
+    state: >-
+      {% set tariff = states('select.monthly_energy') %}
+      {% if not is_state('input_text.tariff_' ~ tariff, 'unavailable') %}
+        {{ states('input_text.tariff_' ~ tariff)|float(default=0) }}
+      {% else %}
+        0
+      {% endif %}

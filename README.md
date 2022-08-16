@@ -274,7 +274,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>29 Lovelace Plugins</summary>
+<details><summary>28 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -351,10 +351,6 @@ Replace input_number sliders with plus and minus buttons
 ### [Rgb Light Card](https://github.com/bokub/rgb-light-card) [v1.11.0]
 
 💡 A Lovelace custom card for RGB lights
-
-### [Simple Thermostat](https://github.com/nervetattoo/simple-thermostat) [v2.5.0]
-
-A different take on the thermostat card for Home Assistant ♨️
 
 ### [Slider Button Card](https://github.com/custom-cards/slider-button-card) [v1.10.9]
 
