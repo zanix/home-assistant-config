@@ -14,7 +14,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 - [Home Assistant][home-assistant]
 - [MQTT](https://mosquitto.org) - MQTT Broker docker container
-- [Zigbee2MQTT](https://zwave-js.github.io/zwavejs2mqtt) - Zigbee to MQTT bridge, get rid of your proprietary Zigbee bridges
+- [Zigbee2MQTT](https://www.zigbee2mqtt.io) - Zigbee to MQTT bridge, get rid of your proprietary Zigbee bridges
 - [Zwavejs2Mqtt](https://zwave-js.github.io/zwavejs2mqtt) - Fully configurable Z-Wave to MQTT Gateway and Control Panel.
 
 ## Technical Details
@@ -525,7 +525,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.8.3-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.8.5-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
