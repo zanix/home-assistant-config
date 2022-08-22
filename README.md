@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1441 total entities**,
-including **627 sensors**.
+This Home Assistant install has approximately **1476 total entities**,
+including **662 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -158,7 +158,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>19 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v1.5.3]
 
@@ -169,12 +169,6 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 Home Assistant Service for sending commands to a Wifi enabled DreamScreen
 
 Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
-
-### [Emporia Vue](https://github.com/magico13/ha-emporia-vue) [v0.7.3]
-
-Home Assistant Integration for Emporia Vue Energy Monitor
-
-Authors: [@magico13](https://github.com/magico13).
 
 ### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.1.5]
 
@@ -458,6 +452,8 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 ### Sensor / Switch
 
 - [Dome Water Leak Sensor](https://www.amazon.com/gp/product/B01LXR0B8Q/) - Detect water leaks
+- [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
+  Hacked for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
 - [ESPHome](https://esphome.io) - DIY devices
 - [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presence of my car
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
