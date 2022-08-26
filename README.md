@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1476 total entities**,
-including **662 sensors**.
+This Home Assistant install has approximately **1463 total entities**,
+including **654 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -310,7 +310,7 @@ Entity Attributes
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.23]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.24]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -338,7 +338,7 @@ Show multiple entity states and attributes on entity rows in Home Assistant's Lo
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v3.12]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v3.13]
 
 Replace input_number sliders with plus and minus buttons
 
