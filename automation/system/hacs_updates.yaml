@@ -7,15 +7,16 @@ trigger:
   platform: state
   entity_id: sensor.hacs
 
+variables:
+  updates: '{{ iif(trigger.to_state.state|int == 1, "Update", "Updates", "") }}'
+
 condition:
   - condition: template
-    value_template: '{{ states(trigger.entity_id) != "unknown" }}'
-  - condition: template
-    value_template: '{{ (states(trigger.entity_id) | float) != 0 }}'
+    value_template: '{{ trigger.to_state.state != "unknown" }}'
   - condition: template
     value_template: >-
       {%- set ns = namespace(found=false) -%}
-      {%- for repo in state_attr(trigger.entity_id, 'repositories') -%}
+      {%- for repo in trigger.to_state.attributes.repositories -%}
         {%- if repo["installed_version"] != repo["available_version"] -%}
           {%- set ns.found = true -%}
         {%- endif -%}
@@ -23,35 +24,52 @@ condition:
       {{ ns.found }}
 
 action:
-  - parallel:
-      - service: script.notify_web
+  - if:
+      - condition: template
+        value_template: '{{ (trigger.to_state.state|int) == 0 and (trigger.from_state.state|int) > 0 }}'
+
+    then:
+      - service: persistent_notification.dismiss
         data:
-          title: 'Updates Pending in HACS'
-          message: >-
-            {%- set list = namespace(updates=[]) -%}
-            {%- for repo in state_attr(trigger.entity_id, 'repositories') -%}
-              {%- if repo["installed_version"] != repo["available_version"] -%}
-                {% set update = '**' ~ repo.display_name ~ '** _' ~ repo["installed_version"] ~ '_ -> _' ~ repo["available_version"] ~ '_' %}
-                {%- set list.updates = list.updates + [update] -%}
-              {%- endif -%}
-            {%- endfor -%}
-            {{ list.updates | join("\n") }}
-          id: 'hacs-update'
+          notification_id: hacs-update
 
       - service: script.notify_mobile
         data:
           who: 'josh'
-          title: 'Updates Pending in HACS'
-          message: >-
-            {%- set list = namespace(updates=[]) -%}
-            {%- for repo in state_attr(trigger.entity_id, 'repositories') -%}
-              {%- if repo["installed_version"] != repo["available_version"] -%}
-                {% set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo["installed_version"] ~ '</em> -> <em>' ~ repo["available_version"] ~ '</em>' %}
-                {%- set list.updates = list.updates + [update] -%}
-              {%- endif -%}
-            {%- endfor -%}
-            {{ list.updates | join("<br>") }}
-          icon: '/local/icons/update.png'
-          group: 'Upgrade'
+          title: ''
+          message: 'clear_notification'
           tag: 'hacs-update'
-          url: 'hacs'
+
+    else:
+      - parallel:
+          - service: script.notify_web
+            data:
+              title: 'HACS: {{ trigger.to_state.state|int }} {{ updates }} Pending'
+              message: >-
+                {%- set list = namespace(updates=[]) -%}
+                {%- for repo in trigger.to_state.attributes.repositories -%}
+                  {%- if repo["installed_version"] != repo["available_version"] -%}
+                    {% set update = '**' ~ repo.display_name ~ '** _' ~ repo["installed_version"] ~ '_ -> _' ~ repo["available_version"] ~ '_' %}
+                    {%- set list.updates = list.updates + [update] -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {{ list.updates | join("\n") }}
+              id: 'hacs-update'
+
+          - service: script.notify_mobile
+            data:
+              who: 'josh'
+              title: 'Updates Pending in HACS'
+              message: >-
+                {%- set list = namespace(updates=[]) -%}
+                {%- for repo in trigger.to_state.attributes.repositories -%}
+                  {%- if repo["installed_version"] != repo["available_version"] -%}
+                    {% set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo["installed_version"] ~ '</em> -> <em>' ~ repo["available_version"] ~ '</em>' %}
+                    {%- set list.updates = list.updates + [update] -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {{ list.updates | join("<br>") }}
+              icon: '/local/icons/update.png'
+              group: 'Upgrade'
+              tag: 'hacs-update'
+              url: 'hacs'

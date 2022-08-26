@@ -2,13 +2,11 @@
 id: system_upgrade_available
 alias: '[System] Upgrade Available'
 description: 'Sends a notification when a new release of Home Assistant is released'
-mode: restart
 max_exceeded: silent
 
 trigger:
   platform: state
   entity_id: binary_sensor.docker_hub_update_available
-  to: 'on'
 
 variables:
   info: 'sensor.home_assistant_website'
@@ -22,44 +20,61 @@ variables:
   action_2_uri: 'https://hasspodcast.io/episodes'
 
 action:
-  - parallel:
-      - service: script.notify_web
+  - if:
+      - condition: template
+        value_template: '{{ trigger.to_state.state == "on" and trigger.from_state.state != "on" }}'
+
+    then:
+      - parallel:
+          - service: script.notify_web
+            data:
+              title: 'Upgrade Available'
+              message: |-
+                **Home Assistant** _{{ current_version }}_ -> _{{ available_version }}_
+
+                {{ release_title }}
+
+                [{{ action_1_title }}]({{ action_1_uri }}) | [ {{ action_2_title }}]({{ action_2_uri }})
+              id: 'upgrade-available'
+
+          - service: script.notify_mobile
+            data:
+              who: 'josh'
+              title: 'Upgrade Available'
+              message: >-
+                <b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{ available_version }}</em><br>
+                {{ release_title }}
+              icon: '/local/icons/update.png'
+              url: '{{ release_notes }}'
+              group: 'Upgrade'
+              tag: 'upgrade-available'
+              actions: >
+                {%- set titles = [action_1_title, action_2_title] -%}
+                {%- set uris = [action_1_uri, action_2_uri] -%}
+                {%- set actions = namespace(data = []) -%}
+                {%- for title in titles -%}
+                  {% if title|length %}
+                    {% set uri = uris[loop.index - 1] %}
+                    {% set action_name = 'action' ~ loop.index|string %}
+                    {% set action = {
+                      'action': 'URI' if uri|length else action_name,
+                      'title': title,
+                      'uri': uri
+                      }
+                    %}
+                    {% set actions.data = actions.data + [action] %}
+                  {% endif %}
+                {% endfor %}
+                {{ actions.data }}
+
+    else:
+      - service: persistent_notification.dismiss
         data:
-          title: 'Upgrade Available'
-          message: |-
-            **Home Assistant** _{{ current_version }}_ -> _{{ available_version }}_
-
-            {{ release_title }}
-
-            [{{ action_1_title }}]({{ action_1_uri }}) | [ {{ action_2_title }}]({{ action_2_uri }})
-          id: 'upgrade-available'
+          notification_id: upgrade-available
 
       - service: script.notify_mobile
         data:
           who: 'josh'
-          title: 'Upgrade Available'
-          message: >-
-            <b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{ available_version }}</em><br>
-            {{ release_title }}
-          icon: '/local/icons/update.png'
-          url: '{{ release_notes }}'
-          group: 'Upgrade'
+          title: ''
+          message: 'clear_notification'
           tag: 'upgrade-available'
-          actions: >
-            {%- set titles = [action_1_title, action_2_title] -%}
-            {%- set uris = [action_1_uri, action_2_uri] -%}
-            {%- set actions = namespace(data = []) -%}
-            {%- for title in titles -%}
-              {% if title|length %}
-                {% set uri = uris[loop.index - 1] %}
-                {% set action_name = 'action' ~ loop.index|string %}
-                {% set action = {
-                  'action': 'URI' if uri|length else action_name,
-                  'title': title,
-                  'uri': uri
-                  }
-                %}
-                {% set actions.data = actions.data + [action] %}
-              {% endif %}
-            {% endfor %}
-            {{ actions.data }}
