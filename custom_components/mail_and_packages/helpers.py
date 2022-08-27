@@ -17,7 +17,6 @@ from shutil import copyfile, copytree, which
 from typing import Any, List, Optional, Type, Union
 
 import aiohttp
-import imageio as io
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
@@ -27,8 +26,7 @@ from homeassistant.const import (
     CONF_USERNAME,
 )
 from homeassistant.core import HomeAssistant
-from PIL import Image
-from resizeimage import resizeimage
+from PIL import Image, ImageOps
 
 from .const import (
     AMAZON_DELIVERED,
@@ -534,17 +532,27 @@ def email_search(
     Returns a tuple
     """
     utf8_flag, search = build_search(address, date, subject)
+    value = ("", [""])
 
     if utf8_flag:
-        subject = subject.encode("utf-8")
-        account.literal = subject
+        cmd = None
         try:
-            value = account.uid("SEARCH", "CHARSET", "UTF-8", search)
+            cmd = account.enable("UTF8=ACCEPT")
         except Exception as err:
-            _LOGGER.warning(
-                "Error searching emails with unicode characters: %s", str(err)
-            )
+            _LOGGER.debug("UTF-8 not supported: %s", str(err))
             value = "BAD", err.args[0]
+
+        if cmd == "OK":
+            subject = subject.encode("utf-8")
+            account.literal = subject
+            try:
+                value = account.uid("SEARCH", "CHARSET", "UTF-8", search)
+            except Exception as err:
+                _LOGGER.debug(
+                    "Error searching emails with unicode characters: %s", str(err)
+                )
+                value = "BAD", err.args[0]
+
     else:
         try:
             value = account.search(None, search)
@@ -689,24 +697,27 @@ def get_mails(
 
             # Create numpy array of images
             _LOGGER.debug("Creating array of image files...")
-            all_images = [io.imread(image) for image in all_images]
+            img, *imgs = [Image.open(file) for file in all_images]
 
             try:
                 _LOGGER.debug("Generating animated GIF")
-                # Use ImageIO to create mail images
-                io.mimwrite(
-                    os.path.join(image_output_path, image_name),
-                    all_images,
-                    duration=gif_duration,
+                # Use Pillow to create mail images
+                img.save(
+                    fp=os.path.join(image_output_path, image_name),
+                    format="GIF",
+                    append_images=imgs,
+                    save_all=True,
+                    duration=gif_duration * 1000,
+                    loop=0,
                 )
-                _LOGGER.info("Mail image generated.")
+                _LOGGER.debug("Mail image generated.")
             except Exception as err:
                 _LOGGER.error("Error attempting to generate image: %s", str(err))
             for image in images_delete:
                 cleanup_images(f"{os.path.split(image)[0]}/", os.path.split(image)[1])
 
         elif image_count == 0:
-            _LOGGER.info("No mail found.")
+            _LOGGER.debug("No mail found.")
             if os.path.isfile(image_output_path + image_name):
                 _LOGGER.debug("Removing " + image_output_path + image_name)
                 cleanup_images(image_output_path, image_name)
@@ -772,7 +783,13 @@ def resize_images(images: list, width: int, height: int) -> list:
             with open(image, "rb") as fd_img:
                 try:
                     img = Image.open(fd_img)
-                    img = resizeimage.resize_contain(img, [width, height])
+                    img.thumbnail((width, height), resample=Image.LANCZOS)
+
+                    # Add padding as needed
+                    img = ImageOps.pad(img, (width, height), method=Image.LANCZOS)
+                    # Crop to size
+                    img = img.crop((0, 0, width, height))
+
                     pre = os.path.splitext(image)[0]
                     image = pre + ".gif"
                     img.save(image, img.format)
@@ -1176,7 +1193,7 @@ def amazon_hub(account: Type[imaplib.IMAP4_SSL], fwds: Optional[str] = None) -> 
 
 
 def amazon_exception(
-    account: Type[imaplib.IMAP4_SSL], fwds: Optional[str] = None
+    account: Type[imaplib.IMAP4_SSL], fwds: Optional[list] = None
 ) -> dict:
     """Find Amazon exception emails.
 
@@ -1233,7 +1250,7 @@ def get_items(
     """
     _LOGGER.debug("Attempting to find Amazon email with item list ...")
 
-    # Limit to past 3 days (plan to make this configurable)
+    # Limit to past X days
     past_date = datetime.date.today() - datetime.timedelta(days=days)
     tfmt = past_date.strftime("%d-%b-%Y")
     deliveries_today = []
@@ -1299,8 +1316,6 @@ def get_items(
                             continue
                         email_msg = email_msg.decode("utf-8", "ignore")
 
-                        _LOGGER.debug("RAW EMAIL: %s", email_msg)
-
                         # Check message body for order number
                         if (
                             (found := pattern.findall(email_msg))
@@ -1324,21 +1339,25 @@ def get_items(
                                 end = email_msg.find("Per tracciare il tuo pacco")
                             elif email_msg.find("View or manage order") != -1:
                                 end = email_msg.find("View or manage order")
+                            elif email_msg.find("Acompanhar") != -1:
+                                end = email_msg.find("Acompanhar")
+                            elif email_msg.find("Sguimiento") != -1:
+                                end = email_msg.find("Sguimiento")
 
                             arrive_date = email_msg[start:end].replace(">", "").strip()
                             _LOGGER.debug("First pass: %s", arrive_date)
                             arrive_date = arrive_date.split(" ")
                             arrive_date = arrive_date[0:3]
-                            # arrive_date[2] = arrive_date[2][:3]
                             arrive_date = " ".join(arrive_date).strip()
                             time_format = None
                             new_arrive_date = None
 
+                            # Loop through all the langs for date format
                             for lang in AMAZON_LANGS:
                                 try:
                                     locale.setlocale(locale.LC_TIME, lang)
                                 except Exception as err:
-                                    _LOGGER.info("Locale error: %s (%s)", err, lang)
+                                    _LOGGER.debug("Locale error: %s (%s)", err, lang)
                                     continue
 
                                 _LOGGER.debug("Arrive Date: %s", arrive_date)
@@ -1360,9 +1379,12 @@ def get_items(
                                     dateobj = datetime.datetime.strptime(
                                         new_arrive_date, time_format
                                     )
+                                    _LOGGER.debug("Valid date format found.")
                                 except ValueError as err:
-                                    _LOGGER.info(
-                                        "International dates not supported. (%s)", err
+                                    _LOGGER.debug(
+                                        "Invalid date format found for language %s. (%s)",
+                                        lang,
+                                        err,
                                     )
                                     continue
 

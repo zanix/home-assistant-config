@@ -8,25 +8,16 @@ trigger:
   entity_id: sensor.hacs
 
 variables:
-  updates: '{{ iif(trigger.to_state.state|int == 1, "Update", "Updates", "") }}'
+  updates: '{{ iif(trigger.to_state.state|int(default=0) == 1, "Update", "Updates", "") }}'
 
 condition:
   - condition: template
     value_template: '{{ trigger.to_state.state != "unknown" }}'
-  - condition: template
-    value_template: >-
-      {%- set ns = namespace(found=false) -%}
-      {%- for repo in trigger.to_state.attributes.repositories -%}
-        {%- if repo["installed_version"] != repo["available_version"] -%}
-          {%- set ns.found = true -%}
-        {%- endif -%}
-      {%- endfor -%}
-      {{ ns.found }}
 
 action:
   - if:
       - condition: template
-        value_template: '{{ (trigger.to_state.state|int) == 0 and (trigger.from_state.state|int) > 0 }}'
+        value_template: '{{ (trigger.to_state.state|int(default=0)) == 0 and (trigger.from_state.state|int(default=0)) > 0 }}'
 
     then:
       - service: persistent_notification.dismiss
