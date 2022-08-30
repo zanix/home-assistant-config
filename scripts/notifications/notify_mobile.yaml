@@ -8,11 +8,24 @@ notify_mobile:
   fields:
     who:
       name: 'Who'
-      description: 'Which person to send to. [ josh | amy | parents | kids | family ]'
+      description: 'Which person to send to.'
       example: 'josh'
       required: true
       selector:
-        text:
+        select:
+          mode: dropdown
+          custom_value: true
+          options:
+            - label: Josh
+              value: josh
+            - label: Amy
+              value: amy
+            - label: Parent
+              value: parents
+            - label: Kids
+              value: kids
+            - label: Family
+              value: family
     title:
       name: 'Title'
       example: 'Startup: Home Assistant is Up and Running!'
@@ -29,6 +42,12 @@ notify_mobile:
       selector:
         text:
           multiline: true
+    notification_icon:
+      name: 'Notification Icon'
+      default: 'mdi:home-assistant'
+      example: 'mdi:home-assistant'
+      selector:
+        icon:
     icon:
       name: 'Icon'
       default: '/local/icons/home-assistant.png'
@@ -73,11 +92,44 @@ notify_mobile:
       example: ''
       selector:
         action:
+    channel:
+      name: 'Notification Channel'
+      description: 'Set the notification channe.'
+      default: 'General'
+      example: 'alarm_stream'
+      selector:
+        text:
+    importance:
+      name: 'Notification Channel Importance'
+      description: 'Set the notification channe.'
+      default: 'default'
+      example: 'default'
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - default
+            - min
+            - low
+            - max
+    color:
+      name: 'Notification Color'
+      description: 'Set the color of the notification.'
+      selector:
+        color_rgb:
 
   # Set local variables for reuse in this script.
   variables:
     notification_service: 'notify.{{ who }}'
     group_id: '{{ group|default("Home Assistant") }}'
+    rgb_color: |-
+      {%- if color is defined -%}
+        {%- if color is iterable -%}
+          #{{ "%02x%02x%02x"|format(color[0],color[1],color[2]) }}
+        {%- elif color is string -%}
+          {{ color }}
+        {%- endif -%}
+      {%- endif -%}
 
   sequence:
     - if:
@@ -97,9 +149,13 @@ notify_mobile:
                     data:
                       subject: '{{ subtitle|default(none, true) }}'
                       image: '/api/camera_proxy/{{ camera }}'
+                      notification_icon: '{{ notification_icon|default(none, true) }}'
                       clickAction: '{{ url|default("lovelace/security", true) }}'
                       group: '{{ group_id }}'
                       tag: '{{ camera }}'
+                      channel: '{{ channel|default(none, true) }}'
+                      importance: '{{ importance|default(none, true) }}'
+                      color: '{{ rgb_color|default(none, true) }}'
                       actions: '{{ actions|default(none, true) }}'
 
             # Send an image.
@@ -112,9 +168,13 @@ notify_mobile:
                     data:
                       subject: '{{ subtitle|default(none, true) }}'
                       image: '{{ image }}'
+                      notification_icon: '{{ notification_icon|default(none, true) }}'
                       clickAction: '{{ url|default("lovelace/main", true) }}'
                       group: '{{ group_id }}'
                       tag: '{{ tag|default(none, true) }}'
+                      channel: '{{ channel|default(none, true) }}'
+                      importance: '{{ importance|default(none, true) }}'
+                      color: '{{ rgb_color|default(none, true) }}'
                       actions: '{{ actions|default(none, true) }}'
 
           # Send a basic, link, or actionable notification message.
@@ -126,7 +186,11 @@ notify_mobile:
                 data:
                   subject: '{{ subtitle|default(none, true) }}'
                   icon_url: '{{ icon|default("/local/icons/home-assistant.png") }}'
+                  notification_icon: '{{ notification_icon|default(none, true) }}'
                   clickAction: '{{ url|default("lovelace/main", true) }}'
                   group: '{{ group_id }}'
                   tag: '{{ tag|default(none, true) }}'
+                  channel: '{{ channel|default(none, true) }}'
+                  importance: '{{ importance|default(none, true) }}'
+                  color: '{{ rgb_color|default(none, true) }}'
                   actions: '{{ actions|default(none, true) }}'

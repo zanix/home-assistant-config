@@ -9,10 +9,11 @@ trigger:
 
 variables:
   updates: '{{ iif(trigger.to_state.state|int(default=0) == 1, "Update", "Updates", "") }}'
+  title: 'HACS: {{ trigger.to_state.state|int }} {{ updates }} Pending'
 
 condition:
   - condition: template
-    value_template: '{{ trigger.to_state.state != "unknown" }}'
+    value_template: '{{ trigger.to_state.state != "unknown" and trigger.from_state.state != "unknown" }}'
 
 action:
   - if:
@@ -35,7 +36,7 @@ action:
       - parallel:
           - service: script.notify_web
             data:
-              title: 'HACS: {{ trigger.to_state.state|int }} {{ updates }} Pending'
+              title: '{{ title }}'
               message: >-
                 {%- set list = namespace(updates=[]) -%}
                 {%- for repo in trigger.to_state.attributes.repositories -%}
@@ -50,7 +51,7 @@ action:
           - service: script.notify_mobile
             data:
               who: 'josh'
-              title: 'Updates Pending in HACS'
+              title: '{{ title }}'
               message: >-
                 {%- set list = namespace(updates=[]) -%}
                 {%- for repo in trigger.to_state.attributes.repositories -%}
