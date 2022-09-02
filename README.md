@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1466 total entities**,
-including **658 sensors**.
+This Home Assistant install has approximately **1493 total entities**,
+including **679 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -192,7 +192,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.26.2]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.27.1]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -338,7 +338,7 @@ Show multiple entity states and attributes on entity rows in Home Assistant's Lo
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v3.13]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.0]
 
 Replace input_number sliders with plus and minus buttons
 
