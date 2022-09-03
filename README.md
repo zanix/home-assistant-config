@@ -160,7 +160,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>18 Custom Integrations</summary>
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v1.5.3]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.0.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity - and also an audio player
 
