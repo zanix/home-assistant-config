@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1493 total entities**,
-including **679 sensors**.
+This Home Assistant install has approximately **1511 total entities**,
+including **691 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -160,7 +160,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>19 Custom Integrations</summary>
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.0.1]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity - and also an audio player
 
