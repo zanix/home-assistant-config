@@ -158,7 +158,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>19 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.0.1]
 
@@ -245,6 +245,10 @@ Authors: [@firstof9](https://github.com/firstof9).
 High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
+
+### [Simpleicons](https://github.com/vigonotion/hass-simpleicons) [v2.0.0]
+
+Use Simple Icons in Home Assistant
 
 ### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.2]
 
