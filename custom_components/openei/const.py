@@ -14,7 +14,7 @@ from typing import Final
 NAME = "OpenEI"
 DOMAIN = "openei"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.1.7"
+VERSION = "0.1.8"
 ATTRIBUTION = "Data provided by OpenEI.org"
 ISSUE_URL = "https://github.com/firstof9/ha-openei/issues"
 PLATFORMS = ["binary_sensor", "sensor"]
@@ -54,6 +54,11 @@ SENSOR_TYPES: Final[dict[str, SensorEntityDescription]] = {
         name="Current Energy Rate",
         icon="mdi:cash-multiple",
     ),
+    "current_adjustment": SensorEntityDescription(
+        key="current_adjustment",
+        name="Current Energy Adjustment",
+        icon="mdi:cash-multiple",
+    ),    
     "distributed_generation": SensorEntityDescription(
         key="distributed_generation",
         name="Distributed Generation",

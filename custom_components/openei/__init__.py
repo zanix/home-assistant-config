@@ -122,6 +122,7 @@ class OpenEIDataUpdateCoordinator(DataUpdateCoordinator):
 
 
 def get_sensors(hass, config) -> dict:
+    """Update sensor data."""
     api = config.data.get(CONF_API_KEY)
     plan = config.data.get(CONF_PLAN)
     meter = config.data.get(CONF_SENSOR)

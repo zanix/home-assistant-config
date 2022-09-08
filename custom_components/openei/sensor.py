@@ -56,7 +56,7 @@ class OpenEISensor(CoordinatorEntity, SensorEntity):
     @property
     def native_unit_of_measurement(self) -> Any:
         """Return the unit of measurement."""
-        if self._key in ["current_rate", "monthly_tier_rate"]:
+        if self._key in ["current_adjustment","current_rate", "monthly_tier_rate"]:
             return f"{self.hass.config.currency}/kWh"
         if f"{self._key}_uom" in self.coordinator.data:
             return self.coordinator.data.get(f"{self._key}_uom")
