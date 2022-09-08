@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1512 total entities**,
+This Home Assistant install has approximately **1532 total entities**,
 including **691 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -318,7 +318,7 @@ Entity Attributes
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.24]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.25]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -529,7 +529,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.8.7-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.9.0-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
