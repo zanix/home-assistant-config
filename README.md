@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1511 total entities**,
+This Home Assistant install has approximately **1512 total entities**,
 including **691 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -272,7 +272,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>28 Lovelace Plugins</summary>
+<details><summary>29 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -301,6 +301,10 @@ Battery state card for Home Assistant
 ### [Card Tools](https://github.com/thomasloven/lovelace-card-tools) [v11]
 
 🔹A collection of tools for other lovelace plugins to use
+
+### [Decluttering Card](https://github.com/custom-cards/decluttering-card) [v0.6.3]
+
+🧹 Declutter your lovelace configuration with the help of this card
 
 ### [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) [v0.1.2]
 
