@@ -19,12 +19,16 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1532 total entities**,
-including **691 sensors**.
+This Home Assistant install has approximately **1535 total entities**,
+including **694 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
 Since some integrations can only be enabled from within the UI, here is a list of integrations that are enabled via the Integrations UI on my Home Assistant.
+
+### [AirNow](https://www.home-assistant.io/integrations/airnow)
+
+The airnow integration uses the AirNow web service as a source for air quality data for your location
 
 ### [Android TV](https://www.home-assistant.io/integrations/androidtv)
 

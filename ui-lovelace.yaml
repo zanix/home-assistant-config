@@ -930,13 +930,73 @@ views:
                 title: Weather
               service: browser_mod.popup
           type: weather
-        - content: '{{ states(entity)|float }}'
+        - content: '{{ states(entity)|float(default=0) }}'
+          entity: sensor.airnow_aqi
+          icon: mdi:blur
+          icon_color: "{% set level = states(entity)|float(default=0) %}\n{% if level\
+            \ >= 300 %}\n  red\n{% elif level >= 200 %}\n  purple\n{% elif level >=\
+            \ 150 %}\n  pink\n{% elif level >= 100 %}\n  orange\n{% elif level >=\
+            \ 50 %}\n  yellow\n{% else %}\n  green\n{% endif %}"
+          tap_action:
+            action: fire-dom-event
+            browser_mod:
+              data:
+                content:
+                  cards:
+                  - double_tap_action:
+                      action: none
+                    entity: sensor.airnow_aqi
+                    fill_container: false
+                    hold_action:
+                      action: none
+                    multiline_secondary: true
+                    primary: 'AQI: {{ state_attr(entity, "description") }}'
+                    tap_action:
+                      action: none
+                    type: custom:mushroom-template-card
+                  - animation:
+                      state: 'on'
+                    decimal: 1
+                    entities:
+                    - entity: sensor.airnow_aqi
+                    - entity: sensor.airnow_pm2_5
+                    max: 400
+                    min: 0
+                    positions:
+                      indicator: inside
+                    severity:
+                    - color: rgb(var(--mush-rgb-green))
+                      from: '0'
+                      to: '50'
+                    - color: rgb(var(--mush-rgb-yellow))
+                      from: '50'
+                      to: '100'
+                    - color: rgb(var(--mush-rgb-orange))
+                      from: '100'
+                      to: '150'
+                    - color: rgb(var(--mush-rgb-red))
+                      from: '150'
+                      to: '200'
+                    - color: rgb(var(--mush-rgb-purple))
+                      from: '200'
+                      to: '300'
+                    - color: rgb(var(--mush-rgb-pink))
+                      from: '300'
+                      to: '400'
+                    style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                      \ #0005;\n}"
+                    type: custom:bar-card
+                  type: vertical-stack
+                title: Air Quality
+              service: browser_mod.popup
+          type: template
+        - content: '{{ states(entity)|float(default=0) }}'
           entity: sensor.allergy_index_today
           icon: mdi:flower-pollen
-          icon_color: "{% set level = states(entity)|float %}\n{% if level >= 9.7\
-            \ %}\n  red\n{% elif level >= 7.3 %}\n  orange\n{% elif level >= 4.9 %}\n\
-            \  yellow\n{% elif level >= 2.5 %}\n  lime\n{% else %}\n  green\n{% endif\
-            \ %}"
+          icon_color: "{% set level = states(entity)|float(default=0) %}\n{% if level\
+            \ >= 9.7 %}\n  red\n{% elif level >= 7.3 %}\n  orange\n{% elif level >=\
+            \ 4.9 %}\n  yellow\n{% elif level >= 2.5 %}\n  lime\n{% else %}\n  green\n\
+            {% endif %}"
           tap_action:
             action: fire-dom-event
             browser_mod:
