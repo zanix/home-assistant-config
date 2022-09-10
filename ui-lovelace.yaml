@@ -72,6 +72,84 @@ decluttering_templates:
     - secondary: null
     - icon: mdi:select-place
     - chips: []
+  light_govee_popup:
+    card:
+      card:
+        colors:
+        - color_temp: 370
+          transition: 1
+        - color_temp: 250
+          transition: 1
+        - color_temp: 181
+          transition: 1
+        - brightness: 153
+          color_temp: 370
+          icon_color: center no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20version%3D%221.1%22%20id%3D%22mdi-book-open-variant%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.5%2014.33C18.29%2014.33%2019.13%2014.41%2020%2014.57V16.07C19.38%2015.91%2018.54%2015.83%2017.5%2015.83C15.6%2015.83%2014.11%2016.16%2013%2016.82V15.13C14.17%2014.6%2015.67%2014.33%2017.5%2014.33M13%2012.46C14.29%2011.93%2015.79%2011.67%2017.5%2011.67C18.29%2011.67%2019.13%2011.74%2020%2011.9V13.4C19.38%2013.24%2018.54%2013.16%2017.5%2013.16C15.6%2013.16%2014.11%2013.5%2013%2014.15M17.5%2010.5C15.6%2010.5%2014.11%2010.82%2013%2011.5V9.84C14.23%209.28%2015.73%209%2017.5%209C18.29%209%2019.13%209.08%2020%209.23V10.78C19.26%2010.59%2018.41%2010.5%2017.5%2010.5M21%2018.5V7C19.96%206.67%2018.79%206.5%2017.5%206.5C15.45%206.5%2013.62%207%2012%208V19.5C13.62%2018.5%2015.45%2018%2017.5%2018C18.69%2018%2019.86%2018.16%2021%2018.5M17.5%204.5C19.85%204.5%2021.69%205%2023%206V20.56C23%2020.68%2022.95%2020.8%2022.84%2020.91C22.73%2021%2022.61%2021.08%2022.5%2021.08C22.39%2021.08%2022.31%2021.06%2022.25%2021.03C20.97%2020.34%2019.38%2020%2017.5%2020C15.45%2020%2013.62%2020.5%2012%2021.5C10.66%2020.5%208.83%2020%206.5%2020C4.84%2020%203.25%2020.36%201.75%2021.07C1.72%2021.08%201.68%2021.08%201.63%2021.1C1.59%2021.11%201.55%2021.12%201.5%2021.12C1.39%2021.12%201.27%2021.08%201.16%2021C1.05%2020.89%201%2020.78%201%2020.65V6C2.34%205%204.18%204.5%206.5%204.5C8.83%204.5%2010.66%205%2012%206C13.34%205%2015.17%204.5%2017.5%204.5Z%22%20%2F%3E%3C%2Fsvg%3E"),
+            rgb(var(--mush-rgb-pink))
+          transition: 1
+        entity: '[[light]]'
+        justify: around
+        type: custom:rgb-light-card
+      style: "ha-card {\n  padding: 20px;\n}\n"
+      type: custom:mod-card
+    default: null
+  light_wb_popup:
+    card:
+      card:
+        colors:
+        - color_temp: 370
+        - color_temp: 250
+        - color_temp: 181
+        entity: '[[light]]'
+        justify: around
+        type: custom:rgb-light-card
+      style: "ha-card {\n  padding: 20px;     \n}\n"
+      type: custom:mod-card
+    default: null
+  package_delivery:
+    card:
+      card:
+        badge_color: blue
+        badge_icon: "{% if states(entity)|int > 0 %} \n  {{ \"mdi:numeric-\" ~ states(entity)\
+          \ ~ \"-circle\" }}\n{% endif %}"
+        entity: '[[entity]]'
+        icon: '[[icon]]'
+        icon_color: '[[icon_color]]'
+        primary: '[[name]]'
+        secondary: '{{ states(entity) }} {{ iif(states(entity)|int == 1, "package",
+          "packages") }}'
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                cards:
+                - entity: '[[entity]]'
+                  icon: '[[icon]]'
+                  icon_color: '[[icon_color]]'
+                  primary: '[[name]]'
+                  secondary: '{{ states(entity) }} {{ iif(states(entity)|int == 1,
+                    "package", "packages") }}'
+                  tap_action:
+                    action: more-info
+                  type: custom:mushroom-template-card
+                - subtitle: Tracking Numbers
+                  type: custom:mushroom-title-card
+                - content: '{%- for trk_number in state_attr(entity, "tracking_#")
+                    %}
+
+                    [{{ trk_number }}]([[url]]{{ trk_number }})
+
+                    {%- endfor -%}'
+                  type: markdown
+                type: vertical-stack
+              title: '[[name]] Tracking'
+            service: browser_mod.popup
+        type: custom:mushroom-template-card
+      conditions:
+      - entity: '[[entity]]'
+        state_not: '0'
+      type: conditional
   person_card:
     card:
       card_mod:
@@ -2035,8 +2113,8 @@ views:
             icon: mdi:mailbox-up
             icon_color: disabled
             primary: Mail
-            secondary: "{% if states(entity)|int == 1 %}\n  1 piece\n{% else %}\n\
-              \  {{ states(entity) }} pieces\n{% endif %}"
+            secondary: '{{ states(entity) }} {{ iif(states(entity)|int == 1, "piece",
+              "pieces") }}'
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -2074,129 +2152,30 @@ views:
           - entity: sensor.mail_usps_mail
             state_not: '0'
           type: conditional
-        - card:
-            badge_color: blue
-            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ \"mdi:numeric-\" ~\
-              \ states(entity) ~ \"-circle\" }}\n{% endif %}"
-            entity: sensor.mail_usps_delivering
-            icon: fab:usps
-            icon_color: blue
-            primary: USPS
-            secondary: "{% if states(entity)|int == 1 %}\n  1 package\n{% else %}\n\
-              \  {{ states(entity) }} packages\n{% endif %}"
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                data:
-                  content:
-                    cards:
-                    - entity: sensor.mail_usps_delivering
-                      icon: fab:usps
-                      icon_color: blue
-                      primary: USPS
-                      secondary: "{% if states(entity)|int == 1 %}\n  1 package\n\
-                        {% else %}\n  {{ states(entity) }} packages\n{% endif %}"
-                      type: custom:mushroom-template-card
-                    - subtitle: Tracking Numbers
-                      type: custom:mushroom-title-card
-                    - content: '{%- for trk_number in state_attr("sensor.mail_usps_delivering",
-                        "tracking_#") %}
-
-                        [{{ trk_number }}](https://tools.usps.com/go/TrackConfirmAction?tLabels={{
-                        trk_number }})
-
-                        {%- endfor -%}'
-                      type: markdown
-                    type: vertical-stack
-                  title: USPS Tracking
-                service: browser_mod.popup
-            type: custom:mushroom-template-card
-          conditions:
+        - template: package_delivery
+          type: custom:decluttering-card
+          variables:
           - entity: sensor.mail_usps_delivering
-            state_not: '0'
-          type: conditional
-        - card:
-            badge_color: blue
-            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ \"mdi:numeric-\" ~\
-              \ states(entity) ~ \"-circle\" }}\n{% endif %}"
-            entity: sensor.mail_ups_delivering
-            icon: fab:ups
-            icon_color: brown
-            primary: UPS
-            secondary: "{% if states(entity)|int == 1 %}\n  1 package\n{% else %}\n\
-              \  {{ states(entity) }} packages\n{% endif %}"
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                data:
-                  content:
-                    cards:
-                    - entity: sensor.mail_ups_delivering
-                      icon: fab:ups
-                      icon_color: brown
-                      primary: UPS
-                      secondary: "{% if states(entity)|int == 1 %}\n  1 package\n\
-                        {% else %}\n  {{ states(entity) }} packages\n{% endif %}"
-                      type: custom:mushroom-template-card
-                    - subtitle: Tracking Numbers
-                      type: custom:mushroom-title-card
-                    - content: '{%- for trk_number in state_attr("sensor.mail_ups_delivering",
-                        "tracking_#") %}
-
-                        [{{ trk_number }}](https://www.ups.com/track?loc=en_US&tracknum={{
-                        trk_number }})
-
-                        {%- endfor -%}'
-                      type: markdown
-                    type: vertical-stack
-                  title: UPS Tracking
-                service: browser_mod.popup
-            type: custom:mushroom-template-card
-          conditions:
+          - name: USPS
+          - icon: fab:usps
+          - icon_color: blue
+          - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=
+        - template: package_delivery
+          type: custom:decluttering-card
+          variables:
           - entity: sensor.mail_ups_delivering
-            state_not: '0'
-          type: conditional
-        - card:
-            badge_color: blue
-            badge_icon: "{% if states(entity)|int > 0 %} \n  {{ \"mdi:numeric-\" ~\
-              \ states(entity) ~ \"-circle\" }}\n{% endif %}"
-            entity: sensor.mail_fedex_delivering
-            icon: fab:fedex
-            icon_color: purple
-            primary: FedEx
-            secondary: "{% if states(entity)|int == 1 %}\n  1 package\n{% else %}\n\
-              \  {{ states(entity) }} packages\n{% endif %}"
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                data:
-                  content:
-                    cards:
-                    - entity: sensor.mail_fedex_delivering
-                      icon: fab:fedex
-                      icon_color: purple
-                      primary: FedEx
-                      secondary: "{% if states(entity)|int == 1 %}\n  1 package\n\
-                        {% else %}\n  {{ states(entity) }} packages\n{% endif %}"
-                      type: custom:mushroom-template-card
-                    - subtitle: Tracking Numbers
-                      type: custom:mushroom-title-card
-                    - content: '{%- for trk_number in state_attr("sensor.mail_fedex_delivering",
-                        "tracking_#") %}
-
-                        [{{ trk_number }}](https://www.fedex.com/fedextrack/?trknbr={{
-                        trk_number }})
-
-                        {%- endfor -%}'
-                      type: markdown
-                    type: vertical-stack
-                  title: FedEx Tracking
-                service: browser_mod.popup
-            type: custom:mushroom-template-card
-          conditions:
+          - name: UPS
+          - icon: fab:ups
+          - icon_color: brown
+          - url: https://www.ups.com/track?loc=en_US&tracknum=
+        - template: package_delivery
+          type: custom:decluttering-card
+          variables:
           - entity: sensor.mail_fedex_delivering
-            state_not: '0'
-          type: conditional
+          - name: FedEx
+          - icon: fab:fedex
+          - icon_color: purple
+          - url: https://www.fedex.com/fedextrack/?trknbr=
         columns: 2
         square: false
         type: grid
@@ -2253,24 +2232,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                  transition: 1
-                - color_temp: 250
-                  transition: 1
-                - color_temp: 181
-                  transition: 1
-                - brightness: 153
-                  color_temp: 370
-                  icon_color: 'center no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20version%3D%221.1%22%20id%3D%22mdi-book-open-variant%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.5%2014.33C18.29%2014.33%2019.13%2014.41%2020%2014.57V16.07C19.38%2015.91%2018.54%2015.83%2017.5%2015.83C15.6%2015.83%2014.11%2016.16%2013%2016.82V15.13C14.17%2014.6%2015.67%2014.33%2017.5%2014.33M13%2012.46C14.29%2011.93%2015.79%2011.67%2017.5%2011.67C18.29%2011.67%2019.13%2011.74%2020%2011.9V13.4C19.38%2013.24%2018.54%2013.16%2017.5%2013.16C15.6%2013.16%2014.11%2013.5%2013%2014.15M17.5%2010.5C15.6%2010.5%2014.11%2010.82%2013%2011.5V9.84C14.23%209.28%2015.73%209%2017.5%209C18.29%209%2019.13%209.08%2020%209.23V10.78C19.26%2010.59%2018.41%2010.5%2017.5%2010.5M21%2018.5V7C19.96%206.67%2018.79%206.5%2017.5%206.5C15.45%206.5%2013.62%207%2012%208V19.5C13.62%2018.5%2015.45%2018%2017.5%2018C18.69%2018%2019.86%2018.16%2021%2018.5M17.5%204.5C19.85%204.5%2021.69%205%2023%206V20.56C23%2020.68%2022.95%2020.8%2022.84%2020.91C22.73%2021%2022.61%2021.08%2022.5%2021.08C22.39%2021.08%2022.31%2021.06%2022.25%2021.03C20.97%2020.34%2019.38%2020%2017.5%2020C15.45%2020%2013.62%2020.5%2012%2021.5C10.66%2020.5%208.83%2020%206.5%2020C4.84%2020%203.25%2020.36%201.75%2021.07C1.72%2021.08%201.68%2021.08%201.63%2021.1C1.59%2021.11%201.55%2021.12%201.5%2021.12C1.39%2021.12%201.27%2021.08%201.16%2021C1.05%2020.89%201%2020.78%201%2020.65V6C2.34%205%204.18%204.5%206.5%204.5C8.83%204.5%2010.66%205%2012%206C13.34%205%2015.17%204.5%2017.5%204.5Z%22%20%2F%3E%3C%2Fsvg%3E"),
-                    #EA888C'
-                  transition: 1
-                entity: light.living_room_floor_lamp
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_govee_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.living_room_floor_lamp
             title: Floor Lamp
           service: browser_mod.popup
       layout: horizontal
@@ -2358,6 +2323,8 @@ views:
       icon: mdi:dots-horizontal-circle
       info: scroll
       name: Google Home
+      tts:
+        platform: cloud
       type: custom:mini-media-player
     type: vertical-stack
   icon: mdi:sofa-single
@@ -2553,6 +2520,9 @@ views:
         shortcuts:
           attribute: source
           buttons:
+          - icon: mdi:motion-play-outline
+            id: Shield
+            type: source
           - icon: mdi:desktop-tower
             id: Computer
             type: source
@@ -2565,7 +2535,7 @@ views:
           - icon: mdi:microsoft-xbox
             id: XBox
             type: source
-          columns: 4
+          columns: 5
         type: custom:mini-media-player
       conditions:
       - entity: sensor.family_room_yamaha_source
@@ -2586,6 +2556,8 @@ views:
       icon: mdi:dots-horizontal-circle
       info: scroll
       name: Google Home
+      tts:
+        platform: cloud
       type: custom:mini-media-player
     type: vertical-stack
   - cards:
@@ -2698,16 +2670,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                - color_temp: 250
-                - color_temp: 181
-                entity: light.office_light
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_wb_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.office_light
             title: Main
           service: browser_mod.popup
       icon: mdi:lightbulb
@@ -2723,16 +2689,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                - color_temp: 250
-                - color_temp: 181
-                entity: light.office_lamp
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_wb_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.office_lamp
             title: Lamp
           service: browser_mod.popup
       layout: horizontal
@@ -2831,6 +2791,8 @@ views:
     icon: mdi:dots-horizontal-circle
     info: scroll
     name: Google Home
+    tts:
+      platform: cloud
     type: custom:mini-media-player
   icon: mdi:chair-rolling
   layout:
@@ -2910,24 +2872,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                  transition: 1
-                - color_temp: 250
-                  transition: 1
-                - color_temp: 181
-                  transition: 1
-                - brightness: 153
-                  color_temp: 370
-                  icon_color: 'center no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20version%3D%221.1%22%20id%3D%22mdi-book-open-variant%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.5%2014.33C18.29%2014.33%2019.13%2014.41%2020%2014.57V16.07C19.38%2015.91%2018.54%2015.83%2017.5%2015.83C15.6%2015.83%2014.11%2016.16%2013%2016.82V15.13C14.17%2014.6%2015.67%2014.33%2017.5%2014.33M13%2012.46C14.29%2011.93%2015.79%2011.67%2017.5%2011.67C18.29%2011.67%2019.13%2011.74%2020%2011.9V13.4C19.38%2013.24%2018.54%2013.16%2017.5%2013.16C15.6%2013.16%2014.11%2013.5%2013%2014.15M17.5%2010.5C15.6%2010.5%2014.11%2010.82%2013%2011.5V9.84C14.23%209.28%2015.73%209%2017.5%209C18.29%209%2019.13%209.08%2020%209.23V10.78C19.26%2010.59%2018.41%2010.5%2017.5%2010.5M21%2018.5V7C19.96%206.67%2018.79%206.5%2017.5%206.5C15.45%206.5%2013.62%207%2012%208V19.5C13.62%2018.5%2015.45%2018%2017.5%2018C18.69%2018%2019.86%2018.16%2021%2018.5M17.5%204.5C19.85%204.5%2021.69%205%2023%206V20.56C23%2020.68%2022.95%2020.8%2022.84%2020.91C22.73%2021%2022.61%2021.08%2022.5%2021.08C22.39%2021.08%2022.31%2021.06%2022.25%2021.03C20.97%2020.34%2019.38%2020%2017.5%2020C15.45%2020%2013.62%2020.5%2012%2021.5C10.66%2020.5%208.83%2020%206.5%2020C4.84%2020%203.25%2020.36%201.75%2021.07C1.72%2021.08%201.68%2021.08%201.63%2021.1C1.59%2021.11%201.55%2021.12%201.5%2021.12C1.39%2021.12%201.27%2021.08%201.16%2021C1.05%2020.89%201%2020.78%201%2020.65V6C2.34%205%204.18%204.5%206.5%204.5C8.83%204.5%2010.66%205%2012%206C13.34%205%2015.17%204.5%2017.5%204.5Z%22%20%2F%3E%3C%2Fsvg%3E"),
-                    #EA888C'
-                  transition: 1
-                entity: light.master_bedroom_floor_lamp
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_govee_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.master_bedroom_floor_lamp
             title: Floor Lamp
           service: browser_mod.popup
       layout: horizontal
@@ -3197,6 +3145,11 @@ views:
     - primary: Outside
     - icon: mdi:spa
     - icon_color: light-green
+    - chips:
+      - entity: sensor.openweathermap_temperature
+        type: entity
+      - entity: sensor.openweathermap_humidity
+        type: entity
   - cards:
     - subtitle: Lights
       type: custom:mushroom-title-card
@@ -4516,24 +4469,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                  transition: 1
-                - color_temp: 250
-                  transition: 1
-                - color_temp: 181
-                  transition: 1
-                - brightness: 153
-                  color_temp: 370
-                  icon_color: 'center no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20version%3D%221.1%22%20id%3D%22mdi-book-open-variant%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.5%2014.33C18.29%2014.33%2019.13%2014.41%2020%2014.57V16.07C19.38%2015.91%2018.54%2015.83%2017.5%2015.83C15.6%2015.83%2014.11%2016.16%2013%2016.82V15.13C14.17%2014.6%2015.67%2014.33%2017.5%2014.33M13%2012.46C14.29%2011.93%2015.79%2011.67%2017.5%2011.67C18.29%2011.67%2019.13%2011.74%2020%2011.9V13.4C19.38%2013.24%2018.54%2013.16%2017.5%2013.16C15.6%2013.16%2014.11%2013.5%2013%2014.15M17.5%2010.5C15.6%2010.5%2014.11%2010.82%2013%2011.5V9.84C14.23%209.28%2015.73%209%2017.5%209C18.29%209%2019.13%209.08%2020%209.23V10.78C19.26%2010.59%2018.41%2010.5%2017.5%2010.5M21%2018.5V7C19.96%206.67%2018.79%206.5%2017.5%206.5C15.45%206.5%2013.62%207%2012%208V19.5C13.62%2018.5%2015.45%2018%2017.5%2018C18.69%2018%2019.86%2018.16%2021%2018.5M17.5%204.5C19.85%204.5%2021.69%205%2023%206V20.56C23%2020.68%2022.95%2020.8%2022.84%2020.91C22.73%2021%2022.61%2021.08%2022.5%2021.08C22.39%2021.08%2022.31%2021.06%2022.25%2021.03C20.97%2020.34%2019.38%2020%2017.5%2020C15.45%2020%2013.62%2020.5%2012%2021.5C10.66%2020.5%208.83%2020%206.5%2020C4.84%2020%203.25%2020.36%201.75%2021.07C1.72%2021.08%201.68%2021.08%201.63%2021.1C1.59%2021.11%201.55%2021.12%201.5%2021.12C1.39%2021.12%201.27%2021.08%201.16%2021C1.05%2020.89%201%2020.78%201%2020.65V6C2.34%205%204.18%204.5%206.5%204.5C8.83%204.5%2010.66%205%2012%206C13.34%205%2015.17%204.5%2017.5%204.5Z%22%20%2F%3E%3C%2Fsvg%3E"),
-                    #EA888C'
-                  transition: 1
-                entity: light.living_room_floor_lamp
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_govee_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.living_room_floor_lamp
             title: Floor Lamp
           service: browser_mod.popup
       layout: horizontal
@@ -4610,16 +4549,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                - color_temp: 250
-                - color_temp: 181
-                entity: light.office_light
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_wb_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.office_light
             title: Main
           service: browser_mod.popup
       icon: mdi:lightbulb
@@ -4635,16 +4568,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                - color_temp: 250
-                - color_temp: 181
-                entity: light.office_lamp
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_wb_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.office_lamp
             title: Lamp
           service: browser_mod.popup
       layout: horizontal
@@ -4796,24 +4723,10 @@ views:
         browser_mod:
           data:
             content:
-              card:
-                colors:
-                - color_temp: 370
-                  transition: 1
-                - color_temp: 250
-                  transition: 1
-                - color_temp: 181
-                  transition: 1
-                - brightness: 153
-                  color_temp: 370
-                  icon_color: 'center no-repeat url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20version%3D%221.1%22%20id%3D%22mdi-book-open-variant%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M17.5%2014.33C18.29%2014.33%2019.13%2014.41%2020%2014.57V16.07C19.38%2015.91%2018.54%2015.83%2017.5%2015.83C15.6%2015.83%2014.11%2016.16%2013%2016.82V15.13C14.17%2014.6%2015.67%2014.33%2017.5%2014.33M13%2012.46C14.29%2011.93%2015.79%2011.67%2017.5%2011.67C18.29%2011.67%2019.13%2011.74%2020%2011.9V13.4C19.38%2013.24%2018.54%2013.16%2017.5%2013.16C15.6%2013.16%2014.11%2013.5%2013%2014.15M17.5%2010.5C15.6%2010.5%2014.11%2010.82%2013%2011.5V9.84C14.23%209.28%2015.73%209%2017.5%209C18.29%209%2019.13%209.08%2020%209.23V10.78C19.26%2010.59%2018.41%2010.5%2017.5%2010.5M21%2018.5V7C19.96%206.67%2018.79%206.5%2017.5%206.5C15.45%206.5%2013.62%207%2012%208V19.5C13.62%2018.5%2015.45%2018%2017.5%2018C18.69%2018%2019.86%2018.16%2021%2018.5M17.5%204.5C19.85%204.5%2021.69%205%2023%206V20.56C23%2020.68%2022.95%2020.8%2022.84%2020.91C22.73%2021%2022.61%2021.08%2022.5%2021.08C22.39%2021.08%2022.31%2021.06%2022.25%2021.03C20.97%2020.34%2019.38%2020%2017.5%2020C15.45%2020%2013.62%2020.5%2012%2021.5C10.66%2020.5%208.83%2020%206.5%2020C4.84%2020%203.25%2020.36%201.75%2021.07C1.72%2021.08%201.68%2021.08%201.63%2021.1C1.59%2021.11%201.55%2021.12%201.5%2021.12C1.39%2021.12%201.27%2021.08%201.16%2021C1.05%2020.89%201%2020.78%201%2020.65V6C2.34%205%204.18%204.5%206.5%204.5C8.83%204.5%2010.66%205%2012%206C13.34%205%2015.17%204.5%2017.5%204.5Z%22%20%2F%3E%3C%2Fsvg%3E"),
-                    #EA888C'
-                  transition: 1
-                entity: light.master_bedroom_floor_lamp
-                justify: around
-                type: custom:rgb-light-card
-              style: "ha-card {\n  padding: 20px;     \n}\n"
-              type: custom:mod-card
+              template: light_govee_popup
+              type: custom:decluttering-card
+              variables:
+              - light: light.master_bedroom_floor_lamp
             title: Floor Lamp
           service: browser_mod.popup
       layout: horizontal
