@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1537 total entities**,
-including **696 sensors**.
+This Home Assistant install has approximately **1541 total entities**,
+including **700 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -190,7 +190,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>19 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
 
@@ -224,7 +224,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.27.1]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.27.2]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -278,10 +278,6 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
 
-### [Simpleicons](https://github.com/vigonotion/hass-simpleicons) [v2.0.0]
-
-Use Simple Icons in Home Assistant
-
 ### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.2]
 
 Subaru STARLINK custom component for Home Assistant.
@@ -304,7 +300,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>29 Lovelace Plugins</summary>
+<details><summary>26 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -338,19 +334,15 @@ Battery state card for Home Assistant
 
 🧹 Declutter your lovelace configuration with the help of this card
 
-### [Entity Attributes Card](https://github.com/custom-cards/entity-attributes-card) [v0.1.2]
-
-Entity Attributes
-
 ### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v2.2.0]
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.32]
+### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.33]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.25]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.26]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -370,10 +362,6 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Multiple Entity Row](https://github.com/benct/lovelace-multiple-entity-row) [v4.4.1]
-
-Show multiple entity states and attributes on entity rows in Home Assistant's Lovelace UI
-
 ### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.1.3]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
@@ -386,14 +374,6 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Slider Button Card](https://github.com/custom-cards/slider-button-card) [v1.10.9]
-
-A button card with integrated slider
-
-### [Slider Entity Row](https://github.com/thomasloven/lovelace-slider-entity-row) [v17.2.1]
-
-🔹 Add sliders to entity cards
-
 ### [Stack In Card](https://github.com/custom-cards/stack-in-card) [v0.2.0]
 
 🛠 group multiple cards into one card without the borders
@@ -401,6 +381,10 @@ A button card with integrated slider
 ### [Sun Card](https://github.com/AitorDB/home-assistant-sun-card) [v0.1.4]
 
 Home assistant sun card based on Google weather design
+
+### [Swipe Card](https://github.com/bramkragten/swipe-card) [v4.0.0]
+
+Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
 ### [Template Entity Row](https://github.com/thomasloven/lovelace-template-entity-row) [v1.3.0]
 
@@ -557,7 +541,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.9.1-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.9.4-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
