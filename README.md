@@ -190,7 +190,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>17 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
 
@@ -241,12 +241,6 @@ Authors: [@LAB02-Admin](https://github.com/LAB02-Admin).
 HASS.Agent Notifier integration. Adds notifications to HASS.Agent - a Windows based client for Home Assistant.
 
 Authors: [@LAB02-Admin](https://github.com/LAB02-Admin).
-
-### [Helium Blockchain](https://github.com/rsnodgrass/hass-helium) [v0.3.8]
-
-Helium blockchain sensors for Home Assistant
-
-Authors: [@rsnodgrass](https://github.com/rsnodgrass).
 
 ### [Holidays](https://github.com/bruxy70/Holidays) [v1.8.0]
 
