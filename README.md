@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1541 total entities**,
-including **700 sensors**.
+This Home Assistant install has approximately **1513 total entities**,
+including **682 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -254,7 +254,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b13]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b14]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -509,7 +509,7 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 
 ## Automations
 
-This Home Assistant install has approximately **134 automations**.
+This Home Assistant install has approximately **128 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
