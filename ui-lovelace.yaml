@@ -135,7 +135,7 @@ decluttering_templates:
                   type: custom:mushroom-template-card
                 - subtitle: Tracking Numbers
                   type: custom:mushroom-title-card
-                - content: '{%- for trk_number in state_attr(entity, "tracking_#")
+                - content: '{%- for trk_number in state_attr("[[entity]]", "tracking_#")
                     %}
 
                     [{{ trk_number }}]([[url]]{{ trk_number }})
@@ -599,6 +599,48 @@ views:
                 action: navigate
                 navigation_path: security
               type: template
+            - chip:
+                content: '{{ expand(entity) | selectattr("state", "eq", "on") | list
+                  | count }}'
+                entity: group.all_doors
+                icon: mdi:door-open
+                icon_color: cyan
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    data:
+                      content:
+                        card:
+                          cards: []
+                          layout_type: masonry
+                          type: custom:layout-card
+                        filter:
+                          exclude: []
+                          include:
+                          - group: group.all_doors
+                            options:
+                              card_mod:
+                                style: "ha-card {\n  padding: 4px 12px !important;\n\
+                                  }\n"
+                              hold_action:
+                                action: none
+                              layout: horizontal
+                              secondary_info: last-changed
+                              tap_action:
+                                action: none
+                              type: custom:mushroom-entity-card
+                            state: 'on'
+                        show_empty: false
+                        sort:
+                          method: friendly_name
+                        type: custom:auto-entities
+                      title: Open Doors
+                    service: browser_mod.popup
+                type: template
+              conditions:
+              - entity: group.all_doors
+                state: 'on'
+              type: conditional
             - content: "{% if is_state(entity, \"off\") %}\n  Off\n{% else %}\n  {{\
                 \ state_attr(\"climate.home\", \"hvac_action\") | capitalize }}\n\
                 {% endif %}"
@@ -622,13 +664,9 @@ views:
                 service: homeassistant.turn_off
                 target:
                   entity_id: group.all_light_switches
-              icon: "{% set lights = expand(state_attr(entity, \"entity_id\")) | selectattr(\"\
-                state\", \"eq\", \"on\") | list | count %}\n{% if lights > 0 %}\n\
-                \  mdi:lightbulb-group\n{% else %}\n  mdi:lightbulb-group-off\n{%\
-                \ endif %}"
-              icon_color: "{% set lights = expand(state_attr(entity, \"entity_id\"\
-                )) | selectattr(\"state\", \"eq\", \"on\") | list | count %}\n{% if\
-                \ lights > 0 %}\n  amber\n{% else %}\n  grey\n{% endif %}"
+              icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-group", "mdi:lightbulb-group-off")
+                }}'
+              icon_color: '{{ iif(is_state(entity, "on"), "amber", "grey") }}'
               tap_action:
                 action: navigate
                 navigation_path: lights
@@ -1060,7 +1098,21 @@ views:
                 icon: mdi:arrow-up-bold-circle
                 icon_color: red
                 tap_action:
-                  action: more-info
+                  action: fire-dom-event
+                  browser_mod:
+                    data:
+                      content:
+                        content: '**Home Assistant** _{{ states("sensor.current_version")
+                          }}_ -> _{{ states("sensor.available_version") }}_
+
+                          {{ state_attr("sensor.home_assistant_website", "release_title")
+                          }}
+
+                          [Release Notes]({{ state_attr("sensor.home_assistant_website",
+                          "release_notes") }}) | [HassPodcast](https://hasspodcast.io/episodes)'
+                        type: markdown
+                      title: Upgrade Available
+                    service: browser_mod.popup
                 type: template
               conditions:
               - entity: binary_sensor.docker_hub_update_available
@@ -1081,6 +1133,65 @@ views:
                 state_not: '0'
               - entity: sensor.hacs
                 state_not: unavailable
+              type: conditional
+            - chip:
+                content: '{{ states(entity) }}'
+                entity: sensor.low_battery_devices
+                icon: mdi:battery-alert
+                icon_color: red
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    data:
+                      content:
+                        card:
+                          cards: []
+                          layout_type: masonry
+                          type: custom:layout-card
+                        filter:
+                          exclude: null
+                          include:
+                          - attributes:
+                              device_class: battery
+                            options:
+                              badge_color: red
+                              badge_icon: "{% set battery_level = states(entity) |\
+                                \ int %}\n{% if battery_level < 10 %} \n  mdi:exclamation-thick\n\
+                                {% endif %}"
+                              card_mod:
+                                style: "ha-card {\n  padding: 4px 12px !important;\n\
+                                  }\n"
+                              icon: "{% set battery_level = (states(entity) | int\
+                                \ / 10) | round(0) | int * 10 %} {% if battery_level\
+                                \ == 100 %}\n  mdi:battery\n{% elif battery_level\
+                                \ > 0 %}\n  mdi:battery-{{ battery_level }}\n{% else\
+                                \ %}\n  mdi:battery-outline\n{% endif %}\n"
+                              icon_color: "{% set battery_level = states(entity) |\
+                                \ int %}\n{% if battery_level > 90 %} \n  green\n\
+                                {% elif battery_level > 60 %}\n  light-green\n{% elif\
+                                \ battery_level > 50 %}\n  lime\n{% elif battery_level\
+                                \ > 40 %}\n  yellow\n{% elif battery_level > 30 %}\n\
+                                \  amber\n{% elif battery_level > 20 %}\n  orange\n\
+                                {% elif battery_level > 10 %}\n  deep-orange\n{% else\
+                                \ %}\n  red\n{% endif %} "
+                              layout: horizontal
+                              primary: '{{ states(entity) }}%'
+                              secondary: '{{ state_attr(entity, "friendly_name") |
+                                title }}'
+                              tap_action:
+                                action: more-info
+                              type: custom:mushroom-template-card
+                            state: < 30
+                        show_empty: false
+                        sort:
+                          method: friendly_name
+                        type: custom:auto-entities
+                      title: Low Batteries
+                    service: browser_mod.popup
+                type: template
+              conditions:
+              - entity: sensor.low_battery_devices
+                state_not: '0'
               type: conditional
             type: custom:mushroom-chips-card
           keep:
@@ -1377,6 +1488,7 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - entity: media_player.living_room_universal
+                  title: Living Room Media
                 service: browser_mod.popup
             type: template
           - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
@@ -1387,7 +1499,39 @@ views:
               }}'
             icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
             tap_action:
-              action: none
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card:
+                      cards: []
+                      layout_type: masonry
+                      type: custom:layout-card
+                    filter:
+                      exclude: []
+                      include:
+                      - entity_id: group.lights_living_room
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  background: rgba(var(--rgb-state-light),\
+                              \ 0.1);\n}\n"
+                          layout: horizontal
+                          secondary_info: none
+                          tap_action:
+                            action: toggle
+                          type: custom:mushroom-light-card
+                      - group: group.lights_living_room
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                          layout: horizontal
+                          show_brightness_control: true
+                          show_color_control: true
+                          show_color_temp_control: true
+                          type: custom:mushroom-light-card
+                    type: custom:auto-entities
+                  title: Lights
+                service: browser_mod.popup
             type: template
           - entity: binary_sensor.home_occupancy
             icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk")
@@ -1480,6 +1624,7 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - entity: media_player.family_room_universal
+                  title: Family Room Media
                 service: browser_mod.popup
             type: template
           - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
@@ -1490,7 +1635,39 @@ views:
               }}'
             icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
             tap_action:
-              action: none
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card:
+                      cards: []
+                      layout_type: masonry
+                      type: custom:layout-card
+                    filter:
+                      exclude: []
+                      include:
+                      - entity_id: group.lights_family_room
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  background: rgba(var(--rgb-state-light),\
+                              \ 0.1);\n}\n"
+                          layout: horizontal
+                          secondary_info: none
+                          tap_action:
+                            action: toggle
+                          type: custom:mushroom-light-card
+                      - group: group.lights_family_room
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                          layout: horizontal
+                          show_brightness_control: true
+                          show_color_control: true
+                          show_color_temp_control: true
+                          type: custom:mushroom-light-card
+                    type: custom:auto-entities
+                  title: Lights
+                service: browser_mod.popup
             type: template
           - entity: binary_sensor.family_room_occupancy
             icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk")
@@ -1528,7 +1705,39 @@ views:
               }}'
             icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
             tap_action:
-              action: none
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card:
+                      cards: []
+                      layout_type: masonry
+                      type: custom:layout-card
+                    filter:
+                      exclude: []
+                      include:
+                      - entity_id: group.lights_office
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  background: rgba(var(--rgb-state-light),\
+                              \ 0.1);\n}\n"
+                          layout: horizontal
+                          secondary_info: none
+                          tap_action:
+                            action: toggle
+                          type: custom:mushroom-light-card
+                      - group: group.lights_office
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                          layout: horizontal
+                          show_brightness_control: true
+                          show_color_control: true
+                          show_color_temp_control: true
+                          type: custom:mushroom-light-card
+                    type: custom:auto-entities
+                  title: Lights
+                service: browser_mod.popup
             type: template
           - entity: binary_sensor.office_occupancy
             icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk")
@@ -1566,7 +1775,39 @@ views:
               }}'
             icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
             tap_action:
-              action: none
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card:
+                      cards: []
+                      layout_type: masonry
+                      type: custom:layout-card
+                    filter:
+                      exclude: []
+                      include:
+                      - entity_id: group.lights_kitchen
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  background: rgba(var(--rgb-state-light),\
+                              \ 0.1);\n}\n"
+                          layout: horizontal
+                          secondary_info: none
+                          tap_action:
+                            action: toggle
+                          type: custom:mushroom-light-card
+                      - group: group.lights_kitchen
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                          layout: horizontal
+                          show_brightness_control: true
+                          show_color_control: true
+                          show_color_temp_control: true
+                          type: custom:mushroom-light-card
+                    type: custom:auto-entities
+                  title: Lights
+                service: browser_mod.popup
             type: template
           - entity: binary_sensor.kitchen_occupancy
             icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk")
@@ -1615,6 +1856,7 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - entity: media_player.master_bedroom_universal
+                  title: Master Bedroom Media
                 service: browser_mod.popup
             type: template
           - entity: light.master_bedroom_floor_lamp
@@ -1751,7 +1993,39 @@ views:
               }}'
             icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
             tap_action:
-              action: none
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card:
+                      cards: []
+                      layout_type: masonry
+                      type: custom:layout-card
+                    filter:
+                      exclude: []
+                      include:
+                      - entity_id: group.lights_outside
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  background: rgba(var(--rgb-state-light),\
+                              \ 0.1);\n}\n"
+                          layout: horizontal
+                          secondary_info: none
+                          tap_action:
+                            action: toggle
+                          type: custom:mushroom-light-card
+                      - group: group.lights_outside
+                        options:
+                          card_mod:
+                            style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                          layout: horizontal
+                          show_brightness_control: true
+                          show_color_control: true
+                          show_color_temp_control: true
+                          type: custom:mushroom-light-card
+                    type: custom:auto-entities
+                  title: Lights
+                service: browser_mod.popup
             type: template
           - entity: binary_sensor.doorbell_motion
             icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk")
@@ -3395,27 +3669,32 @@ views:
       hours_to_show: 4
       type: map
     type: vertical-stack
-  - cards:
-    - subtitle: Doors / Windows
-      type: custom:mushroom-title-card
-    - card:
-        columns: 1
-        square: false
-        type: grid
-      card_param: cards
-      filter:
-        exclude:
-        - state: 'off'
-        - state: unavailable
-        include:
-        - entity_id: binary_sensor.ascent_*_door
-          options:
-            type: custom:mushroom-entity-card
-        - entity_id: binary_sensor.ascent_*_window
-          options:
-            type: custom:mushroom-entity-card
-      type: custom:auto-entities
-    type: vertical-stack
+  - card:
+      cards:
+      - subtitle: Doors / Windows
+        type: custom:mushroom-title-card
+      - card:
+          columns: 1
+          square: false
+          type: grid
+        card_param: cards
+        filter:
+          exclude:
+          - state: 'off'
+          - state: unavailable
+          include:
+          - entity_id: binary_sensor.ascent_*_door
+            options:
+              type: custom:mushroom-entity-card
+          - entity_id: binary_sensor.ascent_*_window
+            options:
+              type: custom:mushroom-entity-card
+        type: custom:auto-entities
+      type: vertical-stack
+    conditions:
+    - entity: binary_sensor.ascent_doors_windows
+      state: 'on'
+    type: conditional
   - cards:
     - subtitle: Tire Pressure
       type: custom:mushroom-title-card
@@ -4270,14 +4549,45 @@ views:
           service: homeassistant.turn_off
           target:
             entity_id: group.all_light_switches
-        icon: "{% set lights = expand(state_attr(entity, \"entity_id\")) | selectattr(\"\
-          state\", \"eq\", \"on\") | list | count %}\n{% if lights > 0 %}\n  mdi:lightbulb-group\n\
-          {% else %}\n  mdi:lightbulb-group-off\n{% endif %}"
-        icon_color: "{% set lights = expand(state_attr(entity, \"entity_id\")) | selectattr(\"\
-          state\", \"eq\", \"on\") | list | count %}\n{% if lights > 0 %}\n  amber\n\
-          {% else %}\n  grey\n{% endif %}"
+        icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-group", "mdi:lightbulb-group-off")
+          }}'
+        icon_color: '{{ iif(is_state(entity, "on"), "amber", "grey") }}'
         tap_action:
-          action: more-info
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                card:
+                  cards: []
+                  layout_type: masonry
+                  type: custom:layout-card
+                filter:
+                  exclude: []
+                  include:
+                  - entity_id: group.all_light_switches
+                    options:
+                      card_mod:
+                        style: "ha-card {\n  background: rgba(var(--rgb-state-light),\
+                          \ 0.1);\n}\n"
+                      layout: horizontal
+                      secondary_info: none
+                      tap_action:
+                        action: toggle
+                      type: custom:mushroom-light-card
+                  - group: group.all_light_switches
+                    options:
+                      card_mod:
+                        style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                      layout: horizontal
+                      show_brightness_control: true
+                      show_color_control: true
+                      show_color_temp_control: true
+                      type: custom:mushroom-light-card
+                sort:
+                  method: friendly_name
+                type: custom:auto-entities
+              title: Lights
+            service: browser_mod.popup
         type: template
   - cards:
     - cards:
@@ -4951,13 +5261,12 @@ views:
         type: entity
       - entity: sensor.home_123_1mon
         type: entity
-      - content: '{{ states(entity) | float(default=0) if not is_state(entity, "unavailable")
+      - content: '{{ iif(not is_state(entity, "unavailable"), states(entity) | float(default=0))
           }}'
         entity: sensor.month_power_cost
         hold_action:
           action: none
         icon: mdi:currency-usd
-        icon_color: grey
         tap_action:
           action: more-info
         type: template
@@ -4995,24 +5304,49 @@ views:
       columns: 3
       square: false
       type: grid
+    - subtitle: Usage
+      type: custom:mushroom-title-card
     - cards:
       - entity: sensor.home_123_1d
         icon: mdi:calendar-today
         icon_color: orange
-        name: Daily Energy
+        name: Daily
+        primary_info: state
+        secondary_info: name
+        type: custom:mushroom-entity-card
+      - entity: sensor.totalusage_1mon
+        icon: mdi:calendar-month
+        icon_color: orange
+        name: Monthly
+        primary_info: state
+        secondary_info: name
+        type: custom:mushroom-entity-card
+      - entity: sensor.mainsfromgrid_1mon
+        icon: mdi:transmission-tower-import
+        icon_color: amber
+        name: Import
+        primary_info: state
+        secondary_info: name
+        type: custom:mushroom-entity-card
+      - entity: sensor.mainstogrid_1mon
+        icon: mdi:transmission-tower-export
+        icon_color: green
+        name: Export
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
       - entity: sensor.home_123_1mon
-        icon: mdi:calendar-month
-        icon_color: orange
-        name: Monthly Energy
+        icon: mdi:transmission-tower
+        icon_color: blue
+        name: Net
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
       columns: 2
       square: false
       type: grid
+    - subtitle: Rate
+      type: custom:mushroom-title-card
     - entity: select.monthly_energy
       icon: mdi:transmission-tower
       icon_color: "{%- if is_state(entity, \"summer_offpeak\") -%}\n  yellow\n{%-\
@@ -5068,13 +5402,32 @@ views:
     - subtitle: Power Usage
       type: custom:mushroom-title-card
     - animation:
-        state: 'on'
-      decimal: 0
+        state: 'off'
+      decimal: 1
       entities:
+      - entity: sensor.totalusage_1min
+        max: 24000
+        name: Current Usage
+        severity:
+        - color: rgb(var(--mush-rgb-green))
+          from: 0
+          to: 4800
+        - color: rgb(var(--mush-rgb-light-green))
+          from: 4801
+          to: 9600
+        - color: rgb(var(--mush-rgb-amber))
+          from: 9601
+          to: 14400
+        - color: rgb(var(--mush-rgb-orange))
+          from: 14401
+          to: 19200
+        - color: rgb(var(--mush-rgb-red))
+          from: 19200
+          to: 24000
       - entity: sensor.home_123_1min
         max: 24000
         min: -4800
-        name: Power Draw
+        name: Power Flow
         severity:
         - color: rgb(var(--mush-rgb-light-blue))
           from: -4800
@@ -5099,7 +5452,6 @@ views:
           to: 24000
       - entity: sensor.solar_1min
         max: 4800
-        min: 0
         name: Solar
         severity:
         - color: rgb(var(--mush-rgb-green))
@@ -5118,7 +5470,24 @@ views:
           from: 3841
           to: 4800
       - entity: sensor.home_balance_1min
+        max: 9600
         name: Home Balance
+        severity:
+        - color: rgb(var(--mush-rgb-green))
+          from: 0
+          to: 1920
+        - color: rgb(var(--mush-rgb-light-green))
+          from: 1921
+          to: 3840
+        - color: rgb(var(--mush-rgb-amber))
+          from: 3841
+          to: 5760
+        - color: rgb(var(--mush-rgb-orange))
+          from: 5761
+          to: 7680
+        - color: rgb(var(--mush-rgb-red))
+          from: 7681
+          to: 9600
       - entity: sensor.family_room_1min
         name: Family Room
       - entity: sensor.dishwasher_disposal_1min

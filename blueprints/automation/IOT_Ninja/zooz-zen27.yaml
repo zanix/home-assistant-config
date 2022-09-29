@@ -1,0 +1,139 @@
+blueprint:
+  name: Zooz ZEN27
+  description: Automations helper for the Zooz ZEN27 S2 Dimmer Switch using the Zwave
+    JS integration.
+  domain: automation
+  input:
+    zooz_zen27:
+      name: Zooz ZEN27
+      description: The ZEN27 Switch to interact with.
+      selector:
+        device:
+          integration: zwave_js
+          manufacturer: Zooz
+    dimmer_up_1x:
+      name: Top Paddle 1x
+      description: 'Action to run on dimmer upper paddle single tap. Default: Turn
+        on dimmer switch load to last/custom brightness.'
+      default: []
+      selector:
+        action: {}
+    dimmer_up_2x:
+      name: Top Paddle 2x
+      description: Action to run on dimmer upper paddle double tap.
+      default: []
+      selector:
+        action: {}
+    dimmer_up_3x:
+      name: Top Paddle 3x
+      description: 'Action to run on dimmer upper paddle triple tap. Default: Enter
+        inclusion/pairing mode.'
+      default: []
+      selector:
+        action: {}
+    dimmer_up_4x:
+      name: Top Paddle 4x
+      description: Action to run on dimmer upper paddle quadruple tap.
+      default: []
+      selector:
+        action: {}
+    dimmer_up_5x:
+      name: Top Paddle 5x
+      description: Action to run on dimmer upper paddle quintuple tap.
+      default: []
+      selector:
+        action: {}
+    dimmer_up_hold:
+      name: Top Paddle Hold
+      description: 'Action to run on dimmer upper paddle press-and-hold. Default:
+        Increase dimmer brightness level.'
+      default: []
+      selector:
+        action: {}
+    dimmer_up_release:
+      name: Top Paddle Release
+      description: Action to run on dimmer upper paddle release.
+      default: []
+      selector:
+        action: {}
+    dimmer_down_1x:
+      name: Lower Paddle 1x
+      description: 'Action to run on dimmer lower paddle single tap. Default: Turn
+        off dimmer switch load.'
+      default: []
+      selector:
+        action: {}
+    dimmer_down_2x:
+      name: Lower Paddle 2x
+      description: Action to run on dimmer lower paddle double tap.
+      default: []
+      selector:
+        action: {}
+    dimmer_down_3x:
+      name: Lower Paddle 3x
+      description: 'Action to run on dimmer lower paddle triple tap. Default: Enter
+        exclusion/un-pairing mode.'
+      default: []
+      selector:
+        action: {}
+    dimmer_down_4x:
+      name: Lower Paddle 4x
+      description: Action to run on dimmer lower paddle quadruple tap.
+      default: []
+      selector:
+        action: {}
+    dimmer_down_5x:
+      name: Lower Paddle 5x
+      description: Action to run on dimmer lower paddle quintuple tap.
+      default: []
+      selector:
+        action: {}
+    dimmer_down_hold:
+      name: Bottom Paddle Hold
+      description: 'Action to run on dimmer lower paddle press-and-hold. Default:
+        Decrease dimmer brightness level.'
+      default: []
+      selector:
+        action: {}
+    dimmer_down_release:
+      name: Bottom Paddle Release
+      description: Action to run on dimmer lower paddle double tap.
+      default: []
+      selector:
+        action: {}
+  source_url: https://community.home-assistant.io/t/zooz-zen27/303161/2
+mode: single
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: zwave_js_value_notification
+  event_data:
+    command_class_name: Central Scene
+    device_id: !input zooz_zen27
+action:
+- variables:
+    scene_id: '{{ trigger.event.data.label }}'
+    attribute_id: '{{ trigger.event.data.value }}'
+- choose:
+  - conditions: '{{ scene_id == "Scene 002" }}'
+    sequence:
+    - choose:
+      - conditions: '{{ attribute_id == "KeyPressed" }}'
+        sequence: !input dimmer_up_1x
+      - conditions: '{{ attribute_id == "KeyPressed2x" }}'
+        sequence: !input dimmer_up_2x
+      - conditions: '{{ attribute_id == "KeyPressed4x" }}'
+        sequence: !input dimmer_up_4x
+      - conditions: '{{ attribute_id == "KeyPressed5x" }}'
+        sequence: !input dimmer_up_5x
+  - conditions: '{{ scene_id == "Scene 001" }}'
+    sequence:
+    - choose:
+      - conditions: '{{ attribute_id == "KeyPressed" }}'
+        sequence: !input dimmer_down_1x
+      - conditions: '{{ attribute_id == "KeyPressed2x" }}'
+        sequence: !input dimmer_down_2x
+      - conditions: '{{ attribute_id == "KeyPressed4x" }}'
+        sequence: !input dimmer_down_4x
+      - conditions: '{{ attribute_id == "KeyPressed5x" }}'
+        sequence: !input dimmer_down_5x

@@ -1,0 +1,33 @@
+---
+# The template integration allows creating entities which derive their values
+# from other data. This is done by specifying templates for properties of an
+# entity, like the name or the state.
+#
+# https://www.home-assistant.io/integrations/template/
+#
+sensor:
+  - name: Low Battery Devices
+    icon: >-
+      {% if is_state('sensor.low_battery_devices', '0') %}
+        mdi:battery-check
+      {% else %}
+        mdi:battery-alert
+      {% endif %}
+    state: >-
+      {% set ignore_entities = [
+        "sensor.galaxy_s21_battery_level",
+        "sensor.pixel_6_battery_level",
+        "sensor.ipad_josh_battery_level"
+      ] %}
+      {{ states.sensor
+        | reject('in', ['unknown', 'unavailable', 'undefined'])
+        | rejectattr('entity_id', 'in', ignore_entities)
+        | rejectattr('attributes.device_class', 'undefined')
+        | selectattr('attributes.device_class', 'eq', 'battery')
+        | map(attribute='state')
+        | map('int', -1)
+        | select('le', 30)
+        | select('ge', 0)
+        | list
+        | count
+      }}
