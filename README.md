@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1522 total entities**,
-including **691 sensors**.
+This Home Assistant install has approximately **1521 total entities**,
+including **689 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -272,7 +272,7 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.2]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.3]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -294,7 +294,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>26 Lovelace Plugins</summary>
+<details><summary>27 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
 
@@ -336,7 +336,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.26]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.27]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -367,6 +367,10 @@ Replace input_number sliders with plus and minus buttons
 ### [Rgb Light Card](https://github.com/bokub/rgb-light-card) [v1.11.0]
 
 💡 A Lovelace custom card for RGB lights
+
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v0.11.0]
+
+A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
 ### [Stack In Card](https://github.com/custom-cards/stack-in-card) [v0.2.0]
 
