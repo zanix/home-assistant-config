@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1534 total entities**,
-including **683 sensors**.
+This Home Assistant install has approximately **1516 total entities**,
+including **680 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -513,7 +513,7 @@ I started out with the GE Z-Wave switches but I'm slowly replacing them with Ino
 
 ## Automations
 
-This Home Assistant install has approximately **128 automations**.
+This Home Assistant install has approximately **132 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
