@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1521 total entities**,
-including **689 sensors**.
+This Home Assistant install has approximately **1534 total entities**,
+including **683 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -224,7 +224,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.27.2]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.28.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -272,7 +272,7 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.3]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.4]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -344,7 +344,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 🙈 Hides the Home Assistant header and/or sidebar
 
-### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.2]
+### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.4]
 
 🔹 Get more control over the placement of lovelace cards.
 
@@ -539,7 +539,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.10.1-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.10.3-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
