@@ -224,7 +224,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.28.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.28.2]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
