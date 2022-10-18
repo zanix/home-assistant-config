@@ -1,0 +1,34 @@
+---
+# The template platform supports sensors which get their values from other
+# entities.
+#
+# https://www.home-assistant.io/integrations/template/
+#
+# Example: {{ state_attr("sensor.nominal_change_history", "changes")["input_boolean.test"] | as_datetime }}
+#
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.front_door_is_open
+      - binary_sensor.sliding_door_is_open
+      - binary_sensor.garage_side_door_is_open
+      - binary_sensor.garage_entry_door_is_open
+      - input_boolean.washer
+      - input_boolean.dryer
+      - input_select.dishwasher_status
+      - sensor.doorbell_last_ding
+      - sensor.doorbell_last_motion
+    not_to:
+      - unavailable
+      - unknown
+    not_from:
+      - unavailable
+      - unknown
+sensor:
+  - name: Nominal Change History
+    state: "OK"
+    attributes:
+      changes: >
+        {% set current = this.attributes.get('changes', {}) %}
+        {% set new = {trigger.entity_id: trigger.to_state.last_changed.isoformat()} %}
+        {{ dict(current, **new) }}
