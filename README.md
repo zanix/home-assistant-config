@@ -154,6 +154,10 @@ The Steam integration will allow you to track the online status of public Steam 
 
 The sun integration will use the location as configured in your Home Assistant configuration to track if the sun is above or below the horizon
 
+### [System Monitor](https://www.home-assistant.io/integrations/systemmonitor)
+
+Monitors disk usage, memory usage, CPU usage, and running processes.
+
 ### [Tasmota](https://www.home-assistant.io/integrations/tasmota)
 
 This integration allows to control of Tasmota devices over MQTT
@@ -444,45 +448,49 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ## Devices
 
-> **Note:** NONE of the links are affiliate links. I don't care about getting a commission from Amazon.
-
 ### Climate
 
 - [EcoBee3 Thermostat](https://www.amazon.com/dp/B00ZIRV39M) - Smart Thermostat with [extra sensors](https://www.amazon.com/dp/B00NXRYOIQ/)
 
 ### Lighting
 
-I started out with the GE Z-Wave switches but I'm slowly replacing them with Inovelli.
-
+- [Inovelli LZW30-SN Red Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-sn-spec-sheet)
+- [Inovelli LZW30 Black Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-spec-sheet)
+- [Zooz ZEN71 On-Off Switch](https://www.getzooz.com/zooz-zen71-on-off-switch/)
+- [Honeywell 39348/ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - GE/Jasco Z-Wave Light Switch (12722)
-- [GE/Jasco Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R)
 - GE/Jasco Z-Wave Dimmer (12724)
+- [GE/Jasco Z-Wave Plus Light Switch (14291)](https://www.amazon.com/dp/B01M1AHC3R)
 - [GE/Jasco Z-Wave Plus Dimmer (14294)](https://www.amazon.com/dp/B006LQFHN2)
-- [Inovelli LZW30 Black Series On/Off Switch](https://inovelli.com/black-series-on-off-switch-z-wave/)
-- [Inovelli LZW30 Red Series On/Off Switch](https://inovelli.com/red-series-on-off-switch-z-wave/)
-- [Honeywell 39348 / ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
-- [Govee Smart LED Floor Lamp](https://www.amazon.com/gp/product/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
-- [Philips Hue White Ambiance](https://www.amazon.com/gp/product/B0753H5GKN)
+- [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
+- [Philips Hue White Ambiance](https://www.amazon.com/dp/B0753H5GKN)
 - [DreamScreen](https://www.dreamscreentv.com/) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
 - [WLED](https://github.com/Aircoookie/WLED) - DIY light strip
 
-### Sensor / Switch
+### Sensor
 
-- [Dome Water Leak Sensor](https://www.amazon.com/gp/product/B01LXR0B8Q/) - Detect water leaks
+- [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
 - [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
-  Hacked for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
+  flashed for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
 - [ESPHome](https://esphome.io) - DIY devices
+  - Bluetooth proxy
+  - Car presense
+  - Soft water salt level sensor
+- [Nortek/GoControl Door/Window Sensor WADWAZ-1](https://www.gocontrol.com/detail.php?productId=14)
 - [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presence of my car
+- [Vision Z-Wave Plus Recessed Door and Window Sensor](https://www.amazon.com/dp/B01JNOCQL4)
+- [Zooz 700 Series Z-Wave Plus 4-in-1 Sensor ZSE40](https://www.amazon.com/dp/B01AKSO80O)
+
+### Switch
+
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
-- [System Resources](https://www.home-assistant.io/integrations/systemmonitor)
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
 - [Zooz Titan Water Valve Actuator](https://www.thesmartesthouse.com/products/zooz-z-wave-plus-700-series-titan-water-valve-actuator-zac36) - Control the water main
-- Various Z-Wave Door/Window sensors
 
 ### Camera
 
-- [Ring Pro Doorbell](https://www.amazon.com/gp/product/B01DM6BDA4)
+- [Ring Pro Doorbell](https://www.amazon.com/dp/B01DM6BDA4)
 - [Wyze Cam v2](https://www.amazon.com/dp/B09XJ36RP2)
 
 ### Media
