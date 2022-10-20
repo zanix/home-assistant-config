@@ -35,26 +35,49 @@
 
   {%- macro dog_water_bowl() -%}
     {%- if states('binary_sensor.dog_water_bowl') == "off" -%}
-      Lilly and Honey's water bowl is empty please refill it for them.
+      Lilly's water bowl is empty please refill it for them.
       {{ " " }}
     {%- endif -%}
   {%- endmacro -%}
 
-  {%- macro door_window_check() -%}
-    {%- set entities = [
-      'cover.garage_door',
-      'binary_sensor.front_door_is_open',
-      'binary_sensor.sliding_door_is_open',
-      'binary_sensor.garage_entry_door_is_open',
-      'binary_sensor.garage_side_door_is_open',
-      'lock.lock_front'
-    ] -%}
-    {%- set open_states = ['open','on','unlocked'] -%}
-    {%- set open_entities = states|selectattr('entity_id','in',entities)|selectattr('state','in',open_states)|map(attribute='entity_id')|list -%}
+  {%- macro door_check() -%}
+    {% set ns = namespace(entities=[]) %}
 
-    {%- if open_entities|length > 0 -%}
-      {%- for entity in open_entities -%}
-        {{ 'T' if entity == open_entities|first else 't' }}he {{ state_attr(entity,'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == open_entities|last else ', ' }}{{ 'and ' if open_entities|length > 1 and entity != open_entities|last }}
+    {% set open_doors = expand(state_attr("group.all_doors", "entity_id")) | selectattr("state", "eq", "on") | map(attribute="entity_id") | list %}
+    {% for entity_id in open_doors %}
+      {% set ns.entities = ns.entities + [ entity_id ] %}
+    {% endfor %}
+
+    {% set security = [
+      "lock.lock_front",
+      "cover.garage_door"
+    ] %}
+
+    {% for entity_id in security %}
+      {% if is_state(entity_id, "open") or is_state(entity_id, "unlocked") %}
+        {% set ns.entities = ns.entities + [ entity_id ] %}
+      {% endif %}
+    {% endfor %}
+
+    {%- if ns.entities|length > 0 -%}
+      {%- for entity in ns.entities -%}
+        {{ 'T' if entity == ns.entities|first else 't' }}he {{ state_attr(entity,'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == ns.entities|last else ', ' }}{{ 'and ' if ns.entities|length > 1 and entity != ns.entities|last }}
+      {%- endfor -%}
+      {{ " " }}
+    {%- endif -%}
+  {%- endmacro -%}
+
+  {%- macro window_check() -%}
+    {% set ns = namespace(entities=[]) %}
+
+    {% set open_windows = expand(state_attr("group.all_windows", "entity_id")) | selectattr("state", "eq", "on") | map(attribute="entity_id") | list %}
+    {% for entity_id in open_windows %}
+      {% set ns.entities = ns.entities + [ entity_id ] %}
+    {% endfor %}
+
+    {%- if ns.entities|length > 0 -%}
+      {%- for entity in ns.entities -%}
+        {{ 'T' if entity == ns.entities|first else 't' }}he {{ state_attr(entity,'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == ns.entities|last else ', ' }}{{ 'and ' if ns.entities|length > 1 and entity != ns.entities|last }}
       {%- endfor -%}
       {{ " " }}
     {%- endif -%}
@@ -248,13 +271,13 @@
     {%- else -%}
       {%- set condition = states('weather.openweathermap') -%}
     {%- endif -%}
-    {{ ['Currently', 'Right now']|random }} in Idaho Falls, it is {{ state_attr('weather.openweathermap','temperature')|int }} degrees fahrenheit, and {{ condition }}.
+    {{ ['Currently', 'Right now']|random }}, it is {{ state_attr('weather.openweathermap','temperature')|int }} degrees fahrenheit, and {{ condition }}.
     {{ states('sensor.forecast') }}
     {{ " " }}
   {%- endmacro -%}
 
   {%- macro dog_warning(person_arriving) -%}
-    Head's up Lilly and Honey. {{ person_arriving }} just got home!
+    Head's up Lilly. {{ person_arriving }} just got home!
     {{ " " }}
   {%- endmacro -%}
 
@@ -294,7 +317,7 @@
       "Welcome back home " ~ person ~ ".",
       "Guess who is home? " ~ person ~ " is!",
       person ~ " is now in the house.",
-      "Welcome Home " ~ person ~ ".  We have missed you.  I know Lilly and Honey sure did.",
+      "Welcome Home " ~ person ~ ".  We have missed you.  I know Lilly sure did.",
       "Our home is now complete, Rest your head and relax your feet!  Welcome Back " ~ person ~ ".",
       "Life is like a song, you’re back where you belong.  Welcome home " ~ person ~ ".",
       "Hey there " ~ person ~ "  Welcome Home!",
@@ -304,7 +327,7 @@
       person ~ "! You are home!",
       "I know a secret!" ~ person ~ " is home!",
       "Hey " ~ person ~ ". Your arrival has been recorded by the Smartest house on the block.",
-      "Take note Lilly and Honey! "  ~ person ~ " is home.",
+      "Take note Lilly! "  ~ person ~ " is home.",
       "I am sensing a disturbance in the force. "  ~ person ~ " must be home!",
       "And the house becomes a home.  Welcome back " ~ person ~ ".",
       "Just a quick announcement. " ~ person ~ " has arrived!",
@@ -351,8 +374,12 @@
       {{ responsibilities() ~ " " }}
     {%- endif -%}
 
-    {%- if say_door_window_check == "true" -%}
-      {{ door_window_check() }}
+    {%- if say_door_check == "true" -%}
+      {{ door_check() }}
+    {%- endif -%}
+
+    {%- if say_window_check == "true" -%}
+      {{ window_check() }}
     {%- endif -%}
 
     {%- if say_light_check == "true" -%}
@@ -403,10 +430,16 @@
     {%- set say_inside_weather = truthify(say_inside_weather) -%}
   {%- endif -%}
 
-  {%- if say_door_window_check is undefined -%}
-    {%- set say_door_window_check = "false" -%}
+  {%- if say_door_check is undefined -%}
+    {%- set say_door_check = "false" -%}
   {%- else -%}
-    {%- set say_door_window_check = truthify(say_door_window_check) -%}
+    {%- set say_door_check = truthify(say_door_check) -%}
+  {%- endif -%}
+
+  {%- if say_window_check is undefined -%}
+    {%- set say_window_check = "false" -%}
+  {%- else -%}
+    {%- set say_window_check = truthify(say_window_check) -%}
   {%- endif -%}
 
   {%- if say_light_check is undefined -%}

@@ -116,24 +116,24 @@ inovelli_led:
                 {% endif %}
 
           # Set enable_debug = true above to provide output troubleshooting information.
-          - choose:
-              - conditions:
-                  - '{{ debug == true }}'
-                sequence:
-                  - service: script.debug
-                    data:
-                      id: 'inovelli_led'
-                      title: 'DEBUG: script.inovelli_led'
-                      message: |-
-                        device: {{ repeat.item }}
-                        model_name: {{ model_name }}
-                        model_type: {{ model_type }}
-                        color: {{ color|title }}
-                        level: {{ level }}
-                        duration: {{ duration|title }}
-                        effect: {{ effect|title }}
-                        parameter: {{ parameter }}
-                        inovelli_math: {{ inovelli_math }}
+          - if:
+              - condition: template
+                value_template: '{{ debug == true }}'
+            then:
+              - service: script.debug
+                data:
+                  id: 'inovelli_led'
+                  title: 'DEBUG: script.inovelli_led'
+                  message: |-
+                    device: {{ repeat.item }}
+                    model_name: {{ model_name }}
+                    model_type: {{ model_type }}
+                    color: {{ color|title }}
+                    level: {{ level }}
+                    duration: {{ duration|title }}
+                    effect: {{ effect|title }}
+                    parameter: {{ parameter }}
+                    inovelli_math: {{ inovelli_math }}
 
           # Clear the previous effect.
           - service: zwave_js.bulk_set_partial_config_parameters
@@ -144,15 +144,16 @@ inovelli_led:
               value: '16714410'
 
           # Start the new effect, unless we were just turning it off.
-          - choose:
-              - conditions: '{{ inovelli_math > 0 }}'
-                sequence:
-                  - service: zwave_js.bulk_set_partial_config_parameters
-                    target:
-                      entity_id: "{{ repeat.item }}"
-                    data:
-                      parameter: "{{ parameter }}"
-                      value: "{{ inovelli_math }}"
+          - if:
+              - condition: template
+                value_template: '{{ inovelli_math > 0 }}'
+            then:
+              - service: zwave_js.bulk_set_partial_config_parameters
+                target:
+                  entity_id: "{{ repeat.item }}"
+                data:
+                  parameter: "{{ parameter }}"
+                  value: "{{ inovelli_math }}"
 
   fields:
     entity_id:
