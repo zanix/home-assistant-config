@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1520 total entities**,
-including **681 sensors**.
+This Home Assistant install has approximately **1518 total entities**,
+including **683 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -228,7 +228,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.28.2]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.28.3]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -258,7 +258,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b15]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b16]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -340,7 +340,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.27]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.28]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -372,7 +372,7 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v0.11.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.1.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -547,7 +547,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.10.4-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.10.5-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
