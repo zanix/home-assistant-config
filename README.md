@@ -194,7 +194,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>17 Custom Integrations</summary>
+<details><summary>16 Custom Integrations</summary>
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
 
@@ -234,17 +234,11 @@ HACS gives you a powerful UI to handle downloads of all your custom needs.
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Hass.Agent Mediaplayer](https://github.com/LAB02-Research/HASS.Agent-MediaPlayer) [v2022.5.7]
+### [Hass.Agent](https://github.com/LAB02-Research/HASS.Agent-Integration) [v2022.10.10]
 
-HASS.Agent MediaPlayer integrations. Adds TTS and the ability to control local media to HASS.Agent - a Windows based client for Home Assistant.
+HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capabilities to HASS.Agent - a Windows based client for Home Assistant.
 
-Authors: [@LAB02-Admin](https://github.com/LAB02-Admin).
-
-### [Hass.Agent Notifier](https://github.com/LAB02-Research/HASS.Agent-Notifier) [v2022.3.15]
-
-HASS.Agent Notifier integration. Adds notifications to HASS.Agent - a Windows based client for Home Assistant.
-
-Authors: [@LAB02-Admin](https://github.com/LAB02-Admin).
+Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
 ### [Holidays](https://github.com/bruxy70/Holidays) [v1.8.0]
 
