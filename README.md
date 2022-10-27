@@ -234,7 +234,7 @@ HACS gives you a powerful UI to handle downloads of all your custom needs.
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Hass.Agent](https://github.com/LAB02-Research/HASS.Agent-Integration) [v2022.10.10]
+### [Hass.Agent](https://github.com/LAB02-Research/HASS.Agent-Integration) [v2022.10.26]
 
 HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capabilities to HASS.Agent - a Windows based client for Home Assistant.
 
@@ -334,7 +334,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.28]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.29]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -354,7 +354,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.1.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.2.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
