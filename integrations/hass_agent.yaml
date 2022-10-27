@@ -137,37 +137,41 @@ script:
       duration: '{{ duration|default(5) }}'
 
     sequence:
-      - choose:
-          # Send camera image.
-          - conditions: '{{ camera is string }}'
-            sequence:
+      - if:
+          - condition: template
+            value_template: '{{ is_state("sensor." ~ computer|lower ~ "_user_notification", "AcceptsNotifications") }}'
+        then:
+          - choose:
+              # Send camera image.
+              - conditions: '{{ camera is string }}'
+                sequence:
+                  - service: '{{ notification_service }}'
+                    data:
+                      title: '{{ title }}'
+                      message: '{{ message }}'
+                      data:
+                        image: '{{ states("sensor.base_url") }}{{ state_attr(camera,"entity_picture") }}'
+                        duration: '{{ duration }}'
+                        actions: '{{ actions|default([], true) }}'
+
+              # Send an image.
+              - conditions: '{{ image is string }}'
+                sequence:
+                  - service: '{{ notification_service }}'
+                    data:
+                      title: '{{ title }}'
+                      message: '{{ message }}'
+                      data:
+                        image: '{{ image_path }}'
+                        duration: '{{ duration }}'
+                        actions: '{{ actions|default([], true) }}'
+
+            # Send a basic notification message.
+            default:
               - service: '{{ notification_service }}'
                 data:
                   title: '{{ title }}'
                   message: '{{ message }}'
                   data:
-                    image: '{{ states("sensor.base_url") }}{{ state_attr(camera,"entity_picture") }}'
                     duration: '{{ duration }}'
                     actions: '{{ actions|default([], true) }}'
-
-          # Send an image.
-          - conditions: '{{ image is string }}'
-            sequence:
-              - service: '{{ notification_service }}'
-                data:
-                  title: '{{ title }}'
-                  message: '{{ message }}'
-                  data:
-                    image: '{{ image_path }}'
-                    duration: '{{ duration }}'
-                    actions: '{{ actions|default([], true) }}'
-
-        # Send a basic notification message.
-        default:
-          - service: '{{ notification_service }}'
-            data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              data:
-                duration: '{{ duration }}'
-                actions: '{{ actions|default([], true) }}'
