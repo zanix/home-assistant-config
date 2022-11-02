@@ -477,6 +477,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ### Switch
 
+- [IKEA E1524/E1810 5-Button Remote Control](https://www.amazon.com/dp/B07KM1YZWW)
 - [Leviton ZW4SF-1BW Smart 4 Speed Fan Controller](https://www.amazon.com/dp/B08GQJWSRG)
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
@@ -515,7 +516,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ## Automations
 
-This Home Assistant install has approximately **132 automations**.
+This Home Assistant install has approximately **133 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
