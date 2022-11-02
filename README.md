@@ -477,6 +477,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ### Switch
 
+- [Leviton ZW4SF-1BW Smart 4 Speed Fan Controller](https://www.amazon.com/dp/B08GQJWSRG)
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
 - [Zooz Titan Water Valve Actuator](https://www.thesmartesthouse.com/products/zooz-z-wave-plus-700-series-titan-water-valve-actuator-zac36) - Control the water main
