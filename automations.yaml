@@ -1257,9 +1257,9 @@
   description: Set Garage light switch LED when Garage Door and light status
   trigger:
   - platform: state
-    entity_id: cover.garage_door
-  - platform: state
-    entity_id: switch.garage_light
+    entity_id:
+    - cover.garage_door
+    - light.garage
   condition: []
   action:
   - choose:
@@ -1268,64 +1268,65 @@
         entity_id: cover.garage_door
         state: closed
       - condition: state
-        entity_id: switch.garage_light
+        entity_id: light.garage
         state: 'off'
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
-          - switch.garage_light
-          effect: 'Off'
+          - light.garage
+          effect: Clear
     - conditions:
       - condition: state
         entity_id: cover.garage_door
         state: closed
       - condition: state
-        entity_id: switch.garage_light
+        entity_id: light.garage
         state: 'on'
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
-          - switch.garage_light
-          effect: 'Off'
+          - light.garage
+          effect: Clear
     - conditions:
       - condition: state
         entity_id: cover.garage_door
         state: open
       - condition: state
-        entity_id: switch.garage_light
+        entity_id: light.garage
         state: 'off'
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
-          - switch.garage_light
+          - light.garage
           color: Red
           effect: Pulse
-          level: 10
+          level: 40
     - conditions:
       - condition: state
         entity_id: cover.garage_door
         state: open
       - condition: state
-        entity_id: switch.garage_light
+        entity_id: light.garage
         state: 'on'
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
-          - switch.garage_light
+          - light.garage
           color: Purple
           effect: Pulse
-          level: 10
+          level: 40
   mode: restart
 - id: '1665688406559'
   alias: "\U0001F6A6 Office Light Switch Status"
   description: Set Office light switch LED light status
   trigger:
   - platform: state
-    entity_id: light.office_light
+    entity_id:
+    - light.office_light
   condition: []
   action:
   - choose:
@@ -1334,23 +1335,24 @@
         entity_id: light.office_light
         state: 'off'
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
-          - switch.office_switch
-          effect: 'Off'
+          - light.office_switch
+          color: Red
+          effect: Solid
+          level: 1
     - conditions:
       - condition: state
         entity_id: light.office_light
         state: 'on'
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
-          - switch.office_switch
+          - light.office_switch
           color: Green
           effect: Solid
-          level: 8
   mode: restart
 - id: '1665688920005'
   alias: "\U0001F514 Doorbell Motion or Ring"
@@ -2279,23 +2281,6 @@
       mode: dark
   - delay:
       seconds: 50
-  - service: script.inovelli_led_set_defaults
-    data:
-      entity_id:
-      - switch.garage_light
-      - switch.garage_entry_light
-      - switch.stair_light
-      - switch.xmas_light
-      color: Green
-      level_on: 8
-      level_off: 1
-  - service: script.inovelli_led_set_defaults
-    data:
-      entity_id:
-      - switch.office_switch
-      color: Green
-      level_on: 1
-      level_off: 1
   - service: button.press
     data:
       entity_id: button.ardena_publish_sensors
@@ -2415,35 +2400,23 @@
     notification_label: '{{ event_data.label|default("") }}'
     node_id: '{{ event_data.node_id|default("") }}'
 - id: '1665696751056'
-  alias: ⚙️ Event Sniffer [Zigbee]
-  description: Listen for Zigbee events
+  alias: ⚙️ Action Sniffer [Zigbee]
+  description: Listen for Zigbee actions
   trigger:
-  - platform: event
-    event_type: state_changed
-    event_data:
-      entity_id: sensor.hue_dimmer_switch_action
+  - platform: mqtt
+    topic: zigbee2mqtt/+/action
   condition: []
   action:
   - service: script.debug
     data:
       title: Zigbee Event Sniffer
-      message: 'event_type: {{ event_type }}
-
-        node_id: {{ node_id }}
-
-        label: {{ label }}
-
-        event_label: {{ event_label }}
-
-        event_data: {{ event_data }}'
+      message: '{{ trigger.payload }}'
+  - service: browser_mod.notification
+    data:
+      duration: 10000
+      message: '{{ trigger.payload }}'
   mode: parallel
   initial_state: false
-  variables:
-    event_data: '{{ trigger.event.data|default("") }}'
-    event_type: '{{ trigger.event.event_type|default("") }}'
-    event_label: '{{ event_data.event_label|default("") }}'
-    notification_label: '{{ event_data.label|default("") }}'
-    node_id: '{{ event_data.node_id|default("") }}'
 - id: '1665697122708'
   alias: "\U0001F4A7 Leak Detected"
   description: Shuts off the water main and sends a notification when a water leak
@@ -2665,23 +2638,23 @@
         entity_id: lock.lock_front
         state: locked
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
           - light.outside_front
-          effect: 'Off'
+          effect: Clear
     - conditions:
       - condition: state
         entity_id: lock.lock_front
         state: unlocked
       sequence:
-      - service: script.inovelli_led
+      - service: script.inovelli_blue_led
         data:
           entity_id:
           - light.outside_front
           color: Red
           effect: Pulse
-          level: 10
+          level: 40
   mode: restart
 - id: '1665699354951'
   alias: "\U0001F4CB [GE Light] Family Room"
@@ -2871,44 +2844,54 @@
       garbage_collection_entity: sensor.recycling
       holiday_entity: calendar.recycle_holiday
 - id: inovelli_garage_switch
-  alias: "\U0001F4CB [Inovelli] Garage Switch"
+  alias: "\U0001F9F0 [Inovelli] Garage Switch"
   description: Custom button actions for the Inovelli switch
-  use_blueprint:
-    path: kylerw/inovelli-lzw30-red-series-switch-using-the-new-zwave-js-integration.yaml
-    input:
-      zwave_device: fa521e089008584a32d7489825e15fa3
-      config_button:
+  trigger:
+  - platform: mqtt
+    topic: zigbee2mqtt/Garage/action
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == "config_single" }}'
+        alias: Action is 'Config Single'
+      sequence:
       - parallel:
-        - service: script.inovelli_led
+        - service: script.inovelli_blue_led
           data:
             entity_id:
-            - switch.garage_light
+            - light.garage
             color: Yellow
-            effect: Fast Blink
-            level: 10
-            duration: 3 Seconds
+            effect: Chase
+            level: 40
+            duration: 5 Seconds
         - service: homeassistant.toggle
           target:
             entity_id: cover.garage_door
           data: {}
       - delay:
-          seconds: 3
+          seconds: 5
       - service: automation.trigger
+        data:
+          skip_condition: true
         target:
           entity_id:
           - automation.garage_light_switch_status
-        data:
-          skip_condition: true
-      button_a2:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == "up_double" }}'
+        alias: Action is 'Up Double'
+      sequence:
       - parallel:
-        - service: script.inovelli_led
+        - service: script.inovelli_blue_led
           data:
             entity_id:
-            - switch.garage_light
+            - light.garage
             color: Yellow
-            effect: Fast Blink
-            level: 10
-            duration: 3 Seconds
+            effect: Chase
+            level: 40
+            duration: 5 Seconds
         - service: light.turn_on
           target:
             entity_id:
@@ -2917,98 +2900,128 @@
           data:
             brightness: 255
       - delay:
-          seconds: 3
+          seconds: 5
       - service: automation.trigger
         data:
           skip_condition: true
         target:
           entity_id: automation.garage_light_switch_status
-      button_a3:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == "up_triple" }}'
+        alias: Action is 'Up Triple'
+      sequence:
       - parallel:
-        - service: script.inovelli_led
+        - service: script.inovelli_blue_led
           data:
             entity_id:
-            - switch.garage_light
+            - light.garage
             color: Blue
-            effect: Fast Blink
-            level: 10
-            duration: 3 Seconds
+            effect: Chase
+            level: 60
+            duration: 5 Seconds
         - service: script.subaru_remote_start
           data: {}
       - delay:
-          seconds: 3
+          seconds: 5
       - service: automation.trigger
         data:
           skip_condition: true
         target:
           entity_id: automation.garage_light_switch_status
-      button_b3:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == "down_triple" }}'
+        alias: Action is 'Down Triple'
+      sequence:
       - parallel:
-        - service: script.inovelli_led
+        - service: script.inovelli_blue_led
           data:
             entity_id:
-            - switch.garage_light
+            - light.garage
             color: Yellow
-            effect: Fast Blink
-            level: 10
-            duration: 3 Seconds
+            effect: Chase
+            level: 60
+            duration: 5 Seconds
         - service: homeassistant.turn_off
           target:
             entity_id: group.lights_inside
           data: {}
       - delay:
-          seconds: 3
+          seconds: 5
       - service: automation.trigger
         data:
           skip_condition: true
         target:
           entity_id: automation.garage_light_switch_status
+  mode: parallel
+  variables:
+    device: '{{ trigger.topic.split(''/'')[1] }}'
+    action: '{{ trigger.payload }}'
 - id: inovelli_office_switch
-  alias: "\U0001F4CB [Inovelli] Office Switch"
+  alias: "\U0001F9F0 [Inovelli] Office Switch"
   description: Custom button actions for the Inovelli switch
-  use_blueprint:
-    path: kylerw/inovelli-lzw30-red-series-switch-using-the-new-zwave-js-integration.yaml
-    input:
-      zwave_device: 96656a8bd35a1f2d1fba587ff70f8f9c
-      button_a:
+  trigger:
+  - platform: mqtt
+    topic: zigbee2mqtt/Office Switch/action
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''up_single'' }}'
+        alias: Action is 'Up Single'
+      sequence:
       - service: script.office_lights_on
         data: {}
-      button_b:
-      - service: homeassistant.turn_off
-        target:
-          entity_id:
-          - light.office_light
-          - light.office_lamp
-          - switch.office_shelf_led
-          - light.office_desk_led
-        data: {}
-      button_a2:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''up_double'' }}'
+        alias: Action is 'Up Double'
+      sequence:
       - parallel:
-        - service: script.inovelli_led_status_start
+        - service: script.inovelli_blue_led_status_start
           data:
             entity_id:
-            - switch.office_switch
+            - light.office_switch
             color_start: Yellow
-            effect_start: Fast Blink
-            duration: 3 Seconds
-            level_start: 10
+            effect_start: Chase
+            duration: 5 Seconds
+            level_start: 60
             color_end: Green
-            effect_end: Solid
-            level_end: 8
+            effect_end: Clear
+            level_end: 40
         - service: script.office_lights_day_mode
           data: {}
-      button_b2:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''down_single'' }}'
+        alias: Action is 'Down Single'
+      sequence:
+      - service: homeassistant.turn_off
+        data: {}
+        target:
+          entity_id: group.lights_office
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''down_double'' }}'
+        alias: Action is 'Down Double'
+      sequence:
       - parallel:
-        - service: script.inovelli_led_status_start
+        - service: script.inovelli_blue_led_status_start
           data:
             entity_id:
-            - switch.office_switch
+            - light.office_switch
             color_start: Yellow
-            effect_start: Fast Blink
-            duration: 3 Seconds
-            level_start: 10
+            effect_start: Chase
+            duration: 5 Seconds
+            level_start: 60
             color_end: Green
-            effect_end: Solid
-            level_end: 8
+            effect_end: Clear
+            level_end: 40
         - service: script.office_lights_night_mode
           data: {}
+  mode: parallel
+  variables:
+    device: '{{ trigger.topic.split(''/'')[1] }}'
+    action: '{{ trigger.payload }}'
