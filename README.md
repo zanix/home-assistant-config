@@ -234,7 +234,7 @@ HACS gives you a powerful UI to handle downloads of all your custom needs.
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Hass.Agent](https://github.com/LAB02-Research/HASS.Agent-Integration) [v2022.10.26]
+### [Hass.Agent](https://github.com/LAB02-Research/HASS.Agent-Integration) [v2022.10.31]
 
 HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capabilities to HASS.Agent - a Windows based client for Home Assistant.
 
@@ -252,7 +252,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b16]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b19]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -270,7 +270,7 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.4]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.5]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -330,11 +330,11 @@ Battery state card for Home Assistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.33]
+### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.34]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.29]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.30]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -366,7 +366,7 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.1.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.1.1]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -394,7 +394,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 A progress bar display for Home Assistant timers
 
-### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.11.1]
+### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.12.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
