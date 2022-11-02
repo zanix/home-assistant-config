@@ -3,7 +3,7 @@
 # Originally in a script by Kevin Schlichter https://github.com/kschlichter/Home-Assistant-Inovelli-Red-Dimmer-Switch
 #
 inovelli_led_set_defaults:
-  alias: 'Inovelli LED (Set Defaults)'
+  alias: 'Inovelli LED Red - Set Defaults'
   description: 'Set the default/initial state of the LED light on Inovelli devices.'
   icon: mdi:led-outline
 
@@ -26,7 +26,19 @@ inovelli_led_set_defaults:
       example: Yellow
       selector:
         select:
-          options: !include ../../templates/inovelli_colors_select.yaml
+          options:
+            - "Off"
+            - Red
+            - Orange
+            - Yellow
+            - Green
+            - Cyan
+            - Teal
+            - Blue
+            - Purple
+            - Light Pink
+            - Pink
+            - White
     level_on:
       name: 'Brightness level on'
       description: 'LED brightness when the switch is on. Value from 0 (off) to 10 (100% brightness).'
@@ -58,7 +70,19 @@ inovelli_led_set_defaults:
     entity_list: '{{ entity_id }}'
     level_on: '{{ level_on|default("8")|int }}'
     level_off: '{{ level_off|default("1")|int }}'
-    colors: !include ../../templates/inovelli_colors_values.yaml
+    colors:
+      'Off': 0
+      'Red': 1
+      'Orange': 21
+      'Yellow': 42
+      'Green': 85
+      'Cyan': 127
+      'Teal': 145
+      'Blue': 170
+      'Purple': 195
+      'Light Pink': 220
+      'Pink': 234
+      'White': 255
 
     parameters:
       dimmer:
@@ -81,12 +105,12 @@ inovelli_led_set_defaults:
   sequence:
     - variables:
         color: >-
-          {% if color is not number %}
+          {% if color|int(default=-1) == -1 %}
             {% set color = color|default("Yellow")|title %}
+            {{ colors[color|title]|int(default=0) }}
           {% else %}
-            {% set color = color|int(default=0) %}
+            {{ color|int(default=0) }}
           {% endif %}
-          {{ colors[color|title]|int(default=0) }}
 
     # Loop through each entity_id
     - repeat:
@@ -129,9 +153,9 @@ inovelli_led_set_defaults:
               - condition: template
                 value_template: '{{ debug == true }}'
             then:
-              - service: script.debug
+              - service: persistent_notification.create
                 data:
-                  id: 'inovelli_led_set_defaults_{{ repeat.item }}'
+                  notification_id: 'inovelli_led_set_defaults_{{ repeat.item }}'
                   title: 'DEBUG: script.inovelli_led_set_defaults'
                   message: |-
                     device: {{ repeat.item }}
