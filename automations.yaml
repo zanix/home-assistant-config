@@ -2865,13 +2865,13 @@
             color: Yellow
             effect: Chase
             level: 40
-            duration: 5 Seconds
+            duration: 3 Seconds
         - service: homeassistant.toggle
           target:
             entity_id: cover.garage_door
           data: {}
       - delay:
-          seconds: 5
+          seconds: 3
       - service: automation.trigger
         data:
           skip_condition: true
@@ -2891,7 +2891,7 @@
             color: Yellow
             effect: Chase
             level: 40
-            duration: 5 Seconds
+            duration: 3 Seconds
         - service: light.turn_on
           target:
             entity_id:
@@ -2900,7 +2900,7 @@
           data:
             brightness: 255
       - delay:
-          seconds: 5
+          seconds: 3
       - service: automation.trigger
         data:
           skip_condition: true
@@ -2919,11 +2919,11 @@
             color: Blue
             effect: Chase
             level: 60
-            duration: 5 Seconds
+            duration: 3 Seconds
         - service: script.subaru_remote_start
           data: {}
       - delay:
-          seconds: 5
+          seconds: 3
       - service: automation.trigger
         data:
           skip_condition: true
@@ -2942,13 +2942,13 @@
             color: Yellow
             effect: Chase
             level: 60
-            duration: 5 Seconds
+            duration: 3 Seconds
         - service: homeassistant.turn_off
           target:
             entity_id: group.lights_inside
           data: {}
       - delay:
-          seconds: 5
+          seconds: 3
       - service: automation.trigger
         data:
           skip_condition: true
@@ -2986,7 +2986,7 @@
             - light.office_switch
             color_start: Yellow
             effect_start: Chase
-            duration: 5 Seconds
+            duration: 3 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3014,7 +3014,7 @@
             - light.office_switch
             color_start: Yellow
             effect_start: Chase
-            duration: 5 Seconds
+            duration: 3 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3025,6 +3025,16 @@
   variables:
     device: '{{ trigger.topic.split(''/'')[1] }}'
     action: '{{ trigger.payload }}'
+- id: '1665723292840'
+  alias: "\U0001F4CB [Controller] Hue Dimmer Switch"
+  description: ''
+  use_blueprint:
+    path: EPMatt/philips_324131092621.yaml
+    input:
+      integration: Zigbee2MQTT
+      controller_entity: sensor.hue_dimmer_switch_action
+      helper_last_controller_event: input_text.hue_dimmer_switch_event
+      helper_double_press_delay: 400
 - id: '1665723372482'
   alias: "\U0001F4CB [Controller] Ikea 5-Button Remote"
   description: ''
@@ -3072,3 +3082,170 @@
         data: {}
         target:
           entity_id: fan.master_bedroom
+- id: '1667446863239'
+  alias: "\U0001F9F0 [Inovelli] Living Room Switch"
+  description: Custom button actions for the Inovelli switch
+  trigger:
+  - platform: mqtt
+    topic: zigbee2mqtt/Living Room/action
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''config_single'' }}'
+        alias: Action is 'Config Single'
+      sequence:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.living_room
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: light.toggle
+          data: {}
+          target:
+            entity_id:
+            - light.living_room_lamp
+            - light.living_room_floor_lamp
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''config_double'' }}'
+        alias: Action is 'Config Double'
+      sequence:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.living_room
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: homeassistant.turn_off
+          data: {}
+          target:
+            entity_id: group.lights_living_room
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''down_double'' }}'
+        alias: Action is 'Down Double'
+      sequence:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.living_room
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - if:
+          - condition: state
+            entity_id: light.living_room
+            state: 'off'
+          then:
+          - service: light.turn_on
+            data:
+              brightness_pct: 20
+            target:
+              entity_id: light.living_room
+        - service: light.turn_on
+          data:
+            brightness_pct: 5
+          target:
+            entity_id: light.living_room
+  mode: parallel
+  variables:
+    device: '{{ trigger.topic.split(''/'')[1] }}'
+    action: '{{ trigger.payload }}'
+- id: '1667448537095'
+  alias: "\U0001F9F0 [Inovelli] Kitchen Switch"
+  description: Custom button actions for the Inovelli switch
+  trigger:
+  - platform: mqtt
+    topic: zigbee2mqtt/Kitchen/action
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''config_single'' }}'
+        alias: Action is 'Config Single'
+      sequence:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.kitchen
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: switch.toggle
+          data: {}
+          target:
+            entity_id:
+            - switch.dining_room_light
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''config_double'' }}'
+        alias: Action is 'Config Double'
+      sequence:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.kitchen
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: homeassistant.turn_off
+          data: {}
+          target:
+            entity_id: group.lights_kitchen
+    - conditions:
+      - condition: template
+        value_template: '{{ action == ''down_double'' }}'
+        alias: Action is 'Down Double'
+      sequence:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.kitchen
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: light.turn_on
+          data:
+            brightness_pct: 5
+          target:
+            entity_id: light.kitchen
+  mode: parallel
+  variables:
+    device: '{{ trigger.topic.split(''/'')[1] }}'
+    action: '{{ trigger.payload }}'
