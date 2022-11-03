@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2206 total entities**,
-including **759 sensors**.
+This Home Assistant install has approximately **2234 total entities**,
+including **789 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -334,7 +334,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.30]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.31]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -354,7 +354,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.2.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.3.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -394,7 +394,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 A progress bar display for Home Assistant timers
 
-### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.12.0]
+### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.12.1]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
@@ -542,7 +542,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.10.5-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.11.0-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
