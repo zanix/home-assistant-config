@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2236 total entities**,
-including **789 sensors**.
+This Home Assistant install has approximately **2242 total entities**,
+including **791 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -515,7 +515,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ## Automations
 
-This Home Assistant install has approximately **135 automations**.
+This Home Assistant install has approximately **137 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
@@ -541,7 +541,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.11.0-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.11.1-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
