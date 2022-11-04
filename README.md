@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2234 total entities**,
+This Home Assistant install has approximately **2236 total entities**,
 including **789 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -354,7 +354,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.3.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.3.2]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -386,7 +386,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 🔹 Display whatever you want in an entities card row.
 
-### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.2.1]
+### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.3.1]
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
@@ -456,7 +456,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
 - [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
 - [Philips Hue White Ambiance](https://www.amazon.com/dp/B0753H5GKN)
-- [DreamScreen](https://www.dreamscreentv.com/) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
+- [DreamScreen](https://www.amazon.com/dp/B01M6UETVR/) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
 - [WLED](https://github.com/Aircoookie/WLED) - DIY light strip
 
 ### Sensor
