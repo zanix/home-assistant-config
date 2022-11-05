@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2242 total entities**,
-including **791 sensors**.
+This Home Assistant install has approximately **2236 total entities**,
+including **784 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -406,7 +406,7 @@ Weather Card with animated icons for Home Assistant Lovelace
 
 </details><details><summary>4 Themes</summary>
 
-### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v1.7.1]
+### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v1.7.2]
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 

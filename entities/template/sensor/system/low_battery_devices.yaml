@@ -14,6 +14,7 @@ sensor:
         mdi:battery-alert
       {% endif %}
     state: >-
+      {% set threshold = 30 %}
       {% set ignore_entities = [
         "sensor.galaxy_s21_battery_level",
         "sensor.pixel_6_battery_level",
@@ -24,11 +25,34 @@ sensor:
         | reject('in', ['unknown', 'unavailable', 'undefined'])
         | rejectattr('entity_id', 'in', ignore_entities)
         | rejectattr('attributes.device_class', 'undefined')
-        | selectattr('attributes.device_class', 'eq', 'battery')
+        | selectattr('attributes.device_class', '==', 'battery')
         | map(attribute='state')
         | map('int', -1)
-        | select('le', 30)
-        | select('ge', 0)
+        | select('<=', threshold)
+        | select('>=', 0)
         | list
         | count
       }}
+    attributes:
+      entity_id: >-
+        {% set threshold = 30 %}
+        {% set ignore_entities = [
+          'sensor.galaxy_s21_battery_level',
+          'sensor.pixel_6_battery_level',
+          'sensor.ipad_josh_battery_level',
+          'sensor.quest_battery_level'
+        ] %}
+        {% set result = namespace(devices=[]) %}
+        {% set devices = states.sensor
+          | reject('in', ['unknown', 'unavailable', 'undefined'])
+          | rejectattr('entity_id', 'in', ignore_entities)
+          | rejectattr('attributes.device_class', 'undefined')
+          | selectattr('attributes.device_class', '==', 'battery')
+          | list
+        %}
+        {% for device in devices %}
+          {% if device.state | int(-1) <= threshold %}
+            {% set result.devices = result.devices + [device.entity_id] %}
+          {% endif %}
+        {% endfor %}
+        {{ result.devices }}
