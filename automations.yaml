@@ -1022,25 +1022,25 @@
       entity_id: timer.dishwasher_run_time
     data: {}
   - parallel:
-      - service: script.notify_mobile
-        data:
-          who: parents
-          title: Dishwasher
-          message: The dishwasher is done!
-          icon: local/icons/dishwasher.png
-          tag: dishwasher
-      - service: script.notify_hass_agent
-        data:
-          computer: erebus
-          title: Dishwasher
-          message: The dishwasher is done!
-      - service: script.notify_join
-        data:
-          who: shield_all
-          title: Dishwasher
-          message: The dishwasher is done!
-          icon: local/icons/dishwasher.png
-          tag: dishwasher
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: Dishwasher
+        message: The dishwasher is done!
+        icon: local/icons/dishwasher.png
+        tag: dishwasher
+    - service: script.notify_hass_agent
+      data:
+        computer: erebus
+        title: Dishwasher
+        message: The dishwasher is done!
+    - service: script.notify_join
+      data:
+        who: shield_all
+        title: Dishwasher
+        message: The dishwasher is done!
+        icon: local/icons/dishwasher.png
+        tag: dishwasher
   mode: single
 - id: '1665687879665'
   alias: "\U0001F4AC Door Closed"
@@ -2416,11 +2416,11 @@
       "") }}'
     title: 'HACS: {{ trigger.to_state.state|int }} {{ updates }} Pending'
     message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
-      -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n
-      \   {% set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo['installed_version']
-      ~ '</em> -> <em>' ~ repo['available_version'] ~ '</em>' %}\n    {%- set
-      list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
-      -%} {{ list.updates | join('<br>') }}"
+      -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n    {%
+      set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo['installed_version']
+      ~ '</em> -> <em>' ~ repo['available_version'] ~ '</em>' %}\n    {%- set list.updates
+      = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
+      | join('<br>') }}"
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
   description: Sends a notification when the RAM usage is high
@@ -2553,14 +2553,13 @@
     action_1_uri: '{{ release_notes }}'
     action_2_title: HassPodcast
     action_2_uri: https://hasspodcast.io/episodes
-    actions: "{%- set titles = [action_1_title, action_2_title] -%} {%- set
-      uris = [action_1_uri, action_2_uri] -%} {%- set actions = namespace(data
-      = []) -%} {%- for title in titles -%}\n  {% if title|length %}\n    {%
-      set uri = uris[loop.index - 1] %}\n    {% set action_name = 'action' ~
-      loop.index|string %}\n    {% set action = {\n      'action': 'URI' if
-      uri|length else action_name,\n      'title': title,\n      'uri': uri\n
-      \     }\n    %}\n    {% set actions.data = actions.data + [action] %}\n
-      \ {% endif %}\n{% endfor %} {{ actions.data }}"
+    actions: "{%- set titles = [action_1_title, action_2_title] -%} {%- set uris =
+      [action_1_uri, action_2_uri] -%} {%- set actions = namespace(data = []) -%}
+      {%- for title in titles -%}\n  {% if title|length %}\n    {% set uri = uris[loop.index
+      - 1] %}\n    {% set action_name = 'action' ~ loop.index|string %}\n    {% set
+      action = {\n      'action': 'URI' if uri|length else action_name,\n      'title':
+      title,\n      'uri': uri\n      }\n    %}\n    {% set actions.data = actions.data
+      + [action] %}\n  {% endif %}\n{% endfor %} {{ actions.data }}"
 - id: '1665696688106'
   alias: ⚙️ Event Sniffer [Z-Wave JS]
   description: Listen for Z-Wave JS events
@@ -3035,190 +3034,6 @@
     input:
       garbage_collection_entity: sensor.recycling
       holiday_entity: calendar.recycle_holiday
-- id: inovelli_garage_switch
-  alias: "\U0001F9F0 [Inovelli] Garage Switch"
-  description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Garage/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "config_single" }}'
-        alias: Action is 'Config Single'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led
-          data:
-            entity_id:
-            - light.garage
-            color: Yellow
-            effect: Chase
-            level: 40
-            duration: 3 Seconds
-        - service: homeassistant.toggle
-          target:
-            entity_id: cover.garage_door
-          data: {}
-      - delay:
-          seconds: 3
-      - service: automation.trigger
-        data:
-          skip_condition: true
-        target:
-          entity_id:
-          - automation.garage_light_switch_status
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "up_double" }}'
-        alias: Action is 'Up Double'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led
-          data:
-            entity_id:
-            - light.garage
-            color: Yellow
-            effect: Chase
-            level: 40
-            duration: 3 Seconds
-        - service: light.turn_on
-          target:
-            entity_id:
-            - light.living_room
-            - light.kitchen
-          data:
-            brightness: 255
-      - delay:
-          seconds: 3
-      - service: automation.trigger
-        data:
-          skip_condition: true
-        target:
-          entity_id: automation.garage_light_switch_status
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "up_triple" }}'
-        alias: Action is 'Up Triple'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led
-          data:
-            entity_id:
-            - light.garage
-            color: Blue
-            effect: Chase
-            level: 60
-            duration: 3 Seconds
-        - service: script.subaru_remote_start
-          data: {}
-      - delay:
-          seconds: 3
-      - service: automation.trigger
-        data:
-          skip_condition: true
-        target:
-          entity_id: automation.garage_light_switch_status
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_triple" }}'
-        alias: Action is 'Down Triple'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led
-          data:
-            entity_id:
-            - light.garage
-            color: Yellow
-            effect: Chase
-            level: 60
-            duration: 3 Seconds
-        - service: homeassistant.turn_off
-          target:
-            entity_id: group.lights_inside
-          data: {}
-      - delay:
-          seconds: 3
-      - service: automation.trigger
-        data:
-          skip_condition: true
-        target:
-          entity_id: automation.garage_light_switch_status
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
-- id: inovelli_office_switch
-  alias: "\U0001F9F0 [Inovelli] Office Switch"
-  description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Office Switch/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "up_single" }}'
-        alias: Action is 'Up Single'
-      sequence:
-      - service: script.office_lights_on
-        data: {}
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "up_double" }}'
-        alias: Action is 'Up Double'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
-            entity_id:
-            - light.office_switch
-            color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-        - service: script.office_lights_day_mode
-          data: {}
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_single" }}'
-        alias: Action is 'Down Single'
-      sequence:
-      - service: homeassistant.turn_off
-        data: {}
-        target:
-          entity_id: group.lights_office
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
-            entity_id:
-            - light.office_switch
-            color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-        - service: script.office_lights_night_mode
-          data: {}
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
 - id: '1665723292840'
   alias: "\U0001F4CB [Controller] Hue Dimmer Switch"
   description: ''
@@ -3280,20 +3095,181 @@
           entity_id: fan.master_bedroom
       button_up_long_loop: false
       button_down_long_loop: false
-- id: '1667446863239'
-  alias: "\U0001F9F0 [Inovelli] Living Room Switch"
+- id: '1667779119970'
+  alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Living Room/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "config_single" }}'
-        alias: Action is 'Config Single'
-      sequence:
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.ethan_action
+      down_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 5
+        target:
+          entity_id: light.ethan
+- id: '1667779287274'
+  alias: "\U0001F4CB [Inovelli] Family Room Switch"
+  description: Custom button actions for the Inovelli switch
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.family_room_action
+      down_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 25
+        target:
+          entity_id: light.family_room
+- id: '1667779442976'
+  alias: "\U0001F4CB [Inovelli] Garage Switch"
+  description: Custom button actions for the Inovelli switch
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.garage_action
+      config_single:
+      - parallel:
+        - service: script.inovelli_blue_led
+          data:
+            entity_id:
+            - light.garage
+            color: Yellow
+            effect: Chase
+            level: 40
+            duration: 3 Seconds
+        - service: homeassistant.toggle
+          target:
+            entity_id: cover.garage_door
+          data: {}
+      - delay:
+          seconds: 3
+      - service: automation.trigger
+        data:
+          skip_condition: true
+        target:
+          entity_id:
+          - automation.garage_light_switch_status
+      up_double:
+      - parallel:
+        - service: script.inovelli_blue_led
+          data:
+            entity_id:
+            - light.garage
+            color: Yellow
+            effect: Chase
+            level: 40
+            duration: 3 Seconds
+        - service: light.turn_on
+          target:
+            entity_id:
+            - light.living_room
+            - light.kitchen
+          data:
+            brightness: 255
+      - delay:
+          seconds: 3
+      - service: automation.trigger
+        data:
+          skip_condition: true
+        target:
+          entity_id: automation.garage_light_switch_status
+      up_triple:
+      - parallel:
+        - service: script.inovelli_blue_led
+          data:
+            entity_id:
+            - light.garage
+            color: Blue
+            effect: Chase
+            level: 60
+            duration: 3 Seconds
+        - service: script.subaru_remote_start
+          data: {}
+      - delay:
+          seconds: 3
+      - service: automation.trigger
+        data:
+          skip_condition: true
+        target:
+          entity_id: automation.garage_light_switch_status
+      down_triple:
+      - parallel:
+        - service: script.inovelli_blue_led
+          data:
+            entity_id:
+            - light.garage
+            color: Yellow
+            effect: Chase
+            level: 60
+            duration: 3 Seconds
+        - service: homeassistant.turn_off
+          target:
+            entity_id: group.lights_inside
+          data: {}
+      - delay:
+          seconds: 3
+      - service: automation.trigger
+        data:
+          skip_condition: true
+        target:
+          entity_id: automation.garage_light_switch_status
+- id: '1667779560311'
+  alias: "\U0001F4CB [Inovelli] Kitchen Switch"
+  description: Custom button actions for the Inovelli switch
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.kitchen_action
+      config_single:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.kitchen
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: switch.toggle
+          data: {}
+          target:
+            entity_id:
+            - switch.dining_room_light
+      config_double:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.kitchen
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: homeassistant.turn_off
+          data: {}
+          target:
+            entity_id: group.lights_kitchen
+      down_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 5
+        target:
+          entity_id: light.kitchen
+- id: '1667779650555'
+  alias: "\U0001F4CB [Inovelli] Living Room Switch"
+  description: Custom button actions for the Inovelli switch
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.living_room_action
+      config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
           data:
@@ -3312,11 +3288,7 @@
             entity_id:
             - light.living_room_lamp
             - light.living_room_floor_lamp
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "config_double" }}'
-        alias: Action is 'Config Double'
-      sequence:
+      config_double:
       - parallel:
         - service: script.inovelli_blue_led_status_start
           data:
@@ -3333,181 +3305,93 @@
           data: {}
           target:
             entity_id: group.lights_living_room
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
+      down_double:
       - service: light.turn_on
         data:
           brightness_pct: 5
         target:
           entity_id: light.living_room
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
-- id: '1667448537095'
-  alias: "\U0001F9F0 [Inovelli] Kitchen Switch"
+- id: '1667779709981'
+  alias: "\U0001F4CB [Inovelli] Master Bedroom Switch"
   description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Kitchen/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "config_single" }}'
-        alias: Action is 'Config Single'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
-            entity_id:
-            - light.kitchen
-            color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-        - service: switch.toggle
-          data: {}
-          target:
-            entity_id:
-            - switch.dining_room_light
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "config_double" }}'
-        alias: Action is 'Config Double'
-      sequence:
-      - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
-            entity_id:
-            - light.kitchen
-            color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-        - service: homeassistant.turn_off
-          data: {}
-          target:
-            entity_id: group.lights_kitchen
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.kitchen
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
-- id: '1667586461719'
-  alias: "\U0001F9F0 [Inovelli] Master Bedroom Switch"
-  description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Master Bedroom/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.master_bedroom_action
+      down_double:
       - service: light.turn_on
         data:
           brightness_pct: 5
         target:
           entity_id: light.master_bedroom
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
-- id: '1667586656539'
-  alias: "\U0001F9F0 [Inovelli] Ethan Switch"
+- id: '1667779857021'
+  alias: "\U0001F4CB [Inovelli] Office Switch"
   description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Ethan/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      up_single:
+      - service: script.office_lights_on
+        data: {}
+      up_double:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.office_switch
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: script.office_lights_day_mode
+          data: {}
+      down_single:
+      - service: homeassistant.turn_off
+        data: {}
         target:
-          entity_id: light.ethan
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
-- id: '1667716646076'
-  alias: "\U0001F9F0 [Inovelli] Family Room Switch"
+          entity_id: group.lights_office
+      down_double:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.office_switch
+            color_start: Yellow
+            effect_start: Chase
+            duration: 3 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: script.office_lights_night_mode
+          data: {}
+      switch: sensor.office_switch_action
+- id: '1667779947579'
+  alias: "\U0001F4CB [Inovelli] Play Space Switch"
   description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Family Room/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
-      - service: light.turn_on
-        data:
-          brightness_pct: 25
-        target:
-          entity_id: light.family_room
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
-- id: '1667716851524'
-  alias: "\U0001F9F0 [Inovelli] Play Space Switch"
-  description: Custom button actions for the Inovelli switch
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/Play Space/action
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ action == "down_double" }}'
-        alias: Action is 'Down Double'
-      sequence:
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.play_space_action
+      down_double:
       - service: light.turn_on
         data:
           brightness_pct: 12
         target:
           entity_id: light.play_space
-  mode: single
-  max_exceeded: silent
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
+- id: '1667780182339'
+  alias: "\U0001F4CB [Inovelli] Guest Room Switch"
+  description: Custom button actions for the Inovelli switch
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.guest_room_action
+      down_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 5
+        target:
+          entity_id: light.guest_room
