@@ -354,7 +354,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.3.5]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.3.6]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
