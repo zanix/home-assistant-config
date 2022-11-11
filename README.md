@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2255 total entities**,
+This Home Assistant install has approximately **2252 total entities**,
 including **792 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -33,6 +33,10 @@ The airnow integration uses the AirNow web service as a source for air quality d
 ### [Android TV](https://www.home-assistant.io/integrations/androidtv)
 
 The androidtv platform allows you to control an Android TV device or Amazon Fire TV device
+
+### [Denon AVR Network Receivers](https://www.home-assistant.io/integrations/denonavr)
+
+The denonavr platform allows you to control Denon Network Receivers from Home Assistant
 
 ### [EcoBee](https://www.home-assistant.io/integrations/ecobee)
 
@@ -99,10 +103,6 @@ The Moon integration tracks the phases of the moon
 ### [MQTT](https://www.home-assistant.io/integrations/mqtt)
 
 Allows extremely lightweight publish/subscribe messaging transport
-
-### [Onkyo](https://www.home-assistant.io/integrations/onkyo)
-
-The onkyo platform allows you to control a Onkyo, Integra and some recent Pioneer receivers
 
 ### [OpenGarage](https://www.home-assistant.io/integrations/opengarage)
 
@@ -519,7 +519,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ## Automations
 
-This Home Assistant install has approximately **137 automations**.
+This Home Assistant install has approximately **138 automations**.
 
 For more details, see the automation folder and automation blocks within integrations.
 
