@@ -723,10 +723,11 @@
   condition: []
   action:
   - service: light.turn_on
-    entity_id: light.outside_front
     data:
-      brightness: 13
       transition: 360
+      brightness_pct: 2
+    target:
+      entity_id: light.outside_front
   mode: single
 - id: '1665686521519'
   alias: "\U0001F4A1 Front Lights off at Sunrise"
@@ -2396,7 +2397,12 @@
         data:
           who: josh
           title: '{{ title }}'
-          message: '{{ message }}'
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
+            -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n
+            \   {% set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo['installed_version']
+            ~ '</em> -> <em>' ~ repo['available_version'] ~ '</em>' %}\n    {%- set
+            list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
+            -%} {{ list.updates | join('<br>') }}"
           icon: local/icons/update.png
           group: Upgrade
           tag: hacs-update
@@ -2405,18 +2411,17 @@
         data:
           computer: erebus
           title: '{{ title }}'
-          message: '{{ message }}'
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
+            -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n
+            \   {% set update = repo.display_name ~ ': ' ~ repo['installed_version']
+            ~ ' -> ' ~ repo['available_version'] %}\n    {%- set list.updates = list.updates
+            + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('\\n')
+            }}"
   mode: single
   variables:
     updates: '{{ iif(trigger.to_state.state|int(default=0) == 1, "Update", "Updates",
       "") }}'
     title: 'HACS: {{ trigger.to_state.state|int }} {{ updates }} Pending'
-    message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
-      -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n    {%
-      set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo['installed_version']
-      ~ '</em> -> <em>' ~ repo['available_version'] ~ '</em>' %}\n    {%- set list.updates
-      = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
-      | join('<br>') }}"
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
   description: Sends a notification when the RAM usage is high
@@ -2502,19 +2507,19 @@
           message: '**Home Assistant** _{{ current_version }}_ -> _{{ available_version
             }}_
 
-
             {{ release_title }}
 
-
-            [{{ action_1_title }}]({{ action_1_uri }}) | [ {{ action_2_title }}]({{
+            [{{ action_1_title }}]({{ action_1_uri }}) | [{{ action_2_title }}]({{
             action_2_uri }})'
           notification_id: upgrade-available
       - service: script.notify_mobile
         data:
           who: josh
           title: Upgrade Available
-          message: <b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{
-            available_version }}</em><br> {{ release_title }}
+          message: '<b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{
+            available_version }}</em><br>
+
+            {{ release_title }}'
           icon: local/icons/update.png
           url: '{{ release_notes }}'
           group: Upgrade
@@ -2524,8 +2529,10 @@
         data:
           computer: erebus
           title: Upgrade Available
-          message: <b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{
-            available_version }}</em><br> {{ release_title }}
+          message: 'Home Assistant: {{ current_version }} -> {{ available_version
+            }}
+
+            {{ release_title }}'
           actions: '{{ actons }}'
     else:
     - service: persistent_notification.dismiss
@@ -3114,9 +3121,12 @@
       down_double:
       - service: light.turn_on
         data:
-          brightness_pct: 25
+          brightness_pct: 20
         target:
           entity_id: light.family_room
+      config_single:
+      - service: script.family_room_game_light_mode
+        data: {}
 - id: '1667779442976'
   alias: "\U0001F4CB [Inovelli] Garage Switch"
   description: Custom button actions for the Inovelli switch
@@ -3375,7 +3385,7 @@
       down_double:
       - service: light.turn_on
         data:
-          brightness_pct: 12
+          brightness_pct: 6
         target:
           entity_id: light.play_space
 - id: '1667780182339'
