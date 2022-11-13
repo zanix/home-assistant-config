@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2252 total entities**,
-including **792 sensors**.
+This Home Assistant install has approximately **2250 total entities**,
+including **793 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -334,7 +334,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.34]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.35]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -350,7 +350,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Minimalistic graph card for Home Assistant Lovelace UI
 
-### [Mini Media Player](https://github.com/kalkih/mini-media-player) [v1.16.4]
+### [Mini Media Player](https://github.com/kalkih/mini-media-player) [v1.16.5]
 
 Minimalistic media card for Home Assistant Lovelace UI
 
