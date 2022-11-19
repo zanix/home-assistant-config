@@ -753,48 +753,42 @@ views:
                 action: navigate
                 navigation_path: security
               type: template
-            - chip:
-                content: '{{ expand(entity) | selectattr("state", "==", "on") | list
-                  | count }}'
-                entity: group.all_doors
-                icon: mdi:door-open
-                icon_color: cyan
-                tap_action:
-                  action: fire-dom-event
-                  browser_mod:
-                    data:
-                      content:
-                        card:
-                          cards: []
-                          layout_type: masonry
-                          type: custom:layout-card
-                        filter:
-                          exclude: []
-                          include:
-                          - group: group.all_doors
-                            options:
-                              card_mod:
-                                style: "ha-card {\n  padding: 4px 12px !important;\n\
-                                  }\n"
-                              hold_action:
-                                action: none
-                              layout: horizontal
-                              secondary_info: last-changed
-                              tap_action:
-                                action: none
-                              type: custom:mushroom-entity-card
-                            state: 'on'
-                        show_empty: false
-                        sort:
-                          method: friendly_name
-                        type: custom:auto-entities
-                      title: Open Doors
-                    service: browser_mod.popup
-                type: template
-              conditions:
-              - entity: group.all_doors
-                state: 'on'
-              type: conditional
+            - content: '{{ expand(entity) | selectattr("state", "==", "on") | list
+                | count }}'
+              entity: group.all_doors
+              icon: '{{ iif(is_state(entity, "on"), "mdi:door-open", "mdi:door") }}'
+              icon_color: '{{ iif(is_state(entity, "on"), "cyan", "disabled") }}'
+              tap_action:
+                action: fire-dom-event
+                browser_mod:
+                  data:
+                    content:
+                      card:
+                        cards: []
+                        layout_type: masonry
+                        type: custom:layout-card
+                      filter:
+                        exclude: []
+                        include:
+                        - group: group.all_doors
+                          options:
+                            card_mod:
+                              style: "ha-card {\n  padding: 4px 12px !important;\n\
+                                }\n"
+                            hold_action:
+                              action: none
+                            layout: horizontal
+                            secondary_info: last-changed
+                            tap_action:
+                              action: none
+                            type: custom:mushroom-entity-card
+                      show_empty: false
+                      sort:
+                        method: friendly_name
+                      type: custom:auto-entities
+                    title: All Doors
+                  service: browser_mod.popup
+              type: template
             - content: "{% if is_state(entity, \"off\") %}\n  Off\n{% else %}\n  {{\
                 \ state_attr(\"climate.home\", \"hvac_action\") | capitalize }}\n\
                 {% endif %}"
@@ -841,21 +835,26 @@ views:
                 action: navigate
                 navigation_path: power
               type: template
+            type: custom:mushroom-chips-card
+          - alignment: justify
+            card_mod:
+              style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                \ none;\n  --chip-spacing: 0;\n}\n"
+            chips:
             - content: "{% set ns = namespace(entities=[]) %} {% set computers = [\n\
                 \  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
-                ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
-                ,\n  \"light.magicmirror\"\n] %} {% for entity_id in computers %}\n\
-                \  {% if is_state(entity_id, \"on\") %}\n    {% set ns.entities =\
-                \ ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %} {{ ns.entities\
-                \ | count }}"
+                ,\n  \"binary_sensor.athos_connected\"\n] %} {% for entity_id in computers\
+                \ %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set ns.entities\
+                \ = ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %} {{\
+                \ ns.entities | count }}"
               icon: mdi:desktop-tower
               icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers\
                 \ = [\n  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.ardena_connected\"\
-                ,\n  \"binary_sensor.athos_connected\",\n  \"binary_sensor.quest_interactive\"\
-                ,\n  \"light.magicmirror\"\n] %}\n{% for entity_id in computers %}\n\
-                \  {% if is_state(entity_id, \"on\") %}\n    {% set ns.entities =\
-                \ ns.entities + [ entity_id ] %}\n  {% endif %}\n{% endfor %}\n{{\
-                \ \"teal\" if ns.entities | count > 0 else \"disabled\" }}"
+                ,\n  \"binary_sensor.athos_connected\"\n] %}\n{% for entity_id in\
+                \ computers %}\n  {% if is_state(entity_id, \"on\") %}\n    {% set\
+                \ ns.entities = ns.entities + [ entity_id ] %}\n  {% endif %}\n{%\
+                \ endfor %}\n{{ \"teal\" if ns.entities | count > 0 else \"disabled\"\
+                \ }}"
               tap_action:
                 action: navigate
                 navigation_path: computer
@@ -1529,6 +1528,50 @@ views:
                   type: vertical-stack
                 title: Allergy / Asthma
               service: browser_mod.popup
+          type: template
+        type: custom:mushroom-chips-card
+      - alignment: justify
+        card_mod:
+          style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+            \  --chip-spacing: 0;\n}\n"
+        chips:
+        - content: "{% if is_state(\"input_boolean.recycling_collection\", \"on\"\
+            ) %}\n  Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
+            \ \"1\") %}\n  Tomorrow\n{% else %}\n  {{ state_attr(entity, \"days\"\
+            ) }} {{ \"Day\" if is_state_attr(entity, \"days\", 1) else \"Days\" }}\n\
+            {% endif %}"
+          entity: sensor.recycling
+          hold_action:
+            action: call-service
+            data:
+              entity: sensor.recycling
+            service: script.collection_at_curb
+            target: {}
+          icon: mdi:recycle
+          icon_color: "{% if is_state(\"input_boolean.recycling_collection\", \"on\"\
+            ) %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
+            \ \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif %}"
+          tap_action:
+            action: more-info
+          type: template
+        - content: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
+            \  Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
+            \ \"1\") %}\n  Tomorrow\n{% else %}\n  {{ state_attr(entity, \"days\"\
+            ) }} {{ \"Day\" if is_state_attr(entity, \"days\", 1) else \"Days\" }}\n\
+            {% endif %}"
+          entity: sensor.garbage
+          hold_action:
+            action: call-service
+            data:
+              entity: sensor.garbage
+            service: script.collection_at_curb
+            target: {}
+          icon: mdi:delete
+          icon_color: "{% if is_state(\"input_boolean.garbage_collection\", \"on\"\
+            ) %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
+            \ \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif %}"
+          tap_action:
+            action: more-info
           type: template
         type: custom:mushroom-chips-card
       keep:
@@ -2373,56 +2416,88 @@ views:
       square: false
       type: grid
     type: vertical-stack
-  - cards:
-    - subtitle: Garbage / Recycling
-      type: custom:mushroom-title-card
-    - cards:
-      - entity: sensor.recycling
-        hold_action:
-          action: call-service
-          data:
-            entity: sensor.recycling
-          service: script.collection_at_curb
-          target: {}
-        icon: mdi:recycle
-        icon_color: "{% if is_state(\"input_boolean.recycling_collection\", \"on\"\
-          ) %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
-          \ \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif %}"
-        primary: Recycling
-        secondary: "{% if is_state(\"input_boolean.recycling_collection\", \"on\"\
-          ) %}\n  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
-          \ \"1\") %}\n  Tomorrow\n{% else %}\n  In {{ state_attr(entity, \"days\"\
-          ) }} {{ \"Day\" if is_state_attr(entity, \"days\", 1) else \"Days\" }},\n\
-          \  {{ state_attr(entity, \"next_date\") | as_timestamp | timestamp_custom(\"\
-          %A\", local=false) }}\n{% endif %}"
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
-      - entity: sensor.garbage
-        hold_action:
-          action: call-service
-          data:
-            entity: sensor.garbage
-          service: script.collection_at_curb
-          target: {}
-        icon: mdi:delete
-        icon_color: "{% if is_state(\"input_boolean.garbage_collection\", \"on\")\
-          \ %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
-          \ \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif %}"
-        primary: Garbage
-        secondary: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
-          \  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n{% elif is_state(entity,\
-          \ \"1\") %}\n  Tomorrow\n{% else %}\n  In {{ state_attr(entity, \"days\"\
-          ) }} {{ \"Day\" if is_state_attr(entity, \"days\", 1) else \"Days\" }},\n\
-          \  {{ state_attr(entity, \"next_date\") | as_timestamp | timestamp_custom(\"\
-          %A\", local=false) }}\n{% endif %}"
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
-      columns: 2
-      square: false
-      type: grid
-    type: vertical-stack
+  - card:
+      cards:
+      - subtitle: Mail / Deliveries
+        type: custom:mushroom-title-card
+      - cards:
+        - card:
+            badge_color: blue
+            badge_icon: "{% if states(entity) | int > 0 %}\n  {{ \"mdi:numeric-\"\
+              \ ~ states(entity) ~ \"-circle\" }}\n{% endif %}"
+            entity: sensor.mail_usps_mail
+            icon: mdi:mailbox-up
+            icon_color: disabled
+            primary: Mail
+            secondary: '{{ states(entity) }} {{ iif(states(entity) | int == 1, "piece",
+              "pieces") }}'
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    elements:
+                    - camera_image: camera.mail_usps
+                      camera_view: live
+                      style:
+                        left: 50%
+                        top: 50%
+                        width: 100%
+                      type: image
+                    - image: /local/mail_and_packages/overlay.png
+                      style:
+                        left: 50%
+                        top: 50%
+                        width: 101%
+                      type: image
+                    - entity: camera.mail_usps
+                      image: /local/mail_and_packages/vignette.png
+                      style:
+                        left: 50%
+                        top: 50%
+                        width: 101%
+                      type: image
+                    entity: camera.mail_usps
+                    image: local/mail_and_packages/white.png
+                    type: picture-elements
+                  size: wide
+                  title: Mail
+                service: browser_mod.popup
+            type: custom:mushroom-template-card
+          conditions:
+          - entity: sensor.mail_usps_mail
+            state_not: '0'
+          type: conditional
+        - template: package_delivery
+          type: custom:decluttering-card
+          variables:
+          - entity: sensor.mail_usps_delivering
+          - name: USPS
+          - icon: fab:usps
+          - icon_color: blue
+          - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=
+        - template: package_delivery
+          type: custom:decluttering-card
+          variables:
+          - entity: sensor.mail_ups_delivering
+          - name: UPS
+          - icon: fab:ups
+          - icon_color: brown
+          - url: https://www.ups.com/track?loc=en_US&tracknum=
+        - template: package_delivery
+          type: custom:decluttering-card
+          variables:
+          - entity: sensor.mail_fedex_delivering
+          - name: FedEx
+          - icon: fab:fedex
+          - icon_color: purple
+          - url: https://www.fedex.com/fedextrack/?trknbr=
+        type: horizontal-stack
+      type: vertical-stack
+    conditions:
+    - entity: binary_sensor.out_for_delivery
+      state: 'on'
+    type: conditional
   - cards:
     - subtitle: Laundry / Dishes
       type: custom:mushroom-title-card
@@ -2537,88 +2612,6 @@ views:
         type: custom:stack-in-card
       type: custom:stack-in-card
     type: vertical-stack
-  - card:
-      cards:
-      - subtitle: Mail / Deliveries
-        type: custom:mushroom-title-card
-      - cards:
-        - card:
-            badge_color: blue
-            badge_icon: "{% if states(entity) | int > 0 %}\n  {{ \"mdi:numeric-\"\
-              \ ~ states(entity) ~ \"-circle\" }}\n{% endif %}"
-            entity: sensor.mail_usps_mail
-            icon: mdi:mailbox-up
-            icon_color: disabled
-            primary: Mail
-            secondary: '{{ states(entity) }} {{ iif(states(entity) | int == 1, "piece",
-              "pieces") }}'
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                data:
-                  content:
-                    elements:
-                    - camera_image: camera.mail_usps
-                      camera_view: live
-                      style:
-                        left: 50%
-                        top: 50%
-                        width: 100%
-                      type: image
-                    - image: /local/mail_and_packages/overlay.png
-                      style:
-                        left: 50%
-                        top: 50%
-                        width: 101%
-                      type: image
-                    - entity: camera.mail_usps
-                      image: /local/mail_and_packages/vignette.png
-                      style:
-                        left: 50%
-                        top: 50%
-                        width: 101%
-                      type: image
-                    entity: camera.mail_usps
-                    image: local/mail_and_packages/white.png
-                    type: picture-elements
-                  size: wide
-                  title: Mail
-                service: browser_mod.popup
-            type: custom:mushroom-template-card
-          conditions:
-          - entity: sensor.mail_usps_mail
-            state_not: '0'
-          type: conditional
-        - template: package_delivery
-          type: custom:decluttering-card
-          variables:
-          - entity: sensor.mail_usps_delivering
-          - name: USPS
-          - icon: fab:usps
-          - icon_color: blue
-          - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=
-        - template: package_delivery
-          type: custom:decluttering-card
-          variables:
-          - entity: sensor.mail_ups_delivering
-          - name: UPS
-          - icon: fab:ups
-          - icon_color: brown
-          - url: https://www.ups.com/track?loc=en_US&tracknum=
-        - template: package_delivery
-          type: custom:decluttering-card
-          variables:
-          - entity: sensor.mail_fedex_delivering
-          - name: FedEx
-          - icon: fab:fedex
-          - icon_color: purple
-          - url: https://www.fedex.com/fedextrack/?trknbr=
-        type: horizontal-stack
-      type: vertical-stack
-    conditions:
-    - entity: binary_sensor.out_for_delivery
-      state: 'on'
-    type: conditional
   icon: mdi:home-assistant
   layout:
     max_cols: 2
@@ -3015,8 +3008,6 @@ views:
           columns: 5
         type: custom:mini-media-player
       conditions:
-      - entity: sensor.family_room_denon_source
-        state: Shield
       - entity: sensor.family_room_denon_source
         state_not: 'off'
       type: conditional
@@ -6007,6 +5998,7 @@ views:
         - icon: mdi:chart-sankey-variant
           icon_color: pink
           primary: Sankey Chart
+          secondary: Daily
           tap_action:
             action: fire-dom-event
             browser_mod:
@@ -6126,6 +6118,7 @@ views:
         - icon: mdi:chart-sankey-variant
           icon_color: pink
           primary: Sankey Chart
+          secondary: Monthly
           tap_action:
             action: fire-dom-event
             browser_mod:
