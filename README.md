@@ -358,7 +358,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.4.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.4.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -456,16 +456,16 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ### Lighting
 
-- [Inovelli VZM31-SN Blue Series Smart 2-1 Switch](https://inovelli.com/products/blue-series-smart-2-1-switch-on-off-or-dimmer)
-- [Inovelli LZW30-SN Red Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-sn-spec-sheet)
-- [Inovelli LZW30 Black Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-spec-sheet)
-- [Zooz ZEN71 On-Off Switch](https://www.getzooz.com/zooz-zen71-on-off-switch/)
-- [Honeywell 39348/ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
-- [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
-- [Philips Hue White Ambiance](https://www.amazon.com/dp/B0753H5GKN)
 - [DreamScreen](https://www.amazon.com/dp/B01M6UETVR/) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
+- [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
+- [Honeywell 39348/ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
+- [Inovelli LZW30 Black Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-spec-sheet)
+- [Inovelli LZW30-SN Red Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-sn-spec-sheet)
+- [Inovelli VZM31-SN Blue Series Smart 2-1 Switch](https://inovelli.com/products/blue-series-smart-2-1-switch-on-off-or-dimmer)
+- [Philips Hue White Ambiance](https://www.amazon.com/dp/B0753H5GKN)
 - [WLED](https://github.com/Aircoookie/WLED) - DIY light strip
+- [Zooz ZEN71 On-Off Switch](https://www.getzooz.com/zooz-zen71-on-off-switch/)
 
 ### Sensor
 
@@ -497,25 +497,25 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ### Media
 
-- [Google Home Mini](https://store.google.com/us/product/google_nest_mini)
-- [Vizio P-Series Quantum X](https://www.vizio.com/en/tv/p-series-quantum-x)
-- [Vizio P-Series Quantum](https://www.vizio.com/en/tv/p-series-quantum)
-- [nVidia Shield](https://www.nvidia.com/en-us/shield/) (2015, 2017, and 2019 versions)
 - [ChromeCast](https://www.google.com/chromecast/)
+- [Google Home Mini](https://store.google.com/us/product/google_nest_mini)
 - [Harmony Hub](https://www.logitech.com/en-us/products/harmony/harmony-hub.html)
-- [Plex](https://plex.tv)
 - [MagicMirror](https://magicmirror.builders)
-- PlayStation 4 Pro
+- [nVidia Shield](https://www.nvidia.com/en-us/shield/) (2015, 2017, and 2019 versions)
+- [PlayStation 4 Pro](https://www.amazon.com/dp/B07K14XKZH)
+- [Plex](https://plex.tv)
+- [Vizio P-Series Quantum](https://www.vizio.com/en/tv/p-series-quantum)
+- [Vizio P-Series Quantum X](https://www.vizio.com/en/tv/p-series-quantum-x)
 
 ### Network
 
-- [Ubiquiti Unifi Security Gateway](https://store.ui.com/products/unifi-security-gateway)
+- [Aeon Labs Z Wave Stick (GEN 5)](https://www.amazon.com/dp/B00X0AWA6E)
+- [SONOFF Zigbee 3.0 USB Dongle Plus Gateway](https://sonoff.tech/product/diy-smart-switch/sonoff-dongle-plus/)
+- [Ubiquiti Access Point WiFi 6 Pro](https://store.ui.com/collections/unifi-network-wireless/products/unifi-ap6-professional)
 - [Ubiquiti Switch 24 PoE (250W)](https://store.ui.com/collections/unifi-network-switching/products/unifiswitch-24-250w)
 - [Ubiquiti Switch 8](https://store.ui.com/collections/unifi-network-switching/products/unifi-switch-8)
 - [Ubiquiti Switch Flex Mini](https://store.ui.com/collections/unifi-network-switching/products/usw-flex-mini)
-- [Ubiquiti Access Point WiFi 6 Pro](https://store.ui.com/collections/unifi-network-wireless/products/unifi-ap6-professional)
-- [Aeon Labs Z Wave Stick (GEN 5)](https://www.amazon.com/dp/B00X0AWA6E)
-- [SONOFF Zigbee 3.0 USB Dongle Plus Gateway](https://sonoff.tech/product/diy-smart-switch/sonoff-dongle-plus/)
+- [Ubiquiti Unifi Security Gateway](https://store.ui.com/products/unifi-security-gateway)
 
 ### Security
 
@@ -523,13 +523,155 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ## Automations
 
-This Home Assistant install has approximately **138 automations**.
+> For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-For more details, see the automation folder and automation blocks within integrations.
+<details><summary>138 Automations</summary>
+
+- ⏯ Family Room Media Auto Off
+- ⏯ Family Room Media State at Night (Disabled)
+- ⏯ Family Room Sound Mode
+- ⏯ Living Room Media Auto Off
+- ⏯ Living Room Media State at Night (Disabled)
+- ⏯ Living Room Sound Mode
+- ⏯ Master Bedroom Media Auto Off
+- ⏯ PS4 Harmony Activity
+- ☑️ Close Garage Door
+- ☑️ Garbage Collection
+- ☑️ Ignore Door Alerts
+- ☑️ Ignore Garage Door Alerts
+- ☑️ Ignore Window Alerts (Disabled)
+- ☑️ Retry Remote Start Subaru
+- ☑️ Turn on Water Main
+- ⚙️ Action Sniffer [Zigbee] (Disabled)
+- ⚙️ Battery Level Low
+- ⚙️ Clear TTS Cache
+- ⚙️ Disk Space Low
+- ⚙️ Event Sniffer [Actionable Event] (Disabled)
+- ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
+- ⚙️ Failed Login
+- ⚙️ HACS Updates
+- ⚙️ RAM Usage High
+- ⚙️ Startup (Disabled)
+- ⚙️ Upgrade Available
+- ⚡ Tariff Summer Off-Peak
+- ⚡ Tariff Summer Peak
+- ⚡ Tariff Winter Off-Peak
+- ⚡ Tariff Winter Peak
+- ✨ DreamScreen Harmony Power Off
+- ✨ DreamScreen Harmony Reactive Activity
+- ✨ DreamScreen Scene Changed
+- 🍽️ Dishwasher is Running
+- 🎄 XMas Lights Off (Disabled)
+- 🎄 XMas Lights On (Disabled)
+- 🎄 XMas Tree Off (Disabled)
+- 🎄 XMas Tree On (Disabled)
+- 🏢 Office Day Mode
+- 🏢 Office Night Mode
+- 💡 All Lights off when Away
+- 💡 Dim Front Lights at Night
+- 💡 Ethan Lamp off at Sunrise
+- 💡 Ethan Lamp on at Night
+- 💡 Front Lights off at Sunrise
+- 💡 Front Lights on at Sunset
+- 💡 Living Room Lamps off at Night
+- 💡 Living Room Lamps on at Sunset
+- 💡 Turn Lights On when Arrive
+- 💧 Leak Detected
+- 💧 Leak Stopped
+- 💧 Shut-Off Valve Overheated
+- 💧 Softener Salt Level Low
+- 💬 Door Closed
+- 💬 Door Left Open
+- 💬 Door Left Open and Leaving
+- 💬 Door Opened and Away
+- 💬 Ender 3 Pro
+- 💬 Garage Door Closed
+- 💬 Garage Door Left Open
+- 💬 Garage Door Left Open and Leaving
+- 💬 Garage Door Opened and Away
+- 💬 Garbage Collection
+- 💬 Potty Time (Disabled)
+- 💬 Subaru Failed Notification
+- 💬 Window Left Open (Disabled)
+- 📋 [Controller] Hue Dimmer Switch
+- 📋 [Controller] Ikea 5-Button Remote
+- 📋 [Holiday in Week] Garbage Collection Adjustment
+- 📋 [Holiday in Week] Recycle Collection Adjustment
+- 📋 [Inovelli] Ethan Switch
+- 📋 [Inovelli] Family Room Switch
+- 📋 [Inovelli] Garage Switch
+- 📋 [Inovelli] Guest Room Switch
+- 📋 [Inovelli] Kitchen Switch
+- 📋 [Inovelli] Living Room Switch
+- 📋 [Inovelli] Master Bedroom Switch
+- 📋 [Inovelli] Office Switch
+- 📋 [Inovelli] Play Space Switch
+- 📦 Clear Packages Out for Delivery
+- 📦 Mail Today
+- 📦 Packages Delivered
+- 📦 Packages Out for Delivery
+- 📦 Update USPS Mail Camera
+- 📱 MagicMirror Brighten when Kitchen Light On
+- 📱 MagicMirror Dim at Sunset
+- 📱 MagicMirror Dim when Kitchen Light Off
+- 📱 MagicMirror Off at Night
+- 📱 MagicMirror Off when Away
+- 📱 MagicMirror On at Morning
+- 📱 MagicMirror On when Arrive
+- 🔑 Front Door Changed Code
+- 🔑 Front Door Decrement Access Count
+- 🔑 Front Door Lock Notifications
+- 🔑 Front Door Open and Close
+- 🔑 Front Door Reset
+- 🔑 Front Door Reset Codeslot
+- 🔑 Front Door User Notifications
+- 🔑 Synchronize Codeslot Front Door 1
+- 🔑 Synchronize Codeslot Front Door 2
+- 🔑 Synchronize Codeslot Front Door 3
+- 🔑 Synchronize Codeslot Front Door 4
+- 🔑 Synchronize Codeslot Front Door 5
+- 🔑 Synchronize Codeslot Front Door 6
+- 🔑 Synchronize Codeslot Front Door 7
+- 🔑 Synchronize Codeslot Front Door 8
+- 🔑 Turn on Access Limit Front Door 1
+- 🔑 Turn on Access Limit Front Door 2
+- 🔑 Turn on Access Limit Front Door 3
+- 🔑 Turn on Access Limit Front Door 4
+- 🔑 Turn on Access Limit Front Door 5
+- 🔑 Turn on Access Limit Front Door 6
+- 🔑 Turn on Access Limit Front Door 7
+- 🔑 Turn on Access Limit Front Door 8
+- 🔒 Front Door Lock at Night
+- 🔒 Front Door Lock Jammed (Disabled)
+- 🔒 Front Door Lock when Away
+- 🔒 Front Door Re-lock after Unlock
+- 🔔 Doorbell Motion
+- 🔔 Doorbell Motion or Ring
+- 🔔 Doorbell Ring
+- 🖥️ [Ardena] Power Actions
+- 🖥️ [Ardena] Power on Activity
+- 🖥️ [Ardena] Sleep When Harmony Off
+- 🖥️ [Quest] Charge Complete
+- 🖥️ [Quest] Charge Soon
+- 🖥️ [Quest] Interactive
+- 🖨️ Low Toner
+- 🖨️ Out of Paper
+- 🗺️ Leaving Costco
+- 🗺️ Leaving Fred Meyer
+- 🗺️ Leaving Wal-Mart
+- 🗺️ Leaving WinCo
+- 🚦 Front Door Light Switch Status
+- 🚦 Garage Light Switch Status
+- 🚦 Office Light Switch Status
+- 🧺 Dryer Running
+- 🧺 Washer Running
+
+---
+
+</details>
 
 ## Things to Consider Buying
 
-- More [Inovelli Switches](https://inovelli.com/products/switches/) because they are much nicer than the GE I currently have
 - [433Mhz Transmitter and receiver](https://www.amazon.com/dp/B00M2CUALS) - For 433Mhz based devices
 - LED RGB [Wifi Controller](https://www.amazon.com/dp/B01JZ2SI6Q) flux_led compatible with [LED Strip kits](https://www.amazon.com/dp/B01CUILC3I) - ~100 Feet
 - [Withings](https://www.amazon.com/dp/B01F3LJ2RW) - Smart Weight scale
@@ -549,28 +691,27 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.11.3-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.11.3-555555?style=flat-square&logo=home-assistant
 
-[github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
-[github-master]: https://github.com/zanix/home-assistant-config/commits/master
-
-[commits-shield]: https://img.shields.io/github/commit-activity/m/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
-[commits]: https://github.com/zanix/home-assistant-config/commits/master
-
-[github-build-status-shield]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml/badge.svg
+[github-build-status-shield]: https://img.shields.io/github/workflow/status/zanix/home-assistant-config/build/master?style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
-[github-linter-status-shield]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yaml/badge.svg
+[github-linter-status-shield]: https://img.shields.io/github/workflow/status/zanix/home-assistant-config/linters/master?style=flat-square&label=linters&logo=github-actions&logoColor=838B95
 [github-linter-status]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yaml
 
-[code-lines-shield]: https://img.shields.io/badge/lines%20of%20code-unknown-informational
+[github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config/master?style=flat-square&logo=github&logoColor=838B95
+[github-master]: https://github.com/zanix/home-assistant-config/commits/master
+
+[commits-shield]: https://img.shields.io/github/commit-activity/m/zanix/home-assistant-config/master?style=flat-square&logo=github&logoColor=838B95
+[commits]: https://github.com/zanix/home-assistant-config/commits/master
+
+[code-lines-shield]: https://img.shields.io/tokei/lines/github/zanix/home-assistant-config?style=flat-square
 [code-link]: https://github.com/zanix/home-assistant-config/pulse
 
-[forum-shield]: https://img.shields.io/discourse/topics?color=46B4ED&label=community&logo=discourse&logoColor=46B4ED&server=https%3A%2F%2Fcommunity.home-assistant.io
+[forum-shield]: https://img.shields.io/discourse/topics?style=flat-square&label=community&logo=discourse&color=46B4ED&logoColor=46B4ED&server=https%3A%2F%2Fcommunity.home-assistant.io
 [forum]: https://community.home-assistant.io
 
-[discord-shield]: https://img.shields.io/discord/330944238910963714.svg?logo=discord&color=7289da
+[discord-shield]: https://img.shields.io/discord/330944238910963714?style=flat-square&color=7289da&label=discord&logo=discord
 [discord]: https://discord.gg/c5DvZ4e
 
-[stars-shield]: https://img.shields.io/github/stars/zanix/home-assistant-config.svg?style=social&label=Stars
-[forks-shield]: https://img.shields.io/github/forks/zanix/home-assistant-config.svg?style=social&label=Forks
-[watchers-shield]: https://img.shields.io/github/watchers/zanix/home-assistant-config.svg?style=social&label=Watchers
+[automations]: https://github.com/zanix/home-assistant-config/blob/master/automations.yaml
+[integrations]: https://github.com/zanix/home-assistant-config/tree/master/integrations
