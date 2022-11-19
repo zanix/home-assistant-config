@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2250 total entities**,
-including **793 sensors**.
+This Home Assistant install has approximately **2308 total entities**,
+including **849 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -236,7 +236,7 @@ Authors: [@ludeeus](https://github.com/ludeeus).
 
 ### [Hass.Agent](https://github.com/LAB02-Research/HASS.Agent-Integration) [v2022.11.9]
 
-HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capabilities to HASS.Agent - a Windows based client for Home Assistant.
+HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capabilities to HASS.Agent - a Windows based client (companion app) for Home Assistant.
 
 Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
@@ -334,7 +334,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.35]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.37]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -354,7 +354,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.3.6]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.4.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -366,7 +366,7 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.1.1]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.3.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -378,7 +378,7 @@ A Home Assistant lovelace card to display a sankey chart. For example for power 
 
 Home assistant sun card based on Google weather design
 
-### [Swipe Card](https://github.com/bramkragten/swipe-card) [v4.0.0]
+### [Swipe Card](https://github.com/bramkragten/swipe-card) [v5.0.0]
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
@@ -414,7 +414,7 @@ Weather Card with animated icons for Home Assistant Lovelace
 
 Additional themes for Lovelace Mushroom Cards 🍄
 
-### [Noctis](https://github.com/aFFekopp/noctis) [v2.7]
+### [Noctis](https://github.com/aFFekopp/noctis) [v2.8]
 
 🐵 Dark Blue Theme for Home Assistant
 
@@ -545,7 +545,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.11.2-333333?logo=home%20assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.11.3-333333?logo=home%20assistant
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config.svg?logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
