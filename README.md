@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2308 total entities**,
-including **849 sensors**.
+This Home Assistant install has approximately **2314 total entities**,
+including **852 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -59,6 +59,10 @@ The generic camera platform allows you to integrate any IP camera or other URL i
 ### [GitHub](https://www.home-assistant.io/integrations/generic)
 
 The GitHub integration allows you to monitor your favorite GitHub repositories
+
+### [Glances](https://www.home-assistant.io/integrations/glances)
+
+The glances integration allows you to monitor the system information provided by the Glances API.
 
 ### [Google Cast](https://www.home-assistant.io/integrations/cast)
 
