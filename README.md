@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2314 total entities**,
-including **852 sensors**.
+This Home Assistant install has approximately **2323 total entities**,
+including **859 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -390,7 +390,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 🔹 Display whatever you want in an entities card row.
 
-### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.3.1]
+### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.4.0]
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
@@ -398,7 +398,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 A progress bar display for Home Assistant timers
 
-### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.12.1]
+### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.13.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
