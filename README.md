@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2323 total entities**,
-including **859 sensors**.
+This Home Assistant install has approximately **2325 total entities**,
+including **860 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -214,7 +214,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 🔹 Use icons from fontawesome in home-assistant
 
-### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.8.3]
+### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.9.0]
 
 🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
 
@@ -318,7 +318,7 @@ Battery state card for Home Assistant
 
 ❇️ Lovelace button-card for home assistant
 
-### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.1.5]
+### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.2.0]
 
 🔹 Add CSS styles to (almost) any lovelace card
 
@@ -691,7 +691,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.11.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.11.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/workflow/status/zanix/home-assistant-config/build/master?style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
