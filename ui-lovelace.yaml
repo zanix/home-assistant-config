@@ -214,14 +214,15 @@ decluttering_templates:
       card:
         badge_icon: mdi:numeric-{{ states(entity) }}
         card_mod:
-          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-blue-color));\n\
-            \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\n"
+          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-[[icon_color]]-color));\n\
+            \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n  width:\
+            \ 110px;\n  margin-top: 10px;\n  margin-left: auto;\n  margin-right: auto;\n\
+            }\n"
         entity: '[[entity]]'
         icon: '[[icon]]'
         icon_color: '[[icon_color]]'
+        layout: vertical
         primary: '[[name]]'
-        secondary: '{{ states(entity) }} {{ iif(states(entity) | int == 1, "package",
-          "packages") }}'
         tap_action:
           action: fire-dom-event
           browser_mod:
@@ -253,6 +254,8 @@ decluttering_templates:
       conditions:
       - entity: '[[entity]]'
         state_not: '0'
+      - entity: '[[entity]]'
+        state_not: unavailable
       type: conditional
   person_card:
     card:
@@ -1674,7 +1677,7 @@ views:
       type: horizontal-stack
     type: vertical-stack
   - cards:
-    - subtitle: Rooms
+    - title: Rooms
       type: custom:mushroom-title-card
     - cards:
       - template: room_card
@@ -1713,11 +1716,20 @@ views:
               browser_mod:
                 data:
                   content:
-                    template: universal_media
-                    type: custom:decluttering-card
-                    variables:
-                    - entity: media_player.living_room_universal
-                    - name: Living Room Media
+                    cards:
+                    - template: universal_media
+                      type: custom:decluttering-card
+                      variables:
+                      - entity: media_player.living_room_universal
+                      - name: Living Room Media
+                    - entity: media_player.cast_living_room
+                      hide:
+                        power: true
+                        volume: true
+                      info: scroll
+                      name: Cast
+                      type: custom:mini-media-player
+                    type: vertical-stack
                 service: browser_mod.popup
             type: template
           - entity: fan.living_room
@@ -1875,11 +1887,20 @@ views:
               browser_mod:
                 data:
                   content:
-                    template: universal_media
-                    type: custom:decluttering-card
-                    variables:
-                    - entity: media_player.family_room_universal
-                    - name: Family Room Media
+                    cards:
+                    - template: universal_media
+                      type: custom:decluttering-card
+                      variables:
+                      - entity: media_player.family_room_universal
+                      - name: Family Room Media
+                    - entity: media_player.cast_family_room
+                      hide:
+                        power: true
+                        volume: true
+                      info: scroll
+                      name: Cast
+                      type: custom:mini-media-player
+                    type: vertical-stack
                 service: browser_mod.popup
             type: template
           - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
@@ -2098,11 +2119,20 @@ views:
               browser_mod:
                 data:
                   content:
-                    template: universal_media
-                    type: custom:decluttering-card
-                    variables:
-                    - entity: media_player.master_bedroom_universal
-                    - name: Master Bedroom Media
+                    cards:
+                    - template: universal_media
+                      type: custom:decluttering-card
+                      variables:
+                      - entity: media_player.master_bedroom_universal
+                      - name: Master Bedroom Media
+                    - entity: media_player.cast_master_bedroom
+                      hide:
+                        power: true
+                        volume: true
+                      info: scroll
+                      name: Cast
+                      type: custom:mini-media-player
+                    type: vertical-stack
                 service: browser_mod.popup
             type: template
           - entity: fan.master_bedroom
@@ -2458,21 +2488,20 @@ views:
     type: vertical-stack
   - card:
       cards:
-      - subtitle: Mail / Deliveries
-        type: custom:mushroom-title-card
       - cards:
         - card:
             badge_icon: "{% if states(entity) | int > 0 %}\n  mdi:numeric-{{ states(entity)\
               \ }}\n{% endif %}"
             card_mod:
               style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-blue-color));\n\
-                \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\n"
+                \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n\
+                \  width: 110px;\n  margin-top: 10px;\n  margin-left: auto;\n  margin-right:\
+                \ auto;\n}\n"
             entity: sensor.mail_usps_mail
             icon: mdi:mailbox-up
-            icon_color: disabled
+            icon_color: blue
+            layout: vertical
             primary: Mail
-            secondary: '{{ states(entity) }} {{ iif(states(entity) | int == 1, "piece",
-              "pieces") }}'
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -2541,13 +2570,11 @@ views:
       state: 'on'
     type: conditional
   - cards:
-    - subtitle: Laundry / Dishes
-      type: custom:mushroom-title-card
     - cards:
       - card_mod:
           style:
-            .: "ha-card:after {\n  content: '';\n  border-bottom: solid 1px rgba(var(--rgb-grey-color),\
-              \ 0.2);\n  margin: 12px 0px -12px;\n}\n"
+            .: "ha-card {\n  width: 110px;\n  margin-top: 10px;\n  margin-left: auto;\n\
+              \  margin-right: auto;\n}\n"
             mushroom-shape-icon$: "ha-icon {\n  {%- if is_state(config.entity, \"\
               on\") -%}\n  --icon-animation: shake 400ms ease-in-out infinite, drum\
               \ 2s ease infinite;\n  transform-origin: 50% 110%;\n  {% endif %}\n\
@@ -2563,24 +2590,22 @@ views:
         icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:washing-machine\n{%- else\
           \ -%}\n  mdi:washing-machine-off\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n \
-          \ grey\n{%- endif -%}"
-        primary: "{%- if is_state(entity, \"on\") -%}\n  Washer is Washing\n{%- else\
-          \ -%}\n  Washer\n{%- endif -%}"
+          \ disabled\n{%- endif -%}"
+        layout: vertical
+        primary: Washer
         secondary: "{% set last_changed = state_attr(\"sensor.nominal_change_history\"\
-          , \"changes\")[entity] | as_datetime -%}\n{%- if last_changed < today_at()\
-          \ - timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed\
-          \ < today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp() |\
-          \ timestamp_custom(\"%A at %-I:%M %p\") }}\n{%- elif last_changed < today_at()\
-          \ -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"Yesterday at %-I:%M\
-          \ %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif\
-          \ -%}"
+          , \"changes\")[entity] | as_datetime -%} {%- if last_changed < today_at()\
+          \ - timedelta(days=6) -%}\n  > Week\n{%- elif last_changed < today_at()\
+          \ - timedelta(days=1) -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"\
+          %A\") }}\n{%- elif last_changed < today_at() -%}\n  Yesterday\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }}\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
       - card_mod:
           style:
-            .: "ha-card:after {\n  content: '';\n  border-bottom: solid 1px rgba(var(--rgb-grey-color),\
-              \ 0.2);\n  margin: 12px 0px -12px;\n}\n"
+            .: "ha-card {\n  width: 110px;\n  margin-top: 10px;\n  margin-left: auto;\n\
+              \  margin-right: auto;\n}\n"
             mushroom-shape-icon$: "ha-icon {\n  {%- if is_state(config.entity, \"\
               on\") -%}\n  --icon-animation: shake 400ms ease-in-out infinite, drum\
               \ 1s infinite;\n  transform-origin: 50% 65%;\n  {% endif %}\n}\n@keyframes\
@@ -2592,67 +2617,69 @@ views:
         icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:tumble-dryer\n{%- else -%}\n\
           \  mdi:tumble-dryer-off\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
-          \  grey\n{%- endif -%}"
-        primary: "{%- if is_state(entity, \"on\") -%}\n  Dryer is Drying\n{%- else\
-          \ -%}\n  Dryer\n{%- endif -%}"
+          \  disabled\n{%- endif -%}"
+        layout: vertical
+        primary: Dryer
         secondary: "{% set last_changed = state_attr(\"sensor.nominal_change_history\"\
-          , \"changes\")[entity] | as_datetime -%}\n{%- if last_changed < today_at()\
-          \ - timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed\
-          \ < today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp() |\
-          \ timestamp_custom(\"%A at %-I:%M %p\") }}\n{%- elif last_changed < today_at()\
-          \ -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"Yesterday at %-I:%M\
-          \ %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif\
-          \ -%}"
+          , \"changes\")[entity] | as_datetime -%} {%- if last_changed < today_at()\
+          \ - timedelta(days=6) -%}\n  > Week\n{%- elif last_changed < today_at()\
+          \ - timedelta(days=1) -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"\
+          %A\") }}\n{%- elif last_changed < today_at() -%}\n  Yesterday\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }}\n{%- endif -%}"
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
       - card_mod:
-          style: "ha-card {\n  height: 75px;\n}\n"
-        cards:
-        - card_mod:
-            style:
-              .: ":host {\n  height: 51px;\n}\n"
-              mushroom-shape-icon$: "ha-icon {\n  {%- if not is_state(config.entity,\
-                \ \"Off\") -%}\n  --icon-animation: bounce 1.5s ease-in-out infinite,\
-                \ wash 1s ease-in-out infinite;\n  transform-origin: 50% 75%;\n  {%\
-                \ endif %}\n}\n@keyframes bounce {\n  0%, 20%, 50%, 80%, 100% {transform:\
-                \ translateY(0); } \n  40% { transform: translateY(-1.2px) rotate(5deg);\
-                \ } \n  60% { transform: translateY(-1.1px) rotate(-4deg); } \n} \n\
-                @keyframes wash {\n  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%,\
-                \ 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%,\
-                \ 100% 100%, 100% 0); }\n}\n"
-          entity: input_select.dishwasher_status
-          icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
-            \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
-          icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif\
-            \ is_state(entity, \"Draining\") -%}\n  brown\n{%- elif is_state(entity,\
-            \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
-            \  red\n{%- elif is_state(entity, \"Clean\") -%}\n  lime\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
-          multiline_secondary: true
-          primary: "{%- if not is_state(entity, \"Off\") -%}\n  Dishwasher is {{ states(entity)\
-            \ }}\n{%- else -%}\n  Dishwasher\n{%- endif -%}"
-          secondary: "{% set last_changed = state_attr(\"sensor.nominal_change_history\"\
-            , \"changes\")[entity] | as_datetime -%}\n{%- if last_changed < today_at()\
-            \ - timedelta(days=6) -%}\n  More than a week ago\n{%- elif last_changed\
-            \ < today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp()\
-            \ | timestamp_custom(\"%A at %-I:%M %p\") }}\n{%- elif last_changed <\
-            \ today_at() -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"\
-            Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed)\
-            \ }} ago\n{%- endif -%}"
-          tap_action:
-            action: more-info
-          type: custom:mushroom-template-card
-        - bar_background: rgba(var(--rgb-grey-color), 50%)
-          bar_direction: rtl
-          bar_height: 5px
-          entity: timer.dishwasher_run_time
-          invert: true
-          layout: full_row
-          text_width: 0em
-          type: custom:timer-bar-card
-        type: custom:stack-in-card
-      type: custom:stack-in-card
+          style:
+            .: "ha-card {\n  width: 110px;\n  margin-top: 10px;\n  margin-left: auto;\n\
+              \  margin-right: auto;\n}\n"
+            mushroom-shape-icon$: "{% set timer = \"timer.dishwasher_run_time\" %}\n\
+              {%- if is_state(config.entity, \"Washing\") -%}\n  {% set icon_color\
+              \ = \"cyan\" %}\n{%- elif is_state(config.entity, \"Draining\") -%}\n\
+              \  {% set icon_color = \"brown\" %}\n{%- elif is_state(config.entity,\
+              \ \"Rinsing\") -%}\n  {% set icon_color = \"blue\" %}\n{%- elif is_state(config.entity,\
+              \ \"Drying\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
+              \ \"Clean\") -%}\n  {% set icon_color = \"lime\" %}\n{%- else -%}\n\
+              \  {% set icon_color = \"grey\" %}\n{%- endif -%}\nha-icon {\n  {%-\
+              \ if not is_state(config.entity, \"Off\") -%}\n  --icon-animation: bounce\
+              \ 1.5s ease-in-out infinite, wash 1s ease-in-out infinite;\n  transform-origin:\
+              \ 50% 75%;\n  {% endif %}\n}\n{% if state_attr(timer, \"finishes_at\"\
+              ) %}\n.shape {\n    {% set remaining = (as_datetime(state_attr(timer,\
+              \ \"finishes_at\")) - now()).total_seconds() | int %}\n    {% set duration\
+              \ =\n      (state_attr(timer, \"duration\").split(\":\")[0] | int *\
+              \ 60 * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[1]\
+              \ | int * 60)\n      + (state_attr(timer, \"duration\").split(\":\"\
+              )[2] | int)\n    %}\n  background:\n    radial-gradient(var(--ha-card-background)\
+              \ 60%, transparent 0%),\n    conic-gradient(rgb(var(--rgb-{{ icon_color\
+              \ }})) {{ ((duration - remaining) / duration * 100)|round() }}% 0%,\
+              \ var(--ha-card-background) 0% 100%);\n}\n.shape:after {\n  content:\
+              \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
+              \ 50%;\n  background: rgba(var(--rgb-{{ icon_color }}), 0.2);\n}\n{%\
+              \ endif %}\n@keyframes bounce {\n  0%, 20%, 50%, 80%, 100% {transform:\
+              \ translateY(0); } \n  40% { transform: translateY(-1.2px) rotate(5deg);\
+              \ } \n  60% { transform: translateY(-1.1px) rotate(-4deg); } \n} \n\
+              @keyframes wash {\n  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%,\
+              \ 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100%\
+              \ 100%, 100% 0); }\n}\n"
+        entity: input_select.dishwasher_status
+        icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
+          \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif is_state(entity,\
+          \ \"Draining\") -%}\n  brown\n{%- elif is_state(entity, \"Rinsing\") -%}\n\
+          \  blue\n{%- elif is_state(entity, \"Drying\") -%}\n  red\n{%- elif is_state(entity,\
+          \ \"Clean\") -%}\n  lime\n{%- else -%}\n  grey\n{%- endif -%}"
+        layout: vertical
+        primary: Dishwasher
+        secondary: "{% set last_changed = state_attr(\"sensor.nominal_change_history\"\
+          , \"changes\")[entity] | as_datetime -%} {%- if last_changed < today_at()\
+          \ - timedelta(days=6) -%}\n  > Week\n{%- elif last_changed < today_at()\
+          \ - timedelta(days=1) -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"\
+          %A\") }}\n{%- elif last_changed < today_at() -%}\n  Yesterday\n{%- else\
+          \ -%}\n  {{ relative_time(last_changed) }}\n{%- endif -%}"
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      type: horizontal-stack
     type: vertical-stack
   icon: mdi:home-assistant
   layout:
@@ -2687,7 +2714,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -2758,7 +2785,7 @@ views:
       type: custom:mushroom-fan-card
     type: vertical-stack
   - cards:
-    - subtitle: Media
+    - title: Media
       type: custom:mushroom-title-card
     - cards:
       - entity: remote.living_room
@@ -2854,7 +2881,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -2912,7 +2939,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Media
+    - title: Media
       type: custom:mushroom-title-card
     - cards:
       - entity: remote.family_room
@@ -3071,7 +3098,7 @@ views:
       type: custom:mini-media-player
     type: vertical-stack
   - cards:
-    - subtitle: Dreamscreen
+    - title: Dreamscreen
       type: custom:mushroom-title-card
     - cards:
       - entity: dreamscreen.family_room
@@ -3175,7 +3202,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -3356,7 +3383,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -3419,7 +3446,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -3472,7 +3499,7 @@ views:
       type: custom:mushroom-fan-card
     type: vertical-stack
   - cards:
-    - subtitle: Media
+    - title: Media
       type: custom:mushroom-title-card
     - cards:
       - entity: remote.master_bedroom
@@ -3587,7 +3614,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -3650,7 +3677,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -3706,7 +3733,7 @@ views:
       - entity: sensor.guest_room_temperature
         type: entity
   - cards:
-    - subtitle: Lights
+    - title: Lights
       type: custom:mushroom-title-card
     - entity: light.guest_room
       layout: horizontal
@@ -3745,7 +3772,7 @@ views:
       - entity: sensor.garage_multisensor_illuminance
         type: entity
   - cards:
-    - subtitle: Lights
+    - title: Lights
       type: custom:mushroom-title-card
     - entity: light.garage
       name: Light
@@ -3806,7 +3833,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Lights
+        - title: Lights
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -3867,7 +3894,7 @@ views:
       - entity: sensor.water_main_air_temperature
         type: entity
   - cards:
-    - subtitle: Water
+    - title: Water
       type: custom:mushroom-title-card
     - card:
         type: vertical-stack
@@ -3930,7 +3957,7 @@ views:
       type: custom:bar-card
     type: vertical-stack
   - cards:
-    - subtitle: Sprinklers
+    - title: Sprinklers
       type: custom:mushroom-title-card
     - cards:
       - entity: switch.rachio_zone_1
@@ -4054,7 +4081,7 @@ views:
       \ {\n  background-color: rgba(var(--rgb-primary-background-color),1);\n}"
     type: custom:bar-card
   - cards:
-    - subtitle: Actions
+    - title: Actions
       type: custom:mushroom-title-card
     - entity: script.subaru_remote_start
       hold_action:
@@ -4174,7 +4201,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Location
+    - title: Location
       type: custom:mushroom-title-card
     - cards:
       - entity: device_tracker.ascent_location
@@ -4203,7 +4230,7 @@ views:
     type: vertical-stack
   - card:
       cards:
-      - subtitle: Doors / Windows
+      - title: Doors / Windows
         type: custom:mushroom-title-card
       - card:
           columns: 1
@@ -4228,7 +4255,7 @@ views:
       state: 'on'
     type: conditional
   - cards:
-    - subtitle: Tire Pressure
+    - title: Tire Pressure
       type: custom:mushroom-title-card
     - cards:
       - entity: sensor.ascent_tire_pressure_fl
@@ -4304,7 +4331,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Update Data
+    - title: Update Data
       type: custom:mushroom-title-card
     - cards:
       - entity: button.ascent_refresh
@@ -4358,15 +4385,9 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - card:
-            subtitle: R5-5600X | RTX 3080 | 750W
-            title: Ardena
-            type: custom:mushroom-title-card
-          card_mod:
-            style:
-              mushroom-title-card$: "h1 {\n  --title-font-size: 1.8rem;\n  --title-font-weight:\
-                \ lighter;\n}\n"
-          type: custom:mod-card
+        - subtitle: R5-5600X | RTX 3080 | 750W
+          title: Ardena
+          type: custom:mushroom-title-card
         - alignment: end
           card_mod:
             style:
@@ -4498,15 +4519,9 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - card:
-            subtitle: R5-5600X | RX 580 | 650W
-            title: Erebus
-            type: custom:mushroom-title-card
-          card_mod:
-            style:
-              mushroom-title-card$: "h1 {\n  --title-font-size: 1.8rem;\n  --title-font-weight:\
-                \ lighter;\n}\n"
-          type: custom:mod-card
+        - subtitle: R5-5600X | RX 580 | 650W
+          title: Erebus
+          type: custom:mushroom-title-card
         - alignment: end
           card_mod:
             style: "ha-card {\n  position: absolute;\n  top: 50%;\n  right: 0;\n \
@@ -4635,15 +4650,9 @@ views:
           show_state: true
     type: vertical-stack
   - cards:
-    - card:
-        subtitle: Virtual Reality Headset
-        title: Quest 2
-        type: custom:mushroom-title-card
-      card_mod:
-        style:
-          mushroom-title-card$: "h1 {\n  --title-font-size: 1.8rem;\n  --title-font-weight:\
-            \ lighter;\n}\n"
-      type: custom:mod-card
+    - subtitle: Virtual Reality Headset
+      title: Quest 2
+      type: custom:mushroom-title-card
     - animation:
         state: 'on'
       decimal: 0
@@ -4713,15 +4722,9 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - card:
-            subtitle: i5-6500 | GTX 1070 | 500W
-            title: Athos
-            type: custom:mushroom-title-card
-          card_mod:
-            style:
-              mushroom-title-card$: "h1 {\n  --title-font-size: 1.8rem;\n  --title-font-weight:\
-                \ lighter;\n}\n"
-          type: custom:mod-card
+        - subtitle: i5-6500 | GTX 1070 | 500W
+          title: Athos
+          type: custom:mushroom-title-card
         - alignment: end
           card_mod:
             style: "ha-card {\n  position: absolute;\n  top: 50%;\n  right: 0;\n \
@@ -4839,15 +4842,9 @@ views:
           show_state: true
     type: vertical-stack
   - cards:
-    - card:
-        subtitle: Raspberry Pi 4
-        title: MagicMirror
-        type: custom:mushroom-title-card
-      card_mod:
-        style:
-          mushroom-title-card$: "h1 {\n  --title-font-size: 1.8rem;\n  --title-font-weight:\
-            \ lighter;\n}\n"
-      type: custom:mod-card
+    - subtitle: Raspberry Pi 4
+      title: MagicMirror
+      type: custom:mushroom-title-card
     - entity: light.magicmirror
       layout: horizontal
       name: Monitor
@@ -4892,15 +4889,9 @@ views:
           show_state: true
     type: vertical-stack
   - cards:
-    - card:
-        subtitle: Raspberry Pi 3
-        title: OctoPrint
-        type: custom:mushroom-title-card
-      card_mod:
-        style:
-          mushroom-title-card$: "h1 {\n  --title-font-size: 1.8rem;\n  --title-font-weight:\
-            \ lighter;\n}\n"
-      type: custom:mod-card
+    - subtitle: Raspberry Pi 3
+      title: OctoPrint
+      type: custom:mushroom-title-card
     - template: uptime_card
       type: custom:decluttering-card
       variables:
@@ -5048,7 +5039,7 @@ views:
       uimode: dark
     type: vertical-stack
   - cards:
-    - subtitle: Thermostat Detail
+    - title: Thermostat Detail
       type: custom:mushroom-title-card
     - all_series_config:
         extend_to: now
@@ -5120,7 +5111,7 @@ views:
         opposite: true
     type: vertical-stack
   - cards:
-    - subtitle: Temperatures
+    - title: Temperatures
       type: custom:mushroom-title-card
     - all_series_config:
         extend_to: now
@@ -5250,7 +5241,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Living Room
+        - title: Living Room
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5319,7 +5310,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Kitchen
+        - title: Kitchen
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5356,7 +5347,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Office
+        - title: Office
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5516,7 +5507,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Family Room
+        - title: Family Room
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5563,7 +5554,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Master Bedroom
+        - title: Master Bedroom
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5614,7 +5605,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Ethan's Room
+        - title: Ethan's Room
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5651,7 +5642,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Emma's Room
+        - title: Emma's Room
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5685,7 +5676,7 @@ views:
         style: "ha-card {\n  background: none;\n  --ha-card-box-shadow: 0px;\n}\n"
       cards:
       - cards:
-        - subtitle: Outside
+        - title: Outside
           type: custom:mushroom-title-card
         - alignment: end
           card_mod:
@@ -5796,7 +5787,7 @@ views:
     square: false
     type: grid
   - cards:
-    - subtitle: Cameras
+    - title: Cameras
       type: custom:mushroom-title-card
     - cards:
       - aspect_ratio: '16:9'
@@ -5925,7 +5916,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Doors
+    - title: Doors
       type: custom:mushroom-title-card
     - cards:
       - badge_color: "{% if is_state(\"lock.lock_front\", \"locked\") %}\n  green\n\
@@ -6017,7 +6008,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Occupancy
+    - title: Occupancy
       type: custom:mushroom-title-card
     - cards:
       - entity: binary_sensor.home_occupancy
@@ -6091,7 +6082,7 @@ views:
           action: more-info
         type: template
   - cards:
-    - subtitle: Cost
+    - title: Cost
       type: custom:mushroom-title-card
     - cards:
       - entity: sensor.minute_power_cost
@@ -6126,7 +6117,7 @@ views:
       type: grid
     - cards:
       - cards:
-        - subtitle: Daily Usage
+        - title: Daily Usage
           type: custom:mushroom-title-card
         - entity: sensor.home_123_1d
           icon: mdi:transmission-tower
@@ -6246,7 +6237,7 @@ views:
           type: custom:mushroom-template-card
         type: vertical-stack
       - cards:
-        - subtitle: Monthly Usage
+        - title: Monthly Usage
           type: custom:mushroom-title-card
         - entity: sensor.home_123_1mon
           icon: mdi:transmission-tower
@@ -6366,7 +6357,7 @@ views:
           type: custom:mushroom-template-card
         type: vertical-stack
       type: horizontal-stack
-    - subtitle: Rate
+    - title: Rate
       type: custom:mushroom-title-card
     - entity: select.monthly_energy
       icon: mdi:transmission-tower
@@ -6385,7 +6376,7 @@ views:
       type: custom:mushroom-template-card
     type: vertical-stack
   - cards:
-    - subtitle: Solar Generation
+    - title: Solar Generation
       type: custom:mushroom-title-card
     - entity: sensor.solar_1min
       name: Current
@@ -6420,7 +6411,7 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - subtitle: Power Usage
+    - title: Power Usage
       type: custom:mushroom-title-card
     - animation:
         state: 'off'
@@ -6665,8 +6656,7 @@ views:
       type: custom:bar-card
     type: vertical-stack
   - cards:
-    - subtitle: Voltage
-      title: ''
+    - title: Voltage
       type: custom:mushroom-title-card
     - cards:
       - entity: sensor.phase_a_voltage
