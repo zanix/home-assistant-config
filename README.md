@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2294 total entities**,
-including **865 sensors**.
+This Home Assistant install has approximately **1651 total entities**,
+including **811 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -544,7 +544,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ☑️ Turn on Water Main
 - ⚙️ Action Sniffer [Zigbee] (Disabled)
 - ⚙️ Battery Level Low
-- ⚙️ Clear TTS Cache
+- ⚙️ Clear TTS Cache (Disabled)
 - ⚙️ Disk Space Low
 - ⚙️ Event Sniffer [Actionable Event] (Disabled)
 - ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
@@ -561,8 +561,8 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
 - 🍽️ Dishwasher is Running
-- 🎄 XMas Lights Off (Disabled)
-- 🎄 XMas Lights On (Disabled)
+- 🎄 XMas Lights Off
+- 🎄 XMas Lights On
 - 🎄 XMas Tree Off (Disabled)
 - 🎄 XMas Tree On (Disabled)
 - 🏢 Office Day Mode
