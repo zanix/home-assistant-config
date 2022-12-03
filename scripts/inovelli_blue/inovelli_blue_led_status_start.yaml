@@ -26,22 +26,14 @@ inovelli_blue_led_status_start:
         select:
           custom_value: true
           options:
-            - label: All
-              value: '0'
-            - label: 'Led 1'
-              value: '1'
-            - label: 'Led 2'
-              value: '2'
-            - label: 'Led 3'
-              value: '3'
-            - label: 'Led 4'
-              value: '4'
-            - label: 'Led 5'
-              value: '5'
-            - label: 'Led 6'
-              value: '6'
-            - label: 'Led 7'
-              value: '7'
+            - All
+            - Led 1
+            - Led 2
+            - Led 3
+            - Led 4
+            - Led 5
+            - Led 6
+            - Led 7
     color_start:
       name: Start LED Color
       description: (You can also enter the number value directly)
@@ -52,7 +44,7 @@ inovelli_blue_led_status_start:
         select:
           custom_value: true
           options:
-            - 'Off'
+            - "Off"
             - Red
             - Orange
             - Yellow
@@ -64,12 +56,21 @@ inovelli_blue_led_status_start:
             - Light Pink
             - Pink
             - White
+    level_start:
+      name: Start LED brightness level
+      description: Value from 0 (off) to 100 (100% brightness).
+      example: '100'
+      selector:
+        number:
+          min: 1
+          max: 100
     effect_start:
       name: Start Effect
       example: Pulse
       required: true
       selector:
         select:
+          custom_value: true
           options:
             - 'Off'
             - 'Clear'
@@ -92,13 +93,6 @@ inovelli_blue_led_status_start:
             - 'Slow Rising'
             - 'Slow Siren'
             - 'Small to Big'
-    level_start:
-      name: Start LED brightness
-      example: '100'
-      selector:
-        number:
-          min: 1
-          max: 100
     duration:
       name: Duration
       description: How long should the effect run?
@@ -188,12 +182,22 @@ inovelli_blue_led_status_start:
             - Light Pink
             - Pink
             - White
+    level_end:
+      name: End LED brightness level
+      description: Value from 0 (off) to 100 (100% brightness).
+      example: '100'
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 100
     effect_end:
       name: End Effect
       example: Pulse
       required: true
       selector:
         select:
+          custom_value: true
           options:
             - 'Off'
             - 'Clear'
@@ -216,14 +220,6 @@ inovelli_blue_led_status_start:
             - 'Slow Rising'
             - 'Slow Siren'
             - 'Small to Big'
-    level_end:
-      name: End LED brightness
-      example: '100'
-      required: true
-      selector:
-        number:
-          min: 1
-          max: 100
     enable_debug:
       name: Enable debug output?
       default: false
@@ -235,71 +231,161 @@ inovelli_blue_led_status_start:
     debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
 
     entity_list: '{{ entity_id }}'
-    led_value: '{{ led|default(0)|int(default=0) }}'
 
+    # Convert LED number to value
+    leds:
+      'all': -1
+      'led 1': 0
+      'led 2': 1
+      'led 3': 2
+      'led 4': 3
+      'led 5': 4
+      'led 6': 5
+      'led 7': 6
+    led: '{{ led|default("all") }}'
+    led_value: >-
+      {% if led|int(default=-2) == -2 %}
+        {{ leds[led|lower]|int(default=-1) }}
+      {% else %}
+        {{ led|int(default=-1) }}
+      {% endif %}
+
+    level_start: '{{ level_start|default(40) }}'
+    level_end: '{{ level_end|default(40) }}'
+
+    # Convert Color to value
+    colors:
+      'off': 0
+      'red': 1
+      'orange': 21
+      'yellow': 42
+      'green': 85
+      'cyan': 127
+      'teal': 145
+      'blue': 170
+      'purple': 195
+      'light pink': 220
+      'lightpink': 220
+      'pink': 234
+      'white': 255
+    color_start: '{{ color_start|default("red") }}'
+    color_start_value: >-
+      {% if color_start|int(default=-1) == -1 %}
+        {{ colors[color_start|lower]|int(default=0) }}
+      {% else %}
+        {{ color_start|int(default=0) }}
+      {% endif %}
+    color_end: '{{ color_end|default("red") }}'
+    color_end_value: >-
+      {% if color_end|int(default=-1) == -1 %}
+        {{ colors[color_end|lower]|int(default=0) }}
+      {% else %}
+        {{ color_end|int(default=0) }}
+      {% endif %}
+
+    # Convert Effect to value
+    effects:
+      'off': 'off'
+      'clear': 'clear_effect'
+      'solid': 'solid'
+      'aurora': 'aurora'
+      'chase': 'chase'
+      'fast blink': 'fast_blink'
+      'fast chase': 'fast_chase'
+      'fast falling': 'fast_falling'
+      'fast rising': 'fast_rising'
+      'fast siren': 'fast_siren'
+      'medium blink': 'medium_blink'
+      'medium falling': 'medium_falling'
+      'medium rising': 'medium_rising'
+      'open/close': 'open_close'
+      'open close': 'open_close'
+      'pulse': 'pulse'
+      'slow blink': 'slow_blink'
+      'slow chase': 'slow_chase'
+      'slow falling': 'slow_falling'
+      'slow rising': 'slow_rising'
+      'slow siren': 'slow_siren'
+      'small to big': 'small_to_big'
+    effect_start: '{{ effect_start|default("clear") }}'
+    effect_start_value: >-
+      {% if effect_start|lower in effects %}
+        {{ effects[effect_start|lower] }}
+      {% else %}
+        {{ effect_start|lower }}
+      {% endif %}
+    effect_end: '{{ effect_end|default("clear") }}'
+    effect_end_value: >-
+      {% if effect_end|lower in effects %}
+        {{ effects[effect_end|lower] }}
+      {% else %}
+        {{ effect_end|lower }}
+      {% endif %}
+
+    # Convert Duration to value
     durations:
-      'Off': 0
-      '1 Second': 1
-      '2 Seconds': 2
-      '3 Seconds': 3
-      '4 Seconds': 4
-      '5 Seconds': 5
-      '6 Seconds': 6
-      '7 Seconds': 7
-      '8 Seconds': 8
-      '9 Seconds': 9
-      '10 Seconds': 10
-      '15 Seconds': 15
-      '20 Seconds': 20
-      '25 Seconds': 25
-      '30 Seconds': 30
-      '35 Seconds': 35
-      '40 Seconds': 40
-      '45 Seconds': 45
-      '50 Seconds': 50
-      '55 Seconds': 55
-      '1 Minute': 60
-      '2 Minutes': 62
-      '3 Minutes': 63
-      '4 Minutes': 64
-      '5 Minutes': 65
-      '6 Minutes': 66
-      '7 Minutes': 67
-      '8 Minutes': 68
-      '9 Minutes': 69
-      '10 Minutes': 70
-      '15 Minutes': 75
-      '20 Minutes': 80
-      '25 Minutes': 85
-      '30 Minutes': 90
-      '35 Minutes': 95
-      '40 Minutes': 100
-      '45 Minutes': 105
-      '50 Minutes': 110
-      '55 Minutes': 115
-      '1 Hour': 120
-      '2 Hours': 122
-      '3 Hours': 123
-      '4 Hours': 124
-      '5 Hours': 125
-      '6 Hours': 126
-      '7 Hours': 127
-      '8 Hours': 128
-      '9 Hours': 129
-      '10 Hours': 130
-      '15 Hours': 135
-      '20 Hours': 140
-      '1 Day': 144
-      '2 Days': 168
-      '3 Days': 192
-      '4 Days': 216
-      '5 Days': 240
-      'Indefinitely': 255
-      'Forever': 255
-    duration: '{{ duration|default("Indefinitely") }}'
+      'off': 0
+      '1 second': 1
+      '2 seconds': 2
+      '3 seconds': 3
+      '4 seconds': 4
+      '5 seconds': 5
+      '6 seconds': 6
+      '7 seconds': 7
+      '8 seconds': 8
+      '9 seconds': 9
+      '10 seconds': 10
+      '15 seconds': 15
+      '20 seconds': 20
+      '25 seconds': 25
+      '30 seconds': 30
+      '35 seconds': 35
+      '40 seconds': 40
+      '45 seconds': 45
+      '50 seconds': 50
+      '55 seconds': 55
+      '1 minute': 60
+      '2 minutes': 62
+      '3 minutes': 63
+      '4 minutes': 64
+      '5 minutes': 65
+      '6 minutes': 66
+      '7 minutes': 67
+      '8 minutes': 68
+      '9 minutes': 69
+      '10 minutes': 70
+      '15 minutes': 75
+      '20 minutes': 80
+      '25 minutes': 85
+      '30 minutes': 90
+      '35 minutes': 95
+      '40 minutes': 100
+      '45 minutes': 105
+      '50 minutes': 110
+      '55 minutes': 115
+      '1 hour': 120
+      '2 hours': 122
+      '3 hours': 123
+      '4 hours': 124
+      '5 hours': 125
+      '6 hours': 126
+      '7 hours': 127
+      '8 hours': 128
+      '9 hours': 129
+      '10 hours': 130
+      '15 hours': 135
+      '20 hours': 140
+      '1 day': 144
+      '2 days': 168
+      '3 days': 192
+      '4 days': 216
+      '5 days': 240
+      'indefinitely': 255
+      'forever': 255
+    duration: '{{ duration|default("indefinitely") }}'
     duration_value: >-
       {% if duration|int(default=-1) == -1 %}
-        {{ durations[duration]|int(default=255) }}
+        {{ durations[duration|lower]|int(default=255) }}
       {% else %}
         {{ duration|int(default=255) }}
       {% endif %}
@@ -320,15 +406,13 @@ inovelli_blue_led_status_start:
                   title: 'DEBUG: script.inovelli_blue_led_status_start'
                   message: |-
                     entity: {{ repeat.item }}
-                    device_name: {{ device_attr(repeat.item, "name") }}
-                    topic: zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set
                     led: {{ led_value }}
-                    color_start: {{ color_start }}
+                    color_start: {{ color_start }} ({{ color_start_value }})
                     level_start: {{ level_start }}
-                    effect_start: {{ effect_start }}
-                    color_end: {{ color_end }}
+                    effect_start: {{ effect_start }} ({{ effect_start_value }})
+                    color_end: {{ color_end }} ({{ color_end_value }})
                     level_end: {{ level_end }}
-                    effect_end: {{ effect_end }}
+                    effect_end: {{ effect_end }} ({{ effect_end_value }})
                     duration: {{ duration }} ({{ duration_value }})
 
           - service: script.inovelli_blue_led
@@ -336,10 +420,10 @@ inovelli_blue_led_status_start:
               entity_id:
                 - '{{ repeat.item }}'
               led: '{{ led_value }}'
-              color: '{{ color_start }}'
-              effect: '{{ effect_start }}'
-              duration: '{{ duration_value }}'
+              color: '{{ color_start_value }}'
               level: '{{ level_start }}'
+              effect: '{{ effect_start_value }}'
+              duration: '{{ duration_value }}'
               enable_debug: '{{ debug }}'
 
           - delay:
@@ -350,8 +434,8 @@ inovelli_blue_led_status_start:
               entity_id:
                 - '{{ repeat.item }}'
               led: '{{ led_value }}'
-              color: '{{ color_end }}'
-              effect: '{{ effect_end }}'
-              duration: 'Indefinitely'
+              color: '{{ color_end_value }}'
               level: '{{ level_end }}'
+              effect: '{{ effect_end_value }}'
+              duration: 'Indefinitely'
               enable_debug: '{{ debug }}'
