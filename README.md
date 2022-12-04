@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1651 total entities**,
-including **811 sensors**.
+This Home Assistant install has approximately **1655 total entities**,
+including **813 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -274,7 +274,7 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.6.5]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.0]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -362,7 +362,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.0]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.1]
 
 Replace input_number sliders with plus and minus buttons
 
@@ -370,7 +370,7 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.4.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.5.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -422,7 +422,7 @@ Additional themes for Lovelace Mushroom Cards 🍄
 
 🐵 Dark Blue Theme for Home Assistant
 
-### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.3]
+### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.4]
 
 Dark Grey Theme for Home Assistant
 
