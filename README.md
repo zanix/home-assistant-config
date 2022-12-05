@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1655 total entities**,
+This Home Assistant install has approximately **1656 total entities**,
 including **813 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -165,6 +165,10 @@ Monitors disk usage, memory usage, CPU usage, and running processes.
 ### [Tasmota](https://www.home-assistant.io/integrations/tasmota)
 
 This integration allows to control of Tasmota devices over MQTT
+
+### [Twinkly](https://www.home-assistant.io/integrations/twinkly)
+
+The Twinkly integration allows you to control Twinkly LED string from Home Assistant
 
 ### [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi)
 
@@ -525,7 +529,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>138 Automations</summary>
+<details><summary>139 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -563,8 +567,8 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🍽️ Dishwasher is Running
 - 🎄 XMas Lights Off
 - 🎄 XMas Lights On
-- 🎄 XMas Tree Off (Disabled)
-- 🎄 XMas Tree On (Disabled)
+- 🎄 XMas Tree Off
+- 🎄 XMas Tree On
 - 🏢 Office Day Mode
 - 🏢 Office Night Mode
 - 💡 All Lights off when Away
@@ -658,6 +662,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🖨️ Out of Paper
 - 🗺️ Leaving Costco
 - 🗺️ Leaving Fred Meyer
+- 🗺️ Leaving Hair Salon
 - 🗺️ Leaving Wal-Mart
 - 🗺️ Leaving WinCo
 - 🚦 Front Door Light Switch Status
