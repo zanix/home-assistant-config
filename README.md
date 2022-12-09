@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1656 total entities**,
-including **813 sensors**.
+This Home Assistant install has approximately **1647 total entities**,
+including **811 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -206,7 +206,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
 
-🔹 A Home Assistant integration to turn your browser into a controllable entity - and also an audio player
+🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
 ### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
 
@@ -218,7 +218,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 🔹 Use icons from fontawesome in home-assistant
 
-### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.9.0]
+### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.10.0]
 
 🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
 
@@ -278,7 +278,7 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.0]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.1]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -302,7 +302,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>27 Lovelace Plugins</summary>
 
-### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.1]
+### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
@@ -342,7 +342,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.38]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.39]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -374,7 +374,7 @@ Replace input_number sliders with plus and minus buttons
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.5.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.5.2]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -696,7 +696,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.11.5-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.12.0-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/workflow/status/zanix/home-assistant-config/build/master?style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
