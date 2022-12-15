@@ -218,7 +218,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 🔹 Use icons from fontawesome in home-assistant
 
-### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.10.0]
+### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.10.2]
 
 🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
 
@@ -236,7 +236,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.28.4]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.29.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -248,7 +248,7 @@ HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capa
 
 Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
-### [Holidays](https://github.com/bruxy70/Holidays) [v1.8.0]
+### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.1]
 
 📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
 
@@ -342,7 +342,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.39]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.41]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -398,7 +398,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.20]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.24]
 
 A progress bar display for Home Assistant timers
 
@@ -696,11 +696,11 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.12.0-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.12.8-555555?style=flat-square&logo=home-assistant
 
-[github-build-status-shield]: https://img.shields.io/github/workflow/status/zanix/home-assistant-config/build/master?style=flat-square&logo=github-actions&logoColor=838B95
+[github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
-[github-linter-status-shield]: https://img.shields.io/github/workflow/status/zanix/home-assistant-config/linters/master?style=flat-square&label=linters&logo=github-actions&logoColor=838B95
+[github-linter-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/linters.yaml?branch=master&style=flat-square&label=linters&logo=github-actions&logoColor=838B95
 [github-linter-status]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yaml
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config/master?style=flat-square&logo=github&logoColor=838B95
