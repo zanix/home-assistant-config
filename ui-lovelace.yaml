@@ -901,8 +901,8 @@ views:
                 navigation_path: computer
               type: template
             - content: "{% set progress = states(\"sensor.octoprint_layer_progress\"\
-                ) %}\n{% if progress != \"unknown\" %}\n  {{ progress }}\n{% endif\
-                \ %}"
+                ) %}\n{% if is_state(entity, \"on\") and progress != \"unknown\" %}\n\
+                \  {{ progress }}\n{% endif %}"
               entity: switch.octoprint_psu
               hold_action:
                 action: none
@@ -1018,7 +1018,7 @@ views:
                                   style: "ha-card {\n  --badge-size: 0px !important;\n\
                                     }\n"
                                 entity: sensor.octoprint_print_status
-                                icon: fab:github
+                                icon: mdi:printer-3d-nozzle
                                 icon_color: green
                                 name: Status
                                 primary_info: state
@@ -1421,12 +1421,56 @@ views:
               data:
                 content:
                   cards:
-                  - current: true
-                    entity: weather.openweathermap
-                    forecast: true
-                    icons: /local/icons/weather_icons/animated/
-                    number_of_forecasts: 6
-                    type: custom:weather-card
+                  - card_config_version: 8
+                    entity_apparent_temp: sensor.openweathermap_feels_like_temperature
+                    entity_forecast_icon: weather.openweathermap
+                    entity_forecast_icon_1: weather.openweathermap
+                    entity_forecast_max: sensor.openweathermap_forecast_temperature
+                    entity_forecast_max_1: weather.openweathermap
+                    entity_forecast_min: sensor.openweathermap_forecast_temperature_low
+                    entity_forecast_min_1: weather.openweathermap
+                    entity_humidity: sensor.openweathermap_humidity
+                    entity_pop: sensor.openweathermap_forecast_precipitation_probability
+                    entity_pop_1: weather.openweathermap
+                    entity_pos: sensor.openweathermap_forecast_precipitation
+                    entity_pos_1: weather.openweathermap
+                    entity_pressure: sensor.openweathermap_pressure
+                    entity_summary: weather.openweathermap
+                    entity_summary_1: weather.openweathermap
+                    entity_sun: sun.sun
+                    entity_temperature: weather.openweathermap
+                    entity_uv_alert_summary: sensor.openweathermap_uv_index
+                    entity_visibility: sensor.openweathermap_visibility
+                    entity_wind_bearing: sensor.openweathermap_wind_bearing
+                    entity_wind_speed: sensor.openweathermap_wind_speed
+                    option_color_fire_danger: true
+                    option_static_icons: false
+                    option_time_format: 12hour
+                    option_today_rainfall_decimals: false
+                    option_today_temperature_decimals: false
+                    section_order:
+                    - overview
+                    - extended
+                    - slots
+                    - daily_forecast
+                    show_section_extended: false
+                    slot_l1: forecast_max
+                    slot_l2: forecast_min
+                    slot_l3: wind
+                    slot_l4: pressure
+                    slot_l5: sun_next
+                    slot_l6: remove
+                    slot_l7: remove
+                    slot_l8: remove
+                    slot_r1: popforecast
+                    slot_r2: humidity
+                    slot_r3: uv_summary
+                    slot_r4: visibility
+                    slot_r5: sun_following
+                    slot_r6: remove
+                    slot_r7: remove
+                    slot_r8: remove
+                    type: custom:platinum-weather-card
                   - type: iframe
                     url: https://embed.windy.com/embed2.html?lat=43.241&lon=-112.143&zoom=7&level=surface&overlay=wind&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=43.490&detailLon=-112.040&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1
                   - darkMode: true
@@ -1661,7 +1705,8 @@ views:
             style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
               \  --chip-spacing: 0;\n}\n"
           chips:
-          - content: '{{ states(entity)|round(0) }}mi'
+          - content: "{% if not is_state(entity, 'unavailable') %}\n  {{ states(entity)|round(0)\
+              \ }}mi\n{% endif %}"
             entity: sensor.ascent_range
             icon: mdi:gas-station
             icon_color: "{% if not is_state(entity, 'unavailable') %}\n  {% set range\
@@ -1672,7 +1717,8 @@ views:
             tap_action:
               action: more-info
             type: template
-          - content: '{{ states(entity) }}mpg'
+          - content: "{% if not is_state(entity, 'unavailable') %}\n  {{ states(entity)\
+              \ }}mpg\n{% endif %}"
             entity: sensor.ascent_avg_fuel_consumption
             tap_action:
               action: more-info
@@ -1823,17 +1869,6 @@ views:
         - path: family
         - chips:
           - chip:
-              entity: binary_sensor.ardena_connected
-              icon: mdi:desktop-tower
-              icon_color: teal
-              tap_action:
-                action: none
-              type: template
-            conditions:
-            - entity: binary_sensor.ardena_connected
-              state: 'on'
-            type: conditional
-          - chip:
               entity: binary_sensor.athos_connected
               icon: mdi:desktop-tower
               icon_color: lime
@@ -1856,13 +1891,14 @@ views:
               state: 'on'
             type: conditional
           - entity: select.family_room_activities
-            icon: "{% set state = states(entity) %}\n{% if state == \"PS3\" %}\n \
-              \ fapro:ps3\n{% elif state == \"PS4\" %}\n  fapro:ps4\n{% elif state\
-              \ == \"XBox\" %}\n  mdi:microsoft-xbox\n{% else %}\n  mdi:gamepad-variant\n\
-              {% endif %}"
-            icon_color: "{% set state = states(entity) %}\n{% if state == \"PS3\"\
-              \ %}\n  cyan\n{% elif state == \"PS4\" %}\n  blue\n{% elif state ==\
-              \ \"XBox\" %}\n  green\n{% else %}\n  disabled\n{% endif %}"
+            icon: "{% set state = states(entity) %}\n{% if state == \"Computer\" %}\n\
+              \  mdi:desktop-tower\n{% elif state == \"PS3\" %}\n  fapro:ps3\n{% elif\
+              \ state == \"PS4\" %}\n  fapro:ps4\n{% elif state == \"XBox\" %}\n \
+              \ mdi:microsoft-xbox\n{% else %}\n  mdi:gamepad-variant\n{% endif %}"
+            icon_color: "{% set state = states(entity) %}\n{% if state == \"Computer\"\
+              \ %}\n  teal\n{% elif state == \"PS3\" %}\n  cyan\n{% elif state ==\
+              \ \"PS4\" %}\n  blue\n{% elif state == \"XBox\" %}\n  green\n{% else\
+              \ %}\n  disabled\n{% endif %}"
             tap_action:
               action: none
             type: template
@@ -2697,6 +2733,14 @@ views:
       show_color_temp_control: true
       type: custom:mushroom-light-card
       use_light_color: true
+    - entity: light.wled_mario_star
+      layout: horizontal
+      name: Star
+      show_brightness_control: true
+      show_color_control: true
+      show_color_temp_control: true
+      type: custom:mushroom-light-card
+      use_light_color: true
     - entity: switch.xmas_light
       name: Lights
       type: custom:mushroom-light-card
@@ -2862,7 +2906,7 @@ views:
       info: scroll
       name: Google Home
       tts:
-        platform: cloud
+        platform: google_cloud
       type: custom:mini-media-player
     type: vertical-stack
   icon: mdi:sofa-single
@@ -3114,7 +3158,7 @@ views:
       info: scroll
       name: Google Home
       tts:
-        platform: cloud
+        platform: google_cloud
       type: custom:mini-media-player
     type: vertical-stack
   - cards:
@@ -3370,7 +3414,7 @@ views:
     info: scroll
     name: Google Home
     tts:
-      platform: cloud
+      platform: google_cloud
     type: custom:mini-media-player
   icon: mdi:chair-rolling
   layout:

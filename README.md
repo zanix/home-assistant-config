@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1647 total entities**,
-including **811 sensors**.
+This Home Assistant install has approximately **1724 total entities**,
+including **841 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -370,6 +370,10 @@ Mushroom Cards - Build a beautiful dashboard easily 🍄
 
 Replace input_number sliders with plus and minus buttons
 
+### [Platinum Weather Card](https://github.com/Makin-Things/platinum-weather-card) [v1.0.4]
+
+This is a fully customisable weather card for Home Assistant with a graphical configuration.
+
 ### [Rgb Light Card](https://github.com/bokub/rgb-light-card) [v1.11.0]
 
 💡 A Lovelace custom card for RGB lights
@@ -405,10 +409,6 @@ A progress bar display for Home Assistant timers
 ### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.13.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
-
-### [Weather Card](https://github.com/bramkragten/weather-card) [v1.5.0]
-
-Weather Card with animated icons for Home Assistant Lovelace
 
 ---
 
