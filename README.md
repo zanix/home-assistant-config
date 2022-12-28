@@ -15,12 +15,12 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - [Home Assistant][home-assistant]
 - [MQTT](https://mosquitto.org) - MQTT Broker docker container
 - [Zigbee2MQTT](https://www.zigbee2mqtt.io) - Zigbee to MQTT bridge, get rid of your proprietary Zigbee bridges
-- [Zwavejs2Mqtt](https://zwave-js.github.io/zwavejs2mqtt) - Fully configurable Z-Wave to MQTT Gateway and Control Panel.
+- [Z-Wave JS UI](https://zwave-js.github.io/zwave-js-ui/#/) - Full featured Z-Wave Control Panel and MQTT Gateway.
 
 ## Technical Details
 
-This Home Assistant install has approximately **1724 total entities**,
-including **841 sensors**.
+This Home Assistant install has approximately **1706 total entities**,
+including **819 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -248,7 +248,7 @@ HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capa
 
 Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
-### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.1]
+### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.3]
 
 📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
 
@@ -260,7 +260,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b20]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b21]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -306,7 +306,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
-### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.11.0]
+### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.12.0]
 
 🔹Automatically populate the entities-list of lovelace cards
 
@@ -412,7 +412,11 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ---
 
-</details><details><summary>5 Themes</summary>
+</details><details><summary>6 Themes</summary>
+
+### [Catppuccin Theme](https://github.com/catppuccin/home-assistant) [v1.0.1]
+
+🏠 Soothing pastel theme for Home Assistant
 
 ### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v1.7.2]
 

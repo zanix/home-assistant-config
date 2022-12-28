@@ -12,7 +12,7 @@ from homeassistant.helpers.entity import EntityCategory
 
 DOMAIN = "mail_and_packages"
 DOMAIN_DATA = f"{DOMAIN}_data"
-VERSION = "0.3.5-b20"
+VERSION = "0.3.5-b21"
 ISSUE_URL = "http://github.com/moralmunky/Home-Assistant-Mail-And-Packages"
 PLATFORM = "sensor"
 PLATFORMS = ["binary_sensor", "camera", "sensor"]
@@ -174,6 +174,8 @@ SENSOR_DATA = {
         "subject": [
             "Your UPS Package was delivered",
             "Your UPS Packages were delivered",
+            "Your UPS Parcel was delivered",
+            "Your UPS Parcels were delivered",
         ],
     },
     "ups_delivering": {
@@ -182,6 +184,7 @@ SENSOR_DATA = {
             "UPS Update: Package Scheduled for Delivery Today",
             "UPS Update: Follow Your Delivery on a Live Map",
             "UPS Pre-Arrival: Your Driver is Arriving Soon! Follow on a Live Map",
+            "UPS Update: Parcel Scheduled for Delivery Today",
         ],
     },
     "ups_exception": {
@@ -233,8 +236,13 @@ SENSOR_DATA = {
         "subject": [
             "DHL On Demand Delivery",
             "Powiadomienie o przesyłce",
+            "Ihr DHL Paket wurde zugestellt",
         ],
-        "body": ["has been delivered", "została doręczona"],
+        "body": [
+            "has been delivered",
+            "została doręczona",
+            "ist angekommen",
+        ],
     },
     "dhl_delivering": {
         "email": [
@@ -245,10 +253,14 @@ SENSOR_DATA = {
         ],
         "subject": [
             "DHL On Demand Delivery",
-            "paket kommt heute",
+            "Ihr DHL Paket kommt heute",
             "Powiadomienie o przesyłce",
         ],
-        "body": ["scheduled for delivery TODAY", "zostanie dziś do Państwa doręczona"],
+        "body": [
+            "scheduled for delivery TODAY",
+            "zostanie dziś do Państwa doręczona",
+            "wird Ihnen heute",
+        ],
     },
     "dhl_packages": {},
     "dhl_tracking": {"pattern": ["\\d{10,11}"]},
