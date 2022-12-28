@@ -202,7 +202,13 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>16 Custom Integrations</summary>
+<details><summary>17 Custom Integrations</summary>
+
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.4.1]
+
+Adaptive Lighting custom component for Home Assistant
+
+Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra).
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
 
@@ -559,7 +565,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ Failed Login
 - ⚙️ HACS Updates
 - ⚙️ RAM Usage High
-- ⚙️ Startup (Disabled)
+- ⚙️ Startup
 - ⚙️ Upgrade Available
 - ⚡ Tariff Summer Off-Peak
 - ⚡ Tariff Summer Peak
