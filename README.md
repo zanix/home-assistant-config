@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1706 total entities**,
-including **819 sensors**.
+This Home Assistant install has approximately **1725 total entities**,
+including **836 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -196,7 +196,7 @@ The yamaha platform allows you to control Yamaha Network Receivers
 
 ### [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js)
 
-The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS](https://zwave-js.github.io/zwavejs2mqtt) driver. This is the recommended Z-Wave integration for Home Assistant.
+The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS UI](https://zwave-js.github.io/zwave-js-ui) driver. This is the recommended Z-Wave integration for Home Assistant.
 
 ---
 
@@ -298,7 +298,7 @@ Authors: [@dummylabs](https://github.com/dummylabs).
 
 ### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v2.3.1]
 
-Home Assistant custom component for viewing IP cameras RTSP stream in real time using WebRTC and MSE technology
+Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
 Authors: [@AlexxIT](https://github.com/AlexxIT).
 
@@ -567,6 +567,8 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ RAM Usage High
 - ⚙️ Startup
 - ⚙️ Upgrade Available
+- ⚙️ Zigbee2MQTT Update
+- ⚙️ ZWave JS UI Update
 - ⚡ Tariff Summer Off-Peak
 - ⚡ Tariff Summer Peak
 - ⚡ Tariff Winter Off-Peak
@@ -575,10 +577,10 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
 - 🍽️ Dishwasher is Running
-- 🎄 XMas Lights Off
-- 🎄 XMas Lights On
-- 🎄 XMas Tree Off
-- 🎄 XMas Tree On
+- 🎄 XMas Lights Off (Disabled)
+- 🎄 XMas Lights On (Disabled)
+- 🎄 XMas Tree Off (Disabled)
+- 🎄 XMas Tree On (Disabled)
 - 🏢 Office Day Mode
 - 🏢 Office Night Mode
 - 💡 All Lights off when Away
