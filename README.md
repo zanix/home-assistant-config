@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1725 total entities**,
-including **836 sensors**.
+This Home Assistant install has approximately **1718 total entities**,
+including **843 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -210,7 +210,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.1.3]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -312,7 +312,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
-### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.12.0]
+### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.12.1]
 
 🔹Automatically populate the entities-list of lovelace cards
 
@@ -348,7 +348,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.41]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.42]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -539,7 +539,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>139 Automations</summary>
+<details><summary>141 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -708,7 +708,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.12.8-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2022.12.9-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
