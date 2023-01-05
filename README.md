@@ -242,7 +242,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.29.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.29.1]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -266,7 +266,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.5-b21]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.6]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
