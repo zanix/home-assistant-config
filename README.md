@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1718 total entities**,
-including **843 sensors**.
+This Home Assistant install has approximately **1734 total entities**,
+including **857 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -278,17 +278,17 @@ OpenEI integration for Home Assistant
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Sensor.Unifigateway](https://github.com/custom-components/sensor.unifigateway) [v0.3.3]
-
-High level health status of UniFi Security Gateway devices via UniFi Controller
-
-Authors: [@jchasey](https://github.com/jchasey).
-
 ### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.1]
 
 Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
+
+### [Unifi Status](https://github.com/zvldz/unifi_status)
+
+High level health status of UniFi Security Gateway devices via UniFi Controller
+
+Authors: [@jchasey](https://github.com/jchasey), [@zvldz](https://github.com/zvldz).
 
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.0]
 
@@ -539,7 +539,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>141 Automations</summary>
+<details><summary>143 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -576,6 +576,8 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
+- 🌐 UniFi WAN Offline
+- 🌐 UniFi WAN Online
 - 🍽️ Dishwasher is Running
 - 🎄 XMas Lights Off (Disabled)
 - 🎄 XMas Lights On (Disabled)
