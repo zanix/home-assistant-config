@@ -388,10 +388,6 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
-### [Stack In Card](https://github.com/custom-cards/stack-in-card) [v0.2.0]
-
-🛠 group multiple cards into one card without the borders
-
 ### [Sun Card](https://github.com/AitorDB/home-assistant-sun-card) [v0.1.4]
 
 Home assistant sun card based on Google weather design
@@ -415,6 +411,10 @@ A progress bar display for Home Assistant timers
 ### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.13.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
+
+### [Vertical Stack In Card](https://github.com/ofekashery/vertical-stack-in-card) [v0.4.4]
+
+📐 Home Assistant Card: Similar to vertical/horizontal-stack, but removes card borders
 
 ---
 
