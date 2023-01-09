@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1739 total entities**,
+This Home Assistant install has approximately **1738 total entities**,
 including **857 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -272,7 +272,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.1]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.2]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -366,11 +366,11 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.1]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.3]
 
 Replace input_number sliders with plus and minus buttons
 
-### [Platinum Weather Card](https://github.com/Makin-Things/platinum-weather-card) [v1.0.4]
+### [Platinum Weather Card](https://github.com/Makin-Things/platinum-weather-card) [v1.0.5]
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
@@ -418,7 +418,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🏠 Soothing pastel theme for Home Assistant
 
-### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v1.7.2]
+### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9]
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 
@@ -705,7 +705,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2022.12.9-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.1.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
