@@ -1276,18 +1276,18 @@ views:
             action: navigate
             navigation_path: lights
           type: template
-        - content: "{% if not is_state(entity, 'unavailable') %}\n  {% set power\
-            \ = states(entity) | int | abs %}\n  {% if power > 1000 %}\n    {{\
-            \ (power | float * 0.001) | round(2) }} kWh\n  {% else %}\n    {{\
-            \ power }} W\n  {% endif %}\n{% endif %}"
-          entity: sensor.home_123_1min
-          icon: "{% if is_state(entity, 'unavailable') %}\n  mdi:transmission-tower-off\n\
-            {% else %}\n  {% if states(entity) | int < 0 %}\n    mdi:transmission-tower-import\n\
-            \  {% else %}\n    mdi:transmission-tower-export\n  {% endif %}\n\
-            {% endif %}"
-          icon_color: "{% if is_state(entity, 'unavailable') %}\n  disabled\n\
-            {% else %}\n  {% if states(entity) | int < 0 %}\n    lime\n  {% else\
-            \ %}\n    deep-orange\n  {% endif %}\n{% endif %}"
+        - content: "{% if not is_state(entity, 'unavailable') and not is_state(entity,\
+            \ 'unknown') %}\n  {% set power = states(entity) | int | abs %}\n  {%\
+            \ if power > 1000 %}\n    {{ (power | float * 0.001) | round(2) }} kWh\n\
+            \  {% else %}\n    {{ power }} W\n  {% endif %}\n{% endif %}"
+          entity: sensor.grid_power
+          icon: "{% if is_state(entity, 'unavailable') or is_state(entity, 'unknown')\
+            \ %}\n  mdi:transmission-tower-off\n{% else %}\n  {% if states(entity)\
+            \ | int < 0 %}\n    mdi:transmission-tower-import\n  {% else %}\n    mdi:transmission-tower-export\n\
+            \  {% endif %}\n{% endif %}"
+          icon_color: "{% if is_state(entity, 'unavailable') or is_state(entity, 'unknown')\
+            \ %}\n  disabled\n{% else %}\n  {% if states(entity) | int < 0 %}\n  \
+            \  lime\n  {% else %}\n    deep-orange\n  {% endif %}\n{% endif %}"
           tap_action:
             action: navigate
             navigation_path: power
@@ -6331,10 +6331,10 @@ views:
     - icon: mdi:transmission-tower
     - icon_color: red
     - chips:
-      - entity: sensor.solar_1min
+      - entity: sensor.pv_power
         icon: mdi:solar-power-variant
         type: entity
-      - entity: sensor.home_123_1mon
+      - entity: sensor.load_monthly
         type: entity
       - content: '{{ iif(not is_state(entity, "unavailable"), states(entity) | float(default=0))
           }}'
@@ -6345,37 +6345,35 @@ views:
         tap_action:
           action: more-info
         type: template
+      - content: '{{ iif(not is_state(entity, "unavailable"), states(entity) | int(default=0)
+          ~ "%") }}'
+        entity: sensor.battery_state_of_charge
+        hold_action:
+          action: none
+        icon: "{% set value = states(entity) | int %} {% if value == 100 %}\n  mdi:battery\n\
+          {% elif value < 10 %}\n  mdi:battery-outline\n{% else %}\n  mdi:battery-{{\
+          \ value // 10 * 10 }}\n{% endif %}"
+        icon_color: "{% set value = states(entity) | int %} {% if (value >= 75) %}\n\
+          \  green\n{% elif (value >= 65) %}\n  light-green\n{% elif (value >= 55)\
+          \ %}\n  lime\n{% elif (value >= 45) %}\n  yellow\n{% elif (value >= 35)\
+          \ %}\n  amber\n{% elif (value >= 25) %}\n  orange\n{% elif (value >= 15)\
+          \ %}\n  deep-orange\n{% else %}\n  red\n{% endif %}"
+        tap_action:
+          action: more-info
+        type: template
   - cards:
     - title: Cost
       type: custom:mushroom-title-card
     - cards:
       - entity: sensor.minute_power_cost
-        icon: mdi:currency-usd
-        icon_color: grey
-        primary: '{{ "$" ~ states(entity) | float(default=0) if not is_state(entity,
-          "unavailable") }}'
-        secondary: Minute
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
+        name: Minute
+        type: entity
       - entity: sensor.day_power_cost
-        icon: mdi:currency-usd
-        icon_color: grey
-        primary: '{{ "$" ~ states(entity) | float(default=0) if not is_state(entity,
-          "unavailable") }}'
-        secondary: Day
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
+        name: Day
+        type: entity
       - entity: sensor.month_power_cost
-        icon: mdi:currency-usd
-        icon_color: grey
-        primary: '{{ "$" ~ states(entity) | float(default=0) if not is_state(entity,
-          "unavailable") }}'
-        secondary: Month
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
+        name: Month
+        type: entity
       columns: 3
       square: false
       type: grid
@@ -6383,28 +6381,28 @@ views:
       - cards:
         - title: Daily Usage
           type: custom:mushroom-title-card
-        - entity: sensor.home_123_1d
+        - entity: sensor.grid_net_daily
           icon: mdi:transmission-tower
           icon_color: blue
           name: Net
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.mainsfromgrid_1d
+        - entity: sensor.grid_in_daily
           icon: mdi:transmission-tower-import
           icon_color: amber
           name: Import
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.mainstogrid_1d
+        - entity: sensor.grid_out_daily
           icon: mdi:transmission-tower-export
           icon_color: green
           name: Export
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.totalusage_1d
+        - entity: sensor.load_daily
           icon: mdi:calendar-today
           icon_color: orange
           name: Total
@@ -6420,82 +6418,95 @@ views:
             browser_mod:
               data:
                 content:
-                  height: 500
+                  height: 700
                   round: 1
                   sections:
                   - entities:
                     - children:
-                      - sensor.totalusage_1d
-                      color: rgb(var(--rgb-light-blue-color))
-                      entity_id: sensor.mainsfromgrid_1d
-                      name: Grid Energy
+                      - sensor.load_daily
+                      - sensor.battery_in_daily
+                      color: rgb(var(--rgb-purple-color))
+                      entity_id: sensor.grid_in_daily
+                      name: Grid Import
+                      remaining:
+                        color: rgb(var(--rgb-grey-color))
+                        name: Inverter
                     - children:
-                      - sensor.totalusage_1d
-                      - sensor.mainstogrid_1d
+                      - sensor.load_daily
+                      color: rgb(var(--rgb-pink-color))
+                      entity_id: sensor.battery_out_daily
+                      name: Battery
+                    - children:
+                      - sensor.load_daily
+                      - sensor.grid_out_daily
                       color: rgb(var(--rgb-orange-color))
-                      entity_id: sensor.solar_1d
+                      entity_id: sensor.pv_daily
                       name: Solar
                   - entities:
                     - children:
-                      - sensor.home_balance_1d
-                      - sensor.air_conditioner_1d
-                      - sensor.basement_bedrooms_1d
-                      - sensor.bedrooms_1d
-                      - sensor.dishwasher_disposal_1d
-                      - sensor.dryer_1d
-                      - sensor.entry_living_bath_lights_1d
-                      - sensor.family_room_1d
-                      - sensor.fridge_kitchen_outlets_1d
-                      - sensor.furnace_1d
-                      - sensor.garage_outlets_1d
-                      - sensor.living_room_master_bedroom_1d
-                      - sensor.mechanical_1d
-                      - sensor.microwave_1d
-                      - sensor.range_1d
-                      - sensor.theater_room_1d
-                      - sensor.washer_1d
+                      - sensor.home_balance_energy
+                      - sensor.air_conditioner_energy
+                      - sensor.basement_bedrooms_energy
+                      - sensor.bedrooms_energy
+                      - sensor.dishwasher_disposal_energy
+                      - sensor.dryer_energy
+                      - sensor.entry_living_bath_lights_energy
+                      - sensor.family_room_energy
+                      - sensor.fridge_kitchen_outlets_energy
+                      - sensor.furnace_energy
+                      - sensor.garage_outlets_energy
+                      - sensor.living_room_master_bedroom_energy
+                      - sensor.mechanical_energy
+                      - sensor.microwave_energy
+                      - sensor.range_energy
+                      - sensor.theater_room_energy
+                      - sensor.washer_energy
                       color: rgb(var(--rgb-cyan-color))
-                      entity_id: sensor.totalusage_1d
+                      entity_id: sensor.load_daily
                       name: Total Energy Used
                       remaining:
+                        color: rgb(var(--rgb-grey-color))
                         name: Other
+                    - color: rgb(var(--rgb-pink-color))
+                      entity_id: sensor.battery_in_daily
+                      name: Battery Charge
                     - color: rgb(var(--rgb-purple-color))
-                      entity_id: sensor.mainstogrid_1d
-                      name: Exported
+                      entity_id: sensor.grid_out_daily
+                      name: Grid Export
                   - entities:
-                    - entity_id: sensor.home_balance_1d
+                    - entity_id: sensor.home_balance_energy
                       name: Balance
-                    - entity_id: sensor.air_conditioner_1d
+                    - entity_id: sensor.air_conditioner_energy
                       name: Air Conditioner
-                    - entity_id: sensor.basement_bedrooms_1d
+                    - entity_id: sensor.basement_bedrooms_energy
                       name: Basement Bedrooms
-                    - entity_id: sensor.bedrooms_1d
+                    - entity_id: sensor.bedrooms_energy
                       name: Bedrooms
-                    - entity_id: sensor.dishwasher_disposal_1d
+                    - entity_id: sensor.dishwasher_disposal_energy
                       name: Dishwasher / Disposal
-                    - entity_id: sensor.dryer_1d
+                    - entity_id: sensor.dryer_energy
                       name: Dryer
-                    - entity_id: sensor.entry_living_bath_lights_1d
+                    - entity_id: sensor.entry_living_bath_lights_energy
                       name: Entry, Living Room, Bath Lights
-                    - entity_id: sensor.family_room_1d
+                    - entity_id: sensor.family_room_energy
                       name: Family Room
-                    - entity_id: sensor.fridge_kitchen_outlets_1d
+                    - entity_id: sensor.fridge_kitchen_outlets_energy
                       name: Fridge / Kitchen Outlets
-                    - entity_id: sensor.furnace_1d
+                    - entity_id: sensor.furnace_energy
                       name: Furnace
-                    - entity_id: sensor.garage_outlets_1d
+                    - entity_id: sensor.garage_outlets_energy
                       name: Garage Outlets
-                    - entity_id: sensor.living_room_master_bedroom_1d
+                    - entity_id: sensor.living_room_master_bedroom_energy
                       name: Living / Master Bed
-                    - entity_id: sensor.microwave_1d
+                    - entity_id: sensor.microwave_energy
                       name: Microwave
-                    - entity_id: sensor.mechanical_1d
+                    - entity_id: sensor.mechanical_energy
                       name: Utility
-                    - entity_id: sensor.range_1d
+                    - entity_id: sensor.range_energy
                       name: Range
-                    - entity_id: sensor.theater_room_1d
+                    - entity_id: sensor.theater_room_energy
                       name: Theater Room
-                    - entity_id: sensor.washer_1d
+                    - entity_id: sensor.washer_energy
                       name: Washer
                   show_names: true
                   type: custom:sankey-chart
@@ -6509,28 +6520,28 @@ views:
       - cards:
         - title: Monthly Usage
           type: custom:mushroom-title-card
-        - entity: sensor.home_123_1mon
+        - entity: sensor.grid_net_monthly
           icon: mdi:transmission-tower
           icon_color: blue
           name: Net
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.mainsfromgrid_1mon
+        - entity: sensor.grid_in_monthly
           icon: mdi:transmission-tower-import
           icon_color: amber
           name: Import
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.mainstogrid_1mon
+        - entity: sensor.grid_out_monthly
           icon: mdi:transmission-tower-export
           icon_color: green
           name: Export
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.totalusage_1mon
+        - entity: sensor.load_monthly
           icon: mdi:calendar-month
           icon_color: orange
           name: Total
@@ -6546,82 +6557,95 @@ views:
             browser_mod:
               data:
                 content:
-                  height: 500
+                  height: 700
                   round: 1
                   sections:
                   - entities:
                     - children:
-                      - sensor.totalusage_1mon
-                      color: rgb(var(--rgb-light-blue-color))
-                      entity_id: sensor.mainsfromgrid_1mon
-                      name: Grid Energy
+                      - sensor.load_monthly
+                      - sensor.battery_in_monthly
+                      color: rgb(var(--rgb-purple-color))
+                      entity_id: sensor.grid_in_monthly
+                      name: Grid Import
+                      remaining:
+                        color: rgb(var(--rgb-grey-color))
+                        name: Inverter
                     - children:
-                      - sensor.totalusage_1mon
-                      - sensor.mainstogrid_1mon
+                      - sensor.load_monthly
+                      color: rgb(var(--rgb-pink-color))
+                      entity_id: sensor.battery_out_monthly
+                      name: Battery
+                    - children:
+                      - sensor.load_monthly
+                      - sensor.grid_out_monthly
                       color: rgb(var(--rgb-orange-color))
-                      entity_id: sensor.solar_1mon
+                      entity_id: sensor.pv_monthly
                       name: Solar
                   - entities:
                     - children:
-                      - sensor.home_balance_1mon
-                      - sensor.air_conditioner_1mon
-                      - sensor.basement_bedrooms_1mon
-                      - sensor.bedrooms_1mon
-                      - sensor.dishwasher_disposal_1mon
-                      - sensor.dryer_1mon
-                      - sensor.entry_living_bath_lights_1mon
-                      - sensor.family_room_1mon
-                      - sensor.fridge_kitchen_outlets_1mon
-                      - sensor.furnace_1mon
-                      - sensor.garage_outlets_1mon
-                      - sensor.living_room_master_bedroom_1mon
-                      - sensor.mechanical_1mon
-                      - sensor.microwave_1mon
-                      - sensor.range_1mon
-                      - sensor.theater_room_1mon
-                      - sensor.washer_1mon
+                      - sensor.home_balance_monthly
+                      - sensor.air_conditioner_monthly
+                      - sensor.basement_bedrooms_monthly
+                      - sensor.bedrooms_monthly
+                      - sensor.dishwasher_disposal_monthly
+                      - sensor.dryer_monthly
+                      - sensor.entry_living_bath_lights_monthly
+                      - sensor.family_room_monthly
+                      - sensor.fridge_kitchen_outlets_monthly
+                      - sensor.furnace_monthly
+                      - sensor.garage_outlets_monthly
+                      - sensor.living_room_master_bedroom_monthly
+                      - sensor.mechanical_monthly
+                      - sensor.microwave_monthly
+                      - sensor.range_monthly
+                      - sensor.theater_room_monthly
+                      - sensor.washer_monthly
                       color: rgb(var(--rgb-cyan-color))
-                      entity_id: sensor.totalusage_1mon
+                      entity_id: sensor.load_monthly
                       name: Total Energy Used
                       remaining:
+                        color: rgb(var(--rgb-grey-color))
                         name: Other
+                    - color: rgb(var(--rgb-pink-color))
+                      entity_id: sensor.battery_in_monthly
+                      name: Battery Charge
                     - color: rgb(var(--rgb-purple-color))
-                      entity_id: sensor.mainstogrid_1mon
-                      name: Exported
+                      entity_id: sensor.grid_out_monthly
+                      name: Grid Export
                   - entities:
-                    - entity_id: sensor.home_balance_1mon
+                    - entity_id: sensor.home_balance_monthly
                       name: Balance
-                    - entity_id: sensor.air_conditioner_1mon
+                    - entity_id: sensor.air_conditioner_monthly
                       name: Air Conditioner
-                    - entity_id: sensor.basement_bedrooms_1mon
+                    - entity_id: sensor.basement_bedrooms_monthly
                       name: Basement Bedrooms
-                    - entity_id: sensor.bedrooms_1mon
+                    - entity_id: sensor.bedrooms_monthly
                       name: Bedrooms
-                    - entity_id: sensor.dishwasher_disposal_1mon
+                    - entity_id: sensor.dishwasher_disposal_monthly
                       name: Dishwasher / Disposal
-                    - entity_id: sensor.dryer_1mon
+                    - entity_id: sensor.dryer_monthly
                       name: Dryer
-                    - entity_id: sensor.entry_living_bath_lights_1mon
+                    - entity_id: sensor.entry_living_bath_lights_monthly
                       name: Entry, Living Room, Bath Lights
-                    - entity_id: sensor.family_room_1mon
+                    - entity_id: sensor.family_room_monthly
                       name: Family Room
-                    - entity_id: sensor.fridge_kitchen_outlets_1mon
+                    - entity_id: sensor.fridge_kitchen_outlets_monthly
                       name: Fridge / Kitchen Outlets
-                    - entity_id: sensor.furnace_1mon
+                    - entity_id: sensor.furnace_monthly
                       name: Furnace
-                    - entity_id: sensor.garage_outlets_1mon
+                    - entity_id: sensor.garage_outlets_monthly
                       name: Garage Outlets
-                    - entity_id: sensor.living_room_master_bedroom_1mon
+                    - entity_id: sensor.living_room_master_bedroom_monthly
                       name: Living / Master Bed
-                    - entity_id: sensor.microwave_1mon
+                    - entity_id: sensor.microwave_monthly
                       name: Microwave
-                    - entity_id: sensor.mechanical_1mon
+                    - entity_id: sensor.mechanical_monthly
                       name: Utility
-                    - entity_id: sensor.range_1mon
+                    - entity_id: sensor.range_monthly
                       name: Range
-                    - entity_id: sensor.theater_room_1mon
+                    - entity_id: sensor.theater_room_monthly
                       name: Theater Room
-                    - entity_id: sensor.washer_1mon
+                    - entity_id: sensor.washer_monthly
                       name: Washer
                   show_names: true
                   type: custom:sankey-chart
@@ -6652,67 +6676,204 @@ views:
       type: custom:mushroom-template-card
     type: vertical-stack
   - cards:
+    - title: Energy Distribution
+      type: custom:mushroom-title-card
+    - link_dashboard: true
+      type: energy-distribution
+    type: vertical-stack
+  - cards:
     - title: Solar Generation
       type: custom:mushroom-title-card
-    - entity: sensor.solar_1min
+    - animate: true
+      entities:
+      - entity: sensor.pv_power
+        name: PV Power
+      height: 60
+      hours_to_show: 12
+      icon: mdi:solar-power-variant
+      line_color: rgb(var(--rgb-green-color))
+      line_width: 2
+      lower_bound: 0
       name: Current
-      primary_info: state
-      secondary_info: name
-      type: custom:mushroom-entity-card
+      points_per_hour: 12
+      show:
+        labels: false
+      type: custom:mini-graph-card
+      upper_bound: 4800
     - cards:
-      - entity: sensor.solar_1d
+      - entity: sensor.pv_daily
         icon: mdi:calendar-today
         name: Today
-        primary_info: state
-        secondary_info: name
-        type: custom:mushroom-entity-card
-      - entity: sensor.solar_1mon
+        type: entity
+      - entity: sensor.pv_monthly
         icon: mdi:calendar-month
         name: This Month
-        primary_info: state
-        secondary_info: name
-        type: custom:mushroom-entity-card
-      - entity: sensor.solar_this_year
+        type: entity
+      - entity: sensor.pv_yearly
+        icon: mdi:calendar-range
         name: This Year
-        primary_info: state
-        secondary_info: name
-        type: custom:mushroom-entity-card
-      - entity: sensor.solar_lifetime
+        type: entity
+      - entity: sensor.pv_energy
+        icon: mdi:calendar-multiple
         name: Lifetime
-        primary_info: state
-        secondary_info: name
-        type: custom:mushroom-entity-card
+        type: entity
       columns: 2
       square: false
       type: grid
     type: vertical-stack
   - cards:
-    - title: Power Usage
+    - title: Battery
+      type: custom:mushroom-title-card
+    - entity: sensor.device_mode
+      icon: mdi:transit-connection-variant
+      name: Mode
+      type: entity
+    - animation:
+        state: 'off'
+      decimal: 1
+      entities:
+      - entity: sensor.battery_state_of_charge
+        icon: mdi:battery-high
+        max: 100
+        min: 0
+        name: State of Charge
+        severity:
+        - color: rgb(var(--rgb-red-color))
+          from: 0
+          to: 30
+        - color: rgb(var(--rgb-orange-color))
+          from: 30
+          to: 50
+        - color: rgb(var(--rgb-amber-color))
+          from: 50
+          to: 70
+        - color: rgb(var(--rgb-light-green-color))
+          from: 70
+          to: 90
+        - color: rgb(var(--rgb-green-color))
+          from: 90
+          to: 100
+      - entity: sensor.battery_voltage
+        icon: mdi:sine-wave
+        max: 56
+        min: 44
+        name: Voltage
+        severity:
+        - color: rgb(var(--rgb-red-color))
+          from: 44
+          to: 46
+        - color: rgb(var(--rgb-amber-color))
+          from: 46
+          to: 48
+        - color: rgb(var(--rgb-green-color))
+          from: 48
+          to: 53
+        - color: rgb(var(--rgb-amber-color))
+          from: 53
+          to: 54
+        - color: rgb(var(--rgb-red-color))
+          from: 54
+          to: 56
+      - entity: sensor.battery_temperature
+        icon: mdi:thermometer
+        max: 150
+        min: -10
+        name: Temperature
+        severity:
+        - color: rgb(var(--rgb-red-color))
+          from: -10
+          to: -4
+        - color: rgb(var(--rgb-orange-color))
+          from: -4
+          to: 32
+        - color: rgb(var(--rgb-amber-color))
+          from: 32
+          to: 42
+        - color: rgb(var(--rgb-green-color))
+          from: 42
+          to: 100
+        - color: rgb(var(--rgb-orange-color))
+          from: 120
+          to: 130
+        - color: rgb(var(--rgb-red-color))
+          from: 130
+          to: 150
+      height: 30px
+      positions:
+        indicator: inside
+      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}"
+      type: custom:bar-card
+    - cards:
+      - entity: sensor.battery_power_in
+        icon: mdi:battery-arrow-up
+        name: Power In
+        type: entity
+      - entity: sensor.battery_current
+        icon: mdi:battery-plus
+        name: Current
+        type: entity
+      - entity: sensor.battery_power_out
+        icon: mdi:battery-arrow-down
+        name: Power Out
+        type: entity
+      - entity: sensor.battery_net_daily
+        icon: mdi:calendar-today
+        name: Daily
+        type: entity
+      - entity: sensor.battery_net_monthly
+        icon: mdi:calendar-month
+        name: Monthly
+        type: entity
+      - entity: sensor.battery_net_yearly
+        icon: mdi:calendar-multiple
+        name: Yearly
+        type: entity
+      columns: 3
+      square: false
+      type: grid
+    type: vertical-stack
+  - cards:
+    - subtitle: ''
+      title: Realtime Power
+      type: custom:mushroom-title-card
+    - subtitle: System
+      title: ''
       type: custom:mushroom-title-card
     - animation:
         state: 'off'
       decimal: 1
       entities:
-      - entity: sensor.home_123_1min
-        max: 24000
-        name: Current Usage
+      - entity: sensor.grid_power
+        icon: mdi:transmission-tower
+        min: -4800
+        name: Grid Power
         severity:
+        - color: rgb(var(--rgb-light-blue-color))
+          from: -4800
+          to: -2400
+        - color: rgb(var(--rgb-blue-color))
+          from: -2399
+          to: 0
         - color: rgb(var(--rgb-green-color))
           from: 0
-          to: 4800
-        - color: rgb(var(--rgb-light-green-color))
-          from: 4800
           to: 9600
-        - color: rgb(var(--rgb-amber-color))
+        - color: rgb(var(--rgb-light-green-color))
           from: 9600
-          to: 14400
-        - color: rgb(var(--rgb-orange-color))
-          from: 14400
           to: 19200
-        - color: rgb(var(--rgb-red-color))
+        - color: rgb(var(--rgb-amber-color))
           from: 19200
-          to: 24000
-      - entity: sensor.solar_1min
+          to: 28800
+        - color: rgb(var(--rgb-orange-color))
+          from: 28800
+          to: 38400
+        - color: rgb(var(--rgb-red-color))
+          from: 38400
+          to: 48000
+      - entity: sensor.load_power
+        icon: mdi:power-plug
+        name: Load Power
+      - entity: sensor.pv_power
+        icon: mdi:solar-power-variant
         max: 4800
         name: Solar
         severity:
@@ -6731,7 +6892,59 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 3840
           to: 4800
-      - entity: sensor.home_balance_1min
+      - entity: sensor.battery_power
+        icon: mdi:battery-high
+        max: 14400
+        min: -14400
+        name: Battery
+        severity:
+        - color: rgb(var(--rgb-green-color))
+          from: 0
+          to: 960
+        - color: rgb(var(--rgb-light-green-color))
+          from: 960
+          to: 1920
+        - color: rgb(var(--rgb-amber-color))
+          from: 1920
+          to: 2880
+        - color: rgb(var(--rgb-orange-color))
+          from: 2880
+          to: 3840
+        - color: rgb(var(--rgb-red-color))
+          from: 3840
+          to: 4800
+      height: 30px
+      max: 48000
+      min: 0
+      positions:
+        indicator: inside
+      severity:
+      - color: rgb(var(--rgb-green-color))
+        from: 0
+        to: 9600
+      - color: rgb(var(--rgb-light-green-color))
+        from: 9600
+        to: 19200
+      - color: rgb(var(--rgb-amber-color))
+        from: 19200
+        to: 28800
+      - color: rgb(var(--rgb-orange-color))
+        from: 28800
+        to: 38400
+      - color: rgb(var(--rgb-red-color))
+        from: 38400
+        to: 48000
+      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px #0005;\n}"
+      type: custom:bar-card
+    - subtitle: Circuits
+      title: ''
+      type: custom:mushroom-title-card
+    - animation:
+        state: 'off'
+      decimal: 1
+      entities:
+      - entity: sensor.home_balance_power
+        icon: mdi:home-analytics
         max: 9600
         name: Home Balance
         severity:
@@ -6750,7 +6963,8 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 7680
           to: 9600
-      - entity: sensor.air_conditioner_1min
+      - entity: sensor.air_conditioner_power
+        icon: mdi:air-conditioner
         max: 7200
         name: Air Conditioner
         severity:
@@ -6769,13 +6983,17 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 5760
           to: 7200
-      - entity: sensor.basement_bedrooms_1min
+      - entity: sensor.basement_bedrooms_power
+        icon: mdi:home-floor-0
         name: Basement Bedrooms
-      - entity: sensor.bedrooms_1min
+      - entity: sensor.bedrooms_power
+        icon: mdi:home-floor-1
         name: Bedrooms
-      - entity: sensor.dishwasher_disposal_1min
+      - entity: sensor.dishwasher_disposal_power
+        icon: mdi:dishwasher
         name: Dishwasher / Disposal
-      - entity: sensor.dryer_1min
+      - entity: sensor.dryer_power
+        icon: mdi:tumble-dryer
         max: 7200
         name: Dryer
         severity:
@@ -6794,13 +7012,17 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 5760
           to: 7200
-      - entity: sensor.family_room_1min
+      - entity: sensor.family_room_power
+        icon: mdi:gamepad-circle
         name: Family Room
-      - entity: sensor.fridge_kitchen_outlets_1min
+      - entity: sensor.fridge_kitchen_outlets_power
+        icon: mdi:fridge-variant
         name: Fridge / Kitchen Outlets
-      - entity: sensor.furnace_1min
+      - entity: sensor.furnace_power
+        icon: mdi:hvac
         name: Furance
-      - entity: sensor.entry_living_bath_lights_1min
+      - entity: sensor.entry_living_bath_lights_power
+        icon: mdi:lightbulb-group
         max: 1800
         name: Entry, Living Room, Bath Lights
         severity:
@@ -6819,13 +7041,17 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 1440
           to: 1800
-      - entity: sensor.garage_outlets_1min
+      - entity: sensor.garage_outlets_power
+        icon: mdi:garage-variant
         name: Garage Outlets
-      - entity: sensor.living_room_master_bedroom_1min
+      - entity: sensor.living_room_master_bedroom_power
+        icon: mdi:sofa-single
         name: Living / Master Bed
-      - entity: sensor.microwave_1min
+      - entity: sensor.microwave_power
+        icon: mdi:microwave
         name: Microwave
-      - entity: sensor.mechanical_1min
+      - entity: sensor.mechanical_power
+        icon: mdi:progress-wrench
         max: 1800
         name: Utility
         severity:
@@ -6844,7 +7070,8 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 1440
           to: 1800
-      - entity: sensor.range_1min
+      - entity: sensor.range_power
+        icon: mdi:stove
         max: 9600
         name: Range
         severity:
@@ -6863,15 +7090,16 @@ views:
         - color: rgb(var(--rgb-red-color))
           from: 7680
           to: 9600
-      - entity: sensor.theater_room_1min
+      - entity: sensor.theater_room_power
+        icon: mdi:theater
         name: Theater Room
-      - entity: sensor.washer_1min
+      - entity: sensor.washer_power
+        icon: mdi:washing-machine
         name: Washer
       height: 30px
       max: 2400
       min: 0
       positions:
-        icon: 'off'
         indicator: inside
       severity:
       - color: rgb(var(--rgb-green-color))

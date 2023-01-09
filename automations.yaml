@@ -408,7 +408,7 @@
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_123_1mon
+    entity_id: sensor.home_12_monthly
     below: 700
   - platform: state
     entity_id:
@@ -443,7 +443,7 @@
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_123_1mon
+    entity_id: sensor.home_12_monthly
     above: 699
   condition:
   - condition: template
@@ -473,7 +473,7 @@
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_123_1mon
+    entity_id: sensor.home_12_monthly
     below: 1000
   - platform: state
     entity_id:
@@ -508,7 +508,7 @@
   description: ''
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_123_1mon
+    entity_id: sensor.home_12_monthly
     above: 999
   condition:
   - condition: template
@@ -637,7 +637,7 @@
   description: Actions when the dryer is running and is done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.dryer_1min
+    entity_id: sensor.dryer_power
     for:
       minutes: 2
     above: 10
@@ -649,7 +649,7 @@
     data: {}
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dryer_1min
+      entity_id: sensor.dryer_power
       below: 10
       for:
         minutes: 2
@@ -685,7 +685,7 @@
   description: Actions when the washer is running and is done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.washer_1min
+    entity_id: sensor.washer_power
     for:
       minutes: 2
     above: 10
@@ -697,7 +697,7 @@
     data: {}
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.washer_1min
+      entity_id: sensor.washer_power
       below: 10
       for:
         minutes: 2
@@ -995,7 +995,7 @@
     done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.dishwasher_disposal_1min
+    entity_id: sensor.dishwasher_disposal_power
     for:
       minutes: 2
     above: 40
@@ -1019,7 +1019,7 @@
       option: Washing
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_1min
+      entity_id: sensor.dishwasher_disposal_power
       below: 20
       for:
         minutes: 2
@@ -1030,7 +1030,7 @@
       option: Draining
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_1min
+      entity_id: sensor.dishwasher_disposal_power
       above: 200
       for:
         minutes: 2
@@ -1041,7 +1041,7 @@
       option: Rinsing
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_1min
+      entity_id: sensor.dishwasher_disposal_power
       below: 20
       for:
         minutes: 2
@@ -1052,7 +1052,7 @@
       option: Drying
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_1min
+      entity_id: sensor.dishwasher_disposal_power
       below: 20
       for:
         minutes: 5
@@ -2366,16 +2366,17 @@
   mode: single
   variables:
     sensors: "{% set threshold = 30 %} {% set ignore_entities = [\n  'sensor.galaxy_s21_battery_level',\n
-      \ 'sensor.pixel_7_battery_level',\n  'sensor.ipad_josh_battery_level',\n  'sensor.quest_battery_level'\n]
-      %} {% set result = namespace(sensors=[]) %} {% set devices = states.sensor\n
-      \ | reject('in', ['unknown', 'unavailable', 'undefined'])\n  | rejectattr('entity_id',
-      'in', ignore_entities)\n  | rejectattr('attributes.device_class', 'undefined')\n
-      \ | selectattr('attributes.device_class', '==', 'battery')\n  | list\n%} {%
-      for device in devices %}\n  {% if device.state | int(-1) <= threshold | int
-      %}\n    {% set name = device.name | replace(': Battery level', '') | replace('
-      Battery level', '') | replace(' Battery Level', '') %}\n    {% set result.sensors
-      = result.sensors + [name ~ ' (' ~ device.state ~ '%)'] %}\n  {% endif %}\n{%
-      endfor %} {{ result.sensors|join(', ') }}"
+      \ 'sensor.pixel_7_battery_level',\n  'sensor.ipad_josh_battery_level',\n  'sensor.quest_battery_level',\n
+      \ 'sensor.load_percentage',\n  'sensor.battery_state_of_charge'\n] %} {% set
+      result = namespace(sensors=[]) %} {% set devices = states.sensor\n  | reject('in',
+      ['unknown', 'unavailable', 'undefined'])\n  | rejectattr('entity_id', 'in',
+      ignore_entities)\n  | rejectattr('attributes.device_class', 'undefined')\n  |
+      selectattr('attributes.device_class', '==', 'battery')\n  | list\n%} {% for
+      device in devices %}\n  {% if device.state | int(-1) <= threshold | int %}\n
+      \   {% set name = device.name | replace(': Battery level', '') | replace(' Battery
+      level', '') | replace(' Battery Level', '') %}\n    {% set result.sensors =
+      result.sensors + [name ~ ' (' ~ device.state ~ '%)'] %}\n  {% endif %}\n{% endfor
+      %} {{ result.sensors|join(', ') }}"
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
@@ -3669,3 +3670,14 @@
     release_notes: '{{ trigger.to_state.attributes.url }}'
     current_version: '{{ trigger.from_state.state }}'
     available_version: '{{ trigger.to_state.state }}'
+- id: '1673168239995'
+  alias: ⚡ PVOutput
+  description: Send PV and Energy data to PVOutput.org
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+  condition: []
+  action:
+  - service: shell_command.pvoutputcurl
+    data: {}
+  mode: single

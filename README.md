@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1734 total entities**,
+This Home Assistant install has approximately **1739 total entities**,
 including **857 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -202,7 +202,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>17 Custom Integrations</summary>
+<details><summary>16 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.4.1]
 
@@ -271,12 +271,6 @@ Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://git
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
-
-### [Openei](https://github.com/firstof9/ha-openei) [v0.1.8]
-
-OpenEI integration for Home Assistant
-
-Authors: [@firstof9](https://github.com/firstof9).
 
 ### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.1]
 
@@ -539,7 +533,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>143 Automations</summary>
+<details><summary>144 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -569,6 +563,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ Upgrade Available
 - ⚙️ Zigbee2MQTT Update
 - ⚙️ ZWave JS UI Update
+- ⚡ PVOutput
 - ⚡ Tariff Summer Off-Peak
 - ⚡ Tariff Summer Peak
 - ⚡ Tariff Winter Off-Peak
