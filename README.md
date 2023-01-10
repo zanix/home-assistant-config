@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1750 total entities**,
+This Home Assistant install has approximately **1751 total entities**,
 including **865 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -533,7 +533,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>147 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -606,6 +606,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💬 Garbage Collection
 - 💬 Potty Time (Disabled)
 - 💬 Subaru Failed Notification
+- 💬 Subaru Started Notification
 - 💬 Window Left Open (Disabled)
 - 📋 [Controller] Hue Dimmer Switch
 - 📋 [Controller] Ikea 5-Button Remote
