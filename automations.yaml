@@ -3206,6 +3206,36 @@
           brightness_pct: 5
         target:
           entity_id: light.ethan
+      config_single:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.ethan
+            color_start: Yellow
+            effect_start: Open/Close
+            duration: 2 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: switch.toggle
+          data: {}
+          target:
+            entity_id: switch.ethans_lamp
+- id: '1673311612826'
+  alias: "\U0001F4CB [Inovelli] Emma Switch"
+  description: Custom button actions for the Inovelli switch
+  use_blueprint:
+    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
+    input:
+      switch: sensor.emma_action
+      down_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 5
+        target:
+          entity_id: light.emma
 - id: '1667779287274'
   alias: "\U0001F4CB [Inovelli] Family Room Switch"
   description: Custom button actions for the Inovelli switch
@@ -3329,8 +3359,8 @@
             entity_id:
             - light.kitchen
             color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
+            effect_start: Open/Close
+            duration: 2 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3347,8 +3377,8 @@
             entity_id:
             - light.kitchen
             color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
+            effect_start: Open/Close
+            duration: 2 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3377,8 +3407,8 @@
             entity_id:
             - light.living_room
             color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
+            effect_start: Open/Close
+            duration: 2 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3396,8 +3426,8 @@
             entity_id:
             - light.living_room
             color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
+            effect_start: Open/Close
+            duration: 2 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3425,6 +3455,23 @@
           brightness_pct: 5
         target:
           entity_id: light.master_bedroom
+      config_single:
+      - parallel:
+        - service: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.master_bedroom
+            color_start: Yellow
+            effect_start: Open/Close
+            duration: 2 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - service: light.toggle
+          data: {}
+          target:
+            entity_id: light.master_bedroom_floor_lamp
 - id: '1667779857021'
   alias: "\U0001F4CB [Inovelli] Office Switch"
   description: Custom button actions for the Inovelli switch
@@ -3441,8 +3488,8 @@
             entity_id:
             - light.office_switch
             color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
+            effect_start: Open/Close
+            duration: 2 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3461,8 +3508,8 @@
             entity_id:
             - light.office_switch
             color_start: Yellow
-            effect_start: Chase
-            duration: 3 Seconds
+            effect_start: Open/Close
+            duration: 2 Seconds
             level_start: 60
             color_end: Green
             effect_end: Clear
@@ -3580,7 +3627,7 @@
           who: josh
           title: Upgrade Available
           message: <b>ZWave JS UI</b> <em>{{ current_version }}</em> -> <em>{{ available_version
-            }}</em><br>
+            }}</em>
           icon: local/icons/update.png
           url: '{{ release_notes }}'
           group: Upgrade
@@ -3640,7 +3687,7 @@
           who: josh
           title: Upgrade Available
           message: <b>Zigbee2MQTT</b> <em>{{ current_version }}</em> -> <em>{{ available_version
-            }}</em><br>
+            }}</em>
           icon: local/icons/update.png
           url: '{{ release_notes }}'
           group: Upgrade
@@ -3664,6 +3711,64 @@
         title: ''
         message: clear_notification
         tag: zigbee2mqtt-upgrade-available
+  mode: single
+  max_exceeded: silent
+  variables:
+    release_notes: '{{ trigger.to_state.attributes.url }}'
+    current_version: '{{ trigger.from_state.state }}'
+    available_version: '{{ trigger.to_state.state }}'
+- id: '1672948192087'
+  alias: ⚙️ ESPHome Update
+  description: Sends a notification when a new release of ESPHome is released
+  trigger:
+  - platform: state
+    entity_id: sensor.esphome_esphome_latest_release
+  condition:
+  - condition: template
+    value_template: '{{ trigger.to_state.state != "unknown" and trigger.from_state.state
+      != "unknown" }}'
+  action:
+  - if:
+    - condition: template
+      value_template: '{{ trigger.to_state.state != trigger.from_state.state }}'
+    then:
+    - parallel:
+      - service: persistent_notification.create
+        data:
+          title: Upgrade Available
+          message: '**ESPHome** _{{ current_version }}_ -> _{{ available_version }}_
+
+            [Release Notes]({{ release_notes }})'
+          notification_id: esphome-upgrade-available
+      - service: script.notify_mobile
+        data:
+          who: josh
+          title: Upgrade Available
+          message: <b>ESPHome</b> <em>{{ current_version }}</em> -> <em>{{ available_version
+            }}</em>
+          icon: local/icons/update.png
+          url: '{{ release_notes }}'
+          group: Upgrade
+          tag: esphome-upgrade-available
+          actions:
+          - action: URI
+            title: Release Notes
+            uri: '{{ release_notes }}'
+      - service: script.notify_hass_agent
+        data:
+          computer: erebus
+          title: Upgrade Available
+          message: 'ESPHome: {{ current_version }} -> {{ available_version }}'
+    else:
+    - service: persistent_notification.dismiss
+      data:
+        notification_id: esphome-upgrade-available
+    - service: script.notify_mobile
+      data:
+        who: josh
+        title: ''
+        message: clear_notification
+        tag: esphome-upgrade-available
   mode: single
   max_exceeded: silent
   variables:

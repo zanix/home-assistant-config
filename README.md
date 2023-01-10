@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1738 total entities**,
-including **857 sensors**.
+This Home Assistant install has approximately **1750 total entities**,
+including **865 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -533,7 +533,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>144 Automations</summary>
+<details><summary>146 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -554,6 +554,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ Battery Level Low
 - ⚙️ Clear TTS Cache (Disabled)
 - ⚙️ Disk Space Low
+- ⚙️ ESPHome Update
 - ⚙️ Event Sniffer [Actionable Event] (Disabled)
 - ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
 - ⚙️ Failed Login
@@ -610,6 +611,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 📋 [Controller] Ikea 5-Button Remote
 - 📋 [Holiday in Week] Garbage Collection Adjustment
 - 📋 [Holiday in Week] Recycle Collection Adjustment
+- 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
 - 📋 [Inovelli] Family Room Switch
 - 📋 [Inovelli] Garage Switch

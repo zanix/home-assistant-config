@@ -647,23 +647,28 @@ decluttering_templates:
           style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
             \  --chip-spacing: 0;\n}\n"
         chips:
-        - double_tap_action:
-            action: none
-          entity: '[[proximity]]'
-          hold_action:
-            action: none
-          icon: "{% if states(entity)|int >= 400 %}\n  {% set icon = \"map-marker-distance\"\
-            \ %}\n  {% if is_state_attr(entity, \"dir_of_travel\", \"towards\") %}\n\
-            \    mdi:map-marker-left\n  {% elif is_state_attr(entity, \"dir_of_travel\"\
-            , \"away_from\") %}\n    mdi:map-marker-right\n  {% else %}\n    mdi:map-marker-distance\n\
-            \  {% endif %}\n{% endif %}"
-          icon_color: "{% if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
-            ) %}\n  green\n{% elif is_state_attr(entity, \"dir_of_travel\", \"away_from\"\
-            ) %}\n  orange\n{% else %}\n  grey\n{% endif %}"
-          layout: vertical
-          tap_action:
-            action: none
-          type: template
+        - chip:
+            double_tap_action:
+              action: none
+            entity: '[[proximity]]'
+            hold_action:
+              action: none
+            icon: "{% if states(entity)|int >= 400 %}\n  {% set icon = \"map-marker-distance\"\
+              \ %}\n  {% if is_state_attr(entity, \"dir_of_travel\", \"towards\")\
+              \ %}\n    mdi:map-marker-left\n  {% elif is_state_attr(entity, \"dir_of_travel\"\
+              , \"away_from\") %}\n    mdi:map-marker-right\n  {% else %}\n    mdi:map-marker-distance\n\
+              \  {% endif %}\n{% endif %}"
+            icon_color: "{% if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
+              ) %}\n  green\n{% elif is_state_attr(entity, \"dir_of_travel\", \"away_from\"\
+              ) %}\n  orange\n{% else %}\n  grey\n{% endif %}"
+            layout: vertical
+            tap_action:
+              action: none
+            type: template
+          conditions:
+          - entity: '[[entity]]'
+            state_not: home
+          type: conditional
         - chip:
             entity: '[[media]]'
             icon: mdi:spotify
@@ -2048,7 +2053,7 @@ views:
               \ \"duration\").split(\":\")[1] | int * 60)\n      + (state_attr(timer,\
               \ \"duration\").split(\":\")[2] | int)\n    %}\n  background:\n    radial-gradient(var(--ha-card-background)\
               \ 60%, transparent 0%),\n    conic-gradient(rgb(var(--rgb-blue)) {{\
-              \ ((duration - remaining) / duration * 100)|round() }}% 0%, var(--ha-card-background)\
+              \ (remaining / duration * 100)|round() }}% 0%, var(--ha-card-background)\
               \ 0% 100%);\n}\n{% endif %}\n"
         entity: device_tracker.ascent_location
         icon_type: entity-picture
@@ -2074,15 +2079,249 @@ views:
           tap_action:
             action: more-info
           type: template
-        - content: "{% if not is_state(entity, 'unavailable') %}\n  {{ states(entity)\
-            \ }}mpg\n{% endif %}"
-          entity: sensor.ascent_avg_fuel_consumption
-          tap_action:
-            action: more-info
-          type: template
         type: custom:mushroom-chips-card
       type: custom:vertical-stack-in-card
     type: horizontal-stack
+  - cards:
+    - badge_icon: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
+        \  mdi:alpha-c\n{% elif is_state(entity, \"0\") %}\n  mdi:calendar-today\n\
+        {% elif is_state(entity, \"1\") %}\n  mdi:calendar-clock\n{% elif state_attr(entity,\
+        \ \"days\") | int > 9 %}\n  mdi:numeric-9-plus\n{% else %}\n  mdi:numeric-{{\
+        \ state_attr(entity, \"days\") }}\n{% endif %}"
+      card_mod:
+        style: "{%- if is_state(\"input_boolean.garbage_collection\", \"on\") -%}\n\
+          \  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity, \"\
+          0\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
+          \ \"1\") -%}\n  {% set icon_color = \"yellow\" %}\n{%- else -%}\n  {% set\
+          \ icon_color = \"white\" %}\n{%- endif -%}\nmushroom-badge-icon {\n  --icon-color:\
+          \ rgb(var(--rgb-{{icon_color}}-color));\n  --main-color: none;\n  --badge-icon-size:\
+          \ 1.5em;\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
+          \ 10px;\n  margin-left: auto;\n  margin-right: auto;\n}\n"
+      entity: sensor.garbage
+      hold_action:
+        action: call-service
+        data:
+          entity: sensor.garbage
+        service: script.collection_at_curb
+        target: {}
+      icon: mdi:delete
+      icon_color: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
+        \  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
+        \ \"1\") %}\n  yellow\n{% else %}\n  disabled\n{% endif %}"
+      layout: vertical
+      tap_action:
+        action: more-info
+      type: custom:mushroom-template-card
+    - badge_icon: "{% if is_state(\"input_boolean.recycling_collection\", \"on\")\
+        \ %}\n  mdi:alpha-c\n{% elif is_state(entity, \"0\") %}\n  mdi:calendar-today\n\
+        {% elif is_state(entity, \"1\") %}\n  mdi:calendar-clock\n{% elif state_attr(entity,\
+        \ \"days\") | int > 9 %}\n  mdi:numeric-9-plus\n{% else %}\n  mdi:numeric-{{\
+        \ state_attr(entity, \"days\") }}\n{% endif %}"
+      card_mod:
+        style: "{%- if is_state(\"input_boolean.recycling_collection\", \"on\") -%}\n\
+          \  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity, \"\
+          0\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
+          \ \"1\") -%}\n  {% set icon_color = \"yellow\" %}\n{%- else -%}\n  {% set\
+          \ icon_color = \"white\" %}\n{%- endif -%}\nmushroom-badge-icon {\n  --icon-color:\
+          \ rgb(var(--rgb-{{icon_color}}-color));\n  --main-color: none;\n  --badge-icon-size:\
+          \ 1.5em;\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
+          \ 10px;\n  margin-left: auto;\n  margin-right: auto;\n}\n"
+      entity: sensor.recycling
+      hold_action:
+        action: call-service
+        data:
+          entity: sensor.recycling
+        service: script.collection_at_curb
+        target: {}
+      icon: mdi:recycle
+      icon_color: "{% if is_state(\"input_boolean.recycling_collection\", \"on\")\
+        \ %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
+        \ \"1\") %}\n  yellow\n{% else %}\n  disabled\n{% endif %}"
+      layout: vertical
+      tap_action:
+        action: more-info
+      type: custom:mushroom-template-card
+    - card:
+        badge_icon: "{% if states(entity) | int > 0 %}\n  mdi:numeric-{{ states(entity)\
+          \ }}\n{% elif states(entity) | int > 9 %}\n  mdi:numeric-9-plus\n{% endif\
+          \ %}"
+        card_mod:
+          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-{{config.icon_color}}-color));\n\
+            \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n  background:\
+            \ none;\n  width: 110px;\n  margin-top: 10px;\n  margin-left: auto;\n\
+            \  margin-right: auto;\n}\n"
+        entity: sensor.mail_usps_mail
+        icon: mdi:mailbox-up
+        icon_color: blue
+        layout: vertical
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                elements:
+                - camera_image: camera.mail_usps
+                  camera_view: live
+                  style:
+                    left: 50%
+                    top: 50%
+                    width: 100%
+                  type: image
+                - image: /local/mail_and_packages/overlay.png
+                  style:
+                    left: 50%
+                    top: 50%
+                    width: 101%
+                  type: image
+                - entity: camera.mail_usps
+                  image: /local/mail_and_packages/vignette.png
+                  style:
+                    left: 50%
+                    top: 50%
+                    width: 101%
+                  type: image
+                entity: camera.mail_usps
+                image: local/mail_and_packages/white.png
+                type: picture-elements
+              size: wide
+              title: Mail
+            service: browser_mod.popup
+        type: custom:mushroom-template-card
+      conditions:
+      - entity: sensor.mail_usps_mail
+        state_not: '0'
+      type: conditional
+    - template: package_delivery
+      type: custom:decluttering-card
+      variables:
+      - entity: sensor.mail_usps_delivering
+      - name: USPS
+      - icon: fab:usps
+      - icon_color: blue
+      - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=
+    - template: package_delivery
+      type: custom:decluttering-card
+      variables:
+      - entity: sensor.mail_ups_delivering
+      - name: UPS
+      - icon: fab:ups
+      - icon_color: brown
+      - url: https://www.ups.com/track?loc=en_US&tracknum=
+    - template: package_delivery
+      type: custom:decluttering-card
+      variables:
+      - entity: sensor.mail_fedex_delivering
+      - name: FedEx
+      - icon: fab:fedex
+      - icon_color: purple
+      - url: https://www.fedex.com/fedextrack/?trknbr=
+    - card:
+        card_mod:
+          style:
+            .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
+              \  margin-left: auto;\n  margin-right: auto;\n}\n"
+            mushroom-shape-icon$: "ha-icon {\n  {%- if is_state(config.entity, \"\
+              on\") -%}\n  --icon-animation: shake 400ms ease-in-out infinite, drum\
+              \ 2s ease infinite;\n  transform-origin: 50% 110%;\n  {% endif %}\n\
+              }\n@keyframes shake {\n  0%, 100% { transform: translate(0, 0) rotate(0);\
+              \ }\n  20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }\n\
+              \  40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }\n  60%\
+              \  { transform: translate(0.4px, 0.4px) rotate(-4deg); }\n  80%  { transform:\
+              \ translate(-0.4px, -0.4px) rotate(4deg); }\n}\n@keyframes drum {\n\
+              \  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%,\
+              \ 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0);\
+              \ }\n}\n"
+        entity: input_boolean.washer
+        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:washing-machine\n{%- else\
+          \ -%}\n  mdi:washing-machine-off\n{%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n \
+          \ disabled\n{%- endif -%}"
+        layout: vertical
+        primary: ''
+        secondary: ''
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      conditions:
+      - entity: input_boolean.washer
+        state: 'on'
+      type: conditional
+    - card:
+        card_mod:
+          style:
+            .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
+              \  margin-left: auto;\n  margin-right: auto;\n}\n"
+            mushroom-shape-icon$: "ha-icon {\n  {%- if is_state(config.entity, \"\
+              on\") -%}\n  --icon-animation: shake 400ms ease-in-out infinite, drum\
+              \ 1s infinite;\n  transform-origin: 50% 65%;\n  {% endif %}\n}\n@keyframes\
+              \ shake {\n  0%, 100% { transform: rotate(4deg); }\n  50%  { transform:\
+              \ rotate(-4deg); }\n}\n@keyframes drum {\n  50%  { clip-path: polygon(0\
+              \ 0, 0 100%, 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%,\
+              \ 36% 73%, 35% 100%, 100% 100%, 100% 0); }\n}\n"
+        entity: input_boolean.dryer
+        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:tumble-dryer\n{%- else -%}\n\
+          \  mdi:tumble-dryer-off\n{%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
+          \  disabled\n{%- endif -%}"
+        layout: vertical
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      conditions:
+      - entity: input_boolean.dryer
+        state: 'on'
+      type: conditional
+    - card:
+        card_mod:
+          style:
+            .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
+              \  margin-left: auto;\n  margin-right: auto;\n}\n"
+            mushroom-shape-icon$: "{% set timer = \"timer.dishwasher_run_time\" %}\n\
+              {% set timer = \"timer.dishwasher_run_time\" %}\n{%- if is_state(config.entity,\
+              \ \"Washing\") -%}\n  {% set icon_color = \"cyan\" %}\n{%- elif is_state(config.entity,\
+              \ \"Draining\") -%}\n  {% set icon_color = \"brown\" %}\n{%- elif is_state(config.entity,\
+              \ \"Rinsing\") -%}\n  {% set icon_color = \"blue\" %}\n{%- elif is_state(config.entity,\
+              \ \"Drying\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
+              \ \"Clean\") -%}\n  {% set icon_color = \"lime\" %}\n{%- else -%}\n\
+              \  {% set icon_color = \"grey\" %}\n{%- endif -%}\nha-icon {\n  {%-\
+              \ if not is_state(config.entity, \"Off\") -%}\n  --icon-animation: bounce\
+              \ 1.5s ease-in-out infinite, wash 1s ease-in-out infinite;\n  transform-origin:\
+              \ 50% 75%;\n  {% endif %}\n}\n{% if state_attr(timer, \"finishes_at\"\
+              ) %}\n.shape {\n    {% set remaining = (as_datetime(state_attr(timer,\
+              \ \"finishes_at\")) - now()).total_seconds() | int %}\n    {% set duration\
+              \ =\n      (state_attr(timer, \"duration\").split(\":\")[0] | int *\
+              \ 60 * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[1]\
+              \ | int * 60)\n      + (state_attr(timer, \"duration\").split(\":\"\
+              )[2] | int)\n    %}\n  background:\n    radial-gradient(var(--ha-card-background)\
+              \ 60%, transparent 0%),\n    conic-gradient(rgb(var(--rgb-{{ icon_color\
+              \ }})) {{ ((duration - remaining) / duration * 100)|round() }}% 0%,\
+              \ var(--ha-card-background) 0% 100%);\n}\n.shape:after {\n  content:\
+              \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
+              \ 50%;\n  background: rgba(var(--rgb-{{ icon_color }}), 0.2);\n}\n{%\
+              \ endif %}\n@keyframes bounce {\n  0%, 20%, 50%, 80%, 100% {transform:\
+              \ translateY(0); } \n  40% { transform: translateY(-1.2px) rotate(5deg);\
+              \ } \n  60% { transform: translateY(-1.1px) rotate(-4deg); } \n} \n\
+              @keyframes wash {\n  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%,\
+              \ 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100%\
+              \ 100%, 100% 0); }\n}\n"
+        entity: input_select.dishwasher_status
+        icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
+          \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif is_state(entity,\
+          \ \"Draining\") -%}\n  brown\n{%- elif is_state(entity, \"Rinsing\") -%}\n\
+          \  blue\n{%- elif is_state(entity, \"Drying\") -%}\n  red\n{%- elif is_state(entity,\
+          \ \"Clean\") -%}\n  lime\n{%- else -%}\n  disabled\n{%- endif -%}"
+        layout: vertical
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      conditions:
+      - entity: input_select.dishwasher_status
+        state_not: 'Off'
+      type: conditional
+    columns: 5
+    square: false
+    type: grid
   - cards:
     - title: Rooms
       type: custom:mushroom-title-card
@@ -2883,244 +3122,6 @@ views:
       square: false
       type: grid
     type: vertical-stack
-  - cards:
-    - badge_icon: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
-        \  mdi:alpha-c\n{% elif is_state(entity, \"0\") %}\n  mdi:calendar-today\n\
-        {% elif is_state(entity, \"1\") %}\n  mdi:calendar-clock\n{% else %}\n  mdi:numeric-{{\
-        \ state_attr(entity, \"days\") }}\n{% endif %}"
-      card_mod:
-        style: "{%- if is_state(\"input_boolean.garbage_collection\", \"on\") -%}\n\
-          \  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity, \"\
-          0\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
-          \ \"1\") -%}\n  {% set icon_color = \"yellow\" %}\n{%- else -%}\n  {% set\
-          \ icon_color = \"white\" %}\n{%- endif -%}\nmushroom-badge-icon {\n  --icon-color:\
-          \ rgb(var(--rgb-{{icon_color}}-color));\n  --main-color: none;\n  --badge-icon-size:\
-          \ 1.5em;\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
-          \ 10px;\n  margin-left: auto;\n  margin-right: auto;\n}\n"
-      entity: sensor.garbage
-      hold_action:
-        action: call-service
-        data:
-          entity: sensor.garbage
-        service: script.collection_at_curb
-        target: {}
-      icon: mdi:delete
-      icon_color: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
-        \  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
-        \ \"1\") %}\n  yellow\n{% else %}\n  disabled\n{% endif %}"
-      layout: vertical
-      tap_action:
-        action: more-info
-      type: custom:mushroom-template-card
-    - badge_icon: "{% if is_state(\"input_boolean.recycling_collection\", \"on\")\
-        \ %}\n  mdi:alpha-c\n{% elif is_state(entity, \"0\") %}\n  mdi:calendar-today\n\
-        {% elif is_state(entity, \"1\") %}\n  mdi:calendar-clock\n{% else %}\n  mdi:numeric-{{\
-        \ state_attr(entity, \"days\") }}\n{% endif %}"
-      card_mod:
-        style: "{%- if is_state(\"input_boolean.recycling_collection\", \"on\") -%}\n\
-          \  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity, \"\
-          0\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
-          \ \"1\") -%}\n  {% set icon_color = \"yellow\" %}\n{%- else -%}\n  {% set\
-          \ icon_color = \"white\" %}\n{%- endif -%}\nmushroom-badge-icon {\n  --icon-color:\
-          \ rgb(var(--rgb-{{icon_color}}-color));\n  --main-color: none;\n  --badge-icon-size:\
-          \ 1.5em;\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
-          \ 10px;\n  margin-left: auto;\n  margin-right: auto;\n}\n"
-      entity: sensor.recycling
-      hold_action:
-        action: call-service
-        data:
-          entity: sensor.recycling
-        service: script.collection_at_curb
-        target: {}
-      icon: mdi:recycle
-      icon_color: "{% if is_state(\"input_boolean.recycling_collection\", \"on\")\
-        \ %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif is_state(entity,\
-        \ \"1\") %}\n  yellow\n{% else %}\n  disabled\n{% endif %}"
-      layout: vertical
-      tap_action:
-        action: more-info
-      type: custom:mushroom-template-card
-    - card:
-        badge_icon: "{% if states(entity) | int > 0 %}\n  mdi:numeric-{{ states(entity)\
-          \ }}\n{% elif states(entity) | int > 9 %}\n  mdi:numeric-9-plus\n{% endif\
-          \ %}"
-        card_mod:
-          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-{{config.icon_color}}-color));\n\
-            \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n  background:\
-            \ none;\n  width: 110px;\n  margin-top: 10px;\n  margin-left: auto;\n\
-            \  margin-right: auto;\n}\n"
-        entity: sensor.mail_usps_mail
-        icon: mdi:mailbox-up
-        icon_color: blue
-        layout: vertical
-        tap_action:
-          action: fire-dom-event
-          browser_mod:
-            data:
-              content:
-                elements:
-                - camera_image: camera.mail_usps
-                  camera_view: live
-                  style:
-                    left: 50%
-                    top: 50%
-                    width: 100%
-                  type: image
-                - image: /local/mail_and_packages/overlay.png
-                  style:
-                    left: 50%
-                    top: 50%
-                    width: 101%
-                  type: image
-                - entity: camera.mail_usps
-                  image: /local/mail_and_packages/vignette.png
-                  style:
-                    left: 50%
-                    top: 50%
-                    width: 101%
-                  type: image
-                entity: camera.mail_usps
-                image: local/mail_and_packages/white.png
-                type: picture-elements
-              size: wide
-              title: Mail
-            service: browser_mod.popup
-        type: custom:mushroom-template-card
-      conditions:
-      - entity: sensor.mail_usps_mail
-        state_not: '0'
-      type: conditional
-    - template: package_delivery
-      type: custom:decluttering-card
-      variables:
-      - entity: sensor.mail_usps_delivering
-      - name: USPS
-      - icon: fab:usps
-      - icon_color: blue
-      - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=
-    - template: package_delivery
-      type: custom:decluttering-card
-      variables:
-      - entity: sensor.mail_ups_delivering
-      - name: UPS
-      - icon: fab:ups
-      - icon_color: brown
-      - url: https://www.ups.com/track?loc=en_US&tracknum=
-    - template: package_delivery
-      type: custom:decluttering-card
-      variables:
-      - entity: sensor.mail_fedex_delivering
-      - name: FedEx
-      - icon: fab:fedex
-      - icon_color: purple
-      - url: https://www.fedex.com/fedextrack/?trknbr=
-    - card:
-        card_mod:
-          style:
-            .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
-              \  margin-left: auto;\n  margin-right: auto;\n}\n"
-            mushroom-shape-icon$: "ha-icon {\n  {%- if is_state(config.entity, \"\
-              on\") -%}\n  --icon-animation: shake 400ms ease-in-out infinite, drum\
-              \ 2s ease infinite;\n  transform-origin: 50% 110%;\n  {% endif %}\n\
-              }\n@keyframes shake {\n  0%, 100% { transform: translate(0, 0) rotate(0);\
-              \ }\n  20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }\n\
-              \  40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }\n  60%\
-              \  { transform: translate(0.4px, 0.4px) rotate(-4deg); }\n  80%  { transform:\
-              \ translate(-0.4px, -0.4px) rotate(4deg); }\n}\n@keyframes drum {\n\
-              \  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%,\
-              \ 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0);\
-              \ }\n}\n"
-        entity: input_boolean.washer
-        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:washing-machine\n{%- else\
-          \ -%}\n  mdi:washing-machine-off\n{%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n \
-          \ disabled\n{%- endif -%}"
-        layout: vertical
-        primary: ''
-        secondary: ''
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
-      conditions:
-      - entity: input_boolean.washer
-        state: 'on'
-      type: conditional
-    - card:
-        card_mod:
-          style:
-            .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
-              \  margin-left: auto;\n  margin-right: auto;\n}\n"
-            mushroom-shape-icon$: "ha-icon {\n  {%- if is_state(config.entity, \"\
-              on\") -%}\n  --icon-animation: shake 400ms ease-in-out infinite, drum\
-              \ 1s infinite;\n  transform-origin: 50% 65%;\n  {% endif %}\n}\n@keyframes\
-              \ shake {\n  0%, 100% { transform: rotate(4deg); }\n  50%  { transform:\
-              \ rotate(-4deg); }\n}\n@keyframes drum {\n  50%  { clip-path: polygon(0\
-              \ 0, 0 100%, 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%,\
-              \ 36% 73%, 35% 100%, 100% 100%, 100% 0); }\n}\n"
-        entity: input_boolean.dryer
-        icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:tumble-dryer\n{%- else -%}\n\
-          \  mdi:tumble-dryer-off\n{%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
-          \  disabled\n{%- endif -%}"
-        layout: vertical
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
-      conditions:
-      - entity: input_boolean.dryer
-        state: 'on'
-      type: conditional
-    - card:
-        card_mod:
-          style:
-            .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
-              \  margin-left: auto;\n  margin-right: auto;\n}\n"
-            mushroom-shape-icon$: "{% set timer = \"timer.dishwasher_run_time\" %}\n\
-              {% set timer = \"timer.dishwasher_run_time\" %}\n{%- if is_state(config.entity,\
-              \ \"Washing\") -%}\n  {% set icon_color = \"cyan\" %}\n{%- elif is_state(config.entity,\
-              \ \"Draining\") -%}\n  {% set icon_color = \"brown\" %}\n{%- elif is_state(config.entity,\
-              \ \"Rinsing\") -%}\n  {% set icon_color = \"blue\" %}\n{%- elif is_state(config.entity,\
-              \ \"Drying\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
-              \ \"Clean\") -%}\n  {% set icon_color = \"lime\" %}\n{%- else -%}\n\
-              \  {% set icon_color = \"grey\" %}\n{%- endif -%}\nha-icon {\n  {%-\
-              \ if not is_state(config.entity, \"Off\") -%}\n  --icon-animation: bounce\
-              \ 1.5s ease-in-out infinite, wash 1s ease-in-out infinite;\n  transform-origin:\
-              \ 50% 75%;\n  {% endif %}\n}\n{% if state_attr(timer, \"finishes_at\"\
-              ) %}\n.shape {\n    {% set remaining = (as_datetime(state_attr(timer,\
-              \ \"finishes_at\")) - now()).total_seconds() | int %}\n    {% set duration\
-              \ =\n      (state_attr(timer, \"duration\").split(\":\")[0] | int *\
-              \ 60 * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[1]\
-              \ | int * 60)\n      + (state_attr(timer, \"duration\").split(\":\"\
-              )[2] | int)\n    %}\n  background:\n    radial-gradient(var(--ha-card-background)\
-              \ 60%, transparent 0%),\n    conic-gradient(rgb(var(--rgb-{{ icon_color\
-              \ }})) {{ ((duration - remaining) / duration * 100)|round() }}% 0%,\
-              \ var(--ha-card-background) 0% 100%);\n}\n.shape:after {\n  content:\
-              \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
-              \ 50%;\n  background: rgba(var(--rgb-{{ icon_color }}), 0.2);\n}\n{%\
-              \ endif %}\n@keyframes bounce {\n  0%, 20%, 50%, 80%, 100% {transform:\
-              \ translateY(0); } \n  40% { transform: translateY(-1.2px) rotate(5deg);\
-              \ } \n  60% { transform: translateY(-1.1px) rotate(-4deg); } \n} \n\
-              @keyframes wash {\n  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%,\
-              \ 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100%\
-              \ 100%, 100% 0); }\n}\n"
-        entity: input_select.dishwasher_status
-        icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
-          \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif is_state(entity,\
-          \ \"Draining\") -%}\n  brown\n{%- elif is_state(entity, \"Rinsing\") -%}\n\
-          \  blue\n{%- elif is_state(entity, \"Drying\") -%}\n  red\n{%- elif is_state(entity,\
-          \ \"Clean\") -%}\n  lime\n{%- else -%}\n  disabled\n{%- endif -%}"
-        layout: vertical
-        tap_action:
-          action: more-info
-        type: custom:mushroom-template-card
-      conditions:
-      - entity: input_select.dishwasher_status
-        state_not: 'Off'
-      type: conditional
-    columns: 5
-    square: false
-    type: grid
   - card:
       cards:
       - title: XMas
