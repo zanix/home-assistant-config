@@ -496,8 +496,12 @@ decluttering_templates:
   person_card:
     card:
       card_mod:
-        style: "ha-card {\n  {% if not is_state(\"[[entity]]\", \"home\") %}\n   \
-          \ background: rgba(var(--rgb-red-color), 0.1);\n  {% endif %}\n}\n"
+        style: "ha-card {\n  background:\n  {% set state = states(\"[[entity]]\")\
+          \ %}\n  {% if state == \"home\" %}\n    var( --ha-card-background, var(--card-background-color,\
+          \ white));\n  {% elif state == \"not_home\" %}\n    rgba(var(--rgb-state-person-not-home-color),\
+          \ 0.2);\n  {% elif state == \"unknown\" %}\n    rgba(var(--state-unknown-color),\
+          \ 0.2);\n  {% else %}\n    rgba(var(--rgb-state-person-zone-color), 0.2);\n\
+          \  {% endif %}\n}\n"
       cards:
       - card_mod:
           style: "ha-card {\n  background: rgba(17, 17, 17, 0.2) !important;\n  margin-left:\
@@ -1687,6 +1691,106 @@ views:
                 title: Meater
               service: browser_mod.popup
           type: template
+        - chip:
+            content: "{%- if is_state(entity, \"on\") -%}\n  {{ states(\"sensor.available_version\"\
+              ) }}\n{%- endif -%}\n"
+            entity: binary_sensor.docker_hub_update_available
+            icon: mdi:arrow-up-bold-circle
+            icon_color: red
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    content: '**Home Assistant** _{{ states("sensor.current_version")
+                      }}_ -> _{{ states("sensor.available_version") }}_
+
+                      {{ state_attr("sensor.home_assistant_website", "release_title")
+                      }}
+
+                      [Release Notes]({{ state_attr("sensor.home_assistant_website",
+                      "release_notes") }}) | [HassPodcast](https://hasspodcast.io/episodes)'
+                    type: markdown
+                  title: Upgrade Available
+                service: browser_mod.popup
+            type: template
+          conditions:
+          - entity: binary_sensor.docker_hub_update_available
+            state: 'on'
+          type: conditional
+        - chip:
+            content: "{%- if states(entity) | int > 0 -%}\n  {{ states(entity) | int\
+              \ }}\n{%- endif -%}\n"
+            entity: sensor.hacs
+            icon: mdi:chevron-triple-up
+            icon_color: red
+            tap_action:
+              action: navigate
+              navigation_path: /hacs
+            type: template
+          conditions:
+          - entity: sensor.hacs
+            state_not: '0'
+          - entity: sensor.hacs
+            state_not: unavailable
+          type: conditional
+        - chip:
+            content: '{{ states(entity) }}'
+            entity: sensor.low_battery_devices
+            icon: mdi:battery-alert
+            icon_color: red
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card:
+                      cards: []
+                      layout_type: masonry
+                      type: custom:layout-card
+                    filter:
+                      exclude: null
+                      include:
+                      - attributes:
+                          device_class: battery
+                        options:
+                          badge_color: red
+                          badge_icon: "{% set battery_level = states(entity) | int\
+                            \ %}\n{% if battery_level < 10 %} \n  mdi:exclamation-thick\n\
+                            {% endif %}"
+                          card_mod:
+                            style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                          icon: "{% set battery_level = (states(entity) | int / 10)\
+                            \ | round(0) | int * 10 %} {% if battery_level == 100\
+                            \ %}\n  mdi:battery\n{% elif battery_level > 0 %}\n  mdi:battery-{{\
+                            \ battery_level }}\n{% else %}\n  mdi:battery-outline\n\
+                            {% endif %}\n"
+                          icon_color: "{% set battery_level = states(entity) | int\
+                            \ %}\n{% if battery_level > 90 %} \n  green\n{% elif battery_level\
+                            \ > 60 %}\n  light-green\n{% elif battery_level > 50 %}\n\
+                            \  lime\n{% elif battery_level > 40 %}\n  yellow\n{% elif\
+                            \ battery_level > 30 %}\n  amber\n{% elif battery_level\
+                            \ > 20 %}\n  orange\n{% elif battery_level > 10 %}\n \
+                            \ deep-orange\n{% else %}\n  red\n{% endif %} "
+                          layout: horizontal
+                          primary: '{{ states(entity) }}%'
+                          secondary: '{{ state_attr(entity, "friendly_name") | title
+                            }}'
+                          tap_action:
+                            action: more-info
+                          type: custom:mushroom-template-card
+                        state: < 30
+                    show_empty: false
+                    sort:
+                      method: friendly_name
+                    type: custom:auto-entities
+                  title: Low Batteries
+                service: browser_mod.popup
+            type: template
+          conditions:
+          - entity: sensor.low_battery_devices
+            state_not: '0'
+          type: conditional
         type: custom:mushroom-chips-card
       layout:
         grid-template-columns: 55px auto
@@ -1911,112 +2015,6 @@ views:
             service: browser_mod.popup
         type: template
       type: custom:mushroom-chips-card
-    - alignment: start
-      card_mod:
-        style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-          \  --chip-spacing: 0;\n}\n"
-      chips:
-      - chip:
-          content: "{%- if is_state(entity, \"on\") -%}\n  {{ states(\"sensor.available_version\"\
-            ) }}\n{%- endif -%}\n"
-          entity: binary_sensor.docker_hub_update_available
-          icon: mdi:arrow-up-bold-circle
-          icon_color: red
-          tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  content: '**Home Assistant** _{{ states("sensor.current_version")
-                    }}_ -> _{{ states("sensor.available_version") }}_
-
-                    {{ state_attr("sensor.home_assistant_website", "release_title")
-                    }}
-
-                    [Release Notes]({{ state_attr("sensor.home_assistant_website",
-                    "release_notes") }}) | [HassPodcast](https://hasspodcast.io/episodes)'
-                  type: markdown
-                title: Upgrade Available
-              service: browser_mod.popup
-          type: template
-        conditions:
-        - entity: binary_sensor.docker_hub_update_available
-          state: 'on'
-        type: conditional
-      - chip:
-          content: "{%- if states(entity) | int > 0 -%}\n  {{ states(entity) | int\
-            \ }}\n{%- endif -%}\n"
-          entity: sensor.hacs
-          icon: mdi:chevron-triple-up
-          icon_color: red
-          tap_action:
-            action: navigate
-            navigation_path: /hacs
-          type: template
-        conditions:
-        - entity: sensor.hacs
-          state_not: '0'
-        - entity: sensor.hacs
-          state_not: unavailable
-        type: conditional
-      - chip:
-          content: '{{ states(entity) }}'
-          entity: sensor.low_battery_devices
-          icon: mdi:battery-alert
-          icon_color: red
-          tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  card:
-                    cards: []
-                    layout_type: masonry
-                    type: custom:layout-card
-                  filter:
-                    exclude: null
-                    include:
-                    - attributes:
-                        device_class: battery
-                      options:
-                        badge_color: red
-                        badge_icon: "{% set battery_level = states(entity) | int %}\n\
-                          {% if battery_level < 10 %} \n  mdi:exclamation-thick\n\
-                          {% endif %}"
-                        card_mod:
-                          style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
-                        icon: "{% set battery_level = (states(entity) | int / 10)\
-                          \ | round(0) | int * 10 %} {% if battery_level == 100 %}\n\
-                          \  mdi:battery\n{% elif battery_level > 0 %}\n  mdi:battery-{{\
-                          \ battery_level }}\n{% else %}\n  mdi:battery-outline\n\
-                          {% endif %}\n"
-                        icon_color: "{% set battery_level = states(entity) | int %}\n\
-                          {% if battery_level > 90 %} \n  green\n{% elif battery_level\
-                          \ > 60 %}\n  light-green\n{% elif battery_level > 50 %}\n\
-                          \  lime\n{% elif battery_level > 40 %}\n  yellow\n{% elif\
-                          \ battery_level > 30 %}\n  amber\n{% elif battery_level\
-                          \ > 20 %}\n  orange\n{% elif battery_level > 10 %}\n  deep-orange\n\
-                          {% else %}\n  red\n{% endif %} "
-                        layout: horizontal
-                        primary: '{{ states(entity) }}%'
-                        secondary: '{{ state_attr(entity, "friendly_name") | title
-                          }}'
-                        tap_action:
-                          action: more-info
-                        type: custom:mushroom-template-card
-                      state: < 30
-                  show_empty: false
-                  sort:
-                    method: friendly_name
-                  type: custom:auto-entities
-                title: Low Batteries
-              service: browser_mod.popup
-          type: template
-        conditions:
-        - entity: sensor.low_battery_devices
-          state_not: '0'
-        type: conditional
-      type: custom:mushroom-chips-card
     type: custom:vertical-stack-in-card
   - cards:
     - template: person_card
@@ -2085,17 +2083,17 @@ views:
   - cards:
     - badge_icon: "{% if is_state(\"input_boolean.garbage_collection\", \"on\") %}\n\
         \  mdi:alpha-c\n{% elif is_state(entity, \"0\") %}\n  mdi:calendar-today\n\
-        {% elif is_state(entity, \"1\") %}\n  mdi:calendar-clock\n{% elif state_attr(entity,\
-        \ \"days\") | int > 9 %}\n  mdi:numeric-9-plus\n{% else %}\n  mdi:numeric-{{\
-        \ state_attr(entity, \"days\") }}\n{% endif %}"
+        {% elif state_attr(entity, \"days\") | int > 9 %}\n  mdi:numeric-9-plus\n\
+        {% else %}\n  mdi:numeric-{{ state_attr(entity, \"days\") }}\n{% endif %}"
       card_mod:
-        style: "{%- if is_state(\"input_boolean.garbage_collection\", \"on\") -%}\n\
-          \  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity, \"\
-          0\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
-          \ \"1\") -%}\n  {% set icon_color = \"yellow\" %}\n{%- else -%}\n  {% set\
-          \ icon_color = \"white\" %}\n{%- endif -%}\nmushroom-badge-icon {\n  --icon-color:\
-          \ rgb(var(--rgb-{{icon_color}}-color));\n  --main-color: none;\n  --badge-icon-size:\
-          \ 1.5em;\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
+        style: "{% set icon_size = \"1.5em\" %}\n{%- if is_state(\"input_boolean.garbage_collection\"\
+          , \"on\") -%}\n  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity,\
+          \ \"0\") -%}\n  {% set icon_color = \"red\" %}\n  {% set icon_size = \"\
+          1em\" %}\n{%- elif is_state(config.entity, \"1\") -%}\n  {% set icon_color\
+          \ = \"yellow\" %}\n{%- else -%}\n  {% set icon_color = \"white\" %}\n{%-\
+          \ endif -%}\nmushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-{{ icon_color\
+          \ }}-color));\n  --main-color: none;\n  --badge-icon-size: {{ icon_size\
+          \ }};\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
           \ 10px;\n  margin-left: auto;\n  margin-right: auto;\n}\n"
       entity: sensor.garbage
       hold_action:
@@ -2114,17 +2112,17 @@ views:
       type: custom:mushroom-template-card
     - badge_icon: "{% if is_state(\"input_boolean.recycling_collection\", \"on\")\
         \ %}\n  mdi:alpha-c\n{% elif is_state(entity, \"0\") %}\n  mdi:calendar-today\n\
-        {% elif is_state(entity, \"1\") %}\n  mdi:calendar-clock\n{% elif state_attr(entity,\
-        \ \"days\") | int > 9 %}\n  mdi:numeric-9-plus\n{% else %}\n  mdi:numeric-{{\
-        \ state_attr(entity, \"days\") }}\n{% endif %}"
+        {% elif state_attr(entity, \"days\") | int > 9 %}\n  mdi:numeric-9-plus\n\
+        {% else %}\n  mdi:numeric-{{ state_attr(entity, \"days\") }}\n{% endif %}"
       card_mod:
-        style: "{%- if is_state(\"input_boolean.recycling_collection\", \"on\") -%}\n\
-          \  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity, \"\
-          0\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
-          \ \"1\") -%}\n  {% set icon_color = \"yellow\" %}\n{%- else -%}\n  {% set\
-          \ icon_color = \"white\" %}\n{%- endif -%}\nmushroom-badge-icon {\n  --icon-color:\
-          \ rgb(var(--rgb-{{icon_color}}-color));\n  --main-color: none;\n  --badge-icon-size:\
-          \ 1.5em;\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
+        style: "{% set icon_size = \"1.5em\" %}\n{%- if is_state(\"input_boolean.recycling_collection\"\
+          , \"on\") -%}\n  {% set icon_color = \"green\" %}\n{%- elif is_state(config.entity,\
+          \ \"0\") -%}\n  {% set icon_color = \"red\" %}\n  {% set icon_size = \"\
+          1em\" %}\n{%- elif is_state(config.entity, \"1\") -%}\n  {% set icon_color\
+          \ = \"yellow\" %}\n{%- else -%}\n  {% set icon_color = \"white\" %}\n{%-\
+          \ endif -%}\nmushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-{{ icon_color\
+          \ }}-color));\n  --main-color: none;\n  --badge-icon-size: {{ icon_size\
+          \ }};\n}\nha-card {\n  background: none;\n  width: 110px;\n  margin-top:\
           \ 10px;\n  margin-left: auto;\n  margin-right: auto;\n}\n"
       entity: sensor.recycling
       hold_action:
@@ -2277,9 +2275,9 @@ views:
             .: "ha-card {\n  background: none;\n  width: 110px;\n  margin-top: 10px;\n\
               \  margin-left: auto;\n  margin-right: auto;\n}\n"
             mushroom-shape-icon$: "{% set timer = \"timer.dishwasher_run_time\" %}\n\
-              {% set timer = \"timer.dishwasher_run_time\" %}\n{%- if is_state(config.entity,\
-              \ \"Washing\") -%}\n  {% set icon_color = \"cyan\" %}\n{%- elif is_state(config.entity,\
-              \ \"Draining\") -%}\n  {% set icon_color = \"brown\" %}\n{%- elif is_state(config.entity,\
+              {%- if is_state(config.entity, \"Washing\") -%}\n  {% set icon_color\
+              \ = \"cyan\" %}\n{%- elif is_state(config.entity, \"Draining\") -%}\n\
+              \  {% set icon_color = \"brown\" %}\n{%- elif is_state(config.entity,\
               \ \"Rinsing\") -%}\n  {% set icon_color = \"blue\" %}\n{%- elif is_state(config.entity,\
               \ \"Drying\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
               \ \"Clean\") -%}\n  {% set icon_color = \"lime\" %}\n{%- else -%}\n\
@@ -2407,9 +2405,13 @@ views:
                     type: custom:mushroom-fan-card
                 service: browser_mod.popup
             type: template
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_living_room
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -2539,9 +2541,13 @@ views:
                     type: vertical-stack
                 service: browser_mod.popup
             type: template
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_family_room
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -2606,9 +2612,13 @@ views:
             - entity: binary_sensor.erebus_connected
               state: 'on'
             type: conditional
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_office
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -2673,9 +2683,13 @@ views:
             - entity: light.magicmirror
               state: 'on'
             type: conditional
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_kitchen
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -2800,9 +2814,13 @@ views:
                     type: custom:mushroom-fan-card
                 service: browser_mod.popup
             type: template
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_master_bedroom
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -2856,9 +2874,13 @@ views:
         - icon_color: green
         - path: ethan
         - chips:
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_ethan
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -2912,9 +2934,13 @@ views:
         - icon_color: purple
         - path: emma
         - chips:
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_emma
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -3029,9 +3055,13 @@ views:
         - icon_color: light-green
         - path: outside
         - chips:
-          - content: "{% if is_state(entity, \"on\") %}\n  {{ expand(state_attr(entity,\
-              \ \"entity_id\")) | selectattr(\"state\", \"==\", \"on\") | list | count\
-              \ }}\n{% endif %}"
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             entity: group.lights_outside
             icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
               }}'
@@ -3204,13 +3234,11 @@ views:
       - entity: sensor.home_humidity
         type: entity
   - cards:
-    - cards:
+    - template: title_chips
+      type: custom:decluttering-card
+      variables:
       - title: Lights
-        type: custom:mushroom-title-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  transform: translateY(30%);\n}\n"
-        chips:
+      - chips:
         - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
             "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
             | list | count }}'
@@ -3220,12 +3248,6 @@ views:
           tap_action:
             action: more-info
           type: template
-        type: custom:mushroom-chips-card
-      layout:
-        grid-template-columns: auto 50%
-        margin: -4px 0px -8px -4px
-      layout_type: custom:grid-layout
-      type: custom:layout-card
     - entity: light.living_room
       layout: horizontal
       name: Main
@@ -3274,13 +3296,11 @@ views:
       type: custom:mushroom-fan-card
     type: vertical-stack
   - cards:
-    - cards:
+    - template: title_chips
+      type: custom:decluttering-card
+      variables:
       - title: Media
-        type: custom:mushroom-title-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  transform: translateY(30%);\n}\n"
-        chips:
+      - chips:
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -3296,12 +3316,6 @@ views:
                 title: Living Room Remote
               service: browser_mod.popup
           type: template
-        type: custom:mushroom-chips-card
-      layout:
-        grid-template-columns: auto 50%
-        margin: -4px 0px -8px -4px
-      layout_type: custom:grid-layout
-      type: custom:layout-card
     - cards:
       - entity: remote.living_room
         icon: mdi:motion-play-outline
@@ -3441,13 +3455,11 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - cards:
+    - template: title_chips
+      type: custom:decluttering-card
+      variables:
       - title: Media
-        type: custom:mushroom-title-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  transform: translateY(30%);\n}\n"
-        chips:
+      - chips:
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -3463,12 +3475,6 @@ views:
                 title: Family Room Remote
               service: browser_mod.popup
           type: template
-        type: custom:mushroom-chips-card
-      layout:
-        grid-template-columns: auto 50%
-        margin: -4px 0px -8px -4px
-      layout_type: custom:grid-layout
-      type: custom:layout-card
     - cards:
       - entity: remote.family_room
         icon: mdi:motion-play-outline
@@ -3952,13 +3958,11 @@ views:
       type: custom:mushroom-fan-card
     type: vertical-stack
   - cards:
-    - cards:
+    - template: title_chips
+      type: custom:decluttering-card
+      variables:
       - title: Media
-        type: custom:mushroom-title-card
-      - alignment: end
-        card_mod:
-          style: "ha-card {\n  transform: translateY(30%);\n}\n"
-        chips:
+      - chips:
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -3974,12 +3978,6 @@ views:
                 title: Master Bedroom Remote
               service: browser_mod.popup
           type: template
-        type: custom:mushroom-chips-card
-      layout:
-        grid-template-columns: auto 50%
-        margin: -4px 0px -8px -4px
-      layout_type: custom:grid-layout
-      type: custom:layout-card
     - cards:
       - entity: remote.master_bedroom
         icon: mdi:motion-play-outline
