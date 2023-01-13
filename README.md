@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1751 total entities**,
-including **865 sensors**.
+This Home Assistant install has approximately **1748 total entities**,
+including **863 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -378,7 +378,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.5.2]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.8.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -402,7 +402,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 A progress bar display for Home Assistant timers
 
-### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.13.0]
+### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.14.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
@@ -418,7 +418,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🏠 Soothing pastel theme for Home Assistant
 
-### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9]
+### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9.1]
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 
@@ -426,7 +426,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Additional themes for Lovelace Mushroom Cards 🍄
 
-### [Noctis](https://github.com/aFFekopp/noctis) [v2.8]
+### [Noctis](https://github.com/aFFekopp/noctis) [v2.9]
 
 🐵 Dark Blue Theme for Home Assistant
 
@@ -708,7 +708,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.1.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.1.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
