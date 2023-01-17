@@ -499,6 +499,7 @@ decluttering_templates:
         style: "ha-card {\n  background:\n  {% set state = states(\"[[entity]]\")\
           \ %}\n  {% if state == \"home\" %}\n    var(--ha-card-background, var(--card-background-color,\
           \ white));\n  {% elif state == \"not_home\" %}\n    rgba(var(--rgb-red-color),\
+          \ 0.2);\n  {% elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(var(--rgb-state-unavailable-color),\
           \ 0.2);\n  {% else %}\n    rgba(var(--rgb-state-person-zone-color), 0.2);\n\
           \  {% endif %}\n}\n"
       cards:
@@ -1284,18 +1285,18 @@ views:
             action: navigate
             navigation_path: lights
           type: template
-        - content: "{% if not is_state(entity, 'unavailable') and not is_state(entity,\
-            \ 'unknown') %}\n  {% set power = states(entity) | int | abs %}\n  {%\
-            \ if power > 1000 %}\n    {{ (power | float * 0.001) | round(2) }} kWh\n\
-            \  {% else %}\n    {{ power }} W\n  {% endif %}\n{% endif %}"
+        - content: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n  {%\
+            \ set power = states(entity) | int | abs %}\n  {% if power > 1000 %}\n\
+            \    {{ (power | float * 0.001) | round(2) }} kWh\n  {% else %}\n    {{\
+            \ power }} W\n  {% endif %}\n{% endif %}"
           entity: sensor.grid_power
-          icon: "{% if is_state(entity, 'unavailable') or is_state(entity, 'unknown')\
-            \ %}\n  mdi:transmission-tower-off\n{% else %}\n  {% if states(entity)\
-            \ | int < 0 %}\n    mdi:transmission-tower-import\n  {% else %}\n    mdi:transmission-tower-export\n\
-            \  {% endif %}\n{% endif %}"
-          icon_color: "{% if is_state(entity, 'unavailable') or is_state(entity, 'unknown')\
-            \ %}\n  disabled\n{% else %}\n  {% if states(entity) | int < 0 %}\n  \
-            \  lime\n  {% else %}\n    deep-orange\n  {% endif %}\n{% endif %}"
+          icon: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n  mdi:transmission-tower-off\n\
+            {% else %}\n  {% if states(entity) | int < 0 %}\n    mdi:transmission-tower-export\n\
+            \  {% else %}\n    mdi:transmission-tower-import\n  {% endif %}\n{% endif\
+            \ %}"
+          icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
+            \  disabled\n{% else %}\n  {% if states(entity) | int < 0 %}\n    lime\n\
+            \  {% else %}\n    deep-orange\n  {% endif %}\n{% endif %}"
           tap_action:
             action: navigate
             navigation_path: power
@@ -1318,8 +1319,8 @@ views:
             navigation_path: computer
           type: template
         - content: "{% set progress = states(\"sensor.octoprint_layer_progress\")\
-            \ %}\n{% if is_state(entity, \"on\") and progress != \"unknown\" %}\n\
-            \  {{ progress }}\n{% endif %}"
+            \ %}\n{% if is_state(entity, \"on\") and not progress in [\"unknown\"\
+            , \"unavailable\"] %}\n  {{ progress }}\n{% endif %}"
           entity: switch.octoprint_psu
           hold_action:
             action: none
@@ -1599,16 +1600,17 @@ views:
                 title: 3D Printer
               service: browser_mod.popup
           type: template
-        - content: "{% if not is_state(entity, \"unavailable\") %}\n  {{ states(\"\
-            sensor.meater_probe_internal\") }} °F\n  {% if states(\"sensor.meater_probe_remaining_time\"\
-            ) != \"unknown\" %}\n    {% set t = (states(\"sensor.meater_probe_remaining_time\"\
-            ) | as_datetime - now()).total_seconds() %}\n    | {{ t | timestamp_custom('%-H\
-            \ hr %-M min' if t > 3600 else '%-M min', false) }}\n  {% endif %}\n{%\
-            \ endif %}"
+        - content: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n  {{\
+            \ states(\"sensor.meater_probe_internal\") }} °F\n  {% if not states(\"\
+            sensor.meater_probe_remaining_time\") in ['unknown', 'unavailable']  %}\n\
+            \    {% set t = (states(\"sensor.meater_probe_remaining_time\") | as_datetime\
+            \ - now()).total_seconds() %}\n    | {{ t | timestamp_custom('%-H hr %-M\
+            \ min' if t > 3600 else '%-M min', false) }}\n  {% endif %}\n{% endif\
+            \ %}"
           entity: sensor.meater_probe_cook_state
           icon: mdi:food-drumstick
-          icon_color: "{% if not is_state(entity, \"unavailable\") %}\n  brown\n{%\
-            \ else %}\n  disabled\n{% endif %}"
+          icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
+            \  brown\n{% else %}\n  disabled\n{% endif %}"
           tap_action:
             action: fire-dom-event
             browser_mod:
@@ -1880,10 +1882,10 @@ views:
         type: weather
       - content: '{{ states(entity) | float(default=0) }}'
         entity: sensor.airnow_aqi
-        icon: '{{ iif(states(entity) != "unavailable", "mdi:blur", "mdi:blur-off")
-          }}'
-        icon_color: "{% if not states(entity) in [\"unavailable\", \"unknown\"] %}\n\
-          \  {% set level = states(entity) | float(default=0) %}\n  {% if level >=\
+        icon: '{{ iif(not states(entity) in [''unknown'', ''unavailable''], "mdi:blur",
+          "mdi:blur-off") }}'
+        icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n \
+          \ {% set level = states(entity) | float(default=0) %}\n  {% if level >=\
           \ 300 %}\n    red\n  {% elif level >= 200 %}\n    purple\n  {% elif level\
           \ >= 150 %}\n    pink\n  {% elif level >= 100 %}\n    orange\n  {% elif\
           \ level >= 50 %}\n    yellow\n  {% elif level >= 0 %}\n    green\n  {% endif\
@@ -2036,6 +2038,7 @@ views:
         style: "ha-card {\n  background:\n  {% set state = states(\"device_tracker.ascent_location\"\
           ) %}\n  {% if state == \"home\" %}\n    var(--ha-card-background, var(--card-background-color,\
           \ white));\n  {% elif state == \"not_home\" %}\n    rgba(var(--rgb-red-color),\
+          \ 0.2);\n  {% elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(var(--rgb-state-unavailable-color),\
           \ 0.2);\n  {% else %}\n    rgba(var(--rgb-state-person-zone-color), 0.2);\n\
           \  {% endif %}\n}\n"
       cards:
@@ -2066,15 +2069,15 @@ views:
           style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
             \  --chip-spacing: 0;\n}\n"
         chips:
-        - content: "{% if not is_state(entity, 'unavailable') %}\n  {{ states(entity)|round(0)\
-            \ }}mi\n{% endif %}"
+        - content: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n  {{\
+            \ states(entity)|round(0) }}mi\n{% endif %}"
           entity: sensor.ascent_range
           icon: mdi:gas-station
-          icon_color: "{% if not is_state(entity, 'unavailable') %}\n  {% set range\
-            \ = states(entity) | int %}\n  {% if range > 200 %}\n    green\n  {% elif\
-            \ range > 60 %}\n    light-green\n  {% elif range > 40 %}\n    amber\n\
-            \  {% elif range > 20 %}\n    orange\n  {% else %}\n    red\n  {% endif\
-            \ %}\n{% endif %}"
+          icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
+            \  {% set range = states(entity) | int %}\n  {% if range > 200 %}\n  \
+            \  green\n  {% elif range > 60 %}\n    light-green\n  {% elif range >\
+            \ 40 %}\n    amber\n  {% elif range > 20 %}\n    orange\n  {% else %}\n\
+            \    red\n  {% endif %}\n{% endif %}"
           tap_action:
             action: more-info
           type: template
@@ -4694,7 +4697,7 @@ views:
     type: vertical-stack
   - card:
       cards:
-      - title: Doors / Windows
+      - title: Doors
         type: custom:mushroom-title-card
       - card:
           columns: 1
@@ -4707,9 +4710,6 @@ views:
           - state: unavailable
           include:
           - entity_id: binary_sensor.ascent_*_door
-            options:
-              type: custom:mushroom-entity-card
-          - entity_id: binary_sensor.ascent_*_window
             options:
               type: custom:mushroom-entity-card
         type: custom:auto-entities
@@ -4894,6 +4894,13 @@ views:
           - entity: sensor.ardena_windows_updates_available_driver_updates
             state_not: unknown
           type: conditional
+        - entity: button.ardena_publish_sensors
+          hold_action:
+            action: toggle
+          icon: mdi:gesture-tap-button
+          tap_action:
+            action: none
+          type: template
     - template: computer_power
       type: custom:decluttering-card
       variables:
@@ -4974,10 +4981,7 @@ views:
       variables:
       - title: Erebus
       - subtitle: R5-5600X | RX 580 | 650W
-      - card_mod:
-          style:
-            .: "ha-card {\n  transform: translateY(30%);\n}\n"
-        chips:
+      - chips:
         - chip:
             content_info: none
             entity: binary_sensor.erebus_mic_active
@@ -5028,6 +5032,13 @@ views:
           - entity: sensor.erebus_windows_updates_available_driver_updates
             state_not: unknown
           type: conditional
+        - entity: button.erebus_publish_sensors
+          hold_action:
+            action: toggle
+          icon: mdi:gesture-tap-button
+          tap_action:
+            action: none
+          type: template
     - template: computer_power
       type: custom:decluttering-card
       variables:
@@ -5169,10 +5180,7 @@ views:
       variables:
       - title: Athos
       - subtitle: i5-6500 | GTX 1070 | 500W
-      - card_mod:
-          style:
-            .: "ha-card {\n  transform: translateY(30%);\n}\n"
-        chips:
+      - chips:
         - chip:
             content: '{{ states(entity) | int }}'
             entity: sensor.athos_windows_updates_available_software_updates
@@ -5205,6 +5213,13 @@ views:
           - entity: sensor.athos_windows_updates_available_driver_updates
             state_not: unknown
           type: conditional
+        - entity: button.athos_publish_sensors
+          hold_action:
+            action: toggle
+          icon: mdi:gesture-tap-button
+          tap_action:
+            action: none
+          type: template
     - template: computer_power
       type: custom:decluttering-card
       variables:
@@ -6355,8 +6370,8 @@ views:
         type: entity
       - entity: sensor.load_monthly
         type: entity
-      - content: '{{ iif(not is_state(entity, "unavailable"), states(entity) | float(default=0))
-          }}'
+      - content: '{{ iif(not states(entity) in [''unknown'', ''unavailable''], states(entity)
+          | float(default=0)) }}'
         entity: sensor.month_power_cost
         hold_action:
           action: none
@@ -6364,8 +6379,8 @@ views:
         tap_action:
           action: more-info
         type: template
-      - content: '{{ iif(not is_state(entity, "unavailable"), states(entity) | int(default=0)
-          ~ "%") }}'
+      - content: '{{ iif(not states(entity) in [''unknown'', ''unavailable''], states(entity)
+          | int(default=0) ~ "%") }}'
         entity: sensor.battery_state_of_charge
         hold_action:
           action: none
@@ -6799,20 +6814,18 @@ views:
       type: custom:mushroom-title-card
     - animate: true
       entities:
-      - entity: sensor.pv_power
+      - color: rgb(var(--rgb-green-color))
+        entity: sensor.pv_power
         name: PV Power
       height: 60
-      hours_to_show: 12
+      hours_to_show: 24
       icon: mdi:solar-power-variant
-      line_color: rgb(var(--rgb-green-color))
       line_width: 2
-      lower_bound: 0
       name: Current
       points_per_hour: 12
       show:
         labels: false
       type: custom:mini-graph-card
-      upper_bound: 4800
     - cards:
       - entity: sensor.pv_daily
         icon: mdi:calendar-today
