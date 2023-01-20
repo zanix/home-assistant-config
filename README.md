@@ -254,7 +254,7 @@ HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capa
 
 Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
-### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.3]
+### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.4]
 
 📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
 
@@ -272,7 +272,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.2]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.3]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -342,7 +342,7 @@ Battery state card for Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.42]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.43]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -362,7 +362,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.4.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.5.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -378,7 +378,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.8.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.9.2]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -708,7 +708,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.1.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.1.6-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
