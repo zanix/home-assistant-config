@@ -300,7 +300,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>27 Lovelace Plugins</summary>
+<details><summary>28 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
 
@@ -333,6 +333,10 @@ Battery state card for Home Assistant
 ### [Decluttering Card](https://github.com/custom-cards/decluttering-card) [v0.6.3]
 
 🧹 Declutter your lovelace configuration with the help of this card
+
+### [Expander Card](https://github.com/Alia5/lovelace-expander-card) [v0.0.3]
+
+Expander card for HomeAssistant
 
 ### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v2.2.0]
 
