@@ -242,7 +242,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.29.1]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.30.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -260,7 +260,7 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://
 
 Authors: [@bruxy70](https://github.com/bruxy70).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.82]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.83]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
@@ -272,7 +272,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.3]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.4]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -290,7 +290,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v2.3.1]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.0.0]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -712,7 +712,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.1.6-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.1.7-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
