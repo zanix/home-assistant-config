@@ -8,15 +8,15 @@
 #
 sensor:
   - platform: rest
-    name: "MagicMirror Brightness"
-    resource: !secret magicmirror_api_brightness
+    name: "Smart Display Brightness"
+    resource: !secret smart_display_api_brightness
     scan_interval: 10
     value_template: '{{ value_json.result }}'
 
 switch:
   - platform: rest
-    name: "MagicMirror Monitor"
-    resource: !secret magicmirror_api_monitor
+    name: "Smart Display Monitor"
+    resource: !secret smart_display_api_monitor
     scan_interval: 10
     body_on: '{"monitor": "on"}'
     body_off: '{"monitor": "off"}'
@@ -25,8 +25,8 @@ switch:
       Content-Type: application/json
 
 rest_command:
-  magicmirror_brightness:
-    url: !secret magicmirror_api_brightness
+  smart_display_brightness:
+    url: !secret smart_display_api_brightness
     method: POST
     payload: '{"brightness": {{ brightness }}}'
     content_type: "application/json; charset=utf-8"
@@ -34,11 +34,11 @@ rest_command:
 light:
   - platform: template
     lights:
-      magicmirror:
-        friendly_name: "MagicMirror"
-        value_template: "{{ states('switch.magicmirror_monitor') }}"
+      smart_display:
+        friendly_name: "Smart Display"
+        value_template: "{{ states('switch.smart_display_monitor') }}"
         icon_template: >-
-          {% if is_state('switch.magicmirror_monitor', 'on') %}
+          {% if is_state('switch.smart_display_monitor', 'on') %}
             mdi:monitor
           {% else %}
             mdi:monitor-off
@@ -46,25 +46,25 @@ light:
         turn_on:
           service: homeassistant.turn_on
           data:
-            entity_id: switch.magicmirror_monitor
+            entity_id: switch.smart_display_monitor
         turn_off:
           service: homeassistant.turn_off
           data:
-            entity_id: switch.magicmirror_monitor
+            entity_id: switch.smart_display_monitor
         set_level:
-          service: rest_command.magicmirror_brightness
+          service: rest_command.smart_display_brightness
           data:
             brightness: "{{ (brightness * 100 / 255)|int }}"
         level_template: >-
-          {%- if is_state('switch.magicmirror_monitor', 'on') -%}
-            {{ (states('sensor.magicmirror_brightness')|float(default=0) * 2.55)|round() }}
+          {%- if is_state('switch.smart_display_monitor', 'on') -%}
+            {{ (states('sensor.smart_display_brightness')|float(default=0) * 2.55)|round() }}
           {%- else -%}
             0
           {%- endif -%}
 
 automation:
-  - id: mm_bright_when_kitchen_light_on
-    alias: "📱 MagicMirror Brighten when Kitchen Light On"
+  - id: smart_display_bright_when_kitchen_light_on
+    alias: "📱 Smart Display Brighten when Kitchen Light On"
     trigger:
       - platform: state
         entity_id: light.kitchen
@@ -94,14 +94,14 @@ automation:
       - condition: sun
         after: sunset
       - condition: time
-        before: input_datetime.magicmirror_off
+        before: input_datetime.smart_display_off
     action:
-      - service: rest_command.magicmirror_brightness
+      - service: rest_command.smart_display_brightness
         data:
           brightness: 100
 
-  - id: mm_dim_when_kitchen_light_off
-    alias: "📱 MagicMirror Dim when Kitchen Light Off"
+  - id: smart_display_dim_when_kitchen_light_off
+    alias: "📱 Smart Display Dim when Kitchen Light Off"
     trigger:
       - platform: state
         entity_id: light.kitchen
@@ -130,14 +130,14 @@ automation:
       - condition: sun
         after: sunset
       - condition: time
-        before: input_datetime.magicmirror_off
+        before: input_datetime.smart_display_off
     action:
-      - service: rest_command.magicmirror_brightness
+      - service: rest_command.smart_display_brightness
         data:
           brightness: 40
 
-  - id: mm_dim_at_sunset
-    alias: "📱 MagicMirror Dim at Sunset"
+  - id: smart_display_dim_at_sunset
+    alias: "📱 Smart Display Dim at Sunset"
     trigger:
       platform: sun
       event: sunset
@@ -154,14 +154,14 @@ automation:
             attribute: brightness
             below: 45
       - condition: time
-        before: input_datetime.magicmirror_off
+        before: input_datetime.smart_display_off
     action:
-      - service: rest_command.magicmirror_brightness
+      - service: rest_command.smart_display_brightness
         data:
           brightness: 40
 
-  - id: mm_on_when_arrive
-    alias: "📱 MagicMirror On when Arrive"
+  - id: smart_display_on_when_arrive
+    alias: "📱 Smart Display On when Arrive"
     trigger:
       platform: state
       entity_id: group.people
@@ -169,16 +169,16 @@ automation:
       to: "home"
     condition:
       - condition: time
-        after: input_datetime.magicmirror_on
+        after: input_datetime.smart_display_on
       - condition: time
-        before: input_datetime.magicmirror_off
+        before: input_datetime.smart_display_off
     action:
       - service: homeassistant.turn_on
         data:
-          entity_id: switch.magicmirror_monitor
+          entity_id: switch.smart_display_monitor
 
-  - id: mm_off_when_away
-    alias: "📱 MagicMirror Off when Away"
+  - id: smart_display_off_when_away
+    alias: "📱 Smart Display Off when Away"
     trigger:
       platform: state
       entity_id: group.people
@@ -188,33 +188,33 @@ automation:
         minutes: 10
     condition:
       - condition: time
-        after: input_datetime.magicmirror_on
+        after: input_datetime.smart_display_on
       - condition: time
-        before: input_datetime.magicmirror_off
+        before: input_datetime.smart_display_off
     action:
       - service: homeassistant.turn_off
         data:
-          entity_id: switch.magicmirror_monitor
+          entity_id: switch.smart_display_monitor
 
-  - id: mm_off_at_night
-    alias: "📱 MagicMirror Off at Night"
+  - id: smart_display_off_at_night
+    alias: "📱 Smart Display Off at Night"
     trigger:
       platform: time
-      at: input_datetime.magicmirror_off
+      at: input_datetime.smart_display_off
     action:
       - service: homeassistant.turn_off
         data:
-          entity_id: switch.magicmirror_monitor
+          entity_id: switch.smart_display_monitor
 
-  - id: mm_on_at_morning
-    alias: "📱 MagicMirror On at Morning"
+  - id: smart_display_on_at_morning
+    alias: "📱 Smart Display On at Morning"
     trigger:
       platform: time
-      at: input_datetime.magicmirror_on
+      at: input_datetime.smart_display_on
     action:
       - service: homeassistant.turn_on
         data:
-          entity_id: switch.magicmirror_monitor
-      - service: rest_command.magicmirror_brightness
+          entity_id: switch.smart_display_monitor
+      - service: rest_command.smart_display_brightness
         data:
           brightness: 100

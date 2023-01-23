@@ -631,13 +631,13 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 📦 Packages Delivered
 - 📦 Packages Out for Delivery
 - 📦 Update USPS Mail Camera
-- 📱 MagicMirror Brighten when Kitchen Light On
-- 📱 MagicMirror Dim at Sunset
-- 📱 MagicMirror Dim when Kitchen Light Off
-- 📱 MagicMirror Off at Night
-- 📱 MagicMirror Off when Away
-- 📱 MagicMirror On at Morning
-- 📱 MagicMirror On when Arrive
+- 📱 Smart Display Brighten when Kitchen Light On
+- 📱 Smart Display Dim at Sunset
+- 📱 Smart Display Dim when Kitchen Light Off
+- 📱 Smart Display Off at Night
+- 📱 Smart Display Off when Away
+- 📱 Smart Display On at Morning
+- 📱 Smart Display On when Arrive
 - 🔑 Front Door Changed Code
 - 🔑 Front Door Decrement Access Count
 - 🔑 Front Door Lock Notifications
