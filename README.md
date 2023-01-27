@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1796 total entities**,
-including **905 sensors**.
+This Home Assistant install has approximately **1793 total entities**,
+including **902 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -260,13 +260,13 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://
 
 Authors: [@bruxy70](https://github.com/bruxy70).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.83]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.84]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.6]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.8]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -290,7 +290,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.0.0]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.0.1]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -366,7 +366,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.5.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.5.2]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -382,7 +382,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.9.2]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.9.3]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 

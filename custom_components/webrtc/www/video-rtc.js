@@ -397,11 +397,11 @@ export class VideoRTC extends HTMLElement {
                         bufLen = 0;
                         sb.appendBuffer(data);
                     } else if (sb.buffered && sb.buffered.length) {
-                        const end = sb.buffered.end(sb.buffered.length - 1) - 5;
+                        const end = sb.buffered.end(sb.buffered.length - 1) - 15;
                         const start = sb.buffered.start(0);
                         if (end > start) {
                             sb.remove(start, end);
-                            ms.setLiveSeekableRange(end, end + 5);
+                            ms.setLiveSeekableRange(end, end + 15);
                         }
                         // console.debug("VideoRTC.buffered", start, end);
                     }
@@ -561,6 +561,7 @@ export class VideoRTC extends HTMLElement {
         /** @type {HTMLVideoElement} */
         const video2 = document.createElement("video");
         video2.autoplay = true;
+        video2.playsInline = true;
         video2.muted = true;
 
         video2.addEventListener("loadeddata", ev => {
