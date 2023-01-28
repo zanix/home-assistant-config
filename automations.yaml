@@ -333,7 +333,7 @@
       title: Mail Today
       message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
         "1" else "items" }} will be in the mailbox today.'
-      camera: camera.mail_usps
+      camera: camera.mail_usps_camera
       url: lovelace/main
       group: Delivery
       tag: delivery-mail
@@ -343,7 +343,7 @@
       title: Mail Today
       message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
         "1" else "items" }} will be in the mailbox today.'
-      camera: camera.mail_usps
+      camera: camera.mail_usps_camera
   mode: single
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
@@ -405,10 +405,10 @@
   mode: single
 - id: '1665683659569'
   alias: ⚡ Tariff Summer Off-Peak
-  description: ''
+  description: Sets the current tariff to Summer Off-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_12_monthly
+    entity_id: sensor.grid_in_monthly
     below: 700
   - platform: state
     entity_id:
@@ -416,8 +416,12 @@
     from: 'off'
     to: 'on'
   condition:
-  - condition: template
-    value_template: '{{ now().month >= 6 and now().month <= 10 }}'
+  - condition: state
+    entity_id: binary_sensor.tariff_summer
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.grid_in_monthly
+    below: 700
   action:
   - service: select.select_option
     data:
@@ -440,14 +444,15 @@
   mode: single
 - id: '1665683670178'
   alias: ⚡ Tariff Summer Peak
-  description: ''
+  description: Sets the current tariff to Summer On-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_12_monthly
+    entity_id: sensor.grid_in_monthly
     above: 699
   condition:
-  - condition: template
-    value_template: '{{ now().month >= 6 and now().month <= 10 }}'
+  - condition: state
+    entity_id: binary_sensor.tariff_summer
+    state: 'on'
   action:
   - service: select.select_option
     data:
@@ -470,10 +475,10 @@
   mode: single
 - id: '1665683680197'
   alias: ⚡ Tariff Winter Off-Peak
-  description: ''
+  description: Sets the current tariff to Winter Off-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_12_monthly
+    entity_id: sensor.grid_in_monthly
     below: 1000
   - platform: state
     entity_id:
@@ -481,8 +486,12 @@
     from: 'off'
     to: 'on'
   condition:
-  - condition: template
-    value_template: '{{ now().month <= 5 or now().month >= 11 }}'
+  - condition: state
+    entity_id: binary_sensor.tariff_winter
+    state: 'on'
+  - condition: numeric_state
+    entity_id: sensor.grid_in_monthly
+    below: 1000
   action:
   - service: select.select_option
     data:
@@ -505,14 +514,15 @@
   mode: single
 - id: '1665683694303'
   alias: ⚡ Tariff Winter Peak
-  description: ''
+  description: Sets the current tariff to Winter On-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.home_12_monthly
+    entity_id: sensor.grid_in_monthly
     above: 999
   condition:
-  - condition: template
-    value_template: '{{ now().month <= 5 or now().month >= 11 }}'
+  - condition: state
+    entity_id: binary_sensor.tariff_winter
+    state: 'on'
   action:
   - service: select.select_option
     data:
@@ -1810,7 +1820,7 @@
       data:
         who: parents
         title: Subaru Remote Start
-        message: '{{ message }}'
+        message: '{{ message }}{{ reason }}'
         icon: local/icons/subaru.png
         group: Subaru
         tag: subaru
@@ -1829,13 +1839,15 @@
     - service: script.notify_speech
       data:
         media_player: media_player.living_room_speaker
-        message: '{{ message }}'
+        message: '{{ message }}{{ reason }}'
   - service: persistent_notification.dismiss
     data:
       notification_id: '{{ trigger.entity_id.split(''.'')[1] }}'
   mode: single
   variables:
-    message: The Subaru did not start, please try again
+    message: The Subaru did not start, please try again.
+    reason: "{% if 'doorNotLocked' in trigger.to_state.attributes.message %}\n  A
+      door was not locked.\n{% endif %}"
 - id: '1665689705099'
   alias: "\U0001F3E2 Office Day Mode"
   description: Turns on the office computer and all the lights on a workday
@@ -2436,25 +2448,26 @@
   alias: ⚙️ Failed Login
   description: Sends a notification when there is a failed login
   trigger:
-  - platform: template
-    value_template: '{{ states("persistent_notification.httplogin") != "unknown" }}'
-  condition: []
+  - platform: state
+    entity_id:
+    - persistent_notification.http_login
+    to: notifying
+  condition:
+  - condition: template
+    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] }}'
   action:
   - service: script.notify_mobile
     data:
       who: josh
-      title: '{{ title }}'
-      message: '{{ message }}'
+      title: '{{ trigger.to_state.attributes.title }}'
+      message: '{{ trigger.to_state.attributes.message }}'
       icon: local/icons/home-assistant.png
   - service: script.notify_hass_agent
     data:
       computer: erebus
-      title: '{{ title }}'
-      message: '{{ message }}'
+      title: '{{ trigger.to_state.attributes.title }}'
+      message: '{{ trigger.to_state.attributes.message }}'
   mode: single
-  variables:
-    title: '{{ state_attr("persistent_notification.httplogin", "title") }}'
-    message: '{{ state_attr("persistent_notification.httplogin", "message") }}'
 - id: '1665696538493'
   alias: ⚙️ HACS Updates
   description: Create a notification when there is updates pending in HACS
@@ -2463,8 +2476,8 @@
     entity_id: sensor.hacs
   condition:
   - condition: template
-    value_template: '{{ trigger.to_state.state != "unknown" and trigger.from_state.state
-      != "unknown" }}'
+    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
+      not trigger.from_state.state in ["unknown", "unavailable"] }}'
   action:
   - if:
     - condition: template
@@ -3615,8 +3628,8 @@
     entity_id: sensor.zwave_js_zwave_js_ui_latest_release
   condition:
   - condition: template
-    value_template: '{{ trigger.to_state.state != "unknown" and trigger.from_state.state
-      != "unknown" }}'
+    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
+      trigger.from_state.state in ["unknown", "unavailable"] }}'
   action:
   - if:
     - condition: template
@@ -3675,8 +3688,8 @@
     - sensor.koenkk_zigbee2mqtt_latest_release
   condition:
   - condition: template
-    value_template: '{{ trigger.to_state.state != "unknown" and trigger.from_state.state
-      != "unknown" }}'
+    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
+      not trigger.from_state.state in ["unknown", "unavailable"] }}'
   action:
   - if:
     - condition: template
@@ -3734,8 +3747,8 @@
     entity_id: sensor.esphome_esphome_latest_release
   condition:
   - condition: template
-    value_template: '{{ trigger.to_state.state != "unknown" and trigger.from_state.state
-      != "unknown" }}'
+    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
+      not trigger.from_state.state in ["unknown", "unavailable"] }}'
   action:
   - if:
     - condition: template
@@ -3845,4 +3858,28 @@
   action:
   - service: shell_command.pvoutputcurl
     data: {}
+  mode: single
+- id: '1674833464205'
+  alias: ⚡ Power Mode Changed
+  description: Sens a notification when the Power mode changes on the inverter.
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.device_mode
+  condition:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
+      and not trigger.to_state.state in ["unknown", "unavailable"] }}'
+  action:
+  - service: script.notify_mobile
+    data:
+      who: josh
+      title: Power Mode Changed
+      icon: local/icons/lightning-bolt.png
+      message: The power mode changed to {{ trigger.to_state.state }}
+  - service: script.notify_hass_agent
+    data:
+      computer: erebus
+      title: Power Mode Changed
+      message: The power mode changed to {{ trigger.to_state.state }}
   mode: single

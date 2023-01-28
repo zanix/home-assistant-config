@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1793 total entities**,
-including **902 sensors**.
+This Home Assistant install has approximately **1795 total entities**,
+including **903 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -537,7 +537,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>147 Automations</summary>
+<details><summary>148 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -568,6 +568,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ Upgrade Available
 - ⚙️ Zigbee2MQTT Update
 - ⚙️ ZWave JS UI Update
+- ⚡ Power Mode Changed
 - ⚡ PVOutput
 - ⚡ Tariff Summer Off-Peak
 - ⚡ Tariff Summer Peak
