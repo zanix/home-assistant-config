@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1795 total entities**,
-including **903 sensors**.
+This Home Assistant install has approximately **1798 total entities**,
+including **906 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -242,7 +242,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.30.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.30.1]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -260,13 +260,13 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://
 
 Authors: [@bruxy70](https://github.com/bruxy70).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.84]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.0.85]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.8]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.9]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
