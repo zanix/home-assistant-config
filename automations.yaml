@@ -652,8 +652,8 @@
   - platform: numeric_state
     entity_id: sensor.dryer_power
     for:
-      minutes: 2
-    above: 10
+      minutes: 1
+    above: 100
   condition: []
   action:
   - service: input_boolean.turn_on
@@ -663,9 +663,11 @@
   - wait_for_trigger:
     - platform: numeric_state
       entity_id: sensor.dryer_power
-      below: 10
+      below: 100
       for:
-        minutes: 2
+        hours: 0
+        minutes: 0
+        seconds: 30
   - parallel:
     - service: input_boolean.turn_off
       target:
@@ -700,7 +702,7 @@
   - platform: numeric_state
     entity_id: sensor.washer_power
     for:
-      minutes: 2
+      minutes: 1
     above: 10
   condition: []
   action:
@@ -713,7 +715,7 @@
       entity_id: sensor.washer_power
       below: 10
       for:
-        minutes: 2
+        minutes: 1
   - parallel:
     - service: input_boolean.turn_off
       target:
@@ -3573,7 +3575,14 @@
     entity_id:
     - sensor.unifi_status_www
     to: WARNING
-  condition: []
+  - platform: state
+    entity_id:
+    - sensor.unifi_status_www
+    to: ERROR
+  condition:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
+      and not trigger.to_state.state in ["unknown", "unavailable"]  }}'
   action:
   - parallel:
     - service: script.notify_mobile
@@ -3600,8 +3609,10 @@
     entity_id:
     - sensor.unifi_status_www
     to: OK
-    from: WARNING
-  condition: []
+  condition:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
+      and not trigger.to_state.state in ["unknown", "unavailable"]  }}'
   action:
   - parallel:
     - service: script.notify_mobile
