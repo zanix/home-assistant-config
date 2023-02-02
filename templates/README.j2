@@ -190,9 +190,9 @@ The vizio integration allows you to control SmartCast-compatible TVs and sound b
 
 WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812, APA102, and similar) LED's
 
-### [Yamaha](https://www.home-assistant.io/integrations/yamaha)
+### [Yamaha MusicCast](https://www.home-assistant.io/integrations/yamaha_musiccast)
 
-The yamaha platform allows you to control Yamaha Network Receivers
+The Yamaha MusicCast integration allows you to control Yamaha MusicCast Receivers from Home Assistant.
 
 ### [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js)
 
