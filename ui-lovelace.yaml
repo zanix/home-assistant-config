@@ -16,8 +16,8 @@ decluttering_templates:
         - card_mod:
             style: "ha-card {\n  background-color: var(--primary-background-color)\
               \ !important;\n  border-radius: var(--ha-card-border-radius) !important;\n\
-              \  --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-spacing:\
-              \ 0;\n}\n"
+              \  box-shadow: var(--ha-card-box-shadow, none) !important;\n  --chip-box-shadow:\
+              \ none;\n  --chip-background: none;\n  --chip-spacing: 0;\n}\n"
           chips: '[[chips]]'
           type: custom:mushroom-chips-card
         layout:
@@ -487,10 +487,11 @@ decluttering_templates:
   package_delivery:
     card:
       card:
-        badge_icon: "{% if states(entity) | int > 9 %}\n  mdi:numeric-9-plus\n{% else\
-          \ %}\n  mdi:numeric-{{ states(entity) }}\n{% endif %}"
+        badge_icon: "{% if states(entity) | int > 9 %}\n  mdi:numeric-9-plus\n{% elif\
+          \ states(entity) | int > 0 %}\n  mdi:numeric-{{ states(entity) }}\n{% else\
+          \ %}\n  mdi:numeric-0\n{% endif %}"
         card_mod:
-          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-[[icon_color]]-color));\n\
+          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-[[icon_color]]));\n\
             \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n  background:\
             \ none;\n  box-shadow: none;\n  margin-top: 10px;\n}\n"
         entity: '[[entity]]'
@@ -547,20 +548,21 @@ decluttering_templates:
   person_card:
     card:
       card_mod:
-        style: "ha-card {\n  background:\n  {% set state = states(\"[[entity]]\")\
-          \ %}\n  {% if state == \"not_home\" %}\n    rgba(var(--rgb-red-color), 0.3);\n\
-          \  {% elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(var(--rgb-state-unavailable-color),\
-          \ 0.3);\n  {% elif state != \"home\" %}\n    rgba(var(--rgb-state-person-zone-color),\
-          \ 0.3);\n  {% endif %}\n}\n"
+        style: "{% set state = states(\"[[entity]]\") %}\nha-card {\n  background:\n\
+          \    {% if state == \"not_home\" %}\n      rgba(244, 67, 54, 0.2)\n    {%\
+          \ elif state in [\"unknown\", \"unavailable\"] %}\n      rgba(189, 189,\
+          \ 189, 0.2)\n    {% elif state != \"home\" %}\n      rgba(33, 150, 243,\
+          \ 0.2)\n    {% endif %};\n}\n"
       cards:
       - card_mod:
           style: "ha-card {\n  transition-duration: 0s;\n  margin-left: -10px;\n \
-            \ height: 66px !important;\n}\n:host {\n  --mush-icon-size: 55px;\n}\n\
-            {% if not is_state(config.entity, \"home\") %}\n:host {\n  --ha-card-background:\
-            \ rgba(255, 255, 255, 0.2);\n}\n:host([dark-mode]) {\n  --ha-card-background:\
-            \ rgba(17, 17, 17, 0.2);\n}\n{% endif %}\nmushroom-shape-avatar {\n{%\
-            \ if not is_state(config.entity, \"home\") %}\n  filter: grayscale(100%);\n\
-            {% endif %}\n}\n"
+            \ height: 66px !important;\n}\n{% set state = states(config.entity) %}\n\
+            :host {\n  --mush-icon-size: 55px;\n  {% if not is_state(config.entity,\
+            \ \"home\") %}\n  --ha-card-background:\n    {% if state == \"not_home\"\
+            \ %}\n      rgba(244, 67, 54, 0.05)\n    {% elif state in [\"unknown\"\
+            , \"unavailable\"] %}\n      rgba(189, 189, 189, 0.05)\n    {% elif state\
+            \ != \"home\" %}\n      rgba(33, 150, 243, 0.05)\n    {% endif %};\n \
+            \ {% endif %}\n}\n"
         entity: '[[entity]]'
         icon_type: entity-picture
         name: '[[name]]'
@@ -810,15 +812,13 @@ decluttering_templates:
     card:
       card_mod:
         style: "ha-card {\n  {% if is_state(\"[[entity]]\", \"on\") %}\n    background:\
-          \ rgba(var(--rgb-[[icon_color]]-color), 0.3);\n  {% endif %}\n}\n:host {\n\
-          }\n"
+          \ rgba([[icon_color]], 0.2);\n  {% endif %}\n}\n"
       cards:
       - card_mod:
           style: "ha-card {\n  transition-duration: 0s;\n  margin: -8px 0px 0 -25px;\n\
             \  height: 75px !important;\n}\n:host {\n  --mush-icon-size: 86px;\n}\n\
             {% if is_state(config.entity, \"on\") %}\n:host {\n  --ha-card-background:\
-            \ rgba(255, 255, 255, 0.2);\n}\n:host([dark-mode]) {\n  --ha-card-background:\
-            \ rgba(17, 17, 17, 0.2);\n}\n{% endif %}\n"
+            \ rgba([[icon_color]], 0.05);\n}\n{% endif %}\n"
         entity: '[[entity]]'
         fill_container: true
         hold_action:
@@ -1183,10 +1183,10 @@ decluttering_templates:
           round: 0
           spacing: 1
         color:
-          half: rgb(var(--rgb-blue-grey-color))
-          ko: rgba(var(--rgb-grey-color), 50%)
-          none: rgb(var(--rgb-black-color))
-          ok: rgb(var(--rgb-green-color))
+          half: var(--blue-grey-color)
+          ko: var(--disabled-color)
+          none: var(--black-color)
+          ok: var(--green-color)
         entity: '[[entity]]'
         hours_to_show: 72
         icon: '[[icon]]'
@@ -1306,7 +1306,7 @@ views:
               style:
                 .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                   \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
-                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                  \ list | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                   \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                   \ 12px;\n}\n{% endif %}\n"
             entity: group.all_light_switches
@@ -1348,7 +1348,7 @@ views:
                   \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id\
                   \ ] %}\n  {% endif %}\n{% endfor %}\n{% if ns.entities | count >\
                   \ 0 %}\nha-card:after {\n  content: \"{{ ns.entities | count }}\"\
-                  ;\n  position: absolute;\n  color: rgb(var(--rgb-teal));\n  font-weight:\
+                  ;\n  position: absolute;\n  color: var(--teal-color);\n  font-weight:\
                   \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n}\n\
                   {% endif %}\n"
             icon: mdi:desktop-tower
@@ -1373,7 +1373,7 @@ views:
               style:
                 .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                   \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
-                  \ list | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-cyan));\n\
+                  \ list | count }}\";\n  position: absolute;\n  color: var(--cyan-color);\n\
                   \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                   \ 12px;\n}\n{% endif %}\n"
             entity: group.all_doors
@@ -1479,8 +1479,8 @@ views:
                           cards:
                           - card_mod:
                               style: "ha-card {\n  {% if is_state(\"switch.octoprint_pause_print\"\
-                                , \"on\") %}\n    background: rgba(var(--rgb-yellow-color),\
-                                \ 0.1);\n  {% else %}\n    background: rgba(var(--rgb-grey-color),\
+                                , \"on\") %}\n    background: rgba(var(--rgb-yellow),\
+                                \ 0.1);\n  {% else %}\n    background: rgba(var(--rgb-grey),\
                                 \ 0.1);\n  {% endif %}\n  width: 74px;\n  border-radius:\
                                 \ 50%;\n  margin-left: auto;\n  margin-right: auto;\n\
                                 }\n"
@@ -1496,7 +1496,7 @@ views:
                               action: none
                             type: custom:mushroom-template-card
                           - card_mod:
-                              style: "ha-card {\n  background: rgba(var(--rgb-amber-color),\
+                              style: "ha-card {\n  background: rgba(var(--rgb-amber),\
                                 \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n \
                                 \ margin-left: auto;\n  margin-right: auto;\n}\n"
                             entity: button.octoprint_cancel_print
@@ -1512,7 +1512,7 @@ views:
                               action: none
                             type: custom:mushroom-template-card
                           - card_mod:
-                              style: "ha-card {\n  background: rgba(var(--rgb-pink-color),\
+                              style: "ha-card {\n  background: rgba(var(--rgb-pink),\
                                 \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n \
                                 \ margin-left: auto;\n  margin-right: auto;\n}\n"
                             entity: button.octoprint_emergency_stop
@@ -1528,7 +1528,7 @@ views:
                               action: none
                             type: custom:mushroom-template-card
                           - card_mod:
-                              style: "ha-card {\n  background: rgba(var(--rgb-red-color),\
+                              style: "ha-card {\n  background: rgba(var(--rgb-red),\
                                 \ 0.1);\n  width: 74px;\n  border-radius: 50%;\n \
                                 \ margin-left: auto;\n  margin-right: auto;\n}\n"
                             entity: button.octoprint_shutdown_system
@@ -2102,38 +2102,38 @@ views:
                     max: 400
                     min: 0
                     severity:
-                    - color: rgb(var(--rgb-green-color))
+                    - color: var(--green-color)
                       from: '0'
                       to: '50'
-                    - color: rgb(var(--rgb-yellow-color))
+                    - color: var(--yellow-color)
                       from: '50'
                       to: '100'
-                    - color: rgb(var(--rgb-orange-color))
+                    - color: var(--orange-color)
                       from: '100'
                       to: '150'
-                    - color: rgb(var(--rgb-red-color))
+                    - color: var(--red-color)
                       from: '150'
                       to: '200'
-                    - color: rgb(var(--rgb-purple-color))
+                    - color: var(--purple-color)
                       from: '200'
                       to: '300'
-                    - color: rgb(var(--rgb-pink-color))
+                    - color: var(--pink-color)
                       from: '300'
                       to: '400'
                   - entity: sensor.airnow_pm2_5
                     max: 100
                     min: 0
                     severity:
-                    - color: rgb(var(--rgb-green-color))
+                    - color: var(--green-color)
                       from: '0'
                       to: '12'
-                    - color: rgb(var(--rgb-yellow-color))
+                    - color: var(--yellow-color)
                       from: '12'
                       to: '35'
-                    - color: rgb(var(--rgb-orange-color))
+                    - color: var(--orange-color)
                       from: '35'
                       to: '50'
-                    - color: rgb(var(--rgb-red-color))
+                    - color: var(--red-color)
                       from: '50'
                       to: '100'
                   positions:
@@ -2209,19 +2209,19 @@ views:
                   positions:
                     indicator: inside
                   severity:
-                  - color: rgb(var(--rgb-green-color))
+                  - color: var(--green-color)
                     from: '0'
                     to: '2.5'
-                  - color: rgb(var(--rgb-light-green-color))
+                  - color: var(--light-green-color)
                     from: '2.5'
                     to: '4.9'
-                  - color: rgb(var(--rgb-amber-color))
+                  - color: var(--amber-color)
                     from: '4.9'
                     to: '7.3'
-                  - color: rgb(var(--rgb-orange-color))
+                  - color: var(--orange-color)
                     from: '7.3'
                     to: '9.7'
-                  - color: rgb(var(--rgb-red-color))
+                  - color: var(--red-color)
                     from: '9.7'
                     to: '12'
                   style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
@@ -2252,18 +2252,21 @@ views:
       - phone_base: galaxy_s21
     - card_mod:
         style: "ha-card {\n  background:\n  {% set state = states(\"device_tracker.ascent_location\"\
-          ) %}\n  {% if state == \"not_home\" %}\n    rgba(var(--rgb-red-color), 0.2);\n\
-          \  {% elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(var(--rgb-state-unavailable-color),\
-          \ 0.3);\n  {% elif state != \"home\" %}\n    rgba(var(--rgb-state-person-zone-color),\
-          \ 0.3);\n  {% endif %}\n}\n"
+          ) %}\n  {% if state == \"not_home\" %}\n    rgba(244, 67, 54, 0.2);\n  {%\
+          \ elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(189, 189, 189,\
+          \ 0.2);\n  {% elif state != \"home\" %}\n    rgba(33, 150, 243, 0.2);\n\
+          \  {% endif %}\n}\n"
       cards:
       - card_mod:
           style:
             .: "ha-card {\n  transition-duration: 0s;\n  margin-left: -10px;\n  height:\
-              \ 66px !important;\n}\n:host {\n  --mush-icon-size: 55px;\n}\n{% if\
-              \ not is_state(config.entity, \"home\") %}\n:host {\n  --ha-card-background:\
-              \ rgba(255, 255, 255, 0.2);\n}\n:host([dark-mode]) {\n  --ha-card-background:\
-              \ rgba(17, 17, 17, 0.2);\n}\n{% endif %}\n"
+              \ 66px !important;\n}\n:host {\n  --mush-icon-size: 55px;\n  {% if not\
+              \ is_state(config.entity, \"home\") %}\n  {% set state = states(config.entity)\
+              \ %}\n  --ha-card-background:\n    {% if state == \"not_home\" %}\n\
+              \      rgba(244, 67, 54, 0.05)\n    {% elif state in [\"unknown\", \"\
+              unavailable\"] %}\n      rgba(189, 189, 189, 0.05)\n    {% elif state\
+              \ != \"home\" %}\n      rgba(33, 150, 243, 0.05)\n    {% endif %};\n\
+              \  {% endif %}\n}\n"
             mushroom-shape-avatar$: "{% set timer = \"timer.subaru_remote_start\"\
               \ %}\n{% if state_attr(timer, \"finishes_at\") %}\n.picture {\n  {%\
               \ set remaining = (as_datetime(state_attr(timer, \"finishes_at\")) -\
@@ -2271,7 +2274,7 @@ views:
               \ \"duration\").split(\":\")[0] | int * 60 * 60)\n    + (state_attr(timer,\
               \ \"duration\").split(\":\")[1] | int * 60)\n    + (state_attr(timer,\
               \ \"duration\").split(\":\")[2] | int)\n  %}\n  background:\n    radial-gradient(var(--card-background-color)\
-              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(rgb(var(--rgb-blue))\
+              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--blue-color)\
               \ {{ (remaining / duration * 100)|round() }}% 0%, var(--card-background-color)\
               \ 0% 100%);\n}\n{% endif %}\n"
         entity: device_tracker.ascent_location
@@ -2320,8 +2323,8 @@ views:
           mushroom-shape-icon$: ".shape {\n  {%- if is_state(\"input_boolean.garbage_collection\"\
             , \"off\") and is_state(config.entity, \"0\") -%}\n  --shape-animation:\
             \ ping 2s infinite;\n  {%- endif -%}\n}\n@keyframes ping {\n  0% { box-shadow:\
-            \ 0 0 1px 1px rgba(var(--rgb-red-color), 0.7); }\n  100% { box-shadow:\
-            \ 0 0 5px 15px transparent; }\n}\n"
+            \ 0 0 1px 1px rgba(var(--rgb-red), 0.7); }\n  100% { box-shadow: 0 0 5px\
+            \ 15px transparent; }\n}\n"
       entity: sensor.garbage
       hold_action:
         action: call-service
@@ -2355,8 +2358,8 @@ views:
           mushroom-shape-icon$: ".shape {\n  {%- if is_state(\"input_boolean.recycling_collection\"\
             , \"off\") and is_state(config.entity, \"0\") -%}\n  --shape-animation:\
             \ ping 2s infinite;\n  {%- endif -%}\n}\n@keyframes ping {\n  0% { box-shadow:\
-            \ 0 0 1px 1px rgba(var(--rgb-red-color), 0.7); }\n  100% { box-shadow:\
-            \ 0 0 5px 15px transparent; }\n}\n"
+            \ 0 0 1px 1px rgba(var(--rgb-red), 0.7); }\n  100% { box-shadow: 0 0 5px\
+            \ 15px transparent; }\n}\n"
       entity: sensor.recycling
       hold_action:
         action: call-service
@@ -2377,7 +2380,7 @@ views:
           \ }}\n{% elif states(entity) | int > 9 %}\n  mdi:numeric-9-plus\n{% endif\
           \ %}"
         card_mod:
-          style: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-{{config.icon_color}}-color));\n\
+          style: "mushroom-badge-icon {\n  --icon-color: var(--{{config.icon_color}}-color);\n\
             \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n  background:\
             \ none;\n  box-shadow: none;\n  margin-top: 10px;\n}\n"
         entity: sensor.mail_usps_mail
@@ -2440,12 +2443,12 @@ views:
           \ %}"
         card_mod:
           style:
-            .: "mushroom-badge-icon {\n  --icon-color: rgb(var(--rgb-{{config.icon_color}}-color));\n\
+            .: "mushroom-badge-icon {\n  --icon-color: var(--{{config.icon_color}}-color);\n\
               \  --main-color: none;\n  --badge-icon-size: 1.5em;\n}\nha-card {\n\
               \  background: none;\n  box-shadow: none;\n  margin-top: 10px;\n}\n"
             mushroom-shape-icon$: ".shape {\n  {%- if states(config.entity) | int\
               \ > 0 -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
-              }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-{{config.icon_color}}-color),\
+              }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-{{config.icon_color}}),\
               \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent; }\n}\n"
         entity: sensor.mail_packages_delivered
         icon: mdi:package-variant
@@ -2543,39 +2546,40 @@ views:
               \ 10px;\n}\n"
             mushroom-shape-icon$: "{% set timer = \"timer.dishwasher_run_time\" %}\n\
               {%- if is_state(config.entity, \"Washing\") -%}\n  {% set icon_color\
-              \ = \"cyan\" %}\n{%- elif is_state(config.entity, \"Draining\") -%}\n\
-              \  {% set icon_color = \"brown\" %}\n{%- elif is_state(config.entity,\
+              \ = \"purple\" %}\n{%- elif is_state(config.entity, \"Draining\") -%}\n\
+              \  {% set icon_color = \"lime\" %}\n{%- elif is_state(config.entity,\
               \ \"Rinsing\") -%}\n  {% set icon_color = \"blue\" %}\n{%- elif is_state(config.entity,\
-              \ \"Drying\") -%}\n  {% set icon_color = \"red\" %}\n{%- elif is_state(config.entity,\
-              \ \"Clean\") -%}\n  {% set icon_color = \"lime\" %}\n{%- else -%}\n\
-              \  {% set icon_color = \"grey\" %}\n{%- endif -%}\nha-icon {\n  {%-\
-              \ if not is_state(config.entity, \"Off\") -%}\n  --icon-animation: bounce\
-              \ 1.5s ease-in-out infinite, wash 1s ease-in-out infinite;\n  transform-origin:\
-              \ 50% 75%;\n  {% endif %}\n}\n{% if state_attr(timer, \"finishes_at\"\
-              ) %}\n.shape {\n  {% set remaining = (as_datetime(state_attr(timer,\
+              \ \"Drying\") -%}\n  {% set icon_color = \"orange\" %}\n{%- elif is_state(config.entity,\
+              \ \"Clean\") -%}\n  {% set icon_color = \"cyan\" %}\n{%- else -%}\n\
+              \  {% set icon_color = \"disabled\" %}\n{%- endif -%}\nha-icon {\n \
+              \ {%- if not is_state(config.entity, \"Off\") -%}\n  --icon-animation:\
+              \ bounce 1.5s ease-in-out infinite, wash 1s ease-in-out infinite;\n\
+              \  transform-origin: 50% 75%;\n  {% endif %}\n}\n{% if state_attr(timer,\
+              \ \"finishes_at\") %}\n.shape {\n  {% set remaining = (as_datetime(state_attr(timer,\
               \ \"finishes_at\")) - now()).total_seconds() | int %}\n  {% set duration\
               \ =\n    (state_attr(timer, \"duration\").split(\":\")[0] | int * 60\
               \ * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[1] |\
               \ int * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[2]\
               \ | int)\n  %}\n  background:\n    radial-gradient(var(--card-background-color)\
-              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(rgb(var(--rgb-{{\
-              \ icon_color }})) {{ ((duration - remaining) / duration * 100)|round()\
-              \ }}% 0%, var(--card-background-color) 0% 100%);\n}\n.shape:after {\n\
-              \  content: \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n\
-              \  border-radius: 50%;\n  background: rgba(var(--rgb-{{ icon_color }}),\
-              \ 0.2);\n}\n{% endif %}\n@keyframes bounce {\n  0%, 20%, 50%, 80%, 100%\
-              \ {transform: translateY(0); }\n  40% { transform: translateY(-1.2px)\
-              \ rotate(5deg); }\n  60% { transform: translateY(-1.1px) rotate(-4deg);\
-              \ }\n}\n@keyframes wash {\n  50%  { clip-path: polygon(0 0, 0 100%,\
-              \ 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35%\
-              \ 100%, 100% 100%, 100% 0); }\n}\n"
+              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--{{ icon_color\
+              \ }}-color) {{ ((duration - remaining) / duration * 100)|round() }}%\
+              \ 0%, var(--card-background-color) 0% 100%);\n}\n.shape:after {\n  content:\
+              \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
+              \ 50%;\n  background: rgba(var(--rgb-{{ icon_color }}), 0.2);\n}\n{%\
+              \ endif %}\n@keyframes bounce {\n  0%, 20%, 50%, 80%, 100% {transform:\
+              \ translateY(0); }\n  40% { transform: translateY(-1.2px) rotate(5deg);\
+              \ }\n  60% { transform: translateY(-1.1px) rotate(-4deg); }\n}\n@keyframes\
+              \ wash {\n  50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%,\
+              \ 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100% 100%,\
+              \ 100% 0); }\n}\n"
         entity: input_select.dishwasher_status
         icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
           \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  cyan\n{%- elif is_state(entity,\
-          \ \"Draining\") -%}\n  brown\n{%- elif is_state(entity, \"Rinsing\") -%}\n\
-          \  blue\n{%- elif is_state(entity, \"Drying\") -%}\n  red\n{%- elif is_state(entity,\
-          \ \"Clean\") -%}\n  lime\n{%- else -%}\n  disabled\n{%- endif -%}"
+        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  purple\n{%- elif\
+          \ is_state(entity, \"Draining\") -%}\n  lime\n{%- elif is_state(entity,\
+          \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
+          \  orange\n{%- elif is_state(entity, \"Clean\") -%}\n  cyan\n{%- else -%}\n\
+          \  disabled\n{%- endif -%}"
         layout: vertical
         tap_action:
           action: more-info
@@ -2584,9 +2588,7 @@ views:
       - entity: input_select.dishwasher_status
         state_not: 'Off'
       type: conditional
-    columns: 8
-    square: false
-    type: grid
+    type: horizontal-stack
   - cards:
     - template: room_card
       type: custom:decluttering-card
@@ -2595,7 +2597,7 @@ views:
       - entity: group.lights_living_room
       - temperature: sensor.home_temperature
       - icon: mdi:sofa-single
-      - icon_color: orange
+      - icon_color: 255, 152, 0
       - path: living
       - chips:
         - entity: media_player.living_room_universal
@@ -2707,7 +2709,7 @@ views:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_living_room
@@ -2751,7 +2753,7 @@ views:
       - entity: group.lights_family_room
       - temperature: sensor.family_room_temperature
       - icon: mdi:gamepad-circle
-      - icon_color: yellow
+      - icon_color: 255, 235, 59
       - path: family
       - chips:
         - chip:
@@ -2852,7 +2854,7 @@ views:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_family_room
@@ -2896,7 +2898,7 @@ views:
       - entity: group.lights_office
       - temperature: sensor.office_temperature
       - icon: mdi:chair-rolling
-      - icon_color: blue
+      - icon_color: 33, 150, 243
       - path: office
       - chips:
         - chip:
@@ -2914,7 +2916,7 @@ views:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_office
@@ -2958,7 +2960,7 @@ views:
       - entity: group.lights_kitchen
       - temperature: sensor.kitchen_temperature
       - icon: mdi:fridge-variant
-      - icon_color: lime
+      - icon_color: 0, 188, 212
       - path: kitchen
       - chips:
         - chip:
@@ -2976,7 +2978,7 @@ views:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_kitchen
@@ -3020,7 +3022,7 @@ views:
       - entity: group.lights_master_bedroom
       - temperature: sensor.master_bedroom_temperature
       - icon: mdi:bed-king
-      - icon_color: deep-purple
+      - icon_color: 103, 58, 183
       - path: master
       - chips:
         - entity: media_player.master_bedroom_universal
@@ -3132,7 +3134,7 @@ views:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_master_bedroom
@@ -3176,14 +3178,14 @@ views:
       - entity: group.lights_ethan
       - temperature: sensor.ethan_temperature
       - icon: mdi:robot
-      - icon_color: green
+      - icon_color: 76, 175, 80
       - path: ethan
       - chips:
         - card_mod:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_ethan
@@ -3227,14 +3229,14 @@ views:
       - entity: group.lights_emma
       - temperature: sensor.emma_temperature
       - icon: mdi:unicorn-variant
-      - icon_color: purple
+      - icon_color: 156, 39, 176
       - path: emma
       - chips:
         - card_mod:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_emma
@@ -3278,7 +3280,7 @@ views:
       - entity: light.guest_room
       - temperature: sensor.guest_room_temperature
       - icon: mdi:account
-      - icon_color: cyan
+      - icon_color: 244, 67, 54
       - path: guest-room
       - chips:
         - entity: light.guest_room
@@ -3301,7 +3303,7 @@ views:
       - entity: light.garage
       - temperature: sensor.garage_multisensor_air_temperature
       - icon: mdi:garage-variant
-      - icon_color: blue-grey
+      - icon_color: 96, 125, 139
       - path: garage
       - chips:
         - chip:
@@ -3337,14 +3339,14 @@ views:
       - entity: group.lights_outside
       - temperature: sensor.openweathermap_temperature
       - icon: mdi:spa
-      - icon_color: light-green
+      - icon_color: 139, 195, 74
       - path: outside
       - chips:
         - card_mod:
             style:
               .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
                 \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
-                \ | count }}\";\n  position: absolute;\n  color: rgb(var(--rgb-amber));\n\
+                \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
           entity: group.lights_outside
@@ -3388,7 +3390,7 @@ views:
       - entity: ''
       - temperature: sensor.water_main_air_temperature
       - icon: mdi:progress-wrench
-      - icon_color: brown
+      - icon_color: 121, 85, 72
       - path: utility
       - chips:
         - chip:
@@ -4223,7 +4225,7 @@ views:
     variables:
     - primary: Kitchen
     - icon: mdi:fridge-variant
-    - icon_color: lime
+    - icon_color: cyan
     - chips:
       - content: '{{ iif(is_state(entity, "on"), "Detected", "Clear") }}'
         entity: binary_sensor.kitchen_occupancy
@@ -4566,7 +4568,7 @@ views:
     variables:
     - primary: Guest
     - icon: mdi:account
-    - icon_color: cyan
+    - icon_color: red
     - chips:
       - content: '{{ iif(is_state(entity, "on"), "Detected", "Clear") }}'
         entity: binary_sensor.guest_room_occupancy
@@ -4800,19 +4802,19 @@ views:
       positions:
         indicator: inside
       severity:
-      - color: rgb(var(--rgb-red-color))
+      - color: var(--red-color)
         from: 0
         to: 20
-      - color: rgb(var(--rgb-orange-color))
+      - color: var(--orange-color)
         from: 20
         to: 40
-      - color: rgb(var(--rgb-amber-color))
+      - color: var(--amber-color)
         from: 40
         to: 60
-      - color: rgb(var(--rgb-light-green-color))
+      - color: var(--light-green-color)
         from: 60
         to: 80
-      - color: rgb(var(--rgb-green-color))
+      - color: var(--green-color)
         from: 80
         to: 100
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
@@ -4917,19 +4919,19 @@ views:
       icon: inside
       indicator: inside
     severity:
-    - color: rgb(var(--rgb-red-color))
+    - color: var(--red-color)
       from: 0
       to: 20
-    - color: rgb(var(--rgb-orange-color))
+    - color: var(--orange-color)
       from: 20
       to: 40
-    - color: rgb(var(--rgb-amber-color))
+    - color: var(--amber-color)
       from: 40
       to: 60
-    - color: rgb(var(--rgb-light-green-color))
+    - color: var(--light-green-color)
       from: 60
       to: 200
-    - color: rgb(var(--rgb-green-color))
+    - color: var(--green-color)
       from: 200
       to: 400
     style: "ha-card {\n  background: none;\n}\n#states {\n  padding: 8px 2px;\n}\n\
@@ -4955,7 +4957,7 @@ views:
         tap_action:
           action: none
         type: custom:mushroom-template-card
-      - bar_background: rgba(var(--rgb-grey-color), 50%)
+      - bar_background: var(--disabled-color)
         bar_direction: rtl
         compressed: true
         entities:
@@ -5133,15 +5135,15 @@ views:
         name: Front Left
         needle: true
         segments:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 25
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 28
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 30
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 35
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 37
         type: gauge
       - entity: sensor.ascent_tire_pressure_fr
@@ -5150,15 +5152,15 @@ views:
         name: Front Right
         needle: true
         segments:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 25
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 28
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 30
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 35
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 37
         type: gauge
       - entity: sensor.ascent_tire_pressure_rl
@@ -5167,15 +5169,15 @@ views:
         name: Rear Left
         needle: true
         segments:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 25
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 28
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 30
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 35
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 37
         type: gauge
       - entity: sensor.ascent_tire_pressure_rr
@@ -5184,15 +5186,15 @@ views:
         name: Rear Right
         needle: true
         segments:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 25
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 28
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 30
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           from: 35
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 37
         type: gauge
       columns: 2
@@ -5249,6 +5251,30 @@ views:
     - secondary: Press and Hold to Activate Actions
     - icon: mdi:desktop-tower
     - icon_color: grey
+    - chips:
+      - card_mod:
+          style:
+            .: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"\
+              binary_sensor.erebus_connected\",\n  \"binary_sensor.nasya_connected\"\
+              ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
+              \n] %}\n{% for entity_id in computers %}\n  {% if is_state(entity_id,\
+              \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n\
+              \  {% endif %}\n{% endfor %}\n{% if ns.entities | count > 0 %}\nha-card:after\
+              \ {\n  content: \"{{ ns.entities | count }}\";\n  position: absolute;\n\
+              \  color: var(--teal-color);\n  font-weight: bolder;\n  top: -2px;\n\
+              \  right: 2px;\n  font-size: 12px;\n}\n{% endif %}\n"
+        icon: mdi:desktop-tower
+        icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n\
+          \  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.nasya_connected\"\
+          ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
+          \n] %}\n{% for entity_id in computers %}\n  {% if is_state(entity_id, \"\
+          on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
+          \ endif %}\n{% endfor %}\n{{ \"teal\" if ns.entities | count > 0 else \"\
+          disabled\" }}"
+        tap_action:
+          action: navigate
+          navigation_path: computer
+        type: template
     view_layout:
       grid-area: header
   - cards:
@@ -5346,12 +5372,12 @@ views:
       - graph_1_name: CPU
       - graph_1_icon: mdi:cpu-64-bit
       - graph_1_entities:
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           entity: sensor.erebus_cpu_load
           name: Usage
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-lime-color))
+        - color: var(--lime-color)
           entity: sensor.erebus_cpu_clock_speed
           name: Speed
           show_points: false
@@ -5361,14 +5387,14 @@ views:
       - graph_3_icon: mdi:harddisk
       - graph_3_entities:
         - attribute: UsedSpacePercentage
-          color: rgb(var(--rgb-blue-color))
+          color: var(--blue-color)
           entity: sensor.erebus_storage_c
           name: Win11
           show_points: false
           show_state: true
           unit: '%'
         - attribute: UsedSpacePercentage
-          color: rgb(var(--rgb-cyan-color))
+          color: var(--cyan-color)
           entity: sensor.erebus_storage_b
           name: Backup
           show_points: false
@@ -5377,7 +5403,7 @@ views:
       - graph_4_name: RAM
       - graph_4_icon: mdi:memory
       - graph_4_entities:
-        - color: rgb(var(--rgb-purple-color))
+        - color: var(--purple-color)
           entity: sensor.erebus_memory_usage
           name: Usage
           show_points: false
@@ -5476,12 +5502,12 @@ views:
       - graph_1_name: CPU
       - graph_1_icon: mdi:cpu-64-bit
       - graph_1_entities:
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           entity: sensor.nasya_cpu_load
           name: Usage
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-lime-color))
+        - color: var(--lime-color)
           entity: sensor.nasya_cpu_clock_speed
           name: Speed
           show_points: false
@@ -5490,12 +5516,12 @@ views:
       - graph_2_name: GPU
       - graph_2_icon: mdi:expansion-card
       - graph_2_entities:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           entity: sensor.nasya_gpu_load
           name: Load
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-pink-color))
+        - color: var(--pink-color)
           entity: sensor.nasya_gpu_temperature
           name: Temp
           show_points: false
@@ -5505,7 +5531,7 @@ views:
       - graph_3_icon: mdi:harddisk
       - graph_3_entities:
         - attribute: UsedSpacePercentage
-          color: rgb(var(--rgb-blue-color))
+          color: var(--blue-color)
           entity: sensor.nasya_storage_c
           name: Win10
           show_points: false
@@ -5514,7 +5540,7 @@ views:
       - graph_4_name: RAM
       - graph_4_icon: mdi:memory
       - graph_4_entities:
-        - color: rgb(var(--rgb-purple-color))
+        - color: var(--purple-color)
           entity: sensor.nasya_memory_usage
           name: Usage
           show_points: false
@@ -5628,12 +5654,12 @@ views:
       - graph_1_name: CPU
       - graph_1_icon: mdi:cpu-64-bit
       - graph_1_entities:
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           entity: sensor.ardena_cpu_load
           name: Usage
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-lime-color))
+        - color: var(--lime-color)
           entity: sensor.ardena_cpu_clock_speed
           name: Speed
           show_points: false
@@ -5642,12 +5668,12 @@ views:
       - graph_2_name: GPU
       - graph_2_icon: mdi:expansion-card
       - graph_2_entities:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           entity: sensor.ardena_gpu_load
           name: Load
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-pink-color))
+        - color: var(--pink-color)
           entity: sensor.ardena_gpu_temperature
           name: Temperature
           show_points: false
@@ -5657,7 +5683,7 @@ views:
       - graph_3_icon: mdi:harddisk
       - graph_3_entities:
         - attribute: UsedSpacePercentage
-          color: rgb(var(--rgb-blue-color))
+          color: var(--blue-color)
           entity: sensor.ardena_storage_c
           name: Win10
           show_points: false
@@ -5666,7 +5692,7 @@ views:
       - graph_4_name: RAM
       - graph_4_icon: mdi:memory
       - graph_4_entities:
-        - color: rgb(var(--rgb-purple-color))
+        - color: var(--purple-color)
           entity: sensor.ardena_memory_usage
           name: Usage
           show_points: false
@@ -5765,12 +5791,12 @@ views:
       - graph_1_name: CPU
       - graph_1_icon: mdi:cpu-64-bit
       - graph_1_entities:
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           entity: sensor.athos_cpu_load
           name: Usage
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-lime-color))
+        - color: var(--lime-color)
           entity: sensor.athos_cpu_clock_speed
           name: Speed
           show_points: false
@@ -5779,12 +5805,12 @@ views:
       - graph_2_name: GPU
       - graph_2_icon: mdi:expansion-card
       - graph_2_entities:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           entity: sensor.athos_gpu_load
           name: Load
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-pink-color))
+        - color: var(--pink-color)
           entity: sensor.athos_gpu_temperature
           name: Temp
           show_points: false
@@ -5794,7 +5820,7 @@ views:
       - graph_3_icon: mdi:harddisk
       - graph_3_entities:
         - attribute: UsedSpacePercentage
-          color: rgb(var(--rgb-blue-color))
+          color: var(--blue-color)
           entity: sensor.athos_storage_c
           name: Win10
           show_points: false
@@ -5803,7 +5829,7 @@ views:
       - graph_4_name: RAM
       - graph_4_icon: mdi:memory
       - graph_4_entities:
-        - color: rgb(var(--rgb-purple-color))
+        - color: var(--purple-color)
           entity: sensor.athos_memory_usage
           name: Usage
           show_points: false
@@ -5824,19 +5850,19 @@ views:
       positions:
         indicator: inside
       severity:
-      - color: rgb(var(--rgb-red-color))
+      - color: var(--red-color)
         from: 0
         to: 10
-      - color: rgb(var(--rgb-orange-color))
+      - color: var(--orange-color)
         from: 10
         to: 30
-      - color: rgb(var(--rgb-amber-color))
+      - color: var(--amber-color)
         from: 30
         to: 50
-      - color: rgb(var(--rgb-light-green-color))
+      - color: var(--light-green-color)
         from: 50
         to: 80
-      - color: rgb(var(--rgb-green-color))
+      - color: var(--green-color)
         from: 80
         to: 100
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
@@ -5851,21 +5877,21 @@ views:
       - graph_1_name: WiFi Speed
       - graph_1_icon: mdi:wifi-arrow-left-right
       - graph_1_entities:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           entity: sensor.quest_wifi_link_speed
           show_points: false
           show_state: false
       - graph_2_name: WiFi Signal
       - graph_2_icon: mdi:wifi
       - graph_2_entities:
-        - color: rgb(var(--rgb-yellow-color))
+        - color: var(--yellow-color)
           entity: sensor.quest_wifi_signal_strength
           show_points: false
           show_state: false
       - graph_3_name: Storage
       - graph_3_icon: mdi:sd
       - graph_3_entities:
-        - color: rgb(var(--rgb-blue-color))
+        - color: var(--blue-color)
           entity: sensor.quest_internal_storage
           name: Storage
           show_points: false
@@ -5873,7 +5899,7 @@ views:
       - graph_4_name: Battery Temp
       - graph_4_icon: mdi:battery-alert
       - graph_4_entities:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           entity: sensor.quest_battery_temperature
           name: Battery Temp
           show_points: false
@@ -5895,12 +5921,12 @@ views:
       - graph_1_name: CPU
       - graph_1_icon: mdi:cpu-64-bit
       - graph_1_entities:
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           entity: sensor.smart_display_cpu_used
           name: Usage
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-pink-color))
+        - color: var(--pink-color)
           entity: sensor.smart_display_cpu_temperature
           name: Temperature
           show_points: false
@@ -5909,7 +5935,7 @@ views:
       - graph_2_name: RAM
       - graph_2_icon: mdi:memory
       - graph_2_entities:
-        - color: rgb(var(--rgb-purple-color))
+        - color: var(--purple-color)
           entity: sensor.smart_display_ram_used_percent
           name: Usage
           show_points: false
@@ -5917,7 +5943,7 @@ views:
       - graph_3_name: Storage
       - graph_3_icon: mdi:sd
       - graph_3_entities:
-        - color: rgb(var(--rgb-blue-color))
+        - color: var(--blue-color)
           entity: sensor.smart_display_disk_used_percent
           name: Storage
           show_points: false
@@ -5934,12 +5960,12 @@ views:
       - graph_1_name: CPU
       - graph_1_icon: mdi:cpu-64-bit
       - graph_1_entities:
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           entity: sensor.octoprint_cpu_used
           name: Usage
           show_points: false
           show_state: true
-        - color: rgb(var(--rgb-pink-color))
+        - color: var(--pink-color)
           entity: sensor.octoprint_cpu_temperature
           name: Temperature
           show_points: false
@@ -5948,7 +5974,7 @@ views:
       - graph_2_name: RAM
       - graph_2_icon: mdi:memory
       - graph_2_entities:
-        - color: rgb(var(--rgb-purple-color))
+        - color: var(--purple-color)
           entity: sensor.octoprint_ram_used_percent
           name: Usage
           show_points: false
@@ -5956,7 +5982,7 @@ views:
       - graph_3_name: Storage
       - graph_3_icon: mdi:sd
       - graph_3_entities:
-        - color: rgb(var(--rgb-blue-color))
+        - color: var(--blue-color)
           entity: sensor.octoprint_disk_used_percent
           name: Storage
           show_points: false
@@ -6046,15 +6072,14 @@ views:
           \  display: flex;\n}\n@keyframes cool {\n  0%, 100% { transform: rotate(25deg);\
           \ }\n  25% { transform: rotate(-25deg); }\n  50% { transform: rotate(50deg);\
           \ }\n  75% { transform: rotate(-50deg); }\n}\n@keyframes heat {\n  0%, 100%\
-          \ { --icon-color: rgba(var(--rgb-red-color), 1); }\n  10%, 90% { --icon-color:\
-          \ rgba(var(--rgb-red-color), 0.8); }\n  20%, 80% { --icon-color: rgba(var(--rgb-red-color),\
-          \ 0.6); }\n  30%, 70% { --icon-color: rgba(var(--rgb-red-color), 0.4); }\n\
-          \  40%, 60% { --icon-color: rgba(var(--rgb-red-color), 0.2); }\n  50% {\
-          \ --icon-color: rgba(var(--rgb-red-color), 0); }\n}\n@keyframes dry {\n\
-          \  0%, 100% { --icon-symbol-size: 21px; }\n  10%, 90% { --icon-symbol-size:\
-          \ 22px; }\n  20%, 80% { --icon-symbol-size: 23px; }\n  30%, 70% { --icon-symbol-size:\
-          \ 24px; }\n  40%, 60% { --icon-symbol-size: 25px; }\n  50% { --icon-symbol-size:\
-          \ 26px; }\n}\n"
+          \ { --icon-color: rgba(var(--rgb-red), 1); }\n  10%, 90% { --icon-color:\
+          \ rgba(var(--rgb-red), 0.8); }\n  20%, 80% { --icon-color: rgba(var(--rgb-red),\
+          \ 0.6); }\n  30%, 70% { --icon-color: rgba(var(--rgb-red), 0.4); }\n  40%,\
+          \ 60% { --icon-color: rgba(var(--rgb-red), 0.2); }\n  50% { --icon-color:\
+          \ rgba(var(--rgb-red), 0); }\n}\n@keyframes dry {\n  0%, 100% { --icon-symbol-size:\
+          \ 21px; }\n  10%, 90% { --icon-symbol-size: 22px; }\n  20%, 80% { --icon-symbol-size:\
+          \ 23px; }\n  30%, 70% { --icon-symbol-size: 24px; }\n  40%, 60% { --icon-symbol-size:\
+          \ 25px; }\n  50% { --icon-symbol-size: 26px; }\n}\n"
       entity: climate.home
       hvac_modes:
       - heat_cool
@@ -6739,6 +6764,61 @@ views:
         tap_action:
           action: none
         type: template
+      - card_mod:
+          style:
+            .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+              \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
+              \ | count }}\";\n  position: absolute;\n  color: var(--cyan-color);\n\
+              \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+              }\n{% endif %}\n"
+        entity: group.all_doors
+        icon: '{{ iif(is_state(entity, "on"), "mdi:door-open", "mdi:door") }}'
+        icon_color: '{{ iif(is_state(entity, "on"), "cyan", "disabled") }}'
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            data:
+              card_mod:
+                style:
+                  ha-dialog$: "@supports (-webkit-backdrop-filter: none) or (backdrop-filter:\
+                    \ none) {\n  .mdc-dialog__surface {\n    backdrop-filter: blur(16px);\n\
+                    \    -webkit-backdrop-filter: blur(16px);\n    background-color:\
+                    \ rgba(var(--rgb-mdc-theme-surface), .5) !important;\n  }\n  .mdc-dialog\
+                    \ .mdc-dialog__scrim {\n    backdrop-filter: blur(0.8em) brightness(1.2);\n\
+                    \    -webkit-backdrop-filter: blur(0.8em) brightness(1.2);\n \
+                    \ }\n} .mdc-dialog__surface {\n  box-shadow: 0 0px 16px 4px rgba(var(--rgb-accent-color),\
+                    \ .15), 0 16px 64px 32px rgba(var(--rgb-accent-color), .5) !important;\n\
+                    }\n"
+              content:
+                card_mod:
+                  style: "ha-card {\n  --ha-card-background: none\n}\n"
+                cards:
+                - card:
+                    cards: []
+                    layout_type: masonry
+                    type: custom:layout-card
+                  filter:
+                    exclude: []
+                    include:
+                    - group: group.all_doors
+                      options:
+                        card_mod:
+                          style: "ha-card {\n  padding: 4px 12px !important;\n}\n"
+                        hold_action:
+                          action: none
+                        layout: horizontal
+                        secondary_info: last-changed
+                        tap_action:
+                          action: none
+                        type: custom:mushroom-entity-card
+                  show_empty: false
+                  sort:
+                    method: friendly_name
+                  type: custom:auto-entities
+                type: custom:vertical-stack-in-card
+              title: All Doors
+            service: browser_mod.popup
+        type: template
   - cards:
     - title: Doors
       type: custom:mushroom-title-card
@@ -6816,7 +6896,7 @@ views:
           layout:
             grid-template-columns: 65px auto
             grid-template-rows: auto
-            margin: 0
+            margin: 0 0 -4px 0
             padding: 0
           layout_type: custom:grid-layout
           type: custom:layout-card
@@ -6953,7 +7033,7 @@ views:
                 \ 10px;\n}\n"
               mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity, \"\
                 on\") -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
-                }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow-color),\
+                }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow),\
                 \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent; }\n}\n"
           entity: input_boolean.ignore_alert_doors
           hold_action:
@@ -6970,7 +7050,7 @@ views:
                 \ 10px;\n}\n"
               mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity, \"\
                 on\") -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
-                }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow-color),\
+                }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow),\
                 \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent; }\n}\n"
           entity: input_boolean.ignore_alert_garage_door
           hold_action:
@@ -7358,26 +7438,26 @@ views:
                     - children:
                       - sensor.load_daily
                       - sensor.battery_in_daily
-                      color: rgb(var(--rgb-purple-color))
+                      color: var(--purple-color)
                       entity_id: sensor.grid_in_daily
                       name: Grid Import
                       remaining:
-                        color: rgb(var(--rgb-grey-color))
+                        color: var(--grey-color)
                         name: Inverter
                     - children:
                       - sensor.load_daily
-                      color: rgb(var(--rgb-pink-color))
+                      color: var(--pink-color)
                       entity_id: sensor.battery_out_daily
                       name: Battery
                     - children:
                       - sensor.load_daily
                       - sensor.battery_in_daily
                       - sensor.grid_out_daily
-                      color: rgb(var(--rgb-orange-color))
+                      color: var(--orange-color)
                       entity_id: sensor.pv_daily
                       name: Solar
                       remaining:
-                        color: rgb(var(--rgb-grey-color))
+                        color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - children:
@@ -7398,16 +7478,16 @@ views:
                       - sensor.range_energy
                       - sensor.theater_room_energy
                       - sensor.washer_energy
-                      color: rgb(var(--rgb-cyan-color))
+                      color: var(--cyan-color)
                       entity_id: sensor.load_daily
                       name: Total Energy Used
                       remaining:
-                        color: rgb(var(--rgb-grey-color))
+                        color: var(--grey-color)
                         name: Other
-                    - color: rgb(var(--rgb-pink-color))
+                    - color: var(--pink-color)
                       entity_id: sensor.battery_in_daily
                       name: Battery Charge
-                    - color: rgb(var(--rgb-purple-color))
+                    - color: var(--purple-color)
                       entity_id: sensor.grid_out_daily
                       name: Grid Export
                   - entities:
@@ -7515,26 +7595,26 @@ views:
                     - children:
                       - sensor.load_monthly
                       - sensor.battery_in_monthly
-                      color: rgb(var(--rgb-purple-color))
+                      color: var(--purple-color)
                       entity_id: sensor.grid_in_monthly
                       name: Grid Import
                       remaining:
-                        color: rgb(var(--rgb-grey-color))
+                        color: var(--grey-color)
                         name: Inverter
                     - children:
                       - sensor.load_monthly
-                      color: rgb(var(--rgb-pink-color))
+                      color: var(--pink-color)
                       entity_id: sensor.battery_out_monthly
                       name: Battery
                     - children:
                       - sensor.load_monthly
                       - sensor.battery_in_monthly
                       - sensor.grid_out_monthly
-                      color: rgb(var(--rgb-orange-color))
+                      color: var(--orange-color)
                       entity_id: sensor.pv_monthly
                       name: Solar
                       remaining:
-                        color: rgb(var(--rgb-grey-color))
+                        color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - children:
@@ -7555,16 +7635,16 @@ views:
                       - sensor.range_monthly
                       - sensor.theater_room_monthly
                       - sensor.washer_monthly
-                      color: rgb(var(--rgb-cyan-color))
+                      color: var(--cyan-color)
                       entity_id: sensor.load_monthly
                       name: Total Energy Used
                       remaining:
-                        color: rgb(var(--rgb-grey-color))
+                        color: var(--grey-color)
                         name: Other
-                    - color: rgb(var(--rgb-pink-color))
+                    - color: var(--pink-color)
                       entity_id: sensor.battery_in_monthly
                       name: Battery Charge
-                    - color: rgb(var(--rgb-purple-color))
+                    - color: var(--purple-color)
                       entity_id: sensor.grid_out_monthly
                       name: Grid Export
                   - entities:
@@ -7675,38 +7755,38 @@ views:
                       - children:
                         - sensor.load_yearly
                         - sensor.battery_in_yearly
-                        color: rgb(var(--rgb-purple-color))
+                        color: var(--purple-color)
                         entity_id: sensor.grid_in_yearly
                         name: Grid Import
                         remaining:
-                          color: rgb(var(--rgb-grey-color))
+                          color: var(--grey-color)
                           name: Inverter
                       - children:
                         - sensor.load_yearly
-                        color: rgb(var(--rgb-pink-color))
+                        color: var(--pink-color)
                         entity_id: sensor.battery_out_yearly
                         name: Battery
                       - children:
                         - sensor.load_yearly
                         - sensor.battery_in_yearly
                         - sensor.grid_out_yearly
-                        color: rgb(var(--rgb-orange-color))
+                        color: var(--orange-color)
                         entity_id: sensor.pv_yearly
                         name: Solar
                         remaining:
-                          color: rgb(var(--rgb-grey-color))
+                          color: var(--grey-color)
                           name: Inverter
                     - entities:
-                      - color: rgb(var(--rgb-cyan-color))
+                      - color: var(--cyan-color)
                         entity_id: sensor.load_yearly
                         name: Total Energy Used
                         remaining:
-                          color: rgb(var(--rgb-grey-color))
+                          color: var(--grey-color)
                           name: Other
-                      - color: rgb(var(--rgb-pink-color))
+                      - color: var(--pink-color)
                         entity_id: sensor.battery_in_yearly
                         name: Battery Charge
-                      - color: rgb(var(--rgb-purple-color))
+                      - color: var(--purple-color)
                         entity_id: sensor.grid_out_yearly
                         name: Grid Export
                     show_names: true
@@ -7732,7 +7812,7 @@ views:
       type: custom:mushroom-title-card
     - animate: true
       entities:
-      - color: rgb(var(--rgb-green-color))
+      - color: var(--green-color)
         entity: sensor.pv_power
         name: PV Power
       height: 60
@@ -7779,19 +7859,19 @@ views:
         min: 0
         name: State of Charge
         severity:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 0
           to: 30
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 30
           to: 50
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 50
           to: 70
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 70
           to: 90
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 90
           to: 100
       - entity: sensor.battery_voltage
@@ -7800,19 +7880,19 @@ views:
         min: 44
         name: Voltage
         severity:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 44
           to: 46
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 46
           to: 48
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 48
           to: 53
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 53
           to: 54
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 54
           to: 56
       - entity: sensor.battery_temperature
@@ -7821,22 +7901,22 @@ views:
         min: -10
         name: Temperature
         severity:
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: -10
           to: -4
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: -4
           to: 32
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 32
           to: 42
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 42
           to: 100
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 120
           to: 130
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 130
           to: 150
       height: 30px
@@ -7888,25 +7968,25 @@ views:
         min: -4800
         name: Grid Power
         severity:
-        - color: rgb(var(--rgb-light-blue-color))
+        - color: var(--light-blue-color)
           from: -4800
           to: -2400
-        - color: rgb(var(--rgb-blue-color))
+        - color: var(--blue-color)
           from: -2399
           to: 0
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 9600
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 9600
           to: 19200
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 19200
           to: 28800
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 28800
           to: 38400
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 38400
           to: 48000
       - entity: sensor.load_power
@@ -7917,19 +7997,19 @@ views:
         max: 4800
         name: Solar
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 960
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 960
           to: 1920
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 1920
           to: 2880
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 2880
           to: 3840
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 3840
           to: 4800
       - entity: sensor.battery_power
@@ -7938,19 +8018,19 @@ views:
         min: -14400
         name: Battery
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 960
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 960
           to: 1920
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 1920
           to: 2880
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 2880
           to: 3840
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 3840
           to: 4800
       height: 30px
@@ -7959,19 +8039,19 @@ views:
       positions:
         indicator: inside
       severity:
-      - color: rgb(var(--rgb-green-color))
+      - color: var(--green-color)
         from: 0
         to: 9600
-      - color: rgb(var(--rgb-light-green-color))
+      - color: var(--light-green-color)
         from: 9600
         to: 19200
-      - color: rgb(var(--rgb-amber-color))
+      - color: var(--amber-color)
         from: 19200
         to: 28800
-      - color: rgb(var(--rgb-orange-color))
+      - color: var(--orange-color)
         from: 28800
         to: 38400
-      - color: rgb(var(--rgb-red-color))
+      - color: var(--red-color)
         from: 38400
         to: 48000
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
@@ -7988,19 +8068,19 @@ views:
         max: 9600
         name: Home Balance
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 1920
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 1920
           to: 3840
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 3840
           to: 5760
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 5760
           to: 7680
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 7680
           to: 9600
       - entity: sensor.air_conditioner_power
@@ -8008,19 +8088,19 @@ views:
         max: 7200
         name: Air Conditioner
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 1440
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 1440
           to: 2880
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 2880
           to: 4320
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 4320
           to: 5760
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 5760
           to: 7200
       - entity: sensor.basement_bedrooms_power
@@ -8037,19 +8117,19 @@ views:
         max: 7200
         name: Dryer
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 1440
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 1440
           to: 2880
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 2880
           to: 4320
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 4320
           to: 5760
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 5760
           to: 7200
       - entity: sensor.family_room_power
@@ -8066,19 +8146,19 @@ views:
         max: 1800
         name: Entry, Living Room, Bath Lights
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 360
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 360
           to: 720
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 720
           to: 1080
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 1080
           to: 1440
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 1440
           to: 1800
       - entity: sensor.garage_outlets_power
@@ -8095,19 +8175,19 @@ views:
         max: 1800
         name: Utility
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 360
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 360
           to: 720
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 720
           to: 1080
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 1080
           to: 1440
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 1440
           to: 1800
       - entity: sensor.range_power
@@ -8115,19 +8195,19 @@ views:
         max: 9600
         name: Range
         severity:
-        - color: rgb(var(--rgb-green-color))
+        - color: var(--green-color)
           from: 0
           to: 1920
-        - color: rgb(var(--rgb-light-green-color))
+        - color: var(--light-green-color)
           from: 1920
           to: 3840
-        - color: rgb(var(--rgb-amber-color))
+        - color: var(--amber-color)
           from: 3840
           to: 5760
-        - color: rgb(var(--rgb-orange-color))
+        - color: var(--orange-color)
           from: 5760
           to: 7680
-        - color: rgb(var(--rgb-red-color))
+        - color: var(--red-color)
           from: 7680
           to: 9600
       - entity: sensor.theater_room_power
@@ -8142,19 +8222,19 @@ views:
       positions:
         indicator: inside
       severity:
-      - color: rgb(var(--rgb-green-color))
+      - color: var(--green-color)
         from: 0
         to: 480
-      - color: rgb(var(--rgb-light-green-color))
+      - color: var(--light-green-color)
         from: 480
         to: 960
-      - color: rgb(var(--rgb-amber-color))
+      - color: var(--amber-color)
         from: 960
         to: 1440
-      - color: rgb(var(--rgb-orange-color))
+      - color: var(--orange-color)
         from: 1440
         to: 1920
-      - color: rgb(var(--rgb-red-color))
+      - color: var(--red-color)
         from: 1920
         to: 2400
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
