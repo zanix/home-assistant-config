@@ -300,7 +300,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>27 Lovelace Plugins</summary>
+<details><summary>28 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
 
@@ -385,6 +385,10 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 ### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.9.3]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
+
+### [Steam Card](https://github.com/Kibibit/kb-steam-card) [v1.1.1]
+
+A Home Assistant card for Steam integrations
 
 ### [Sun Card](https://github.com/AitorDB/home-assistant-sun-card) [v0.1.4]
 
