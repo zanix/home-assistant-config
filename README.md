@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1798 total entities**,
-including **906 sensors**.
+This Home Assistant install has approximately **1834 total entities**,
+including **928 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -284,13 +284,13 @@ High level health status of UniFi Security Gateway devices via UniFi Controller
 
 Authors: [@jchasey](https://github.com/jchasey), [@zvldz](https://github.com/zvldz).
 
-### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.0]
+### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.1]
 
 Home Assistant custom integration to keep track of missing entities and services in your config files
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.0.1]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.0.2]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -300,7 +300,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>28 Lovelace Plugins</summary>
+<details><summary>27 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
 
@@ -366,7 +366,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.5.2]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.5.3]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -394,10 +394,6 @@ Home assistant sun card based on Google weather design
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
-### [Template Entity Row](https://github.com/thomasloven/lovelace-template-entity-row) [v1.3.0]
-
-🔹 Display whatever you want in an entities card row.
-
 ### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.4.0]
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
@@ -416,19 +412,11 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ---
 
-</details><details><summary>6 Themes</summary>
-
-### [Catppuccin Theme](https://github.com/catppuccin/home-assistant) [v1.0.1]
-
-🏠 Soothing pastel theme for Home Assistant
+</details><details><summary>4 Themes</summary>
 
 ### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9.1]
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
-
-### [Mushroom Themes](https://github.com/piitaya/lovelace-mushroom-themes) [v0.0.9]
-
-Additional themes for Lovelace Mushroom Cards 🍄
 
 ### [Noctis](https://github.com/aFFekopp/noctis) [v2.9]
 
@@ -713,7 +701,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.1.7-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.2.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml

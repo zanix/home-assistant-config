@@ -43,6 +43,7 @@ DASH_CAST_SCHEMA = vol.Schema(
         vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
         vol.Exclusive("url", "url"): cv.string,
         vol.Exclusive("entity", "url"): cv.entity_id,
+        vol.Optional("extra"): dict,
     },
     required=True,
 )
@@ -88,11 +89,14 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
             "ts": time.time() + 30,  # for 30 seconds
         }
 
+        query = call.data.get("extra", {})
+        query["url"] = link_id
+
         await hass.async_add_executor_job(
             utils.dash_cast,
             hass,
             call.data[ATTR_ENTITY_ID],
-            f"{get_url(hass)}/webrtc/embed?url={link_id}",
+            f"{get_url(hass)}/webrtc/embed?" + urlencode(query),
         )
 
     hass.services.async_register(DOMAIN, "create_link", create_link, CREATE_LINK_SCHEMA)
@@ -111,7 +115,7 @@ async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry):
 
     if url:
         # netloc example: admin:admin@192.168.1.123:1984
-        hass.data[DOMAIN] = f"ws://{urlparse(url).netloc}/api/ws"
+        hass.data[DOMAIN] = urlparse(url).netloc
         return True
 
     # 3. Serve go2rtc binary manually
@@ -135,23 +139,34 @@ async def async_unload_entry(hass: HomeAssistantType, entry: ConfigEntry):
 
 
 async def ws_connect(hass: HomeAssistantType, params) -> str:
+    entry = hass.data[DOMAIN]
+    if isinstance(entry, Server):
+        assert entry.available, "WebRTC server not available"
+        netloc = "localhost:1984"
+    else:
+        netloc = entry
+
     if entity := params.get("entity"):
         url = await utils.get_stream_source(hass, entity)
         assert url, f"Can't get URL for {entity}"
+
+        # adds stream to go2rtc using entity_id as name (RTSPtoWebRTC API)
+        session = async_get_clientsession(hass)
+        r = await session.post(
+            f"http://{netloc}/stream/add",
+            json={"name": entity, "channels": {"0": {"url": url}}},
+            timeout=3,
+        )
+        if r.ok:
+            url = entity
+
     elif url := params.get("url"):
         if "{{" in url or "{%" in url:
             url = Template(url, hass).async_render()
     else:
         raise Exception("Missing url or entity")
 
-    query = urlencode({"src": url})
-
-    entry = hass.data[DOMAIN]
-    if isinstance(entry, Server):
-        assert entry.available, "WebRTC server not available"
-        return f"ws://localhost:1984/api/ws?{query}"
-
-    return f"{entry}?{query}"
+    return f"ws://{netloc}/api/ws?" + urlencode({"src": url})
 
 
 class WebSocketView(HomeAssistantView):
@@ -161,6 +176,7 @@ class WebSocketView(HomeAssistantView):
 
     async def get(self, request: web.Request):
         params = request.query
+        _LOGGER.debug(f"New client: {dict(params)}")
 
         if request.query.get("embed"):
             link_id = request.query.get("url")

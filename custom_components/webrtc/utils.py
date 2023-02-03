@@ -23,7 +23,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "webrtc"
 
-BINARY_VERSION = "1.0.1"
+BINARY_VERSION = "1.1.1"
 
 SYSTEM = {
     "Windows": {"AMD64": "go2rtc_win64.zip"},
@@ -207,7 +207,7 @@ def validate_signed_request(request: web.Request) -> bool:
 async def check_go2rtc(hass: HomeAssistant, url: str = DEFAULT_URL) -> Optional[str]:
     session = async_get_clientsession(hass)
     try:
-        r = await session.head(url, timeout=1)
+        r = await session.head(url, timeout=2)
         return url if r.ok else None
     except Exception:
         return None
