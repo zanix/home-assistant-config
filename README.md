@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1834 total entities**,
+This Home Assistant install has approximately **1832 total entities**,
 including **928 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -266,7 +266,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.9]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.10]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -402,7 +402,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.24]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.25]
 
 A progress bar display for Home Assistant timers
 
@@ -426,7 +426,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🐵 Dark Blue Theme for Home Assistant
 
-### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.4]
+### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.5]
 
 Dark Grey Theme for Home Assistant
 
@@ -705,7 +705,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.2.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.2.5-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
