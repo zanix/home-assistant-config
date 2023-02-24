@@ -101,7 +101,7 @@ script:
     fields:
       computer:
         name: 'Computer'
-        description: 'Which computer to send to.'
+        description: 'Which computer to send to. Also accepts comma separated values or a list.'
         example: 'ardena'
         required: true
         selector:
@@ -150,53 +150,76 @@ script:
 
     # Set local variables for reuse in this script.
     variables:
-      notification_service: 'notify.{{ computer|default("ardena") }}'
-      image_path: >-
-        {%- if image is string -%}
-          {%- if image.startswith("http") -%}
-            {{ image }}
-          {%- else -%}
-            {{ states("sensor.base_url") }}/{{ image }}
-          {%- endif -%}
-        {%- endif -%}
-      duration: '{{ duration|default(5) }}'
+      computer: '{{ computer|default([])|lower }}'
+      computer_list: >
+        {% set computers = namespace(names=[]) %}
+        {% if computer %}
+          {# Convert to a list #}
+          {% if ',' in computer %}
+            {% set entitynum = computer.split(',') | count %}
+              {% for i in range(0,entitynum) %}
+                {% set computers.names = computers.names + [computer.split(',')[i]|string|trim ] %}
+              {% endfor %}
+            {% elif computer[0]|count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+              {% set computers.names = computers.names + [computer|string|trim] %}
+            {% else %}
+              {% set computers.names = computer %}
+          {% endif %}
+        {% endif %}
+        {{ computers.names|unique|list|lower }}
 
     sequence:
-      - if:
-          - condition: template
-            value_template: '{{ is_state("sensor." ~ computer|lower ~ "_user_notification", "AcceptsNotifications") }}'
-        then:
-          - choose:
-              # Send camera image.
-              - conditions: '{{ camera is string }}'
-                sequence:
-                  - service: '{{ notification_service }}'
-                    data:
-                      title: '{{ title }}'
-                      message: '{{ message }}'
-                      data:
-                        image: '{{ states("sensor.base_url") }}{{ state_attr(camera,"entity_picture") }}'
-                        duration: '{{ duration }}'
-                        actions: '{{ actions|default([], true) }}'
+      # Loop through computer_list
+      - repeat:
+          for_each: '{{ computer_list }}'
+          sequence:
+            - variables:
+                notification_service: 'notify.{{ repeat.item }}'
+                image_path: >-
+                  {%- if image is string -%}
+                    {%- if image.startswith("http") -%}
+                      {{ image }}
+                    {%- else -%}
+                      {{ states("sensor.base_url") }}/{{ image }}
+                    {%- endif -%}
+                  {%- endif -%}
+                duration: '{{ duration|default(5) }}'
 
-              # Send an image.
-              - conditions: '{{ image is string }}'
-                sequence:
-                  - service: '{{ notification_service }}'
-                    data:
-                      title: '{{ title }}'
-                      message: '{{ message }}'
-                      data:
-                        image: '{{ image_path }}'
-                        duration: '{{ duration }}'
-                        actions: '{{ actions|default([], true) }}'
+            - if:
+                - condition: template
+                  value_template: '{{ is_state("sensor." ~ repeat.item ~ "_user_notification", "AcceptsNotifications") }}'
+              then:
+                - choose:
+                    # Send camera image.
+                    - conditions: '{{ camera is string }}'
+                      sequence:
+                        - service: '{{ notification_service }}'
+                          data:
+                            title: '{{ title }}'
+                            message: '{{ message }}'
+                            data:
+                              image: '{{ states("sensor.base_url") }}{{ state_attr(camera,"entity_picture") }}'
+                              duration: '{{ duration }}'
+                              actions: '{{ actions|default([], true) }}'
 
-            # Send a basic notification message.
-            default:
-              - service: '{{ notification_service }}'
-                data:
-                  title: '{{ title }}'
-                  message: '{{ message }}'
-                  data:
-                    duration: '{{ duration }}'
-                    actions: '{{ actions|default([], true) }}'
+                    # Send an image.
+                    - conditions: '{{ image is string }}'
+                      sequence:
+                        - service: '{{ notification_service }}'
+                          data:
+                            title: '{{ title }}'
+                            message: '{{ message }}'
+                            data:
+                              image: '{{ image_path }}'
+                              duration: '{{ duration }}'
+                              actions: '{{ actions|default([], true) }}'
+
+                  # Send a basic notification message.
+                  default:
+                    - service: '{{ notification_service }}'
+                      data:
+                        title: '{{ title }}'
+                        message: '{{ message }}'
+                        data:
+                          duration: '{{ duration }}'
+                          actions: '{{ actions|default([], true) }}'
