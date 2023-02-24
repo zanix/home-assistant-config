@@ -1,6 +1,6 @@
 ((LitElement) => {
 
-console.info('NUMBERBOX_CARD 4.3');
+console.info('NUMBERBOX_CARD 4.5');
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
 class NumberBox extends LitElement {
@@ -28,12 +28,15 @@ render() {
 	if( this.config.unit === undefined && this.stateObj.attributes.unit_of_measurement ){
 		this.config.unit=this.stateObj.attributes.unit_of_measurement;
 	}
-	if(this.config.min === undefined){ this.config.min=this.stateObj.attributes.min;}
-	if(isNaN(parseFloat(this.config.min))){this.config.min=0;}
-	if(this.config.max === undefined){ this.config.max=this.stateObj.attributes.max;}
-	if(isNaN(parseFloat(this.config.max))){this.config.max=9e9;}
-	if('step_entity' in this.config && this.config.step_entity in this._hass.states && !isNaN(parseFloat(this._hass.states[this.config.step_entity].state))) {this.config.step=this._hass.states[this.config.step_entity].state;}
-	if(this.config.step === undefined){ this.config.step=this.stateObj.attributes.step;}
+	const d={min:0,max:9e9,step:1};
+	for(const j of Object.keys(d)) {
+		const b=j+'_entity';
+		if(b in this.config && this.config[b] in this._hass.states && !isNaN(parseFloat(this._hass.states[this.config[b]].state))) {
+			const c=this._hass.states[this.config[b]]; this.config[j]=c.state; this.old.t[this.config[b]]=c.last_updated
+		}		
+		if(this.config[j] === undefined){ this.config[j]=this.stateObj.attributes[j];}
+		if(isNaN(parseFloat(this.config[j]))){this.config[j]=d[j];}
+	}
 
 	return html`
 	<ha-card class="${(!this.config.border)?'noborder':''}">
@@ -168,7 +171,7 @@ setNumb(c){
 	if( v===false ){ v=this.timeNum(this.state); v=isNaN(v)?this.config.min:v;}
 	let adval=c?(v + Number(this.config.step)):(v - Number(this.config.step));
 	adval=Math.round(adval*1e9)/1e9;
-	if( adval <= Number(this.config.max) && adval >= Number(this.config.min)){
+	if(adval!=this.state && adval <= Number(this.config.max) && adval >= Number(this.config.min)){
 		this.pending=(adval);
 		if(this.config.delay){
 			clearTimeout(this.bounce);
@@ -176,16 +179,18 @@ setNumb(c){
 		}else{
 			this.publishNum(this);
 		}
+	}else{
+		clearTimeout(this.bounce);this.pending=false;
 	}
 }
 
 publishNum(dhis){
+	if(dhis.pending===false){return;}
 	const s=dhis.config.service.split('.');
 	if(s[0]=='input_datetime'){dhis.pending=dhis.numTime(dhis.pending,1);}
 	const v={entity_id: dhis.config.entity, [dhis.config.param]: dhis.pending};
 	dhis.pending=false;
 	dhis.old.state=dhis.state;
-							  
 	dhis._hass.callService(s[0], s[1], v);
 }
 
@@ -536,6 +541,24 @@ render() {
 		type="number"
 		step="any"
 	></ha-textfield>
+</div>
+<div class="side">
+	<ha-entity-picker
+		label="min_entity"
+		.hass=${this.hass}
+		.value="${this.config.min_entity}"
+		.configValue=${'min_entity'}
+		@change="${this.updVal}"
+		allow-custom-entity
+	></ha-entity-picker>
+	<ha-entity-picker
+		label="max_entity"
+		.hass=${this.hass}
+		.value="${this.config.max_entity}"
+		.configValue=${'max_entity'}
+		@change="${this.updVal}"
+		allow-custom-entity
+	></ha-entity-picker>
 </div>
 <div class="side">
 	<ha-entity-picker

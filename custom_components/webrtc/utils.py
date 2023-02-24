@@ -8,6 +8,7 @@ import subprocess
 import zipfile
 from threading import Thread
 from typing import Optional
+from urllib.parse import urljoin
 
 import jwt
 from aiohttp import web
@@ -23,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "webrtc"
 
-BINARY_VERSION = "1.1.1"
+BINARY_VERSION = "1.2.0"
 
 SYSTEM = {
     "Windows": {"AMD64": "go2rtc_win64.zip"},
@@ -207,10 +208,16 @@ def validate_signed_request(request: web.Request) -> bool:
 async def check_go2rtc(hass: HomeAssistant, url: str = DEFAULT_URL) -> Optional[str]:
     session = async_get_clientsession(hass)
     try:
-        r = await session.head(url, timeout=2)
-        return url if r.ok else None
+        r = await session.head(url, timeout=2, allow_redirects=False)
+        return url if r.status < 300 else None
     except Exception:
         return None
+
+
+def api_streams(hass: HomeAssistant) -> str:
+    entry = hass.data[DOMAIN]
+    go_url = "http://localhost:1984/" if isinstance(entry, Server) else entry
+    return urljoin(go_url, "api/streams")
 
 
 class Server(Thread):

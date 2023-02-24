@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1832 total entities**,
-including **928 sensors**.
+This Home Assistant install has approximately **1838 total entities**,
+including **930 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -272,7 +272,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.4]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.5]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -290,7 +290,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.0.2]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.1.0]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -346,7 +346,7 @@ Expander card for HomeAssistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.43]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.44]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -370,7 +370,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.3]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.5]
 
 Replace input_number sliders with plus and minus buttons
 
@@ -382,7 +382,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.9.3]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.10.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -412,7 +412,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ### [Vertical Stack In Card](https://github.com/ofekashery/vertical-stack-in-card) [v0.4.4]
 
-📐 Home Assistant Card: Similar to vertical/horizontal-stack, but removes card borders
+📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
 ---
 
