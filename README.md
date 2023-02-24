@@ -38,11 +38,11 @@ The androidtv platform allows you to control an Android TV device or Amazon Fire
 
 The denonavr platform allows you to control Denon Network Receivers from Home Assistant
 
-### [EcoBee](https://www.home-assistant.io/integrations/ecobee)
+### [ecobee](https://www.home-assistant.io/integrations/ecobee)
 
 The ecobee integration lets you control and view sensor data from ecobee thermostats
 
-(Connected via HomeKit Controller integration for local control)
+(Also connected via HomeKit Controller integration for local control)
 
 ### [ESPHome](https://www.home-assistant.io/integrations/esphome)
 

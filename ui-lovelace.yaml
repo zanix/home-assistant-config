@@ -179,7 +179,6 @@ decluttering_templates:
           style: "ha-card {\n  {% if is_state(\"[[entity]]\", \"on\") %}\n  background:\
             \ rgba(var(--rgb-state-light), 0.2);\n  {%endif %}\n}\n"
         entity: '[[entity]]'
-        layout: horizontal
         secondary_info: none
         tap_action:
           action: toggle
@@ -209,7 +208,9 @@ decluttering_templates:
       card_mod:
         style: "ha-card {\n  --ha-card-background: none\n}\n"
       cards:
-      - entity: '[[light]]'
+      - card_mod:
+          style: ":host {\n  --mush-icon-size: 90px;\n}\n"
+        entity: '[[light]]'
         layout: vertical
         primary_info: name
         type: custom:mushroom-light-card
@@ -317,7 +318,9 @@ decluttering_templates:
       card_mod:
         style: "ha-card {\n  --ha-card-background: none\n}\n"
       cards:
-      - entity: '[[light]]'
+      - card_mod:
+          style: ":host {\n  --mush-icon-size: 90px;\n}\n"
+        entity: '[[light]]'
         layout: vertical
         primary_info: name
         type: custom:mushroom-light-card
@@ -3315,15 +3318,23 @@ views:
         - chip:
             card_mod:
               style: "@keyframes phase {\n  50% {opacity: 0;}\n}\nha-card {\n  animation:\
-                \ phase 1.5s ease-out infinite;\n}\n"
-            icon: mdi:garage-open-variant
-            icon_color: red
+                \ phase 1.5s ease-out infinite;\n}"
+            entity: cover.garage_door
+            icon: "{% if is_state(entity, \"open\") %}\n  mdi:garage-open-variant\n\
+              {% elif states(entity) in [\"opening\", \"closing\"]  %}\n  mdi:garage-alert-variant\n\
+              {% endif %}"
+            icon_color: "{% if is_state(entity, \"open\") %}\n  red\n{% elif states(entity)\
+              \ in [\"opening\", \"closing\"]  %}\n  orange\n{% endif %}"
             tap_action:
               action: none
             type: template
           conditions:
           - entity: cover.garage_door
             state: open
+          - entity: cover.garage_door
+            state: opening
+          - entity: cover.garage_door
+            state: closing
           type: conditional
         - entity: light.garage
           icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
@@ -3621,6 +3632,26 @@ views:
       variables:
       - title: Media
       - chips:
+        - chip:
+            entity: sensor.yamaha_rx_v679_sound_mode
+            tap_action:
+              action: none
+            type: entity
+          conditions:
+          - entity: media_player.yamaha_rx_v679
+            state_not: 'off'
+          type: conditional
+        - chip:
+            content: '{{ (state_attr(entity, ''volume_level'') * 100)|round }}'
+            entity: media_player.yamaha_rx_v679
+            icon: mdi:volume-source
+            tap_action:
+              action: none
+            type: template
+          conditions:
+          - entity: media_player.yamaha_rx_v679
+            state_not: 'off'
+          type: conditional
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -3797,6 +3828,26 @@ views:
       variables:
       - title: Media
       - chips:
+        - chip:
+            entity: sensor.denon_avr_s760h_sound_mode
+            tap_action:
+              action: none
+            type: entity
+          conditions:
+          - entity: media_player.denon_avr_s760h
+            state_not: 'off'
+          type: conditional
+        - chip:
+            content: '{{ (state_attr(entity, ''volume_level'') * 100)|round }}'
+            entity: media_player.denon_avr_s760h
+            icon: mdi:volume-source
+            tap_action:
+              action: none
+            type: template
+          conditions:
+          - entity: media_player.denon_avr_s760h
+            state_not: 'off'
+          type: conditional
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -6146,19 +6197,17 @@ views:
     - cards:
       - entity: sensor.home_temperature
         icon_color: green
-        name: Inside
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
       - entity: sensor.home_humidity
         icon_color: blue
-        name: Humidity
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
       type: horizontal-stack
     - entities:
-      - entity: select.ecobee_current_mode
+      - entity: select.ecobee_preset
         name: Profile
       type: entities
     - cardName: historycard-ecobee-mode
@@ -6171,6 +6220,7 @@ views:
       labelsVisible: false
       stateColors:
         Cooling: rgb(33,150,243)
+        Fan: rgb(255,235,59)
         Heating: rgb(244,67,54)
         Idle: rgb(100,100,100)
       stateTextMode: auto
