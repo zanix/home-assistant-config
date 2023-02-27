@@ -2320,6 +2320,9 @@
   - platform: state
     entity_id: media_player.family_room_shield
     attribute: source
+  - platform: state
+    entity_id: media_player.denon_avr_s760h
+    attribute: source
   condition:
   - condition: not
     conditions:
@@ -2327,14 +2330,22 @@
       entity_id: media_player.denon_avr_s760h
       state: 'off'
   action:
-  - service: media_player.select_sound_mode
-    target:
-      entity_id: media_player.denon_avr_s760h
-    data:
-      sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH
-        STEREO\n{%- elif trigger.to_state.attributes.source in ['Youtube', 'YouTube
-        Kids', 'DisneyNow', 'PBS Kids', 'Hulu'] -%}\n  DOLBY DIGITAL\n{%- else -%}\n
-        \ DIRECT\n{%- endif -%}"
+  - if:
+    - condition: template
+      alias: If the new sound mode matches the current mode, do not update.
+      value_template: '{{ sound_mode != state_attr("media_player.denon_avr_s760h",
+        "sound_mode") }}'
+    then:
+    - service: media_player.select_sound_mode
+      target:
+        entity_id: media_player.denon_avr_s760h
+      data:
+        sound_mode: '{{ sound_mode }}'
+  variables:
+    sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH
+      STEREO\n{%- elif trigger.to_state.attributes.source in ['Youtube', 'YouTube
+      Kids', 'DisneyNow', 'PBS Kids', 'Hulu'] -%}\n  DOLBY DIGITAL\n{%- else -%}\n
+      \ DIRECT\n{%- endif -%}"
   mode: single
 - id: '1665696345535'
   alias: ⏯ Living Room Sound Mode
@@ -2350,14 +2361,22 @@
       entity_id: media_player.yamaha_rx_v679
       state: 'off'
   action:
-  - service: media_player.select_sound_mode
-    target:
-      entity_id: media_player.yamaha_rx_v679
-    data:
-      sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  7ch_stereo\n{%-
-        elif trigger.to_state.attributes.source in ['Youtube', 'YouTube Kids', 'DisneyNow',
-        'PBS Kids', 'Hulu'] -%}\n  surr_decoder\n{%- else -%}\n  straight\n{%- endif
-        -%}"
+  - if:
+    - condition: template
+      alias: If the new sound mode matches the current mode, do not update.
+      value_template: '{{ sound_mode != state_attr("media_player.yamaha_rx_v679",
+        "sound_mode") }}'
+    then:
+    - service: media_player.select_sound_mode
+      target:
+        entity_id: media_player.yamaha_rx_v679
+      data:
+        sound_mode: '{{ sound_mode }}'
+  variables:
+    sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  7ch_stereo\n{%-
+      elif trigger.to_state.attributes.source in ['Youtube', 'YouTube Kids', 'DisneyNow',
+      'PBS Kids', 'Hulu'] -%}\n  surr_decoder\n{%- else -%}\n  straight\n{%- endif
+      -%}"
   mode: single
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer [Actionable Event]
@@ -2414,18 +2433,12 @@
         message: '{{ sensors }}'
   mode: single
   variables:
-    sensors: "{% set threshold = 30 %} {% set ignore_entities = [\n  'sensor.galaxy_s21_battery_level',\n
-      \ 'sensor.pixel_7_battery_level',\n  'sensor.ipad_josh_battery_level',\n  'sensor.quest_battery_level',\n
-      \ 'sensor.load_percentage',\n  'sensor.battery_state_of_charge'\n] %} {% set
-      result = namespace(sensors=[]) %} {% set devices = states.sensor\n  | reject('in',
-      ['unknown', 'unavailable', 'undefined'])\n  | rejectattr('entity_id', 'in',
-      ignore_entities)\n  | rejectattr('attributes.device_class', 'undefined')\n  |
-      selectattr('attributes.device_class', '==', 'battery')\n  | list\n%} {% for
-      device in devices %}\n  {% if device.state | int(-1) <= threshold | int %}\n
-      \   {% set name = device.name | replace(': Battery level', '') | replace(' Battery
-      level', '') | replace(' Battery Level', '') %}\n    {% set result.sensors =
-      result.sensors + [name ~ ' (' ~ device.state ~ '%)'] %}\n  {% endif %}\n{% endfor
-      %} {{ result.sensors|join(', ') }}"
+    sensors: "{% set result = namespace(sensors=[]) %}\n{% set entities = trigger.to_state.attributes.entity_id
+      %}\n{% for entity in entities %}\n  {% set device = states.sensor[entity.split('.')[1]]
+      %}\n  {% set name = device.name | replace(': Battery level', '') | replace('
+      Battery level', '') | replace(' Battery Level', '') %}\n  {% set result.sensors
+      = result.sensors + [name ~ ' (' ~ device.state|round ~ '%)'] %}\n{% endfor %}\n-
+      {{ result.sensors|join('\\n- ') }}"
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
