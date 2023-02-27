@@ -17,18 +17,42 @@ script:
         example: 'computer'
         required: true
         selector:
-          text:
+          select:
+            mode: dropdown
+            custom_value: true
+            multiple: true
+            options: !secret hass_agent_computers
 
     # Set local variables for reuse in this script.
     variables:
-      computer_value: '{{ computer|lower }}'
+      computer: '{{ computer|default([])|lower }}'
+      computer_list: >
+        {% set computers = namespace(names=[]) %}
+        {% if computer %}
+          {# Convert to a list #}
+          {% if ',' in computer %}
+            {% set entitynum = computer.split(',') | count %}
+            {% for i in range(0, entitynum) %}
+              {% set computers.names = computers.names + [computer.split(',')[i]|string|trim ] %}
+            {% endfor %}
+          {% elif computer[0]|count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set computers.names = computers.names + [computer|string|trim] %}
+          {% else %}
+            {% set computers.names = computer %}
+          {% endif %}
+        {% endif %}
+        {{ computers.names|unique|list|lower }}
 
     sequence:
-      - service: button.press
-        target:
-          entity_id:
-            - 'button.{{ computer_value }}_publish_sensors'
-            - 'button.{{ computer_value }}_satellite_publish_sensors'
+      # Loop through computer_list
+      - repeat:
+          for_each: '{{ computer_list }}'
+          sequence:
+            - service: button.press
+              target:
+                entity_id:
+                  - 'button.{{ repeat.item }}_publish_sensors'
+                  - 'button.{{ repeat.item }}_satellite_publish_sensors'
 
   hass_agent_launch:
     alias: '[HASS.Agent] Launch Application'
@@ -42,7 +66,11 @@ script:
         example: 'computer'
         required: true
         selector:
-          text:
+          select:
+            mode: dropdown
+            custom_value: true
+            multiple: true
+            options: !secret hass_agent_computers
       command:
         name: 'Command'
         description: 'Application name or command line.'
@@ -53,13 +81,33 @@ script:
 
     # Set local variables for reuse in this script.
     variables:
-      computer_value: '{{ computer|upper }}'
+      computer: '{{ computer|default([])|upper }}'
+      computer_list: >
+        {% set computers = namespace(names=[]) %}
+        {% if computer %}
+          {# Convert to a list #}
+          {% if ',' in computer %}
+            {% set entitynum = computer.split(',') | count %}
+            {% for i in range(0, entitynum) %}
+              {% set computers.names = computers.names + [computer.split(',')[i]|string|trim ] %}
+            {% endfor %}
+          {% elif computer[0]|count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set computers.names = computers.names + [computer|string|trim] %}
+          {% else %}
+            {% set computers.names = computer %}
+          {% endif %}
+        {% endif %}
+        {{ computers.names|unique|list|upper }}
 
     sequence:
-      - service: mqtt.publish
-        data:
-          topic_template: "homeassistant/button/{{ computer_value }}/{{ computer_value }}_Launch/action"
-          payload_template: '{{ command }}'
+      # Loop through computer_list
+      - repeat:
+          for_each: '{{ computer_list }}'
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic_template: "homeassistant/button/{{ repeat.item }}/{{ repeat.item }}_Launch/action"
+                payload_template: '{{ command }}'
 
   hass_agent_launch_url:
     alias: '[HASS.Agent] Launch URL'
@@ -73,7 +121,11 @@ script:
         example: 'computer'
         required: true
         selector:
-          text:
+          select:
+            mode: dropdown
+            custom_value: true
+            multiple: true
+            options: !secret hass_agent_computers
       url:
         name: 'URL'
         description: 'URL or file path.'
@@ -84,13 +136,33 @@ script:
 
     # Set local variables for reuse in this script.
     variables:
-      computer_value: '{{ computer|upper }}'
+      computer: '{{ computer|default([])|upper }}'
+      computer_list: >
+        {% set computers = namespace(names=[]) %}
+        {% if computer %}
+          {# Convert to a list #}
+          {% if ',' in computer %}
+            {% set entitynum = computer.split(',') | count %}
+            {% for i in range(0, entitynum) %}
+              {% set computers.names = computers.names + [computer.split(',')[i]|string|trim ] %}
+            {% endfor %}
+          {% elif computer[0]|count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set computers.names = computers.names + [computer|string|trim] %}
+          {% else %}
+            {% set computers.names = computer %}
+          {% endif %}
+        {% endif %}
+        {{ computers.names|unique|list|upper }}
 
     sequence:
-      - service: mqtt.publish
-        data:
-          topic_template: "homeassistant/button/{{ computer_value }}/{{ computer_value }}_Launch_URL/action"
-          payload_template: '{{ url }}'
+      # Loop through computer_list
+      - repeat:
+          for_each: '{{ computer_list }}'
+          sequence:
+            - service: mqtt.publish
+              data:
+                topic_template: "homeassistant/button/{{ repeat.item }}/{{ repeat.item }}_Launch_URL/action"
+                payload_template: '{{ url }}'
 
   notify_hass_agent:
     alias: '[Notify] HASS.Agent'
@@ -137,7 +209,6 @@ script:
       duration:
         name: 'Duration'
         description: 'The duration in seconds for which the notification will be displayed.'
-        default: 5
         example: '5'
         selector:
           number:
