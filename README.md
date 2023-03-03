@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1843 total entities**,
-including **934 sensors**.
+This Home Assistant install has approximately **1854 total entities**,
+including **935 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -366,7 +366,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.5.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.6.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -402,7 +402,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.25]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.26]
 
 A progress bar display for Home Assistant timers
 
@@ -705,7 +705,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.2.5-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.3.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
