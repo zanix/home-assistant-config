@@ -246,6 +246,15 @@
       - Nasya
       title: Water Main
       message: The water main has been turned back on after the leak was detected
+  - service: script.notify_pipup
+    data:
+      device:
+      - Living Room
+      - Family Room
+      - Master Bedroom
+      title: Water Main
+      message: The water main has been turned back on after the leak was detected
+      icon: local/icons/water-alert.png
   mode: single
 - id: '1665682232855'
   alias: "\U0001F5A5️ [Ardena] Power Actions"
@@ -341,8 +350,7 @@
     data:
       who: parents
       title: Mail Today
-      message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
-        "1" else "items" }} will be in the mailbox today.'
+      message: '{{ message }}'
       camera: camera.mail_usps_camera
       url: lovelace/main
       group: Delivery
@@ -353,10 +361,22 @@
       - Erebus
       - Nasya
       title: Mail Today
-      message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
-        "1" else "items" }} will be in the mailbox today.'
+      message: '{{ message }}'
       camera: camera.mail_usps_camera
+  - service: script.notify_pipup
+    data:
+      device:
+      - Living Room
+      - Family Room
+      - Master Bedroom
+      title: Mail Today
+      message: '{{ message }}'
+      image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
+      duration: 15
   mode: single
+  variables:
+    message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
+      "1" else "items" }} will be in the mailbox today.'
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
   description: Notifies when packages have been delivered
@@ -370,12 +390,12 @@
     value_template: '{{ (trigger.to_state.state|int(default=0)) != (trigger.from_state.state|int(default=0))
       }}'
   action:
+  - parallel:
   - service: script.notify_mobile
     data:
       who: parents
       title: Package Delivery
-      message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
-        == "1" else "packages are" }} delivered.'
+        message: '{{ message }}'
       icon: local/icons/package-variant.png
       group: Delivery
       tag: delivery-packages-delivered
@@ -385,9 +405,20 @@
       - Erebus
       - Nasya
       title: Package Delivery
+        message: '{{ message }}'
+    - service: script.notify_pipup
+      data:
+        device:
+        - Living Room
+        - Family Room
+        - Master Bedroom
+        title: Package Delivery
+        message: '{{ message }}'
+        icon: local/icons/package-variant.png
+  mode: single
+  variables:
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} delivered.'
-  mode: single
 - id: '1665682458887'
   alias: "\U0001F4E6 Packages Out for Delivery"
   description: Notifies when packages are out for delivery
@@ -401,12 +432,12 @@
     value_template: '{{ (trigger.to_state.state|int(default=0)) != (trigger.from_state.state|int(default=0))
       }}'
   action:
+  - parallel:
   - service: script.notify_mobile
     data:
       who: parents
       title: Package Delivery
-      message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
-        == "1" else "packages are" }} out for delivery.'
+        message: '{{ message }}'
       icon: local/icons/package.png
       group: Delivery
       tag: delivery-packages-pending
@@ -416,9 +447,20 @@
       - Erebus
       - Nasya
       title: Package Delivery
+        message: '{{ message }}'
+    - service: script.notify_pipup
+      data:
+        device:
+        - Living Room
+        - Family Room
+        - Master Bedroom
+        title: Package Delivery
+        icon: local/icons/package.png
+        message: '{{ message }}'
+  mode: single
+  variables:
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} out for delivery.'
-  mode: single
 - id: '1665683659569'
   alias: ⚡ Tariff Summer Off-Peak
   description: Sets the current tariff to Summer Off-Peak and sends a notification.
@@ -1327,10 +1369,25 @@
     to: 'on'
   condition: []
   action:
+  - parallel:
+    - service: script.notify_hass_agent
+      data:
+        computer:
+        - Erebus
+        - Nasya
+        title: Door Bell
+        message: There is motion at the Front Door
   - service: script.notify_pipup
     data:
       device:
       - Living Room
+        title: Door Bell
+        message: There is motion at the Front Door
+        camera: camera.doorbell_live
+        duration: 30
+    - service: script.notify_pipup
+      data:
+        device:
       - Family Room
       - Master Bedroom
       title: Door Bell
@@ -1420,14 +1477,28 @@
         target:
           entity_id: media_player.google_speakers
       enabled: true
+    - service: script.notify_hass_agent
+      data:
+        computer:
+        - Erebus
+        - Nasya
+        title: Door Bell
+        message: Someone rang the doorbell
     - service: script.notify_pipup
       data:
         device:
         - Living Room
+        title: Door Bell
+        message: Someone rang the doorbell
+        camera: camera.doorbell_live
+        duration: 30
+    - service: script.notify_pipup
+      data:
+        device:
         - Family Room
         - Master Bedroom
         title: Door Bell
-        message: Someone is at the Front Door
+        message: Someone rang the doorbell
         icon: local/icons/doorbell-video.png
     - if:
       - condition: state
@@ -1791,13 +1862,6 @@
         actions:
         - action: '{{ name|lower }}_collection'
           title: Can on curb
-    - service: script.notify_hass_agent
-      data:
-        computer:
-        - Erebus
-        - Nasya
-        title: '{{ name }}'
-        message: '{{ name }} will be picked up {{ time }}'
   mode: single
   variables:
     name: '{{ trigger.to_state.name }}'
@@ -4020,5 +4084,14 @@
       - Erebus
       - Nasya
       title: Power Mode Changed
+      message: The power mode changed to {{ trigger.to_state.state }}
+  - service: script.notify_pipup
+    data:
+      device:
+      - Living Room
+      - Family Room
+      - Master Bedroom
+      title: Power Mode Changed
+      icon: local/icons/lightning-bolt.png
       message: The power mode changed to {{ trigger.to_state.state }}
   mode: single
