@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1854 total entities**,
-including **934 sensors**.
+This Home Assistant install has approximately **1843 total entities**,
+including **922 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -491,6 +491,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - [Leviton ZW4SF-1BW Smart 4 Speed Fan Controller](https://www.amazon.com/dp/B08GQJWSRG)
 - [Philips Hue Dimmer Remote 324131092621](https://www.amazon.com/dp/B0167Z0P3I)
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
+- [SONOFF S31 Lite 15A Zigbee Smart Plug](https://www.amazon.com/dp/B08Y87WD1X) -  Smart plug
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
 - [Zooz Titan Water Valve Actuator](https://www.thesmartesthouse.com/products/zooz-z-wave-plus-700-series-titan-water-valve-actuator-zac36) - Control the water main
 
