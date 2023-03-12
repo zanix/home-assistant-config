@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1843 total entities**,
-including **922 sensors**.
+This Home Assistant install has approximately **1870 total entities**,
+including **948 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -300,7 +300,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>28 Lovelace Plugins</summary>
+<details><summary>29 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
 
@@ -349,6 +349,10 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 ### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.44]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
+
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.10.1]
+
+Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
 ### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.3]
 

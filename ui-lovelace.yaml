@@ -487,6 +487,341 @@ decluttering_templates:
         type: custom:mushroom-light-card
         use_light_color: true
       type: custom:vertical-stack-in-card
+  media_card:
+    card:
+      card_mod:
+        style:
+          .: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
+            \ translate3d(0,0,0);\n  content: \"\";\n  position: absolute;\n  height:\
+            \ 100%;\n  width: 100%;\n\n  {%- if not states('[[entity]]') in [\"off\"\
+            , \"unknown\", \"unavailable\", \"idle\"] and state_attr('[[entity]]',\
+            \ \"entity_picture\") -%}\n  background: url( '{{ state_attr('[[entity]]',\
+            \ \"entity_picture\") }}') center no-repeat;\n  {%- endif -%}\n  filter:\
+            \ blur(100px) saturate(200%);\n  background-size: 100% 100%;\n}\nha-card\
+            \ {\n  transform: translate3d(0,0,0);\n  -webkit-transform: translate3d(0,0,0);\n\
+            }\n"
+          expander-card$: ".header-overlay {\n  right: initial;\n  left: 0;\n}\n"
+      cards:
+      - cards:
+        - card:
+            cards:
+            - alignment: end
+              card_mod:
+                style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                  \ none;\n  --chip-spacing: -5px;\n  --chip-padding: 0;\n}\n"
+              chips:
+              - content: "{%- if not states(entity) in [\"off\", \"unknown\", \"unavailable\"\
+                  , \"standby\"] -%}\n  {{ (state_attr(entity, \"volume_level\") *\
+                  \ 100) | round(0) }}%\n{%- endif -%}"
+                entity: '[[entity]]'
+                icon: mdi:volume-source
+                tap_action:
+                  action: call-service
+                  service: media_player.volume_mute
+                  target:
+                    entity_id: '[[entity]]'
+                type: template
+              type: custom:mushroom-chips-card
+            - card_mod:
+                style: ":host {\n  --mush-rgb-state-media-player: var(--rgb-accent-color);\n\
+                  }\nha-card {\n  --control-height: 10px;\n  transform: translate3d(0,0,0);\n\
+                  \  -webkit-transform: translate3d(0,0,0);\n  background: transparent;\n\
+                  \  border: none !important;\n  box-shadow: none;\n}\n"
+              entity: '[[entity]]'
+              icon_type: none
+              primary_info: none
+              secondary_info: none
+              type: custom:mushroom-media-player-card
+              volume_controls:
+              - volume_set
+            - card:
+                alignment: start
+                card_mod:
+                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                    \ none;\n}\n"
+                chips:
+                - entity: '[[sound_mode]]'
+                  tap_action:
+                    action: none
+                  type: entity
+                type: custom:mushroom-chips-card
+              conditions:
+              - entity: '[[entity]]'
+                state_not: unavailable
+              - entity: '[[sound_mode]]'
+                state_not: unavailable
+              type: conditional
+            - card:
+                alignment: center
+                chips:
+                - card_mod:
+                    style: "ha-card {\n  margin: 0px 10px 0px 0;\n  --chip-background:\
+                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
+                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
+                      \  --chip-padding: 10px;\n}\n"
+                  entity: '[[entity]]'
+                  icon: mdi:volume-minus
+                  tap_action:
+                    action: call-service
+                    service: media_player.volume_down
+                    target:
+                      entity_id: '[[entity]]'
+                  type: template
+                - card_mod:
+                    style: "ha-card {\n  margin: 0px 0px 0px 0px;\n  --chip-background:\
+                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
+                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
+                      \  --chip-padding: 10px;\n}\n"
+                  entity: '[[entity]]'
+                  icon: mdi:volume-plus
+                  tap_action:
+                    action: call-service
+                    service: media_player.volume_up
+                    target:
+                      entity_id: '[[entity]]'
+                  type: template
+                type: custom:mushroom-chips-card
+              conditions:
+              - entity: '[[entity]]'
+                state_not: unavailable
+              - entity: '[[entity]]'
+                state_not: idle
+              - entity: '[[entity]]'
+                state_not: standby
+              - entity: '[[sound_mode]]'
+                state: unavailable
+              type: conditional
+            layout:
+              grid-template-columns: 65px auto 105px
+              grid-template-rows: auto
+              margin: 0
+              padding: 5px
+            layout_type: custom:grid-layout
+            type: custom:layout-card
+          conditions:
+          - entity: '[[entity]]'
+            state_not: unavailable
+          - entity: '[[entity]]'
+            state_not: idle
+          type: conditional
+        - artwork: none
+          card_mod:
+            style: ":host {\n  --mini-media-player-background-opacity: 0;\n}\n"
+          entity: '[[entity]]'
+          group: true
+          hide:
+            controls: true
+            icon: true
+            info: true
+            name: true
+            power: true
+            progress: true
+            source: true
+            volume: true
+          shortcuts:
+            attribute: source
+            buttons: '[[buttons]]'
+            columns: 3
+          type: custom:mini-media-player
+        child-padding: 0.5em
+        gap: 0em
+        overlay-margin: 0.5em
+        padding: 0em
+        title-card:
+          cards:
+          - cards:
+            - card:
+                alignment: center
+                subtitle: "{%- set entity = \"[[entity]]\" -%} {%- if states(entity)\
+                  \ in [\"playing\", \"paused\", \"standby\"] -%}\n  {{ states(entity)\
+                  \ | title }}\n{%- endif -%}"
+                title: "{%- if not \"[[\" in \"[[name]]\" -%}\n  [[name]]\n{%- else\
+                  \ -%}\n  {{ state_attr(\"[[entity]]\", \"friendly_name\") }}\n{%-\
+                  \ endif -%}"
+                type: custom:mushroom-title-card
+              card_mod:
+                style:
+                  mushroom-title-card$: "h1 {\n  margin-left: 1.2em !important;\n\
+                    }\n"
+              type: custom:mod-card
+            - card:
+                alignment: center
+                chips:
+                - card_mod:
+                    style: "ha-card {\n  margin: 0px 10px 0px 0;\n  --chip-background:\
+                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
+                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
+                      \  --chip-padding: 10px;\n}\n"
+                  entity: '[[entity]]'
+                  icon: mdi:skip-backward
+                  tap_action:
+                    action: call-service
+                    service: media_player.media_previous_track
+                    target:
+                      entity_id: '[[entity]]'
+                  type: template
+                - card_mod:
+                    style: "ha-card {\n  margin: 0px 0px 0px 0px;\n  --chip-background:\
+                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
+                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
+                      \  --chip-padding: 10px;\n}\n"
+                  entity: '[[entity]]'
+                  icon: "{%- if is_state(entity, \"playing\") -%}\n  mdi:pause\n{%-\
+                    \ else -%}\n  mdi:play\n{%- endif -%}"
+                  tap_action:
+                    action: call-service
+                    service: media_player.media_play_pause
+                    target:
+                      entity_id: '[[entity]]'
+                  type: template
+                - card_mod:
+                    style: "ha-card {\n  margin: 0px 0px 0px 10px;\n  --chip-background:\
+                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
+                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
+                      \  --chip-padding: 10px;\n}\n"
+                  entity: '[[entity]]'
+                  icon: mdi:skip-forward
+                  tap_action:
+                    action: call-service
+                    service: media_player.media_next_track
+                    target:
+                      entity_id: '[[entity]]'
+                  type: template
+                type: custom:mushroom-chips-card
+              conditions:
+              - entity: '[[entity]]'
+                state_not: unavailable
+              - entity: '[[entity]]'
+                state_not: 'off'
+              - entity: '[[entity]]'
+                state_not: standby
+              type: conditional
+            - card:
+                alignment: center
+                subtitle: "{%- set entity = \"[[entity]]\" -%} {%- set media_type\
+                  \ = state_attr(entity, \"media_content_type\") -%} {%- if media_type\
+                  \ == \"music\" -%}\n  {{ state_attr(entity, \"media_artist\") }}\
+                  \ - {{ state_attr(entity, \"media_title\") }}\n{%- elif media_type\
+                  \ == \"movie\" -%}\n  {{ state_attr(entity, \"media_title\") }}\n\
+                  {%- elif media_type == \"tvshow\" -%}\n  {{ state_attr(entity, \"\
+                  media_series_title\") }}\n{%- endif -%}"
+                type: custom:mushroom-title-card
+              conditions:
+              - entity: '[[entity]]'
+                state_not: unavailable
+              - entity: '[[entity]]'
+                state_not: idle
+              type: conditional
+            type: vertical-stack
+          - card:
+              card_mod:
+                style: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
+                  \ translate3d(0,0,0);\n  content: \"\";\n\n  background:\n  {%-\
+                  \ if not states(config.entity) in [\"off\", \"unknown\", \"unavailable\"\
+                  , \"idle\"] and state_attr(config.entity, \"entity_picture\") -%}\n\
+                  \    url( '{{ state_attr(config.entity, \"entity_picture\") }}')\
+                  \ center no-repeat;\n  {%- elif not states(config.entity) in [\"\
+                  off\", \"unknown\", \"unavailable\"] -%}\n    url('/local/icons/idle_media_player.png')\
+                  \ center no-repeat;\n  {%- endif -%}\n  background-size: contain;\n\
+                  \n  border-radius: var(--control-border-radius);\n  {% set media_type\
+                  \ = state_attr(config.entity, 'media_content_type') %}\n  {% if\
+                  \ media_type == 'tvshow' %}\n    aspect-ratio: 16 / 9;\n    margin:\
+                  \ 0px 0px 0px -45px;\n    margin-top: 1px;\n  {% elif media_type\
+                  \ == 'movie' %}\n    aspect-ratio: 2 / 3;\n  {% else %}\n    aspect-ratio:\
+                  \ 1 / 1;\n    width: 99%;\n  {% endif %}\n}\nha-card {\n  transform:\
+                  \ translate3d(0,0,0);\n  -webkit-transform: translate3d(0,0,0);\n\
+                  \  border-radius: 30px;\n  overflow: visible !important;\n  box-shadow:\
+                  \ none !important;\n  background-color: transparent;\n  border:\
+                  \ none !important;\n}\n"
+              entity: '[[entity]]'
+              fill_container: false
+              icon_type: none
+              primary_info: none
+              secondary_info: none
+              show_volume_level: false
+              type: custom:mushroom-media-player-card
+              use_media_artwork: false
+              use_media_info: false
+            conditions:
+            - entity: '[[entity]]'
+              state_not: unavailable
+            - entity: '[[entity]]'
+              state_not: 'off'
+            - entity: '[[entity]]'
+              state_not: standby
+            type: conditional
+          columns: 2
+          square: false
+          type: grid
+        title-card-button-overlay: true
+        title-card-padding: 0em
+        type: custom:expander-card
+      - card_mod:
+          style:
+            .: "ha-card {\n  --mmp-progress-height: 10px !important;\n  height: var(--mmp-progress-height);\n\
+              \  --mmp-accent-color: var(--accent-color);\n  --ha-card-border-width:\
+              \ 0;\n}\n"
+        entity: '[[entity]]'
+        group: true
+        hide:
+          controls: true
+          icon: true
+          info: true
+          name: true
+          power: true
+          source: true
+          state_label: true
+          volume: true
+        more_info: false
+        toggle_power: false
+        type: custom:mini-media-player
+      type: custom:vertical-stack-in-card
+    default:
+    - buttons:
+      - icon: mdi:plex
+        id: com.plexapp.android
+        name: Plex
+        type: source
+      - icon: mdi:netflix
+        id: com.netflix.ninja
+        name: Netflix
+        type: source
+      - icon: fab:amazon
+        id: com.amazon.amazonvideo.livingroom
+        name: Prime
+        type: source
+      - icon: mdi:youtube
+        id: com.google.android.youtube.tv
+        name: YouTube
+        type: source
+      - icon: mdi:spotify
+        id: com.spotify.tv.android
+        name: Spotify
+        type: source
+      - icon: mdi:twitch
+        id: tv.twitch.android.viewer
+        name: Twitch
+        type: source
+      - icon: fapro:crunchyroll
+        id: com.crunchyroll.crunchyroid
+        name: Crunchyroll
+        type: source
+      - icon: fapro:youtube_kids
+        id: com.google.android.youtube.tvkids
+        name: YT Kids
+        type: source
+      - icon: fapro:pbs_kids
+        id: org.pbskids.video
+        name: PBS Kids
+        type: source
+      - icon: fapro:disney_now
+        id: com.disney.datg.videoplatforms.android.watchdc
+        name: DisneyNow
+        type: source
+      - icon: mdi:apps
+        id: com.spocky.projengmenu
+        name: Home
+        type: source
   package_delivery:
     card:
       card:
@@ -660,14 +995,16 @@ decluttering_templates:
                   - entity: notify.mobile_app_[[phone_base]]
                     hold_action:
                       action: call-service
+                      confirmation:
+                        text: Are you sure you want to ring this device?
                       data:
                         data:
                           channel: alarm_stream
                           priority: high
                           tag: Find
                           ttl: 0
-                        message: Ringing phone
-                        title: Finding Phone
+                        message: This device is being located
+                        title: Finding Device
                       service: notify.mobile_app_[[phone_base]]
                     icon: mdi:volume-high
                     icon_color: orange
@@ -734,19 +1071,11 @@ decluttering_templates:
               browser_mod:
                 data:
                   content:
-                    artwork: full-cover-fit
-                    card_mod:
-                      style: "ha-card {\n  --ha-card-background: none\n}\n"
-                    entity: '[[media]]'
-                    hide:
-                      power: true
-                      source: true
-                      volume: true
-                    icon: mdi:spotify
-                    info: scroll
-                    name: Spotify
-                    source: icon
-                    type: custom:mini-media-player
+                    template: media_card
+                    type: custom:decluttering-card
+                    variables:
+                    - entity: '[[media]]'
+                    - buttons: []
                 service: browser_mod.popup
             type: template
           conditions:
@@ -1020,69 +1349,6 @@ decluttering_templates:
     - title: Title
     - subtitle: ''
     - chips: []
-  universal_media:
-    card:
-      artwork: full-cover
-      entity: '[[entity]]'
-      hide:
-        power: true
-        source: true
-      icon: '[[icon]]'
-      info: scroll
-      name: '[[name]]'
-      shortcuts:
-        attribute: source
-        buttons: '[[buttons]]'
-        columns: 3
-      type: custom:mini-media-player
-    default:
-    - name: TV
-    - icon: mdi:motion-play-outline
-    - buttons:
-      - icon: mdi:plex
-        id: com.plexapp.android
-        name: Plex
-        type: source
-      - icon: mdi:netflix
-        id: com.netflix.ninja
-        name: Netflix
-        type: source
-      - icon: fab:amazon
-        id: com.amazon.amazonvideo.livingroom
-        name: Prime
-        type: source
-      - icon: mdi:youtube
-        id: com.google.android.youtube.tv
-        name: YouTube
-        type: source
-      - icon: mdi:spotify
-        id: com.spotify.tv.android
-        name: Spotify
-        type: source
-      - icon: mdi:twitch
-        id: tv.twitch.android.viewer
-        name: Twitch
-        type: source
-      - icon: fapro:crunchyroll
-        id: com.crunchyroll.crunchyroid
-        name: Crunchyroll
-        type: source
-      - icon: fapro:youtube_kids
-        id: com.google.android.youtube.tvkids
-        name: YT Kids
-        type: source
-      - icon: fapro:pbs_kids
-        id: org.pbskids.video
-        name: PBS Kids
-        type: source
-      - icon: fapro:disney_now
-        id: com.disney.datg.videoplatforms.android.watchdc
-        name: DisneyNow
-        type: source
-      - icon: mdi:apps
-        id: com.spocky.projengmenu
-        name: Home
-        type: source
   uptime_card:
     card:
       cards:
@@ -1140,7 +1406,7 @@ decluttering_templates:
         type: grid
       child-padding: 0em
       gap: 0em
-      overlay-margin: 2em
+      overlay-margin: 0.5em
       padding: 0em
       title-card:
         alias:
@@ -1186,6 +1452,7 @@ decluttering_templates:
           hour24: false
         type: custom:uptime-card
         update_interval: 30
+      title-card-button-overlay: true
       title-card-padding: 0em
       type: custom:expander-card
     default:
@@ -1285,7 +1552,6 @@ views:
             entity: group.all_light_switches
             hold_action:
               action: call-service
-              data: {}
               service: homeassistant.turn_off
               target:
                 entity_id: group.all_light_switches
@@ -1948,6 +2214,64 @@ views:
                   slot_r7: remove
                   slot_r8: remove
                   type: custom:platinum-weather-card
+                - cards:
+                  - card_mod:
+                      style: "ha-card {\n  background: none;\n  --ha-card-box-shadow:\
+                        \ 0px;\n}\n"
+                    entity: weather.owm_hourly
+                    icon_color: blue
+                    type: custom:mushroom-entity-card
+                  - card_mod:
+                      style:
+                        .: "ha-card {\n  background: none;\n  --ha-card-box-shadow:\
+                          \ 0px;\n  margin: -8px -4px -4px -16px;\n}\n"
+                        weather-bar$: ".main {\n  --mush-rgb-red: 244, 67, 54;\n \
+                          \ --mush-rgb-pink: 233, 30, 99;\n  --mush-rgb-purple: 156,\
+                          \ 39, 176;\n  --mush-rgb-deep-purple: 103, 58, 183;\n  --mush-rgb-indigo:\
+                          \ 63, 81, 181;\n  --mush-rgb-blue: 33, 150, 243;\n  --mush-rgb-light-blue:\
+                          \ 3, 169, 244;\n  --mush-rgb-cyan: 0, 188, 212;\n  --mush-rgb-teal:\
+                          \ 0, 150, 136;\n  --mush-rgb-green: 76, 175, 80;\n  --mush-rgb-light-green:\
+                          \ 139, 195, 74;\n  --mush-rgb-lime: 205, 220, 57;\n  --mush-rgb-yellow:\
+                          \ 255, 235, 59;\n  --mush-rgb-amber: 255, 193, 7;\n  --mush-rgb-orange:\
+                          \ 255, 152, 0;\n  --mush-rgb-deep-orange: 255, 87, 34;\n\
+                          \  --mush-rgb-brown: 121, 85, 72;\n  --mush-rgb-grey: 158,\
+                          \ 158, 158;\n  --mush-rgb-blue-grey: 96, 125, 139;\n  --mush-rgb-black:\
+                          \ 0, 0, 0;\n  --mush-rgb-white: 255, 255, 255;\n\n  --color-clear-night:\
+                          \ rgba(var(--mush-rgb-black), 0.2) !important;\n  --color-cloudy:\
+                          \ rgba(var(--mush-rgb-grey), 0.2) !important;\n  --color-fog:\
+                          \ var(--color-cloudy);\n  --color-hail: rgba(var(--mush-rgb-indigo),\
+                          \ 0.2) !important;\n  --color-lightning: var(--color-rainy);\n\
+                          \  --color-lightning-rainy: var(--color-rainy);\n  --color-partlycloudy:\
+                          \ rgba(var(--mush-rgb-blue), 0.2) !important;\n  --color-pouring:\
+                          \ var(--color-rainy);\n  --color-rainy: rgba(var(--mush-rgb-indigo),\
+                          \ 0.2) !important;\n  --color-snowy: rgba(var(--mush-rgb-white),\
+                          \ 0.2) !important;\n  --color-snowy-rainy: var(--color-partlycloudy);\n\
+                          \  --color-sunny: rgba(var(--mush-rgb-yellow), 0.2) !important;\n\
+                          \  --color-windy: var(--color-sunny);\n  --color-windy-variant:\
+                          \ var(--color-sunny);\n  --color-exceptional: rgba(var(--mush-rgb-amber),\
+                          \ 0.2) !important;\n}\n.bar > div {\n  height: 42px !important;\n\
+                          }            \n.bar > div:first-child {\n  border-top-left-radius:\
+                          \ 12px !important;\n  border-bottom-left-radius: 12px !important;\n\
+                          }            \n.bar > div:last-child {\n  border-top-right-radius:\
+                          \ 12px !important;\n  border-bottom-right-radius: 12px !important;\n\
+                          }            \n.bar > div > span {\n  text-shadow: none\
+                          \ !important;\n  color: rgb(var(--primary-text-color));\n\
+                          \  font-size: 14px;\n  font-weight: bold;\n} \n.axes > div\
+                          \ > .bar-block-bottom > .hour {\n  font-size: 12px;\n  font-weight:\
+                          \ bolder;\n}\n.axes > div > .bar-block-bottom > .temperature\
+                          \ {\n  font-size: 12px;\n  font-weight: bolder;\n}\n.axes\
+                          \ {\n  margin-top: 10px !important;\n}\n"
+                    entity: weather.owm_hourly
+                    icons: false
+                    label_spacing: '2'
+                    name: ' '
+                    num_segments: '12'
+                    type: custom:hourly-weather
+                  layout:
+                    grid-template-columns: 66px auto
+                    margin: -4px -4px -12px -4px;
+                  layout_type: custom:grid-layout
+                  type: custom:layout-card
                 - type: iframe
                   url: https://embed.windy.com/embed2.html?lat=43.241&lon=-112.143&zoom=7&level=surface&overlay=wind&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=43.490&detailLon=-112.040&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1
                 - darkMode: true
@@ -2497,11 +2821,12 @@ views:
                   card_mod:
                     style: "ha-card {\n  --ha-card-background: none\n}\n"
                   cards:
-                  - template: universal_media
+                  - template: media_card
                     type: custom:decluttering-card
                     variables:
+                    - name: Living Room
                     - entity: media_player.living_room_universal
-                    - name: Living Room Media
+                    - sound_mode: sensor.yamaha_rx_v679_sound_mode
                   - card:
                       entity: media_player.cast_living_room
                       hide:
@@ -2653,11 +2978,12 @@ views:
                   card_mod:
                     style: "ha-card {\n  --ha-card-background: none\n}\n"
                   cards:
-                  - template: universal_media
+                  - template: media_card
                     type: custom:decluttering-card
                     variables:
+                    - name: Family Room
                     - entity: media_player.family_room_universal
-                    - name: Family Room Media
+                    - sound_mode: sensor.denon_avr_s760h_sound_mode
                   - card:
                       entity: media_player.cast_family_room
                       hide:
@@ -2842,11 +3168,44 @@ views:
                   card_mod:
                     style: "ha-card {\n  --ha-card-background: none\n}\n"
                   cards:
-                  - template: universal_media
+                  - template: media_card
                     type: custom:decluttering-card
                     variables:
+                    - name: Master Bedroom
                     - entity: media_player.master_bedroom_universal
-                    - name: Master Bedroom Media
+                    - buttons:
+                      - icon: mdi:plex
+                        id: com.plexapp.android
+                        name: Plex
+                        type: source
+                      - icon: mdi:netflix
+                        id: com.netflix.ninja
+                        name: Netflix
+                        type: source
+                      - icon: fab:amazon
+                        id: com.amazon.amazonvideo.livingroom
+                        name: Prime
+                        type: source
+                      - icon: mdi:youtube
+                        id: com.google.android.youtube.tv
+                        name: YouTube
+                        type: source
+                      - icon: mdi:spotify
+                        id: com.spotify.tv.android
+                        name: Spotify
+                        type: source
+                      - icon: mdi:twitch
+                        id: tv.twitch.android.viewer
+                        name: Twitch
+                        type: source
+                      - icon: fapro:crunchyroll
+                        id: com.crunchyroll.crunchyroid
+                        name: Crunchyroll
+                        type: source
+                      - icon: mdi:apps
+                        id: com.spocky.projengmenu
+                        name: Home
+                        type: source
                   - card:
                       entity: media_player.cast_master_bedroom
                       hide:
@@ -3307,52 +3666,6 @@ views:
       variables:
       - title: Media
       - chips:
-        - chip:
-            entity: sensor.yamaha_rx_v679_sound_mode
-            tap_action:
-              action: none
-            type: entity
-          conditions:
-          - entity: media_player.yamaha_rx_v679
-            state_not: 'off'
-          type: conditional
-        - chip:
-            content: '{{ (state_attr(entity, "volume_level") * 100)|round }}'
-            entity: media_player.yamaha_rx_v679
-            icon: mdi:volume-source
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                data:
-                  content:
-                    card_mod:
-                      style: "ha-card {\n  --ha-card-background: none\n}\n"
-                    cards:
-                    - entity: media_player.yamaha_rx_v679
-                      icon: mdi:volume-high
-                      icon_color: green
-                      primary: Volume
-                      secondary: '{{ (state_attr(entity, "volume_level") * 100) |
-                        round(0) }}%'
-                      type: custom:mushroom-template-card
-                    - card_mod:
-                        style: ":host {\n  --mush-rgb-state-media-player: var(--rgb-green);\n\
-                          }\n"
-                      entity: media_player.yamaha_rx_v679
-                      icon_type: none
-                      primary_info: none
-                      secondary_info: none
-                      type: custom:mushroom-media-player-card
-                      volume_controls:
-                      - volume_set
-                    horizontal: true
-                    type: custom:vertical-stack-in-card
-                service: browser_mod.popup
-            type: template
-          conditions:
-          - entity: media_player.yamaha_rx_v679
-            state_not: 'off'
-          type: conditional
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -3401,10 +3714,12 @@ views:
       square: false
       type: grid
     - card:
-        template: universal_media
+        template: media_card
         type: custom:decluttering-card
         variables:
+        - name: Living Room
         - entity: media_player.living_room_universal
+        - sound_mode: sensor.yamaha_rx_v679_sound_mode
       conditions:
       - entity: remote.living_room
         state_not: 'off'
@@ -3517,52 +3832,6 @@ views:
       variables:
       - title: Media
       - chips:
-        - chip:
-            entity: sensor.denon_avr_s760h_sound_mode
-            tap_action:
-              action: none
-            type: entity
-          conditions:
-          - entity: media_player.denon_avr_s760h
-            state_not: 'off'
-          type: conditional
-        - chip:
-            content: '{{ (state_attr(entity, "volume_level") * 100)|round }}'
-            entity: media_player.denon_avr_s760h
-            icon: mdi:volume-source
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                data:
-                  content:
-                    card_mod:
-                      style: "ha-card {\n  --ha-card-background: none\n}\n"
-                    cards:
-                    - entity: media_player.denon_avr_s760h
-                      icon: mdi:volume-high
-                      icon_color: green
-                      primary: Volume
-                      secondary: '{{ (state_attr(entity, "volume_level") * 100) |
-                        round(0) }}%'
-                      type: custom:mushroom-template-card
-                    - card_mod:
-                        style: ":host {\n  --mush-rgb-state-media-player: var(--rgb-green);\n\
-                          }\n"
-                      entity: media_player.denon_avr_s760h
-                      icon_type: none
-                      primary_info: none
-                      secondary_info: none
-                      type: custom:mushroom-media-player-card
-                      volume_controls:
-                      - volume_set
-                    horizontal: true
-                    type: custom:vertical-stack-in-card
-                service: browser_mod.popup
-            type: template
-          conditions:
-          - entity: media_player.denon_avr_s760h
-            state_not: 'off'
-          type: conditional
         - icon: mdi:remote-tv
           icon_color: orange
           tap_action:
@@ -3663,10 +3932,12 @@ views:
       square: false
       type: grid
     - card:
-        template: universal_media
+        template: media_card
         type: custom:decluttering-card
         variables:
+        - name: Family Room
         - entity: media_player.family_room_universal
+        - sound_mode: sensor.denon_avr_s760h_sound_mode
       conditions:
       - entity: sensor.family_room_denon_source
         state: Shield
@@ -4122,9 +4393,10 @@ views:
       square: false
       type: grid
     - card:
-        template: universal_media
+        template: media_card
         type: custom:decluttering-card
         variables:
+        - name: Master Bedroom
         - entity: media_player.master_bedroom_universal
         - buttons:
           - icon: mdi:plex
@@ -4665,7 +4937,6 @@ views:
       - entity: script.subaru_remote_start
         hold_action:
           action: call-service
-          data: {}
           service: script.turn_on
           target:
             entity_id: script.subaru_remote_start
@@ -5067,14 +5338,11 @@ views:
       variables:
       - computer: erebus
     - card:
-        entity: media_player.erebus
-        hide:
-          power: true
-          source: true
-        icon: mdi:desktop-tower
-        info: scroll
-        name: Erebus
-        type: custom:mini-media-player
+        template: media_card
+        type: custom:decluttering-card
+        variables:
+        - entity: media_player.erebus
+        - buttons: []
       conditions:
       - entity: media_player.erebus
         state_not: unavailable
@@ -5231,14 +5499,11 @@ views:
         state_not: 'off'
       type: conditional
     - card:
-        entity: media_player.nasya
-        hide:
-          power: true
-          source: true
-        icon: mdi:desktop-tower
-        info: scroll
-        name: Nasya
-        type: custom:mini-media-player
+        template: media_card
+        type: custom:decluttering-card
+        variables:
+        - entity: media_player.nasya
+        - buttons: []
       conditions:
       - entity: media_player.nasya
         state_not: unavailable
@@ -5383,14 +5648,11 @@ views:
       variables:
       - computer: ardena
     - card:
-        entity: media_player.ardena
-        hide:
-          power: true
-          source: true
-        icon: mdi:desktop-tower
-        info: scroll
-        name: Ardena
-        type: custom:mini-media-player
+        template: media_card
+        type: custom:decluttering-card
+        variables:
+        - entity: media_player.ardena
+        - buttons: []
       conditions:
       - entity: media_player.ardena
         state_not: unavailable
@@ -5520,14 +5782,11 @@ views:
       variables:
       - computer: athos
     - card:
-        entity: media_player.athos
-        hide:
-          power: true
-          source: true
-        icon: mdi:desktop-tower
-        info: scroll
-        name: Athos
-        type: custom:mini-media-player
+        template: media_card
+        type: custom:decluttering-card
+        variables:
+        - entity: media_player.athos
+        - buttons: []
       conditions:
       - entity: media_player.athos
         state_not: unavailable
@@ -6033,7 +6292,6 @@ views:
         entity: group.all_light_switches
         hold_action:
           action: call-service
-          data: {}
           service: homeassistant.turn_off
           target:
             entity_id: group.all_light_switches
