@@ -1,19 +1,27 @@
 ---
+# Interesting briefing macros.
+# Most are currently not used but maybe someday, they will be.
 >
   {# UTILITY FUNCTIONS #}
+
+  {#
+    Generate a friendly list of entity names.
+    Accepts a list of entity objects or Entity IDs.
+  #}
   {%- macro get_friendly_names(entity_list) -%}
-    {% set comma = joiner(', ') -%}
-    {%- for entity_id in entity_list -%}
-      {{ ', and ' if loop.last and not loop.first else comma() }}
-      {%- set name = entity_id.name -%}
-      {%- if name is string -%}
-        {{ name | trim }}
-      {%- else -%}
-        {{ entity_id | replace('light.', '') | replace('switch.', '') | replace('_', ' ') | trim | title }}
-      {%- endif -%}
-    {%- endfor -%}
+  {%- for entity in entity_list -%}
+    {%- if entity is string -%}
+      {%- set name = state_attr(entity, "friendly_name") -%}
+    {%- else -%}
+      {%- set name = entity.attributes.friendly_name -%}
+    {%- endif -%}
+    {{ name }}{{ ', ' if loop.length > 2 and not loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
+  {%- endfor -%}
   {%- endmacro -%}
 
+  {#
+    Converts various "true" states into a boolean true or false.
+  #}
   {%- macro truthify(state) -%}
     {%- set truthy_states = ['on', 'true', 'open'] -%}
     {%- if state in truthy_states -%}
@@ -24,6 +32,10 @@
   {%- endmacro -%}
 
   {# BRIEFING FUNCTIONS #}
+
+  {#
+    Random "dark outside" message.
+  #}
   {%- macro dark_outside() -%}
     {{ [
       'It is about to get dark outside. Turning the lights on now.',
@@ -33,6 +45,9 @@
     ] | random ~ " " }}
   {%- endmacro -%}
 
+  {#
+    A reminder to fill the dog water bowl.
+  #}
   {%- macro dog_water_bowl() -%}
     {%- if states('binary_sensor.dog_water_bowl') == "off" -%}
       Lilly's water bowl is empty please refill it for them.
@@ -40,6 +55,9 @@
     {%- endif -%}
   {%- endmacro -%}
 
+  {#
+    Report if any door is open or locks are unlocked.
+  #}
   {%- macro door_check() -%}
     {% set ns = namespace(entities=[]) %}
 
@@ -61,12 +79,15 @@
 
     {%- if ns.entities | length > 0 -%}
       {%- for entity in ns.entities -%}
-        {{ 'T' if entity == ns.entities | first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == ns.entities | last else ', ' }}{{ 'and ' if ns.entities | length > 1 and entity != ns.entities | last }}
+        {{ 'T' if loop.first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ ',' if loop.length > 2 and not loop.last else '' }}{{ '.' if loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
       {%- endfor -%}
       {{ " " }}
     {%- endif -%}
   {%- endmacro -%}
 
+  {#
+    Report if any window is open.
+  #}
   {%- macro window_check() -%}
     {% set ns = namespace(entities=[]) %}
 
@@ -77,12 +98,15 @@
 
     {%- if ns.entities | length > 0 -%}
       {%- for entity in ns.entities -%}
-        {{ 'T' if entity == ns.entities | first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ '.' if entity == ns.entities | last else ', ' }}{{ 'and ' if ns.entities | length > 1 and entity != ns.entities | last }}
+        {{ 'T' if loop.first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is open{{ ',' if loop.length > 2 and not loop.last else '' }}{{ '.' if loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
       {%- endfor -%}
       {{ " " }}
     {%- endif -%}
   {%- endmacro -%}
 
+  {#
+    Random "goodbye" message.
+  #}
   {%- macro goodbye_line() -%}
     {{ [
       "Adios!",
@@ -94,9 +118,9 @@
       "Good friends never say goodbye, they simply say, see you soon!",
       "See you later alligator!",
       "Stay out of trouble.",
-      "I am out of here. Oh, I'm stuck here, are-nt I?",
+      "I am out of here. Oh wait, I'm stuck in here, are-nt I?",
       "Okay...bye, fry guy!",
-      "If I don’t see you around, I'll see you square.",
+      "If I don't see you around, I'll see you square.",
       "Stay classy.",
       "Fare thee well.",
       "Catch you on the rebound.",
@@ -104,7 +128,7 @@
       "Peace out!",
       "Gotta hit the road.",
       "Live long and prosper!",
-      "Well, I guess your off! I've got things to do too.",
+      "Well, I guess you're off! I've got things to do too.",
       "Bye bye, butterfly.",
       "Out to the door, dinosaur.",
       "Catch you on the flip side.",
@@ -143,7 +167,7 @@
       "I'm off like a dirty shirt.",
       "See you when I see you.",
       "Catch ya later, future dudes!",
-      "Cya. (Clearly, this is just short for ‘see you,’ which makes no sense because you utter ‘cya’ and not write it. Oh, whatever!) ",
+      "Cya. (Clearly, this is just short for 'see you', which makes no sense because you utter 'cya' and not write it. Oh, whatever!)",
       "As you wish, jellyfish!",
       "Later, skater!",
       "May the force be with you... always.",
@@ -164,7 +188,7 @@
       "Are you late for your bus, snuffle-up-ahgus?",
       "Move out, brussels sprout!",
       "Make sure the doormat says goodbye!",
-      "I’ll show you to the door!",
+      "I'll show you to the door!",
       "Ciao ciao, brown cow!",
       "Forget you guys, I'm going home!",
       "See you, space cowboy."
@@ -196,6 +220,9 @@
     ] | random ~ " " }}
   {%- endmacro -%}
 
+  {#
+    Random "goodnight" message.
+  #}
   {%- macro goodnight_line() -%}
     {{ [
       "Goodnight, talk to you tomorrow.",
@@ -221,6 +248,9 @@
     ] | random ~ " " }}
   {%- endmacro -%}
 
+  {#
+    A simple greeting based on the time of day.
+  #}
   {%- macro greeting_line() -%}
     {%- set hour = now().strftime('%H') | int -%}
     {%- if hour > 0 and hour < 10  -%}
@@ -240,6 +270,9 @@
     {% endif -%}
   {%- endmacro -%}
 
+  {#
+    Report if any light is on.
+  #}
   {%- macro light_check() -%}
     {%- set lights_on = states | selectattr('entity_id', 'in', state_attr('group.all_light_switches', 'entity_id')) | selectattr('state', 'in', ['on']) | list -%}
     {% if lights_on | length | default(0) | int > 0 and lights_on != [''] -%}
@@ -254,11 +287,17 @@
     {%- endif -%}
   {%- endmacro -%}
 
+  {#
+    Report the current inside temperature.
+  #}
   {%- macro inside_weather() -%}
     Inside the house, it is {{ states('sensor.home_temperature') | int }} degrees.
     {{ " " }}
   {%- endmacro -%}
 
+  {#
+    Report the current outside weather conditions.
+  #}
   {%- macro outside_weather() -%}
     {%- set conditions = {
       "clear-night": "clear night skies",
@@ -273,11 +312,6 @@
     {%- endif -%}
     {{ ['Currently', 'Right now'] | random }}, it is {{ state_attr('weather.openweathermap', 'temperature') | int }} degrees fahrenheit, and {{ condition | replace('clear', 'clear ') | replace('partly', 'partly ') }}.
     {{ states('sensor.forecast') }}
-    {{ " " }}
-  {%- endmacro -%}
-
-  {%- macro dog_warning(person_arriving) -%}
-    Head's up Lilly. {{ person_arriving }} just got home!
     {{ " " }}
   {%- endmacro -%}
 
@@ -312,14 +346,17 @@
     {%- endif -%}
   {%- endmacro -%}
 
+  {#
+    Random "welcome home" message.
+  #}
   {%- macro welcome_home(person) -%}
     {{ [
       "Welcome back home " ~ person ~ ".",
       "Guess who is home? " ~ person ~ " is!",
       person ~ " is now in the house.",
-      "Welcome Home " ~ person ~ ".  We have missed you.  I know Lilly sure did.",
+      "Welcome Home " ~ person ~ ". We have missed you. I know Lilly sure did.",
       "Our home is now complete, Rest your head and relax your feet!  Welcome Back " ~ person ~ ".",
-      "Life is like a song, you're back where you belong.  Welcome home " ~ person ~ ".",
+      "Life is like a song, you're back where you belong. Welcome home " ~ person ~ ".",
       "Hey there " ~ person ~ "  Welcome Home!",
       "Knock Knock. Who is There? " ~ person ~ " is!",
       "The garage door just told me that " ~ person ~ " is home.",
@@ -329,7 +366,7 @@
       "Hey " ~ person ~ ". Your arrival has been recorded by the Smartest house on the block.",
       "Take note Lilly! "  ~ person ~ " is home.",
       "I am sensing a disturbance in the force. "  ~ person ~ " must be home!",
-      "And the house becomes a home.  Welcome back " ~ person ~ ".",
+      "And the house becomes a home. Welcome back " ~ person ~ ".",
       "Just a quick announcement. " ~ person ~ " has arrived!",
       "Pardon the interruption but " ~ person ~ " is home!",
       "My systems are picking up the presence of additional humans. " ~ person ~ " has been identified as home."
@@ -345,11 +382,7 @@
     {%- endif -%}
 
     {%- if person_arriving is not undefined -%}
-      {%- if say_dog_warning == "true" -%}
-        {{ dog_warning(person_arriving) }}
-      {%- else -%}
-        {{ welcome_home(person_arriving) }}
-      {%- endif -%}
+      {{ welcome_home(person_arriving) }}
     {%- endif -%}
 
     {%- if say_dark_outside == "true" -%}
@@ -450,16 +483,6 @@
     {%- set say_outside_weather = "false" -%}
   {%- else -%}
     {%- set say_outside_weather = truthify(say_outside_weather) -%}
-  {%- endif -%}
-
-  {%- if say_dog_warning is undefined -%}
-    {%- set say_dog_warning = "false" -%}
-  {%- else -%}
-    {%- set say_dog_warning = truthify(say_dog_warning) -%}
-  {%- endif -%}
-
-  {%- if say_dog_warning == "true" -%}
-    {%- set say_greeting = "false" -%}
   {%- endif -%}
 
   {%- if say_responsibilities is undefined -%}
