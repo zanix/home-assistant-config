@@ -3,6 +3,180 @@ inovelli_blue_led:
   description: Set LED effects for Inovelli VZM31-SN Blue Series 2-1 Switches
   use_blueprint:
     path: zanix/inovelli_blue_led_zigbee2mqtt.yaml
+  icon: mdi:led-on
   mode: parallel
   max: 100
-  icon: mdi:led-on
+remote_family_room_activate_tv:
+  alias: Family Room TV
+  sequence:
+  - service: remote.turn_off
+    target:
+      entity_id: remote.family_room
+    data:
+      activity: Shield TV
+  icon: mdi:android
+  mode: single
+remote_family_room_activate_computer:
+  alias: Gaming PC
+  sequence:
+  - service: remote.turn_on
+    target:
+      entity_id: remote.family_room
+    data:
+      activity: Computer
+  icon: mdi:desktop-tower
+  mode: single
+remote_family_room_activate_ps3:
+  alias: PS3
+  sequence:
+  - service: remote.turn_on
+    target:
+      entity_id: remote.family_room
+    data:
+      activity: PS3
+  icon: mdi:sony-playstation
+  mode: single
+remote_family_room_activate_ps4:
+  alias: PS4
+  sequence:
+  - service: remote.turn_on
+    target:
+      entity_id: remote.family_room
+    data:
+      activity: PS4
+  icon: mdi:sony-playstation
+  mode: single
+remote_family_room_activate_xbox:
+  alias: XBox
+  sequence:
+  - service: remote.turn_on
+    target:
+      entity_id: remote.family_room
+    data:
+      activity: XBox
+  icon: mdi:microsoft-xbox
+  mode: single
+family_room_game_light_mode:
+  alias: Family Room Game Light Mode
+  sequence:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: sun
+          after: sunset
+          after_offset: -01:00:00
+        - condition: sun
+          before: sunrise
+      sequence:
+      - parallel:
+        - service: switch.turn_off
+          target:
+            entity_id: switch.stair_light
+          data: {}
+        - service: light.turn_on
+          data:
+            transition: 1
+            brightness_pct: 20
+          target:
+            entity_id: light.family_room
+        - service: light.turn_on
+          data:
+            transition: 1
+            brightness_pct: 6
+          target:
+            entity_id: light.play_space
+    default:
+    - parallel:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.stair_light
+        data: {}
+      - service: light.turn_on
+        data:
+          brightness_pct: 20
+          transition: 1
+        target:
+          entity_id: light.family_room
+      - service: light.turn_on
+        data:
+          transition: 1
+          brightness_pct: 80
+        target:
+          entity_id: light.play_space
+  description: Adjusts the lights in the Family Room for Games.
+  icon: mdi:light-flood-up
+  mode: single
+office_lights_on:
+  alias: Office Lights On
+  sequence:
+  - choose:
+    - conditions:
+        or:
+        - condition: time
+          after: input_datetime.office_night_mode
+        - condition: sun
+          before: sunrise
+          before_offset: -00:20:00
+      sequence:
+      - service: script.office_lights_night_mode
+        data: {}
+    default:
+    - service: script.office_lights_day_mode
+      data: {}
+  description: Turns on the office lights based on time of day.
+  icon: mdi:chair-rolling
+  mode: single
+generate_readme:
+  alias: Generate README
+  sequence:
+  - service: readme.generate
+    data: {}
+  - service: browser_mod.notification
+    data:
+      message: README generation process complete
+      duration: 5000
+  description: Regernerates the readme file based on templates/README.js.
+  icon: mdi:text
+  mode: single
+subaru_remote_start:
+  alias: Subaru Remote Start
+  sequence:
+  - parallel:
+    - service: cover.open_cover
+      data: {}
+      target:
+        entity_id: cover.garage_door
+    - service: button.press
+      data: {}
+      target:
+        entity_id: button.ascent_remote_start
+  description: Starts the Subaru and opens the garage door.
+  icon: fapro:subaru
+  mode: single
+subaru_remote_stop:
+  alias: Subaru Remote Stop
+  sequence:
+  - service: button.press
+    data:
+      entity_id: button.ascent_remote_stop
+  - if:
+    - condition: state
+      entity_id: cover.garage_door
+      state: open
+    then:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.garage_door
+      data: {}
+  description: Stops the Subaru and closes the garage door.
+  icon: fapro:subaru
+  mode: single
+sql_purge:
+  alias: Purge Home Assistant Database
+  sequence:
+  - service: recorder.purge
+    data:
+      keep_days: '{{ states("input_number.sql_purge_keep") | int }}'
+  icon: mdi:database
+  mode: single
