@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1871 total entities**,
-including **948 sensors**.
+This Home Assistant install has approximately **1828 total entities**,
+including **906 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -354,7 +354,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.3]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.7]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -386,7 +386,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.10.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.11.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -426,7 +426,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 
-### [Noctis](https://github.com/aFFekopp/noctis) [v2.10]
+### [Noctis](https://github.com/aFFekopp/noctis) [v2.13]
 
 🐵 Dark Blue Theme for Home Assistant
 
@@ -710,7 +710,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.3.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.3.5-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
