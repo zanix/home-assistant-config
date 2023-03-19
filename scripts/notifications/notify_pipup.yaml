@@ -6,19 +6,14 @@ notify_pipup:
   mode: parallel
 
   fields:
-    device:
-      name: 'Device'
-      description: 'Which device to send to.'
+    entity:
+      name: 'Entity'
+      description: 'Which Android TV entity to send to.'
       required: true
       selector:
-        select:
-          mode: dropdown
-          custom_value: true
+        entity:
           multiple: true
-          options:
-            - Living Room
-            - Family Room
-            - Master Bedroom
+          integration: androidtv
     title:
       name: 'Title'
       example: 'Startup: Home Assistant is Up and Running!'
@@ -189,24 +184,23 @@ notify_pipup:
           {{ message_color }}
         {%- endif -%}
       {%- endif -%}
-    devices: !secret pipup_devices
-    device: '{{ device | default([]) | lower }}'
-    device_list: >
-      {% set devices = namespace(names=[]) %}
-      {% if device %}
+    entity: '{{ entity | default([]) }}'
+    entity_list: >
+      {% set entities = namespace(names=[]) %}
+      {% if entity %}
         {# Convert to a list #}
-        {% if ',' in device %}
-          {% set entitynum = device.split(',') | count %}
+        {% if ',' in entity %}
+          {% set entitynum = entity.split(',') | count %}
           {% for i in range(0, entitynum) %}
-            {% set devices.names = devices.names + [device.split(',')[i] | string | trim ] %}
+            {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
           {% endfor %}
-        {% elif device[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-          {% set devices.names = devices.names + [device | string | trim] %}
+        {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+          {% set entities.names = entities.names + [entity | string | trim] %}
         {% else %}
-          {% set devices.names = device %}
+          {% set entities.names = entity %}
         {% endif %}
       {% endif %}
-      {{ devices.names | unique | list | lower }}
+      {{ entities.names | unique | list | lower }}
 
     # Generate a random ID for the webrtc link.
     link_id: '{% for _ in range(40) %}{{ range(10) | random }}{% endfor %}'
@@ -270,6 +264,7 @@ notify_pipup:
             notification_id: 'notify_pipup'
             title: 'DEBUG: script.notify_pipup'
             message: |-
+              entity_list: {{ entity_list }}
               duration: {{ duration | default(8, true) }}
               position: {{ position | default(1, true) }}
               title: {{ title | default("", true) }}
@@ -291,20 +286,16 @@ notify_pipup:
             entity: '{{ camera }}'
             open_limit: 5
             time_to_live: 60
-    # Loop through device_list
+    # Loop through entity_list
     - repeat:
-        for_each: '{{ device_list }}'
+        for_each: '{{ entity_list }}'
         sequence:
           - variables:
-              device_value: >-
-                {% if repeat.item | int(default=-1) == -1 %}
-                  {{ devices[repeat.item | lower] }}
-                {% else %}
-                  {{ repeat.item }}
-                {% endif %}
+              ip_address: >-
+                {{ device_attr(repeat.item, 'name') | replace("Android TV ", "") }}
           - service: rest_command.pipup
             data:
-              ip_address: '{{ device_value }}'
+              ip_address: '{{ ip_address }}'
               duration: '{{ duration | default(8, true) }}'
               position: '{{ position | default(1, true) }}'
               title: '{{ title | default("", true) }}'

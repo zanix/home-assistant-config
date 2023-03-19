@@ -7,52 +7,53 @@
 script:
   hass_publish_sensors:
     alias: '[HASS.Agent] Publish Sensors'
-    description: 'Publishes user and Satellite sensors.'
+    description: 'Publishes user and Satellite sensors. This script requires the Hass Agent media player and notification integration.'
     icon: mdi:gesture-tap-button
 
     fields:
-      computer:
+      entity:
         name: 'Computer'
         description: 'The HASS.Agent computer.'
-        example: 'computer'
+        example: 'media_player.computer'
         required: true
         selector:
-          select:
-            mode: dropdown
-            custom_value: true
+          entity:
             multiple: true
-            options: !secret hass_agent_computers
+            integration: hass_agent
 
     # Set local variables for reuse in this script.
     variables:
-      computer: '{{ computer | default([]) | lower }}'
-      computer_list: >
-        {% set computers = namespace(names=[]) %}
-        {% if computer %}
+      entity: '{{ entity | default([]) }}'
+      entity_list: >
+        {% set entities = namespace(names=[]) %}
+        {% if entity %}
           {# Convert to a list #}
-          {% if ',' in computer %}
-            {% set entitynum = computer.split(',') | count %}
+          {% if ',' in entity %}
+            {% set entitynum = entity.split(',') | count %}
             {% for i in range(0, entitynum) %}
-              {% set computers.names = computers.names + [computer.split(',')[i] | string | trim ] %}
+              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
             {% endfor %}
-          {% elif computer[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set computers.names = computers.names + [computer | string | trim] %}
+          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set entities.names = entities.names + [entity | string | trim] %}
           {% else %}
-            {% set computers.names = computer %}
+            {% set entities.names = entity %}
           {% endif %}
         {% endif %}
-        {{ computers.names | unique | list | lower }}
+        {{ entities.names | unique | list }}
 
     sequence:
-      # Loop through computer_list
+      # Loop through entity_list
       - repeat:
-          for_each: '{{ computer_list }}'
+          for_each: '{{ entity_list }}'
           sequence:
+            - variables:
+                computer: >-
+                  {{ device_attr(repeat.item, 'name') | lower }}
             - service: button.press
               target:
                 entity_id:
-                  - 'button.{{ repeat.item }}_publish_sensors'
-                  - 'button.{{ repeat.item }}_satellite_publish_sensors'
+                  - 'button.{{ computer }}_publish_sensors'
+                  - 'button.{{ computer }}_satellite_publish_sensors'
 
   hass_agent_launch:
     alias: '[HASS.Agent] Launch Application'
@@ -60,17 +61,15 @@ script:
     icon: mdi:application-outline
 
     fields:
-      computer:
+      entity:
         name: 'Computer'
         description: 'The HASS.Agent computer.'
-        example: 'computer'
+        example: 'media_player.computer'
         required: true
         selector:
-          select:
-            mode: dropdown
-            custom_value: true
+          entity:
             multiple: true
-            options: !secret hass_agent_computers
+            integration: hass_agent
       command:
         name: 'Command'
         description: 'Application name or command line.'
@@ -81,32 +80,35 @@ script:
 
     # Set local variables for reuse in this script.
     variables:
-      computer: '{{ computer | default([]) | upper }}'
-      computer_list: >
-        {% set computers = namespace(names=[]) %}
-        {% if computer %}
+      entity: '{{ entity | default([]) }}'
+      entity_list: >
+        {% set entities = namespace(names=[]) %}
+        {% if entity %}
           {# Convert to a list #}
-          {% if ',' in computer %}
-            {% set entitynum = computer.split(',') | count %}
+          {% if ',' in entity %}
+            {% set entitynum = entity.split(',') | count %}
             {% for i in range(0, entitynum) %}
-              {% set computers.names = computers.names + [computer.split(',')[i] | string | trim ] %}
+              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
             {% endfor %}
-          {% elif computer[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set computers.names = computers.names + [computer | string | trim] %}
+          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set entities.names = entities.names + [entity | string | trim] %}
           {% else %}
-            {% set computers.names = computer %}
+            {% set entities.names = entity %}
           {% endif %}
         {% endif %}
-        {{ computers.names | unique | list | upper }}
+        {{ entities.names | unique | list }}
 
     sequence:
-      # Loop through computer_list
+      # Loop through entity_list
       - repeat:
-          for_each: '{{ computer_list }}'
+          for_each: '{{ entity_list }}'
           sequence:
+            - variables:
+                computer: >-
+                  {{ device_attr(repeat.item, 'name') | upper }}
             - service: mqtt.publish
               data:
-                topic_template: "homeassistant/button/{{ repeat.item }}/{{ repeat.item }}_Launch/action"
+                topic_template: "homeassistant/button/{{ computer }}/{{ computer }}_Launch/action"
                 payload_template: '{{ command }}'
 
   hass_agent_launch_url:
@@ -115,17 +117,15 @@ script:
     icon: mdi:application-outline
 
     fields:
-      computer:
+      entity:
         name: 'Computer'
         description: 'The HASS.Agent computer.'
-        example: 'computer'
+        example: 'media_player.computer'
         required: true
         selector:
-          select:
-            mode: dropdown
-            custom_value: true
+          entity:
             multiple: true
-            options: !secret hass_agent_computers
+            integration: hass_agent
       url:
         name: 'URL'
         description: 'URL or file path.'
@@ -136,32 +136,35 @@ script:
 
     # Set local variables for reuse in this script.
     variables:
-      computer: '{{ computer | default([]) | upper }}'
-      computer_list: >
-        {% set computers = namespace(names=[]) %}
-        {% if computer %}
+      entity: '{{ entity | default([]) }}'
+      entity_list: >
+        {% set entities = namespace(names=[]) %}
+        {% if entity %}
           {# Convert to a list #}
-          {% if ',' in computer %}
-            {% set entitynum = computer.split(',') | count %}
+          {% if ',' in entity %}
+            {% set entitynum = entity.split(',') | count %}
             {% for i in range(0, entitynum) %}
-              {% set computers.names = computers.names + [computer.split(',')[i] | string | trim ] %}
+              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
             {% endfor %}
-          {% elif computer[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set computers.names = computers.names + [computer | string | trim] %}
+          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set entities.names = entities.names + [entity | string | trim] %}
           {% else %}
-            {% set computers.names = computer %}
+            {% set entities.names = entity %}
           {% endif %}
         {% endif %}
-        {{ computers.names | unique | list | upper }}
+        {{ entities.names | unique | list }}
 
     sequence:
-      # Loop through computer_list
+      # Loop through entity_list
       - repeat:
-          for_each: '{{ computer_list }}'
+          for_each: '{{ entity_list }}'
           sequence:
+            - variables:
+                computer: >-
+                  {{ device_attr(repeat.item, 'name') | upper }}
             - service: mqtt.publish
               data:
-                topic_template: "homeassistant/button/{{ repeat.item }}/{{ repeat.item }}_Launch_URL/action"
+                topic_template: "homeassistant/button/{{ computer }}/{{ computer }}_Launch_URL/action"
                 payload_template: '{{ url }}'
 
   notify_hass_agent:
@@ -171,17 +174,15 @@ script:
     mode: parallel
 
     fields:
-      computer:
+      entity:
         name: 'Computer'
-        description: 'Which computer to send to. Also accepts comma separated values or a list.'
-        example: 'computer'
+        description: 'The HASS.Agent computer.'
+        example: 'media_player.computer'
         required: true
         selector:
-          select:
-            mode: dropdown
-            custom_value: true
+          entity:
             multiple: true
-            options: !secret hass_agent_computers
+            integration: hass_agent
       title:
         name: 'Title'
         example: 'Startup: Home Assistant is Up and Running!'
@@ -225,31 +226,33 @@ script:
 
     # Set local variables for reuse in this script.
     variables:
-      computer: '{{ computer | default([]) | lower }}'
-      computer_list: >
-        {% set computers = namespace(names=[]) %}
-        {% if computer %}
+      entity: '{{ entity | default([]) }}'
+      entity_list: >
+        {% set entities = namespace(names=[]) %}
+        {% if entity %}
           {# Convert to a list #}
-          {% if ',' in computer %}
-            {% set entitynum = computer.split(',') | count %}
+          {% if ',' in entity %}
+            {% set entitynum = entity.split(',') | count %}
             {% for i in range(0, entitynum) %}
-              {% set computers.names = computers.names + [computer.split(',')[i] | string | trim ] %}
+              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
             {% endfor %}
-          {% elif computer[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set computers.names = computers.names + [computer | string | trim] %}
+          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+            {% set entities.names = entities.names + [entity | string | trim] %}
           {% else %}
-            {% set computers.names = computer %}
+            {% set entities.names = entity %}
           {% endif %}
         {% endif %}
-        {{ computers.names | unique | list | lower }}
+        {{ entities.names | unique | list }}
 
     sequence:
-      # Loop through computer_list
+      # Loop through entity_list
       - repeat:
-          for_each: '{{ computer_list }}'
+          for_each: '{{ entity_list }}'
           sequence:
             - variables:
-                notification_service: 'notify.{{ repeat.item }}'
+                computer: >-
+                  {{ device_attr(repeat.item, 'name') | lower }}
+                notification_service: 'notify.{{ computer }}'
                 image_path: >-
                   {%- if image is string -%}
                     {%- if image.startswith("http") -%}
@@ -262,7 +265,7 @@ script:
 
             - if:
                 - condition: template
-                  value_template: '{{ is_state("sensor." ~ repeat.item ~ "_user_notification", "AcceptsNotifications") }}'
+                  value_template: '{{ is_state("sensor." ~ computer ~ "_user_notification", "AcceptsNotifications") }}'
               then:
                 - choose:
                     # Send camera image.
