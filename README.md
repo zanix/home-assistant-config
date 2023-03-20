@@ -128,10 +128,6 @@ The rachio platform allows you to control your Rachio irrigation system
 
 The Radio Browser integration allows you to use the directory of radio stations collected on Radio Browser in Home Assistant
 
-### [Ring](https://www.home-assistant.io/integrations/ring)
-
-The ring implementation allows you to integrate your Ring.com devices in Home Assistant
-
 ### [SNMP](https://www.home-assistant.io/integrations/snmp)
 
 This is a standardized method for monitoring/managing network connected devices. SNMP uses a tree-like hierarchy where each node is an object.
@@ -202,7 +198,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>16 Custom Integrations</summary>
+<details><summary>17 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.4.1]
 
@@ -213,6 +209,12 @@ Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://g
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
+
+### [Dahua](https://github.com/rroller/dahua) [v0.9.44]
+
+Dahua Camera and Doorbell Home Assistant Integration
+
+Authors: [@rroller](https://github.com/rroller).
 
 ### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
 
@@ -501,7 +503,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ### Camera
 
-- [Ring Pro Doorbell](https://www.amazon.com/dp/B01DM6BDA4)
+- [Amcrest AD410 Doorbell](https://www.amazon.com/dp/B091KMT9GB)
 - [Wyze Cam v2](https://www.amazon.com/dp/B09XJ36RP2)
 
 ### Media
@@ -663,7 +665,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🔒 Front Door Lock Jammed (Disabled)
 - 🔒 Front Door Lock when Away
 - 🔒 Front Door Re-lock after Unlock
-- 🔔 Doorbell Motion
+- 🔔 Doorbell Human
 - 🔔 Doorbell Motion or Ring
 - 🔔 Doorbell Ring
 - 🖥️ [Ardena] Power Actions
