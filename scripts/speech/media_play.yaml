@@ -1,0 +1,198 @@
+---
+# Sends a media file or Text-to-Speech message to a media player.
+# This is normally called by script.notify_speech as it handles availability.
+media_play:
+  alias: Media Play
+  description: >-
+    Plays TTS or media at the specified volume then restores the volume to the
+    previous level. For Google Speakers, media will play without the extra
+    bleeps and bloops.
+  icon: mdi:cast-audio
+  mode: parallel
+
+  fields:
+    media_player:
+      name: Media Player
+      description: Which Media Player to play
+      example: media_player.living_room_speaker
+      required: true
+      selector:
+        entity:
+          domain: media_player
+    message:
+      name: Message
+      example: Message text for TTS
+      selector:
+        text:
+          multiline: true
+    media_location:
+      name: Media Content
+      description: The ID of the content to play. Platform dependent.
+      example: media-source://media_source/sounds/file.wav
+      selector:
+        text: null
+    media_type:
+      name: Content Type
+      description: The type of the content to play.
+      example: music
+      selector:
+        select:
+          options:
+            - channel
+            - episode
+            - image
+            - music
+            - playlist
+            - tvshow
+            - video
+    volume:
+      name: Volume
+      description: The announcement volume.
+      example: "50"
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: 10
+          unit_of_measurement: "%"
+
+  variables:
+    # Special handling for Google devices
+    is_google: '{{ "Google" in device_attr(media_player, "model") }}'
+    # Define voice service so I don't have to hunt for it below
+    voice_service: 'script.say_elevenlabs'
+
+  sequence:
+    - parallel:
+        - service: browser_mod.notification
+          data:
+            message: '{{ message }}'
+            duration: 30000
+
+        # Store Last Message
+        - service: script.store_mqtt_sensor
+          data:
+            name: 'last_message'
+            state: '{{ message }}'
+
+        # Store Last Speaker
+        - service: script.store_mqtt_sensor
+          data:
+            name: 'last_speaker'
+            state: '{{ media_player }}'
+
+    # Actions for Google only
+    - if:
+        - condition: template
+          value_template: '{{ is_google }}'
+      then:
+        # Mute to hide the Google bloop-bloop sound
+        - service: media_player.volume_mute
+          data:
+            is_volume_muted: true
+          target:
+            entity_id: "{{ media_player }}"
+        - delay:
+            milliseconds: 200
+
+        # Plays a 1 second silent track
+        - service: media_player.play_media
+          data:
+            media_content_type: music
+            media_content_id: media-source://media_source/sounds/1-second-of-silence.mp3
+          target:
+            entity_id: "{{ media_player }}"
+        - delay:
+            milliseconds: 200
+
+    # Store the current volume level
+    - variables:
+        current_volume: "{{ state_attr(media_player, 'volume_level') }}"
+
+    # Set the desired volume for the announcement
+    - if:
+        - condition: template
+          value_template: '{{ volume is number }}'
+      then:
+        - service: media_player.volume_set
+          data:
+            volume_level: "{{ volume / 100 }}"
+          target:
+            entity_id: "{{ media_player }}"
+
+    # Actions for Google only
+    - if:
+        - condition: template
+          value_template: '{{ is_google }}'
+      then:
+        # Unmute after setting the volume to hide the volume change sound
+        - service: media_player.volume_mute
+          data:
+            is_volume_muted: false
+          target:
+            entity_id: "{{ media_player }}"
+
+    - choose:
+        - conditions: '{{ media_location is string }}'
+          sequence:
+            # Play the desired media file
+            - service: media_player.play_media
+              data:
+                media_content_type: "{{ media_type | default('music', true) }}"
+                media_content_id: "{{ media_location }}"
+                enqueue: play
+              target:
+                entity_id: "{{ media_player }}"
+        - conditions: '{{ message is string }}'
+          sequence:
+            # Call the voice script directly since script.media_play calls this.
+            - service: '{{ voice_service }}'
+              data:
+                media_player: '{{ media_player }}'
+                message: '{{ message }}'
+
+    # Store the current volume level
+    - variables:
+        media_duration: "{{ state_attr(media_player, 'media_duration') | round(0, 'ceil') }}"
+
+    # Restore volume if it was changed
+    - if:
+        - condition: template
+          value_template: '{{ volume is number }}'
+      then:
+        # Delay for the media file
+        - delay:
+            seconds: "{{ media_duration }}"
+
+        # Actions for Google only
+        - if:
+            - condition: template
+              value_template: '{{ is_google }}'
+          then:
+            # Mute to hide the volume change sound
+            - service: media_player.volume_mute
+              data:
+                is_volume_muted: true
+              target:
+                entity_id: "{{ media_player }}"
+
+        # Restore volume
+        - service: media_player.volume_set
+          data:
+            volume_level: "{{ current_volume }}"
+          target:
+            entity_id: "{{ media_player }}"
+
+        # Actions for Google only
+        - if:
+            - condition: template
+              value_template: '{{ is_google }}'
+          then:
+            - delay:
+                milliseconds: 500
+            # Unmute to allow other announcements
+            - service: media_player.volume_mute
+              data:
+                is_volume_muted: false
+              target:
+                entity_id: "{{ media_player }}"

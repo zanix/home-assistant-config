@@ -1284,7 +1284,10 @@
             icon: local/icons/door-open.png
         - service: script.notify_speech
           data:
-            media_player: media_player.google_speakers
+            media_player:
+            - media_player.living_room_speaker
+            - media_player.family_room_speaker
+            - media_player.office_speaker
             message: '{{ message }}'
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
@@ -1373,13 +1376,20 @@
   condition: []
   action:
   - parallel:
+    - service: script.notify_speech
+      data:
+        media_player:
+        - media_player.living_room_speaker
+        - media_player.family_room_speaker
+        - media_player.office_speaker
+        message: There is a person at the front door
     - service: script.notify_hass_agent
       data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Doorbell
-        message: Someone is at the front door
+        message: There is a person at the front door
         camera: camera.doorbell
         duration: 10
     - service: script.notify_pipup
@@ -1387,7 +1397,7 @@
         entity:
         - media_player.living_room_shield
         title: Doorbell
-        message: Someone is at the front door
+        message: There is a person at the front door
         camera: camera.doorbell
         duration: 30
     - service: script.notify_pipup
@@ -1396,7 +1406,7 @@
         - media_player.family_room_shield
         - media_player.master_bedroom_shield
         title: Doorbell
-        message: Someone is at the front door
+        message: There is a person at the front door
         icon: local/icons/run-fast.png
     - if:
       - condition: state
@@ -1447,25 +1457,22 @@
             "timestamp") | int %} {{ (start <= current_time <= end) and (nap_start
             > current_time or current_time > nap_end) }}'
       then:
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.9
-        target:
-          entity_id: media_player.google_speakers
-      - service: media_player.play_media
-        data:
-          media_content_type: audio/mp3
-          media_content_id: media-source://media_source/sounds/ds9_doorchime.mp3
-          announce: true
-        target:
-          entity_id: media_player.google_speakers
-      - delay:
-          seconds: 3
-      - service: media_player.volume_set
-        data:
-          volume_level: 0.5
-        target:
-          entity_id: media_player.google_speakers
+      - parallel:
+        - service: script.media_play
+          data:
+            media_player: media_player.living_room_speaker
+            media_location: media-source://media_source/sounds/ds9_doorchime.mp3
+            volume: 90
+        - service: script.media_play
+          data:
+            media_player: media_player.family_room_speaker
+            media_location: media-source://media_source/sounds/ds9_doorchime.mp3
+            volume: 90
+        - service: script.media_play
+          data:
+            media_player: media_player.office_speaker
+            media_location: media-source://media_source/sounds/ds9_doorchime.mp3
+            volume: 90
     - service: script.notify_hass_agent
       data:
         entity:
@@ -1748,7 +1755,10 @@
             icon: local/icons/garage-open.png
         - service: script.notify_speech
           data:
-            media_player: media_player.google_speakers
+            media_player:
+            - media_player.living_room_speaker
+            - media_player.family_room_speaker
+            - media_player.office_speaker
             message: '{{ message }}'
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
         timeout: 00:30:00
@@ -1954,10 +1964,10 @@
       notification_id: '{{ trigger.entity_id.split(''.'')[1] }}'
   mode: single
   variables:
-    message: "The Subaru did not start.{{ \" \" }}\n{%- if 'doorNotLocked' in trigger.to_state.attributes.message
-      -%}\n  A door was not locked.\n{%- elif 'fuelLevelTooLow' in trigger.to_state.attributes.message
-      -%}\n  The fuel level is low.\n{%- elif 'unknown' in trigger.to_state.attributes.message
-      -%}\n  The reason is unknown. Please try again.\n{% endif %}"
+    message: "The car didn't start.{{ \" \" }}\n{%- if 'doorNotLocked' in trigger.to_state.attributes.message
+      -%}\n  A door wasn't locked.\n{%- elif 'fuelLevelTooLow' in trigger.to_state.attributes.message
+      -%}\n  The gas is low.\n{%- elif 'unknown' in trigger.to_state.attributes.message
+      -%}\n  I have no idea why. Please try again.\n{% endif %}"
 - id: '1665689705099'
   alias: "\U0001F3E2 Office Day Mode"
   description: Turns on the office computer and all the lights on a workday
@@ -2710,7 +2720,10 @@
         icon: local/icons/water-alert.png
     - service: script.notify_speech
       data:
-        media_player: media_player.google_speakers
+        media_player:
+        - media_player.living_room_speaker
+        - media_player.family_room_speaker
+        - media_player.office_speaker
         message: '{{ message }}'
   - wait_for_trigger:
     - platform: state
@@ -2746,8 +2759,8 @@
     title: Water Leak Detected
     location: '{{ trigger.to_state.name | replace(" Leak Sensor", "") | replace("
       Leak", "") | trim }}'
-    message: A water leak was detected in the {{ location }} and the water main has
-      been shut off.
+    message: There is a water leak in the {{ location }} and the water main has been
+      shut off.
 - id: '1665697158654'
   alias: "\U0001F4A7 Leak Stopped"
   description: Clears notifications when the water leak is stopped
@@ -2846,7 +2859,10 @@
         icon: local/icons/water-alert.png
     - service: script.notify_speech
       data:
-        media_player: media_player.google_speakers
+        media_player:
+        - media_player.living_room_speaker
+        - media_player.family_room_speaker
+        - media_player.office_speaker
         message: '{{ message }}'
   mode: single
   variables:
@@ -3088,7 +3104,10 @@
             icon: local/icons/window-open.png
         - service: script.notify_speech
           data:
-            media_player: media_player.google_speakers
+            media_player:
+            - media_player.living_room_speaker
+            - media_player.family_room_speaker
+            - media_player.office_speaker
             message: '{{ message }}'
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
@@ -3849,7 +3868,7 @@
       entity_id: timer.subaru_remote_start
   mode: single
   variables:
-    message: The Subaru successfully started
+    message: The car started and is running
 - id: '1673168239995'
   alias: ⚡ PVOutput
   description: Send PV and Energy data to PVOutput.org
@@ -3988,4 +4007,4 @@
         message: '{{ message }}'
   mode: single
   variables:
-    message: The Subaru remote start timer expired.
+    message: The car shut off and is no longer running.

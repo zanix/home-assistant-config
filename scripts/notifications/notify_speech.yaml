@@ -1,4 +1,7 @@
 ---
+# Sends a Text-to-Speech message to a media player.
+# This checks the current time as to not disturb sleeping kids (or adults) then
+# calls script.media_play to send the message.
 notify_speech:
   alias: '[Notify] Speech'
   description: 'Notify users via Text-to-speech.'
@@ -12,6 +15,7 @@ notify_speech:
       required: true
       selector:
         entity:
+          multiple: true
           domain: media_player
     message:
       name: 'Message'
@@ -20,23 +24,59 @@ notify_speech:
       selector:
         text:
           multiline: true
+    urgent:
+      name: 'Urgent'
+      example: 'Indicates this message is urgent and will bypass availability restrictions'
+      selector:
+        boolean:
+
+  # Set local variables for reuse in this script.
+  variables:
+    # Set to true to bypass availability restrictions.
+    is_urgent: '{{ iif(urgent is defined, urgent, false) }}'
+    media_player: '{{ media_player | default([]) }}'
+    media_player_list: >
+      {% set entities = namespace(names=[]) %}
+      {% if media_player %}
+        {# Convert to a list #}
+        {% if ',' in media_player %}
+          {% set entitynum = media_player.split(',') | count %}
+          {% for i in range(0, entitynum) %}
+            {% set entities.names = entities.names + [media_player.split(',')[i] | string | trim] %}
+          {% endfor %}
+        {% elif media_player[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+          {% set entities.names = entities.names + [media_player | string | trim] %}
+        {% else %}
+          {% set entities.names = media_player %}
+        {% endif %}
+      {% endif %}
+      {{ entities.names | unique | list }}
 
   sequence:
     - if:
-        - condition: state
-          entity_id: input_boolean.audio_notifications
-          state: 'on'
-        - condition: template
-          value_template: >-
-            {% set current_time = (now().second + (now().minute * 60) + (now().hour * 3600)) %}
-            {% set start = state_attr('input_datetime.audio_notifications_start', 'timestamp') | int %}
-            {% set end = state_attr('input_datetime.audio_notifications_end', 'timestamp') | int %}
-            {% set nap_start = state_attr('input_datetime.nap_time_start', 'timestamp') | int %}
-            {% set nap_end = state_attr('input_datetime.nap_time_end', 'timestamp') | int %}
-            {{ (start <= current_time <= end) and (nap_start > current_time or current_time > nap_end) }}
+        - condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ is_urgent }}"
+            - condition: and
+              conditions:
+                - condition: state
+                  entity_id: input_boolean.audio_notifications
+                  state: "on"
+                - condition: template
+                  value_template: >-
+                    {% set current_time = (now().second + (now().minute * 60) + (now().hour * 3600)) %}
+                    {% set start = state_attr('input_datetime.audio_notifications_start', 'timestamp') | int %}
+                    {% set end = state_attr('input_datetime.audio_notifications_end', 'timestamp') | int %}
+                    {% set nap_start = state_attr('input_datetime.nap_time_start', 'timestamp') | int %}
+                    {% set nap_end = state_attr('input_datetime.nap_time_end', 'timestamp') | int %}
+                    {{ (start <= current_time <= end) and (nap_start > current_time or current_time > nap_end) }}
 
       then:
-        - service: script.say
-          data:
-            media_player: '{{ media_player }}'
-            message: '{{ message }}'
+        - repeat:
+            for_each: '{{ media_player_list }}'
+            sequence:
+              - service: script.media_play
+                data:
+                  media_player: '{{ repeat.item }}'
+                  message: '{{ message }}'
