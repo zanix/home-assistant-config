@@ -356,7 +356,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.7]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.8]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -428,7 +428,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 
-### [Noctis](https://github.com/aFFekopp/noctis) [v2.13]
+### [Noctis](https://github.com/aFFekopp/noctis) [v2.14]
 
 🐵 Dark Blue Theme for Home Assistant
 
