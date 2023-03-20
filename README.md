@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1826 total entities**,
+This Home Assistant install has approximately **1824 total entities**,
 including **902 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -540,7 +540,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>149 Automations</summary>
+<details><summary>145 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -681,11 +681,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
-- 🗺️ Leaving Costco
-- 🗺️ Leaving Fred Meyer
-- 🗺️ Leaving Hair Salon
-- 🗺️ Leaving Wal-Mart
-- 🗺️ Leaving WinCo
+- 🗺️ Leaving Zone
 - 🚦 Front Door Light Switch Status
 - 🚦 Garage Light Switch Status
 - 🚦 Office Light Switch Status
