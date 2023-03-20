@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1828 total entities**,
-including **906 sensors**.
+This Home Assistant install has approximately **1826 total entities**,
+including **902 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -36,7 +36,7 @@ The androidtv platform allows you to control an Android TV device or Amazon Fire
 
 ### [Denon AVR Network Receivers](https://www.home-assistant.io/integrations/denonavr)
 
-The denonavr platform allows you to control Denon Network Receivers from Home Assistant
+The denonavr platform allows you to control Denon Network Receivers
 
 ### [ecobee](https://www.home-assistant.io/integrations/ecobee)
 
@@ -46,7 +46,7 @@ The ecobee integration lets you control and view sensor data from ecobee thermos
 
 ### [ESPHome](https://www.home-assistant.io/integrations/esphome)
 
-Connect ESPHome devices directly to Home Assistant with the native ESPHome API
+Connect ESPHome devices directly with the native ESPHome API
 
 ### [Forecast.Solar](https://www.home-assistant.io/integrations/forecast_solar)
 
@@ -54,7 +54,7 @@ The Forecast.Solar service provides solar production forecasting for your solar 
 
 ### [Generic Camera](https://www.home-assistant.io/integrations/github)
 
-The generic camera platform allows you to integrate any IP camera or other URL into Home Assistant
+The generic camera platform allows you to integrate any IP camera or other URL
 
 ### [GitHub](https://www.home-assistant.io/integrations/generic)
 
@@ -62,7 +62,7 @@ The GitHub integration allows you to monitor your favorite GitHub repositories
 
 ### [Glances](https://www.home-assistant.io/integrations/glances)
 
-The glances integration allows you to monitor the system information provided by the Glances API.
+The glances integration allows you to monitor the system information provided by the Glances API
 
 ### [Google Cast](https://www.home-assistant.io/integrations/cast)
 
@@ -70,7 +70,7 @@ Google Cast integration
 
 ### [HomeKit Controller](https://www.home-assistant.io/integrations/homekit_controller)
 
-The HomeKit controller integration allows you to connect accessories with the "Works with HomeKit" logo to Home Assistant
+The HomeKit controller integration allows you to connect accessories with the "Works with HomeKit" logo
 
 ### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
 
@@ -90,11 +90,11 @@ The harmony remote platform allows you to control the state of your Harmony Hub 
 
 ### [Meater](https://www.home-assistant.io/integrations/meater)
 
-The Meater Smart Meat Thermometer integration allows for communicating with the Meater Temperature Probe from Apption Labs.
+The Meater Smart Meat Thermometer integration allows for communicating with the Meater Temperature Probe from Apption Labs
 
 ### [MJPEG IP Camera](https://www.home-assistant.io/integrations/mjpeg)
 
-The MJPEG IP Camera integration allows you to integrate IP cameras which are capable to stream their video with MJPEG (Motion JPEG) into Home Assistant
+The MJPEG IP Camera integration allows you to integrate IP cameras which are capable to stream their video with MJPEG (Motion JPEG)
 
 ### [Mobile App](https://www.home-assistant.io/integrations/mobile_app)
 
@@ -126,13 +126,13 @@ The rachio platform allows you to control your Rachio irrigation system
 
 ### [Radio Browser](https://www.home-assistant.io/integrations/radio_browser)
 
-The Radio Browser integration allows you to use the directory of radio stations collected on Radio Browser in Home Assistant
+The Radio Browser integration allows you to use the directory of radio stations collected on Radio Browser
 
 ### [SNMP](https://www.home-assistant.io/integrations/snmp)
 
 This is a standardized method for monitoring/managing network connected devices. SNMP uses a tree-like hierarchy where each node is an object.
 
-This is used to get printer status data.
+This is used to get printer status data
 
 ### [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4)
 
@@ -152,11 +152,11 @@ The Steam integration will allow you to track the online status of public Steam 
 
 ### [Sun](https://www.home-assistant.io/integrations/sun)
 
-The sun integration will use the location as configured in your Home Assistant configuration to track if the sun is above or below the horizon
+The sun integration will use the location as configured to track if the sun is above or below the horizon
 
 ### [System Monitor](https://www.home-assistant.io/integrations/systemmonitor)
 
-Monitors disk usage, memory usage, CPU usage, and running processes.
+Monitors disk usage, memory usage, CPU usage, and running processes
 
 ### [Tasmota](https://www.home-assistant.io/integrations/tasmota)
 
@@ -164,7 +164,7 @@ This integration allows to control of Tasmota devices over MQTT
 
 ### [Twinkly](https://www.home-assistant.io/integrations/twinkly)
 
-The Twinkly integration allows you to control Twinkly LED string from Home Assistant
+The Twinkly integration allows you to control Twinkly LED string
 
 ### [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi)
 
@@ -188,11 +188,11 @@ WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to 
 
 ### [Yamaha MusicCast](https://www.home-assistant.io/integrations/yamaha_musiccast)
 
-The Yamaha MusicCast integration allows you to control Yamaha MusicCast Receivers from Home Assistant.
+The Yamaha MusicCast integration allows you to control Yamaha MusicCast Receivers
 
 ### [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js)
 
-The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS UI](https://zwave-js.github.io/zwave-js-ui) driver. This is the recommended Z-Wave integration for Home Assistant.
+The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS UI](https://zwave-js.github.io/zwave-js-ui) driver. This is the recommended Z-Wave integration for Home Assistant
 
 ---
 
@@ -536,12 +536,12 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>148 Automations</summary>
+<details><summary>149 Automations</summary>
 
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
 - ⏯ Family Room Sound Mode
-- ⏯ Living Room Media Auto Off
+- ⏯ Living Room Media Auto Off (Disabled)
 - ⏯ Living Room Media State at Night (Disabled)
 - ⏯ Living Room Sound Mode
 - ⏯ Master Bedroom Media Auto Off
@@ -610,6 +610,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💬 Garbage Collection
 - 💬 Potty Time (Disabled)
 - 💬 Subaru Failed Notification
+- 💬 Subaru Remote Start Expired Notification
 - 💬 Subaru Started Notification
 - 💬 Window Left Open (Disabled)
 - 📋 [Controller] Hue Dimmer Switch

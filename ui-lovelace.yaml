@@ -493,13 +493,14 @@ decluttering_templates:
         style:
           .: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
             \ translate3d(0,0,0);\n  content: \"\";\n  position: absolute;\n  height:\
-            \ 100%;\n  width: 100%;\n\n  {%- if not states('[[entity]]') in [\"off\"\
-            , \"unknown\", \"unavailable\", \"idle\"] and state_attr('[[entity]]',\
-            \ \"entity_picture\") -%}\n  background: url( '{{ state_attr('[[entity]]',\
-            \ \"entity_picture\") }}') center no-repeat;\n  {%- endif -%}\n  filter:\
-            \ blur(100px) saturate(200%);\n  background-size: 100% 100%;\n}\nha-card\
-            \ {\n  transform: translate3d(0,0,0);\n  -webkit-transform: translate3d(0,0,0);\n\
-            }\n"
+            \ 100%;\n  width: 100%;\n\n  background: \n  {%- if not states('[[entity]]')\
+            \ in [\"off\", \"unknown\", \"unavailable\", \"idle\"] and state_attr('[[entity]]',\
+            \ \"entity_picture\") -%}\n    url( '{{ state_attr('[[entity]]', \"entity_picture\"\
+            ) }}') center no-repeat;\n  {%- elif not states('[[entity]]') in [\"off\"\
+            , \"unknown\", \"unavailable\"] -%}\n    url('/local/icons/idle_media_player.png')\
+            \ center no-repeat;\n  {%- endif -%}\n  filter: blur(100px) saturate(200%);\n\
+            \  background-size: 100% 100%;\n}\nha-card {\n  transform: translate3d(0,0,0);\n\
+            \  -webkit-transform: translate3d(0,0,0);\n}\n"
           expander-card$: ".header-overlay {\n  right: initial;\n  left: 0;\n}\n"
       cards:
       - cards:
@@ -534,23 +535,6 @@ decluttering_templates:
               type: custom:mushroom-media-player-card
               volume_controls:
               - volume_set
-            - card:
-                alignment: start
-                card_mod:
-                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
-                    \ none;\n}\n"
-                chips:
-                - entity: '[[sound_mode]]'
-                  tap_action:
-                    action: none
-                  type: entity
-                type: custom:mushroom-chips-card
-              conditions:
-              - entity: '[[entity]]'
-                state_not: unavailable
-              - entity: '[[sound_mode]]'
-                state_not: unavailable
-              type: conditional
             - card:
                 alignment: center
                 chips:
@@ -588,8 +572,6 @@ decluttering_templates:
                 state_not: idle
               - entity: '[[entity]]'
                 state_not: standby
-              - entity: '[[sound_mode]]'
-                state: unavailable
               type: conditional
             layout:
               grid-template-columns: 65px auto 105px
@@ -603,6 +585,45 @@ decluttering_templates:
             state_not: unavailable
           - entity: '[[entity]]'
             state_not: idle
+          type: conditional
+        - card:
+            alignment: start
+            card_mod:
+              style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                \ none;\n}\n"
+            chips:
+            - content: '{{ states("[[sound_mode]]") }}'
+              entity: '[[sound_mode]]'
+              icon: mdi:surround-sound
+              tap_action:
+                action: fire-dom-event
+                browser_mod:
+                  data:
+                    card_mod:
+                      style:
+                        ha-dialog$: ".mdc-dialog .mdc-dialog__container .mdc-dialog__surface,\
+                          \ .mdc-dialog .mdc-dialog__content {\n  overflow: visible\
+                          \ !important;\n}\n"
+                    content:
+                      card_mod:
+                        style: "ha-card {\n  --ha-card-background: none;\n  overflow:\
+                          \ visible !important;\n}\n"
+                      cards:
+                      - entity: '[[sound_mode]]'
+                        icon_color: indigo
+                        layout: horizontal
+                        name: Sound Mode
+                        secondary_info: none
+                        type: custom:mushroom-select-card
+                      type: custom:vertical-stack-in-card
+                  service: browser_mod.popup
+              type: template
+            type: custom:mushroom-chips-card
+          conditions:
+          - entity: '[[entity]]'
+            state_not: unavailable
+          - entity: '[[sound_mode]]'
+            state_not: unavailable
           type: conditional
         - artwork: none
           card_mod:
@@ -624,6 +645,7 @@ decluttering_templates:
             columns: 3
           type: custom:mini-media-player
         child-padding: 0.5em
+        expanded: '[[expanded]]'
         gap: 0em
         overlay-margin: 0.5em
         padding: 0em
@@ -642,7 +664,7 @@ decluttering_templates:
               card_mod:
                 style:
                   mushroom-title-card$: "h1 {\n  margin-left: 1.2em !important;\n\
-                    }\n"
+                    }\nh2 {\n  text-shadow: 0 0 18px rgba(0, 0, 0, 0.5);\n}\n"
               type: custom:mod-card
             - card:
                 alignment: center
@@ -697,15 +719,19 @@ decluttering_templates:
                 state_not: standby
               type: conditional
             - card:
-                alignment: center
-                subtitle: "{%- set entity = \"[[entity]]\" -%} {%- set media_type\
-                  \ = state_attr(entity, \"media_content_type\") -%} {%- if media_type\
-                  \ == \"music\" -%}\n  {{ state_attr(entity, \"media_artist\") }}\
-                  \ - {{ state_attr(entity, \"media_title\") }}\n{%- elif media_type\
-                  \ == \"movie\" -%}\n  {{ state_attr(entity, \"media_title\") }}\n\
-                  {%- elif media_type == \"tvshow\" -%}\n  {{ state_attr(entity, \"\
-                  media_series_title\") }}\n{%- endif -%}"
-                type: custom:mushroom-title-card
+                card:
+                  alignment: center
+                  subtitle: "{%- set entity = \"[[entity]]\" -%}\n{{ [\n  state_attr(entity,\
+                    \ \"media_artist\") | default(None, true),\n  state_attr(entity,\
+                    \ \"media_title\") | default(None, true),\n  state_attr(entity,\
+                    \ \"media_series_title\") | default(None, true)\n  ] | reject(\"\
+                    ==\", None) | list | join(\" - \")\n}}"
+                  type: custom:mushroom-title-card
+                card_mod:
+                  style:
+                    mushroom-title-card$: "h2 {\n  text-shadow: 0 0 18px rgba(0, 0,\
+                      \ 0, 0.5);\n}\n"
+                type: custom:mod-card
               conditions:
               - entity: '[[entity]]'
                 state_not: unavailable
@@ -777,6 +803,7 @@ decluttering_templates:
         type: custom:mini-media-player
       type: custom:vertical-stack-in-card
     default:
+    - expanded: false
     - buttons:
       - icon: mdi:plex
         id: com.plexapp.android
@@ -1127,7 +1154,7 @@ decluttering_templates:
         icon: '[[icon]]'
         icon_color: '[[icon_color]]'
         primary: '[[primary]]'
-        secondary: '{{ states("[[temperature]]") }} °F'
+        secondary: '{{ states("[[temperature]]")|round(1) }} °F'
         tap_action:
           action: navigate
           navigation_path: '[[path]]'
@@ -1153,7 +1180,7 @@ decluttering_templates:
         style: "ha-card {\n  --ha-card-background: none\n}\n"
       cards:
       - elements:
-        - entity: '[[universal]]'
+        - entity: '[[shield]]'
           icon: mdi:power
           state_color: true
           style:
@@ -1167,7 +1194,7 @@ decluttering_templates:
               command: toggle
             service: media_player.toggle
             target:
-              entity_id: '[[universal]]'
+              entity_id: '[[shield]]'
           type: state-icon
         - icon: mdi:chevron-up
           style:
@@ -2826,22 +2853,9 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - name: Living Room
+                    - expanded: true
                     - entity: media_player.living_room_universal
-                    - sound_mode: sensor.yamaha_rx_v679_sound_mode
-                  - card:
-                      entity: media_player.cast_living_room
-                      hide:
-                        power: true
-                        volume: true
-                      info: scroll
-                      name: Cast
-                      type: custom:mini-media-player
-                    conditions:
-                    - entity: sensor.living_room_shield_source
-                      state_not: Plex
-                    - entity: sensor.living_room_shield_source
-                      state_not: Netflix
-                    type: conditional
+                    - sound_mode: select.yamaha_sound_mode
                   type: custom:vertical-stack-in-card
               service: browser_mod.popup
           type: template
@@ -2983,22 +2997,9 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - name: Family Room
+                    - expanded: true
                     - entity: media_player.family_room_universal
-                    - sound_mode: sensor.denon_avr_s760h_sound_mode
-                  - card:
-                      entity: media_player.cast_family_room
-                      hide:
-                        power: true
-                        volume: true
-                      info: scroll
-                      name: Cast
-                      type: custom:mini-media-player
-                    conditions:
-                    - entity: sensor.family_room_shield_source
-                      state_not: Plex
-                    - entity: sensor.family_room_shield_source
-                      state_not: Netflix
-                    type: conditional
+                    - sound_mode: select.denon_sound_mode
                   type: custom:vertical-stack-in-card
               service: browser_mod.popup
           type: template
@@ -3173,6 +3174,7 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - name: Master Bedroom
+                    - expanded: true
                     - entity: media_player.master_bedroom_universal
                     - buttons:
                       - icon: mdi:plex
@@ -3207,20 +3209,6 @@ views:
                         id: com.spocky.projengmenu
                         name: Home
                         type: source
-                  - card:
-                      entity: media_player.cast_master_bedroom
-                      hide:
-                        power: true
-                        volume: true
-                      info: scroll
-                      name: Cast
-                      type: custom:mini-media-player
-                    conditions:
-                    - entity: sensor.master_bedroom_shield_source
-                      state_not: Plex
-                    - entity: sensor.master_bedroom_shield_source
-                      state_not: Netflix
-                    type: conditional
                   type: custom:vertical-stack-in-card
               service: browser_mod.popup
           type: template
@@ -3393,7 +3381,9 @@ views:
       - primary: Garage
       - entity: light.garage
       - temperature: sensor.garage_multisensor_air_temperature
-      - icon: mdi:garage-variant
+      - icon: ' {%- if is_state(entity, ''open'') -%} mdi:garage-open-variant {%-
+          elif states(entity) in [''opening'', ''closing''] -%} mdi:garage-alert-variant
+          {%- else -%} mdi:garage-variant {%- endif -%} '
       - icon_color: 96, 125, 139
       - path: garage
       - chips:
@@ -3402,9 +3392,9 @@ views:
               style: "@keyframes phase {\n  50% {opacity: 0;}\n}\nha-card {\n  animation:\
                 \ phase 1.5s ease-out infinite;\n}"
             entity: cover.garage_door
-            icon: "{% if is_state(entity, \"open\") %}\n  mdi:garage-open-variant\n\
-              {% elif states(entity) in [\"opening\", \"closing\"]  %}\n  mdi:garage-alert-variant\n\
-              {% endif %}"
+            icon: "{%- if is_state(entity, \"open\") -%}\n  mdi:garage-open-variant\n\
+              {%- elif states(entity) in [\"opening\", \"closing\"] -%}\n  mdi:garage-alert-variant\n\
+              {%- endif -%}"
             icon_color: "{% if is_state(entity, \"open\") %}\n  red\n{% elif states(entity)\
               \ in [\"opening\", \"closing\"]  %}\n  orange\n{% endif %}"
             tap_action:
@@ -3522,7 +3512,9 @@ views:
         - title: XMas
           type: custom:mushroom-title-card
         - cards:
-          - entity: light.xmas_tree
+          - double_tap_action:
+              action: more-info
+            entity: light.xmas_tree
             hold_action:
               action: toggle
             icon: mdi:pine-tree
@@ -3540,7 +3532,9 @@ views:
                   title: Tree
                 service: browser_mod.popup
             type: custom:mushroom-light-card
-          - entity: light.wled_mario_star
+          - double_tap_action:
+              action: more-info
+            entity: light.wled_mario_star
             hold_action:
               action: toggle
             icon: mdi:star-face
@@ -3624,7 +3618,9 @@ views:
       name: Lamp
       show_brightness_control: true
       type: custom:mushroom-light-card
-    - entity: light.living_room_floor_lamp
+    - double_tap_action:
+        action: more-info
+      entity: light.living_room_floor_lamp
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -3643,13 +3639,19 @@ views:
       type: custom:mushroom-light-card
     - cards:
       - entity: switch.hallway_light
+        layout: vertical
         name: Hallway
+        secondary_info: none
         type: custom:mushroom-light-card
       - entity: switch.front_entry_light
+        layout: vertical
         name: Entry
+        secondary_info: none
         type: custom:mushroom-light-card
       - entity: switch.garage_entry_light
+        layout: vertical
         name: Garage Entry
+        secondary_info: none
         type: custom:mushroom-light-card
       columns: 3
       square: false
@@ -3683,32 +3685,31 @@ views:
               service: browser_mod.popup
           type: template
     - cards:
-      - entity: remote.living_room
+      - entity: media_player.living_room_shield
         icon: mdi:motion-play-outline
-        icon_color: "{%- if is_state_attr(entity, \"current_activity\", \"Shield TV\"\
-          ) -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
+        icon_color: "{%- if not is_state(entity, \"off\") -%}\n  green\n{%- else -%}\n\
+          \  grey\n{%- endif -%}"
         primary: Shield
         tap_action:
           action: call-service
-          data:
-            activity: Shield TV
-          service: remote.turn_on
+          data: {}
+          service: media_player.turn_on
           target:
-            entity_id: remote.living_room
+            entity_id: media_player.living_room_shield
         type: custom:mushroom-template-card
       - card:
-          entity: remote.living_room
+          entity: media_player.living_room_shield
           icon: mdi:power
           icon_color: red
           primary: Power
           tap_action:
             action: call-service
-            service: remote.turn_off
+            service: media_player.turn_off
             target:
-              entity_id: remote.living_room
+              entity_id: media_player.living_room_shield
           type: custom:mushroom-template-card
         conditions:
-        - entity: remote.living_room
+        - entity: media_player.living_room_shield
           state: 'on'
         type: conditional
       columns: 2
@@ -3720,21 +3721,9 @@ views:
         variables:
         - name: Living Room
         - entity: media_player.living_room_universal
-        - sound_mode: sensor.yamaha_rx_v679_sound_mode
+        - sound_mode: select.yamaha_sound_mode
       conditions:
-      - entity: remote.living_room
-        state_not: 'off'
-      type: conditional
-    - card:
-        entity: media_player.cast_living_room
-        hide:
-          power: true
-          volume: true
-        info: scroll
-        name: Cast
-        type: custom:mini-media-player
-      conditions:
-      - entity: media_player.living_room_shield
+      - entity: media_player.living_room_universal
         state_not: 'off'
       type: conditional
     - entity: media_player.living_room_speaker
@@ -3938,7 +3927,7 @@ views:
         variables:
         - name: Family Room
         - entity: media_player.family_room_universal
-        - sound_mode: sensor.denon_avr_s760h_sound_mode
+        - sound_mode: select.denon_sound_mode
       conditions:
       - entity: sensor.family_room_denon_source
         state: Shield
@@ -3987,18 +3976,6 @@ views:
         type: custom:mini-media-player
       conditions:
       - entity: sensor.family_room_denon_source
-        state_not: 'off'
-      type: conditional
-    - card:
-        entity: media_player.cast_family_room
-        hide:
-          power: true
-          volume: true
-        info: scroll
-        name: Cast
-        type: custom:mini-media-player
-      conditions:
-      - entity: media_player.family_room_shield
         state_not: 'off'
       type: conditional
     - entity: media_player.family_room_speaker
@@ -4123,21 +4100,27 @@ views:
         - content_info: none
           entity: switch.adaptive_lighting_adapt_brightness_office
           icon: mdi:brightness-auto
-          icon_color: green
+          icon_color: amber
           tap_action:
             action: toggle
           type: entity
         - content_info: none
           entity: switch.adaptive_lighting_adapt_color_office
           icon: mdi:palette
-          icon_color: purple
+          icon_color: pink
           tap_action:
             action: toggle
           type: entity
         - content_info: none
           entity: switch.adaptive_lighting_sleep_mode_office
           icon: mdi:sleep
-          icon_color: amber
+          icon_color: cyan
+          tap_action:
+            action: toggle
+          type: entity
+        - content_info: none
+          entity: switch.adaptive_lighting_office
+          icon_color: lime
           tap_action:
             action: toggle
           type: entity
@@ -4150,7 +4133,9 @@ views:
           tap_action:
             action: more-info
           type: template
-    - entity: light.office_light
+    - double_tap_action:
+        action: more-info
+      entity: light.office_light
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -4169,7 +4154,9 @@ views:
       show_color_temp_control: true
       type: custom:mushroom-light-card
       use_light_color: true
-    - entity: light.office_lamp
+    - double_tap_action:
+        action: more-info
+      entity: light.office_lamp
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -4187,7 +4174,9 @@ views:
       show_color_temp_control: true
       type: custom:mushroom-light-card
       use_light_color: true
-    - entity: light.office_desk_led
+    - double_tap_action:
+        action: more-info
+      entity: light.office_desk_led
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -4316,7 +4305,9 @@ views:
       name: Main
       show_brightness_control: true
       type: custom:mushroom-light-card
-    - entity: light.master_bedroom_floor_lamp
+    - double_tap_action:
+        action: more-info
+      entity: light.master_bedroom_floor_lamp
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -4434,18 +4425,6 @@ views:
             type: source
       conditions:
       - entity: remote.master_bedroom
-        state_not: 'off'
-      type: conditional
-    - card:
-        entity: media_player.cast_master_bedroom
-        hide:
-          power: true
-          volume: true
-        info: scroll
-        name: Cast
-        type: custom:mini-media-player
-      conditions:
-      - entity: media_player.master_bedroom_shield
         state_not: 'off'
       type: conditional
     type: vertical-stack
@@ -6081,7 +6060,9 @@ views:
         tap_action:
           action: none
         type: template
-  - cards:
+  - card_mod:
+      style: "ha-card {\n  overflow: visible !important;\n}\n"
+    cards:
     - card_mod:
         style: "mushroom-shape-icon {\n  {% if is_state(config.entity, 'heat_cool')\
           \ %}\n    --card-mod-icon: mdi:autorenew;\n  {% elif is_state(config.entity,\
@@ -6113,10 +6094,12 @@ views:
         secondary_info: name
         type: custom:mushroom-entity-card
       type: horizontal-stack
-    - entities:
-      - entity: select.ecobee_preset
-        name: Profile
-      type: entities
+    - entity: select.ecobee_preset
+      icon_color: cyan
+      layout: horizontal
+      name: Profile
+      secondary_info: none
+      type: custom:mushroom-select-card
     - cardName: historycard-ecobee-mode
       graphs:
       - entities:
@@ -6406,21 +6389,27 @@ views:
         - content_info: none
           entity: switch.adaptive_lighting_adapt_brightness_office
           icon: mdi:brightness-auto
-          icon_color: green
+          icon_color: amber
           tap_action:
             action: toggle
           type: entity
         - content_info: none
           entity: switch.adaptive_lighting_adapt_color_office
           icon: mdi:palette
-          icon_color: purple
+          icon_color: pink
           tap_action:
             action: toggle
           type: entity
         - content_info: none
           entity: switch.adaptive_lighting_sleep_mode_office
           icon: mdi:sleep
-          icon_color: amber
+          icon_color: cyan
+          tap_action:
+            action: toggle
+          type: entity
+        - content_info: none
+          entity: switch.adaptive_lighting_office
+          icon_color: lime
           tap_action:
             action: toggle
           type: entity
@@ -7214,8 +7203,14 @@ views:
       - entity: sensor.pv_power
         icon: mdi:solar-power-variant
         type: entity
-      - entity: sensor.load_monthly
-        type: entity
+      - content: "{%- if not states(entity) in ['unknown', 'unavailable'] -%}\n  {{\
+          \ (states(entity) | float(default=0)) | round(1) }}\n  {{ state_attr(entity,\
+          \ 'unit_of_measurement') }}\n{%- endif -%}"
+        entity: sensor.load_monthly
+        icon: mdi:power-plug
+        tap_action:
+          action: more-info
+        type: template
       - content: '{{ iif(not states(entity) in [''unknown'', ''unavailable''], states(entity)
           | float(default=0)) }}'
         entity: sensor.month_power_cost
@@ -7280,12 +7275,26 @@ views:
   - cards:
     - cards:
       - cards:
-        - title: Daily Usage
+        - title: Daily
           type: custom:mushroom-title-card
         - entity: sensor.grid_net_daily
           icon: mdi:transmission-tower
           icon_color: blue
-          name: Grid
+          name: Net
+          primary_info: state
+          secondary_info: name
+          type: custom:mushroom-entity-card
+        - entity: sensor.pv_daily
+          icon: mdi:solar-panel
+          icon_color: red
+          name: Solar
+          primary_info: state
+          secondary_info: name
+          type: custom:mushroom-entity-card
+        - entity: sensor.battery_net_daily
+          icon: mdi:battery-high
+          icon_color: lime
+          name: Battery
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
@@ -7425,12 +7434,26 @@ views:
           type: custom:mushroom-template-card
         type: vertical-stack
       - cards:
-        - title: Monthly Usage
+        - title: Monthly
           type: custom:mushroom-title-card
         - entity: sensor.grid_net_monthly
           icon: mdi:transmission-tower
           icon_color: blue
-          name: Grid
+          name: Net
+          primary_info: state
+          secondary_info: name
+          type: custom:mushroom-entity-card
+        - entity: sensor.pv_monthly
+          icon: mdi:solar-panel
+          icon_color: red
+          name: Solar
+          primary_info: state
+          secondary_info: name
+          type: custom:mushroom-entity-card
+        - entity: sensor.battery_net_monthly
+          icon: mdi:battery-high
+          icon_color: lime
+          name: Battery
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
@@ -7573,12 +7596,26 @@ views:
     - cards:
       - cards:
         - cards:
-          - title: Yearly Usage
+          - title: Yearly
             type: custom:mushroom-title-card
           - entity: sensor.grid_net_yearly
             icon: mdi:transmission-tower
             icon_color: blue
-            name: Grid
+            name: Net
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - entity: sensor.pv_yearly
+            icon: mdi:solar-panel
+            icon_color: red
+            name: Solar
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - entity: sensor.battery_net_yearly
+            icon: mdi:battery-high
+            icon_color: lime
+            name: Battery
             primary_info: state
             secondary_info: name
             type: custom:mushroom-entity-card
@@ -7664,6 +7701,105 @@ views:
                 service: browser_mod.popup
             type: custom:mushroom-template-card
           type: vertical-stack
+        - cards:
+          - title: Lifetime
+            type: custom:mushroom-title-card
+          - entity: sensor.grid_energy_in
+            icon: mdi:transmission-tower
+            icon_color: blue
+            name: Net
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - entity: sensor.pv_energy
+            icon: mdi:solar-panel
+            icon_color: red
+            name: Solar
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - entity: sensor.grid_energy_in
+            icon: mdi:transmission-tower-import
+            icon_color: amber
+            name: Import
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - entity: sensor.grid_energy_out
+            icon: mdi:transmission-tower-export
+            icon_color: green
+            name: Export
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - entity: sensor.load_energy
+            icon: mdi:calendar-multiple
+            icon_color: orange
+            name: Load
+            primary_info: state
+            secondary_info: name
+            type: custom:mushroom-entity-card
+          - icon: mdi:chart-sankey-variant
+            icon_color: pink
+            primary: Sankey Chart
+            secondary: Lifetime
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                data:
+                  content:
+                    card_mod:
+                      style: "ha-card {\n  --ha-card-background: none\n}\n"
+                    height: 700
+                    round: 1
+                    sections:
+                    - entities:
+                      - children:
+                        - sensor.load_energy
+                        - sensor.battery_energy_in
+                        color: var(--purple-color)
+                        entity_id: sensor.grid_energy_in
+                        name: Grid Import
+                        remaining:
+                          color: var(--grey-color)
+                          name: Inverter
+                      - children:
+                        - sensor.load_energy
+                        color: var(--pink-color)
+                        entity_id: sensor.battery_energy_out
+                        name: Battery
+                      - children:
+                        - sensor.load_energy
+                        - sensor.battery_energy_in
+                        - sensor.grid_energy_out
+                        color: var(--orange-color)
+                        entity_id: sensor.pv_energy
+                        name: Solar
+                        remaining:
+                          color: var(--grey-color)
+                          name: Inverter
+                    - entities:
+                      - color: var(--cyan-color)
+                        entity_id: sensor.load_energy
+                        name: Total Energy Used
+                        remaining:
+                          color: var(--grey-color)
+                          name: Other
+                      - color: var(--pink-color)
+                        entity_id: sensor.battery_energy_in
+                        name: Battery Charge
+                      - color: var(--purple-color)
+                        entity_id: sensor.grid_energy_out
+                        name: Grid Export
+                    show_names: true
+                    type: custom:sankey-chart
+                    unit_prefix: k
+                    wide: true
+                  size: wide
+                  title: Sankey Chart
+                service: browser_mod.popup
+            type: custom:mushroom-template-card
+          type: vertical-stack
         type: horizontal-stack
       type: vertical-stack
     type: custom:swipe-card
@@ -7691,26 +7827,6 @@ views:
         labels: false
       type: custom:mini-graph-card
       upper_bound: 4800
-    - cards:
-      - entity: sensor.pv_daily
-        icon: mdi:calendar-today
-        name: Today
-        type: entity
-      - entity: sensor.pv_monthly
-        icon: mdi:calendar-month
-        name: This Month
-        type: entity
-      - entity: sensor.pv_yearly
-        icon: mdi:calendar-range
-        name: This Year
-        type: entity
-      - entity: sensor.pv_energy
-        icon: mdi:calendar-multiple
-        name: Lifetime
-        type: entity
-      columns: 2
-      square: false
-      type: grid
     type: vertical-stack
   - cards:
     - title: Battery
@@ -7791,34 +7907,6 @@ views:
       style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
         }"
       type: custom:bar-card
-    - cards:
-      - entity: sensor.battery_power_in
-        icon: mdi:battery-arrow-up
-        name: Power In
-        type: entity
-      - entity: sensor.battery_current
-        icon: mdi:battery-plus
-        name: Current
-        type: entity
-      - entity: sensor.battery_power_out
-        icon: mdi:battery-arrow-down
-        name: Power Out
-        type: entity
-      - entity: sensor.battery_net_daily
-        icon: mdi:calendar-today
-        name: Daily
-        type: entity
-      - entity: sensor.battery_net_monthly
-        icon: mdi:calendar-month
-        name: Monthly
-        type: entity
-      - entity: sensor.battery_net_yearly
-        icon: mdi:calendar-multiple
-        name: Yearly
-        type: entity
-      columns: 3
-      square: false
-      type: grid
     type: vertical-stack
   - cards:
     - title: Realtime Power
@@ -7834,11 +7922,20 @@ views:
         min: -4800
         name: Grid Power
         severity:
-        - color: var(--blue-color)
+        - color: var(--purple-color)
           from: -4800
-          to: -2400
+          to: -3840
+        - color: var(--blue-color)
+          from: -3840
+          to: -2880
+        - color: var(--light-blue-color)
+          from: -2880
+          to: -1920
         - color: var(--cyan-color)
-          from: -2399
+          from: -1920
+          to: -960
+        - color: var(--teal-color)
+          from: -960
           to: 0
         - color: var(--green-color)
           from: 0
@@ -7906,13 +8003,13 @@ views:
         - color: var(--blue-color)
           from: -10368
           to: -7776
-        - color: var(--teal-color)
+        - color: var(--light-blue-color)
           from: -7776
           to: -5184
-        - color: var(--light-blue-color)
+        - color: var(--cyan-color)
           from: -5184
           to: -2592
-        - color: var(--cyan-color)
+        - color: var(--teal-color)
           from: -2592
           to: 0
         - color: var(--green-color)
