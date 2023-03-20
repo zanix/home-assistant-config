@@ -198,7 +198,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>17 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.4.1]
 
@@ -221,6 +221,10 @@ Authors: [@rroller](https://github.com/rroller).
 Home Assistant Service for sending commands to a Wifi enabled DreamScreen
 
 Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
+
+### [Elevenlabs.Io Tts Provider](https://github.com/philiplawall/ha_elevenlabs_tts)
+
+Integration to use ElevenLabs.io as TTS Provider
 
 ### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.1.5]
 
