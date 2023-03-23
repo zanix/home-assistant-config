@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1825 total entities**,
-including **903 sensors**.
+This Home Assistant install has approximately **1831 total entities**,
+including **910 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -540,8 +540,9 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>145 Automations</summary>
+<details><summary>146 Automations</summary>
 
+- ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
 - ⏯ Family Room Sound Mode

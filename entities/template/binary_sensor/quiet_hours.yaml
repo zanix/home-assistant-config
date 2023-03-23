@@ -1,0 +1,17 @@
+---
+# The template integration allows creating entities which derive their values
+# from other data. This is done by specifying templates for properties of an
+# entity, like the name or the state.
+#
+# https://www.home-assistant.io/integrations/template/
+#
+binary_sensor:
+  - name: Quiet Hours
+    icon: mdi:volume-vibrate
+    state: >-
+      {%- set current_time = (now().second + (now().minute * 60) + (now().hour * 3600)) -%}
+      {%- set start = state_attr('input_datetime.audio_notifications_start', 'timestamp') | int -%}
+      {%- set end = state_attr('input_datetime.audio_notifications_end', 'timestamp') | int -%}
+      {%- set nap_start = state_attr('input_datetime.nap_time_start', 'timestamp') | int -%}
+      {%- set nap_end = state_attr('input_datetime.nap_time_end', 'timestamp') | int -%}
+      {{ not (start <= current_time <= end) and (nap_start > current_time or current_time > nap_end) }}

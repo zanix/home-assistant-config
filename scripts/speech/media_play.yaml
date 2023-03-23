@@ -63,24 +63,6 @@ media_play:
     voice_service: 'script.say_elevenlabs'
 
   sequence:
-    - parallel:
-        - service: browser_mod.notification
-          data:
-            message: '{{ message }}'
-            duration: 30000
-
-        # Store Last Message
-        - service: script.store_mqtt_sensor
-          data:
-            name: 'last_message'
-            state: '{{ message }}'
-
-        # Store Last Speaker
-        - service: script.store_mqtt_sensor
-          data:
-            name: 'last_speaker'
-            state: '{{ media_player }}'
-
     # Actions for Google only
     - if:
         - condition: template
@@ -105,7 +87,7 @@ media_play:
         - delay:
             milliseconds: 200
 
-    # Store the current volume level
+    # Store the current volume level (must be outside of the if block)
     - variables:
         current_volume: "{{ state_attr(media_player, 'volume_level') }}"
 
@@ -151,9 +133,11 @@ media_play:
                 media_player: '{{ media_player }}'
                 message: '{{ message }}'
 
-    # Store the current volume level
+    # Get the current media length (must be outside of the choose and if blocks)
+    - delay:
+        milliseconds: 200
     - variables:
-        media_duration: "{{ state_attr(media_player, 'media_duration') | round(0, 'ceil') }}"
+        media_duration: "{{ state_attr(media_player, 'media_duration') | default(4, true) | round(0, 'ceil') }}"
 
     # Restore volume if it was changed
     - if:
@@ -196,3 +180,15 @@ media_play:
                 is_volume_muted: false
               target:
                 entity_id: "{{ media_player }}"
+
+    # Store Last Message
+    - service: script.store_mqtt_sensor
+      data:
+        name: 'last_message'
+        state: '{{ iif(message is string, message, media_location) }}'
+
+    # Store Last Speaker
+    - service: script.store_mqtt_sensor
+      data:
+        name: 'last_speaker'
+        state: '{{ media_player }}'

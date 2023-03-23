@@ -2,7 +2,7 @@
 notify_pipup:
   alias: '[Notify] PiPup'
   description: 'Notify PiPup devices.'
-  icon: mdi:android
+  icon: mdi:picture-in-picture-top-right
   mode: parallel
 
   fields:
@@ -282,7 +282,7 @@ notify_pipup:
       then:
         - service: webrtc.create_link
           data:
-            link_id: '{{ link_id }}'
+            link_id: '"{{ link_id }}"'
             entity: '{{ camera }}'
             open_limit: 5
             time_to_live: 60
@@ -293,16 +293,21 @@ notify_pipup:
           - variables:
               ip_address: >-
                 {{ device_attr(repeat.item, 'name') | replace("Android TV ", "") }}
-          - service: rest_command.pipup
-            data:
-              ip_address: '{{ ip_address }}'
-              duration: '{{ duration | default(8, true) }}'
-              position: '{{ position | default(1, true) }}'
-              title: '{{ title | default("", true) }}'
-              titleColor: '{{ title_color_rgba | default("#50bff2", true) }}'
-              titleSize: '{{ title_size | default(16, true) }}'
-              message: '{{ message | default("", true) }}'
-              messageColor: '{{ message_color_rgba | default("#fbf5f5", true) }}'
-              messageSize: '{{ message_size | default(12, true) }}'
-              backgroundColor: '{{ background_color_rgba | default("#cc0f0e0e", true) }}'
-              media_data: '{{ media_data | default("", true) }}'
+          # Only send the message if the device is on.
+          - if:
+              - condition: template
+                value_template: '{{ not is_state(repeat.item, "off") }}'
+            then:
+              - service: rest_command.pipup
+                data:
+                  ip_address: '{{ ip_address }}'
+                  duration: '{{ duration | default(8, true) }}'
+                  position: '{{ position | default(1, true) }}'
+                  title: '{{ title | default("", true) }}'
+                  titleColor: '{{ title_color_rgba | default("#50bff2", true) }}'
+                  titleSize: '{{ title_size | default(16, true) }}'
+                  message: '{{ message | default("", true) }}'
+                  messageColor: '{{ message_color_rgba | default("#fbf5f5", true) }}'
+                  messageSize: '{{ message_size | default(12, true) }}'
+                  backgroundColor: '{{ background_color_rgba | default("#cc0f0e0e", true) }}'
+                  media_data: '{{ media_data | default("", true) }}'

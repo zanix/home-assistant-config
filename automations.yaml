@@ -1398,8 +1398,8 @@
         - media_player.living_room_shield
         title: Doorbell
         message: There is a person at the front door
-        camera: camera.doorbell
         duration: 30
+        icon: local/icons/run-fast.png
     - service: script.notify_pipup
       data:
         entity:
@@ -1443,36 +1443,29 @@
   action:
   - parallel:
     - if:
-      - condition: and
-        conditions:
-        - condition: state
-          entity_id: input_boolean.audio_notifications
-          state: 'on'
-        - condition: template
-          value_template: '{% set current_time = (now().second + (now().minute * 60)
-            + (now().hour * 3600)) %} {% set start = state_attr("input_datetime.audio_notifications_start",
-            "timestamp") | int %} {% set end = state_attr("input_datetime.audio_notifications_end",
-            "timestamp") | int %} {% set nap_start = state_attr("input_datetime.nap_time_start",
-            "timestamp") | int %} {% set nap_end = state_attr("input_datetime.nap_time_end",
-            "timestamp") | int %} {{ (start <= current_time <= end) and (nap_start
-            > current_time or current_time > nap_end) }}'
+      - condition: state
+        entity_id: input_boolean.audio_notifications
+        state: 'on'
+      - condition: state
+        entity_id: input_boolean.quiet_hours
+        state: 'on'
       then:
       - parallel:
         - service: script.media_play
           data:
             media_player: media_player.living_room_speaker
-            media_location: media-source://media_source/sounds/ds9_doorchime.mp3
-            volume: 90
+            media_location: '{{ media_location }}'
+            volume: '{{ volume }}'
         - service: script.media_play
           data:
             media_player: media_player.family_room_speaker
-            media_location: media-source://media_source/sounds/ds9_doorchime.mp3
-            volume: 90
+            media_location: '{{ media_location }}'
+            volume: '{{ volume }}'
         - service: script.media_play
           data:
             media_player: media_player.office_speaker
-            media_location: media-source://media_source/sounds/ds9_doorchime.mp3
-            volume: 90
+            media_location: '{{ media_location }}'
+            volume: '{{ volume }}'
     - service: script.notify_hass_agent
       data:
         entity:
@@ -1488,8 +1481,8 @@
         - media_player.living_room_shield
         title: Doorbell
         message: Someone rang the doorbell
-        camera: camera.doorbell
-        duration: 30
+        duration: 10
+        icon: local/icons/doorbell-video.png
     - service: script.notify_pipup
       data:
         entity:
@@ -1520,6 +1513,9 @@
           entity_id: light.office_desk_led
         data:
           effect: Solid
+  variables:
+    volume: '{{ iif(is_state("input_boolean.quiet_hours", "on"), 90, 40) }}'
+    media_location: media-source://media_source/sounds/ds9_doorchime.mp3
   mode: single
 - id: '1665688313389'
   alias: "\U0001F6A6 Garage Light Switch Status"
@@ -1882,37 +1878,15 @@
   - condition: state
     entity_id: input_boolean.audio_notifications
     state: 'on'
-  - condition: template
-    value_template: '{% set current_time = (now().second + (now().minute * 60) + (now().hour
-      * 3600)) %} {% set start = state_attr("input_datetime.audio_notifications_start",
-      "timestamp") | int %} {% set end = state_attr("input_datetime.audio_notifications_end",
-      "timestamp") | int %} {% set nap_start = state_attr("input_datetime.nap_time_start",
-      "timestamp") | int %} {% set nap_end = state_attr("input_datetime.nap_time_end",
-      "timestamp") | int %} {{ (start <= current_time <= end) and (nap_start > current_time
-      or current_time > nap_end) }}'
+  - condition: state
+    entity_id: input_boolean.quiet_hours
+    state: 'on'
   action:
-  - service: media_player.volume_set
+  - service: script.media_play
     data:
-      volume_level: 0.4
-    target:
-      entity_id: media_player.living_room_speaker
-  - service: media_player.play_media
-    data:
-      media_content_type: audio/opus
-      media_content_id: media-source://media_source/sounds/clementine.opus
-    target:
-      entity_id: media_player.living_room_speaker
-  - delay:
-      seconds: 20
-  - service: media_player.media_stop
-    target:
-      entity_id: media_player.living_room_speaker
-    data: {}
-  - service: media_player.volume_set
-    data:
-      volume_level: 0.5
-    target:
-      entity_id: media_player.living_room_speaker
+      media_player: media_player.living_room_speaker
+      media_location: media-source://media_source/sounds/clementine.opus
+      volume: 90
   mode: single
 - id: '1665689633891'
   alias: "\U0001F4AC Subaru Failed Notification"
@@ -4008,3 +3982,25 @@
   mode: single
   variables:
     message: The car shut off and is no longer running.
+- id: '1679462212869'
+  alias: ⏯ Ensure PiPup is Running
+  description: ''
+  trigger:
+  - platform: time
+    at: 05:00:00
+  condition: []
+  action:
+  - repeat:
+      for_each: '{{ media_players }}'
+      sequence:
+      - service: androidtv.adb_command
+        data:
+          command: am start -n nl.rogro82.pipup/nl.rogro82.pipup.MainActivity
+        target:
+          entity_id: '{{ repeat.item }}'
+  mode: single
+  variables:
+    media_players:
+    - media_player.living_room_shield
+    - media_player.family_room_shield
+    - media_player.master_bedroom_shield

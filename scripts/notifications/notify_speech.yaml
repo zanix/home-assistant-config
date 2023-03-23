@@ -24,16 +24,9 @@ notify_speech:
       selector:
         text:
           multiline: true
-    urgent:
-      name: 'Urgent'
-      example: 'Indicates this message is urgent and will bypass availability restrictions'
-      selector:
-        boolean:
 
   # Set local variables for reuse in this script.
   variables:
-    # Set to true to bypass availability restrictions.
-    is_urgent: '{{ iif(urgent is defined, urgent, false) }}'
     media_player: '{{ media_player | default([]) }}'
     media_player_list: >
       {% set entities = namespace(names=[]) %}
@@ -54,24 +47,9 @@ notify_speech:
 
   sequence:
     - if:
-        - condition: or
-          conditions:
-            - condition: template
-              value_template: "{{ is_urgent }}"
-            - condition: and
-              conditions:
-                - condition: state
-                  entity_id: input_boolean.audio_notifications
-                  state: "on"
-                - condition: template
-                  value_template: >-
-                    {% set current_time = (now().second + (now().minute * 60) + (now().hour * 3600)) %}
-                    {% set start = state_attr('input_datetime.audio_notifications_start', 'timestamp') | int %}
-                    {% set end = state_attr('input_datetime.audio_notifications_end', 'timestamp') | int %}
-                    {% set nap_start = state_attr('input_datetime.nap_time_start', 'timestamp') | int %}
-                    {% set nap_end = state_attr('input_datetime.nap_time_end', 'timestamp') | int %}
-                    {{ (start <= current_time <= end) and (nap_start > current_time or current_time > nap_end) }}
-
+        - condition: state
+          entity_id: input_boolean.audio_notifications
+          state: "on"
       then:
         - repeat:
             for_each: '{{ media_player_list }}'
@@ -80,3 +58,5 @@ notify_speech:
                 data:
                   media_player: '{{ repeat.item }}'
                   message: '{{ message }}'
+                  # Use a lower volume during quiet hours.
+                  volume: '{{ iif(is_state("input_boolean.quiet_hours", "on"), 90, 40) }}'
