@@ -493,14 +493,20 @@ decluttering_templates:
         style:
           .: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
             \ translate3d(0,0,0);\n  content: \"\";\n  position: absolute;\n  height:\
-            \ 100%;\n  width: 100%;\n\n  background: \n  {%- if not states('[[entity]]')\
-            \ in [\"off\", \"unknown\", \"unavailable\", \"idle\"] and state_attr('[[entity]]',\
-            \ \"entity_picture\") -%}\n    url( '{{ state_attr('[[entity]]', \"entity_picture\"\
-            ) }}') center no-repeat;\n  {%- elif not states('[[entity]]') in [\"off\"\
-            , \"unknown\", \"unavailable\"] -%}\n    url('/local/icons/idle_media_player.png')\
-            \ center no-repeat;\n  {%- endif -%}\n  filter: blur(100px) saturate(200%);\n\
-            \  background-size: 100% 100%;\n}\nha-card {\n  transform: translate3d(0,0,0);\n\
-            \  -webkit-transform: translate3d(0,0,0);\n}\n"
+            \ 100%;\n  width: 100%;\n\n  animation: gradient 40s ease infinite;\n\n\
+            \  background:\n  {%- if state_attr('[[entity]]', \"app_id\") in [\"Netflix\"\
+            , \"Youtube\"] -%}\n    url('/local/backgrounds/red.jpg') center no-repeat\n\
+            \  {%- elif not states('[[entity]]') in [\"off\", \"unknown\", \"unavailable\"\
+            , \"idle\"] and state_attr('[[entity]]', \"entity_picture\") -%}\n   \
+            \ url( '{{ state_attr('[[entity]]', \"entity_picture\") }}') center no-repeat\n\
+            \  {%- elif not states('[[entity]]') in [\"off\", \"unknown\", \"unavailable\"\
+            ] -%}\n    url('/local/backgrounds/clear-light2.jpg') center no-repeat\n\
+            \  {%- endif -%};\n  background-size: 500% 500%;\n  filter: blur(100px)\
+            \ saturate(200%);\n}\nha-card {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
+            \ translate3d(0,0,0);\n}\n@keyframes gradient {\n  0% {\n    background-position:\
+            \ 0% 50%;\n  }\n  25% {\n    background-position: 50% 0%;\n  }\n  50%\
+            \ {\n    background-position: 100% 50%;\n  }\n  75% {\n    background-position:\
+            \ 50% 100%;\n  }\n  100% {\n    background-position: 0% 50%;\n  }\n"
           expander-card$: ".header-overlay {\n  right: initial;\n  left: 0;\n}\n"
       cards:
       - cards:
@@ -508,19 +514,22 @@ decluttering_templates:
             cards:
             - alignment: end
               card_mod:
-                style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
-                  \ none;\n  --chip-spacing: -5px;\n  --chip-padding: 0;\n}\n"
+                style:
+                  .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled), 0.15);\n\
+                    \  --ha-card-box-shadow: none;\n  --chip-border-radius: 12px;\n\
+                    \  --chip-height: 35px;\n  --chip-padding: 10px;\n  --chip-spacing:\
+                    \ 18px;\n}\n.chip-container * {\n  margin-bottom: var(--chip-spacing)\
+                    \ !important;\n}\n"
               chips:
-              - content: "{%- if not states(entity) in [\"off\", \"unknown\", \"unavailable\"\
-                  , \"standby\"] -%}\n  {{ (state_attr(entity, \"volume_level\") *\
-                  \ 100) | round(0) }}%\n{%- endif -%}"
+              - content: "{%- if state_attr(entity, \"volume_level\") -%}\n  {{ (state_attr(entity,\
+                  \ \"volume_level\") * 100) | round(0) }}%\n{%- endif -%}"
                 entity: '[[entity]]'
                 icon: "{%- if state_attr(entity, \"is_volume_muted\") -%}\n  mdi:volume-mute\n\
                   {%- else -%}\n  mdi:volume-source\n{%- endif -%}"
                 tap_action:
                   action: call-service
                   data:
-                    media_player: '[[sound]]'
+                    media_player: '[[sound_entity]]'
                   service: script.media_player_mute
                 type: template
               type: custom:mushroom-chips-card
@@ -538,13 +547,15 @@ decluttering_templates:
               - volume_set
             - card:
                 alignment: center
+                card_mod:
+                  style:
+                    .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled),\
+                      \ 0.15);\n  --ha-card-box-shadow: none;\n  --chip-border-radius:\
+                      \ 12px;\n  --chip-height: 35px;\n  --chip-padding: 10px;\n \
+                      \ --chip-spacing: 18px;\n}\n.chip-container * {\n  margin-bottom:\
+                      \ var(--chip-spacing) !important;\n}\n"
                 chips:
-                - card_mod:
-                    style: "ha-card {\n  margin: 0px 10px 0px 0;\n  --chip-background:\
-                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
-                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
-                      \  --chip-padding: 10px;\n}\n"
-                  entity: '[[entity]]'
+                - entity: '[[entity]]'
                   icon: mdi:volume-minus
                   tap_action:
                     action: call-service
@@ -552,12 +563,7 @@ decluttering_templates:
                     target:
                       entity_id: '[[entity]]'
                   type: template
-                - card_mod:
-                    style: "ha-card {\n  margin: 0px 0px 0px 0px;\n  --chip-background:\
-                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
-                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
-                      \  --chip-padding: 10px;\n}\n"
-                  entity: '[[entity]]'
+                - entity: '[[entity]]'
                   icon: mdi:volume-plus
                   tap_action:
                     action: call-service
@@ -585,13 +591,19 @@ decluttering_templates:
           - entity: '[[entity]]'
             state_not: unavailable
           - entity: '[[entity]]'
+            state_not: unknown
+          - entity: '[[entity]]'
             state_not: 'off'
           type: conditional
         - card:
-            alignment: start
+            alignment: center
             card_mod:
-              style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
-                \ none;\n}\n"
+              style:
+                .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled), 0.15);\n\
+                  \  --ha-card-box-shadow: none;\n  --chip-border-radius: 12px;\n\
+                  \  --chip-height: 35px;\n  --chip-padding: 10px;\n  --chip-spacing:\
+                  \ 18px;\n}\n.chip-container * {\n  margin-bottom: var(--chip-spacing)\
+                  \ !important;\n}\n"
             chips:
             - content: '{{ states("[[sound_mode]]") }}'
               entity: '[[sound_mode]]'
@@ -625,25 +637,35 @@ decluttering_templates:
           - entity: '[[entity]]'
             state_not: 'off'
           type: conditional
-        - artwork: none
-          card_mod:
-            style: ":host {\n  --mini-media-player-background-opacity: 0;\n}\n"
-          entity: '[[entity]]'
-          group: true
-          hide:
-            controls: true
-            icon: true
-            info: true
-            name: true
-            power: true
-            progress: true
-            source: true
-            volume: true
-          shortcuts:
-            attribute: source
-            buttons: '[[buttons]]'
-            columns: 3
-          type: custom:mini-media-player
+        - card:
+            artwork: none
+            card_mod:
+              style:
+                mmp-shortcuts$: ".mmp-shortcuts__button {\n  --mmp-button-color: rgba(189,\
+                  \ 189, 189, 0.15);\n  box-shadow: var(--ha-card-box-shadow);\n \
+                  \ border-radius: 12px;\n}\n"
+            entity: '[[entity]]'
+            group: true
+            hide:
+              controls: true
+              icon: true
+              info: true
+              name: true
+              power: true
+              progress: true
+              source: true
+              volume: true
+            shortcuts:
+              attribute: source
+              buttons: '[[buttons]]'
+              columns: 3
+            type: custom:mini-media-player
+          conditions:
+          - entity: '[[entity]]'
+            state_not: unavailable
+          - entity: '[[entity]]'
+            state_not: unknown
+          type: conditional
         child-padding: 0.5em
         expanded: '[[expanded]]'
         gap: 0em
@@ -658,8 +680,8 @@ decluttering_templates:
                   \ in [\"playing\", \"paused\", \"standby\"] -%}\n  {{ states(entity)\
                   \ | title }}\n{%- endif -%}"
                 title: "{%- if not \"[[\" in \"[[name]]\" -%}\n  [[name]]\n{%- else\
-                  \ -%}\n  {{ state_attr(\"[[entity]]\", \"friendly_name\") }}\n{%-\
-                  \ endif -%}"
+                  \ -%}\n  {{ state_attr(\"[[entity]]\", \"friendly_name\") | title\
+                  \ }}\n{%- endif -%}"
                 type: custom:mushroom-title-card
               card_mod:
                 style:
@@ -668,13 +690,15 @@ decluttering_templates:
               type: custom:mod-card
             - card:
                 alignment: center
+                card_mod:
+                  style:
+                    .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled),\
+                      \ 0.15);\n  --ha-card-box-shadow: none;\n  --chip-border-radius:\
+                      \ 12px;\n  --chip-height: 35px;\n  --chip-padding: 10px;\n \
+                      \ --chip-spacing: 18px;\n}\n.chip-container * {\n  margin-bottom:\
+                      \ var(--chip-spacing) !important;\n}\n"
                 chips:
-                - card_mod:
-                    style: "ha-card {\n  margin: 0px 10px 0px 0;\n  --chip-background:\
-                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
-                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
-                      \  --chip-padding: 10px;\n}\n"
-                  entity: '[[entity]]'
+                - entity: '[[entity]]'
                   icon: mdi:skip-backward
                   tap_action:
                     action: call-service
@@ -682,12 +706,7 @@ decluttering_templates:
                     target:
                       entity_id: '[[entity]]'
                   type: template
-                - card_mod:
-                    style: "ha-card {\n  margin: 0px 0px 0px 0px;\n  --chip-background:\
-                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
-                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
-                      \  --chip-padding: 10px;\n}\n"
-                  entity: '[[entity]]'
+                - entity: '[[entity]]'
                   icon: "{%- if is_state(entity, \"playing\") -%}\n  mdi:pause\n{%-\
                     \ else -%}\n  mdi:play\n{%- endif -%}"
                   tap_action:
@@ -696,12 +715,7 @@ decluttering_templates:
                     target:
                       entity_id: '[[entity]]'
                   type: template
-                - card_mod:
-                    style: "ha-card {\n  margin: 0px 0px 0px 10px;\n  --chip-background:\
-                      \ rgba(var(--rgb-disabled), 0.15);\n  --ha-card-box-shadow:\
-                      \ none;\n  --chip-border-radius: 12px;\n  --chip-height: 35px;\n\
-                      \  --chip-padding: 10px;\n}\n"
-                  entity: '[[entity]]'
+                - entity: '[[entity]]'
                   icon: mdi:skip-forward
                   tap_action:
                     action: call-service
@@ -722,8 +736,8 @@ decluttering_templates:
                 card:
                   alignment: center
                   subtitle: "{%- set entity = \"[[entity]]\" -%}\n{{ [\n  state_attr(entity,\
-                    \ \"media_artist\") | default(None, true),\n  state_attr(entity,\
                     \ \"media_title\") | default(None, true),\n  state_attr(entity,\
+                    \ \"media_artist\") | default(None, true),\n  state_attr(entity,\
                     \ \"media_series_title\") | default(None, true)\n  ] | reject(\"\
                     ==\", None) | list | join(\" - \")\n}}"
                   type: custom:mushroom-title-card
@@ -743,12 +757,16 @@ decluttering_templates:
               card_mod:
                 style: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
                   \ translate3d(0,0,0);\n  content: \"\";\n\n  background:\n  {%-\
-                  \ if not states(config.entity) in [\"off\", \"unknown\", \"unavailable\"\
-                  , \"idle\"] and state_attr(config.entity, \"entity_picture\") -%}\n\
-                  \    url( '{{ state_attr(config.entity, \"entity_picture\") }}')\
-                  \ center no-repeat;\n  {%- elif not states(config.entity) in [\"\
-                  off\", \"unknown\", \"unavailable\"] -%}\n    url('/local/icons/idle_media_player.png')\
-                  \ center no-repeat;\n  {%- endif -%}\n  background-size: contain;\n\
+                  \ if state_attr(config.entity, \"app_id\") in [\"Netflix\", \"Spotify\"\
+                  , \"Youtube\", \"YouTube Kids\"] -%}\n    url('/local/images/{{\
+                  \ state_attr(config.entity, \"app_id\") | replace(\" \", \"_\")\
+                  \ | lower }}-logo.png') center no-repeat\n  {%- elif not states(config.entity)\
+                  \ in [\"off\", \"unknown\", \"unavailable\", \"idle\"] and state_attr(config.entity,\
+                  \ \"entity_picture\") -%}\n    url('{{ state_attr(config.entity,\
+                  \ \"entity_picture\") }}') center no-repeat\n  {%- elif \"spotify\"\
+                  \ in config.entity -%}\n    url('/local/images/spotify-logo.png')\
+                  \ center no-repeat\n  {%- else -%}\n    url('/local/images/idle-media-player.png')\
+                  \ center no-repeat\n  {%- endif -%};\n  background-size: contain;\n\
                   \n  border-radius: var(--control-border-radius);\n  {% set media_type\
                   \ = state_attr(config.entity, 'media_content_type') %}\n  {% if\
                   \ media_type == 'tvshow' %}\n    aspect-ratio: 16 / 9;\n    margin:\
@@ -772,9 +790,7 @@ decluttering_templates:
             - entity: '[[entity]]'
               state_not: unavailable
             - entity: '[[entity]]'
-              state_not: 'off'
-            - entity: '[[entity]]'
-              state_not: standby
+              state_not: unknown
             type: conditional
           columns: 2
           square: false
@@ -784,9 +800,10 @@ decluttering_templates:
         type: custom:expander-card
       - card_mod:
           style:
-            .: "ha-card {\n  --mmp-progress-height: 10px !important;\n  height: var(--mmp-progress-height);\n\
-              \  --mmp-accent-color: var(--accent-color);\n  --ha-card-border-width:\
-              \ 0;\n}\n"
+            .: "ha-card {\n  --mmp-progress-height: 10px !important;\n  --paper-progress-container-color:\
+              \ transparent;\n  --paper-progress-active-color: var(--mmp-accent-color);\
+              \ \n  --ha-card-border-width: 0;\n  height: var(--mmp-progress-height);\n\
+              }\n"
         entity: '[[entity]]'
         group: true
         hide:
@@ -798,8 +815,6 @@ decluttering_templates:
           source: true
           state_label: true
           volume: true
-        more_info: false
-        toggle_power: false
         type: custom:mini-media-player
       type: custom:vertical-stack-in-card
     default:
@@ -2855,7 +2870,7 @@ views:
                     - name: Living Room
                     - expanded: true
                     - entity: media_player.living_room_universal
-                    - sound: media_player.yamaha_rx_v679
+                    - sound_entity: media_player.yamaha_rx_v679
                     - sound_mode: select.yamaha_sound_mode
                   type: custom:vertical-stack-in-card
               service: browser_mod.popup
@@ -2998,7 +3013,7 @@ views:
                     - name: Family Room
                     - expanded: true
                     - entity: media_player.family_room_universal
-                    - sound: media_player.denon_avr_s760h
+                    - sound_entity: media_player.denon_avr_s760h
                     - sound_mode: select.denon_sound_mode
                   type: custom:vertical-stack-in-card
               service: browser_mod.popup
@@ -3735,7 +3750,7 @@ views:
           type: custom:mushroom-template-card
         conditions:
         - entity: media_player.living_room_shield
-          state: 'on'
+          state_not: 'off'
         type: conditional
       columns: 2
       square: false
@@ -3746,7 +3761,7 @@ views:
         variables:
         - name: Living Room
         - entity: media_player.living_room_universal
-        - sound: media_player.yamaha_rx_v679
+        - sound_entity: media_player.yamaha_rx_v679
         - sound_mode: select.yamaha_sound_mode
       conditions:
       - entity: media_player.living_room_universal
@@ -3984,7 +3999,7 @@ views:
         variables:
         - name: Family Room
         - entity: media_player.family_room_universal
-        - sound: media_player.denon_avr_s760h
+        - sound_entity: media_player.denon_avr_s760h
         - sound_mode: select.denon_sound_mode
       conditions:
       - entity: sensor.family_room_denon_source
@@ -4009,7 +4024,6 @@ views:
         hide:
           controls: true
           power: true
-          sound_mode: false
           source: true
         icon: mdi:audio-video
         shortcuts:
@@ -5376,7 +5390,7 @@ views:
         type: custom:decluttering-card
         variables:
         - entity: media_player.erebus
-        - sound: media_player.erebus
+        - sound_entity: media_player.erebus
         - buttons: []
       conditions:
       - entity: media_player.erebus
@@ -5538,7 +5552,7 @@ views:
         type: custom:decluttering-card
         variables:
         - entity: media_player.nasya
-        - sound: media_player.nasya
+        - sound_entity: media_player.nasya
         - buttons: []
       conditions:
       - entity: media_player.nasya
@@ -5688,7 +5702,7 @@ views:
         type: custom:decluttering-card
         variables:
         - entity: media_player.ardena
-        - sound: media_player.ardena
+        - sound_entity: media_player.ardena
         - buttons: []
       conditions:
       - entity: media_player.ardena
@@ -5823,7 +5837,7 @@ views:
         type: custom:decluttering-card
         variables:
         - entity: media_player.athos
-        - sound: media_player.athos
+        - sound_entity: media_player.athos
         - buttons: []
       conditions:
       - entity: media_player.athos
