@@ -1,66 +1,77 @@
 'use strict';
 
+function _iterableToArrayLimit(arr, i) {
+  var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"];
+  if (null != _i) {
+    var _s,
+      _e,
+      _x,
+      _r,
+      _arr = [],
+      _n = !0,
+      _d = !1;
+    try {
+      if (_x = (_i = _i.call(arr)).next, 0 === i) {
+        if (Object(_i) !== _i) return;
+        _n = !1;
+      } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0);
+    } catch (err) {
+      _d = !0, _e = err;
+    } finally {
+      try {
+        if (!_n && null != _i.return && (_r = _i.return(), Object(_r) !== _r)) return;
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+    return _arr;
+  }
+}
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
-
   if (Object.getOwnPropertySymbols) {
     var symbols = Object.getOwnPropertySymbols(object);
-
-    if (enumerableOnly) {
-      symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-    }
-
-    keys.push.apply(keys, symbols);
+    enumerableOnly && (symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    })), keys.push.apply(keys, symbols);
   }
-
   return keys;
 }
-
 function _objectSpread2(target) {
   for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i] != null ? arguments[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
+    var source = null != arguments[i] ? arguments[i] : {};
+    i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+    });
   }
-
   return target;
 }
-
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
-
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
     descriptor.enumerable = descriptor.enumerable || false;
     descriptor.configurable = true;
     if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
+    Object.defineProperty(target, _toPropertyKey(descriptor.key), descriptor);
   }
 }
-
 function _createClass(Constructor, protoProps, staticProps) {
   if (protoProps) _defineProperties(Constructor.prototype, protoProps);
   if (staticProps) _defineProperties(Constructor, staticProps);
+  Object.defineProperty(Constructor, "prototype", {
+    writable: false
+  });
   return Constructor;
 }
-
 function _defineProperty(obj, key, value) {
+  key = _toPropertyKey(key);
   if (key in obj) {
     Object.defineProperty(obj, key, {
       value: value,
@@ -71,15 +82,12 @@ function _defineProperty(obj, key, value) {
   } else {
     obj[key] = value;
   }
-
   return obj;
 }
-
 function _inherits(subClass, superClass) {
   if (typeof superClass !== "function" && superClass !== null) {
     throw new TypeError("Super expression must either be null or a function");
   }
-
   subClass.prototype = Object.create(superClass && superClass.prototype, {
     constructor: {
       value: subClass,
@@ -87,30 +95,28 @@ function _inherits(subClass, superClass) {
       configurable: true
     }
   });
+  Object.defineProperty(subClass, "prototype", {
+    writable: false
+  });
   if (superClass) _setPrototypeOf(subClass, superClass);
 }
-
 function _getPrototypeOf(o) {
-  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
   };
   return _getPrototypeOf(o);
 }
-
 function _setPrototypeOf(o, p) {
-  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) {
     o.__proto__ = p;
     return o;
   };
-
   return _setPrototypeOf(o, p);
 }
-
 function _isNativeReflectConstruct() {
   if (typeof Reflect === "undefined" || !Reflect.construct) return false;
   if (Reflect.construct.sham) return false;
   if (typeof Proxy === "function") return true;
-
   try {
     Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
     return true;
@@ -118,130 +124,79 @@ function _isNativeReflectConstruct() {
     return false;
   }
 }
-
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
   }
-
   return self;
 }
-
 function _possibleConstructorReturn(self, call) {
   if (call && (typeof call === "object" || typeof call === "function")) {
     return call;
+  } else if (call !== void 0) {
+    throw new TypeError("Derived constructors may only return object or undefined");
   }
-
   return _assertThisInitialized(self);
 }
-
 function _createSuper(Derived) {
   var hasNativeReflectConstruct = _isNativeReflectConstruct();
-
   return function _createSuperInternal() {
     var Super = _getPrototypeOf(Derived),
-        result;
-
+      result;
     if (hasNativeReflectConstruct) {
       var NewTarget = _getPrototypeOf(this).constructor;
-
       result = Reflect.construct(Super, arguments, NewTarget);
     } else {
       result = Super.apply(this, arguments);
     }
-
     return _possibleConstructorReturn(this, result);
   };
 }
-
 function _superPropBase(object, property) {
   while (!Object.prototype.hasOwnProperty.call(object, property)) {
     object = _getPrototypeOf(object);
     if (object === null) break;
   }
-
   return object;
 }
-
-function _get(target, property, receiver) {
+function _get() {
   if (typeof Reflect !== "undefined" && Reflect.get) {
-    _get = Reflect.get;
+    _get = Reflect.get.bind();
   } else {
     _get = function _get(target, property, receiver) {
       var base = _superPropBase(target, property);
-
       if (!base) return;
       var desc = Object.getOwnPropertyDescriptor(base, property);
-
       if (desc.get) {
-        return desc.get.call(receiver);
+        return desc.get.call(arguments.length < 3 ? target : receiver);
       }
-
       return desc.value;
     };
   }
-
-  return _get(target, property, receiver || target);
+  return _get.apply(this, arguments);
 }
-
 function _taggedTemplateLiteral(strings, raw) {
   if (!raw) {
     raw = strings.slice(0);
   }
-
   return Object.freeze(Object.defineProperties(strings, {
     raw: {
       value: Object.freeze(raw)
     }
   }));
 }
-
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
-
 function _toArray(arr) {
   return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
 }
-
 function _arrayWithHoles(arr) {
   if (Array.isArray(arr)) return arr;
 }
-
 function _iterableToArray(iter) {
   if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter);
 }
-
-function _iterableToArrayLimit(arr, i) {
-  var _i = arr && (typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]);
-
-  if (_i == null) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-
-  var _s, _e;
-
-  try {
-    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
 function _unsupportedIterableToArray(o, minLen) {
   if (!o) return;
   if (typeof o === "string") return _arrayLikeToArray(o, minLen);
@@ -250,47 +205,35 @@ function _unsupportedIterableToArray(o, minLen) {
   if (n === "Map" || n === "Set") return Array.from(o);
   if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
-
 function _arrayLikeToArray(arr, len) {
   if (len == null || len > arr.length) len = arr.length;
-
   for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
   return arr2;
 }
-
 function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-
 function _toPrimitive(input, hint) {
   if (typeof input !== "object" || input === null) return input;
   var prim = input[Symbol.toPrimitive];
-
   if (prim !== undefined) {
     var res = prim.call(input, hint || "default");
     if (typeof res !== "object") return res;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
-
   return (hint === "string" ? String : Number)(input);
 }
-
 function _toPropertyKey(arg) {
   var key = _toPrimitive(arg, "string");
-
   return typeof key === "symbol" ? key : String(key);
 }
-
 function _decorate(decorators, factory, superClass, mixins) {
   var api = _getDecoratorsApi();
-
   if (mixins) {
     for (var i = 0; i < mixins.length; i++) {
       api = mixins[i](api);
     }
   }
-
   var r = factory(function initialize(O) {
     api.initializeInstanceElements(O, decorated.elements);
   }, superClass);
@@ -298,12 +241,10 @@ function _decorate(decorators, factory, superClass, mixins) {
   api.initializeClassElements(r.F, decorated.elements);
   return api.runClassFinishers(r.F, decorated.finishers);
 }
-
 function _getDecoratorsApi() {
   _getDecoratorsApi = function () {
     return api;
   };
-
   var api = {
     elementsDefinitionOrder: [["method"], ["field"]],
     initializeInstanceElements: function (O, elements) {
@@ -320,7 +261,6 @@ function _getDecoratorsApi() {
       ["method", "field"].forEach(function (kind) {
         elements.forEach(function (element) {
           var placement = element.placement;
-
           if (element.kind === kind && (placement === "static" || placement === "prototype")) {
             var receiver = placement === "static" ? F : proto;
             this.defineClassElement(receiver, element);
@@ -330,7 +270,6 @@ function _getDecoratorsApi() {
     },
     defineClassElement: function (receiver, element) {
       var descriptor = element.descriptor;
-
       if (element.kind === "field") {
         var initializer = element.initializer;
         descriptor = {
@@ -340,7 +279,6 @@ function _getDecoratorsApi() {
           value: initializer === void 0 ? void 0 : initializer.call(receiver)
         };
       }
-
       Object.defineProperty(receiver, element.key, descriptor);
     },
     decorateClass: function (elements, decorators) {
@@ -361,14 +299,12 @@ function _getDecoratorsApi() {
         newElements.push.apply(newElements, elementFinishersExtras.extras);
         finishers.push.apply(finishers, elementFinishersExtras.finishers);
       }, this);
-
       if (!decorators) {
         return {
           elements: newElements,
           finishers: finishers
         };
       }
-
       var result = this.decorateConstructor(newElements, decorators);
       finishers.push.apply(finishers, result.finishers);
       result.finishers = finishers;
@@ -376,17 +312,14 @@ function _getDecoratorsApi() {
     },
     addElementPlacement: function (element, placements, silent) {
       var keys = placements[element.placement];
-
       if (!silent && keys.indexOf(element.key) !== -1) {
         throw new TypeError("Duplicated element (" + element.key + ")");
       }
-
       keys.push(element.key);
     },
     decorateElement: function (element, placements) {
       var extras = [];
       var finishers = [];
-
       for (var decorators = element.decorators, i = decorators.length - 1; i >= 0; i--) {
         var keys = placements[element.placement];
         keys.splice(keys.indexOf(element.key), 1);
@@ -394,22 +327,17 @@ function _getDecoratorsApi() {
         var elementFinisherExtras = this.toElementFinisherExtras((0, decorators[i])(elementObject) || elementObject);
         element = elementFinisherExtras.element;
         this.addElementPlacement(element, placements);
-
         if (elementFinisherExtras.finisher) {
           finishers.push(elementFinisherExtras.finisher);
         }
-
         var newExtras = elementFinisherExtras.extras;
-
         if (newExtras) {
           for (var j = 0; j < newExtras.length; j++) {
             this.addElementPlacement(newExtras[j], placements);
           }
-
           extras.push.apply(extras, newExtras);
         }
       }
-
       return {
         element: element,
         finishers: finishers,
@@ -418,18 +346,14 @@ function _getDecoratorsApi() {
     },
     decorateConstructor: function (elements, decorators) {
       var finishers = [];
-
       for (var i = decorators.length - 1; i >= 0; i--) {
         var obj = this.fromClassDescriptor(elements);
         var elementsAndFinisher = this.toClassDescriptor((0, decorators[i])(obj) || obj);
-
         if (elementsAndFinisher.finisher !== undefined) {
           finishers.push(elementsAndFinisher.finisher);
         }
-
         if (elementsAndFinisher.elements !== undefined) {
           elements = elementsAndFinisher.elements;
-
           for (var j = 0; j < elements.length - 1; j++) {
             for (var k = j + 1; k < elements.length; k++) {
               if (elements[j].key === elements[k].key && elements[j].placement === elements[k].placement) {
@@ -439,7 +363,6 @@ function _getDecoratorsApi() {
           }
         }
       }
-
       return {
         elements: elements,
         finishers: finishers
@@ -471,19 +394,14 @@ function _getDecoratorsApi() {
     },
     toElementDescriptor: function (elementObject) {
       var kind = String(elementObject.kind);
-
       if (kind !== "method" && kind !== "field") {
         throw new TypeError('An element descriptor\'s .kind property must be either "method" or' + ' "field", but a decorator created an element descriptor with' + ' .kind "' + kind + '"');
       }
-
       var key = _toPropertyKey(elementObject.key);
-
       var placement = String(elementObject.placement);
-
       if (placement !== "static" && placement !== "prototype" && placement !== "own") {
         throw new TypeError('An element descriptor\'s .placement property must be one of "static",' + ' "prototype" or "own", but a decorator created an element descriptor' + ' with .placement "' + placement + '"');
       }
-
       var descriptor = elementObject.descriptor;
       this.disallowProperty(elementObject, "elements", "An element descriptor");
       var element = {
@@ -492,7 +410,6 @@ function _getDecoratorsApi() {
         placement: placement,
         descriptor: Object.assign({}, descriptor)
       };
-
       if (kind !== "field") {
         this.disallowProperty(elementObject, "initializer", "A method descriptor");
       } else {
@@ -501,14 +418,11 @@ function _getDecoratorsApi() {
         this.disallowProperty(descriptor, "value", "The property descriptor of a field descriptor");
         element.initializer = elementObject.initializer;
       }
-
       return element;
     },
     toElementFinisherExtras: function (elementObject) {
       var element = this.toElementDescriptor(elementObject);
-
       var finisher = _optionalCallableProperty(elementObject, "finisher");
-
       var extras = this.toElementDescriptors(elementObject.extras);
       return {
         element: element,
@@ -530,19 +444,15 @@ function _getDecoratorsApi() {
     },
     toClassDescriptor: function (obj) {
       var kind = String(obj.kind);
-
       if (kind !== "class") {
         throw new TypeError('A class descriptor\'s .kind property must be "class", but a decorator' + ' created a class descriptor with .kind "' + kind + '"');
       }
-
       this.disallowProperty(obj, "key", "A class descriptor");
       this.disallowProperty(obj, "placement", "A class descriptor");
       this.disallowProperty(obj, "descriptor", "A class descriptor");
       this.disallowProperty(obj, "initializer", "A class descriptor");
       this.disallowProperty(obj, "extras", "A class descriptor");
-
       var finisher = _optionalCallableProperty(obj, "finisher");
-
       var elements = this.toElementDescriptors(obj.elements);
       return {
         elements: elements,
@@ -552,16 +462,13 @@ function _getDecoratorsApi() {
     runClassFinishers: function (constructor, finishers) {
       for (var i = 0; i < finishers.length; i++) {
         var newConstructor = (0, finishers[i])(constructor);
-
         if (newConstructor !== undefined) {
           if (typeof newConstructor !== "function") {
             throw new TypeError("Finishers must return a constructor.");
           }
-
           constructor = newConstructor;
         }
       }
-
       return constructor;
     },
     disallowProperty: function (obj, name, objectType) {
@@ -572,12 +479,9 @@ function _getDecoratorsApi() {
   };
   return api;
 }
-
 function _createElementDescriptor(def) {
   var key = _toPropertyKey(def.key);
-
   var descriptor;
-
   if (def.kind === "method") {
     descriptor = {
       value: def.value,
@@ -604,7 +508,6 @@ function _createElementDescriptor(def) {
       enumerable: true
     };
   }
-
   var element = {
     kind: def.kind === "field" ? "field" : "method",
     key: key,
@@ -615,7 +518,6 @@ function _createElementDescriptor(def) {
   if (def.kind === "field") element.initializer = def.value;
   return element;
 }
-
 function _coalesceGetterSetter(element, other) {
   if (element.descriptor.get !== undefined) {
     other.descriptor.get = element.descriptor.get;
@@ -623,61 +525,74 @@ function _coalesceGetterSetter(element, other) {
     other.descriptor.set = element.descriptor.set;
   }
 }
-
 function _coalesceClassElements(elements) {
   var newElements = [];
-
   var isSameElement = function (other) {
     return other.kind === "method" && other.key === element.key && other.placement === element.placement;
   };
-
   for (var i = 0; i < elements.length; i++) {
     var element = elements[i];
     var other;
-
     if (element.kind === "method" && (other = newElements.find(isSameElement))) {
       if (_isDataDescriptor(element.descriptor) || _isDataDescriptor(other.descriptor)) {
         if (_hasDecorators(element) || _hasDecorators(other)) {
           throw new ReferenceError("Duplicated methods (" + element.key + ") can't be decorated.");
         }
-
         other.descriptor = element.descriptor;
       } else {
         if (_hasDecorators(element)) {
           if (_hasDecorators(other)) {
             throw new ReferenceError("Decorators can't be placed on different accessors with for " + "the same property (" + element.key + ").");
           }
-
           other.decorators = element.decorators;
         }
-
         _coalesceGetterSetter(element, other);
       }
     } else {
       newElements.push(element);
     }
   }
-
   return newElements;
 }
-
 function _hasDecorators(element) {
   return element.decorators && element.decorators.length;
 }
-
 function _isDataDescriptor(desc) {
   return desc !== undefined && !(desc.value === undefined && desc.writable === undefined);
 }
-
 function _optionalCallableProperty(obj, name) {
   var value = obj[name];
-
   if (value !== undefined && typeof value !== "function") {
     throw new TypeError("Expected '" + name + "' to be a function");
   }
-
   return value;
 }
+
+/**
+ * @license
+ * Copyright 2019 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+const t$1=window,e$2=t$1.ShadowRoot&&(void 0===t$1.ShadyCSS||t$1.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s$3=Symbol(),n$3=new WeakMap;let o$3 = class o{constructor(t,e,n){if(this._$cssResult$=!0,n!==s$3)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e;}get styleSheet(){let t=this.o;const s=this.t;if(e$2&&void 0===t){const e=void 0!==s&&1===s.length;e&&(t=n$3.get(s)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),e&&n$3.set(s,t));}return t}toString(){return this.cssText}};const r$2=t=>new o$3("string"==typeof t?t:t+"",void 0,s$3),i$1=(t,...e)=>{const n=1===t.length?t[0]:e.reduce(((e,s,n)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+t[n+1]),t[0]);return new o$3(n,t,s$3)},S$1=(s,n)=>{e$2?s.adoptedStyleSheets=n.map((t=>t instanceof CSSStyleSheet?t:t.styleSheet)):n.forEach((e=>{const n=document.createElement("style"),o=t$1.litNonce;void 0!==o&&n.setAttribute("nonce",o),n.textContent=e.cssText,s.appendChild(n);}));},c$1=e$2?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return r$2(e)})(t):t;
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */var s$2;const e$1=window,r$1=e$1.trustedTypes,h$1=r$1?r$1.emptyScript:"",o$2=e$1.reactiveElementPolyfillSupport,n$2={toAttribute(t,i){switch(i){case Boolean:t=t?h$1:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t);}return t},fromAttribute(t,i){let s=t;switch(i){case Boolean:s=null!==t;break;case Number:s=null===t?null:Number(t);break;case Object:case Array:try{s=JSON.parse(t);}catch(t){s=null;}}return s}},a$1=(t,i)=>i!==t&&(i==i||t==t),l$2={attribute:!0,type:String,converter:n$2,reflect:!1,hasChanged:a$1};let d$1 = class d extends HTMLElement{constructor(){super(),this._$Ei=new Map,this.isUpdatePending=!1,this.hasUpdated=!1,this._$El=null,this.u();}static addInitializer(t){var i;this.finalize(),(null!==(i=this.h)&&void 0!==i?i:this.h=[]).push(t);}static get observedAttributes(){this.finalize();const t=[];return this.elementProperties.forEach(((i,s)=>{const e=this._$Ep(s,i);void 0!==e&&(this._$Ev.set(e,s),t.push(e));})),t}static createProperty(t,i=l$2){if(i.state&&(i.attribute=!1),this.finalize(),this.elementProperties.set(t,i),!i.noAccessor&&!this.prototype.hasOwnProperty(t)){const s="symbol"==typeof t?Symbol():"__"+t,e=this.getPropertyDescriptor(t,s,i);void 0!==e&&Object.defineProperty(this.prototype,t,e);}}static getPropertyDescriptor(t,i,s){return {get(){return this[i]},set(e){const r=this[t];this[i]=e,this.requestUpdate(t,r,s);},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)||l$2}static finalize(){if(this.hasOwnProperty("finalized"))return !1;this.finalized=!0;const t=Object.getPrototypeOf(this);if(t.finalize(),void 0!==t.h&&(this.h=[...t.h]),this.elementProperties=new Map(t.elementProperties),this._$Ev=new Map,this.hasOwnProperty("properties")){const t=this.properties,i=[...Object.getOwnPropertyNames(t),...Object.getOwnPropertySymbols(t)];for(const s of i)this.createProperty(s,t[s]);}return this.elementStyles=this.finalizeStyles(this.styles),!0}static finalizeStyles(i){const s=[];if(Array.isArray(i)){const e=new Set(i.flat(1/0).reverse());for(const i of e)s.unshift(c$1(i));}else void 0!==i&&s.push(c$1(i));return s}static _$Ep(t,i){const s=i.attribute;return !1===s?void 0:"string"==typeof s?s:"string"==typeof t?t.toLowerCase():void 0}u(){var t;this._$E_=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$Eg(),this.requestUpdate(),null===(t=this.constructor.h)||void 0===t||t.forEach((t=>t(this)));}addController(t){var i,s;(null!==(i=this._$ES)&&void 0!==i?i:this._$ES=[]).push(t),void 0!==this.renderRoot&&this.isConnected&&(null===(s=t.hostConnected)||void 0===s||s.call(t));}removeController(t){var i;null===(i=this._$ES)||void 0===i||i.splice(this._$ES.indexOf(t)>>>0,1);}_$Eg(){this.constructor.elementProperties.forEach(((t,i)=>{this.hasOwnProperty(i)&&(this._$Ei.set(i,this[i]),delete this[i]);}));}createRenderRoot(){var t;const s=null!==(t=this.shadowRoot)&&void 0!==t?t:this.attachShadow(this.constructor.shadowRootOptions);return S$1(s,this.constructor.elementStyles),s}connectedCallback(){var t;void 0===this.renderRoot&&(this.renderRoot=this.createRenderRoot()),this.enableUpdating(!0),null===(t=this._$ES)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostConnected)||void 0===i?void 0:i.call(t)}));}enableUpdating(t){}disconnectedCallback(){var t;null===(t=this._$ES)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostDisconnected)||void 0===i?void 0:i.call(t)}));}attributeChangedCallback(t,i,s){this._$AK(t,s);}_$EO(t,i,s=l$2){var e;const r=this.constructor._$Ep(t,s);if(void 0!==r&&!0===s.reflect){const h=(void 0!==(null===(e=s.converter)||void 0===e?void 0:e.toAttribute)?s.converter:n$2).toAttribute(i,s.type);this._$El=t,null==h?this.removeAttribute(r):this.setAttribute(r,h),this._$El=null;}}_$AK(t,i){var s;const e=this.constructor,r=e._$Ev.get(t);if(void 0!==r&&this._$El!==r){const t=e.getPropertyOptions(r),h="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==(null===(s=t.converter)||void 0===s?void 0:s.fromAttribute)?t.converter:n$2;this._$El=r,this[r]=h.fromAttribute(i,t.type),this._$El=null;}}requestUpdate(t,i,s){let e=!0;void 0!==t&&(((s=s||this.constructor.getPropertyOptions(t)).hasChanged||a$1)(this[t],i)?(this._$AL.has(t)||this._$AL.set(t,i),!0===s.reflect&&this._$El!==t&&(void 0===this._$EC&&(this._$EC=new Map),this._$EC.set(t,s))):e=!1),!this.isUpdatePending&&e&&(this._$E_=this._$Ej());}async _$Ej(){this.isUpdatePending=!0;try{await this._$E_;}catch(t){Promise.reject(t);}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){var t;if(!this.isUpdatePending)return;this.hasUpdated,this._$Ei&&(this._$Ei.forEach(((t,i)=>this[i]=t)),this._$Ei=void 0);let i=!1;const s=this._$AL;try{i=this.shouldUpdate(s),i?(this.willUpdate(s),null===(t=this._$ES)||void 0===t||t.forEach((t=>{var i;return null===(i=t.hostUpdate)||void 0===i?void 0:i.call(t)})),this.update(s)):this._$Ek();}catch(t){throw i=!1,this._$Ek(),t}i&&this._$AE(s);}willUpdate(t){}_$AE(t){var i;null===(i=this._$ES)||void 0===i||i.forEach((t=>{var i;return null===(i=t.hostUpdated)||void 0===i?void 0:i.call(t)})),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t);}_$Ek(){this._$AL=new Map,this.isUpdatePending=!1;}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$E_}shouldUpdate(t){return !0}update(t){void 0!==this._$EC&&(this._$EC.forEach(((t,i)=>this._$EO(i,this[i],t))),this._$EC=void 0),this._$Ek();}updated(t){}firstUpdated(t){}};d$1.finalized=!0,d$1.elementProperties=new Map,d$1.elementStyles=[],d$1.shadowRootOptions={mode:"open"},null==o$2||o$2({ReactiveElement:d$1}),(null!==(s$2=e$1.reactiveElementVersions)&&void 0!==s$2?s$2:e$1.reactiveElementVersions=[]).push("1.6.1");
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+var t;const i=window,s$1=i.trustedTypes,e=s$1?s$1.createPolicy("lit-html",{createHTML:t=>t}):void 0,o$1=`lit$${(Math.random()+"").slice(9)}$`,n$1="?"+o$1,l$1=`<${n$1}>`,h=document,r=(t="")=>h.createComment(t),d=t=>null===t||"object"!=typeof t&&"function"!=typeof t,u=Array.isArray,c=t=>u(t)||"function"==typeof(null==t?void 0:t[Symbol.iterator]),v=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,a=/-->/g,f=/>/g,_=RegExp(">|[ \t\n\f\r](?:([^\\s\"'>=/]+)([ \t\n\f\r]*=[ \t\n\f\r]*(?:[^ \t\n\f\r\"'`<>=]|(\"|')|))|$)","g"),m=/'/g,p=/"/g,$=/^(?:script|style|textarea|title)$/i,g=t=>(i,...s)=>({_$litType$:t,strings:i,values:s}),y=g(1),x=Symbol.for("lit-noChange"),b=Symbol.for("lit-nothing"),T=new WeakMap,A=h.createTreeWalker(h,129,null,!1),E=(t,i)=>{const s=t.length-1,n=[];let h,r=2===i?"<svg>":"",d=v;for(let i=0;i<s;i++){const s=t[i];let e,u,c=-1,g=0;for(;g<s.length&&(d.lastIndex=g,u=d.exec(s),null!==u);)g=d.lastIndex,d===v?"!--"===u[1]?d=a:void 0!==u[1]?d=f:void 0!==u[2]?($.test(u[2])&&(h=RegExp("</"+u[2],"g")),d=_):void 0!==u[3]&&(d=_):d===_?">"===u[0]?(d=null!=h?h:v,c=-1):void 0===u[1]?c=-2:(c=d.lastIndex-u[2].length,e=u[1],d=void 0===u[3]?_:'"'===u[3]?p:m):d===p||d===m?d=_:d===a||d===f?d=v:(d=_,h=void 0);const y=d===_&&t[i+1].startsWith("/>")?" ":"";r+=d===v?s+l$1:c>=0?(n.push(e),s.slice(0,c)+"$lit$"+s.slice(c)+o$1+y):s+o$1+(-2===c?(n.push(void 0),i):y);}const u=r+(t[s]||"<?>")+(2===i?"</svg>":"");if(!Array.isArray(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return [void 0!==e?e.createHTML(u):u,n]};class C{constructor({strings:t,_$litType$:i},e){let l;this.parts=[];let h=0,d=0;const u=t.length-1,c=this.parts,[v,a]=E(t,i);if(this.el=C.createElement(v,e),A.currentNode=this.el.content,2===i){const t=this.el.content,i=t.firstChild;i.remove(),t.append(...i.childNodes);}for(;null!==(l=A.nextNode())&&c.length<u;){if(1===l.nodeType){if(l.hasAttributes()){const t=[];for(const i of l.getAttributeNames())if(i.endsWith("$lit$")||i.startsWith(o$1)){const s=a[d++];if(t.push(i),void 0!==s){const t=l.getAttribute(s.toLowerCase()+"$lit$").split(o$1),i=/([.?@])?(.*)/.exec(s);c.push({type:1,index:h,name:i[2],strings:t,ctor:"."===i[1]?M:"?"===i[1]?k:"@"===i[1]?H:S});}else c.push({type:6,index:h});}for(const i of t)l.removeAttribute(i);}if($.test(l.tagName)){const t=l.textContent.split(o$1),i=t.length-1;if(i>0){l.textContent=s$1?s$1.emptyScript:"";for(let s=0;s<i;s++)l.append(t[s],r()),A.nextNode(),c.push({type:2,index:++h});l.append(t[i],r());}}}else if(8===l.nodeType)if(l.data===n$1)c.push({type:2,index:h});else {let t=-1;for(;-1!==(t=l.data.indexOf(o$1,t+1));)c.push({type:7,index:h}),t+=o$1.length-1;}h++;}}static createElement(t,i){const s=h.createElement("template");return s.innerHTML=t,s}}function P(t,i,s=t,e){var o,n,l,h;if(i===x)return i;let r=void 0!==e?null===(o=s._$Co)||void 0===o?void 0:o[e]:s._$Cl;const u=d(i)?void 0:i._$litDirective$;return (null==r?void 0:r.constructor)!==u&&(null===(n=null==r?void 0:r._$AO)||void 0===n||n.call(r,!1),void 0===u?r=void 0:(r=new u(t),r._$AT(t,s,e)),void 0!==e?(null!==(l=(h=s)._$Co)&&void 0!==l?l:h._$Co=[])[e]=r:s._$Cl=r),void 0!==r&&(i=P(t,r._$AS(t,i.values),r,e)),i}class V{constructor(t,i){this.u=[],this._$AN=void 0,this._$AD=t,this._$AM=i;}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}v(t){var i;const{el:{content:s},parts:e}=this._$AD,o=(null!==(i=null==t?void 0:t.creationScope)&&void 0!==i?i:h).importNode(s,!0);A.currentNode=o;let n=A.nextNode(),l=0,r=0,d=e[0];for(;void 0!==d;){if(l===d.index){let i;2===d.type?i=new N(n,n.nextSibling,this,t):1===d.type?i=new d.ctor(n,d.name,d.strings,this,t):6===d.type&&(i=new I(n,this,t)),this.u.push(i),d=e[++r];}l!==(null==d?void 0:d.index)&&(n=A.nextNode(),l++);}return o}p(t){let i=0;for(const s of this.u)void 0!==s&&(void 0!==s.strings?(s._$AI(t,s,i),i+=s.strings.length-2):s._$AI(t[i])),i++;}}class N{constructor(t,i,s,e){var o;this.type=2,this._$AH=b,this._$AN=void 0,this._$AA=t,this._$AB=i,this._$AM=s,this.options=e,this._$Cm=null===(o=null==e?void 0:e.isConnected)||void 0===o||o;}get _$AU(){var t,i;return null!==(i=null===(t=this._$AM)||void 0===t?void 0:t._$AU)&&void 0!==i?i:this._$Cm}get parentNode(){let t=this._$AA.parentNode;const i=this._$AM;return void 0!==i&&11===t.nodeType&&(t=i.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,i=this){t=P(this,t,i),d(t)?t===b||null==t||""===t?(this._$AH!==b&&this._$AR(),this._$AH=b):t!==this._$AH&&t!==x&&this.g(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):c(t)?this.k(t):this.g(t);}O(t,i=this._$AB){return this._$AA.parentNode.insertBefore(t,i)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t));}g(t){this._$AH!==b&&d(this._$AH)?this._$AA.nextSibling.data=t:this.T(h.createTextNode(t)),this._$AH=t;}$(t){var i;const{values:s,_$litType$:e}=t,o="number"==typeof e?this._$AC(t):(void 0===e.el&&(e.el=C.createElement(e.h,this.options)),e);if((null===(i=this._$AH)||void 0===i?void 0:i._$AD)===o)this._$AH.p(s);else {const t=new V(o,this),i=t.v(this.options);t.p(s),this.T(i),this._$AH=t;}}_$AC(t){let i=T.get(t.strings);return void 0===i&&T.set(t.strings,i=new C(t)),i}k(t){u(this._$AH)||(this._$AH=[],this._$AR());const i=this._$AH;let s,e=0;for(const o of t)e===i.length?i.push(s=new N(this.O(r()),this.O(r()),this,this.options)):s=i[e],s._$AI(o),e++;e<i.length&&(this._$AR(s&&s._$AB.nextSibling,e),i.length=e);}_$AR(t=this._$AA.nextSibling,i){var s;for(null===(s=this._$AP)||void 0===s||s.call(this,!1,!0,i);t&&t!==this._$AB;){const i=t.nextSibling;t.remove(),t=i;}}setConnected(t){var i;void 0===this._$AM&&(this._$Cm=t,null===(i=this._$AP)||void 0===i||i.call(this,t));}}class S{constructor(t,i,s,e,o){this.type=1,this._$AH=b,this._$AN=void 0,this.element=t,this.name=i,this._$AM=e,this.options=o,s.length>2||""!==s[0]||""!==s[1]?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=b;}get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}_$AI(t,i=this,s,e){const o=this.strings;let n=!1;if(void 0===o)t=P(this,t,i,0),n=!d(t)||t!==this._$AH&&t!==x,n&&(this._$AH=t);else {const e=t;let l,h;for(t=o[0],l=0;l<o.length-1;l++)h=P(this,e[s+l],i,l),h===x&&(h=this._$AH[l]),n||(n=!d(h)||h!==this._$AH[l]),h===b?t=b:t!==b&&(t+=(null!=h?h:"")+o[l+1]),this._$AH[l]=h;}n&&!e&&this.j(t);}j(t){t===b?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,null!=t?t:"");}}class M extends S{constructor(){super(...arguments),this.type=3;}j(t){this.element[this.name]=t===b?void 0:t;}}const R=s$1?s$1.emptyScript:"";class k extends S{constructor(){super(...arguments),this.type=4;}j(t){t&&t!==b?this.element.setAttribute(this.name,R):this.element.removeAttribute(this.name);}}class H extends S{constructor(t,i,s,e,o){super(t,i,s,e,o),this.type=5;}_$AI(t,i=this){var s;if((t=null!==(s=P(this,t,i,0))&&void 0!==s?s:b)===x)return;const e=this._$AH,o=t===b&&e!==b||t.capture!==e.capture||t.once!==e.once||t.passive!==e.passive,n=t!==b&&(e===b||o);o&&this.element.removeEventListener(this.name,this,e),n&&this.element.addEventListener(this.name,this,t),this._$AH=t;}handleEvent(t){var i,s;"function"==typeof this._$AH?this._$AH.call(null!==(s=null===(i=this.options)||void 0===i?void 0:i.host)&&void 0!==s?s:this.element,t):this._$AH.handleEvent(t);}}class I{constructor(t,i,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=i,this.options=s;}get _$AU(){return this._$AM._$AU}_$AI(t){P(this,t);}}const z=i.litHtmlPolyfillSupport;null==z||z(C,N),(null!==(t=i.litHtmlVersions)&&void 0!==t?t:i.litHtmlVersions=[]).push("2.6.1");const Z=(t,i,s)=>{var e,o;const n=null!==(e=null==s?void 0:s.renderBefore)&&void 0!==e?e:i;let l=n._$litPart$;if(void 0===l){const t=null!==(o=null==s?void 0:s.renderBefore)&&void 0!==o?o:null;n._$litPart$=l=new N(i.insertBefore(r(),t),t,void 0,null!=s?s:{});}return l._$AI(t),l};
+
+/**
+ * @license
+ * Copyright 2017 Google LLC
+ * SPDX-License-Identifier: BSD-3-Clause
+ */var l,o;class s extends d$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const i=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=Z(i,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!1);}render(){return x}}s.finalized=!0,s._$litElement$=!0,null===(l=globalThis.litElementHydrateSupport)||void 0===l||l.call(globalThis,{LitElement:s});const n=globalThis.litElementPolyfillSupport;null==n||n({LitElement:s});(null!==(o=globalThis.litElementVersions)&&void 0!==o?o:globalThis.litElementVersions=[]).push("3.2.2");
 
 /**
  * @license
@@ -1352,111 +1267,6 @@ const isIterable = (value) => {
         !!(value && value[Symbol.iterator]);
 };
 /**
- * Writes attribute values to the DOM for a group of AttributeParts bound to a
- * single attribute. The value is only set once even if there are multiple parts
- * for an attribute.
- */
-class AttributeCommitter {
-    constructor(element, name, strings) {
-        this.dirty = true;
-        this.element = element;
-        this.name = name;
-        this.strings = strings;
-        this.parts = [];
-        for (let i = 0; i < strings.length - 1; i++) {
-            this.parts[i] = this._createPart();
-        }
-    }
-    /**
-     * Creates a single part. Override this to create a differnt type of part.
-     */
-    _createPart() {
-        return new AttributePart(this);
-    }
-    _getValue() {
-        const strings = this.strings;
-        const l = strings.length - 1;
-        const parts = this.parts;
-        // If we're assigning an attribute via syntax like:
-        //    attr="${foo}"  or  attr=${foo}
-        // but not
-        //    attr="${foo} ${bar}" or attr="${foo} baz"
-        // then we don't want to coerce the attribute value into one long
-        // string. Instead we want to just return the value itself directly,
-        // so that sanitizeDOMValue can get the actual value rather than
-        // String(value)
-        // The exception is if v is an array, in which case we do want to smash
-        // it together into a string without calling String() on the array.
-        //
-        // This also allows trusted values (when using TrustedTypes) being
-        // assigned to DOM sinks without being stringified in the process.
-        if (l === 1 && strings[0] === '' && strings[1] === '') {
-            const v = parts[0].value;
-            if (typeof v === 'symbol') {
-                return String(v);
-            }
-            if (typeof v === 'string' || !isIterable(v)) {
-                return v;
-            }
-        }
-        let text = '';
-        for (let i = 0; i < l; i++) {
-            text += strings[i];
-            const part = parts[i];
-            if (part !== undefined) {
-                const v = part.value;
-                if (isPrimitive(v) || !isIterable(v)) {
-                    text += typeof v === 'string' ? v : String(v);
-                }
-                else {
-                    for (const t of v) {
-                        text += typeof t === 'string' ? t : String(t);
-                    }
-                }
-            }
-        }
-        text += strings[l];
-        return text;
-    }
-    commit() {
-        if (this.dirty) {
-            this.dirty = false;
-            this.element.setAttribute(this.name, this._getValue());
-        }
-    }
-}
-/**
- * A Part that controls all or part of an attribute value.
- */
-class AttributePart {
-    constructor(committer) {
-        this.value = undefined;
-        this.committer = committer;
-    }
-    setValue(value) {
-        if (value !== noChange && (!isPrimitive(value) || value !== this.value)) {
-            this.value = value;
-            // If the value is a not a directive, dirty the committer so that it'll
-            // call setAttribute. If the value is a directive, it'll dirty the
-            // committer if it calls setValue().
-            if (!isDirective(value)) {
-                this.committer.dirty = true;
-            }
-        }
-    }
-    commit() {
-        while (isDirective(this.value)) {
-            const directive = this.value;
-            this.value = noChange;
-            directive(this);
-        }
-        if (this.value === noChange) {
-            return;
-        }
-        this.committer.commit();
-    }
-}
-/**
  * A Part that controls a location within a Node tree. Like a Range, NodePart
  * has start and end locations and can set and update the Nodes between those
  * locations.
@@ -1642,83 +1452,6 @@ class NodePart {
         removeNodes(this.startNode.parentNode, startNode.nextSibling, this.endNode);
     }
 }
-/**
- * Implements a boolean attribute, roughly as defined in the HTML
- * specification.
- *
- * If the value is truthy, then the attribute is present with a value of
- * ''. If the value is falsey, the attribute is removed.
- */
-class BooleanAttributePart {
-    constructor(element, name, strings) {
-        this.value = undefined;
-        this.__pendingValue = undefined;
-        if (strings.length !== 2 || strings[0] !== '' || strings[1] !== '') {
-            throw new Error('Boolean attributes can only contain a single expression');
-        }
-        this.element = element;
-        this.name = name;
-        this.strings = strings;
-    }
-    setValue(value) {
-        this.__pendingValue = value;
-    }
-    commit() {
-        while (isDirective(this.__pendingValue)) {
-            const directive = this.__pendingValue;
-            this.__pendingValue = noChange;
-            directive(this);
-        }
-        if (this.__pendingValue === noChange) {
-            return;
-        }
-        const value = !!this.__pendingValue;
-        if (this.value !== value) {
-            if (value) {
-                this.element.setAttribute(this.name, '');
-            }
-            else {
-                this.element.removeAttribute(this.name);
-            }
-            this.value = value;
-        }
-        this.__pendingValue = noChange;
-    }
-}
-/**
- * Sets attribute values for PropertyParts, so that the value is only set once
- * even if there are multiple parts for a property.
- *
- * If an expression controls the whole property value, then the value is simply
- * assigned to the property under control. If there are string literals or
- * multiple expressions, then the strings are expressions are interpolated into
- * a string first.
- */
-class PropertyCommitter extends AttributeCommitter {
-    constructor(element, name, strings) {
-        super(element, name, strings);
-        this.single =
-            (strings.length === 2 && strings[0] === '' && strings[1] === '');
-    }
-    _createPart() {
-        return new PropertyPart(this);
-    }
-    _getValue() {
-        if (this.single) {
-            return this.parts[0].value;
-        }
-        return super._getValue();
-    }
-    commit() {
-        if (this.dirty) {
-            this.dirty = false;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            this.element[this.name] = this._getValue();
-        }
-    }
-}
-class PropertyPart extends AttributePart {
-}
 // Detect event listener options support. If the `capture` property is read
 // from the options object, then options are supported. If not, then the third
 // argument to add/removeEventListener is interpreted as the boolean capture
@@ -1743,61 +1476,6 @@ let eventOptionsSupported = false;
         // event options not supported
     }
 })();
-class EventPart {
-    constructor(element, eventName, eventContext) {
-        this.value = undefined;
-        this.__pendingValue = undefined;
-        this.element = element;
-        this.eventName = eventName;
-        this.eventContext = eventContext;
-        this.__boundHandleEvent = (e) => this.handleEvent(e);
-    }
-    setValue(value) {
-        this.__pendingValue = value;
-    }
-    commit() {
-        while (isDirective(this.__pendingValue)) {
-            const directive = this.__pendingValue;
-            this.__pendingValue = noChange;
-            directive(this);
-        }
-        if (this.__pendingValue === noChange) {
-            return;
-        }
-        const newListener = this.__pendingValue;
-        const oldListener = this.value;
-        const shouldRemoveListener = newListener == null ||
-            oldListener != null &&
-                (newListener.capture !== oldListener.capture ||
-                    newListener.once !== oldListener.once ||
-                    newListener.passive !== oldListener.passive);
-        const shouldAddListener = newListener != null && (oldListener == null || shouldRemoveListener);
-        if (shouldRemoveListener) {
-            this.element.removeEventListener(this.eventName, this.__boundHandleEvent, this.__options);
-        }
-        if (shouldAddListener) {
-            this.__options = getOptions(newListener);
-            this.element.addEventListener(this.eventName, this.__boundHandleEvent, this.__options);
-        }
-        this.value = newListener;
-        this.__pendingValue = noChange;
-    }
-    handleEvent(event) {
-        if (typeof this.value === 'function') {
-            this.value.call(this.eventContext || this.element, event);
-        }
-        else {
-            this.value.handleEvent(event);
-        }
-    }
-}
-// We copy options because of the inconsistent behavior of browsers when reading
-// the third argument of add/removeEventListener. IE11 doesn't support options
-// at all. Chrome 41 only reads `capture` if the argument is an object.
-const getOptions = (o) => o &&
-    (eventOptionsSupported ?
-        { capture: o.capture, passive: o.passive, once: o.once } :
-        o.capture);
 
 /**
  * @license
@@ -1899,68 +1577,12 @@ const render$1 = (result, container, options) => {
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-/**
- * Creates Parts when a template is instantiated.
- */
-class DefaultTemplateProcessor {
-    /**
-     * Create parts for an attribute-position binding, given the event, attribute
-     * name, and string literals.
-     *
-     * @param element The element containing the binding
-     * @param name  The attribute name
-     * @param strings The string literals. There are always at least two strings,
-     *   event for fully-controlled bindings with a single expression.
-     */
-    handleAttributeExpressions(element, name, strings, options) {
-        const prefix = name[0];
-        if (prefix === '.') {
-            const committer = new PropertyCommitter(element, name.slice(1), strings);
-            return committer.parts;
-        }
-        if (prefix === '@') {
-            return [new EventPart(element, name.slice(1), options.eventContext)];
-        }
-        if (prefix === '?') {
-            return [new BooleanAttributePart(element, name.slice(1), strings)];
-        }
-        const committer = new AttributeCommitter(element, name, strings);
-        return committer.parts;
-    }
-    /**
-     * Create parts for a text-position binding.
-     * @param templateFactory
-     */
-    handleTextExpression(options) {
-        return new NodePart(options);
-    }
-}
-const defaultTemplateProcessor = new DefaultTemplateProcessor();
-
-/**
- * @license
- * Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at
- * http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at
- * http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at
- * http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at
- * http://polymer.github.io/PATENTS.txt
- */
 // IMPORTANT: do not change the property name or the assignment expression.
 // This line will be used in regexes to search for lit-html usage.
 // TODO(justinfagnani): inject version number at build time
 if (typeof window !== 'undefined') {
     (window['litHtmlVersions'] || (window['litHtmlVersions'] = [])).push('1.4.1');
 }
-/**
- * Interprets a template literal as an HTML template that can efficiently
- * render to and update a container.
- */
-const html = (strings, ...values) => new TemplateResult(strings, values, 'html', defaultTemplateProcessor);
 
 /**
  * @license
@@ -3124,28 +2746,6 @@ class CSSResult {
 const unsafeCSS = (value) => {
     return new CSSResult(String(value), constructionToken);
 };
-const textFromCSSResult = (value) => {
-    if (value instanceof CSSResult) {
-        return value.cssText;
-    }
-    else if (typeof value === 'number') {
-        return value;
-    }
-    else {
-        throw new Error(`Value passed to 'css' function must be a 'css' function result: ${value}. Use 'unsafeCSS' to pass non-literal values, but
-            take care to ensure page security.`);
-    }
-};
-/**
- * Template tag which which can be used with LitElement's [[LitElement.styles |
- * `styles`]] property to set element styles. For security reasons, only literal
- * string values may be used. To incorporate non-literal values [[`unsafeCSS`]]
- * may be used inside a template string part.
- */
-const css = (strings, ...values) => {
-    const cssText = values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
-    return new CSSResult(cssText, constructionToken);
-};
 
 /**
  * @license
@@ -3374,346 +2974,695 @@ LitElement.render = render;
 /** @nocollapse */
 LitElement.shadowRootOptions = { mode: 'open' };
 
-var _templateObject$1;
-var cardStyles = css(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["\n  .sun-card {\n    --sun-card-lines: #464646;\n    --sun-card-text-color: #fff;\n    --sun-card-subtitle-color: #fff;\n\n    color: var(--sun-card-text-color);\n    padding: 1rem;\n  }\n\n  .sun-card-body {\n    padding-top: 0.5rem;\n  }\n\n  .sun-card.sun-card-light {\n    --sun-card-lines: #ececec;\n    --sun-card-text-color: #000;\n    --sun-card-subtitle-color: #828282;\n  }\n\n  .sun-card-header {\n    display: flex;\n    justify-content: space-between;\n  }\n  \n  .sun-card-footer .sun-card-footer-row {\n    display: flex;\n    justify-content: space-around;\n    padding-top: 1.5rem;\n  }\n\n  .sun-card-title {\n    font-size: 1.5rem;\n    font-weight: 500;\n    padding-bottom: 2rem;\n    margin: 0;\n  }\n\n  .sun-card-text-container {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n  }\n\n  .sun-card-header .sun-card-text-subtitle {\n    font-size: 1.15rem;\n    font-weight: 400;\n    padding-bottom: 0.25rem;\n    color: var(--sun-card-subtitle-color);\n  }\n\n  .sun-card-header .sun-card-text-time {\n    font-size: 1.85rem;\n    font-weight: 400;\n  }\n\n  .sun-card-footer .sun-card-text-subtitle {\n    font-size: 1.25rem;\n    font-weight: 400;\n    padding-bottom: 0.5rem;\n    color: var(--sun-card-subtitle-color);\n  }\n\n  .sun-card-footer .sun-card-text-time {\n    font-size: 1.25rem;\n    font-weight: 500;\n  }\n\n  .sun-card-text-time-period {\n    font-size: 0.75rem;\n  }\n"])));
+var _templateObject$7;
+var cardStyles = i$1(_templateObject$7 || (_templateObject$7 = _taggedTemplateLiteral(["\n  .horizon-card {\n    --horizon-card-primary: var(--primary-text-color, #000000);\n    --horizon-card-secondary: var(--secondary-text-color, #828282);\n    --horizon-card-accent: #d7d7d7;\n\n    --horizon-card-lines: var(--horizon-card-accent);\n    --horizon-card-field-name-color: var(--horizon-card-secondary);\n    --horizon-card-field-value-color: var(--horizon-card-primary);\n\n    --horizon-card-stop-invisible: rgb(0,0,0,0);\n    --horizon-card-stop-sun-color: #f9d05e;\n    --horizon-card-stop-dawn-color: #393b78;\n    --horizon-card-stop-day-color: #8ebeeb;\n    --horizon-card-stop-dusk-color: #393b78;\n\n    padding: 0.5rem;\n    font-family: var(--primary-font-family);\n  }\n\n  .horizon-card.horizon-card-dark {\n    --horizon-card-primary: #ffffff;\n    --horizon-card-secondary: #828282;\n    --horizon-card-accent: #464646;\n  }\n\n  .horizon-card-field-row {\n    display: flex;\n    justify-content: space-around;\n    margin-top: 1rem;\n  }\n\n  .horizon-card-text-container {\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n  }\n\n  .horizon-card-field-name {\n    color: var(--horizon-card-field-name-color);\n  }\n\n  .horizon-card-field-value {\n    color: var(--horizon-card-field-value-color);\n    font-size: 1.3em;\n    line-height: 1.1em;\n  }\n\n  .horizon-card-header {\n    display: flex;\n    justify-content: space-around;\n    margin-top: 1rem;\n    margin-bottom: -1rem;\n  }\n\n  .horizon-card-header .horizon-card-text-container {\n    font-size: 1.3rem;\n  }\n\n  .horizon-card-footer {\n    margin-bottom: 1rem;\n  }\n\n  .horizon-card-title {\n    margin: 1rem 1rem 2rem 1rem;\n    font-size: 1.5rem;\n    color: var(--horizon-card-primary);\n  }\n\n  .horizon-card-graph {\n    shape-rendering=\"geometricPrecision\";\n    margin: 1rem 0 1rem 0;\n  }\n\n  .horizon-card-graph .sunInitialStop {\n    stop-color: var(--horizon-card-stop-sun-color);\n  }\n\n  .horizon-card-graph .sunMiddleStop {\n    stop-color: var(--horizon-card-stop-sun-color);\n  }\n\n  .horizon-card-graph .sunEndStop {\n    stop-color: var(--horizon-card-stop-invisible);\n  }\n\n  .horizon-card-graph .dawnInitialStop {\n    stop-color: var(--horizon-card-stop-dawn-color);\n  }\n\n  .horizon-card-graph .dawnMiddleStop {\n    stop-color: var(--horizon-card-stop-dawn-color);\n  }\n\n  .horizon-card-graph .dawnEndStop {\n    stop-color: var(--horizon-card-stop-invisible);\n  }\n\n  .horizon-card-graph .dayInitialStop {\n    stop-color: var(--horizon-card-stop-day-color);\n  }\n\n  .horizon-card-graph .dayMiddleStop {\n    stop-color: var(--horizon-card-stop-day-color);\n  }\n\n  .horizon-card-graph .dayEndStop {\n    stop-color: var(--horizon-card-stop-invisible);\n  }\n\n  .horizon-card-graph .duskInitialStop {\n    stop-color: var(--horizon-card-stop-dusk-color);\n  }\n\n  .horizon-card-graph .duskMiddleStop {\n    stop-color: var(--horizon-card-stop-dusk-color);\n  }\n\n  .horizon-card-graph .duskEndStop {\n    stop-color: var(--horizon-card-stop-invisible);\n  }\n\n  .card-config ul {\n    list-style: none;\n    padding: 0 0 0 1.5rem;\n  }\n\n  .card-config li {\n    padding: 0.5rem 0;\n  }\n"])));
 
-var Azimuth$e = "Azimut";
-var Dawn$e = "Daggry";
-var Dusk$e = "Tusmørke";
-var Elevation$e = "Højde";
-var Noon$e = "Middag";
-var Sunrise$e = "Solopgang";
-var Sunset$e = "Solnedgang";
-var errors$e = {
-	SunIntegrationNotFound: "Sun integration not found"
+var azimuth$t = "Азимут";
+var dawn$t = "Зора";
+var dusk$t = "Здрач";
+var elevation$t = "Височина";
+var noon$t = "Пладне";
+var sunrise$t = "Изгрев";
+var sunset$t = "Залез";
+var errors$t = {
+	SunIntegrationNotFound: "Интеграцията Sun не е намерена"
+};
+var bg = {
+	azimuth: azimuth$t,
+	dawn: dawn$t,
+	dusk: dusk$t,
+	elevation: elevation$t,
+	noon: noon$t,
+	sunrise: sunrise$t,
+	sunset: sunset$t,
+	errors: errors$t
+};
+
+var azimuth$s = "Azimut";
+var dawn$s = "Alba";
+var dusk$s = "Capvespre";
+var elevation$s = "Elevació";
+var noon$s = "Migdia solar";
+var sunrise$s = "Sortida del sol";
+var sunset$s = "Posta del sol";
+var errors$s = {
+	SunIntegrationNotFound: "No s'ha trobat la integració Sun"
+};
+var ca = {
+	azimuth: azimuth$s,
+	dawn: dawn$s,
+	dusk: dusk$s,
+	elevation: elevation$s,
+	noon: noon$s,
+	sunrise: sunrise$s,
+	sunset: sunset$s,
+	errors: errors$s
+};
+
+var azimuth$r = "Azimut";
+var dawn$r = "Svítání";
+var dusk$r = "Soumrak";
+var elevation$r = "Výška";
+var noon$r = "Sluneční poledne";
+var sunrise$r = "Východ slunce";
+var sunset$r = "Západ slunce";
+var errors$r = {
+	SunIntegrationNotFound: "Integrace Sun nenalezena"
+};
+var cs = {
+	azimuth: azimuth$r,
+	dawn: dawn$r,
+	dusk: dusk$r,
+	elevation: elevation$r,
+	noon: noon$r,
+	sunrise: sunrise$r,
+	sunset: sunset$r,
+	errors: errors$r
+};
+
+var azimuth$q = "Azimut";
+var dawn$q = "Daggry";
+var dusk$q = "Skumring";
+var elevation$q = "Højde";
+var noon$q = "Middag";
+var sunrise$q = "Solopgang";
+var sunset$q = "Solnedgang";
+var errors$q = {
+	SunIntegrationNotFound: "kunne ikke finde integrationen for Sol"
 };
 var da = {
-	Azimuth: Azimuth$e,
-	Dawn: Dawn$e,
-	Dusk: Dusk$e,
-	Elevation: Elevation$e,
-	Noon: Noon$e,
-	Sunrise: Sunrise$e,
-	Sunset: Sunset$e,
-	errors: errors$e
+	azimuth: azimuth$q,
+	dawn: dawn$q,
+	dusk: dusk$q,
+	elevation: elevation$q,
+	noon: noon$q,
+	sunrise: sunrise$q,
+	sunset: sunset$q,
+	errors: errors$q
 };
 
-var Azimuth$d = "Azimut";
-var Dawn$d = "Morgendämmerung";
-var Dusk$d = "Abenddämmerung";
-var Elevation$d = "Zenitwinkel";
-var Noon$d = "Zenit";
-var Sunrise$d = "Sonnenaufgang";
-var Sunset$d = "Sonnenuntergang";
-var errors$d = {
+var azimuth$p = "Azimut";
+var dawn$p = "Morgendämmerung";
+var dusk$p = "Abenddämmerung";
+var elevation$p = "Zenitwinkel";
+var noon$p = "Zenit";
+var sunrise$p = "Sonnenaufgang";
+var sunset$p = "Sonnenuntergang";
+var errors$p = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var de = {
-	Azimuth: Azimuth$d,
-	Dawn: Dawn$d,
-	Dusk: Dusk$d,
-	Elevation: Elevation$d,
-	Noon: Noon$d,
-	Sunrise: Sunrise$d,
-	Sunset: Sunset$d,
-	errors: errors$d
+	azimuth: azimuth$p,
+	dawn: dawn$p,
+	dusk: dusk$p,
+	elevation: elevation$p,
+	noon: noon$p,
+	sunrise: sunrise$p,
+	sunset: sunset$p,
+	errors: errors$p
 };
 
-var Azimuth$c = "Azimuth";
-var Dawn$c = "Dawn";
-var Dusk$c = "Dusk";
-var Elevation$c = "Elevation";
-var Noon$c = "Solar noon";
-var Sunrise$c = "Sunrise";
-var Sunset$c = "Sunset";
-var errors$c = {
+var azimuth$o = "Azimuth";
+var dawn$o = "Dawn";
+var dusk$o = "Dusk";
+var elevation$o = "Elevation";
+var noon$o = "Solar noon";
+var sunrise$o = "Sunrise";
+var sunset$o = "Sunset";
+var errors$o = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var en = {
-	Azimuth: Azimuth$c,
-	Dawn: Dawn$c,
-	Dusk: Dusk$c,
-	Elevation: Elevation$c,
-	Noon: Noon$c,
-	Sunrise: Sunrise$c,
-	Sunset: Sunset$c,
-	errors: errors$c
+	azimuth: azimuth$o,
+	dawn: dawn$o,
+	dusk: dusk$o,
+	elevation: elevation$o,
+	noon: noon$o,
+	sunrise: sunrise$o,
+	sunset: sunset$o,
+	errors: errors$o
 };
 
-var Azimuth$b = "Azimut";
-var Dawn$b = "Amanecer";
-var Dusk$b = "Anochecer";
-var Elevation$b = "Elevación";
-var Noon$b = "Mediodía solar";
-var Sunrise$b = "Salida del sol";
-var Sunset$b = "Atardecer";
-var errors$b = {
-	SunIntegrationNotFound: "Sun integration not found"
+var azimuth$n = "Azimut";
+var dawn$n = "Amanecer";
+var dusk$n = "Anochecer";
+var elevation$n = "Elevación";
+var noon$n = "Mediodía solar";
+var sunrise$n = "Salida del sol";
+var sunset$n = "Atardecer";
+var errors$n = {
+	SunIntegrationNotFound: "No se encontró la integración de Sun"
 };
 var es = {
-	Azimuth: Azimuth$b,
-	Dawn: Dawn$b,
-	Dusk: Dusk$b,
-	Elevation: Elevation$b,
-	Noon: Noon$b,
-	Sunrise: Sunrise$b,
-	Sunset: Sunset$b,
-	errors: errors$b
+	azimuth: azimuth$n,
+	dawn: dawn$n,
+	dusk: dusk$n,
+	elevation: elevation$n,
+	noon: noon$n,
+	sunrise: sunrise$n,
+	sunset: sunset$n,
+	errors: errors$n
 };
 
-var Azimuth$a = "Asimuut";
-var Dawn$a = "Koidik";
-var Dusk$a = "Hämarik";
-var Elevation$a = "Kõrgus";
-var Noon$a = "Keskpäev";
-var Sunrise$a = "Päikesetõus";
-var Sunset$a = "Päikeseloojang";
-var errors$a = {
+var azimuth$m = "Asimuut";
+var dawn$m = "Koidik";
+var dusk$m = "Hämarik";
+var elevation$m = "Kõrgus";
+var noon$m = "Keskpäev";
+var sunrise$m = "Päikesetõus";
+var sunset$m = "Päikeseloojang";
+var errors$m = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var et = {
-	Azimuth: Azimuth$a,
-	Dawn: Dawn$a,
-	Dusk: Dusk$a,
-	Elevation: Elevation$a,
-	Noon: Noon$a,
-	Sunrise: Sunrise$a,
-	Sunset: Sunset$a,
-	errors: errors$a
+	azimuth: azimuth$m,
+	dawn: dawn$m,
+	dusk: dusk$m,
+	elevation: elevation$m,
+	noon: noon$m,
+	sunrise: sunrise$m,
+	sunset: sunset$m,
+	errors: errors$m
 };
 
-var Azimuth$9 = "Atsimuutti";
-var Dawn$9 = "Sarastus";
-var Dusk$9 = "Hämärä";
-var Elevation$9 = "Korkeus";
-var Noon$9 = "Keskipäivä";
-var Sunrise$9 = "Auringonnousu";
-var Sunset$9 = "Auringonlasku";
-var errors$9 = {
+var azimuth$l = "Atsimuutti";
+var dawn$l = "Sarastus";
+var dusk$l = "Hämärä";
+var elevation$l = "Korkeus";
+var noon$l = "Keskipäivä";
+var sunrise$l = "Auringonnousu";
+var sunset$l = "Auringonlasku";
+var errors$l = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var fi = {
-	Azimuth: Azimuth$9,
-	Dawn: Dawn$9,
-	Dusk: Dusk$9,
-	Elevation: Elevation$9,
-	Noon: Noon$9,
-	Sunrise: Sunrise$9,
-	Sunset: Sunset$9,
-	errors: errors$9
+	azimuth: azimuth$l,
+	dawn: dawn$l,
+	dusk: dusk$l,
+	elevation: elevation$l,
+	noon: noon$l,
+	sunrise: sunrise$l,
+	sunset: sunset$l,
+	errors: errors$l
 };
 
-var Azimuth$8 = "Azimut";
-var Dawn$8 = "Aube";
-var Dusk$8 = "Crépuscule";
-var Elevation$8 = "Élévation";
-var Noon$8 = "Midi solaire";
-var Sunrise$8 = "Lever du soleil";
-var Sunset$8 = "Coucher du soleil";
-var errors$8 = {
+var azimuth$k = "Azimut";
+var dawn$k = "Aube";
+var dusk$k = "Crépuscule";
+var elevation$k = "Élévation";
+var noon$k = "Midi solaire";
+var sunrise$k = "Lever du soleil";
+var sunset$k = "Coucher du soleil";
+var errors$k = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var fr = {
-	Azimuth: Azimuth$8,
-	Dawn: Dawn$8,
-	Dusk: Dusk$8,
-	Elevation: Elevation$8,
-	Noon: Noon$8,
-	Sunrise: Sunrise$8,
-	Sunset: Sunset$8,
-	errors: errors$8
+	azimuth: azimuth$k,
+	dawn: dawn$k,
+	dusk: dusk$k,
+	elevation: elevation$k,
+	noon: noon$k,
+	sunrise: sunrise$k,
+	sunset: sunset$k,
+	errors: errors$k
 };
 
-var Azimuth$7 = "Azimut";
-var Dawn$7 = "Hajnal";
-var Dusk$7 = "Szürkület";
-var Elevation$7 = "Magasság";
-var Noon$7 = "Dél";
-var Sunrise$7 = "Napkelte";
-var Sunset$7 = "Napnyugta";
-var errors$7 = {
+var azimuth$j = "אזימוט";
+var dawn$j = "עלות השחר";
+var dusk$j = "בין הערבים";
+var elevation$j = "גובה";
+var noon$j = "אמצע היום";
+var sunrise$j = "זריחה";
+var sunset$j = "שקיעה";
+var errors$j = {
+	SunIntegrationNotFound: "אינטגרצית שמש לא נמצאה"
+};
+var he = {
+	azimuth: azimuth$j,
+	dawn: dawn$j,
+	dusk: dusk$j,
+	elevation: elevation$j,
+	noon: noon$j,
+	sunrise: sunrise$j,
+	sunset: sunset$j,
+	errors: errors$j
+};
+
+var azimuth$i = "Azimut";
+var dawn$i = "Hajnal";
+var dusk$i = "Szürkület";
+var elevation$i = "Magasság";
+var noon$i = "Dél";
+var sunrise$i = "Napkelte";
+var sunset$i = "Napnyugta";
+var errors$i = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var hu = {
-	Azimuth: Azimuth$7,
-	Dawn: Dawn$7,
-	Dusk: Dusk$7,
-	Elevation: Elevation$7,
-	Noon: Noon$7,
-	Sunrise: Sunrise$7,
-	Sunset: Sunset$7,
-	errors: errors$7
+	azimuth: azimuth$i,
+	dawn: dawn$i,
+	dusk: dusk$i,
+	elevation: elevation$i,
+	noon: noon$i,
+	sunrise: sunrise$i,
+	sunset: sunset$i,
+	errors: errors$i
 };
 
-var Azimuth$6 = "Azimuth";
-var Dawn$6 = "Alba";
-var Dusk$6 = "Crepuscolo";
-var Elevation$6 = "Elevazione";
-var Noon$6 = "Mezzogiorno solare";
-var Sunrise$6 = "Alba";
-var Sunset$6 = "Tramonto";
-var errors$6 = {
+var azimuth$h = "Áttarhorn";
+var dawn$h = "Dögun";
+var dusk$h = "Rökkur";
+var elevation$h = "Hækkun";
+var noon$h = "Sólarhádegi";
+var sunrise$h = "Sólarupprás";
+var sunset$h = "Sólsetur";
+var errors$h = {
+	SunIntegrationNotFound: "Sólar eining fannst ekki"
+};
+var is = {
+	azimuth: azimuth$h,
+	dawn: dawn$h,
+	dusk: dusk$h,
+	elevation: elevation$h,
+	noon: noon$h,
+	sunrise: sunrise$h,
+	sunset: sunset$h,
+	errors: errors$h
+};
+
+var azimuth$g = "Azimuth";
+var dawn$g = "Aurora";
+var dusk$g = "Crepuscolo";
+var elevation$g = "Elevazione";
+var noon$g = "Mezzogiorno solare";
+var sunrise$g = "Alba";
+var sunset$g = "Tramonto";
+var errors$g = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var it = {
-	Azimuth: Azimuth$6,
-	Dawn: Dawn$6,
-	Dusk: Dusk$6,
-	Elevation: Elevation$6,
-	Noon: Noon$6,
-	Sunrise: Sunrise$6,
-	Sunset: Sunset$6,
-	errors: errors$6
+	azimuth: azimuth$g,
+	dawn: dawn$g,
+	dusk: dusk$g,
+	elevation: elevation$g,
+	noon: noon$g,
+	sunrise: sunrise$g,
+	sunset: sunset$g,
+	errors: errors$g
 };
 
-var Azimuth$5 = "Azimut";
-var Dawn$5 = "Dageraad";
-var Dusk$5 = "Schemer";
-var Elevation$5 = "Hoogte";
-var Noon$5 = "Zonne-middag";
-var Sunrise$5 = "Zonsopkomst";
-var Sunset$5 = "Zonsondergang";
-var errors$5 = {
+var azimuth$f = "方位角";
+var dawn$f = "明け方";
+var dusk$f = "夕";
+var elevation$f = "仰俯角";
+var noon$f = "太陽の正午";
+var sunrise$f = "日出";
+var sunset$f = "日沒";
+var errors$f = {
+	SunIntegrationNotFound: "インテグレーション Sun は検索できません"
+};
+var ja = {
+	azimuth: azimuth$f,
+	dawn: dawn$f,
+	dusk: dusk$f,
+	elevation: elevation$f,
+	noon: noon$f,
+	sunrise: sunrise$f,
+	sunset: sunset$f,
+	errors: errors$f
+};
+
+var azimuth$e = "Azimutas";
+var dawn$e = "Aušra";
+var dusk$e = "Prieblanda";
+var elevation$e = "Pakilimas";
+var noon$e = "Vidurdienis";
+var sunrise$e = "Saulėtekis";
+var sunset$e = "Saulėlydis";
+var errors$e = {
+	SunIntegrationNotFound: "Sun integration not found"
+};
+var lt = {
+	azimuth: azimuth$e,
+	dawn: dawn$e,
+	dusk: dusk$e,
+	elevation: elevation$e,
+	noon: noon$e,
+	sunrise: sunrise$e,
+	sunset: sunset$e,
+	errors: errors$e
+};
+
+var azimuth$d = "Azimut";
+var dawn$d = "Daggry";
+var dusk$d = "Skumring";
+var elevation$d = "Elevasjon";
+var noon$d = "Middag";
+var sunrise$d = "Soloppgang";
+var sunset$d = "Solnedgang";
+var errors$d = {
+	SunIntegrationNotFound: "Fant ikke Sol-integrasjonen"
+};
+var nb = {
+	azimuth: azimuth$d,
+	dawn: dawn$d,
+	dusk: dusk$d,
+	elevation: elevation$d,
+	noon: noon$d,
+	sunrise: sunrise$d,
+	sunset: sunset$d,
+	errors: errors$d
+};
+
+var azimuth$c = "Azimut";
+var dawn$c = "Dageraad";
+var dusk$c = "Schemer";
+var elevation$c = "Hoogte";
+var noon$c = "Middaguur";
+var sunrise$c = "Zonsopkomst";
+var sunset$c = "Zonsondergang";
+var errors$c = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var nl = {
-	Azimuth: Azimuth$5,
-	Dawn: Dawn$5,
-	Dusk: Dusk$5,
-	Elevation: Elevation$5,
-	Noon: Noon$5,
-	Sunrise: Sunrise$5,
-	Sunset: Sunset$5,
-	errors: errors$5
+	azimuth: azimuth$c,
+	dawn: dawn$c,
+	dusk: dusk$c,
+	elevation: elevation$c,
+	noon: noon$c,
+	sunrise: sunrise$c,
+	sunset: sunset$c,
+	errors: errors$c
 };
 
-var Azimuth$4 = "Azymut";
-var Dawn$4 = "Świt";
-var Dusk$4 = "Zmierzch";
-var Elevation$4 = "Wysokość";
-var Noon$4 = "Górowanie";
-var Sunrise$4 = "Wschód";
-var Sunset$4 = "Zachód";
-var errors$4 = {
+var azimuth$b = "Asimut";
+var dawn$b = "Daggry";
+var dusk$b = "Skumring";
+var elevation$b = "Høgde";
+var noon$b = "Middag";
+var sunrise$b = "Soloppgang";
+var sunset$b = "Solnedgang";
+var errors$b = {
+	SunIntegrationNotFound: "Kunne ikkje finne sol-integrasjonen"
+};
+var nn = {
+	azimuth: azimuth$b,
+	dawn: dawn$b,
+	dusk: dusk$b,
+	elevation: elevation$b,
+	noon: noon$b,
+	sunrise: sunrise$b,
+	sunset: sunset$b,
+	errors: errors$b
+};
+
+var azimuth$a = "Azymut";
+var dawn$a = "Świt";
+var dusk$a = "Zmierzch";
+var elevation$a = "Wysokość";
+var noon$a = "Górowanie";
+var sunrise$a = "Wschód";
+var sunset$a = "Zachód";
+var errors$a = {
 	SunIntegrationNotFound: "Nie odnaleziono integracji sun"
 };
 var pl = {
-	Azimuth: Azimuth$4,
-	Dawn: Dawn$4,
-	Dusk: Dusk$4,
-	Elevation: Elevation$4,
-	Noon: Noon$4,
-	Sunrise: Sunrise$4,
-	Sunset: Sunset$4,
-	errors: errors$4
+	azimuth: azimuth$a,
+	dawn: dawn$a,
+	dusk: dusk$a,
+	elevation: elevation$a,
+	noon: noon$a,
+	sunrise: sunrise$a,
+	sunset: sunset$a,
+	errors: errors$a
 };
 
-var Azimuth$3 = "Azimute";
-var Dawn$3 = "Amanhecer";
-var Dusk$3 = "Anoitecer";
-var Elevation$3 = "Elevação";
-var Noon$3 = "Meio dia solar";
-var Sunrise$3 = "Nascer do sol";
-var Sunset$3 = "Pôr do sol";
-var errors$3 = {
-	SunIntegrationNotFound: "Sun integration not found"
+var azimuth$9 = "Azimute";
+var dawn$9 = "Amanhecer";
+var dusk$9 = "Anoitecer";
+var elevation$9 = "Elevação";
+var noon$9 = "Meio dia solar";
+var sunrise$9 = "Nascer do sol";
+var sunset$9 = "Pôr do sol";
+var errors$9 = {
+	SunIntegrationNotFound: "Integração Sun não encontrada"
 };
 var ptBR = {
-	Azimuth: Azimuth$3,
-	Dawn: Dawn$3,
-	Dusk: Dusk$3,
-	Elevation: Elevation$3,
-	Noon: Noon$3,
-	Sunrise: Sunrise$3,
-	Sunset: Sunset$3,
-	errors: errors$3
+	azimuth: azimuth$9,
+	dawn: dawn$9,
+	dusk: dusk$9,
+	elevation: elevation$9,
+	noon: noon$9,
+	sunrise: sunrise$9,
+	sunset: sunset$9,
+	errors: errors$9
 };
 
-var Azimuth$2 = "Азимут";
-var Dawn$2 = "Рассвет";
-var Dusk$2 = "Сумерки";
-var Elevation$2 = "Высота";
-var Noon$2 = "Зенит";
-var Sunrise$2 = "Восход";
-var Sunset$2 = "Закат";
-var errors$2 = {
+var azimuth$8 = "Azimut";
+var dawn$8 = "Zori";
+var dusk$8 = "Amurg";
+var elevation$8 = "Elevație";
+var noon$8 = "Zenit";
+var sunrise$8 = "Răsărit";
+var sunset$8 = "Apus";
+var errors$8 = {
+	SunIntegrationNotFound: "Integrare solară indisponibilă"
+};
+var ro = {
+	azimuth: azimuth$8,
+	dawn: dawn$8,
+	dusk: dusk$8,
+	elevation: elevation$8,
+	noon: noon$8,
+	sunrise: sunrise$8,
+	sunset: sunset$8,
+	errors: errors$8
+};
+
+var azimuth$7 = "Азимут";
+var dawn$7 = "Рассвет";
+var dusk$7 = "Сумерки";
+var elevation$7 = "Высота";
+var noon$7 = "Зенит";
+var sunrise$7 = "Восход";
+var sunset$7 = "Закат";
+var errors$7 = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var ru = {
-	Azimuth: Azimuth$2,
-	Dawn: Dawn$2,
-	Dusk: Dusk$2,
-	Elevation: Elevation$2,
-	Noon: Noon$2,
-	Sunrise: Sunrise$2,
-	Sunset: Sunset$2,
-	errors: errors$2
+	azimuth: azimuth$7,
+	dawn: dawn$7,
+	dusk: dusk$7,
+	elevation: elevation$7,
+	noon: noon$7,
+	sunrise: sunrise$7,
+	sunset: sunset$7,
+	errors: errors$7
 };
 
-var Azimuth$1 = "Azimut";
-var Dawn$1 = "Zora";
-var Dusk$1 = "Mrak";
-var Elevation$1 = "Višina";
-var Noon$1 = "Sončno poldne";
-var Sunrise$1 = "Sončni vzhod";
-var Sunset$1 = "Sončni zahod";
-var errors$1 = {
+var azimuth$6 = "Azimut";
+var dawn$6 = "Úsvit";
+var dusk$6 = "Súmrak";
+var elevation$6 = "Výška";
+var noon$6 = "Slnečné poludnie";
+var sunrise$6 = "Východ slnka";
+var sunset$6 = "Západ slnka";
+var errors$6 = {
+	SunIntegrationNotFound: "Integrácia slnka sa nenašla"
+};
+var sk = {
+	azimuth: azimuth$6,
+	dawn: dawn$6,
+	dusk: dusk$6,
+	elevation: elevation$6,
+	noon: noon$6,
+	sunrise: sunrise$6,
+	sunset: sunset$6,
+	errors: errors$6
+};
+
+var azimuth$5 = "Azimut";
+var dawn$5 = "Zora";
+var dusk$5 = "Mrak";
+var elevation$5 = "Višina";
+var noon$5 = "Sončno poldne";
+var sunrise$5 = "Sončni vzhod";
+var sunset$5 = "Sončni zahod";
+var errors$5 = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var sl = {
-	Azimuth: Azimuth$1,
-	Dawn: Dawn$1,
-	Dusk: Dusk$1,
-	Elevation: Elevation$1,
-	Noon: Noon$1,
-	Sunrise: Sunrise$1,
-	Sunset: Sunset$1,
-	errors: errors$1
+	azimuth: azimuth$5,
+	dawn: dawn$5,
+	dusk: dusk$5,
+	elevation: elevation$5,
+	noon: noon$5,
+	sunrise: sunrise$5,
+	sunset: sunset$5,
+	errors: errors$5
 };
 
-var Azimuth = "Azimut";
-var Dawn = "Gryning";
-var Dusk = "Skymning";
-var Elevation = "Elevation";
-var Noon = "Middag";
-var Sunrise = "Soluppgång";
-var Sunset = "Solnedgång";
-var errors = {
+var azimuth$4 = "Azimut";
+var dawn$4 = "Gryning";
+var dusk$4 = "Skymning";
+var elevation$4 = "Elevation";
+var noon$4 = "Middag";
+var sunrise$4 = "Soluppgång";
+var sunset$4 = "Solnedgång";
+var errors$4 = {
 	SunIntegrationNotFound: "Sun integration not found"
 };
 var sv = {
-	Azimuth: Azimuth,
-	Dawn: Dawn,
-	Dusk: Dusk,
-	Elevation: Elevation,
-	Noon: Noon,
-	Sunrise: Sunrise,
-	Sunset: Sunset,
+	azimuth: azimuth$4,
+	dawn: dawn$4,
+	dusk: dusk$4,
+	elevation: elevation$4,
+	noon: noon$4,
+	sunrise: sunrise$4,
+	sunset: sunset$4,
+	errors: errors$4
+};
+
+var azimuth$3 = "Güney Açısı";
+var dawn$3 = "Şafak";
+var dusk$3 = "Alacakaranlık";
+var elevation$3 = "Yükseklik";
+var noon$3 = "Öğle";
+var sunrise$3 = "Gündoğumu";
+var sunset$3 = "Günbatımı";
+var errors$3 = {
+	SunIntegrationNotFound: "Güneş entegrasyonu bulunamadı"
+};
+var tr = {
+	azimuth: azimuth$3,
+	dawn: dawn$3,
+	dusk: dusk$3,
+	elevation: elevation$3,
+	noon: noon$3,
+	sunrise: sunrise$3,
+	sunset: sunset$3,
+	errors: errors$3
+};
+
+var azimuth$2 = "Азимут";
+var dawn$2 = "Світанок";
+var dusk$2 = "Сутінки";
+var elevation$2 = "Висота";
+var noon$2 = "Заніт";
+var sunrise$2 = "Схід";
+var sunset$2 = "Захід";
+var errors$2 = {
+	SunIntegrationNotFound: "Інтеграцію Sun не знайдено"
+};
+var uk = {
+	azimuth: azimuth$2,
+	dawn: dawn$2,
+	dusk: dusk$2,
+	elevation: elevation$2,
+	noon: noon$2,
+	sunrise: sunrise$2,
+	sunset: sunset$2,
+	errors: errors$2
+};
+
+var azimuth$1 = "方位角";
+var dawn$1 = "拂晓";
+var dusk$1 = "傍晚";
+var elevation$1 = "仰角";
+var noon$1 = "日中";
+var sunrise$1 = "日出";
+var sunset$1 = "日落";
+var errors$1 = {
+	SunIntegrationNotFound: "未搜索到集成 Sun"
+};
+var zh_Hans = {
+	azimuth: azimuth$1,
+	dawn: dawn$1,
+	dusk: dusk$1,
+	elevation: elevation$1,
+	noon: noon$1,
+	sunrise: sunrise$1,
+	sunset: sunset$1,
+	errors: errors$1
+};
+
+var azimuth = "方位";
+var dawn = "黎明";
+var dusk = "黃昏";
+var elevation = "仰角";
+var noon = "日正當中";
+var sunrise = "日昇";
+var sunset = "日落";
+var errors = {
+	SunIntegrationNotFound: "沒有找到整合 Sun"
+};
+var zh_Hant = {
+	azimuth: azimuth,
+	dawn: dawn,
+	dusk: dusk,
+	elevation: elevation,
+	noon: noon,
+	sunrise: sunrise,
+	sunset: sunset,
 	errors: errors
 };
 
-var Constants = function Constants() {
+var Constants = /*#__PURE__*/_createClass(function Constants() {
   _classCallCheck(this, Constants);
-};
-
+});
 _defineProperty(Constants, "DEFAULT_CONFIG", {
+  type: 'horizon-card',
   darkMode: true,
   language: 'en',
-  showAzimuth: false,
-  showElevation: false,
-  timeFormat: '24h'
+  use12hourClock: false,
+  component: 'sun.sun',
+  fields: {
+    sunrise: true,
+    sunset: true,
+    dawn: true,
+    noon: true,
+    dusk: true,
+    azimuth: false,
+    elevation: false
+  }
 });
-
 _defineProperty(Constants, "EVENT_X_POSITIONS", {
   dayStart: 5,
   sunrise: 101,
   sunset: 449,
   dayEnd: 545
 });
-
 _defineProperty(Constants, "HORIZON_Y", 108);
-
+_defineProperty(Constants, "SUN_RADIUS", 17);
+_defineProperty(Constants, "SUN_SECTIONS", {
+  dawn: 105,
+  day: 499 - 106,
+  dusk: 605 - 500
+});
+_defineProperty(Constants, "DEFAULT_SUN_INFO", {
+  dawnProgressPercent: 0,
+  dayProgressPercent: 0,
+  duskProgressPercent: 0,
+  sunAboveHorizon: false,
+  sunPercentOverHorizon: 0,
+  sunPosition: {
+    x: 0,
+    y: 0
+  },
+  sunrise: 0,
+  sunset: 0
+});
+_defineProperty(Constants, "DEFAULT_TIMES", {
+  dawn: new Date(),
+  dusk: new Date(),
+  noon: new Date(),
+  sunrise: new Date(),
+  sunset: new Date()
+});
 _defineProperty(Constants, "LOCALIZATION_LANGUAGES", {
+  bg: bg,
+  ca: ca,
+  cs: cs,
   da: da,
   de: de,
   en: en,
@@ -3721,131 +3670,594 @@ _defineProperty(Constants, "LOCALIZATION_LANGUAGES", {
   et: et,
   fi: fi,
   fr: fr,
+  he: he,
   hu: hu,
+  is: is,
   it: it,
+  ja: ja,
+  lt: lt,
+  nb: nb,
   nl: nl,
+  nn: nn,
   pl: pl,
   'pt-BR': ptBR,
+  ro: ro,
   ru: ru,
+  sk: sk,
   sl: sl,
-  sv: sv
+  sv: sv,
+  tr: tr,
+  uk: uk,
+  'zh-Hans': zh_Hans,
+  'zh-Hant': zh_Hant
 });
+_defineProperty(Constants, "FALLBACK_LOCALIZATION", en);
+// Magic number - used by Home Assistant and the library (astral) it uses to calculate the sun events
+_defineProperty(Constants, "BELOW_HORIZON_ELEVATION", 0.83);
 
-_defineProperty(Constants, "SUN_RADIUS", 17);
+var EHorizonCardErrors;
+(function (EHorizonCardErrors) {
+  EHorizonCardErrors["SunIntegrationNotFound"] = "SunIntegrationNotFound";
+})(EHorizonCardErrors || (EHorizonCardErrors = {}));
+var EHorizonCardI18NKeys;
+(function (EHorizonCardI18NKeys) {
+  EHorizonCardI18NKeys["Azimuth"] = "azimuth";
+  EHorizonCardI18NKeys["Dawn"] = "dawn";
+  EHorizonCardI18NKeys["Dusk"] = "dusk";
+  EHorizonCardI18NKeys["Elevation"] = "elevation";
+  EHorizonCardI18NKeys["Noon"] = "noon";
+  EHorizonCardI18NKeys["Sunrise"] = "sunrise";
+  EHorizonCardI18NKeys["Sunset"] = "sunset";
+})(EHorizonCardI18NKeys || (EHorizonCardI18NKeys = {}));
 
-var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8, _templateObject9, _templateObject10, _templateObject11, _templateObject12, _templateObject13, _templateObject14, _templateObject15, _templateObject16, _templateObject17;
-var SunCardContent = /*#__PURE__*/function () {
-  function SunCardContent() {
-    _classCallCheck(this, SunCardContent);
+var _templateObject$6, _templateObject2$2;
+var HelperFunctions = /*#__PURE__*/function () {
+  function HelperFunctions() {
+    _classCallCheck(this, HelperFunctions);
   }
-
-  _createClass(SunCardContent, null, [{
-    key: "generate",
-    value: function generate(data, localization, config) {
-      if (data !== null && data !== void 0 && data.error) {
-        return html(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n        <ha-card>\n          ", "\n        </ha-card>\n      "])), this.generateError());
+  _createClass(HelperFunctions, null, [{
+    key: "nothing",
+    value: function nothing() {
+      return y(_templateObject$6 || (_templateObject$6 = _taggedTemplateLiteral([""])));
+    }
+  }, {
+    key: "renderFieldElement",
+    value: function renderFieldElement(i18n, translationKey, value) {
+      var display;
+      if (value === undefined) {
+        display = '-';
+      } else if (value instanceof Date) {
+        display = i18n.formatDateAsTime(value);
+      } else {
+        display = value.toString();
+        if (translationKey === 'azimuth' || translationKey === 'elevation') {
+          display += '°';
+        }
       }
-
-      return html(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <ha-card>\n        <div class=\"sun-card ", "\">\n          ", "\n          ", "\n          ", "\n        </div>\n      </ha-card>\n    "])), config.darkMode ? '' : 'sun-card-light', this.generateHeader(data, localization, config), this.generateBody(data), this.generateFooter(data, localization, config));
+      return y(_templateObject2$2 || (_templateObject2$2 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-text-container\">\n        <span class=\"horizon-card-field-name\">", "</span>\n        <span class=\"horizon-card-field-value\">", "</span>\n      </div>\n    "])), i18n.tr(translationKey), display);
     }
   }, {
-    key: "generateHeader",
-    value: function generateHeader(data, localization, config) {
-      var title = config.title !== undefined ? html(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n      <h1 class=\"sun-card-title\">", "</h1>\n    "])), config.title) : html(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral([""])));
-      return html(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n      ", "\n      <div class=\"sun-card-header\">\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          ", "\n\n        </div>\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          ", "\n        </div>\n      </div>\n    "])), title, localization.Sunrise, data !== null && data !== void 0 && data.times.sunrise ? this.generateTime(data.times.sunrise) : '', localization.Sunset, data !== null && data !== void 0 && data.times.sunset ? this.generateTime(data.times.sunset) : '');
+    key: "isValidLanguage",
+    value: function isValidLanguage(language) {
+      return Object.keys(Constants.LOCALIZATION_LANGUAGES).includes(language);
     }
   }, {
-    key: "generateBody",
-    value: function generateBody(data) {
-      var _data$sunPercentOverH, _data$sunPercentOverH2, _data$dawnProgressPer, _data$dawnProgressPer2, _data$dayProgressPerc, _data$dayProgressPerc2, _data$duskProgressPer, _data$duskProgressPer2, _data$sunPosition$x, _data$sunPosition$y;
-
-      var sunID = Math.random().toString(36).replace('0.', '');
-      var dawnID = Math.random().toString(36).replace('0.', '');
-      var dayID = Math.random().toString(36).replace('0.', '');
-      var duskID = Math.random().toString(36).replace('0.', '');
-      return html(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n      <div class=\"sun-card-body\">\n        <svg viewBox=\"0 0 550 150\" xmlns=\"http://www.w3.org/2000/svg\">\n          <defs>\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">\n              <stop offset=\"0%\" style=\"stop-color:#f9d05e;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:#f9d05e;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:rgb(0,0,0,0);stop-opacity:1\" />\n            </linearGradient>\n            \n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" style=\"stop-color:#393b78;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:#393b78;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:rgb(0,0,0,0);stop-opacity:1\" />\n            </linearGradient>\n            \n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" style=\"stop-color:#8ebeeb;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:#8ebeeb;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:rgb(0,0,0,0);stop-opacity:1\" />\n            </linearGradient>\n            \n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" style=\"stop-color:#393b78;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:#393b78;stop-opacity:1\" />\n              <stop offset=\"", "%\" style=\"stop-color:rgb(0,0,0,0);stop-opacity:1\" />\n            </linearGradient>\n          </defs>\n          <path class=\"sun-card-sun-line\" d=\"M5,146 C29,153 73,128 101,108 C276,-29 342,23 449,108 C473,123 509,150 545,146\" fill=\"none\" stroke=\"var(--sun-card-lines)\" shape-rendering=\"geometricPrecision\" />\n          <path d=\"M5,146 C29,153 73,128 101,108 L 5 108\" fill=\"url(#", ")\" opacity=\"", "\" stroke=\"url(#", ")\" shape-rendering=\"geometricPrecision\" />\n          <path d=\"M101,108 C276,-29 342,23 449,108 L 104,108\" fill=\"url(#", ")\" opacity=\"", "\" stroke=\"url(#", ")\" shape-rendering=\"geometricPrecision\" />\n          <path d=\"M449,108 C473,123 509,150 545,146 L 545 108\" fill=\"url(#", ")\" opacity=\"", "\" stroke=\"url(#", ")\" shape-rendering=\"geometricPrecision\" />\n          <line x1=\"5\" y1=\"108\" x2=\"545\" y2=\"108\" stroke=\"var(--sun-card-lines)\" />\n          <line x1=\"101\" y1=\"25\" x2=\"101\" y2=\"100\" stroke=\"var(--sun-card-lines)\" />\n          <line x1=\"449\" y1=\"25\" x2=\"449\" y2=\"100\" stroke=\"var(--sun-card-lines)\" />\n          <circle cx=\"", "\" cy=\"", "\" r=\"17\" opacity=\"", "\" stroke=\"none\" fill=\"url(#", ")\" shape-rendering=\"geometricPrecision\" />\n        </svg>\n      </div>\n    "])), sunID, (_data$sunPercentOverH = data === null || data === void 0 ? void 0 : data.sunPercentOverHorizon) !== null && _data$sunPercentOverH !== void 0 ? _data$sunPercentOverH : 0, (_data$sunPercentOverH2 = data === null || data === void 0 ? void 0 : data.sunPercentOverHorizon) !== null && _data$sunPercentOverH2 !== void 0 ? _data$sunPercentOverH2 : 0, dawnID, (_data$dawnProgressPer = data === null || data === void 0 ? void 0 : data.dawnProgressPercent) !== null && _data$dawnProgressPer !== void 0 ? _data$dawnProgressPer : 0, (_data$dawnProgressPer2 = data === null || data === void 0 ? void 0 : data.dawnProgressPercent) !== null && _data$dawnProgressPer2 !== void 0 ? _data$dawnProgressPer2 : 0, dayID, (_data$dayProgressPerc = data === null || data === void 0 ? void 0 : data.dayProgressPercent) !== null && _data$dayProgressPerc !== void 0 ? _data$dayProgressPerc : 0, (_data$dayProgressPerc2 = data === null || data === void 0 ? void 0 : data.dayProgressPercent) !== null && _data$dayProgressPerc2 !== void 0 ? _data$dayProgressPerc2 : 0, duskID, (_data$duskProgressPer = data === null || data === void 0 ? void 0 : data.duskProgressPercent) !== null && _data$duskProgressPer !== void 0 ? _data$duskProgressPer : 0, (_data$duskProgressPer2 = data === null || data === void 0 ? void 0 : data.duskProgressPercent) !== null && _data$duskProgressPer2 !== void 0 ? _data$duskProgressPer2 : 0, dawnID, data !== null && data !== void 0 && data.dawnProgressPercent ? 1 : 0, dawnID, dayID, data !== null && data !== void 0 && data.dayProgressPercent ? 1 : 0, dayID, duskID, data !== null && data !== void 0 && data.duskProgressPercent ? 1 : 0, duskID, (_data$sunPosition$x = data === null || data === void 0 ? void 0 : data.sunPosition.x) !== null && _data$sunPosition$x !== void 0 ? _data$sunPosition$x : 0, (_data$sunPosition$y = data === null || data === void 0 ? void 0 : data.sunPosition.y) !== null && _data$sunPosition$y !== void 0 ? _data$sunPosition$y : 0, data !== null && data !== void 0 && data.sunPercentOverHorizon ? 1 : 0, sunID);
+    key: "startOfDay",
+    value: function startOfDay(now) {
+      var today = new Date(now);
+      today.setHours(0);
+      today.setMinutes(0);
+      today.setSeconds(0);
+      today.setMilliseconds(0);
+      return today;
     }
   }, {
-    key: "generateError",
-    value: function generateError() {
-      return html(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["\n      <hui-error-card></hui-error-card>\n    "])));
+    key: "endOfDay",
+    value: function endOfDay(now) {
+      var today = new Date(now);
+      today.setHours(23);
+      today.setMinutes(59);
+      today.setSeconds(59);
+      today.setMilliseconds(999);
+      return today;
     }
   }, {
-    key: "generateFooter",
-    value: function generateFooter(data, localization, config) {
-      var upperRow = html(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["\n      <div class=\"sun-card-footer-row\">\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          ", "\n        </div>\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          ", "\n        </div>\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          ", "\n        </div>\n      </div>\n    "])), localization.Dawn, data !== null && data !== void 0 && data.times.dawn ? this.generateTime(data.times.dawn) : '', localization.Noon, data !== null && data !== void 0 && data.times.noon ? this.generateTime(data.times.noon) : '', localization.Dusk, data !== null && data !== void 0 && data.times.dusk ? this.generateTime(data.times.dusk) : '');
-      var bottomRow = html(_templateObject9 || (_templateObject9 = _taggedTemplateLiteral([""])));
-
-      if (config.showAzimuth || config.showElevation) {
-        var _data$azimuth, _data$elevation;
-
-        var azimuth = config.showAzimuth ? html(_templateObject10 || (_templateObject10 = _taggedTemplateLiteral(["\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          <span class=\"sun-card-dawn-time sun-card-text-time\">", "</span>\n        </div>\n      "])), localization.Azimuth, (_data$azimuth = data === null || data === void 0 ? void 0 : data.azimuth) !== null && _data$azimuth !== void 0 ? _data$azimuth : '') : html(_templateObject11 || (_templateObject11 = _taggedTemplateLiteral([""])));
-        var elevation = config.showElevation ? html(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["\n        <div class=\"sun-card-text-container\">\n          <span class=\"sun-card-text-subtitle\">", "</span>\n          <span class=\"sun-card-dawn-time sun-card-text-time\">", "</span>\n        </div>\n      "])), localization.Elevation, (_data$elevation = data === null || data === void 0 ? void 0 : data.elevation) !== null && _data$elevation !== void 0 ? _data$elevation : '') : html(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral([""])));
-        bottomRow = html(_templateObject14 || (_templateObject14 = _taggedTemplateLiteral(["\n        <div class=\"sun-card-footer-row\">\n          ", "\n          ", "\n        </div>\n      "])), azimuth, elevation);
+    key: "findSectionPosition",
+    value: function findSectionPosition(msSinceSectionStart, msSectionEnd, section) {
+      return Math.min(msSinceSectionStart, msSectionEnd) * section / msSectionEnd;
+    }
+  }, {
+    key: "findSunProgress",
+    value: function findSunProgress(sunPosition, startPosition, endPosition) {
+      return HelperFunctions.clamp(0, 100, 100 * (sunPosition - startPosition) / (endPosition - startPosition));
+    }
+  }, {
+    key: "clamp",
+    value: function clamp(min, max, value) {
+      if (min === max) {
+        return min;
       }
-
-      return html(_templateObject15 || (_templateObject15 = _taggedTemplateLiteral(["\n      <div class=\"sun-card-footer\">\n        ", "\n        ", "\n      </div>\n    "])), upperRow, bottomRow);
-    }
-  }, {
-    key: "generateTime",
-    value: function generateTime(time) {
-      if (time.period) {
-        return html(_templateObject16 || (_templateObject16 = _taggedTemplateLiteral(["\n        <span class=\"sun-card-text-time\">\n          ", " <span class=\"sun-card-text-time-period\">", "</span>\n        </span>\n      "])), time.time, time.period);
+      if (min > max) {
+        throw new RangeError('Min value can not be bigger than the max value');
       }
-
-      return html(_templateObject17 || (_templateObject17 = _taggedTemplateLiteral(["\n      <span class=\"sun-card-text-time\">", "</span>\n    "])), time.time);
+      return Math.min(Math.max(value, min), max);
     }
   }]);
-
-  return SunCardContent;
+  return HelperFunctions;
 }();
 
-var ESunCardErrors;
+var I18N = /*#__PURE__*/function () {
+  function I18N(language, use12HourClock) {
+    _classCallCheck(this, I18N);
+    _defineProperty(this, "localization", void 0);
+    _defineProperty(this, "dateFormatter", void 0);
+    this.localization = Constants.LOCALIZATION_LANGUAGES[language];
 
-(function (ESunCardErrors) {
-  ESunCardErrors["SunIntegrationNotFound"] = "SunIntegrationNotFound";
-})(ESunCardErrors || (ESunCardErrors = {}));
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat
+    var dateTimeFormatOptions = {
+      timeStyle: 'short'
+    };
 
-var SunCard = _decorate([customElement('sun-card')], function (_initialize, _LitElement) {
-  var SunCard = /*#__PURE__*/function (_LitElement2) {
-    _inherits(SunCard, _LitElement2);
+    // if user hasn't defined this specifically in config
+    // let the formatter figure it out based on language
+    if (use12HourClock !== undefined) {
+      dateTimeFormatOptions.hour12 = use12HourClock;
+    }
+    this.dateFormatter = new Intl.DateTimeFormat(language, dateTimeFormatOptions);
+  }
+  _createClass(I18N, [{
+    key: "formatDateAsTime",
+    value: function formatDateAsTime(date) {
+      return this.dateFormatter.formatToParts(date).map(function (_ref) {
+        var type = _ref.type,
+          value = _ref.value;
+        switch (type) {
+          // intentional fallthrough
+          case 'hour':
+          case 'minute':
+          case 'dayPeriod':
+          case 'literal':
+            return value;
 
-    var _super = _createSuper(SunCard);
+          /* istanbul ignore next */
+          default:
+            return '';
+        }
+      }).join('');
+    }
 
-    function SunCard() {
+    /**
+     * TR -> TRanslation
+     * @param translationKey The key to lookup a translation for
+     * @returns The string specified in the translation files
+     */
+  }, {
+    key: "tr",
+    value: function tr(translationKey) {
+      return this.getLocalizationElement(this.localization, translationKey).toString();
+    }
+
+    // Janky recursive logic to handle nested values in i18n json sources
+  }, {
+    key: "getLocalizationElement",
+    value: function getLocalizationElement(localization, translationKey) {
+      if (translationKey.includes('.')) {
+        var parts = translationKey.split('.', 2);
+        // TODO: maybe add typecheck
+        var _localization = this.getLocalizationElement(this.localization, parts[0]);
+        return this.getLocalizationElement(_localization, parts[1]);
+      } else {
+        var _ref2, _ref3;
+        // if the translation isn't completed in the target language, fall back to english
+        // give ugly string for developers who misstype
+        return (_ref2 = (_ref3 = localization ? localization[translationKey] : undefined) !== null && _ref3 !== void 0 ? _ref3 : Constants.FALLBACK_LOCALIZATION[translationKey]) !== null && _ref2 !== void 0 ? _ref2 : "Translation key '".concat(translationKey, "' doesn't have a valid translation");
+      }
+    }
+  }]);
+  return I18N;
+}();
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+var EventUtils = /*#__PURE__*/function () {
+  function EventUtils() {
+    _classCallCheck(this, EventUtils);
+    _defineProperty(this, "eventMap", new Map());
+  }
+  _createClass(EventUtils, [{
+    key: "on",
+    value: function on(eventName, listener) {
+      var eventListeners = this.eventMap.get(eventName) || [];
+      eventListeners.push(listener);
+      this.eventMap.set(eventName, eventListeners);
+    }
+  }, {
+    key: "emit",
+    value: function emit(eventName, data) {
+      var eventListeners = this.eventMap.get(eventName) || [];
+      eventListeners.forEach(function (eventListener) {
+        eventListener(data);
+      });
+    }
+  }]);
+  return EventUtils;
+}();
+
+var _templateObject$5, _templateObject2$1, _templateObject3$1, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8;
+var HorizonCardEditorContent = /*#__PURE__*/function (_EventUtils) {
+  _inherits(HorizonCardEditorContent, _EventUtils);
+  var _super = _createSuper(HorizonCardEditorContent);
+  function HorizonCardEditorContent(config) {
+    var _this;
+    _classCallCheck(this, HorizonCardEditorContent);
+    _this = _super.call(this);
+    _defineProperty(_assertThisInitialized(_this), "config", void 0);
+    _this.config = config;
+    return _this;
+  }
+  _createClass(HorizonCardEditorContent, [{
+    key: "render",
+    value: function render() {
+      return y(_templateObject$5 || (_templateObject$5 = _taggedTemplateLiteral(["\n      <div class=\"card-config\">\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n      </div>\n    "])), this.renderTitleEditor(), this.renderLanguageEditor(), this.renderDarkModeEditor(), this.render12HourClockEditor(), this.renderFieldsEditor());
+    }
+  }, {
+    key: "onConfigChanged",
+    value: function onConfigChanged(event) {
+      this.emit('configChanged', event);
+    }
+  }, {
+    key: "renderTitleEditor",
+    value: function renderTitleEditor() {
+      var _this$config$title,
+        _this$config,
+        _this2 = this;
+      return y(_templateObject2$1 || (_templateObject2$1 = _taggedTemplateLiteral(["\n      <paper-input\n        label=\"Title (Optional)\"\n        .configValue=", "\n        .value=", "\n        @value-changed=", "\n      >\n      </paper-input>\n    "])), 'title', (_this$config$title = (_this$config = this.config) === null || _this$config === void 0 ? void 0 : _this$config.title) !== null && _this$config$title !== void 0 ? _this$config$title : '', function (event) {
+        return _this2.onConfigChanged(event);
+      });
+    }
+  }, {
+    key: "renderLanguageEditor",
+    value: function renderLanguageEditor() {
+      var _this$config$language,
+        _this$config2,
+        _this3 = this;
+      // TODO: Add language full name
+      var selectedLanguage = Object.keys(Constants.LOCALIZATION_LANGUAGES).indexOf((_this$config$language = (_this$config2 = this.config) === null || _this$config2 === void 0 ? void 0 : _this$config2.language) !== null && _this$config$language !== void 0 ? _this$config$language : '') + 1;
+      return y(_templateObject3$1 || (_templateObject3$1 = _taggedTemplateLiteral(["\n      <paper-dropdown-menu\n        label=\"Language\"\n        .configValue=", "\n        @value-changed=", "\n      >\n        <paper-listbox slot=\"dropdown-content\" selected=\"", "\">\n          <paper-item label=\"default\">Default</paper-item>\n          ", "\n        </paper-listbox>\n      </paper-dropdown-menu>\n    "])), 'language', function (event) {
+        return _this3.onConfigChanged(event);
+      }, selectedLanguage, Object.keys(Constants.LOCALIZATION_LANGUAGES).map(function (language) {
+        return y(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <paper-item label=\"", "\">", "</paper-item>\n          "])), language, language);
+      }));
+    }
+  }, {
+    key: "renderDarkModeEditor",
+    value: function renderDarkModeEditor() {
+      var _this$config$darkMode,
+        _this$config3,
+        _this4 = this;
+      var selectedDarkMode = (_this$config$darkMode = (_this$config3 = this.config) === null || _this$config3 === void 0 ? void 0 : _this$config3.darkMode) !== null && _this$config$darkMode !== void 0 ? _this$config$darkMode : 'default';
+      return y(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n      <label id=\"theme\">Theme:</label>\n      <paper-radio-group\n        aria-labelledby=\"theme\"\n        .configValue=", "\n        .selected=", "\n        @paper-radio-group-changed=", "\n      >\n        <paper-radio-button name=\"default\">Default</paper-radio-button>\n        <paper-radio-button name=\"true\">Dark</paper-radio-button>\n        <paper-radio-button name=\"false\">Light</paper-radio-button>\n      </paper-radio-group>\n    "])), 'darkMode', selectedDarkMode.toString(), function (event) {
+        return _this4.onConfigChanged(event);
+      });
+    }
+  }, {
+    key: "render12HourClockEditor",
+    value: function render12HourClockEditor() {
+      var _this$config$use12hou,
+        _this$config4,
+        _this5 = this;
+      var selectedClockMode = (_this$config$use12hou = (_this$config4 = this.config) === null || _this$config4 === void 0 ? void 0 : _this$config4.use12hourClock) !== null && _this$config$use12hou !== void 0 ? _this$config$use12hou : 'default';
+      return y(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n      <label id=\"clock\">Clock mode:</label>\n      <paper-radio-group\n        aria-labelledby=\"clock\"\n        .configValue=", "\n        .selected=", "\n        @paper-radio-group-changed=", "\n      >\n        <paper-radio-button name=\"default\">Default</paper-radio-button>\n        <paper-radio-button name=\"true\">12 hours</paper-radio-button>\n        <paper-radio-button name=\"false\">24 hourse</paper-radio-button>\n      </paper-radio-group>\n    "])), 'use12hourClock', selectedClockMode.toString(), function (event) {
+        return _this5.onConfigChanged(event);
+      });
+    }
+  }, {
+    key: "renderFieldsEditor",
+    value: function renderFieldsEditor() {
+      var _this6 = this;
+      return y(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["\n      <label>Card fields:</label>\n      <ul>\n        ", "\n      </ul>\n    "])), Object.entries(EHorizonCardI18NKeys).map(function (_ref) {
+        var _this6$config$fields$, _this6$config$fields;
+        var _ref2 = _slicedToArray(_ref, 2),
+          name = _ref2[0],
+          configValue = _ref2[1];
+        return y(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["\n            <li><ha-switch .configValue=", " .checked=", " @change=", "></ha-switch> ", "</li>\n          "])), configValue, (_this6$config$fields$ = (_this6$config$fields = _this6.config.fields) === null || _this6$config$fields === void 0 ? void 0 : _this6$config$fields[configValue]) !== null && _this6$config$fields$ !== void 0 ? _this6$config$fields$ : Constants.DEFAULT_CONFIG.fields[configValue], function (event) {
+          return _this6.onConfigChanged(event);
+        }, name);
+      }));
+    }
+  }]);
+  return HorizonCardEditorContent;
+}(EventUtils);
+
+var HorizonCardEditor = _decorate([customElement('horizon-card-editor')], function (_initialize, _LitElement) {
+  var HorizonCardEditor = /*#__PURE__*/function (_LitElement2) {
+    _inherits(HorizonCardEditor, _LitElement2);
+    var _super = _createSuper(HorizonCardEditor);
+    function HorizonCardEditor() {
       var _this;
-
-      _classCallCheck(this, SunCard);
-
+      _classCallCheck(this, HorizonCardEditor);
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
-
       _this = _super.call.apply(_super, [this].concat(args));
-
       _initialize(_assertThisInitialized(_this));
-
       return _this;
     }
-
-    return SunCard;
+    return _createClass(HorizonCardEditor);
   }(_LitElement);
-
   return {
-    F: SunCard,
+    F: HorizonCardEditor,
     d: [{
       kind: "field",
       "static": true,
       key: "cardType",
       value: function value() {
-        return 'sun-card';
+        return 'horizon-card-editor';
+      }
+    }, {
+      kind: "field",
+      "static": true,
+      key: "CONFIG_CHANGED_EVENT",
+      value: function value() {
+        return 'config-changed';
+      }
+    }, {
+      kind: "field",
+      decorators: [property({
+        type: Object
+      })],
+      key: "hass",
+      value: void 0
+    }, {
+      kind: "field",
+      decorators: [property()],
+      key: "config",
+      value: void 0
+    }, {
+      kind: "get",
+      "static": true,
+      key: "styles",
+      value: function styles() {
+        return cardStyles;
+      }
+    }, {
+      kind: "method",
+      key: "setConfig",
+      value: function setConfig(config) {
+        this.config = config;
+      }
+    }, {
+      kind: "method",
+      key: "configChanged",
+      value: function configChanged(event) {
+        var _event$target, _ref, _event$detail$value, _event$detail, _event$target2, _event$target3;
+        var property = (_event$target = event.target) === null || _event$target === void 0 ? void 0 : _event$target.configValue;
+        var value = (_ref = (_event$detail$value = (_event$detail = event.detail) === null || _event$detail === void 0 ? void 0 : _event$detail.value) !== null && _event$detail$value !== void 0 ? _event$detail$value : (_event$target2 = event.target) === null || _event$target2 === void 0 ? void 0 : _event$target2.selected) !== null && _ref !== void 0 ? _ref : (_event$target3 = event.target) === null || _event$target3 === void 0 ? void 0 : _event$target3.checked;
+        var newConfig = _objectSpread2(_objectSpread2({}, this.config), {}, _defineProperty({}, property, value));
+
+        // Handles default or empty values by deleting the config property
+        if (value === 'default' || value === undefined || value === '') {
+          delete newConfig[property];
+        }
+
+        // Handles boolean values
+        if (value === 'true' || value === 'false') {
+          newConfig[property] = value === 'true';
+        }
+
+        // Handles fields config
+        if (Object.values(EHorizonCardI18NKeys).includes(property)) {
+          delete newConfig[property];
+          newConfig.fields = _objectSpread2(_objectSpread2({}, newConfig.fields), {}, _defineProperty({}, property, value));
+        }
+        var customEvent = new CustomEvent(HorizonCardEditor.CONFIG_CHANGED_EVENT, {
+          bubbles: true,
+          composed: true,
+          detail: {
+            config: newConfig
+          }
+        });
+        this.dispatchEvent(customEvent);
+      }
+    }, {
+      kind: "method",
+      key: "render",
+      value: function render() {
+        var _this2 = this;
+        var content = new HorizonCardEditorContent(this.config);
+        content.on('configChanged', function (event) {
+          return _this2.configChanged(event);
+        });
+        return content.render();
+      }
+    }]
+  };
+}, s);
+
+var _templateObject$4;
+var HorizonErrorContent = /*#__PURE__*/function () {
+  function HorizonErrorContent(config, error) {
+    _classCallCheck(this, HorizonErrorContent);
+    _defineProperty(this, "i18n", void 0);
+    _defineProperty(this, "error", void 0);
+    this.i18n = config.i18n;
+    this.error = error;
+  }
+  _createClass(HorizonErrorContent, [{
+    key: "render",
+    value: function render() {
+      var errorMessage = this.i18n.tr("errors.".concat(this.error));
+      // eslint-disable-next-line no-console
+      console.error(errorMessage);
+      return y(_templateObject$4 || (_templateObject$4 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-error\">\n        ", "\n      </div>\n    "])), errorMessage);
+    }
+  }]);
+  return HorizonErrorContent;
+}();
+
+var _templateObject$3;
+var HorizonCardFooter = /*#__PURE__*/function () {
+  function HorizonCardFooter(config, data) {
+    _classCallCheck(this, HorizonCardFooter);
+    _defineProperty(this, "data", void 0);
+    _defineProperty(this, "i18n", void 0);
+    _defineProperty(this, "times", void 0);
+    _defineProperty(this, "fields", void 0);
+    this.data = data;
+    this.i18n = config.i18n;
+    this.times = data === null || data === void 0 ? void 0 : data.times;
+    this.fields = config.fields;
+  }
+  _createClass(HorizonCardFooter, [{
+    key: "render",
+    value: function render() {
+      var _this$fields, _this$times, _this$fields2, _this$times2, _this$fields3, _this$times3, _this$fields4, _this$data, _this$fields5, _this$data2;
+      return y(_templateObject$3 || (_templateObject$3 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-footer\">\n        <div class=\"horizon-card-field-row\">\n          ", "\n          ", "\n          ", "\n        </div>\n\n        <div class=\"horizon-card-field-row\">\n          ", "\n          ", "\n        </div>\n      </div>\n    "])), (_this$fields = this.fields) !== null && _this$fields !== void 0 && _this$fields.dawn ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Dawn, (_this$times = this.times) === null || _this$times === void 0 ? void 0 : _this$times.dawn) : HelperFunctions.nothing(), (_this$fields2 = this.fields) !== null && _this$fields2 !== void 0 && _this$fields2.noon ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Noon, (_this$times2 = this.times) === null || _this$times2 === void 0 ? void 0 : _this$times2.noon) : HelperFunctions.nothing(), (_this$fields3 = this.fields) !== null && _this$fields3 !== void 0 && _this$fields3.dusk ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Dusk, (_this$times3 = this.times) === null || _this$times3 === void 0 ? void 0 : _this$times3.dusk) : HelperFunctions.nothing(), (_this$fields4 = this.fields) !== null && _this$fields4 !== void 0 && _this$fields4.azimuth ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Azimuth, (_this$data = this.data) === null || _this$data === void 0 ? void 0 : _this$data.azimuth) : HelperFunctions.nothing(), (_this$fields5 = this.fields) !== null && _this$fields5 !== void 0 && _this$fields5.elevation ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Elevation, (_this$data2 = this.data) === null || _this$data2 === void 0 ? void 0 : _this$data2.elevation) : HelperFunctions.nothing());
+    }
+  }]);
+  return HorizonCardFooter;
+}();
+
+var _templateObject$2;
+var HorizonCardGraph = /*#__PURE__*/function () {
+  function HorizonCardGraph(data) {
+    var _data$sunInfo;
+    _classCallCheck(this, HorizonCardGraph);
+    _defineProperty(this, "sunInfo", void 0);
+    this.sunInfo = (_data$sunInfo = data === null || data === void 0 ? void 0 : data.sunInfo) !== null && _data$sunInfo !== void 0 ? _data$sunInfo : Constants.DEFAULT_SUN_INFO;
+  }
+  _createClass(HorizonCardGraph, [{
+    key: "render",
+    value: function render() {
+      var sunID = 'sun-gradient';
+      var dawnID = 'dawn-gradient';
+      var dayID = 'day-gradient';
+      var duskID = 'dusk-gradient';
+      var viewBox = '0 0 550 150';
+      // TODO: Check sun opacity
+
+      return y(_templateObject$2 || (_templateObject$2 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-graph\">\n        <svg viewBox=\"", "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n          <!-- Define gradients for use when drawing afterwards -->\n          <defs>\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">\n              <stop offset=\"0%\" class=\"sunInitialStop\" />\n              <stop offset=\"", "%\" class=\"sunMiddleStop\" />\n              <stop offset=\"", "%\" class=\"sunEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"dawnInitialStop\" />\n              <stop offset=\"", "%\" class=\"dawnMiddleStop\" />\n              <stop offset=\"", "%\" class=\"dawnEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"dayInitialStop\" />\n              <stop offset=\"", "%\" class=\"dayMiddleStop\" />\n              <stop offset=\"", "%\" class=\"dayEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"duskInitialStop\" />\n              <stop offset=\"", "%\" class=\"duskMiddleStop\" />\n              <stop offset=\"", "%\" class=\"duskEndStop\" />\n            </linearGradient>\n          </defs>\n\n          <!-- Draw path of the sun across the 'sky' -->\n          <path\n            class=\"horizon-card-sun-line\"\n            d=\"M5,146 C29,153 73,128 101,108 C276,-29 342,23 449,108 C473,123 509,150 545,146\"\n            fill=\"none\"\n            stroke=\"var(--horizon-card-lines)\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for dawn -->\n          <!-- IE: First dark blue part -->\n          <path\n            d=\"M5,146 C29,153 73,128 101,108 L 5 108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for day -->\n          <!-- IE: Main light blue part in the middle -->\n          <path\n            d=\"M101,108 C276,-29 342,23 449,108 L 104,108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for dusk -->\n          <!-- IE: Last dark blue part -->\n          <path\n            d=\"M449,108 C473,123 509,150 545,146 L 545 108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw the horizon, dawn and dusk lines (the gray horizontal/vertical lines) -->\n          <line x1=\"5\" y1=\"108\" x2=\"545\" y2=\"108\" stroke=\"var(--horizon-card-lines)\" />\n          <line x1=\"101\" y1=\"25\" x2=\"101\" y2=\"100\" stroke=\"var(--horizon-card-lines)\" />\n          <line x1=\"449\" y1=\"25\" x2=\"449\" y2=\"100\" stroke=\"var(--horizon-card-lines)\" />\n\n          <!-- Draw a circle representing the sun -->\n          <circle\n            cx=\"", "\"\n            cy=\"", "\"\n            r=\"17\"\n            opacity=\"", "\"\n            stroke=\"none\" fill=\"url(#", ")\"\n          />\n        </svg>\n      </div>\n    "])), viewBox, sunID, this.sunInfo.sunPercentOverHorizon, this.sunInfo.sunPercentOverHorizon, dawnID, this.sunInfo.dawnProgressPercent, this.sunInfo.dawnProgressPercent, dayID, this.sunInfo.dayProgressPercent, this.sunInfo.dayProgressPercent, duskID, this.sunInfo.duskProgressPercent, this.sunInfo.duskProgressPercent, dawnID, dawnID, this.sunInfo.dawnProgressPercent, dayID, dayID, this.sunInfo.dayProgressPercent, duskID, duskID, this.sunInfo.duskProgressPercent, this.sunInfo.sunPosition.x, this.sunInfo.sunPosition.y, this.sunInfo.sunPercentOverHorizon, sunID);
+    }
+  }]);
+  return HorizonCardGraph;
+}();
+
+var _templateObject$1, _templateObject2, _templateObject3;
+var HorizonCardHeader = /*#__PURE__*/function () {
+  function HorizonCardHeader(config, data) {
+    _classCallCheck(this, HorizonCardHeader);
+    _defineProperty(this, "title", void 0);
+    _defineProperty(this, "times", void 0);
+    _defineProperty(this, "fields", void 0);
+    _defineProperty(this, "i18n", void 0);
+    this.title = config.title;
+    this.fields = config.fields;
+    this.times = data === null || data === void 0 ? void 0 : data.times;
+    this.i18n = config.i18n;
+  }
+  _createClass(HorizonCardHeader, [{
+    key: "render",
+    value: function render() {
+      return y(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["\n      ", "\n      ", "\n    "])), this.showTitle() ? this.renderTitle() : HelperFunctions.nothing(), this.renderHeader());
+    }
+  }, {
+    key: "renderTitle",
+    value: function renderTitle() {
+      return y(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<div class=\"horizon-card-title\">", "</div>"])), this.title);
+    }
+  }, {
+    key: "renderHeader",
+    value: function renderHeader() {
+      var _this$fields, _this$times, _this$fields2, _this$times2;
+      return y(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-header\">\n        ", "\n        ", "\n      </div>\n    "])), (_this$fields = this.fields) !== null && _this$fields !== void 0 && _this$fields.sunrise ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Sunrise, (_this$times = this.times) === null || _this$times === void 0 ? void 0 : _this$times.sunrise) : HelperFunctions.nothing(), (_this$fields2 = this.fields) !== null && _this$fields2 !== void 0 && _this$fields2.sunset ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Sunset, (_this$times2 = this.times) === null || _this$times2 === void 0 ? void 0 : _this$times2.sunset) : HelperFunctions.nothing());
+    }
+  }, {
+    key: "showTitle",
+    value: function showTitle() {
+      return this.title !== undefined;
+    }
+  }]);
+  return HorizonCardHeader;
+}();
+
+var _templateObject;
+var HorizonCardContent = /*#__PURE__*/function () {
+  function HorizonCardContent(config, data) {
+    _classCallCheck(this, HorizonCardContent);
+    _defineProperty(this, "config", void 0);
+    _defineProperty(this, "data", void 0);
+    this.config = config;
+    this.data = data;
+  }
+  _createClass(HorizonCardContent, [{
+    key: "render",
+    value: function render() {
+      return y(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      <ha-card>\n        <div class=\"horizon-card ", "\">\n          ", "\n          ", "\n          ", "\n        </div>\n      </ha-card>\n    "])), this.config.darkMode ? 'horizon-card-dark' : '', this.showHeader() ? this.renderHeader() : HelperFunctions.nothing(), this.renderGraph(), this.showFooter() ? this.renderFooter() : HelperFunctions.nothing());
+    }
+  }, {
+    key: "renderHeader",
+    value: function renderHeader() {
+      return new HorizonCardHeader(this.config, this.data).render();
+    }
+  }, {
+    key: "renderGraph",
+    value: function renderGraph() {
+      return new HorizonCardGraph(this.data).render();
+    }
+  }, {
+    key: "renderFooter",
+    value: function renderFooter() {
+      return new HorizonCardFooter(this.config, this.data).render();
+    }
+  }, {
+    key: "showHeader",
+    value: function showHeader() {
+      // logic based on config
+      return true;
+    }
+  }, {
+    key: "showFooter",
+    value: function showFooter() {
+      // logic based on config
+      return true;
+    }
+  }]);
+  return HorizonCardContent;
+}();
+
+var HorizonCard = _decorate([customElement('horizon-card')], function (_initialize, _LitElement) {
+  var HorizonCard = /*#__PURE__*/function (_LitElement2) {
+    _inherits(HorizonCard, _LitElement2);
+    var _super = _createSuper(HorizonCard);
+    function HorizonCard() {
+      var _this;
+      _classCallCheck(this, HorizonCard);
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+      _this = _super.call.apply(_super, [this].concat(args));
+      _initialize(_assertThisInitialized(_this));
+      return _this;
+    }
+    return _createClass(HorizonCard);
+  }(_LitElement);
+  return {
+    F: HorizonCard,
+    d: [{
+      kind: "field",
+      "static": true,
+      key: "cardType",
+      value: function value() {
+        return 'horizon-card';
       }
     }, {
       kind: "field",
       "static": true,
       key: "cardName",
       value: function value() {
-        return 'Sun Card';
+        return 'Horizon Card';
       }
     }, {
       kind: "field",
@@ -3859,7 +4271,9 @@ var SunCard = _decorate([customElement('sun-card')], function (_initialize, _Lit
       decorators: [state()],
       key: "config",
       value: function value() {
-        return {};
+        return {
+          type: HorizonCard.cardType
+        };
       }
     }, {
       kind: "field",
@@ -3877,227 +4291,9 @@ var SunCard = _decorate([customElement('sun-card')], function (_initialize, _Lit
       key: "lastHass",
       value: void 0
     }, {
-      kind: "set",
-      key: "hass",
-      value: function hass(_hass) {
-        this.lastHass = _hass;
-
-        if (!this.hasRendered) {
-          return;
-        }
-
-        this.processLastHass();
-      }
-    }, {
-      kind: "method",
-      key: "calculatePositionAndProgressesByTime",
-      value: function calculatePositionAndProgressesByTime(hass) {
-        var _this$shadowRoot;
-
-        var sunLine = (_this$shadowRoot = this.shadowRoot) === null || _this$shadowRoot === void 0 ? void 0 : _this$shadowRoot.querySelector('path');
-        var sunrise = new Date(hass.states['sun.sun'].attributes.next_rising);
-        var sunset = new Date(hass.states['sun.sun'].attributes.next_setting);
-        var eventsAt = {
-          dayStart: 0,
-          sunrise: this.convertDateToMinutesSinceDayStarted(sunrise),
-          sunset: this.convertDateToMinutesSinceDayStarted(sunset),
-          dayEnd: 23 * 60 + 59
-        };
-        var now = new Date();
-        var minutesSinceTodayStarted = this.convertDateToMinutesSinceDayStarted(now); // Dawn section position [0 - 105]
-
-        var dawnSectionPosition = Math.min(minutesSinceTodayStarted, eventsAt.sunrise) * 105 / eventsAt.sunrise; // Day section position [106 - 499]
-
-        var minutesSinceDayStarted = Math.max(minutesSinceTodayStarted - eventsAt.sunrise, 0);
-        var daySectionPosition = Math.min(minutesSinceDayStarted, eventsAt.sunset - eventsAt.sunrise) * (499 - 106) / (eventsAt.sunset - eventsAt.sunrise); // Dusk section position [500 - 605]
-
-        var minutesSinceDuskStarted = Math.max(minutesSinceTodayStarted - eventsAt.sunset, 0);
-        var duskSectionPosition = minutesSinceDuskStarted * (605 - 500) / (eventsAt.dayEnd - eventsAt.sunset);
-        var position = dawnSectionPosition + daySectionPosition + duskSectionPosition;
-        var sunPosition = sunLine.getPointAtLength(position);
-        var dawnProgressPercent = 100 * (sunPosition.x - Constants.EVENT_X_POSITIONS.dayStart) / (Constants.EVENT_X_POSITIONS.sunrise - Constants.EVENT_X_POSITIONS.dayStart);
-        var dayProgressPercent = 100 * (sunPosition.x - Constants.EVENT_X_POSITIONS.sunrise) / (Constants.EVENT_X_POSITIONS.sunset - Constants.EVENT_X_POSITIONS.sunrise);
-        var duskProgressPercent = 100 * (sunPosition.x - Constants.EVENT_X_POSITIONS.sunset) / (Constants.EVENT_X_POSITIONS.dayEnd - Constants.EVENT_X_POSITIONS.sunset);
-        var sunYTop = sunPosition.y - Constants.SUN_RADIUS;
-        var yOver = Constants.HORIZON_Y - sunYTop;
-        var sunPercentOverHorizon = 0;
-
-        if (yOver > 0) {
-          sunPercentOverHorizon = Math.min(100 * yOver / (2 * Constants.SUN_RADIUS), 100);
-        }
-
-        return {
-          dawnProgressPercent: dawnProgressPercent,
-          dayProgressPercent: dayProgressPercent,
-          duskProgressPercent: duskProgressPercent,
-          sunPercentOverHorizon: sunPercentOverHorizon,
-          sunPosition: {
-            x: sunPosition.x,
-            y: sunPosition.y
-          }
-        };
-      }
-    }, {
-      kind: "method",
-      key: "convertDateToMinutesSinceDayStarted",
-      value: function convertDateToMinutesSinceDayStarted(date) {
-        return date.getHours() * 60 + date.getMinutes();
-      }
-    }, {
-      kind: "method",
-      key: "parseTime",
-      value: function parseTime(timeText, locale) {
-        var regex = /\d{1,2}[:.]\d{1,2}|[AMP]+/g;
-        var date = new Date(timeText);
-
-        var _this$getConfig = this.getConfig(),
-            language = _this$getConfig.language,
-            timeFormat = _this$getConfig.timeFormat;
-
-        var result = date.toLocaleTimeString(locale !== null && locale !== void 0 ? locale : language, {
-          hour12: timeFormat === '12h'
-        }).match(regex);
-
-        if (!result && !locale) {
-          return this.parseTime(timeText, Constants.DEFAULT_CONFIG.language);
-        }
-
-        var _result = _slicedToArray(result, 2),
-            time = _result[0],
-            period = _result[1];
-
-        return {
-          time: time,
-          period: period
-        };
-      }
-    }, {
-      kind: "method",
-      key: "processLastHass",
-      value: function processLastHass() {
-        var _this$config$darkMode, _ref, _this$config$language, _this$lastHass$locale, _this$config$timeForm;
-
-        if (!this.lastHass) {
-          return;
-        }
-
-        if (!this.lastHass.states['sun.sun']) {
-          return this.showError(ESunCardErrors.SunIntegrationNotFound);
-        }
-
-        this.config.darkMode = (_this$config$darkMode = this.config.darkMode) !== null && _this$config$darkMode !== void 0 ? _this$config$darkMode : this.lastHass.themes.darkMode;
-        this.config.language = (_ref = (_this$config$language = this.config.language) !== null && _this$config$language !== void 0 ? _this$config$language : (_this$lastHass$locale = this.lastHass.locale) === null || _this$lastHass$locale === void 0 ? void 0 : _this$lastHass$locale.language) !== null && _ref !== void 0 ? _ref : this.lastHass.language;
-        this.config.timeFormat = (_this$config$timeForm = this.config.timeFormat) !== null && _this$config$timeForm !== void 0 ? _this$config$timeForm : this.getTimeFormatByLanguage(this.config.language);
-        var times = {
-          dawn: this.parseTime(this.lastHass.states['sun.sun'].attributes.next_dawn),
-          dusk: this.parseTime(this.lastHass.states['sun.sun'].attributes.next_dusk),
-          noon: this.parseTime(this.lastHass.states['sun.sun'].attributes.next_noon),
-          sunrise: this.parseTime(this.lastHass.states['sun.sun'].attributes.next_rising),
-          sunset: this.parseTime(this.lastHass.states['sun.sun'].attributes.next_setting)
-        };
-
-        var _this$calculatePositi = this.calculatePositionAndProgressesByTime(this.lastHass),
-            dawnProgressPercent = _this$calculatePositi.dawnProgressPercent,
-            dayProgressPercent = _this$calculatePositi.dayProgressPercent,
-            duskProgressPercent = _this$calculatePositi.duskProgressPercent,
-            sunPercentOverHorizon = _this$calculatePositi.sunPercentOverHorizon,
-            sunPosition = _this$calculatePositi.sunPosition;
-
-        var data = {
-          azimuth: this.lastHass.states['sun.sun'].attributes.azimuth,
-          dawnProgressPercent: dawnProgressPercent,
-          dayProgressPercent: dayProgressPercent,
-          duskProgressPercent: duskProgressPercent,
-          elevation: this.lastHass.states['sun.sun'].attributes.elevation,
-          sunPercentOverHorizon: sunPercentOverHorizon,
-          sunPosition: sunPosition,
-          times: times
-        };
-        this.data = data;
-      }
-    }, {
-      kind: "method",
-      key: "getConfig",
-      value: function getConfig() {
-        var _this$config$darkMode2, _this$config$language2, _this$config$showAzim, _this$config$showElev, _this$config$timeForm2;
-
-        var config = {};
-        config.darkMode = (_this$config$darkMode2 = this.config.darkMode) !== null && _this$config$darkMode2 !== void 0 ? _this$config$darkMode2 : Constants.DEFAULT_CONFIG.darkMode;
-        config.language = (_this$config$language2 = this.config.language) !== null && _this$config$language2 !== void 0 ? _this$config$language2 : Constants.DEFAULT_CONFIG.language;
-        config.showAzimuth = (_this$config$showAzim = this.config.showAzimuth) !== null && _this$config$showAzim !== void 0 ? _this$config$showAzim : Constants.DEFAULT_CONFIG.showAzimuth;
-        config.showElevation = (_this$config$showElev = this.config.showElevation) !== null && _this$config$showElev !== void 0 ? _this$config$showElev : Constants.DEFAULT_CONFIG.showElevation;
-        config.timeFormat = (_this$config$timeForm2 = this.config.timeFormat) !== null && _this$config$timeForm2 !== void 0 ? _this$config$timeForm2 : Constants.DEFAULT_CONFIG.timeFormat;
-        config.title = this.config.title;
-
-        if (!Object.keys(Constants.LOCALIZATION_LANGUAGES).includes(config.language)) {
-          config.language = Constants.DEFAULT_CONFIG.language;
-        }
-
-        return config;
-      }
-    }, {
-      kind: "method",
-      key: "getTimeFormatByLanguage",
-      value: function getTimeFormatByLanguage(language) {
-        var date = new Date();
-        var time = date.toLocaleTimeString(language).toLocaleLowerCase();
-        return time.includes('pm') || time.includes('am') ? '12h' : '24h';
-      }
-    }, {
-      kind: "method",
-      key: "setConfig",
-      value: function setConfig(config) {
-        this.config = _objectSpread2({}, config);
-      }
-    }, {
-      kind: "method",
-      key: "showError",
-      value: function showError(error) {
-        this.data = {
-          error: error
-        };
-      }
-    }, {
-      kind: "method",
-      key: "render",
-      value: function render() {
-        var config = this.getConfig();
-        var language = config.language;
-        var localization = Constants.LOCALIZATION_LANGUAGES[language];
-        return SunCardContent.generate(this.data, localization, config);
-      }
-    }, {
-      kind: "method",
-      key: "updated",
-      value: function updated(changedProperties) {
-        _get(_getPrototypeOf(SunCard.prototype), "updated", this).call(this, changedProperties);
-
-        if (!this.hasRendered) {
-          this.hasRendered = true;
-          this.processLastHass();
-          return;
-        }
-
-        if (this.data.error) {
-          var _this$shadowRoot2;
-
-          var errorElement = (_this$shadowRoot2 = this.shadowRoot) === null || _this$shadowRoot2 === void 0 ? void 0 : _this$shadowRoot2.querySelector('hui-error-card');
-
-          if (errorElement) {
-            var _errorElement$setConf;
-
-            var _config = this.getConfig();
-
-            var language = _config.language;
-            var localization = Constants.LOCALIZATION_LANGUAGES[language];
-            var error = localization.errors[this.data.error];
-            (_errorElement$setConf = errorElement.setConfig) === null || _errorElement$setConf === void 0 ? void 0 : _errorElement$setConf.call(errorElement, {
-              error: error
-            });
-            console.error(error);
-          }
-        }
-      }
+      kind: "field",
+      key: "fixedNow",
+      value: void 0
     }, {
       kind: "get",
       "static": true,
@@ -4105,13 +4301,334 @@ var SunCard = _decorate([customElement('sun-card')], function (_initialize, _Lit
       value: function styles() {
         return cardStyles;
       }
+    }, {
+      kind: "set",
+      key: "hass",
+      value: function hass(_hass) {
+        this.lastHass = _hass;
+        if (!this.hasRendered) {
+          this.populateConfigFromHass();
+          return;
+        }
+        this.processLastHass();
+      }
+    }, {
+      kind: "method",
+      "static": true,
+      key: "getConfigElement",
+      value: function getConfigElement() {
+        return document.createElement(HorizonCardEditor.cardType);
+      }
+
+      // called by HASS whenever config changes
+    }, {
+      kind: "method",
+      key: "setConfig",
+      value: function setConfig(config) {
+        var _config$component, _config$fields$sunris, _config$fields, _config$fields$sunset, _config$fields2, _config$fields$dawn, _config$fields3, _config$fields$noon, _config$fields4, _config$fields$dusk, _config$fields5, _config$fields$azimut, _config$fields6, _config$fields$elevat, _config$fields7;
+        var newConfig = _objectSpread2({}, this.config);
+        newConfig.title = config.title;
+        newConfig.darkMode = config.darkMode;
+        newConfig.language = config.language;
+        newConfig.use12hourClock = config.use12hourClock;
+        newConfig.component = (_config$component = config.component) !== null && _config$component !== void 0 ? _config$component : Constants.DEFAULT_CONFIG.component;
+        if (newConfig.language && !HelperFunctions.isValidLanguage(newConfig.language)) {
+          throw Error("".concat(config.language, " is not a supported language. Supported languages: ").concat(Object.keys(Constants.LOCALIZATION_LANGUAGES)));
+        }
+        var defaultFields = Constants.DEFAULT_CONFIG.fields;
+        newConfig.fields = {
+          sunrise: (_config$fields$sunris = (_config$fields = config.fields) === null || _config$fields === void 0 ? void 0 : _config$fields.sunrise) !== null && _config$fields$sunris !== void 0 ? _config$fields$sunris : defaultFields.sunrise,
+          sunset: (_config$fields$sunset = (_config$fields2 = config.fields) === null || _config$fields2 === void 0 ? void 0 : _config$fields2.sunset) !== null && _config$fields$sunset !== void 0 ? _config$fields$sunset : defaultFields.sunset,
+          dawn: (_config$fields$dawn = (_config$fields3 = config.fields) === null || _config$fields3 === void 0 ? void 0 : _config$fields3.dawn) !== null && _config$fields$dawn !== void 0 ? _config$fields$dawn : defaultFields.dawn,
+          noon: (_config$fields$noon = (_config$fields4 = config.fields) === null || _config$fields4 === void 0 ? void 0 : _config$fields4.noon) !== null && _config$fields$noon !== void 0 ? _config$fields$noon : defaultFields.noon,
+          dusk: (_config$fields$dusk = (_config$fields5 = config.fields) === null || _config$fields5 === void 0 ? void 0 : _config$fields5.dusk) !== null && _config$fields$dusk !== void 0 ? _config$fields$dusk : defaultFields.dusk,
+          azimuth: (_config$fields$azimut = (_config$fields6 = config.fields) === null || _config$fields6 === void 0 ? void 0 : _config$fields6.azimuth) !== null && _config$fields$azimut !== void 0 ? _config$fields$azimut : defaultFields.azimuth,
+          elevation: (_config$fields$elevat = (_config$fields7 = config.fields) === null || _config$fields7 === void 0 ? void 0 : _config$fields7.elevation) !== null && _config$fields$elevat !== void 0 ? _config$fields$elevat : defaultFields.elevation
+        };
+        this.config = newConfig;
+        if (this.lastHass) {
+          this.populateConfigFromHass();
+        }
+      }
+    }, {
+      kind: "method",
+      key: "render",
+      value: function render() {
+        var _this$data;
+        if ((_this$data = this.data) !== null && _this$data !== void 0 && _this$data.error) {
+          return new HorizonErrorContent(this.config, this.data.error).render();
+        }
+
+        // TODO: Move
+        // init i18n component (assume set config has run at least once)
+        this.config.i18n = new I18N(this.config.language, this.config.use12hourClock);
+
+        // render components
+        return new HorizonCardContent(this.config, this.data).render();
+      }
+    }, {
+      kind: "method",
+      key: "updated",
+      value: function updated(changedProperties) {
+        _get(_getPrototypeOf(HorizonCard.prototype), "updated", this).call(this, changedProperties);
+        if (!this.hasRendered) {
+          this.hasRendered = true;
+          this.processLastHass();
+        }
+      }
+
+      /**
+       * Sets a fixed now value to use instead of the actual time.
+       * Used for development only. Called from js code in the dev directory.
+       * @param fixedNow a Date
+       * @protected
+       */
+    }, {
+      kind: "method",
+      key: "setFixedNow",
+      value: function setFixedNow(fixedNow) {
+        this.fixedNow = fixedNow;
+      }
+    }, {
+      kind: "method",
+      key: "populateConfigFromHass",
+      value: function populateConfigFromHass() {
+        var _this$config$darkMode, _this$lastHass$themes, _ref, _this$config$language, _locale;
+        // respect setting in hass
+        // NOTE: custom-card-helpers types are not up to date with home assistant
+        // NOTE: Old releases from Home Assistant doesn't provide the locale property
+        this.config.darkMode = (_this$config$darkMode = this.config.darkMode) !== null && _this$config$darkMode !== void 0 ? _this$config$darkMode : (_this$lastHass$themes = this.lastHass.themes) === null || _this$lastHass$themes === void 0 ? void 0 : _this$lastHass$themes.darkMode;
+        this.config.language = (_ref = (_this$config$language = this.config.language) !== null && _this$config$language !== void 0 ? _this$config$language : (_locale = this.lastHass.locale) === null || _locale === void 0 ? void 0 : _locale.language) !== null && _ref !== void 0 ? _ref : this.lastHass.language;
+      }
+    }, {
+      kind: "method",
+      key: "processLastHass",
+      value: function processLastHass() {
+        if (!this.lastHass) {
+          return;
+        }
+        this.populateConfigFromHass();
+        var sunComponent = this.config.component;
+        if (this.lastHass.states[sunComponent]) {
+          var sunAttrs = this.lastHass.states[sunComponent].attributes;
+          var now = this.now();
+          var times = this.readTimes(sunAttrs, now);
+          var sunInfo = this.calculateSunInfo(sunAttrs.elevation, now, times);
+          this.data = {
+            azimuth: sunAttrs.azimuth,
+            elevation: sunAttrs.elevation,
+            sunInfo: sunInfo,
+            times: times
+          };
+        } else {
+          this.data = {
+            azimuth: 0,
+            elevation: 0,
+            sunInfo: Constants.DEFAULT_SUN_INFO,
+            times: Constants.DEFAULT_TIMES,
+            error: EHorizonCardErrors.SunIntegrationNotFound
+          };
+        }
+      }
+
+      /* For the math to work in #calculateSunInfo(sunrise, sunset, noon, elevation, now), we need the
+       * date part of the given 'date-time' to be equal. This will not be the
+       * case whenever we pass one of the 'times', ie: when we pass dawn, hass
+       * will update that variable with tomorrows dawn.
+       *
+       * This function safe-guards that through standardizing the 'date'-part on
+       * the last 'time' to now. This means that all dates will have the date of the
+       * current moment, thus ensuring equal date across all times of day.
+       */
+    }, {
+      kind: "method",
+      key: "readTimes",
+      value: function readTimes(sunAttributes, now) {
+        var noon = new Date(sunAttributes.next_noon);
+        return {
+          dawn: this.normalizeSunEventTime(sunAttributes.next_dawn, now, noon),
+          dusk: this.normalizeSunEventTime(sunAttributes.next_dusk, now, noon),
+          noon: this.combineDateTime(now, noon),
+          sunrise: this.normalizeSunEventTime(sunAttributes.next_rising, now, noon),
+          sunset: this.normalizeSunEventTime(sunAttributes.next_setting, now, noon)
+        };
+      }
+
+      /**
+       * Normalizes a sun event time and returns it as a Date whose date part is set to the provided now Date,
+       * or undefined if the event does not occur within 24h of the provided noon moment.
+       * Dawn, dusk, sunset and sunrise events may not occur for certain times of the year at high latitudes.
+       * @param eventTime event time as string
+       * @param now the current time
+       * @param noon the time of next noon
+       * @private
+       */
+    }, {
+      kind: "method",
+      key: "normalizeSunEventTime",
+      value: function normalizeSunEventTime(eventTime, now, noon) {
+        var event = new Date(eventTime);
+        if (Math.abs(event.getTime() - noon.getTime()) > 24 * 60 * 60 * 1000) {
+          // No such event within 24h, happens at higher latitudes for certain times of the year.
+          // This can happen for dusk, dawn, sunset, sunrise but not noon since solar noon is defined as the highest
+          // elevation of the sun, even if it's below the horizon.
+          return undefined;
+        }
+        return this.combineDateTime(now, event);
+      }
+
+      /**
+       * Takes the date from dateSource and the time from timeSource and returns a Date combining both
+       * @param dateSource a Date
+       * @param timeSource a Date
+       * @private
+       */
+    }, {
+      kind: "method",
+      key: "combineDateTime",
+      value: function combineDateTime(dateSource, timeSource) {
+        // Note: these need to be the non-UTC versions of the methods!
+        return new Date(dateSource.getFullYear(), dateSource.getMonth(), dateSource.getDate(), timeSource.getHours(), timeSource.getMinutes(), timeSource.getSeconds(), timeSource.getMilliseconds());
+      }
+
+      /**
+       * Returns the current moment in time, used to normalize the event times and calculate the position of the sun.
+       * @private
+       */
+    }, {
+      kind: "method",
+      key: "now",
+      value: function now() {
+        if (this.fixedNow == null) {
+          // normal operation
+          return new Date();
+        } else {
+          // for development: pretend the current moment is the fixed value
+          return this.fixedNow;
+        }
+      }
+
+      /**
+       * Calculates a usable sunrise value even if the true sunrise doesn't occur (sun is above/below the horizon)
+       * on a given day.
+       * @param dayStartMs day start time as ms since epoch
+       * @param elevation sun elevation
+       * @param noon normalized noon time
+       * @param sunrise normalized sunrise time
+       * @param sunset normalized sunset time
+       * @private
+       */
+    }, {
+      kind: "method",
+      key: "calculateUsableSunrise",
+      value: function calculateUsableSunrise(dayStartMs, elevation, noon, sunrise, sunset) {
+        if (sunrise === undefined) {
+          // No sunrise
+          if (elevation < Constants.BELOW_HORIZON_ELEVATION) {
+            // Sun is below horizon, fake sunrise 1 ms before noon
+            return noon.getTime() - 1;
+          } else {
+            // Sun is above horizon, fake sunrise at 00:00:00
+            return dayStartMs;
+          }
+        } else if (sunset !== undefined && sunrise > sunset) {
+          // Quirk - happens when the sun rises shortly after it sets on the same day before midnight,
+          // fake sunrise at 00:00:00
+          return dayStartMs;
+        }
+        return sunrise.getTime();
+      }
+
+      /**
+       * Calculates a usable sunset value even if the true sunset doesn't occur (sun is above/below the horizon)
+       * on a given day.
+       * @param dayEndMs day end time as ms since epoch
+       * @param elevation sun elevation
+       * @param noon normalized noon time
+       * @param sunset normalized sunset time
+       * @private
+       */
+    }, {
+      kind: "method",
+      key: "calculateUsableSunset",
+      value: function calculateUsableSunset(dayEndMs, elevation, noon, sunset) {
+        if (sunset === undefined) {
+          if (elevation < Constants.BELOW_HORIZON_ELEVATION) {
+            // Sun is below horizon, fake sunset 1 ms after noon
+            return noon.getTime() + 1;
+          } else {
+            // Sun is above horizon, fake sunset at 23:59:59
+            return dayEndMs;
+          }
+        }
+        return sunset.getTime();
+      }
+    }, {
+      kind: "method",
+      key: "calculateSunInfo",
+      value: function calculateSunInfo(elevation, now, times) {
+        var _this$shadowRoot;
+        var sunLine = (_this$shadowRoot = this.shadowRoot) === null || _this$shadowRoot === void 0 ? void 0 : _this$shadowRoot.querySelector('path');
+
+        // find the instances of time for today
+        var nowMs = now.getTime();
+        var dayStartMs = HelperFunctions.startOfDay(now).getTime();
+        var dayEndMs = HelperFunctions.endOfDay(now).getTime();
+
+        // Here it gets fuzzy for higher latitudes - the sun may not rise or set within 24h
+        var sunriseMs = this.calculateUsableSunrise(dayStartMs, elevation, times.noon, times.sunrise, times.sunset);
+        var sunsetMs = this.calculateUsableSunset(dayEndMs, elevation, times.noon, times.sunset);
+
+        // calculate relevant moments in time
+        var msSinceStartOfDay = Math.max(nowMs - dayStartMs, 0);
+        var msSinceSunrise = Math.max(nowMs - sunriseMs, 0);
+        var msSinceSunset = Math.max(nowMs - sunsetMs, 0);
+        var msOfDaylight = sunsetMs - sunriseMs;
+        // We need at least 1ms to avoid division by zero
+        var msUntilSunrise = Math.max(sunriseMs - dayStartMs, 1);
+        var msUntilEndOfDay = Math.max(dayEndMs - sunsetMs, 1);
+
+        // find section positions
+        var dawnSectionPosition = HelperFunctions.findSectionPosition(msSinceStartOfDay, msUntilSunrise, Constants.SUN_SECTIONS.dawn);
+        var daySectionPosition = HelperFunctions.findSectionPosition(msSinceSunrise, msOfDaylight, Constants.SUN_SECTIONS.day);
+        var duskSectionPosition = HelperFunctions.findSectionPosition(msSinceSunset, msUntilEndOfDay, Constants.SUN_SECTIONS.dusk);
+
+        // find the sun position
+        var position = dawnSectionPosition + daySectionPosition + duskSectionPosition;
+        var sunPosition = sunLine.getPointAtLength(position);
+
+        // calculate section progress, in percentage
+        var dawnProgressPercent = HelperFunctions.findSunProgress(sunPosition.x, Constants.EVENT_X_POSITIONS.dayStart, Constants.EVENT_X_POSITIONS.sunrise);
+        var dayProgressPercent = HelperFunctions.findSunProgress(sunPosition.x, Constants.EVENT_X_POSITIONS.sunrise, Constants.EVENT_X_POSITIONS.sunset);
+        var duskProgressPercent = HelperFunctions.findSunProgress(sunPosition.x, Constants.EVENT_X_POSITIONS.sunset, Constants.EVENT_X_POSITIONS.dayEnd);
+
+        // calculate sun position in regards to the horizon
+        var sunCenterY = sunPosition.y - Constants.SUN_RADIUS;
+        var sunCenterYAboveHorizon = Constants.HORIZON_Y - sunCenterY;
+        var sunAboveHorizon = sunCenterYAboveHorizon > 0;
+        var sunPercentOverHorizon = 100 * sunCenterYAboveHorizon / (2 * Constants.SUN_RADIUS);
+        sunPercentOverHorizon = HelperFunctions.clamp(0, 100, sunPercentOverHorizon);
+        return {
+          sunrise: sunriseMs,
+          sunset: sunsetMs,
+          dawnProgressPercent: dawnProgressPercent,
+          dayProgressPercent: dayProgressPercent,
+          duskProgressPercent: duskProgressPercent,
+          sunAboveHorizon: sunAboveHorizon,
+          sunPercentOverHorizon: sunPercentOverHorizon,
+          sunPosition: {
+            x: sunPosition.x,
+            y: sunPosition.y
+          }
+        };
+      }
     }]
   };
-}, LitElement);
-
+}, s);
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: SunCard.cardType,
-  name: SunCard.cardName,
-  description: SunCard.cardDescription
+  type: HorizonCard.cardType,
+  name: HorizonCard.cardName,
+  preview: true,
+  description: HorizonCard.cardDescription
 });

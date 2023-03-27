@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1816 total entities**,
-including **895 sensors**.
+This Home Assistant install has approximately **1823 total entities**,
+including **902 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -306,7 +306,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>29 Lovelace Plugins</summary>
+<details><summary>30 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
 
@@ -356,6 +356,10 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v0.7.2]
+
+Sun Card successor: Visualize the position of the Sun over the horizon.
+
 ### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.10.1]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
@@ -388,6 +392,10 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.0.9.4]
+
+A power distribution card inspired by the official Energy Distribution card for Home Assistant
+
 ### [Rgb Light Card](https://github.com/bokub/rgb-light-card) [v1.11.0]
 
 💡 A Lovelace custom card for RGB lights
@@ -399,10 +407,6 @@ A Home Assistant lovelace card to display a sankey chart. For example for power 
 ### [Steam Card](https://github.com/Kibibit/kb-steam-card) [v1.1.1]
 
 A Home Assistant card for Steam integrations
-
-### [Sun Card](https://github.com/AitorDB/home-assistant-sun-card) [v0.1.4]
-
-Home assistant sun card based on Google weather design
 
 ### [Swipe Card](https://github.com/bramkragten/swipe-card) [v5.0.0]
 
