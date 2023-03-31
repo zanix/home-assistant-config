@@ -544,7 +544,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>147 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -686,6 +686,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
+- 🗺️ Arriving Home
 - 🗺️ Leaving Zone
 - 🚦 Front Door Light Switch Status
 - 🚦 Garage Light Switch Status

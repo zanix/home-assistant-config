@@ -1373,7 +1373,12 @@
     entity_id:
     - binary_sensor.doorbell_human
     to: 'on'
-  condition: []
+  condition:
+  - condition: state
+    entity_id: binary_sensor.front_door_is_open
+    state: 'off'
+    for:
+      minutes: 5
   action:
   - parallel:
     - service: script.notify_speech
@@ -1430,6 +1435,8 @@
           entity_id: light.office_desk_led
         data:
           effect: Solid
+  - delay:
+      minutes: 5
   mode: single
   variables:
     message: There's a person at the front door.
@@ -3828,10 +3835,8 @@
       - cover.garage_door
       to: closed
     timeout:
-      hours: 0
       minutes: 10
-      seconds: 30
-      milliseconds: 0
+      seconds: 10
     continue_on_timeout: false
   - service: timer.cancel
     data: {}
@@ -3982,6 +3987,74 @@
   mode: single
   variables:
     message: The car shut off and is no longer running.
+- id: '1679340622496'
+  alias: "\U0001F5FA️ Arriving Home"
+  description: Sends a notification when someone is arriving home.
+  trigger:
+  - platform: state
+    entity_id:
+    - person.joshua
+    - person.amy
+    to: not_home
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition:
+  - condition: template
+    value_template: '{{ trigger.to_state.state == "home" and trigger.from_state.state
+      == "not_home" }}'
+  - condition: template
+    value_template: '{{ trigger.to_state.attributes.gps_accuracy | int < 30 }}'
+  - condition: time
+    after: 08:00:00
+    before: '22:00:00'
+  action:
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.garage_entry_door_is_open
+      to: 'on'
+    timeout:
+      minutes: 2
+    continue_on_timeout: false
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: '{{ name }} is Home'
+        message: '{{ message }}'
+        group: Presence
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: '{{ name }} is Home'
+        message: '{{ message }}'
+    - service: script.notify_speech
+      data:
+        media_player:
+        - media_player.living_room_speaker
+        - media_player.family_room_speaker
+        - media_player.office_speaker
+        message: '{{ message }}'
+  - delay:
+      minutes: 5
+  mode: single
+  variables:
+    zone_name: '{{ trigger.from_state.state }}'
+    name: '{{ trigger.to_state.attributes.friendly_name }}'
+    message: "{% set names = {'Amy': 'Mom', 'Joshua': 'Dad'} %}\n{% set content =
+      [\n  \"Guess who is home? [name] is!\",\n  \"[name] is now in the house.\",\n
+      \ \"Knock, Knock. Who's there? [name] is!\",\n  \"The garage door just told
+      me that [name] is home.\",\n  \"[name] can not hide from the system. Welcome
+      home.\",\n  \"[name]! You are home!\",\n  \"I know a secret! [name] is home!\",\n
+      \ \"I am sensing a disturbance in the force. [name] must be home!\",\n  \"Just
+      a quick announcement. [name] has arrived!\",\n  \"Pardon the interruption, but
+      [name] is home!\",\n  \"My systems are picking up the presence of additional
+      humans. [name] has been identified as home.\"\n] | random %}\n{{ content | replace('[name]',
+      names[name]) }}"
 - id: '1679462212869'
   alias: ⏯ Ensure PiPup is Running
   description: ''
