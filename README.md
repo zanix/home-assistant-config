@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1823 total entities**,
-including **902 sensors**.
+This Home Assistant install has approximately **1825 total entities**,
+including **903 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -200,11 +200,11 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>18 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.4.1]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.7.0]
 
 Adaptive Lighting custom component for Home Assistant
 
-Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra).
+Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1).
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.0]
 
@@ -392,7 +392,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.0.9.4]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.0.9.5]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
