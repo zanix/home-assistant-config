@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1825 total entities**,
-including **903 sensors**.
+This Home Assistant install has approximately **1883 total entities**,
+including **928 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -200,7 +200,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>18 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.7.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.10.0]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -308,7 +308,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>30 Lovelace Plugins</summary>
 
-### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.2]
+### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
@@ -324,7 +324,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Button Card](https://github.com/custom-cards/button-card) [v3.4.2]
+### [Button Card](https://github.com/custom-cards/button-card) [v3.5.0]
 
 ❇️ Lovelace button-card for home assistant
 
@@ -336,7 +336,7 @@ Battery state card for Home Assistant
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Decluttering Card](https://github.com/custom-cards/decluttering-card) [v0.6.3]
+### [Decluttering Card](https://github.com/custom-cards/decluttering-card) [v1.0.0]
 
 🧹 Declutter your lovelace configuration with the help of this card
 
@@ -380,7 +380,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.6.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.6.3]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
