@@ -10,17 +10,15 @@ sensor:
   - platform: rest
     name: "Smart Display Brightness"
     resource: !secret smart_display_api_brightness
-    scan_interval: 10
     value_template: '{{ value_json.result }}'
 
 switch:
   - platform: rest
     name: "Smart Display Monitor"
     resource: !secret smart_display_api_monitor
-    scan_interval: 10
     body_on: '{"monitor": "on"}'
     body_off: '{"monitor": "off"}'
-    is_on_template: '{{ value_json.monitor | replace("off", "false") | replace("on", "true") }}'
+    is_on_template: '{{ value_json.monitor == "on" }}'
     headers:
       Content-Type: application/json
 
@@ -44,12 +42,12 @@ light:
             mdi:monitor-off
           {% endif %}
         turn_on:
-          service: homeassistant.turn_on
-          data:
+          service: switch.turn_on
+          target:
             entity_id: switch.smart_display_monitor
         turn_off:
-          service: homeassistant.turn_off
-          data:
+          service: switch.turn_off
+          target:
             entity_id: switch.smart_display_monitor
         set_level:
           service: rest_command.smart_display_brightness
