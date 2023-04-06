@@ -4,28 +4,16 @@
   Report if any door is open or locks are unlocked.
 #}
 {%- macro door_check() -%}
-  {% set ns = namespace(entities=[]) %}
-
-  {% set open_doors = expand(state_attr("group.all_doors", "entity_id")) | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
-  {% for entity_id in open_doors %}
-    {% set ns.entities = ns.entities + [ entity_id ] %}
-  {% endfor %}
-
-  {% set security = [
+  {% set security = expand("group.all_doors") | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
+  {% set security = security + expand([
     "lock.lock_front",
     "cover.garage_door"
-  ] %}
+  ]) | selectattr("state", "in", ["open", "unlocked"]) | map(attribute="entity_id") | list %}
 
-  {% for entity_id in security %}
-    {% if is_state(entity_id, "open") or is_state(entity_id, "unlocked") %}
-      {% set ns.entities = ns.entities + [ entity_id ] %}
-    {% endif %}
-  {% endfor %}
-
-  {% if ns.entities | length > 0 %}
-    {% for entity in ns.entities %}
+  {% if security | length > 0 %}
+    {% for entity in security -%}
       {{ 'T' if loop.first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ ',' if loop.length > 2 and not loop.last else '' }}{{ '.' if loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
-    {% endfor %}
+    {%- endfor %}
   {% endif %}
 {%- endmacro -%}
 
@@ -47,8 +35,8 @@
   A simple greeting based on the time of day.
 #}
 {%- macro holiday() -%}
-  {% if has_value('sensor.holiday') %}
-    Today is {{ states('sensor.holiday') }}.
+  {% if has_value('calendar.holidays') and is_state('calendar.holidays', '0') %}
+    Today is {{ state_attr('calendar.holidays', 'next_holiday') }}.
   {% endif %}
 {%- endmacro -%}
 
@@ -56,12 +44,12 @@
   Report if any light is on.
 #}
 {%- macro light_check() -%}
-  {% set lights_on = expand(state_attr("group.all_light_switches", "entity_id")) | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
+  {% set lights_on = expand("group.all_light_switches") | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
   {% if lights_on | length | default(0) | int > 0 and lights_on != [''] -%}
     {% if lights_on | length == 1 %}
-      There is 1 light on right now. The {{ get_friendly_names(lights_on) }} is on.
+      There is 1 light on right now. It's the {{ get_friendly_names(lights_on) }}.
     {% else %}
-      There are {{ lights_on | length }} lights on right now. The {{ get_friendly_names(lights_on) }} are on.
+      There are {{ lights_on | length }} lights on right now. The {{ get_friendly_names(lights_on) }}.
     {% endif %}
   {% endif %}
 {%- endmacro -%}
@@ -100,10 +88,10 @@
   Report if any window is open.
 #}
 {%- macro window_check() -%}
-  {% set open_windows = expand(state_attr("group.all_windows", "entity_id")) | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
+  {% set open_windows = expand("group.all_windows") | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
   {% if open_windows | length > 0 %}
-    {% for entity in open_windows %}
+    {% for entity in open_windows -%}
       {{ 'T' if loop.first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is open{{ ',' if loop.length > 2 and not loop.last else '' }}{{ '.' if loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
-    {% endfor %}
+    {%- endfor %}
   {% endif %}
 {%- endmacro -%}

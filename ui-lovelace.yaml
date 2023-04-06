@@ -171,11 +171,11 @@ decluttering_templates:
             service: button.press
             target:
               entity_id: button.[[computer]]_lock
-          icon: "{%- if is_state(\"sensor.[[computer]]_session_state\", \"Locked\"\
-            ) -%}\n  mdi:lock\n{%- else -%}\n  mdi:lock-open\n{%- endif -%}"
-          icon_color: "{%- if is_state(\"sensor.[[computer]]_session_state\", \"Locked\"\
-            ) -%}\n  red\n{%- elif is_state(\"sensor.[[computer]]_session_state\"\
-            , \"Unlocked\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
+          icon: "{% if is_state(\"sensor.[[computer]]_session_state\", \"Locked\"\
+            ) %}\n  mdi:lock\n{% else %}\n  mdi:lock-open\n{% endif %}"
+          icon_color: "{% if is_state(\"sensor.[[computer]]_session_state\", \"Locked\"\
+            ) %}\n  red\n{% elif is_state(\"sensor.[[computer]]_session_state\", \"\
+            Unlocked\") %}\n  green\n{% else %}\n  grey\n{% endif %}"
           layout: vertical
           tap_action:
             action: none
@@ -213,8 +213,7 @@ decluttering_templates:
             target:
               entity_id: button.[[computer]]_sleep
           icon: mdi:sleep
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
+          icon_color: '{{ is_state(entity, "on") | iif("green", "grey") }}'
           layout: vertical
           tap_action:
             action: none
@@ -233,8 +232,7 @@ decluttering_templates:
             target:
               entity_id: button.[[computer]]_restart
           icon: mdi:reload
-          icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-            \  grey\n{%- endif -%}"
+          icon_color: '{{ is_state(entity, "on") | iif("green", "grey") }}'
           layout: vertical
           tap_action:
             action: none
@@ -247,32 +245,19 @@ decluttering_templates:
       type: custom:vertical-stack-in-card
   door_card:
     card:
-      badge_color: "{% set entity = \"[[battery_entity]]\" %} {% if not states(entity)\
-        \ in [\"unknown\", \"unavailable\"] %}\n  {% set battery_level = states(entity)\
-        \ | int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90: \"\
-        green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"lime\",\n\
-        \    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n    20: \"\
-        orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level]\
-        \ }}\n{% else %}\n  red\n{% endif %}"
-      badge_icon: "{% set entity = \"[[battery_entity]]\" %} {% if not states(entity)\
-        \ in [\"unknown\", \"unavailable\"] %}\n  {% set battery_level = states(entity)\
-        \ | int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif battery_level\
-        \ >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10 }}\n  {% elif battery_level\
-        \ < 10 %}\n    mdi:battery-outline\n  {% endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n\
-        {% endif %}"
+      badge_color: '{% from "util.jinja" import battery_color %} {{ battery_color("[[battery_entity]]")
+        }}'
+      badge_icon: '{% from "util.jinja" import battery_icon %} {{ battery_icon("[[battery_entity]]")
+        }}'
       entity: '[[entity]]'
       icon: '[[icon]]{{ iif(is_state(entity, "on"), "-open", "") }}'
       icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
       multiline_secondary: true
       primary: '[[name]]'
-      secondary: "{{ iif(is_state(entity, \"on\"), \"Open\", \"Closed\") }}\n{% set\
-        \ last_changed = state_attr(\"sensor.nominal_change_history\", \"changes\"\
-        )[entity] | as_datetime -%} {%- if last_changed < today_at() - timedelta(days=6)\
-        \ -%}\n  More than a week ago\n{%- elif last_changed < today_at() - timedelta(days=1)\
-        \ -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"%A at %-I:%M %p\"\
-        ) }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()\
-        \ | timestamp_custom(\"Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed)\
-        \ }} ago\n{%- endif -%}"
+      secondary: '{% from "util.jinja" import custom_timedelta %} {{ iif(is_state(entity,
+        "on"), "Open", "Closed") }}
+
+        {{ custom_timedelta(entity) }}'
       tap_action:
         action: more-info
       type: custom:mushroom-template-card
@@ -608,10 +593,9 @@ decluttering_templates:
             \ center no-repeat;\n  {%- endif -%};\n  background-size: 500% 500%;\n\
             \  filter: blur(100px) saturate(200%);\n}\nha-card {\n  transform: translate3d(0,0,0);\n\
             \  -webkit-transform: translate3d(0,0,0);\n}\n@keyframes gradient {\n\
-            \  0% {\n    background-position: 0% 50%;\n  }\n  25% {\n    background-position:\
-            \ 50% 0%;\n  }\n  50% {\n    background-position: 100% 50%;\n  }\n  75%\
-            \ {\n    background-position: 50% 100%;\n  }\n  100% {\n    background-position:\
-            \ 0% 50%;\n  }\n"
+            \  0% { background-position: 0% 50%; }\n  25% { background-position: 50%\
+            \ 0%; }\n  50% { background-position: 100% 50%; }\n  75% { background-position:\
+            \ 50% 100%; }\n  100% { background-position: 0% 50%; }\n"
           expander-card$: ".header-overlay {\n  right: initial;\n  left: 0;\n}\n"
       cards:
       - cards:
@@ -626,11 +610,11 @@ decluttering_templates:
                     \ 18px;\n}\n.chip-container * {\n  margin-bottom: var(--chip-spacing)\
                     \ !important;\n}\n"
               chips:
-              - content: "{%- if state_attr(entity, \"volume_level\") -%}\n  {{ (state_attr(entity,\
-                  \ \"volume_level\") * 100) | round(0) }}%\n{%- endif -%}"
+              - content: "{% if state_attr(entity, \"volume_level\") %}\n  {{ (state_attr(entity,\
+                  \ \"volume_level\") * 100) | round(0) }}%\n{% endif %}"
                 entity: '[[entity]]'
-                icon: "{%- if state_attr(entity, \"is_volume_muted\") -%}\n  mdi:volume-mute\n\
-                  {%- else -%}\n  mdi:volume-source\n{%- endif -%}"
+                icon: "{% if state_attr(entity, \"is_volume_muted\") %}\n  mdi:volume-mute\n\
+                  {% else %}\n  mdi:volume-source\n{% endif %}"
                 tap_action:
                   action: call-service
                   data:
@@ -781,12 +765,12 @@ decluttering_templates:
           - cards:
             - card:
                 alignment: center
-                subtitle: "{%- set entity = \"[[entity]]\" -%} {%- if states(entity)\
-                  \ in [\"playing\", \"paused\", \"standby\"] -%}\n  {{ states(entity)\
-                  \ | title }}\n{%- endif -%}"
-                title: "{%- if not \"[[\" in \"[[name]]\" -%}\n  [[name]]\n{%- else\
-                  \ -%}\n  {{ state_attr(\"[[entity]]\", \"friendly_name\") | title\
-                  \ }}\n{%- endif -%}"
+                subtitle: "{% set entity = \"[[entity]]\" %} {% if states(entity)\
+                  \ in [\"playing\", \"paused\", \"standby\"] %}\n  {{ states(entity)\
+                  \ | title }}\n{% endif %}"
+                title: "{% if not \"[[\" in \"[[name]]\" %}\n  [[name]]\n{% else %}\n\
+                  \  {{ state_attr(\"[[entity]]\", \"friendly_name\") | title }}\n\
+                  {% endif %}"
                 type: custom:mushroom-title-card
               card_mod:
                 style:
@@ -812,8 +796,8 @@ decluttering_templates:
                       entity_id: '[[entity]]'
                   type: template
                 - entity: '[[entity]]'
-                  icon: "{%- if is_state(entity, \"playing\") -%}\n  mdi:pause\n{%-\
-                    \ else -%}\n  mdi:play\n{%- endif -%}"
+                  icon: '{{ is_state(entity, "playing") | iif("mdi:pause", "mdi:play")
+                    }}'
                   tap_action:
                     action: call-service
                     service: media_player.media_play_pause
@@ -840,11 +824,11 @@ decluttering_templates:
             - card:
                 card:
                   alignment: center
-                  subtitle: "{%- set entity = \"[[entity]]\" -%}\n{{ [\n  state_attr(entity,\
-                    \ \"media_title\") | default(None, true),\n  state_attr(entity,\
-                    \ \"media_artist\") | default(None, true),\n  state_attr(entity,\
-                    \ \"media_series_title\") | default(None, true)\n  ] | reject(\"\
-                    ==\", None) | list | join(\" - \")\n}}"
+                  subtitle: "{{ [\n  state_attr(\"[[entity]]\", \"media_title\") |\
+                    \ default(None, true),\n  state_attr(\"[[entity]]\", \"media_artist\"\
+                    ) | default(None, true),\n  state_attr(\"[[entity]]\", \"media_series_title\"\
+                    ) | default(None, true)\n  ] | reject(\"==\", None) | list | join(\"\
+                    \ - \")\n}}"
                   type: custom:mushroom-title-card
                 card_mod:
                   style:
@@ -1004,12 +988,9 @@ decluttering_templates:
                   type: custom:mushroom-template-card
                 - subtitle: Tracking Numbers
                   type: custom:mushroom-title-card
-                - content: '{%- for trk_number in state_attr("[[entity]]", "tracking_#")
-                    %}
-
-                    [{{ trk_number }}]([[url]]{{ trk_number }})
-
-                    {%- endfor -%}'
+                - content: "{% for trk_number in state_attr(\"[[entity]]\", \"tracking_#\"\
+                    ) -%}\n  <ha-icon icon=\"mdi:package-variant-closed\"></ha-icon>\
+                    \ [{{ trk_number }}]([[url]]{{ trk_number }})\n{% endfor %}"
                   type: markdown
                 type: custom:vertical-stack-in-card
               title: '[[name]] Tracking'
@@ -1108,27 +1089,14 @@ decluttering_templates:
                   type: custom:mushroom-chips-card
                 - cards:
                   - entity: sensor.[[phone_base]]_battery_level
-                    icon: "{% if not states(entity) in [\"unknown\", \"unavailable\"\
-                      ] %}\n  {% set state = \"battery\" %}\n  {% if is_state(\"sensor.[[phone_base]]_battery_state\"\
-                      , \"charging\") %}\n    {% set state = state ~ \"-charging\"\
-                      \ %}\n    {% if is_state(\"sensor.[[phone_base]]_charger_type\"\
-                      , \"wireless\") %}\n      {% set state = state ~ \"-wireless\"\
-                      \ %}\n    {% endif %}\n  {% endif %}\n  {% set battery_level\
-                      \ = states(entity) | int %}\n  {% if battery_level == 100 %}\n\
-                      \    mdi:{{ state }}\n  {% elif battery_level >= 10 %}\n   \
-                      \ mdi:{{ state }}-{{ battery_level // 10 * 10 }}\n  {% elif\
-                      \ battery_level < 10 %}\n    mdi:{{ state }}-outline\n  {% endif\
-                      \ %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
-                      \ %}"
-                    icon_color: "{% if not states(entity) in [\"unknown\", \"unavailable\"\
-                      ] %}\n  {% set battery_level = states(entity) | int // 10 *\
-                      \ 10 %}\n  {% set levels = {\n    100: \"green\",\n    90: \"\
-                      green\",\n    80: \"green\",\n    70: \"light-green\",\n   \
-                      \ 60: \"lime\",\n    50: \"yellow\",\n    40: \"amber\",\n \
-                      \   30: \"orange\",\n    20: \"orange\",\n    10: \"red\",\n\
-                      \    0: \"red\"\n  } %}\n  {% if is_state(\"sensor.[[phone_base]]_battery_state\"\
-                      , \"charging\") %}\n    light-blue\n  {% else %}\n    {{ levels[battery_level]\
-                      \ }}\n  {% endif %}\n{% else %}\n  red\n{% endif %}"
+                    icon: '{% from "util.jinja" import cell_battery_icon %}
+
+                      {{ cell_battery_icon(entity, "sensor.[[phone_base]]_battery_state",
+                      "sensor.[[phone_base]]_charger_type") }}'
+                    icon_color: "{% from \"util.jinja\" import battery_color %} {%\
+                      \ if is_state(\"sensor.[[phone_base]]_battery_state\", \"charging\"\
+                      ) %}\n  light-blue\n{% else %}\n  {{ battery_color(entity) }}\n\
+                      {% endif %}"
                     layout: vertical
                     primary: Battery
                     secondary: '{{ states(entity) }}%'
@@ -1256,24 +1224,13 @@ decluttering_templates:
             action: more-info
           type: template
         - entity: sensor.[[phone_base]]_battery_level
-          icon: "{% if has_value(entity) %}\n  {% set state = \"battery\" %}\n  {%\
-            \ if is_state(\"sensor.[[phone_base]]_battery_state\", \"charging\") %}\n\
-            \    {% set state = state ~ \"-charging\" %}\n    {% if is_state(\"sensor.[[phone_base]]_charger_type\"\
-            , \"wireless\") %}\n      {% set state = state ~ \"-wireless\" %}\n  \
-            \  {% endif %}\n  {% endif %}\n  {% set battery_level = states(entity)\
-            \ | int %}\n  {% if battery_level == 100 %}\n    mdi:{{ state }}\n  {%\
-            \ elif battery_level >= 10 %}\n    mdi:{{ state }}-{{ battery_level //\
-            \ 10 * 10 }}\n  {% elif battery_level < 10 %}\n    mdi:{{ state }}-outline\n\
-            \  {% endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
-            \ %}"
-          icon_color: "{% if has_value(entity) %}\n  {% set battery_level = states(entity)\
-            \ | int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90:\
-            \ \"green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"\
-            lime\",\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n\
-            \    20: \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {% if\
-            \ is_state(\"sensor.[[phone_base]]_battery_state\", \"charging\") %}\n\
-            \    light-blue\n  {% else %}\n    {{ levels[battery_level] }}\n  {% endif\
-            \ %}\n{% else %}\n  red\n{% endif %}"
+          icon: '{% from "util.jinja" import cell_battery_icon %}
+
+            {{ cell_battery_icon(entity, "sensor.[[phone_base]]_battery_state", "sensor.[[phone_base]]_charger_type")
+            }}'
+          icon_color: "{% from \"util.jinja\" import battery_color %} {% if is_state(\"\
+            sensor.[[phone_base]]_battery_state\", \"charging\") %}\n  light-blue\n\
+            {% else %}\n  {{ battery_color(entity) }}\n{% endif %}"
           tap_action:
             action: more-info
           type: template
@@ -1545,37 +1502,13 @@ views:
             style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
               \  --chip-spacing: 0;\n}\n"
           chips:
-          - content: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = expand(state_attr(\"\
-              group.all_doors\", \"entity_id\")) | selectattr(\"state\", \"==\", \"\
-              on\") | map(attribute=\"entity_id\") | list %}\n{% for entity_id in\
-              \ open_doors %}\n  {% set ns.entities = ns.entities + [ entity_id ]\
-              \ %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\",\n  \"\
-              cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {% if\
-              \ is_state(entity_id, \"open\") or is_state(entity_id, \"unlocked\"\
-              ) %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-              \ endif %}\n{% endfor %}\n{{ \"Secure\" if ns.entities | count == 0\
-              \ else \"Not Secure\" }}"
+          - content: '{% from "util.jinja" import security_count %} {{ iif(security_count()
+              | int == 0, "Secure", "Not Secure") }}'
             entity: lock.lock_front
-            icon: "{% set ns = namespace(entities=[]) %}\n{% set open_doors = expand(state_attr(\"\
-              group.all_doors\", \"entity_id\")) | selectattr(\"state\", \"==\", \"\
-              on\") | map(attribute=\"entity_id\") | list %}\n{% for entity_id in\
-              \ open_doors %}\n  {% set ns.entities = ns.entities + [ entity_id ]\
-              \ %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\",\n  \"\
-              cover.garage_door\"\n] %}\n{% for entity_id in security %}\n  {% if\
-              \ is_state(entity_id, \"open\") or is_state(entity_id, \"unlocked\"\
-              ) %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-              \ endif %}\n{% endfor %}\n{{ \"mdi:shield-check\" if ns.entities | count\
-              \ == 0 else \"mdi:shield-alert\" }}"
-            icon_color: "{% set ns = namespace(entities=[]) %}\n{% set open_doors\
-              \ = expand(state_attr(\"group.all_doors\", \"entity_id\")) | selectattr(\"\
-              state\", \"==\", \"on\") | map(attribute=\"entity_id\") | list %}\n\
-              {% for entity_id in open_doors %}\n  {% set ns.entities = ns.entities\
-              \ + [ entity_id ] %}\n{% endfor %}\n{% set security = [\n  \"lock.lock_front\"\
-              ,\n  \"cover.garage_door\"\n] %}\n{% for entity_id in security %}\n\
-              \  {% if is_state(entity_id, \"open\") or is_state(entity_id, \"unlocked\"\
-              ) %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-              \ endif %}\n{% endfor %}\n{{ \"green\" if ns.entities | count == 0 else\
-              \ \"red\" }}"
+            icon: '{% from "util.jinja" import security_count %} {{ iif(security_count()
+              | int == 0, "mdi:shield-check", "mdi:shield-alert") }}'
+            icon_color: '{% from "util.jinja" import security_count %} {{ iif(security_count()
+              | int == 0, "green", "red") }}'
             tap_action:
               action: navigate
               navigation_path: security
@@ -1619,13 +1552,12 @@ views:
               \ | round(2) }} kWh\n  {% else %}\n    {{ power }} W\n  {% endif %}\n\
               {% endif %}"
             entity: sensor.grid_power
-            icon: "{% if states(entity) in ['unknown', 'unavailable'] %}\n  mdi:transmission-tower-off\n\
-              {% else %}\n  {% if states(entity) | int < 0 %}\n    mdi:transmission-tower-export\n\
-              \  {% else %}\n    mdi:transmission-tower-import\n  {% endif %}\n{%\
-              \ endif %}"
-            icon_color: "{% if states(entity) in ['unknown', 'unavailable'] %}\n \
-              \ disabled\n{% else %}\n  {% if states(entity) | int < 0 %}\n    lime\n\
-              \  {% else %}\n    deep-orange\n  {% endif %}\n{% endif %}"
+            icon: "{% if has_value(entity) %}\n  {% if states(entity) | int < 0 %}\n\
+              \    mdi:transmission-tower-export\n  {% else %}\n    mdi:transmission-tower-import\n\
+              \  {% endif %}\n{% else %}\n  mdi:transmission-tower-off\n{% endif %}"
+            icon_color: "{% if has_value(entity) %}\n  {% if states(entity) | int\
+              \ < 0 %}\n    lime\n  {% else %}\n    deep-orange\n  {% endif %}\n{%\
+              \ else %}\n  disabled\n{% endif %}"
             tap_action:
               action: navigate
               navigation_path: power
@@ -1638,24 +1570,14 @@ views:
           chips:
           - card_mod:
               style:
-                .: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n\
-                  \  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.nasya_connected\"\
-                  ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
-                  \n] %}\n{% for entity_id in computers %}\n  {% if is_state(entity_id,\
-                  \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id\
-                  \ ] %}\n  {% endif %}\n{% endfor %}\n{% if ns.entities | count >\
-                  \ 0 %}\nha-card:after {\n  content: \"{{ ns.entities | count }}\"\
-                  ;\n  position: absolute;\n  color: var(--teal-color);\n  font-weight:\
-                  \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n}\n\
-                  {% endif %}\n"
+                .: "{% from \"util.jinja\" import computer_count %}\n{% if (computer_count()\
+                  \ | int) > 0 %}\nha-card:after {\n  content: \"{{ computer_count()\
+                  \ | int }}\";\n  position: absolute;\n  color: var(--teal-color);\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
             icon: mdi:desktop-tower
-            icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers =\
-              \ [\n  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.nasya_connected\"\
-              ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
-              \n] %}\n{% for entity_id in computers %}\n  {% if is_state(entity_id,\
-              \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n\
-              \  {% endif %}\n{% endfor %}\n{{ \"teal\" if ns.entities | count > 0\
-              \ else \"disabled\" }}"
+            icon_color: '{% from "util.jinja" import computer_count %} {{ "teal" if
+              computer_count() | int > 0 else "disabled" }}'
             tap_action:
               action: navigate
               navigation_path: computer
@@ -1705,9 +1627,8 @@ views:
                   title: All Doors
                 service: browser_mod.popup
             type: template
-          - content: "{% set progress = states(\"sensor.octoprint_layer_progress\"\
-              ) %}\n{% if is_state(entity, \"on\") and not progress in [\"unknown\"\
-              , \"unavailable\"] %}\n  {{ progress }}\n{% endif %}"
+          - content: "{% if is_state(entity, \"on\") and has_value(\"sensor.octoprint_layer_progress\"\
+              ) %}\n  {{ progress }}\n{% endif %}"
             entity: switch.octoprint_psu
             hold_action:
               action: none
@@ -1997,8 +1918,7 @@ views:
               {% endif %}"
             entity: sensor.meater_probe_cook_state
             icon: mdi:food-drumstick
-            icon_color: "{% if has_value(entity) %}\n  brown\n{% else %}\n  disabled\n\
-              {% endif %}"
+            icon_color: '{{ has_value(entity) | iif("brown", "disabled") }}'
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -2112,8 +2032,7 @@ views:
               state: 'on'
             type: conditional
           - chip:
-              content: "{%- if states(entity) | int > 0 -%}\n  {{ states(entity) |\
-                \ int }}\n{%- endif -%}\n"
+              content: '{{ states(entity) | int }}'
               entity: sensor.hacs
               icon: mdi:chevron-triple-up
               icon_color: red
@@ -2157,23 +2076,12 @@ views:
                               card_mod:
                                 style: "ha-card {\n  padding: 4px 12px !important;\n\
                                   }\n"
-                              icon: "{% if not states(entity) in [\"unknown\", \"\
-                                unavailable\"] %}\n  {% set battery_level = states(entity)\
-                                \ | int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n\
-                                \  {% elif battery_level >= 10 %}\n    mdi:battery-{{\
-                                \ battery_level // 10 * 10 }}\n  {% elif battery_level\
-                                \ < 10 %}\n    mdi:battery-outline\n  {% endif %}\n\
-                                {% else %}\n  mdi:battery-alert-variant-outline\n\
-                                {% endif %}\n"
-                              icon_color: "{% if not states(entity) in [\"unknown\"\
-                                , \"unavailable\"] %}\n  {% set battery_level = states(entity)\
-                                \ | int // 10 * 10 %}\n  {% set levels = {\n    100:\
-                                \ \"green\",\n    90: \"green\",\n    80: \"green\"\
-                                ,\n    70: \"light-green\",\n    60: \"lime\",\n \
-                                \   50: \"yellow\",\n    40: \"amber\",\n    30: \"\
-                                orange\",\n    20: \"orange\",\n    10: \"red\",\n\
-                                \    0: \"red\"\n  } %}\n  {{ levels[battery_level]\
-                                \ }}\n{% else %}\n  red\n{% endif %}"
+                              icon: '{% from "util.jinja" import battery_icon %} {{
+                                battery_icon(entity) }}
+
+                                '
+                              icon_color: '{% from "util.jinja" import battery_color
+                                %} {{ battery_color(entity) }}'
                               layout: horizontal
                               primary: '{{ states(entity) }}%'
                               secondary: '{{ state_attr(entity, "friendly_name") |
@@ -2847,21 +2755,7 @@ views:
       - path: living
       - chips:
         - entity: media_player.living_room_universal
-          icon: "{% set app = state_attr(entity, \"source\") %} {% set app_list =\
-            \ {\n  \"com.amazon.amazonvideo.livingroom\": \"fab:amazon\",\n  \"com.crunchyroll.crunchyroid\"\
-            : \"fapro:crunchyroll\",\n  \"com.disney.datg.videoplatforms.android.watchdc\"\
-            : \"fapro:disney_now\",\n  \"com.google.android.youtube.tv\": \"mdi:youtube\"\
-            ,\n  \"com.google.android.youtube.tvkids\": \"fapro:youtube_kids\",\n\
-            \  \"com.hulu.livingroomplus\": \"mdi:hulu\",\n  \"com.netflix.ninja\"\
-            : \"mdi:netflix\",\n  \"com.plexapp.android\": \"mdi:plex\",\n  \"com.spotify.tv.android\"\
-            : \"mdi:spotify\",\n  \"org.pbskids.video\": \"fapro:pbs_kids\",\n  \"\
-            tv.twitch.android.viewer\": \"mdi:twitch\",\n} %} {% set media_type =\
-            \ state_attr(entity, \"media_content_type\") %} {% set media_type_list\
-            \ = {\n  \"tvshow\": \"mdi:television\",\n  \"movie\": \"mdi:movie-open\"\
-            ,\n  \"music\": \"mdi:music\",\n  \"playlist\": \"mdi:playlist-music\"\
-            ,\n} %} {% if media_type in media_type_list %}\n  {{ media_type_list[media_type]\
-            \ }}\n{% elif app in app_list %}\n  {{ app_list[app] }}\n{% else %}\n\
-            \  mdi:motion-play-outline\n{% endif %}"
+          icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity) }}'
           icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
             \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% elif state\
             \ == \"idle\" %}\n  light-blue\n{% elif state in [\"standby\", \"on\"\
@@ -2887,34 +2781,19 @@ views:
           type: template
         - entity: fan.living_room
           icon: mdi:fan
-          icon_color: "{% if is_state(entity, 'on') %}\n  {% if is_state_attr(entity,\
-            \ 'percentage', 25) %}\n  green\n  {% elif is_state_attr(entity, 'percentage',\
-            \ 50) %}\n  yellow\n  {% elif is_state_attr(entity, 'percentage', 75)\
-            \ %}\n  orange\n  {% elif is_state_attr(entity, 'percentage', 100) %}\n\
-            \  red\n  {% endif %}\n{% else %}\n  disabled\n{% endif %}"
-          style: "ha-card {\n  {% if is_state(config.entity, 'on') %}\n  animation:\
-            \ rotation linear infinite;\n    {% if is_state_attr(config.entity, 'percentage',\
-            \ 25) %}\n    animation-duration: 1.33333s;\n    {% elif is_state_attr(config.entity,\
-            \ 'percentage', 50) %}\n    animation-duration: 0.942809s;\n    {% elif\
-            \ is_state_attr(config.entity, 'percentage', 75) %}\n    animation-duration:\
-            \ 0.7698s;\n    {% elif is_state_attr(config.entity, 'percentage', 100)\
-            \ %}\n    animation-duration: 0.666667s;\n    {% endif %}\n  {% endif\
-            \ %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
+          icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
+            \ 'percentage') %}\n  {{ {\n    25: \"green\",\n    50: \"yellow\",\n\
+            \    75: \"orange\",\n    100: \"red\"\n  }[speed] }}\n{% else %}\n  disabled\n\
+            {% endif %}"
+          style: "ha-card {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
+            \ speed = state_attr(config.entity, 'percentage') %}\n    {% set duration\
+            \ = {\n      25: \"1.33333s\",\n      50: \"0.942809s\",\n      75: \"\
+            0.7698s\",\n      100: \"0.666667s\"\n    }[speed] %}\n    animation:\
+            \ rotation linear infinite;\n    animation-duration: {{ duration }};\n\
+            \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
             \  }\n}\n"
           tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  card_mod:
-                    style: "ha-card {\n  background: none;\n}\n"
-                  entity: fan.living_room
-                  icon_animation: true
-                  layout: horizontal
-                  name: Fan
-                  show_percentage_control: true
-                  type: custom:mushroom-fan-card
-              service: browser_mod.popup
+            action: more-info
           type: template
         - card_mod:
             style:
@@ -2990,21 +2869,7 @@ views:
             action: none
           type: template
         - entity: media_player.family_room_universal
-          icon: "{% set app = state_attr(entity, \"source\") %} {% set app_list =\
-            \ {\n  \"com.amazon.amazonvideo.livingroom\": \"fab:amazon\",\n  \"com.crunchyroll.crunchyroid\"\
-            : \"fapro:crunchyroll\",\n  \"com.disney.datg.videoplatforms.android.watchdc\"\
-            : \"fapro:disney_now\",\n  \"com.google.android.youtube.tv\": \"mdi:youtube\"\
-            ,\n  \"com.google.android.youtube.tvkids\": \"fapro:youtube_kids\",\n\
-            \  \"com.hulu.livingroomplus\": \"mdi:hulu\",\n  \"com.netflix.ninja\"\
-            : \"mdi:netflix\",\n  \"com.plexapp.android\": \"mdi:plex\",\n  \"com.spotify.tv.android\"\
-            : \"mdi:spotify\",\n  \"org.pbskids.video\": \"fapro:pbs_kids\",\n  \"\
-            tv.twitch.android.viewer\": \"mdi:twitch\",\n} %} {% set media_type =\
-            \ state_attr(entity, \"media_content_type\") %} {% set media_type_list\
-            \ = {\n  \"tvshow\": \"mdi:television\",\n  \"movie\": \"mdi:movie-open\"\
-            ,\n  \"music\": \"mdi:music\",\n  \"playlist\": \"mdi:playlist-music\"\
-            ,\n} %} {% if media_type in media_type_list %}\n  {{ media_type_list[media_type]\
-            \ }}\n{% elif app in app_list %}\n  {{ app_list[app] }}\n{% else %}\n\
-            \  mdi:motion-play-outline\n{% endif %}"
+          icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity) }}'
           icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
             \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% elif state\
             \ == \"idle\" %}\n  light-blue\n{% elif state in [\"standby\", \"on\"\
@@ -3168,21 +3033,7 @@ views:
       - path: master
       - chips:
         - entity: media_player.master_bedroom_universal
-          icon: "{% set app = state_attr(entity, \"source\") %} {% set app_list =\
-            \ {\n  \"com.amazon.amazonvideo.livingroom\": \"fab:amazon\",\n  \"com.crunchyroll.crunchyroid\"\
-            : \"fapro:crunchyroll\",\n  \"com.disney.datg.videoplatforms.android.watchdc\"\
-            : \"fapro:disney_now\",\n  \"com.google.android.youtube.tv\": \"mdi:youtube\"\
-            ,\n  \"com.google.android.youtube.tvkids\": \"fapro:youtube_kids\",\n\
-            \  \"com.hulu.livingroomplus\": \"mdi:hulu\",\n  \"com.netflix.ninja\"\
-            : \"mdi:netflix\",\n  \"com.plexapp.android\": \"mdi:plex\",\n  \"com.spotify.tv.android\"\
-            : \"mdi:spotify\",\n  \"org.pbskids.video\": \"fapro:pbs_kids\",\n  \"\
-            tv.twitch.android.viewer\": \"mdi:twitch\",\n} %} {% set media_type =\
-            \ state_attr(entity, \"media_content_type\") %} {% set media_type_list\
-            \ = {\n  \"tvshow\": \"mdi:television\",\n  \"movie\": \"mdi:movie-open\"\
-            ,\n  \"music\": \"mdi:music\",\n  \"playlist\": \"mdi:playlist-music\"\
-            ,\n} %} {% if media_type in media_type_list %}\n  {{ media_type_list[media_type]\
-            \ }}\n{% elif app in app_list %}\n  {{ app_list[app] }}\n{% else %}\n\
-            \  mdi:motion-play-outline\n{% endif %}"
+          icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity) }}'
           icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
             \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% elif state\
             \ == \"idle\" %}\n  light-blue\n{% elif state in [\"standby\", \"on\"\
@@ -3239,34 +3090,19 @@ views:
           type: template
         - entity: fan.master_bedroom
           icon: mdi:fan
-          icon_color: "{% if is_state(entity, 'on') %}\n  {% if is_state_attr(entity,\
-            \ 'percentage', 25) %}\n  green\n  {% elif is_state_attr(entity, 'percentage',\
-            \ 50) %}\n  yellow\n  {% elif is_state_attr(entity, 'percentage', 75)\
-            \ %}\n  orange\n  {% elif is_state_attr(entity, 'percentage', 100) %}\n\
-            \  red\n  {% endif %}\n{% else %}\n  disabled\n{% endif %}"
-          style: "ha-card {\n  {% if is_state(config.entity, 'on') %}\n  animation:\
-            \ rotation linear infinite;\n    {% if is_state_attr(config.entity, 'percentage',\
-            \ 25) %}\n    animation-duration: 1.33333s;\n    {% elif is_state_attr(config.entity,\
-            \ 'percentage', 50) %}\n    animation-duration: 0.942809s;\n    {% elif\
-            \ is_state_attr(config.entity, 'percentage', 75) %}\n    animation-duration:\
-            \ 0.7698s;\n    {% elif is_state_attr(config.entity, 'percentage', 100)\
-            \ %}\n    animation-duration: 0.666667s;\n    {% endif %}\n  {% endif\
-            \ %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
+          icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
+            \ 'percentage') %}\n  {{ {\n    25: \"green\",\n    50: \"yellow\",\n\
+            \    75: \"orange\",\n    100: \"red\"\n  }[speed] }}\n{% else %}\n  disabled\n\
+            {% endif %}"
+          style: "ha-card {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
+            \ speed = state_attr(config.entity, 'percentage') %}\n    {% set duration\
+            \ = {\n      25: \"1.33333s\",\n      50: \"0.942809s\",\n      75: \"\
+            0.7698s\",\n      100: \"0.666667s\"\n    }[speed] %}\n    animation:\
+            \ rotation linear infinite;\n    animation-duration: {{ duration }};\n\
+            \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
             \  }\n}\n"
           tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  card_mod:
-                    style: "ha-card {\n  background: none;\n}\n"
-                  entity: fan.master_bedroom
-                  icon_animation: true
-                  layout: horizontal
-                  name: Fan
-                  show_percentage_control: true
-                  type: custom:mushroom-fan-card
-              service: browser_mod.popup
+            action: more-info
           type: template
         - card_mod:
             style:
@@ -3404,9 +3240,9 @@ views:
       - primary: Garage
       - entity: light.garage
       - temperature: sensor.garage_multisensor_air_temperature
-      - icon: ' {%- if is_state(entity, ''open'') -%} mdi:garage-open-variant {%-
-          elif states(entity) in [''opening'', ''closing''] -%} mdi:garage-alert-variant
-          {%- else -%} mdi:garage-variant {%- endif -%} '
+      - icon: '{% if is_state(entity, ''open'') %}mdi:garage-open-variant{% elif states(entity)
+          in [''opening'', ''closing''] %}mdi:garage-alert-variant{% else %}mdi:garage-variant{%
+          endif %}'
       - icon_color: 96, 125, 139
       - path: garage
       - chips:
@@ -3519,9 +3355,10 @@ views:
           - entity: binary_sensor.water_leak_detected
             state: 'on'
           type: conditional
-        - icon: "{% for id in range(1,8) %}\n  {% set entity_id = \"switch.rachio_zone_\"\
-            \ ~ id %}\n  {% if is_state(entity_id, \"on\") %}\n    mdi:numeric-{{\
-            \ id }}-circle\n  {% endif %}\n{% endfor %}"
+        - icon: "{% set zone = expand(\"switch.rachio_zones\") | selectattr(\"state\"\
+            , \"==\", \"on\") | map(attribute=\"entity_id\") | list %}\n{% if zone[0]\
+            \ is defined %}\n  {% set id = state_attr(zone[0], \"Zone number\") %}\n\
+            \  mdi:numeric-{{ id }}-circle\n{% endif %}"
           icon_color: light-blue
           tap_action:
             action: none
@@ -3622,9 +3459,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_living_room
           hold_action:
             action: toggle
@@ -3823,9 +3659,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_family_room
           hold_action:
             action: toggle
@@ -4202,13 +4037,12 @@ views:
           type: entity
         - content_info: none
           entity: switch.adaptive_lighting_office
-          icon_color: lime
+          icon_color: green
           tap_action:
             action: toggle
           type: entity
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_office
           hold_action:
             action: toggle
@@ -4321,9 +4155,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_kitchen
           hold_action:
             action: toggle
@@ -4371,9 +4204,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_master_bedroom
           hold_action:
             action: toggle
@@ -4540,9 +4372,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_ethan
           hold_action:
             action: toggle
@@ -4590,9 +4421,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_emma
           hold_action:
             action: toggle
@@ -4653,7 +4483,9 @@ views:
     type: custom:decluttering-card
     variables:
     - primary: Garage
-    - icon: mdi:garage-variant
+    - icon: '{% if is_state(''cover.garage_door'', ''open'') %}mdi:garage-open-variant{%
+        elif states(''cover.garage_door'') in [''opening'', ''closing''] %}mdi:garage-alert-variant{%
+        else %}mdi:garage-variant{% endif %}'
     - icon_color: blue-grey
     - chips:
       - content: '{{ iif(is_state(entity, "on"), "Detected", "Clear") }}'
@@ -4690,16 +4522,10 @@ views:
         {% else %}\n  mdi:garage-alert-variant\n{% endif %}"
       multiline_secondary: true
       primary: Garage Door
-      secondary: "{%- if is_state(entity, \"open\") %}\n  Open\n{%- elif is_state(entity,\
-        \ \"opening\") %}\n  Opening\n{%- elif is_state(entity, \"closed\") %}\n \
-        \ Closed\n{%- else %}\n  Unknown\n{%- endif %}\n{% set last_changed = state_attr(\"\
-        sensor.nominal_change_history\", \"changes\")[entity] | as_datetime -%}\n\
-        {%- if last_changed < today_at() - timedelta(days=6) -%}\n  More than a week\
-        \ ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n  {{ last_changed.timestamp()\
-        \ | timestamp_custom(\"%A at %-I:%M %p\") }}\n{%- elif last_changed < today_at()\
-        \ -%}\n  {{ last_changed.timestamp() | timestamp_custom(\"Yesterday at %-I:%M\
-        \ %p\") }}\n{%- else -%}\n  {{ relative_time(last_changed) }} ago\n{%- endif\
-        \ -%}"
+      secondary: "{% from \"util.jinja\" import custom_timedelta %} {%- if is_state(entity,\
+        \ \"open\") %}\n  Open\n{%- elif is_state(entity, \"opening\") %}\n  Opening\n\
+        {%- elif is_state(entity, \"closed\") %}\n  Closed\n{%- else %}\n  Unknown\n\
+        {%- endif %}\n{{ custom_timedelta(entity) }}"
       tap_action:
         action: none
       type: custom:mushroom-template-card
@@ -4764,9 +4590,8 @@ views:
       variables:
       - title: Lights
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_outside
           hold_action:
             action: toggle
@@ -5305,23 +5130,14 @@ views:
     - chips:
       - card_mod:
           style:
-            .: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n  \"\
-              binary_sensor.erebus_connected\",\n  \"binary_sensor.nasya_connected\"\
-              ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
-              \n] %}\n{% for entity_id in computers %}\n  {% if is_state(entity_id,\
-              \ \"on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n\
-              \  {% endif %}\n{% endfor %}\n{% if ns.entities | count > 0 %}\nha-card:after\
-              \ {\n  content: \"{{ ns.entities | count }}\";\n  position: absolute;\n\
-              \  color: var(--teal-color);\n  font-weight: bolder;\n  top: -2px;\n\
-              \  right: 2px;\n  font-size: 12px;\n}\n{% endif %}\n"
+            .: "{% from \"util.jinja\" import computer_count %}\n{% if (computer_count()\
+              \ | int) > 0 %}\nha-card:after {\n  content: \"{{ computer_count() |\
+              \ int }}\";\n  position: absolute;\n  color: var(--teal-color);\n  font-weight:\
+              \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n}\n{% endif\
+              \ %}\n"
         icon: mdi:desktop-tower
-        icon_color: "{% set ns = namespace(entities=[]) %}\n{% set computers = [\n\
-          \  \"binary_sensor.erebus_connected\",\n  \"binary_sensor.nasya_connected\"\
-          ,\n  \"binary_sensor.ardena_connected\",\n  \"binary_sensor.athos_connected\"\
-          \n] %}\n{% for entity_id in computers %}\n  {% if is_state(entity_id, \"\
-          on\") %}\n    {% set ns.entities = ns.entities + [ entity_id ] %}\n  {%\
-          \ endif %}\n{% endfor %}\n{{ \"teal\" if ns.entities | count > 0 else \"\
-          disabled\" }}"
+        icon_color: '{% from "util.jinja" import computer_count %} {{ "teal" if computer_count()
+          | int > 0 else "disabled" }}'
         tap_action:
           action: none
         type: template
@@ -5566,8 +5382,7 @@ views:
                 \  }\n}\n"
           entity: switch.computer_exhaust_fan
           icon: mdi:fan
-          icon_color: "{% if is_state(entity, 'on') %}\n  green\n{% else %}\n  disabled\n\
-            {% endif %}"
+          icon_color: '{{ iif(is_state(entity, ''on''), "green", "disabled") }}'
           type: template
         - chip:
             content_info: none
@@ -6031,8 +5846,8 @@ views:
     - icon: mdi:lightbulb-group
     - icon_color: amber
     - chips:
-      - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-          "==", "on") | list | count }}'
+      - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+          }}'
         entity: group.all_light_switches
         hold_action:
           action: call-service
@@ -6060,9 +5875,8 @@ views:
       variables:
       - title: Living Room
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_living_room
           hold_action:
             action: toggle
@@ -6122,9 +5936,8 @@ views:
       variables:
       - title: Kitchen
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_kitchen
           hold_action:
             action: toggle
@@ -6169,13 +5982,12 @@ views:
           type: entity
         - content_info: none
           entity: switch.adaptive_lighting_office
-          icon_color: lime
+          icon_color: green
           tap_action:
             action: toggle
           type: entity
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_office
           hold_action:
             action: toggle
@@ -6249,9 +6061,8 @@ views:
       variables:
       - title: Family Room
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_family_room
           hold_action:
             action: toggle
@@ -6283,9 +6094,8 @@ views:
       variables:
       - title: Master Bedroom
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_master_bedroom
           hold_action:
             action: toggle
@@ -6327,9 +6137,8 @@ views:
       variables:
       - title: Ethan's Room
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_ethan
           hold_action:
             action: toggle
@@ -6351,9 +6160,8 @@ views:
       variables:
       - title: Emma's Room
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_emma
           hold_action:
             action: toggle
@@ -6381,9 +6189,8 @@ views:
       variables:
       - title: Outside
       - chips:
-        - content: '{{ expand(state_attr(entity, "entity_id")) | selectattr("state",
-            "==", "on") | list | count }} / {{ expand(state_attr(entity, "entity_id"))
-            | list | count }}'
+        - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
+            }} / {{ expand(entity) | list | count }}'
           entity: group.lights_outside
           hold_action:
             action: toggle
@@ -6428,38 +6235,15 @@ views:
     - icon: mdi:shield
     - icon_color: green
     - chips:
-      - content: "{%- set ns = namespace(entities=[]) -%} {%- set open_doors = expand(state_attr(\"\
-          group.all_doors\", \"entity_id\")) | selectattr(\"state\", \"==\", \"on\"\
-          ) | map(attribute=\"entity_id\") | list -%} {%- for entity_id in open_doors\
-          \ -%}\n  {%- set ns.entities = ns.entities + [ entity_id ] -%}\n{%- endfor\
-          \ -%} {%- set security = [\n  \"lock.lock_front\",\n  \"cover.garage_door\"\
-          \n] -%} {%- for entity_id in security -%}\n  {%- if is_state(entity_id,\
-          \ \"open\") or is_state(entity_id, \"unlocked\") -%}\n    {%- set ns.entities\
-          \ = ns.entities + [ entity_id ] -%}\n  {%- endif -%}\n{%- endfor -%} {{\
-          \ \"Secure\" if ns.entities | count == 0 else \"Not Secure\" }}"
+      - content: '{% from "util.jinja" import security_count %} {{ iif(security_count()
+          | int == 0, "Secure", "Not Secure") }}'
         entity: lock.lock_front
         hold_action:
           action: none
-        icon: "{%- set ns = namespace(entities=[]) -%} {%- set open_doors = expand(state_attr(\"\
-          group.all_doors\", \"entity_id\")) | selectattr(\"state\", \"==\", \"on\"\
-          ) | map(attribute=\"entity_id\") | list -%} {%- for entity_id in open_doors\
-          \ -%}\n  {%- set ns.entities = ns.entities + [ entity_id ] -%}\n{%- endfor\
-          \ -%} {%- set security = [\n  \"lock.lock_front\",\n  \"cover.garage_door\"\
-          \n] -%} {%- for entity_id in security -%}\n  {%- if is_state(entity_id,\
-          \ \"open\") or is_state(entity_id, \"unlocked\") -%}\n    {%- set ns.entities\
-          \ = ns.entities + [ entity_id ] -%}\n  {%- endif -%}\n{%- endfor -%} {{\
-          \ \"mdi:shield-check\" if ns.entities | count == 0 else \"mdi:shield-alert\"\
-          \ }}"
-        icon_color: "{%- set ns = namespace(entities=[]) -%} {%- set open_doors =\
-          \ expand(state_attr(\"group.all_doors\", \"entity_id\")) | selectattr(\"\
-          state\", \"==\", \"on\") | map(attribute=\"entity_id\") | list -%} {%- for\
-          \ entity_id in open_doors -%}\n  {%- set ns.entities = ns.entities + [ entity_id\
-          \ ] -%}\n{%- endfor -%} {%- set security = [\n  \"lock.lock_front\",\n \
-          \ \"cover.garage_door\"\n] -%} {%- for entity_id in security -%}\n  {%-\
-          \ if is_state(entity_id, \"open\") or is_state(entity_id, \"unlocked\")\
-          \ -%}\n    {%- set ns.entities = ns.entities + [ entity_id ] -%}\n  {%-\
-          \ endif -%}\n{%- endfor -%} {{ \"green\" if ns.entities | count == 0 else\
-          \ \"red\" }}"
+        icon: '{% from "util.jinja" import security_count %} {{ iif(security_count()
+          | int == 0, "mdi:shield-check", "mdi:shield-alert") }}'
+        icon_color: '{% from "util.jinja" import security_count %} {{ iif(security_count()
+          | int == 0, "green", "red") }}'
         tap_action:
           action: none
         type: template
@@ -6481,23 +6265,14 @@ views:
       type: custom:mushroom-title-card
     - cards:
       - card_mod:
-          style: "ha-card {\n  background:\n  {% if is_state(\"lock.lock_front\",\
-            \ \"locked\") and is_state(\"binary_sensor.front_door_is_open\", \"off\"\
-            ) %}\n      background: rgba(101,170,91,0.2);\n  {% endif %}\n}\n"
+          style: "ha-card {\n  {% if is_state(\"lock.lock_front\", \"locked\") and\
+            \ is_state(\"binary_sensor.front_door_is_open\", \"off\") %}\n    background:\
+            \ rgba(101,170,91,0.2);\n  {% endif %}\n}\n"
         cards:
-        - badge_color: "{% set entity = \"sensor.front_door_battery_level\" %} {%\
-            \ if has_value(entity) %}\n  {% set battery_level = states(entity) | int\
-            \ // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90: \"\
-            green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"lime\"\
-            ,\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n    20:\
-            \ \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level]\
-            \ }}\n{% else %}\n  red\n{% endif %}"
-          badge_icon: "{% set entity = \"sensor.front_door_battery_level\" %} {% if\
-            \ has_value(entity) %}\n  {% set battery_level = states(entity) | int\
-            \ %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif battery_level\
-            \ >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10 }}\n  {% elif\
-            \ battery_level < 10 %}\n    mdi:battery-outline\n  {% endif %}\n{% else\
-            \ %}\n  mdi:battery-alert-variant-outline\n{% endif %}"
+        - badge_color: '{% from "util.jinja" import battery_color %} {{ battery_color("sensor.front_door_battery_level")
+            }}'
+          badge_icon: '{% from "util.jinja" import battery_icon %} {{ battery_icon("sensor.front_door_battery_level")
+            }}'
           entity: binary_sensor.front_door_is_open
           icon: "{% if is_state(entity, \"on\") %}\n  mdi:door-open\n{% elif is_state(\"\
             lock.lock_front\", \"unlocked\") and is_state(entity, \"off\") %}\n  mdi:door-closed\n\
@@ -6509,34 +6284,18 @@ views:
             \ \"off\") %}\n  green\n{% endif %}"
           multiline_secondary: true
           primary: Front Door
-          secondary: "{% if is_state(entity, \"on\") -%}\n  Open\n{% elif is_state(\"\
-            lock.lock_front\", \"unlocked\") -%}\n  Closed and Unlocked\n{% else -%}\n\
-            \  Closed and Locked\n{% endif -%} {% set last_changed = state_attr(\"\
-            sensor.nominal_change_history\", \"changes\")[entity] | as_datetime -%}\
-            \ {%- if last_changed < today_at() - timedelta(days=6) -%}\n  More than\
-            \ a week ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n\
-            \  {{ last_changed.timestamp() | timestamp_custom(\"%A at %-I:%M %p\"\
-            ) }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()\
-            \ | timestamp_custom(\"Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{\
-            \ relative_time(last_changed) }} ago\n{%- endif -%}"
+          secondary: "{% from \"util.jinja\" import custom_timedelta %} {% if is_state(entity,\
+            \ \"on\") -%}\n  Open\n{% elif is_state(\"lock.lock_front\", \"unlocked\"\
+            ) -%}\n  Closed and Unlocked\n{% else -%}\n  Closed and Locked\n{% endif\
+            \ -%} {{ custom_timedelta(entity) }}"
           tap_action:
             action: more-info
           type: custom:mushroom-template-card
         - cards:
-          - badge_color: "{% set entity = \"sensor.lock_front_battery_level\" %} {%\
-              \ if has_value(entity) %}\n  {% set battery_level = states(entity) |\
-              \ int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90:\
-              \ \"green\",\n    80: \"green\",\n    70: \"light-green\",\n    60:\
-              \ \"lime\",\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\"\
-              ,\n    20: \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n \
-              \ {{ levels[battery_level] }}\n{% else %}\n  red\n{% endif %}"
-            badge_icon: "{% set entity = \"sensor.lock_front_battery_level\" %} {%\
-              \ if has_value(entity) %}\n  {% set battery_level = states(entity) |\
-              \ int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif\
-              \ battery_level >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10\
-              \ }}\n  {% elif battery_level < 10 %}\n    mdi:battery-outline\n  {%\
-              \ endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
-              \ %}"
+          - badge_color: '{% from "util.jinja" import battery_color %} {{ battery_color("sensor.lock_front_battery_level")
+              }}'
+            badge_icon: '{% from "util.jinja" import battery_icon %} {{ battery_icon("sensor.lock_front_battery_level")
+              }}'
             card_mod:
               style: "ha-card {\n  --icon-border-radius: var(--control-border-radius);\n\
                 }\n"
@@ -6571,14 +6330,8 @@ views:
             \ \"closed\") %}\n  green\n{% else %}\n  red\n{% endif %}"
           multiline_secondary: true
           primary: Garage Door
-          secondary: "{{ states(entity) | title }}\n{% set last_changed = state_attr(\"\
-            sensor.nominal_change_history\", \"changes\")[entity] | as_datetime -%}\
-            \ {%- if last_changed < today_at() - timedelta(days=6) -%}\n  More than\
-            \ a week ago\n{%- elif last_changed < today_at() - timedelta(days=1) -%}\n\
-            \  {{ last_changed.timestamp() | timestamp_custom(\"%A at %-I:%M %p\"\
-            ) }}\n{%- elif last_changed < today_at() -%}\n  {{ last_changed.timestamp()\
-            \ | timestamp_custom(\"Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{\
-            \ relative_time(last_changed) }} ago\n{%- endif -%}"
+          secondary: '{% from "util.jinja" import custom_timedelta %} {{ states(entity)
+            | title }} {{ custom_timedelta(entity) }}'
           tap_action:
             action: more-info
           type: custom:mushroom-template-card
@@ -6799,13 +6552,8 @@ views:
           icon: mdi:bell-ring
           icon_color: disabled
           primary: Last Ring
-          secondary: "{% set state = state_attr(\"sensor.nominal_change_history\"\
-            , \"changes\")[entity] | as_datetime -%}\n{%- if state < today_at() -\
-            \ timedelta(days=6) -%}\n  More than a week ago\n{%- elif state < today_at()\
-            \ - timedelta(days=1) -%}\n  {{ state.timestamp() | timestamp_custom(\"\
-            %A at %-I:%M %p\") }}\n{%- elif state < today_at() -%}\n  {{ state.timestamp()\
-            \ | timestamp_custom(\"Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{\
-            \ relative_time(state) }} ago\n{%- endif -%}"
+          secondary: '{% from "util.jinja" import custom_timedelta %} {{ custom_timedelta(entity)
+            }}'
           tap_action:
             action: more-info
           type: custom:mushroom-template-card
@@ -6813,13 +6561,8 @@ views:
           icon: mdi:walk
           icon_color: disabled
           primary: Last Person
-          secondary: "{% set state = state_attr(\"sensor.nominal_change_history\"\
-            , \"changes\")[entity] | as_datetime -%}\n{%- if state < today_at() -\
-            \ timedelta(days=6) -%}\n  More than a week ago\n{%- elif state < today_at()\
-            \ - timedelta(days=1) -%}\n  {{ state.timestamp() | timestamp_custom(\"\
-            %A at %-I:%M %p\") }}\n{%- elif state < today_at() -%}\n  {{ state.timestamp()\
-            \ | timestamp_custom(\"Yesterday at %-I:%M %p\") }}\n{%- else -%}\n  {{\
-            \ relative_time(state) }} ago\n{%- endif -%}"
+          secondary: '{% from "util.jinja" import custom_timedelta %} {{ custom_timedelta(entity)
+            }}'
           tap_action:
             action: more-info
           type: custom:mushroom-template-card
@@ -6912,17 +6655,12 @@ views:
         entity: sensor.battery_state_of_charge
         hold_action:
           action: none
-        icon: "{% if has_value(entity) %}\n  {% set battery_level = states(entity)\
-          \ | int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif\
-          \ battery_level >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10 }}\n\
-          \  {% elif battery_level < 10 %}\n    mdi:battery-outline\n  {% endif %}\n\
-          {% else %}\n  mdi:battery-alert-variant-outline\n{% endif %}"
-        icon_color: "{% if has_value(entity) %}\n  {% set battery_level = states(entity)\
-          \ | int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90:\
-          \ \"green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"lime\"\
-          ,\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n    20:\
-          \ \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level]\
-          \ }}\n{% else %}\n  red\n{% endif %}"
+        icon: '{% from "util.jinja" import battery_icon %}
+
+          {{ battery_icon(entity) }}'
+        icon_color: '{% from "util.jinja" import battery_color %}
+
+          {{ battery_color(entity) }}'
         tap_action:
           action: more-info
         type: template
@@ -6955,7 +6693,7 @@ views:
       primary: "{%- if is_state(entity, \"summer_offpeak\") -%}\n  Summer Off-Peak\n\
         {%- elif is_state(entity, \"summer_peak\") -%}\n  Summer Peak\n{%- elif is_state(entity,\
         \ \"winter_offpeak\") -%}\n  Winter Off-Peak\n{%- elif is_state(entity, \"\
-        winter_peak\") -%}\n  Winter Peak\n{%- else -%}\n  Huh?\n{%- endif -%}"
+        winter_peak\") -%}\n  Winter Peak\n{%- else -%}\n  Unknown\n{%- endif -%}"
       secondary: '{{ states("sensor.tariff_price") }} {{ state_attr("sensor.tariff_price",
         "unit_of_measurement") }}'
       tap_action:

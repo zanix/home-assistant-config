@@ -5,14 +5,13 @@
   Accepts a list of entity objects or Entity IDs.
 #}
 {%- macro get_friendly_names(entity_list) -%}
-  {% for entity in entity_list %}
-    {% if entity is string %}
+  {% for entity in entity_list -%}
+    {% set name = entity %}
+    {%- if not state_attr(entity, "friendly_name") in ["unavailable", "unknown"] -%}
       {% set name = state_attr(entity, "friendly_name") %}
-    {% else %}
-      {% set name = entity.attributes.friendly_name %}
-    {% endif %}
+    {%- endif -%}
     {{ name }}{{ ', ' if loop.length > 2 and not loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
-  {% endfor %}
+  {%- endfor %}
 {%- endmacro -%}
 
 {#
@@ -20,4 +19,146 @@
 #}
 {%- macro truthify(state) -%}
   {{ state in ['on', 'true', 'open'] }}
+{%- endmacro -%}
+
+{#
+  Returns color based on battery level.
+#}
+{%- macro battery_color(entity) -%}
+  {% if has_value(entity) %}
+    {% set battery_level = states(entity) | int // 10 * 10 %}
+    {{ {
+      100: "green",
+      90: "green",
+      80: "green",
+      70: "light-green",
+      60: "lime",
+      50: "yellow",
+      40: "amber",
+      30: "orange",
+      20: "orange",
+      10: "red",
+      0: "red"
+    }[battery_level] }}
+  {% else %}
+    red
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  Returns battery icon based on battery level.
+#}
+{%- macro battery_icon(entity) -%}
+  {% if has_value(entity) %}
+    {% set battery_level = states(entity) | int %}
+    {% if battery_level == 100 %}
+      mdi:battery
+    {% elif battery_level >= 10 %}
+      mdi:battery-{{ battery_level // 10 * 10 }}
+    {% elif battery_level < 10 %}
+      mdi:battery-outline
+    {% endif %}
+  {% else %}
+    mdi:battery-alert-variant-outline
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  Returns battery icon based on battery level and charge state.
+#}
+{%- macro cell_battery_icon(entity, charge, type) -%}
+  {% if has_value(entity) %}
+    {% set state = "battery" %}
+    {% if is_state(charge, "charging") %}
+      {% set state = state ~ "-charging" %}
+      {% if is_state(type, "wireless") %}
+        {% set state = state ~ "-wireless" %}
+      {% endif %}
+    {% endif %}
+    {% set battery_level = states(entity) | int %}
+    {% if battery_level == 100 %}
+      mdi:{{ state }}
+    {% elif battery_level >= 10 %}
+      mdi:{{ state }}-{{ battery_level // 10 * 10 }}
+    {% elif battery_level < 10 %}
+      mdi:{{ state }}-outline
+    {% endif %}
+  {% else %}
+    mdi:battery-alert-variant-outline
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  Return a count of running computers.
+#}
+{%- macro computer_count() -%}
+  {% set computers = expand([
+    "binary_sensor.erebus_connected",
+    "binary_sensor.nasya_connected",
+    "binary_sensor.ardena_connected",
+    "binary_sensor.athos_connected"
+  ]) | selectattr("state", "==", "on") | map(attribute="entity_id") | list -%}
+  {{ computers | count }}
+{%- endmacro -%}
+
+{#
+  Return last changed using change history sensor.
+#}
+{%- macro custom_timedelta(entity) -%}
+  {% set last_changed = state_attr("sensor.nominal_change_history", "changes")[entity] | as_datetime -%}
+  {%- if last_changed < today_at() - timedelta(days=6) -%}
+    More than a week ago
+  {%- elif last_changed < today_at() - timedelta(days=1) -%}
+    {{ last_changed.timestamp() | timestamp_custom("%A at %-I:%M %p") }}
+  {%- elif last_changed < today_at() -%}
+    {{ last_changed.timestamp() | timestamp_custom("Yesterday at %-I:%M %p") }}
+  {%- else -%}
+    {{ relative_time(last_changed) }} ago
+  {%- endif -%}
+{%- endmacro -%}
+
+{#
+  Returns media player icon based on source.
+#}
+{%- macro media_icon(entity) -%}
+  {% set app = state_attr(entity, "source") %}
+  {% set app_list = {
+    "com.amazon.amazonvideo.livingroom": "fab:amazon",
+    "com.crunchyroll.crunchyroid": "fapro:crunchyroll",
+    "com.disney.datg.videoplatforms.android.watchdc": "fapro:disney_now",
+    "com.google.android.youtube.tv": "mdi:youtube",
+    "com.google.android.youtube.tvkids": "fapro:youtube_kids",
+    "com.hulu.livingroomplus": "mdi:hulu",
+    "com.netflix.ninja": "mdi:netflix",
+    "com.plexapp.android": "mdi:plex",
+    "com.spotify.tv.android": "mdi:spotify",
+    "org.pbskids.video": "fapro:pbs_kids",
+    "tv.twitch.android.viewer": "mdi:twitch",
+  } %}
+  {% set media_type = state_attr(entity, "media_content_type") %}
+  {% set media_type_list = {
+    "tvshow": "mdi:television",
+    "movie": "mdi:movie-open",
+    "music": "mdi:music",
+    "playlist": "mdi:playlist-music",
+  } %}
+  {% if media_type in media_type_list %}
+    {{ media_type_list[media_type] }}
+  {% elif app in app_list %}
+    {{ app_list[app] }}
+  {% else %}
+    mdi:motion-play-outline
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  Return a count of open doors or unlocked locks.
+#}
+{%- macro security_count() -%}
+  {% set security = expand("group.all_doors") | selectattr("state", "==", "on") | map(attribute="entity_id") | list -%}
+  {% set security = security + expand([
+    "lock.lock_front",
+    "cover.garage_door"
+  ]) | selectattr("state", "in", ["open", "unlocked"]) | map(attribute="entity_id") | list -%}
+  {{ security | count }}
 {%- endmacro -%}

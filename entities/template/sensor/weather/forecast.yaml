@@ -9,18 +9,33 @@ sensor:
   - name: Forecast
     availability: "{{ has_value('weather.openweathermap') }}"
     state: >-
+      {% set conditions = {
+        "clear-day": "clear skies",
+        "clear-night": "clear night skies",
+        "cloudy": "cloudy skies",
+        "clr": "clear skies",
+        "exceptional": "clear skies and sun",
+        "partlycloudy": "partly cloudy skies",
+        "sunny": "clear skies and sun",
+        "wind_": "windy",
+        "windy-variant": "windy",
+      } %}
       {% if has_value('weather.openweathermap') %}
         {% set hour = now().hour | int %}
-        {% if hour < 17 %}
-          Today's forecast is {{ state_attr('weather.openweathermap', 'forecast')[0]['condition'] | replace('clear', 'clear ') | replace('partly', 'partly ') }},
-          with a high of {{ state_attr('weather.openweathermap', 'forecast')[0]['temperature'] | round }} degrees.
+        {% if hour < 15 %}
+          {% set condition = state_attr('weather.openweathermap', 'forecast')[0]['condition'] %}
+          {% if condition in conditions %}
+            {% set condition = conditions[condition] %}
+          {% endif %}
+          Today's forecast is {{ condition }}, with a high of {{ state_attr('weather.openweathermap', 'forecast')[0]['temperature'] | round }} degrees.
         {% else %}
-          {%- set condition = state_attr('weather.openweathermap', 'forecast')[1]['condition'] | replace('clear', 'clear ') | replace('partly', 'partly ') -%}
-          {%- set high = state_attr('weather.openweathermap', 'forecast')[1]['temperature'] | round -%}
-          {%- set low = state_attr('weather.openweathermap', 'forecast')[1]['templow'] | round -%}
-          {%- set chance = state_attr('weather.openweathermap', 'forecast')[1]['precipitation_probability'] -%}
-          Tomorrow's forecast is {{ condition }},
-          {% if chance > 0 -%}a {{ chance }} percent chance of precipitation,{% endif %}
-          with a high of {{ high }} degrees, and a low of {{ low }} degrees.
+          {% set condition = state_attr('weather.openweathermap', 'forecast')[1]['condition'] %}
+          {% if condition in conditions %}
+            {% set condition = conditions[condition] %}
+          {% endif %}
+          {% set high = state_attr('weather.openweathermap', 'forecast')[1]['temperature'] | round %}
+          {% set low = state_attr('weather.openweathermap', 'forecast')[1]['templow'] | round %}
+          {% set chance = state_attr('weather.openweathermap', 'forecast')[1]['precipitation_probability'] %}
+          Tomorrow's forecast is {{ condition }}, {% if chance > 0 -%}a {{ chance }} percent chance of precipitation,{% endif %} with a high of {{ high }} degrees, and a low of {{ low }} degrees.
         {% endif %}
       {% endif %}
