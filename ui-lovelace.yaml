@@ -1256,24 +1256,24 @@ decluttering_templates:
             action: more-info
           type: template
         - entity: sensor.[[phone_base]]_battery_level
-          icon: "{% if not states(entity) in [\"unknown\", \"unavailable\"] %}\n \
-            \ {% set state = \"battery\" %}\n  {% if is_state(\"sensor.[[phone_base]]_battery_state\"\
-            , \"charging\") %}\n    {% set state = state ~ \"-charging\" %}\n    {%\
-            \ if is_state(\"sensor.[[phone_base]]_charger_type\", \"wireless\") %}\n\
-            \      {% set state = state ~ \"-wireless\" %}\n    {% endif %}\n  {%\
-            \ endif %}\n  {% set battery_level = states(entity) | int %}\n  {% if\
-            \ battery_level == 100 %}\n    mdi:{{ state }}\n  {% elif battery_level\
-            \ >= 10 %}\n    mdi:{{ state }}-{{ battery_level // 10 * 10 }}\n  {% elif\
-            \ battery_level < 10 %}\n    mdi:{{ state }}-outline\n  {% endif %}\n\
-            {% else %}\n  mdi:battery-alert-variant-outline\n{% endif %}"
-          icon_color: "{% if not states(entity) in [\"unknown\", \"unavailable\"]\
-            \ %}\n  {% set battery_level = states(entity) | int // 10 * 10 %}\n  {%\
-            \ set levels = {\n    100: \"green\",\n    90: \"green\",\n    80: \"\
-            green\",\n    70: \"light-green\",\n    60: \"lime\",\n    50: \"yellow\"\
-            ,\n    40: \"amber\",\n    30: \"orange\",\n    20: \"orange\",\n    10:\
-            \ \"red\",\n    0: \"red\"\n  } %}\n  {% if is_state(\"sensor.[[phone_base]]_battery_state\"\
-            , \"charging\") %}\n    light-blue\n  {% else %}\n    {{ levels[battery_level]\
-            \ }}\n  {% endif %}\n{% else %}\n  red\n{% endif %}"
+          icon: "{% if has_value(entity) %}\n  {% set state = \"battery\" %}\n  {%\
+            \ if is_state(\"sensor.[[phone_base]]_battery_state\", \"charging\") %}\n\
+            \    {% set state = state ~ \"-charging\" %}\n    {% if is_state(\"sensor.[[phone_base]]_charger_type\"\
+            , \"wireless\") %}\n      {% set state = state ~ \"-wireless\" %}\n  \
+            \  {% endif %}\n  {% endif %}\n  {% set battery_level = states(entity)\
+            \ | int %}\n  {% if battery_level == 100 %}\n    mdi:{{ state }}\n  {%\
+            \ elif battery_level >= 10 %}\n    mdi:{{ state }}-{{ battery_level //\
+            \ 10 * 10 }}\n  {% elif battery_level < 10 %}\n    mdi:{{ state }}-outline\n\
+            \  {% endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
+            \ %}"
+          icon_color: "{% if has_value(entity) %}\n  {% set battery_level = states(entity)\
+            \ | int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90:\
+            \ \"green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"\
+            lime\",\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n\
+            \    20: \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {% if\
+            \ is_state(\"sensor.[[phone_base]]_battery_state\", \"charging\") %}\n\
+            \    light-blue\n  {% else %}\n    {{ levels[battery_level] }}\n  {% endif\
+            \ %}\n{% else %}\n  red\n{% endif %}"
           tap_action:
             action: more-info
           type: template
@@ -1614,10 +1614,10 @@ views:
               action: navigate
               navigation_path: lights
             type: template
-          - content: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
-              \  {% set power = states(entity) | int | abs %}\n  {% if power > 1000\
-              \ %}\n    {{ (power | float * 0.001) | round(2) }} kWh\n  {% else %}\n\
-              \    {{ power }} W\n  {% endif %}\n{% endif %}"
+          - content: "{% if has_value(entity) %}\n  {% set power = states(entity)\
+              \ | int | abs %}\n  {% if power > 1000 %}\n    {{ (power | float * 0.001)\
+              \ | round(2) }} kWh\n  {% else %}\n    {{ power }} W\n  {% endif %}\n\
+              {% endif %}"
             entity: sensor.grid_power
             icon: "{% if states(entity) in ['unknown', 'unavailable'] %}\n  mdi:transmission-tower-off\n\
               {% else %}\n  {% if states(entity) | int < 0 %}\n    mdi:transmission-tower-export\n\
@@ -1989,17 +1989,16 @@ views:
                   title: 3D Printer
                 service: browser_mod.popup
             type: template
-          - content: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
-              \  {{ states(\"sensor.meater_probe_internal\") }} °F\n  {% if not states(\"\
-              sensor.meater_probe_remaining_time\") in ['unknown', 'unavailable']\
-              \  %}\n    {% set t = (states(\"sensor.meater_probe_remaining_time\"\
+          - content: "{% if has_value(entity) %}\n  {{ states(\"sensor.meater_probe_internal\"\
+              ) }} °F\n  {% if has_value(\"sensor.meater_probe_remaining_time\") \
+              \ %}\n    {% set t = (states(\"sensor.meater_probe_remaining_time\"\
               ) | as_datetime - now()).total_seconds() %}\n    | {{ t | timestamp_custom('%-H\
               \ hr %-M min' if t > 3600 else '%-M min', false) }}\n  {% endif %}\n\
               {% endif %}"
             entity: sensor.meater_probe_cook_state
             icon: mdi:food-drumstick
-            icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
-              \  brown\n{% else %}\n  disabled\n{% endif %}"
+            icon_color: "{% if has_value(entity) %}\n  brown\n{% else %}\n  disabled\n\
+              {% endif %}"
             tap_action:
               action: fire-dom-event
               browser_mod:
@@ -2337,14 +2336,13 @@ views:
         type: weather
       - content: '{{ states(entity) | float(default=0) }}'
         entity: sensor.airnow_aqi
-        icon: '{{ iif(not states(entity) in [''unknown'', ''unavailable''], "mdi:blur",
-          "mdi:blur-off") }}'
-        icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n \
-          \ {% set level = states(entity) | float(default=0) %}\n  {% if level >=\
-          \ 300 %}\n    red\n  {% elif level >= 200 %}\n    purple\n  {% elif level\
-          \ >= 150 %}\n    pink\n  {% elif level >= 100 %}\n    orange\n  {% elif\
-          \ level >= 50 %}\n    yellow\n  {% elif level >= 0 %}\n    green\n  {% endif\
-          \ %}\n{% else %}\n  disabled\n{% endif %}"
+        icon: '{{ iif(has_value(entity), "mdi:blur", "mdi:blur-off") }}'
+        icon_color: "{% if has_value(entity) %}\n  {% set level = states(entity) |\
+          \ float(default=0) %}\n  {% if level >= 300 %}\n    red\n  {% elif level\
+          \ >= 200 %}\n    purple\n  {% elif level >= 150 %}\n    pink\n  {% elif\
+          \ level >= 100 %}\n    orange\n  {% elif level >= 50 %}\n    yellow\n  {%\
+          \ elif level >= 0 %}\n    green\n  {% endif %}\n{% else %}\n  disabled\n\
+          {% endif %}"
         tap_action:
           action: fire-dom-event
           browser_mod:
@@ -2548,15 +2546,15 @@ views:
           style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
             \  --chip-spacing: 0;\n}\n"
         chips:
-        - content: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n  {{\
-            \ states(entity) | round(0) }}mi\n{% endif %}"
+        - content: "{% if has_value(entity) %}\n  {{ states(entity) | round(0) }}mi\n\
+            {% endif %}"
           entity: sensor.ascent_range
           icon: mdi:gas-station
-          icon_color: "{% if not states(entity) in ['unknown', 'unavailable'] %}\n\
-            \  {% set range = states(entity) | int %}\n  {% if range > 200 %}\n  \
-            \  green\n  {% elif range > 60 %}\n    light-green\n  {% elif range >\
-            \ 40 %}\n    amber\n  {% elif range > 20 %}\n    orange\n  {% else %}\n\
-            \    red\n  {% endif %}\n{% endif %}"
+          icon_color: "{% if has_value(entity) %}\n  {% set range = states(entity)\
+            \ | int %}\n  {% if range > 200 %}\n    green\n  {% elif range > 60 %}\n\
+            \    light-green\n  {% elif range > 40 %}\n    amber\n  {% elif range\
+            \ > 20 %}\n    orange\n  {% else %}\n    red\n  {% endif %}\n{% endif\
+            \ %}"
           tap_action:
             action: more-info
           type: template
@@ -6488,20 +6486,18 @@ views:
             ) %}\n      background: rgba(101,170,91,0.2);\n  {% endif %}\n}\n"
         cards:
         - badge_color: "{% set entity = \"sensor.front_door_battery_level\" %} {%\
-            \ if not states(entity) in [\"unknown\", \"unavailable\"] %}\n  {% set\
-            \ battery_level = states(entity) | int // 10 * 10 %}\n  {% set levels\
-            \ = {\n    100: \"green\",\n    90: \"green\",\n    80: \"green\",\n \
-            \   70: \"light-green\",\n    60: \"lime\",\n    50: \"yellow\",\n   \
-            \ 40: \"amber\",\n    30: \"orange\",\n    20: \"orange\",\n    10: \"\
-            red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level] }}\n{% else\
-            \ %}\n  red\n{% endif %}"
+            \ if has_value(entity) %}\n  {% set battery_level = states(entity) | int\
+            \ // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90: \"\
+            green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"lime\"\
+            ,\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n    20:\
+            \ \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level]\
+            \ }}\n{% else %}\n  red\n{% endif %}"
           badge_icon: "{% set entity = \"sensor.front_door_battery_level\" %} {% if\
-            \ not states(entity) in [\"unknown\", \"unavailable\"] %}\n  {% set battery_level\
-            \ = states(entity) | int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n\
-            \  {% elif battery_level >= 10 %}\n    mdi:battery-{{ battery_level //\
-            \ 10 * 10 }}\n  {% elif battery_level < 10 %}\n    mdi:battery-outline\n\
-            \  {% endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
-            \ %}"
+            \ has_value(entity) %}\n  {% set battery_level = states(entity) | int\
+            \ %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif battery_level\
+            \ >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10 }}\n  {% elif\
+            \ battery_level < 10 %}\n    mdi:battery-outline\n  {% endif %}\n{% else\
+            \ %}\n  mdi:battery-alert-variant-outline\n{% endif %}"
           entity: binary_sensor.front_door_is_open
           icon: "{% if is_state(entity, \"on\") %}\n  mdi:door-open\n{% elif is_state(\"\
             lock.lock_front\", \"unlocked\") and is_state(entity, \"off\") %}\n  mdi:door-closed\n\
@@ -6528,20 +6524,19 @@ views:
           type: custom:mushroom-template-card
         - cards:
           - badge_color: "{% set entity = \"sensor.lock_front_battery_level\" %} {%\
-              \ if not states(entity) in [\"unknown\", \"unavailable\"] %}\n  {% set\
-              \ battery_level = states(entity) | int // 10 * 10 %}\n  {% set levels\
-              \ = {\n    100: \"green\",\n    90: \"green\",\n    80: \"green\",\n\
-              \    70: \"light-green\",\n    60: \"lime\",\n    50: \"yellow\",\n\
-              \    40: \"amber\",\n    30: \"orange\",\n    20: \"orange\",\n    10:\
-              \ \"red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level] }}\n\
-              {% else %}\n  red\n{% endif %}"
+              \ if has_value(entity) %}\n  {% set battery_level = states(entity) |\
+              \ int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90:\
+              \ \"green\",\n    80: \"green\",\n    70: \"light-green\",\n    60:\
+              \ \"lime\",\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\"\
+              ,\n    20: \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n \
+              \ {{ levels[battery_level] }}\n{% else %}\n  red\n{% endif %}"
             badge_icon: "{% set entity = \"sensor.lock_front_battery_level\" %} {%\
-              \ if not states(entity) in [\"unknown\", \"unavailable\"] %}\n  {% set\
-              \ battery_level = states(entity) | int %}\n  {% if battery_level ==\
-              \ 100 %}\n    mdi:battery\n  {% elif battery_level >= 10 %}\n    mdi:battery-{{\
-              \ battery_level // 10 * 10 }}\n  {% elif battery_level < 10 %}\n   \
-              \ mdi:battery-outline\n  {% endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n\
-              {% endif %}"
+              \ if has_value(entity) %}\n  {% set battery_level = states(entity) |\
+              \ int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif\
+              \ battery_level >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10\
+              \ }}\n  {% elif battery_level < 10 %}\n    mdi:battery-outline\n  {%\
+              \ endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
+              \ %}"
             card_mod:
               style: "ha-card {\n  --icon-border-radius: var(--control-border-radius);\n\
                 }\n"
@@ -6896,16 +6891,15 @@ views:
       - entity: sensor.pv_power
         icon: mdi:solar-power-variant
         type: entity
-      - content: "{%- if not states(entity) in [\"unknown\", \"unavailable\"] -%}\n\
-          \  {{ (states(entity) | float(default=0)) | round(1) }}\n  {{ state_attr(entity,\
-          \ \"unit_of_measurement\") }}\n{%- endif -%}"
+      - content: "{%- if has_value(entity) -%}\n  {{ (states(entity) | float(default=0))\
+          \ | round(1) }}\n  {{ state_attr(entity, \"unit_of_measurement\") }}\n{%-\
+          \ endif -%}"
         entity: sensor.grid_net_monthly
         icon: mdi:power-plug
         tap_action:
           action: more-info
         type: template
-      - content: '{{ iif(not states(entity) in ["unknown", "unavailable"], states(entity)
-          | float(default=0)) }}'
+      - content: '{{ iif(has_value(entity), states(entity) | float(default=0)) }}'
         entity: sensor.month_power_cost
         hold_action:
           action: none
@@ -6913,24 +6907,22 @@ views:
         tap_action:
           action: more-info
         type: template
-      - content: '{{ iif(not states(entity) in ["unknown", "unavailable"], states(entity)
-          | int(default=0) ~ "%") }}'
+      - content: '{{ iif(has_value(entity), states(entity) | int(default=0) ~ "%")
+          }}'
         entity: sensor.battery_state_of_charge
         hold_action:
           action: none
-        icon: "{% if not states(entity) in [\"unknown\", \"unavailable\"] %}\n  {%\
-          \ set battery_level = states(entity) | int %}\n  {% if battery_level ==\
-          \ 100 %}\n    mdi:battery\n  {% elif battery_level >= 10 %}\n    mdi:battery-{{\
-          \ battery_level // 10 * 10 }}\n  {% elif battery_level < 10 %}\n    mdi:battery-outline\n\
-          \  {% endif %}\n{% else %}\n  mdi:battery-alert-variant-outline\n{% endif\
-          \ %}"
-        icon_color: "{% if not states(entity) in [\"unknown\", \"unavailable\"] %}\n\
-          \  {% set battery_level = states(entity) | int // 10 * 10 %}\n  {% set levels\
-          \ = {\n    100: \"green\",\n    90: \"green\",\n    80: \"green\",\n   \
-          \ 70: \"light-green\",\n    60: \"lime\",\n    50: \"yellow\",\n    40:\
-          \ \"amber\",\n    30: \"orange\",\n    20: \"orange\",\n    10: \"red\"\
-          ,\n    0: \"red\"\n  } %}\n  {{ levels[battery_level] }}\n{% else %}\n \
-          \ red\n{% endif %}"
+        icon: "{% if has_value(entity) %}\n  {% set battery_level = states(entity)\
+          \ | int %}\n  {% if battery_level == 100 %}\n    mdi:battery\n  {% elif\
+          \ battery_level >= 10 %}\n    mdi:battery-{{ battery_level // 10 * 10 }}\n\
+          \  {% elif battery_level < 10 %}\n    mdi:battery-outline\n  {% endif %}\n\
+          {% else %}\n  mdi:battery-alert-variant-outline\n{% endif %}"
+        icon_color: "{% if has_value(entity) %}\n  {% set battery_level = states(entity)\
+          \ | int // 10 * 10 %}\n  {% set levels = {\n    100: \"green\",\n    90:\
+          \ \"green\",\n    80: \"green\",\n    70: \"light-green\",\n    60: \"lime\"\
+          ,\n    50: \"yellow\",\n    40: \"amber\",\n    30: \"orange\",\n    20:\
+          \ \"orange\",\n    10: \"red\",\n    0: \"red\"\n  } %}\n  {{ levels[battery_level]\
+          \ }}\n{% else %}\n  red\n{% endif %}"
         tap_action:
           action: more-info
         type: template

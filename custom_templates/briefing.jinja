@@ -1,0 +1,109 @@
+{# BRIEFING MACROS #}
+
+{#
+  Report if any door is open or locks are unlocked.
+#}
+{%- macro door_check() -%}
+  {% set ns = namespace(entities=[]) %}
+
+  {% set open_doors = expand(state_attr("group.all_doors", "entity_id")) | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
+  {% for entity_id in open_doors %}
+    {% set ns.entities = ns.entities + [ entity_id ] %}
+  {% endfor %}
+
+  {% set security = [
+    "lock.lock_front",
+    "cover.garage_door"
+  ] %}
+
+  {% for entity_id in security %}
+    {% if is_state(entity_id, "open") or is_state(entity_id, "unlocked") %}
+      {% set ns.entities = ns.entities + [ entity_id ] %}
+    {% endif %}
+  {% endfor %}
+
+  {% if ns.entities | length > 0 %}
+    {% for entity in ns.entities %}
+      {{ 'T' if loop.first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is {{ 'unlocked' if 'lock' in entity else 'open' }}{{ ',' if loop.length > 2 and not loop.last else '' }}{{ '.' if loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
+    {% endfor %}
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  A simple greeting based on the time of day.
+#}
+{%- macro greeting_line() -%}
+  {% set hour = now().strftime('%H') | int %}
+  {% if hour > 0 and hour < 10  %}
+    Good morning.
+  {% elif hour >= 10 and hour < 17 %}
+    Good afternoon.
+  {% else %}
+    Good evening.
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  A simple greeting based on the time of day.
+#}
+{%- macro holiday() -%}
+  {% if has_value('sensor.holiday') %}
+    Today is {{ states('sensor.holiday') }}.
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  Report if any light is on.
+#}
+{%- macro light_check() -%}
+  {% set lights_on = expand(state_attr("group.all_light_switches", "entity_id")) | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
+  {% if lights_on | length | default(0) | int > 0 and lights_on != [''] -%}
+    {% if lights_on | length == 1 %}
+      There is 1 light on right now. The {{ get_friendly_names(lights_on) }} is on.
+    {% else %}
+      There are {{ lights_on | length }} lights on right now. The {{ get_friendly_names(lights_on) }} are on.
+    {% endif %}
+  {% endif %}
+{%- endmacro -%}
+
+{#
+  Report the current inside temperature.
+#}
+{%- macro inside_weather() -%}
+  Inside the house, it is {{ states('sensor.home_temperature') | int }} degrees.
+{%- endmacro -%}
+
+{#
+  Report the current outside weather conditions.
+#}
+{%- macro outside_weather() -%}
+  {% set conditions = {
+    "clear-day": "clear skies",
+    "clear-night": "clear night skies",
+    "cloudy": "cloudy skies",
+    "clr": "clear skies",
+    "exceptional": "clear skies and sun",
+    "partlycloudy": "partly cloudy skies",
+    "sunny": "clear skies and sun",
+    "wind_": "windy",
+    "windy-variant": "windy",
+  } %}
+  {% set condition = states('weather.openweathermap') %}
+  {% if condition in conditions %}
+    {% set condition = conditions[condition] %}
+  {% endif %}
+  {{ ['Currently', 'Right now'] | random }}, it is {{ state_attr('weather.openweathermap', 'temperature') | int }} degrees fahrenheit, and {{ condition }}.
+  {{ states('sensor.forecast') }}
+{%- endmacro -%}
+
+{#
+  Report if any window is open.
+#}
+{%- macro window_check() -%}
+  {% set open_windows = expand(state_attr("group.all_windows", "entity_id")) | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
+  {% if open_windows | length > 0 %}
+    {% for entity in open_windows %}
+      {{ 'T' if loop.first else 't' }}he {{ state_attr(entity, 'friendly_name') }} is open{{ ',' if loop.length > 2 and not loop.last else '' }}{{ '.' if loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
+    {% endfor %}
+  {% endif %}
+{%- endmacro -%}
