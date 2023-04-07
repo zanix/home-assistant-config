@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1893 total entities**,
+This Home Assistant install has approximately **1894 total entities**,
 including **938 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -200,7 +200,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>18 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.10.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.10.1]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -364,7 +364,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.7.8]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.8.1]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -719,7 +719,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.4.0-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.4.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
