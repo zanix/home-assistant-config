@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1894 total entities**,
-including **938 sensors**.
+This Home Assistant install has approximately **1949 total entities**,
+including **939 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -200,13 +200,13 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>18 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.10.1]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.11.0]
 
 Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -248,7 +248,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.31.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.32.1]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -272,13 +272,13 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.10]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.11]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.5]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.6]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -364,7 +364,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.8.1]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.8.2]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -719,7 +719,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.4.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.4.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
