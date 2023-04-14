@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2049 total entities**,
+This Home Assistant install has approximately **2048 total entities**,
 including **956 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -198,7 +198,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>19 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.11.0]
 
@@ -229,6 +229,12 @@ Integration to use ElevenLabs.io as TTS Provider
 ### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.1.5]
 
 🔹 Use icons from fontawesome in home-assistant
+
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v4.0.0]
+
+Frigate integration for Home Assistant
+
+Authors: [@blakeblackshear](https://github.com/blakeblackshear).
 
 ### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.10.2]
 
@@ -306,7 +312,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>30 Lovelace Plugins</summary>
+<details><summary>31 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
 
@@ -347,6 +353,10 @@ Expander card for HomeAssistant
 ### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v2.2.0]
 
 🔹 A foldable row for entities card, containing other rows
+
+### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v5.0.0-beta.1]
+
+A Lovelace card for Frigate in Home Assistant
 
 ### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.35]
 
