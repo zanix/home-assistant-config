@@ -1,0 +1,38 @@
+---
+# The template integration allows creating entities which derive their values
+# from other data. This is done by specifying templates for properties of an
+# entity, like the name or the state.
+#
+# https://www.home-assistant.io/integrations/template/
+#
+sensor:
+  - name: HACS Updates
+    icon: >-
+      {% if is_state('sensor.hacs_updates', '0') %}
+        mdi:package-check
+      {% else %}
+        mdi:package-up
+      {% endif %}
+    state: >-
+      {% set entities = integration_entities('hacs') %}
+      {{ expand(entities)
+        | selectattr('state', '==', 'on')
+        | map(attribute='entity_id')
+        | list
+        | count
+      }}
+    attributes:
+      entity_id: >-
+        {% set entities = integration_entities('hacs') %}
+        {{ expand(entities)
+          | selectattr('state', '==', 'on')
+          | map(attribute='entity_id')
+          | list
+        }}
+      in_progress: >-
+        {% set entities = integration_entities('hacs') %}
+        {{ expand(entities)
+          | selectattr('attributes.in_progress', '!=', false)
+          | map(attribute='entity_id')
+          | list
+        }}

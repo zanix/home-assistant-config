@@ -2381,19 +2381,20 @@
   mode: single
 - id: '1665696538493'
   alias: ⚙️ HACS Updates
-  description: Create a notification when there is updates pending in HACS
+  description: Create a notification when there are updates pending in HACS
   trigger:
   - platform: state
-    entity_id: sensor.hacs
+    entity_id:
+    - sensor.hacs_updates
   condition:
   - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
-      not trigger.from_state.state in ["unknown", "unavailable"] }}'
+    value_template: "{{ not trigger.to_state.state in [\"unknown\", \"unavailable\"]\n
+      \ and not trigger.from_state.state in [\"unknown\", \"unavailable\"] }}"
   action:
   - if:
     - condition: template
-      value_template: '{{ (trigger.to_state.state | int(default=0)) == 0 and (trigger.from_state.state
-        | int(default=0)) > 0 }}'
+      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+        | int(default=0)) > 0 }}"
     then:
     - service: persistent_notification.dismiss
       data:
@@ -2401,7 +2402,6 @@
     - service: script.notify_mobile
       data:
         who: josh
-        title: ''
         message: clear_notification
         tag: hacs-update
     else:
@@ -2409,43 +2409,46 @@
       - service: persistent_notification.create
         data:
           title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
-            -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n
-            \   {% set update = '**' ~ repo.display_name ~ '** _' ~ repo['installed_version']
-            ~ '_ -> _' ~ repo['available_version'] ~ '_' %}\n    {%- set list.updates
-            = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
-            | join('\\n') }}"
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+            'latest_version') -%}\n    {% set update = '__' ~ state_attr(repo, 'friendly_name')
+            | replace(' update', '') ~ ':__ _' ~ state_attr(repo, 'installed_version')
+            ~ '_ -> _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set
+            list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
+            -%} {{ list.updates | join('\\n') }}"
           notification_id: hacs-update
       - service: script.notify_mobile
         data:
           who: josh
           title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
-            -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n
-            \   {% set update = '<b>' ~ repo.display_name ~ '</b> <em>' ~ repo['installed_version']
-            ~ '</em> -> <em>' ~ repo['available_version'] ~ '</em>' %}\n    {%- set
-            list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
-            -%} {{ list.updates | join('<br>') }}"
-          icon: local/icons/update.png
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+            'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo, 'friendly_name')
+            | replace(' update', '') ~ ':</b> <em>' ~ state_attr(repo, 'installed_version')
+            ~ '</em> -> <em>' ~ state_attr(repo, 'latest_version') ~ '</em>' %}\n
+            \   {%- set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%-
+            endfor -%} {{ list.updates | join('<br>') }}"
+          icon_url: local/icons/update.png
           group: Upgrade
           tag: hacs-update
-          url: hacs
+          url: config/updates
       - service: script.notify_hass_agent
         data:
           entity:
           - media_player.erebus
           title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.repositories
-            -%}\n  {%- if repo['installed_version'] != repo['available_version'] -%}\n
-            \   {% set update = repo.display_name ~ ': ' ~ repo['installed_version']
-            ~ ' -> ' ~ repo['available_version'] %}\n    {%- set list.updates = list.updates
-            + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('\\n')
-            }}"
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+            'latest_version') -%}\n    {% set update = state_attr(repo, 'friendly_name')
+            | replace(' update', '') ~ ': ' ~ state_attr(repo, 'installed_version')
+            ~ ' -> ' ~ state_attr(repo, 'latest_version') %}\n    {%- set list.updates
+            = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
+            | join('\\n') }}"
   mode: single
   variables:
     updates: '{{ trigger.to_state.state | int(default=0) }}'
-    title: 'HACS: {{ iif(updates == 1, ''Update'', ''Updates'', '''') }} Pending ({{
-      updates }})'
+    title: '{{ iif(updates == 1, ''Update'', ''Updates'', '''') }} Pending ({{ updates
+      }})'
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
   description: Sends a notification when the RAM usage is high
