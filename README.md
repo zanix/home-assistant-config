@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1949 total entities**,
-including **939 sensors**.
+This Home Assistant install has approximately **2049 total entities**,
+including **956 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -272,7 +272,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.11]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.13]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -364,7 +364,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.8.2]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.8.3]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -392,7 +392,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.0.9.5]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.0.9.6]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -430,7 +430,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ---
 
-</details><details><summary>4 Themes</summary>
+</details><details><summary>3 Themes</summary>
 
 ### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9.1]
 
@@ -443,10 +443,6 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 ### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.5]
 
 Dark Grey Theme for Home Assistant
-
-### [Noctis Solarized](https://github.com/williamahartman/noctis-solarized)
-
-Noctis theme made Solarized
 
 ---
 
@@ -719,7 +715,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.4.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.4.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
