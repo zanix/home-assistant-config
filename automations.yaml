@@ -1194,11 +1194,8 @@
       tag: door-{{ trigger.to_state.object_id }}
   - if:
     - condition: template
-      value_template: "{%- set ns = namespace(pass=true) -%}\n{%- set open_doors =
-        states | selectattr('entity_id', 'in', state_attr('group.all_doors', 'entity_id'))
-        | selectattr('state', '==', 'on') | map(attribute='entity_id') | list -%}\n{%-
-        for entity_id in open_doors if ns.pass -%}\n  {%- set ns.pass = false -%}\n{%-
-        endfor -%}\n{{ ns.pass }}"
+      value_template: '{{ expand("group.all_doors") | selectattr("state", "==", "on")
+        | map(attribute="entity_id") | list | count == 0 }}'
     then:
     - service: input_boolean.turn_off
       target:
@@ -1296,11 +1293,8 @@
       minutes: 1
   condition:
   - condition: template
-    value_template: "{%- set ns = namespace(found=false) -%}\n{%- set open_doors =
-      states | selectattr('entity_id', 'in', state_attr('group.all_doors', 'entity_id'))
-      | selectattr('state', '==', 'on') | list -%}\n{%- for entity_id in open_doors
-      if not ns.found -%}\n  {%- set ns.found = true -%}\n{%- endfor -%}\n{{ ns.found
-      }}"
+    value_template: '{{ expand("group.all_doors") | selectattr("state", "==", "on")
+      | map(attribute="entity_id") | list | count > 0 }}'
   - condition: state
     entity_id: input_boolean.ignore_alert_doors
     state: 'off'
@@ -1318,11 +1312,11 @@
         title: Ignore
   mode: single
   variables:
-    message: "{%- set open_doors = states | selectattr('entity_id', 'in', state_attr('group.all_doors',
-      'entity_id')) | selectattr('state', '==', 'on') | list -%} {%- for entity in
-      open_doors -%}\n  {%- if loop.first %} The {% elif loop.last %}, and the {%
-      else %}, the {% endif -%}\n  {{ entity.name }} was left open when you left!\n{%-
-      endfor %}"
+    message: "{% from \"util.jinja\" import get_friendly_names %} {% set doors = expand(\"group.all_doors\")
+      | selectattr(\"state\", \"==\", \"on\") | map(attribute=\"entity_id\") | list
+      %} {% if doors | length == 1 %}\n  The {{ get_friendly_names(doors) }} was open
+      when you left!\n{% else %}\n  The {{ get_friendly_names(doors) }} were open
+      when you left!\n{% endif %}"
 - id: '1665687990814'
   alias: "\U0001F4AC Door Opened and Away"
   description: Sends notification if a door is open when people are away
@@ -2530,10 +2524,12 @@
       - service: persistent_notification.create
         data:
           title: Upgrade Available
-          message: '**Home Assistant** _{{ current_version }}_ -> _{{ available_version
+          message: '__Home Assistant__ _{{ current_version }}_ -> _{{ available_version
             }}_
 
+
             {{ release_title }}
+
 
             [{{ action_1_title }}]({{ action_1_uri }}) | [{{ action_2_title }}]({{
             action_2_uri }})'
@@ -3162,12 +3158,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.ethan_action
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.ethan
+      down_double: []
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3192,12 +3183,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.emma_action
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.emma
+      down_double: []
 - id: '1667779287274'
   alias: "\U0001F4CB [Inovelli] Family Room Switch"
   description: Custom button actions for the Inovelli switch
@@ -3205,12 +3191,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.family_room_action
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 20
-        target:
-          entity_id: light.family_room
+      down_double: []
       config_single:
       - service: script.family_room_game_light_mode
         data: {}
@@ -3349,12 +3330,7 @@
           data: {}
           target:
             entity_id: group.lights_kitchen
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.kitchen
+      down_double: []
 - id: '1667779650555'
   alias: "\U0001F4CB [Inovelli] Living Room Switch"
   description: Custom button actions for the Inovelli switch
@@ -3398,12 +3374,7 @@
           data: {}
           target:
             entity_id: group.lights_living_room
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.living_room
+      down_double: []
 - id: '1667779709981'
   alias: "\U0001F4CB [Inovelli] Master Bedroom Switch"
   description: Custom button actions for the Inovelli switch
@@ -3411,12 +3382,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.master_bedroom_action
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.master_bedroom
+      down_double: []
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3443,11 +3409,6 @@
       up_single:
       - service: script.office_lights_on
         data: {}
-        enabled: false
-      - service: homeassistant.turn_on
-        data: {}
-        target:
-          entity_id: group.lights_office
       up_double:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3491,12 +3452,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.play_space_action
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 6
-        target:
-          entity_id: light.play_space
+      down_double: []
 - id: '1667780182339'
   alias: "\U0001F4CB [Inovelli] Guest Room Switch"
   description: Custom button actions for the Inovelli switch
@@ -3504,12 +3460,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.guest_room_action
-      down_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 5
-        target:
-          entity_id: light.guest_room
+      down_double: []
 - id: '1669656817921'
   alias: "\U0001F310 UniFi WAN Offline"
   description: Sends notifications when the internet is down
@@ -3924,10 +3875,8 @@
   variables:
     zone_name: '{{ trigger.from_state.state }}'
     name: '{{ trigger.to_state.attributes.friendly_name }}'
-    message: "{% set names = {'Amy': 'mom', 'Joshua': 'dad'} %}\n{% set content =
-      [\n  'Just a heads up. [name] is done at ' ~ zone_name ~ '.',\n  'Your [name]
-      is on the way home from ' ~ zone_name ~ '.'\n] | random %}\n{{ content | replace('[name]',
-      names[name]) }}"
+    message: '{% from "message.jinja" import arriving_home %} {% set person = {"Amy":
+      "Mom", "Joshua": "Dad"}[name] %} {{ arriving_home(person, zone_name) }}'
 - id: '1678829415008'
   alias: "\U0001F4AC Subaru Remote Start Expired Notification"
   description: Sends a notification when the Subaru remote start expires
@@ -4028,16 +3977,8 @@
   variables:
     zone_name: '{{ trigger.from_state.state }}'
     name: '{{ trigger.to_state.attributes.friendly_name }}'
-    message: "{% set names = {'Amy': 'Mom', 'Joshua': 'Dad'} %}\n{% set content =
-      [\n  \"Guess who is home? [name] is!\",\n  \"[name] is now in the house.\",\n
-      \ \"Knock, Knock. Who's there? [name] is!\",\n  \"The garage door just told
-      me that [name] is home.\",\n  \"[name] can not hide from the system. Welcome
-      home.\",\n  \"[name]! You are home!\",\n  \"I know a secret! [name] is home!\",\n
-      \ \"I am sensing a disturbance in the force. [name] must be home!\",\n  \"Just
-      a quick announcement. [name] has arrived!\",\n  \"Pardon the interruption, but
-      [name] is home!\",\n  \"My systems are picking up the presence of additional
-      humans. [name] has been identified as home.\"\n] | random %}\n{{ content | replace('[name]',
-      names[name]) }}"
+    message: '{% from "message.jinja" import welcome_home %} {% set person = {"Amy":
+      "Mom", "Joshua": "Dad"}[name] %} {{ welcome_home(person) }}'
 - id: '1679462212869'
   alias: ⏯ Ensure PiPup is Running
   description: ''
