@@ -845,7 +845,7 @@
   - service: light.turn_on
     data:
       transition: 360
-      brightness_pct: 2
+      brightness_pct: 8
     target:
       entity_id: light.outside_front
   mode: single
@@ -874,9 +874,10 @@
     after: 00:00:00
   action:
   - service: light.turn_on
-    entity_id: light.outside_front
     data:
-      brightness: 255
+      brightness_pct: 100
+    target:
+      entity_id: light.outside_front
   mode: single
 - id: '1665686584864'
   alias: "\U0001F4A1 Living Room Lamps off at Night"
@@ -1635,16 +1636,18 @@
       before_offset: -01:00:00
   action:
   - service: light.turn_on
-    entity_id: light.outside_front
     data:
-      brightness: 255
+      brightness_pct: 100
+    target:
+      entity_id: light.outside_front
   - delay:
       minutes: 5
   - service: light.turn_on
-    entity_id: light.outside_front
     data:
-      brightness: 13
       transition: 360
+      brightness_pct: 8
+    target:
+      entity_id: light.outside_front
   mode: restart
 - id: '1665689270166'
   alias: "\U0001F4AC Garage Door Closed"
@@ -2300,7 +2303,7 @@
   mode: single
   variables:
     sensors: "{% set result = namespace(sensors=[]) %} {% if trigger.to_state is defined
-      %}\n  {% set entities = trigger.to_state.attributes.entity_id %} {% for entity
+      %}\n  {% set entities = trigger.to_state.attributes.entity_id %}\n  {% for entity
       in entities %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n
       \   {% set name = device.name | replace(': Battery level', '') | replace(' Battery
       level', '') | replace(' Battery Level', '') %}\n    {% set result.sensors =
@@ -2388,8 +2391,9 @@
     - sensor.hacs_updates
   condition:
   - condition: template
-    value_template: "{{ not trigger.to_state.state in [\"unknown\", \"unavailable\"]\n
-      \ and not trigger.from_state.state in [\"unknown\", \"unavailable\"] }}"
+    value_template: "{{ not trigger.to_state.state in [\"unknown\", \"unavailable\",
+      trigger.from_state.state]\n  and not trigger.from_state.state in [\"unknown\",
+      \"unavailable\"]\n}}"
   action:
   - if:
     - condition: template
@@ -2444,7 +2448,7 @@
             ~ ' -> ' ~ state_attr(repo, 'latest_version') %}\n    {%- set list.updates
             = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
             | join('\\n') }}"
-  mode: single
+  mode: restart
   variables:
     updates: '{{ trigger.to_state.state | int(default=0) }}'
     title: '{{ iif(updates == 1, ''Update'', ''Updates'', '''') }} Pending ({{ updates
@@ -3951,7 +3955,10 @@
       - binary_sensor.garage_entry_door_is_open
       to: 'on'
     timeout:
-      minutes: 2
+      hours: 0
+      minutes: 4
+      seconds: 0
+      milliseconds: 0
     continue_on_timeout: false
   - parallel:
     - service: script.notify_mobile
