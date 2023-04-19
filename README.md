@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2048 total entities**,
-including **956 sensors**.
+This Home Assistant install has approximately **1955 total entities**,
+including **951 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -280,7 +280,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.6]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.7]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -386,7 +386,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.6.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.7.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -406,7 +406,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.11.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.12.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -446,7 +446,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🐵 Dark Blue Theme for Home Assistant
 
-### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.5]
+### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.6]
 
 Dark Grey Theme for Home Assistant
 
@@ -721,7 +721,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.4.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.4.5-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
