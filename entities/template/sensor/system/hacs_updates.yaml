@@ -8,14 +8,19 @@
 sensor:
   - name: HACS Updates
     icon: >-
-      {% if is_state('sensor.hacs_updates', '0') %}
+      {% set updates = expand(integration_entities('hacs'))
+        | selectattr('state', '==', 'on')
+        | map(attribute='entity_id')
+        | list
+        | count
+      %}
+      {% if updates == 0 %}
         mdi:package-check
       {% else %}
         mdi:package-up
       {% endif %}
     state: >-
-      {% set entities = integration_entities('hacs') %}
-      {{ expand(entities)
+      {{ expand(integration_entities('hacs'))
         | selectattr('state', '==', 'on')
         | map(attribute='entity_id')
         | list
@@ -23,15 +28,13 @@ sensor:
       }}
     attributes:
       entity_id: >-
-        {% set entities = integration_entities('hacs') %}
-        {{ expand(entities)
+        {{ expand(integration_entities('hacs'))
           | selectattr('state', '==', 'on')
           | map(attribute='entity_id')
           | list
         }}
       in_progress: >-
-        {% set entities = integration_entities('hacs') %}
-        {{ expand(entities)
+        {{ expand(integration_entities('hacs'))
           | selectattr('attributes.in_progress', '!=', false)
           | map(attribute='entity_id')
           | list

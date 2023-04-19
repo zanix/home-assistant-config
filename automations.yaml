@@ -1622,7 +1622,6 @@
   - platform: state
     entity_id:
     - binary_sensor.doorbell_ring
-    - binary_sensor.doorbell_motion
     - binary_sensor.doorbell_human
     to: 'on'
   condition:
@@ -2272,12 +2271,8 @@
     entity_id: sensor.low_battery_devices
   condition:
   - condition: template
-    value_template: '{{ (trigger.to_state.state | int(default=0)) > 0 }}'
-  - condition: template
-    value_template: '{{ (trigger.to_state.state | int(default=0)) != (trigger.from_state.state
-      | int(default=0)) }}'
-  - condition: template
-    value_template: '{{ sensors != "" }}'
+    value_template: "{{ trigger.to_state.state | int > 0\n  and trigger.to_state.state
+      | int != trigger.from_state.state | int\n}}"
   action:
   - parallel:
     - service: persistent_notification.create
@@ -2302,14 +2297,12 @@
         message: '{{ sensors }}'
   mode: single
   variables:
-    sensors: "{% set result = namespace(sensors=[]) %} {% if trigger.to_state is defined
-      %}\n  {% set entities = trigger.to_state.attributes.entity_id %}\n  {% for entity
-      in entities %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n
-      \   {% set name = device.name | replace(': Battery level', '') | replace(' Battery
-      level', '') | replace(' Battery Level', '') %}\n    {% set result.sensors =
-      result.sensors + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor
-      %}\n  {{ iif(result.sensors|count > 0, '- ', '') }}{{ result.sensors | join('\\n-')
-      }}\n{% endif %}"
+    sensors: "{% set result = namespace(sensors=[]) %} {% for entity in trigger.to_state.attributes.entity_id
+      %}\n  {% set device = states.sensor[entity.split('.')[1]] %}\n  {% set name
+      = device.name | replace(': Battery level', '') | replace(' Battery level', '')
+      | replace(' Battery Level', '') %}\n  {% set result.sensors = result.sensors
+      + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n{% endfor %} {{ iif(result.sensors|count
+      > 0, '- ', '') }}{{ result.sensors | join('\\n-') }}"
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
@@ -3119,6 +3112,10 @@
       helper_double_press_delay: 400
       controller_device: 003cea560c919173b8ae8e4d9e616aba
       button_center_double_press: true
+      button_up_double_press: true
+      button_down_double_press: true
+      button_up_long_loop: false
+      button_down_long_loop: false
       action_button_left_short:
       - service: fan.decrease_speed
         data:
@@ -3135,14 +3132,28 @@
       - service: light.turn_on
         data:
           brightness_step_pct: 10
-          transition: 0
+          transition: 1
+        target:
+          entity_id: light.master_bedroom
+      action_button_up_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 100
+          transition: 1
         target:
           entity_id: light.master_bedroom
       action_button_down_short:
       - service: light.turn_on
         data:
-          transition: 0
           brightness_step_pct: -10
+          transition: 1
+        target:
+          entity_id: light.master_bedroom
+      action_button_down_double:
+      - service: light.turn_on
+        data:
+          brightness_pct: 2
+          transition: 1
         target:
           entity_id: light.master_bedroom
       action_button_center_short:
@@ -3156,8 +3167,6 @@
         data: {}
         target:
           entity_id: fan.master_bedroom
-      button_up_long_loop: false
-      button_down_long_loop: false
 - id: '1667779119970'
   alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
@@ -3468,84 +3477,75 @@
     input:
       switch: sensor.guest_room_action
       down_double: []
-- id: '1669656817921'
-  alias: "\U0001F310 UniFi WAN Offline"
-  description: Sends notifications when the internet is down
-  trigger:
-  - platform: state
-    entity_id:
-    - sensor.unifi_status_www
-    to: WARNING
-  - platform: state
-    entity_id:
-    - sensor.unifi_status_www
-    to: ERROR
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      and not trigger.to_state.state in ["unknown", "unavailable"]  }}'
-  action:
-  - parallel:
-    - service: script.notify_mobile
-      data:
-        message: The Internet is down
-        who: parents
-        title: Network
-        icon_url: local/icons/web.png
-    - service: script.notify_pipup
-      data:
-        entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
-        title: Network
-        message: The Internet is down
-        icon_url: local/icons/web.png
-    - service: script.notify_hass_agent
-      data:
-        entity:
-        - media_player.erebus
-        - media_player.nasya
-        message: The Internet is down
-        title: Network
-  mode: single
 - id: '1669666972148'
-  alias: "\U0001F310 UniFi WAN Online"
-  description: Sends notifications when the internet is back up
+  alias: "\U0001F310 UniFi WAN Status"
+  description: Sends notifications when the network status changes
   trigger:
   - platform: state
     entity_id:
     - sensor.unifi_status_www
-    to: OK
   condition:
   - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      and not trigger.to_state.state in ["unknown", "unavailable"]  }}'
+    value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"]\n  and trigger.from_state.state
+      != trigger.to_state.state }}"
   action:
-  - parallel:
-    - service: script.notify_mobile
-      data:
-        message: The Internet is back up
-        who: parents
-        title: Network
-        icon_url: local/icons/web.png
-    - service: script.notify_pipup
-      data:
-        entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
-        title: Network
-        message: The Internet is back up
-        icon_url: local/icons/web.png
-    - service: script.notify_hass_agent
-      data:
-        entity:
-        - media_player.erebus
-        - media_player.nasya
-        message: The Internet is back up
-        title: Network
-  mode: single
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.unifi_status_www
+        state: OK
+      sequence:
+      - parallel:
+        - service: script.notify_mobile
+          data:
+            who: parents
+            title: Network
+            message: The Internet is back up
+            icon_url: local/icons/web.png
+            tag: unifi-www
+        - service: script.notify_pipup
+          data:
+            entity:
+            - media_player.living_room_shield
+            - media_player.family_room_shield
+            - media_player.master_bedroom_shield
+            title: Network
+            message: The Internet is back up
+            icon_url: local/icons/web.png
+        - service: script.notify_hass_agent
+          data:
+            entity:
+            - media_player.erebus
+            - media_player.nasya
+            title: Network
+            message: The Internet is back up
+    default:
+    - parallel:
+      - service: script.notify_mobile
+        data:
+          who: parents
+          title: Network
+          message: The Internet is down
+          icon_url: local/icons/web.png
+          tag: unifi-www
+      - service: script.notify_pipup
+        data:
+          entity:
+          - media_player.living_room_shield
+          - media_player.family_room_shield
+          - media_player.master_bedroom_shield
+          title: Network
+          message: The Internet is down
+          icon_url: local/icons/web.png
+      - service: script.notify_hass_agent
+        data:
+          entity:
+          - media_player.erebus
+          - media_player.nasya
+          title: Network
+          message: The Internet is down
+  mode: restart
 - id: '1672332473106'
   alias: ⚙️ ZWave JS UI Update
   description: Sends a notification when a new release of ZWave JS UI is released
@@ -3955,11 +3955,7 @@
       - binary_sensor.garage_entry_door_is_open
       to: 'on'
     timeout:
-      hours: 0
-      minutes: 4
-      seconds: 0
-      milliseconds: 0
-    continue_on_timeout: false
+      minutes: 2
   - parallel:
     - service: script.notify_mobile
       data:

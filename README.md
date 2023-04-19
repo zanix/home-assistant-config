@@ -546,7 +546,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>147 Automations</summary>
+<details><summary>146 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -587,8 +587,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
-- 🌐 UniFi WAN Offline
-- 🌐 UniFi WAN Online
+- 🌐 UniFi WAN Status
 - 🍽️ Dishwasher is Running
 - 🎄 XMas Lights Off (Disabled)
 - 🎄 XMas Lights On (Disabled)
