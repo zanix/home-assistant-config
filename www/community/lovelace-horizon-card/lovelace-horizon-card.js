@@ -3857,226 +3857,7 @@ var I18N = /*#__PURE__*/function () {
   return I18N;
 }();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-
-var EventUtils = /*#__PURE__*/function () {
-  function EventUtils() {
-    _classCallCheck(this, EventUtils);
-    _defineProperty(this, "eventMap", new Map());
-  }
-  _createClass(EventUtils, [{
-    key: "on",
-    value: function on(eventName, listener) {
-      var eventListeners = this.eventMap.get(eventName) || [];
-      eventListeners.push(listener);
-      this.eventMap.set(eventName, eventListeners);
-    }
-  }, {
-    key: "emit",
-    value: function emit(eventName, data) {
-      var eventListeners = this.eventMap.get(eventName) || [];
-      eventListeners.forEach(function (eventListener) {
-        eventListener(data);
-      });
-    }
-  }]);
-  return EventUtils;
-}();
-
-var _templateObject$5, _templateObject2$1, _templateObject3$1, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8;
-var HorizonCardEditorContent = /*#__PURE__*/function (_EventUtils) {
-  _inherits(HorizonCardEditorContent, _EventUtils);
-  var _super = _createSuper(HorizonCardEditorContent);
-  function HorizonCardEditorContent(config) {
-    var _this;
-    _classCallCheck(this, HorizonCardEditorContent);
-    _this = _super.call(this);
-    _defineProperty(_assertThisInitialized(_this), "config", void 0);
-    _this.config = config;
-    return _this;
-  }
-  _createClass(HorizonCardEditorContent, [{
-    key: "render",
-    value: function render() {
-      return y(_templateObject$5 || (_templateObject$5 = _taggedTemplateLiteral(["\n      <div class=\"card-config\">\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n      </div>\n    "])), this.renderTitleEditor(), this.renderLanguageEditor(), this.renderDarkModeEditor(), this.render12HourClockEditor(), this.renderFieldsEditor());
-    }
-  }, {
-    key: "onConfigChanged",
-    value: function onConfigChanged(event) {
-      this.emit('configChanged', event);
-    }
-  }, {
-    key: "renderTitleEditor",
-    value: function renderTitleEditor() {
-      var _this$config$title,
-        _this$config,
-        _this2 = this;
-      return y(_templateObject2$1 || (_templateObject2$1 = _taggedTemplateLiteral(["\n      <paper-input\n        label=\"Title (Optional)\"\n        .configValue=", "\n        .value=", "\n        @value-changed=", "\n      >\n      </paper-input>\n    "])), 'title', (_this$config$title = (_this$config = this.config) === null || _this$config === void 0 ? void 0 : _this$config.title) !== null && _this$config$title !== void 0 ? _this$config$title : '', function (event) {
-        return _this2.onConfigChanged(event);
-      });
-    }
-  }, {
-    key: "renderLanguageEditor",
-    value: function renderLanguageEditor() {
-      var _this$config$language,
-        _this$config2,
-        _this3 = this;
-      // TODO: Add language full name
-      var selectedLanguage = Object.keys(Constants.LOCALIZATION_LANGUAGES).indexOf((_this$config$language = (_this$config2 = this.config) === null || _this$config2 === void 0 ? void 0 : _this$config2.language) !== null && _this$config$language !== void 0 ? _this$config$language : '') + 1;
-      return y(_templateObject3$1 || (_templateObject3$1 = _taggedTemplateLiteral(["\n      <paper-dropdown-menu\n        label=\"Language\"\n        .configValue=", "\n        @value-changed=", "\n      >\n        <paper-listbox slot=\"dropdown-content\" selected=\"", "\">\n          <paper-item label=\"default\">Default</paper-item>\n          ", "\n        </paper-listbox>\n      </paper-dropdown-menu>\n    "])), 'language', function (event) {
-        return _this3.onConfigChanged(event);
-      }, selectedLanguage, Object.keys(Constants.LOCALIZATION_LANGUAGES).map(function (language) {
-        return y(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <paper-item label=\"", "\">", "</paper-item>\n          "])), language, language);
-      }));
-    }
-  }, {
-    key: "renderDarkModeEditor",
-    value: function renderDarkModeEditor() {
-      var _this$config$darkMode,
-        _this$config3,
-        _this4 = this;
-      var selectedDarkMode = (_this$config$darkMode = (_this$config3 = this.config) === null || _this$config3 === void 0 ? void 0 : _this$config3.darkMode) !== null && _this$config$darkMode !== void 0 ? _this$config$darkMode : 'default';
-      return y(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n      <label id=\"theme\">Theme:</label>\n      <paper-radio-group\n        aria-labelledby=\"theme\"\n        .configValue=", "\n        .selected=", "\n        @paper-radio-group-changed=", "\n      >\n        <paper-radio-button name=\"default\">Default</paper-radio-button>\n        <paper-radio-button name=\"true\">Dark</paper-radio-button>\n        <paper-radio-button name=\"false\">Light</paper-radio-button>\n      </paper-radio-group>\n    "])), 'darkMode', selectedDarkMode.toString(), function (event) {
-        return _this4.onConfigChanged(event);
-      });
-    }
-  }, {
-    key: "render12HourClockEditor",
-    value: function render12HourClockEditor() {
-      var _this$config$use12hou,
-        _this$config4,
-        _this5 = this;
-      var selectedClockMode = (_this$config$use12hou = (_this$config4 = this.config) === null || _this$config4 === void 0 ? void 0 : _this$config4.use12hourClock) !== null && _this$config$use12hou !== void 0 ? _this$config$use12hou : 'default';
-      return y(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n      <label id=\"clock\">Clock mode:</label>\n      <paper-radio-group\n        aria-labelledby=\"clock\"\n        .configValue=", "\n        .selected=", "\n        @paper-radio-group-changed=", "\n      >\n        <paper-radio-button name=\"default\">Default</paper-radio-button>\n        <paper-radio-button name=\"true\">12 hours</paper-radio-button>\n        <paper-radio-button name=\"false\">24 hourse</paper-radio-button>\n      </paper-radio-group>\n    "])), 'use12hourClock', selectedClockMode.toString(), function (event) {
-        return _this5.onConfigChanged(event);
-      });
-    }
-  }, {
-    key: "renderFieldsEditor",
-    value: function renderFieldsEditor() {
-      var _this6 = this;
-      return y(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["\n      <label>Card fields:</label>\n      <ul>\n        ", "\n      </ul>\n    "])), Object.entries(EHorizonCardI18NKeys).map(function (_ref) {
-        var _this6$config$fields$, _this6$config$fields;
-        var _ref2 = _slicedToArray(_ref, 2),
-          name = _ref2[0],
-          configValue = _ref2[1];
-        return y(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["\n            <li><ha-switch .configValue=", " .checked=", " @change=", "></ha-switch> ", "</li>\n          "])), configValue, (_this6$config$fields$ = (_this6$config$fields = _this6.config.fields) === null || _this6$config$fields === void 0 ? void 0 : _this6$config$fields[configValue]) !== null && _this6$config$fields$ !== void 0 ? _this6$config$fields$ : Constants.DEFAULT_CONFIG.fields[configValue], function (event) {
-          return _this6.onConfigChanged(event);
-        }, name);
-      }));
-    }
-  }]);
-  return HorizonCardEditorContent;
-}(EventUtils);
-
-var HorizonCardEditor = _decorate([customElement('horizon-card-editor')], function (_initialize, _LitElement) {
-  var HorizonCardEditor = /*#__PURE__*/function (_LitElement2) {
-    _inherits(HorizonCardEditor, _LitElement2);
-    var _super = _createSuper(HorizonCardEditor);
-    function HorizonCardEditor() {
-      var _this;
-      _classCallCheck(this, HorizonCardEditor);
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-      _this = _super.call.apply(_super, [this].concat(args));
-      _initialize(_assertThisInitialized(_this));
-      return _this;
-    }
-    return _createClass(HorizonCardEditor);
-  }(_LitElement);
-  return {
-    F: HorizonCardEditor,
-    d: [{
-      kind: "field",
-      "static": true,
-      key: "cardType",
-      value: function value() {
-        return 'horizon-card-editor';
-      }
-    }, {
-      kind: "field",
-      "static": true,
-      key: "CONFIG_CHANGED_EVENT",
-      value: function value() {
-        return 'config-changed';
-      }
-    }, {
-      kind: "field",
-      decorators: [property({
-        type: Object
-      })],
-      key: "hass",
-      value: void 0
-    }, {
-      kind: "field",
-      decorators: [property()],
-      key: "config",
-      value: void 0
-    }, {
-      kind: "get",
-      "static": true,
-      key: "styles",
-      value: function styles() {
-        return cardStyles;
-      }
-    }, {
-      kind: "method",
-      key: "setConfig",
-      value: function setConfig(config) {
-        this.config = config;
-      }
-    }, {
-      kind: "method",
-      key: "configChanged",
-      value: function configChanged(event) {
-        var _event$target, _ref, _event$detail$value, _event$detail, _event$target2, _event$target3;
-        var property = (_event$target = event.target) === null || _event$target === void 0 ? void 0 : _event$target.configValue;
-        var value = (_ref = (_event$detail$value = (_event$detail = event.detail) === null || _event$detail === void 0 ? void 0 : _event$detail.value) !== null && _event$detail$value !== void 0 ? _event$detail$value : (_event$target2 = event.target) === null || _event$target2 === void 0 ? void 0 : _event$target2.selected) !== null && _ref !== void 0 ? _ref : (_event$target3 = event.target) === null || _event$target3 === void 0 ? void 0 : _event$target3.checked;
-        var newConfig = _objectSpread2(_objectSpread2({}, this.config), {}, _defineProperty({}, property, value));
-
-        // Handles default or empty values by deleting the config property
-        if (value === 'default' || value === undefined || value === '') {
-          delete newConfig[property];
-        }
-
-        // Handles boolean values
-        if (value === 'true' || value === 'false') {
-          newConfig[property] = value === 'true';
-        }
-
-        // Handles fields config
-        if (Object.values(EHorizonCardI18NKeys).includes(property)) {
-          delete newConfig[property];
-          newConfig.fields = _objectSpread2(_objectSpread2({}, newConfig.fields), {}, _defineProperty({}, property, value));
-        }
-        var customEvent = new CustomEvent(HorizonCardEditor.CONFIG_CHANGED_EVENT, {
-          bubbles: true,
-          composed: true,
-          detail: {
-            config: newConfig
-          }
-        });
-        this.dispatchEvent(customEvent);
-      }
-    }, {
-      kind: "method",
-      key: "render",
-      value: function render() {
-        var _this2 = this;
-        var content = new HorizonCardEditorContent(this.config);
-        content.on('configChanged', function (event) {
-          return _this2.configChanged(event);
-        });
-        return content.render();
-      }
-    }]
-  };
-}, s);
-
-var _templateObject$4;
+var _templateObject$5;
 var HorizonErrorContent = /*#__PURE__*/function () {
   function HorizonErrorContent(config, error) {
     _classCallCheck(this, HorizonErrorContent);
@@ -4091,13 +3872,13 @@ var HorizonErrorContent = /*#__PURE__*/function () {
       var errorMessage = this.i18n.tr("errors.".concat(this.error));
       // eslint-disable-next-line no-console
       console.error(errorMessage);
-      return y(_templateObject$4 || (_templateObject$4 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-error\">\n        ", "\n      </div>\n    "])), errorMessage);
+      return y(_templateObject$5 || (_templateObject$5 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-error\">\n        ", "\n      </div>\n    "])), errorMessage);
     }
   }]);
   return HorizonErrorContent;
 }();
 
-var _templateObject$3;
+var _templateObject$4;
 var HorizonCardFooter = /*#__PURE__*/function () {
   function HorizonCardFooter(config, data) {
     _classCallCheck(this, HorizonCardFooter);
@@ -4114,13 +3895,13 @@ var HorizonCardFooter = /*#__PURE__*/function () {
     key: "render",
     value: function render() {
       var _this$fields, _this$times, _this$fields2, _this$times2, _this$fields3, _this$times3, _this$fields4, _this$data, _this$fields5, _this$data2;
-      return y(_templateObject$3 || (_templateObject$3 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-footer\">\n        <div class=\"horizon-card-field-row\">\n          ", "\n          ", "\n          ", "\n        </div>\n\n        <div class=\"horizon-card-field-row\">\n          ", "\n          ", "\n        </div>\n      </div>\n    "])), (_this$fields = this.fields) !== null && _this$fields !== void 0 && _this$fields.dawn ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Dawn, (_this$times = this.times) === null || _this$times === void 0 ? void 0 : _this$times.dawn) : HelperFunctions.nothing(), (_this$fields2 = this.fields) !== null && _this$fields2 !== void 0 && _this$fields2.noon ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Noon, (_this$times2 = this.times) === null || _this$times2 === void 0 ? void 0 : _this$times2.noon) : HelperFunctions.nothing(), (_this$fields3 = this.fields) !== null && _this$fields3 !== void 0 && _this$fields3.dusk ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Dusk, (_this$times3 = this.times) === null || _this$times3 === void 0 ? void 0 : _this$times3.dusk) : HelperFunctions.nothing(), (_this$fields4 = this.fields) !== null && _this$fields4 !== void 0 && _this$fields4.azimuth ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Azimuth, (_this$data = this.data) === null || _this$data === void 0 ? void 0 : _this$data.azimuth) : HelperFunctions.nothing(), (_this$fields5 = this.fields) !== null && _this$fields5 !== void 0 && _this$fields5.elevation ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Elevation, (_this$data2 = this.data) === null || _this$data2 === void 0 ? void 0 : _this$data2.elevation) : HelperFunctions.nothing());
+      return y(_templateObject$4 || (_templateObject$4 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-footer\">\n        <div class=\"horizon-card-field-row\">\n          ", "\n          ", "\n          ", "\n        </div>\n\n        <div class=\"horizon-card-field-row\">\n          ", "\n          ", "\n        </div>\n      </div>\n    "])), (_this$fields = this.fields) !== null && _this$fields !== void 0 && _this$fields.dawn ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Dawn, (_this$times = this.times) === null || _this$times === void 0 ? void 0 : _this$times.dawn) : HelperFunctions.nothing(), (_this$fields2 = this.fields) !== null && _this$fields2 !== void 0 && _this$fields2.noon ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Noon, (_this$times2 = this.times) === null || _this$times2 === void 0 ? void 0 : _this$times2.noon) : HelperFunctions.nothing(), (_this$fields3 = this.fields) !== null && _this$fields3 !== void 0 && _this$fields3.dusk ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Dusk, (_this$times3 = this.times) === null || _this$times3 === void 0 ? void 0 : _this$times3.dusk) : HelperFunctions.nothing(), (_this$fields4 = this.fields) !== null && _this$fields4 !== void 0 && _this$fields4.azimuth ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Azimuth, (_this$data = this.data) === null || _this$data === void 0 ? void 0 : _this$data.azimuth) : HelperFunctions.nothing(), (_this$fields5 = this.fields) !== null && _this$fields5 !== void 0 && _this$fields5.elevation ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Elevation, (_this$data2 = this.data) === null || _this$data2 === void 0 ? void 0 : _this$data2.elevation) : HelperFunctions.nothing());
     }
   }]);
   return HorizonCardFooter;
 }();
 
-var _templateObject$2;
+var _templateObject$3;
 var HorizonCardGraph = /*#__PURE__*/function () {
   function HorizonCardGraph(data) {
     var _data$sunInfo;
@@ -4138,13 +3919,13 @@ var HorizonCardGraph = /*#__PURE__*/function () {
       var viewBox = '0 0 550 150';
       // TODO: Check sun opacity
 
-      return y(_templateObject$2 || (_templateObject$2 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-graph\">\n        <svg viewBox=\"", "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n          <!-- Define gradients for use when drawing afterwards -->\n          <defs>\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">\n              <stop offset=\"0%\" class=\"sunInitialStop\" />\n              <stop offset=\"", "%\" class=\"sunMiddleStop\" />\n              <stop offset=\"", "%\" class=\"sunEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"dawnInitialStop\" />\n              <stop offset=\"", "%\" class=\"dawnMiddleStop\" />\n              <stop offset=\"", "%\" class=\"dawnEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"dayInitialStop\" />\n              <stop offset=\"", "%\" class=\"dayMiddleStop\" />\n              <stop offset=\"", "%\" class=\"dayEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"duskInitialStop\" />\n              <stop offset=\"", "%\" class=\"duskMiddleStop\" />\n              <stop offset=\"", "%\" class=\"duskEndStop\" />\n            </linearGradient>\n          </defs>\n\n          <!-- Draw path of the sun across the 'sky' -->\n          <path\n            class=\"horizon-card-sun-line\"\n            d=\"M5,146 C29,153 73,128 101,108 C276,-29 342,23 449,108 C473,123 509,150 545,146\"\n            fill=\"none\"\n            stroke=\"var(--horizon-card-lines)\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for dawn -->\n          <!-- IE: First dark blue part -->\n          <path\n            d=\"M5,146 C29,153 73,128 101,108 L 5 108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for day -->\n          <!-- IE: Main light blue part in the middle -->\n          <path\n            d=\"M101,108 C276,-29 342,23 449,108 L 104,108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for dusk -->\n          <!-- IE: Last dark blue part -->\n          <path\n            d=\"M449,108 C473,123 509,150 545,146 L 545 108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw the horizon, dawn and dusk lines (the gray horizontal/vertical lines) -->\n          <line x1=\"5\" y1=\"108\" x2=\"545\" y2=\"108\" stroke=\"var(--horizon-card-lines)\" />\n          <line x1=\"101\" y1=\"25\" x2=\"101\" y2=\"100\" stroke=\"var(--horizon-card-lines)\" />\n          <line x1=\"449\" y1=\"25\" x2=\"449\" y2=\"100\" stroke=\"var(--horizon-card-lines)\" />\n\n          <!-- Draw a circle representing the sun -->\n          <circle\n            cx=\"", "\"\n            cy=\"", "\"\n            r=\"17\"\n            opacity=\"", "\"\n            stroke=\"none\" fill=\"url(#", ")\"\n          />\n        </svg>\n      </div>\n    "])), viewBox, sunID, this.sunInfo.sunPercentOverHorizon, this.sunInfo.sunPercentOverHorizon, dawnID, this.sunInfo.dawnProgressPercent, this.sunInfo.dawnProgressPercent, dayID, this.sunInfo.dayProgressPercent, this.sunInfo.dayProgressPercent, duskID, this.sunInfo.duskProgressPercent, this.sunInfo.duskProgressPercent, dawnID, dawnID, this.sunInfo.dawnProgressPercent, dayID, dayID, this.sunInfo.dayProgressPercent, duskID, duskID, this.sunInfo.duskProgressPercent, this.sunInfo.sunPosition.x, this.sunInfo.sunPosition.y, this.sunInfo.sunPercentOverHorizon, sunID);
+      return y(_templateObject$3 || (_templateObject$3 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-graph\">\n        <svg viewBox=\"", "\" xmlns=\"http://www.w3.org/2000/svg\">\n\n          <!-- Define gradients for use when drawing afterwards -->\n          <defs>\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"0%\" y2=\"100%\">\n              <stop offset=\"0%\" class=\"sunInitialStop\" />\n              <stop offset=\"", "%\" class=\"sunMiddleStop\" />\n              <stop offset=\"", "%\" class=\"sunEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"dawnInitialStop\" />\n              <stop offset=\"", "%\" class=\"dawnMiddleStop\" />\n              <stop offset=\"", "%\" class=\"dawnEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"dayInitialStop\" />\n              <stop offset=\"", "%\" class=\"dayMiddleStop\" />\n              <stop offset=\"", "%\" class=\"dayEndStop\" />\n            </linearGradient>\n\n            <linearGradient id=\"", "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"0%\">\n              <stop offset=\"0%\" class=\"duskInitialStop\" />\n              <stop offset=\"", "%\" class=\"duskMiddleStop\" />\n              <stop offset=\"", "%\" class=\"duskEndStop\" />\n            </linearGradient>\n          </defs>\n\n          <!-- Draw path of the sun across the 'sky' -->\n          <path\n            class=\"horizon-card-sun-line\"\n            d=\"M5,146 C29,153 73,128 101,108 C276,-29 342,23 449,108 C473,123 509,150 545,146\"\n            fill=\"none\"\n            stroke=\"var(--horizon-card-lines)\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for dawn -->\n          <!-- IE: First dark blue part -->\n          <path\n            d=\"M5,146 C29,153 73,128 101,108 L 5 108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for day -->\n          <!-- IE: Main light blue part in the middle -->\n          <path\n            d=\"M101,108 C276,-29 342,23 449,108 L 104,108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw between the path of the sun and the horizon line for dusk -->\n          <!-- IE: Last dark blue part -->\n          <path\n            d=\"M449,108 C473,123 509,150 545,146 L 545 108\"\n            fill=\"url(#", ")\"\n            stroke=\"url(#", ")\"\n            opacity=\"", "\"\n          />\n\n          <!-- Draw the horizon, dawn and dusk lines (the gray horizontal/vertical lines) -->\n          <line x1=\"5\" y1=\"108\" x2=\"545\" y2=\"108\" stroke=\"var(--horizon-card-lines)\" />\n          <line x1=\"101\" y1=\"25\" x2=\"101\" y2=\"100\" stroke=\"var(--horizon-card-lines)\" />\n          <line x1=\"449\" y1=\"25\" x2=\"449\" y2=\"100\" stroke=\"var(--horizon-card-lines)\" />\n\n          <!-- Draw a circle representing the sun -->\n          <circle\n            cx=\"", "\"\n            cy=\"", "\"\n            r=\"17\"\n            opacity=\"", "\"\n            stroke=\"none\" fill=\"url(#", ")\"\n          />\n        </svg>\n      </div>\n    "])), viewBox, sunID, this.sunInfo.sunPercentOverHorizon, this.sunInfo.sunPercentOverHorizon, dawnID, this.sunInfo.dawnProgressPercent, this.sunInfo.dawnProgressPercent, dayID, this.sunInfo.dayProgressPercent, this.sunInfo.dayProgressPercent, duskID, this.sunInfo.duskProgressPercent, this.sunInfo.duskProgressPercent, dawnID, dawnID, this.sunInfo.dawnProgressPercent, dayID, dayID, this.sunInfo.dayProgressPercent, duskID, duskID, this.sunInfo.duskProgressPercent, this.sunInfo.sunPosition.x, this.sunInfo.sunPosition.y, this.sunInfo.sunPercentOverHorizon, sunID);
     }
   }]);
   return HorizonCardGraph;
 }();
 
-var _templateObject$1, _templateObject2, _templateObject3;
+var _templateObject$2, _templateObject2$1, _templateObject3$1;
 var HorizonCardHeader = /*#__PURE__*/function () {
   function HorizonCardHeader(config, data) {
     _classCallCheck(this, HorizonCardHeader);
@@ -4160,18 +3941,18 @@ var HorizonCardHeader = /*#__PURE__*/function () {
   _createClass(HorizonCardHeader, [{
     key: "render",
     value: function render() {
-      return y(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["\n      ", "\n      ", "\n    "])), this.showTitle() ? this.renderTitle() : HelperFunctions.nothing(), this.renderHeader());
+      return y(_templateObject$2 || (_templateObject$2 = _taggedTemplateLiteral(["\n      ", "\n      ", "\n    "])), this.showTitle() ? this.renderTitle() : HelperFunctions.nothing(), this.renderHeader());
     }
   }, {
     key: "renderTitle",
     value: function renderTitle() {
-      return y(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["<div class=\"horizon-card-title\">", "</div>"])), this.title);
+      return y(_templateObject2$1 || (_templateObject2$1 = _taggedTemplateLiteral(["<div class=\"horizon-card-title\">", "</div>"])), this.title);
     }
   }, {
     key: "renderHeader",
     value: function renderHeader() {
       var _this$fields, _this$times, _this$fields2, _this$times2;
-      return y(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-header\">\n        ", "\n        ", "\n      </div>\n    "])), (_this$fields = this.fields) !== null && _this$fields !== void 0 && _this$fields.sunrise ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Sunrise, (_this$times = this.times) === null || _this$times === void 0 ? void 0 : _this$times.sunrise) : HelperFunctions.nothing(), (_this$fields2 = this.fields) !== null && _this$fields2 !== void 0 && _this$fields2.sunset ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Sunset, (_this$times2 = this.times) === null || _this$times2 === void 0 ? void 0 : _this$times2.sunset) : HelperFunctions.nothing());
+      return y(_templateObject3$1 || (_templateObject3$1 = _taggedTemplateLiteral(["\n      <div class=\"horizon-card-header\">\n        ", "\n        ", "\n      </div>\n    "])), (_this$fields = this.fields) !== null && _this$fields !== void 0 && _this$fields.sunrise ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Sunrise, (_this$times = this.times) === null || _this$times === void 0 ? void 0 : _this$times.sunrise) : HelperFunctions.nothing(), (_this$fields2 = this.fields) !== null && _this$fields2 !== void 0 && _this$fields2.sunset ? HelperFunctions.renderFieldElement(this.i18n, EHorizonCardI18NKeys.Sunset, (_this$times2 = this.times) === null || _this$times2 === void 0 ? void 0 : _this$times2.sunset) : HelperFunctions.nothing());
     }
   }, {
     key: "showTitle",
@@ -4182,7 +3963,7 @@ var HorizonCardHeader = /*#__PURE__*/function () {
   return HorizonCardHeader;
 }();
 
-var _templateObject;
+var _templateObject$1;
 var HorizonCardContent = /*#__PURE__*/function () {
   function HorizonCardContent(config, data) {
     _classCallCheck(this, HorizonCardContent);
@@ -4194,7 +3975,7 @@ var HorizonCardContent = /*#__PURE__*/function () {
   _createClass(HorizonCardContent, [{
     key: "render",
     value: function render() {
-      return y(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      <ha-card>\n        <div class=\"horizon-card ", "\">\n          ", "\n          ", "\n          ", "\n        </div>\n      </ha-card>\n    "])), this.config.darkMode ? 'horizon-card-dark' : '', this.showHeader() ? this.renderHeader() : HelperFunctions.nothing(), this.renderGraph(), this.showFooter() ? this.renderFooter() : HelperFunctions.nothing());
+      return y(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["\n      <ha-card>\n        <div class=\"horizon-card ", "\">\n          ", "\n          ", "\n          ", "\n        </div>\n      </ha-card>\n    "])), this.config.darkMode ? 'horizon-card-dark' : '', this.showHeader() ? this.renderHeader() : HelperFunctions.nothing(), this.renderGraph(), this.showFooter() ? this.renderFooter() : HelperFunctions.nothing());
     }
   }, {
     key: "renderHeader",
@@ -4312,13 +4093,39 @@ var HorizonCard = _decorate([customElement('horizon-card')], function (_initiali
         }
         this.processLastHass();
       }
+
+      /**
+       * called by HASS to properly distribute card in lovelace view. It should return height
+       * of the card as a number where 1 is equivalent of 50 pixels.
+       * @see https://developers.home-assistant.io/docs/frontend/custom-ui/custom-card/#api
+       */
     }, {
       kind: "method",
-      "static": true,
-      key: "getConfigElement",
-      value: function getConfigElement() {
-        return document.createElement(HorizonCardEditor.cardType);
+      key: "getCardSize",
+      value: function getCardSize() {
+        var _this$config$fields, _this$config$fields2, _this$config$fields3, _this$config$fields4, _this$config$fields5, _this$config$fields6, _this$config$fields7;
+        var height = 4; // Smallest possible card (only graph) is roughly 200px
+
+        // Each element of card (title, header, content, footer) adds roughly 50px to the height
+        if (this.config.title && this.config.title.length > 0) {
+          height += 1;
+        }
+        if ((_this$config$fields = this.config.fields) !== null && _this$config$fields !== void 0 && _this$config$fields.sunrise || (_this$config$fields2 = this.config.fields) !== null && _this$config$fields2 !== void 0 && _this$config$fields2.sunset) {
+          height += 1;
+        }
+        if ((_this$config$fields3 = this.config.fields) !== null && _this$config$fields3 !== void 0 && _this$config$fields3.dawn || (_this$config$fields4 = this.config.fields) !== null && _this$config$fields4 !== void 0 && _this$config$fields4.noon || (_this$config$fields5 = this.config.fields) !== null && _this$config$fields5 !== void 0 && _this$config$fields5.dusk) {
+          height += 1;
+        }
+        if ((_this$config$fields6 = this.config.fields) !== null && _this$config$fields6 !== void 0 && _this$config$fields6.azimuth || (_this$config$fields7 = this.config.fields) !== null && _this$config$fields7 !== void 0 && _this$config$fields7.elevation) {
+          height += 1;
+        }
+        return height;
       }
+
+      // Visual editor disabled because it's broken, see https://developers.home-assistant.io/blog/2022/02/18/paper-elements/
+      // static getConfigElement (): HTMLElement {
+      //   return document.createElement(HorizonCardEditor.cardType)
+      // }
 
       // called by HASS whenever config changes
     }, {
@@ -4632,3 +4439,222 @@ window.customCards.push({
   preview: true,
   description: HorizonCard.cardDescription
 });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+var EventUtils = /*#__PURE__*/function () {
+  function EventUtils() {
+    _classCallCheck(this, EventUtils);
+    _defineProperty(this, "eventMap", new Map());
+  }
+  _createClass(EventUtils, [{
+    key: "on",
+    value: function on(eventName, listener) {
+      var eventListeners = this.eventMap.get(eventName) || [];
+      eventListeners.push(listener);
+      this.eventMap.set(eventName, eventListeners);
+    }
+  }, {
+    key: "emit",
+    value: function emit(eventName, data) {
+      var eventListeners = this.eventMap.get(eventName) || [];
+      eventListeners.forEach(function (eventListener) {
+        eventListener(data);
+      });
+    }
+  }]);
+  return EventUtils;
+}();
+
+var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7, _templateObject8;
+var HorizonCardEditorContent = /*#__PURE__*/function (_EventUtils) {
+  _inherits(HorizonCardEditorContent, _EventUtils);
+  var _super = _createSuper(HorizonCardEditorContent);
+  function HorizonCardEditorContent(config) {
+    var _this;
+    _classCallCheck(this, HorizonCardEditorContent);
+    _this = _super.call(this);
+    _defineProperty(_assertThisInitialized(_this), "config", void 0);
+    _this.config = config;
+    return _this;
+  }
+  _createClass(HorizonCardEditorContent, [{
+    key: "render",
+    value: function render() {
+      return y(_templateObject || (_templateObject = _taggedTemplateLiteral(["\n      <div class=\"card-config\">\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n        <div>\n          ", "\n        </div>\n      </div>\n    "])), this.renderTitleEditor(), this.renderLanguageEditor(), this.renderDarkModeEditor(), this.render12HourClockEditor(), this.renderFieldsEditor());
+    }
+  }, {
+    key: "onConfigChanged",
+    value: function onConfigChanged(event) {
+      this.emit('configChanged', event);
+    }
+  }, {
+    key: "renderTitleEditor",
+    value: function renderTitleEditor() {
+      var _this$config$title,
+        _this$config,
+        _this2 = this;
+      return y(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["\n      <paper-input\n        label=\"Title (Optional)\"\n        .configValue=", "\n        .value=", "\n        @value-changed=", "\n      >\n      </paper-input>\n    "])), 'title', (_this$config$title = (_this$config = this.config) === null || _this$config === void 0 ? void 0 : _this$config.title) !== null && _this$config$title !== void 0 ? _this$config$title : '', function (event) {
+        return _this2.onConfigChanged(event);
+      });
+    }
+  }, {
+    key: "renderLanguageEditor",
+    value: function renderLanguageEditor() {
+      var _this$config$language,
+        _this$config2,
+        _this3 = this;
+      // TODO: Add language full name
+      var selectedLanguage = Object.keys(Constants.LOCALIZATION_LANGUAGES).indexOf((_this$config$language = (_this$config2 = this.config) === null || _this$config2 === void 0 ? void 0 : _this$config2.language) !== null && _this$config$language !== void 0 ? _this$config$language : '') + 1;
+      return y(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["\n      <paper-dropdown-menu\n        label=\"Language\"\n        .configValue=", "\n        @value-changed=", "\n      >\n        <paper-listbox slot=\"dropdown-content\" selected=\"", "\">\n          <paper-item label=\"default\">Default</paper-item>\n          ", "\n        </paper-listbox>\n      </paper-dropdown-menu>\n    "])), 'language', function (event) {
+        return _this3.onConfigChanged(event);
+      }, selectedLanguage, Object.keys(Constants.LOCALIZATION_LANGUAGES).map(function (language) {
+        return y(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["\n            <paper-item label=\"", "\">", "</paper-item>\n          "])), language, language);
+      }));
+    }
+  }, {
+    key: "renderDarkModeEditor",
+    value: function renderDarkModeEditor() {
+      var _this$config$darkMode,
+        _this$config3,
+        _this4 = this;
+      var selectedDarkMode = (_this$config$darkMode = (_this$config3 = this.config) === null || _this$config3 === void 0 ? void 0 : _this$config3.darkMode) !== null && _this$config$darkMode !== void 0 ? _this$config$darkMode : 'default';
+      return y(_templateObject5 || (_templateObject5 = _taggedTemplateLiteral(["\n      <label id=\"theme\">Theme:</label>\n      <paper-radio-group\n        aria-labelledby=\"theme\"\n        .configValue=", "\n        .selected=", "\n        @paper-radio-group-changed=", "\n      >\n        <paper-radio-button name=\"default\">Default</paper-radio-button>\n        <paper-radio-button name=\"true\">Dark</paper-radio-button>\n        <paper-radio-button name=\"false\">Light</paper-radio-button>\n      </paper-radio-group>\n    "])), 'darkMode', selectedDarkMode.toString(), function (event) {
+        return _this4.onConfigChanged(event);
+      });
+    }
+  }, {
+    key: "render12HourClockEditor",
+    value: function render12HourClockEditor() {
+      var _this$config$use12hou,
+        _this$config4,
+        _this5 = this;
+      var selectedClockMode = (_this$config$use12hou = (_this$config4 = this.config) === null || _this$config4 === void 0 ? void 0 : _this$config4.use12hourClock) !== null && _this$config$use12hou !== void 0 ? _this$config$use12hou : 'default';
+      return y(_templateObject6 || (_templateObject6 = _taggedTemplateLiteral(["\n      <label id=\"clock\">Clock mode:</label>\n      <paper-radio-group\n        aria-labelledby=\"clock\"\n        .configValue=", "\n        .selected=", "\n        @paper-radio-group-changed=", "\n      >\n        <paper-radio-button name=\"default\">Default</paper-radio-button>\n        <paper-radio-button name=\"true\">12 hours</paper-radio-button>\n        <paper-radio-button name=\"false\">24 hours</paper-radio-button>\n      </paper-radio-group>\n    "])), 'use12hourClock', selectedClockMode.toString(), function (event) {
+        return _this5.onConfigChanged(event);
+      });
+    }
+  }, {
+    key: "renderFieldsEditor",
+    value: function renderFieldsEditor() {
+      var _this6 = this;
+      return y(_templateObject7 || (_templateObject7 = _taggedTemplateLiteral(["\n      <label>Card fields:</label>\n      <ul>\n        ", "\n      </ul>\n    "])), Object.entries(EHorizonCardI18NKeys).map(function (_ref) {
+        var _this6$config$fields$, _this6$config$fields;
+        var _ref2 = _slicedToArray(_ref, 2),
+          name = _ref2[0],
+          configValue = _ref2[1];
+        return y(_templateObject8 || (_templateObject8 = _taggedTemplateLiteral(["\n            <li><ha-switch .configValue=", " .checked=", " @change=", "></ha-switch> ", "</li>\n          "])), configValue, (_this6$config$fields$ = (_this6$config$fields = _this6.config.fields) === null || _this6$config$fields === void 0 ? void 0 : _this6$config$fields[configValue]) !== null && _this6$config$fields$ !== void 0 ? _this6$config$fields$ : Constants.DEFAULT_CONFIG.fields[configValue], function (event) {
+          return _this6.onConfigChanged(event);
+        }, name);
+      }));
+    }
+  }]);
+  return HorizonCardEditorContent;
+}(EventUtils);
+
+_decorate([customElement('horizon-card-editor')], function (_initialize, _LitElement) {
+  var HorizonCardEditor = /*#__PURE__*/function (_LitElement2) {
+    _inherits(HorizonCardEditor, _LitElement2);
+    var _super = _createSuper(HorizonCardEditor);
+    function HorizonCardEditor() {
+      var _this;
+      _classCallCheck(this, HorizonCardEditor);
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+      _this = _super.call.apply(_super, [this].concat(args));
+      _initialize(_assertThisInitialized(_this));
+      return _this;
+    }
+    return _createClass(HorizonCardEditor);
+  }(_LitElement);
+  return {
+    F: HorizonCardEditor,
+    d: [{
+      kind: "field",
+      "static": true,
+      key: "cardType",
+      value: function value() {
+        return 'horizon-card-editor';
+      }
+    }, {
+      kind: "field",
+      "static": true,
+      key: "CONFIG_CHANGED_EVENT",
+      value: function value() {
+        return 'config-changed';
+      }
+    }, {
+      kind: "field",
+      decorators: [property({
+        type: Object
+      })],
+      key: "hass",
+      value: void 0
+    }, {
+      kind: "field",
+      decorators: [property()],
+      key: "config",
+      value: void 0
+    }, {
+      kind: "get",
+      "static": true,
+      key: "styles",
+      value: function styles() {
+        return cardStyles;
+      }
+    }, {
+      kind: "method",
+      key: "setConfig",
+      value: function setConfig(config) {
+        this.config = config;
+      }
+    }, {
+      kind: "method",
+      key: "configChanged",
+      value: function configChanged(event) {
+        var _event$target, _ref, _event$detail$value, _event$detail, _event$target2, _event$target3;
+        var property = (_event$target = event.target) === null || _event$target === void 0 ? void 0 : _event$target.configValue;
+        var value = (_ref = (_event$detail$value = (_event$detail = event.detail) === null || _event$detail === void 0 ? void 0 : _event$detail.value) !== null && _event$detail$value !== void 0 ? _event$detail$value : (_event$target2 = event.target) === null || _event$target2 === void 0 ? void 0 : _event$target2.selected) !== null && _ref !== void 0 ? _ref : (_event$target3 = event.target) === null || _event$target3 === void 0 ? void 0 : _event$target3.checked;
+        var newConfig = _objectSpread2(_objectSpread2({}, this.config), {}, _defineProperty({}, property, value));
+
+        // Handles default or empty values by deleting the config property
+        if (value === 'default' || value === undefined || value === '') {
+          delete newConfig[property];
+        }
+
+        // Handles boolean values
+        if (value === 'true' || value === 'false') {
+          newConfig[property] = value === 'true';
+        }
+
+        // Handles fields config
+        if (Object.values(EHorizonCardI18NKeys).includes(property)) {
+          delete newConfig[property];
+          newConfig.fields = _objectSpread2(_objectSpread2({}, newConfig.fields), {}, _defineProperty({}, property, value));
+        }
+        var customEvent = new CustomEvent(HorizonCardEditor.CONFIG_CHANGED_EVENT, {
+          bubbles: true,
+          composed: true,
+          detail: {
+            config: newConfig
+          }
+        });
+        this.dispatchEvent(customEvent);
+      }
+    }, {
+      kind: "method",
+      key: "render",
+      value: function render() {
+        var _this2 = this;
+        var content = new HorizonCardEditorContent(this.config);
+        content.on('configChanged', function (event) {
+          return _this2.configChanged(event);
+        });
+        return content.render();
+      }
+    }]
+  };
+}, s);

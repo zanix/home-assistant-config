@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **1955 total entities**,
-including **951 sensors**.
+This Home Assistant install has approximately **2013 total entities**,
+including **989 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -350,7 +350,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v5.0.0-beta.1]
+### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v5.0.0]
 
 A Lovelace card for Frigate in Home Assistant
 
@@ -362,7 +362,7 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
-### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v0.7.2]
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v0.9.0]
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
@@ -390,7 +390,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.7]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.8]
 
 Replace input_number sliders with plus and minus buttons
 
@@ -720,7 +720,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.4.5-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.4.6-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
