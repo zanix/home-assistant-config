@@ -7,13 +7,13 @@
 #
 sensor:
   - name: Low Battery Devices
-    icon: 'mdi:battery-{{ iif(this.state | int == 0, "check", "alert") }}'
+    icon: 'mdi:battery-{{ iif(this.state | int(default=0) == 0, "check", "alert") }}'
     state: >-
       {% set threshold = 30 %}
       {{ states.sensor
         | reject('in', ['unknown', 'unavailable', 'undefined'])
         | rejectattr('state', 'in', ['unknown', 'unavailable', 'undefined'])
-        | rejectattr('entity_id', 'in', this.attributes.excluded_entities)
+        | rejectattr('entity_id', 'in', this.attributes.get('excluded_entities', []))
         | rejectattr('attributes.device_class', 'undefined')
         | selectattr('attributes.device_class', '==', 'battery')
         | map(attribute='state')
@@ -39,7 +39,7 @@ sensor:
         {% set devices = states.sensor
           | reject('in', ['unknown', 'unavailable', 'undefined'])
           | rejectattr('state', 'in', ['unknown', 'unavailable', 'undefined'])
-          | rejectattr('entity_id', 'in', this.attributes.excluded_entities)
+          | rejectattr('entity_id', 'in', this.attributes.get('excluded_entities', []))
           | rejectattr('attributes.device_class', 'undefined')
           | selectattr('attributes.device_class', '==', 'battery')
           | list
