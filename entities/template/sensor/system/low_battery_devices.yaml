@@ -7,26 +7,13 @@
 #
 sensor:
   - name: Low Battery Devices
-    icon: >-
-      {% if is_state('sensor.low_battery_devices', '0') %}
-        mdi:battery-check
-      {% else %}
-        mdi:battery-alert
-      {% endif %}
+    icon: 'mdi:battery-{{ iif(this.state | int == 0, "check", "alert") }}'
     state: >-
       {% set threshold = 30 %}
-      {% set ignore_entities = [
-        'sensor.galaxy_s21_battery_level',
-        'sensor.pixel_7_battery_level',
-        'sensor.ipad_josh_battery_level',
-        'sensor.quest_battery_level',
-        'sensor.load_percentage',
-        'sensor.battery_state_of_charge'
-      ] %}
       {{ states.sensor
         | reject('in', ['unknown', 'unavailable', 'undefined'])
         | rejectattr('state', 'in', ['unknown', 'unavailable', 'undefined'])
-        | rejectattr('entity_id', 'in', ignore_entities)
+        | rejectattr('entity_id', 'in', this.attributes.excluded_entities)
         | rejectattr('attributes.device_class', 'undefined')
         | selectattr('attributes.device_class', '==', 'battery')
         | map(attribute='state')
@@ -37,21 +24,22 @@ sensor:
         | count
       }}
     attributes:
-      entity_id: >-
-        {% set threshold = 30 %}
-        {% set ignore_entities = [
+      excluded_entities: >-
+        {{[
           'sensor.galaxy_s21_battery_level',
           'sensor.pixel_7_battery_level',
           'sensor.ipad_josh_battery_level',
           'sensor.quest_battery_level',
           'sensor.load_percentage',
           'sensor.battery_state_of_charge'
-        ] %}
+        ]}}
+      entity_id: >-
+        {% set threshold = 30 %}
         {% set result = namespace(devices=[]) %}
         {% set devices = states.sensor
           | reject('in', ['unknown', 'unavailable', 'undefined'])
           | rejectattr('state', 'in', ['unknown', 'unavailable', 'undefined'])
-          | rejectattr('entity_id', 'in', ignore_entities)
+          | rejectattr('entity_id', 'in', this.attributes.excluded_entities)
           | rejectattr('attributes.device_class', 'undefined')
           | selectattr('attributes.device_class', '==', 'battery')
           | list
