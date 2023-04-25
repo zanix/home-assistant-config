@@ -20,7 +20,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 ## Technical Details
 
 This Home Assistant install has approximately **2013 total entities**,
-including **989 sensors**.
+including **990 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -489,6 +489,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 ### Sensor
 
+- [Aqara Door and Window Sensor](https://www.amazon.com/dp/B07D37VDM3)
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
 - [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
   flashed for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
@@ -496,7 +497,6 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
   - Bluetooth proxy
   - Car presense
   - Soft water salt level sensor
-- [Nortek/GoControl Door/Window Sensor WADWAZ-1](https://www.gocontrol.com/detail.php?productId=14)
 - [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presence of my car
 - [Vision Z-Wave Plus Recessed Door and Window Sensor](https://www.amazon.com/dp/B01JNOCQL4)
 - [Zooz 700 Series Z-Wave Plus 4-in-1 Sensor ZSE40](https://www.amazon.com/dp/B01AKSO80O)
