@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2013 total entities**,
+This Home Assistant install has approximately **2012 total entities**,
 including **990 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -198,7 +198,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>17 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.11.0]
 
@@ -231,12 +231,6 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear).
-
-### [Garbage Collection](https://github.com/bruxy70/Garbage-Collection) [v4.10.2]
-
-🗑 Custom Home Assistant sensor for scheduling garbage collection (or other regularly re-occurring events - weekly on given days, semi-weekly or monthly)
-
-Authors: [@bruxy70](https://github.com/bruxy70).
 
 ### [Generate Readme](https://github.com/custom-components/readme) [v0.5.0]
 
@@ -546,7 +540,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>144 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -625,8 +619,6 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💬 Window Left Open (Disabled)
 - 📋 [Controller] Hue Dimmer Switch
 - 📋 [Controller] Ikea 5-Button Remote
-- 📋 [Holiday in Week] Garbage Collection Adjustment
-- 📋 [Holiday in Week] Recycle Collection Adjustment
 - 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
 - 📋 [Inovelli] Family Room Switch

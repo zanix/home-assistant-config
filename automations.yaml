@@ -28,7 +28,7 @@
   - platform: event
     event_type: mobile_app_notification_action
     event_data:
-      action: recycling_collection
+      action: recycle_collection
   - platform: event
     event_type: hass_agent_notifications
     event_data:
@@ -36,12 +36,12 @@
   - platform: event
     event_type: hass_agent_notifications
     event_data:
-      action: recycling_collection
+      action: recycle_collection
   condition: []
   action:
   - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.{{ trigger.event.data.title | lower }}_collection
+      entity_id: input_boolean.{{ trigger.event.data.action }}
   - service: script.notify_mobile
     data:
       who: parents
@@ -1819,43 +1819,43 @@
   trigger:
   - platform: state
     entity_id:
-    - sensor.garbage
-    - sensor.recycling
+    - sensor.garbage_collection
+    - sensor.recycle_collection
   condition:
   - condition: template
     value_template: '{{ trigger.to_state.state | int != trigger.from_state.state |
       int }}'
   action:
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state | int == 2 }}'
-    then:
-    - service: input_boolean.turn_off
-      target:
-        entity_id: input_boolean.{{ object_id }}_collection
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state | int < 2 }}'
-    - condition: template
-      value_template: '{{ is_state("input_boolean." ~ object_id ~ "_collection", "off")
-        }}'
-    then:
-    - service: script.notify_mobile
-      data:
-        who: parents
-        title: '{{ name }}'
-        message: '{{ name }} will be picked up {{ time }}'
-        icon_url: local/icons/{{ icon }}.png
-        group: Garbage
-        tag: '{{ name | lower }}-collection'
-        url: lovelace/main
-        actions:
-        - action: '{{ name | lower }}_collection'
-          title: Can on curb
-  mode: single
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state.state | int == 2 }}'
+      sequence:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.{{ object_id }}
+    - conditions:
+      - condition: template
+        value_template: "{{ trigger.to_state.state | int < 2\n  and is_state(\"input_boolean.\"
+          ~ object_id, \"off\") }}"
+      sequence:
+      - service: script.notify_mobile
+        data:
+          who: parents
+          title: '{{ name }}'
+          message: '{{ name }} will be picked up {{ time }}'
+          icon_url: local/icons/{{ icon }}.png
+          group: Collection
+          tag: '{{ tag }}'
+          url: lovelace/main
+          actions:
+          - action: '{{ object_id }}'
+            title: Can on curb
+  mode: restart
   variables:
-    name: '{{ trigger.to_state.name }}'
+    name: '{{ trigger.to_state.name | replace(" Collection", "") }}'
     object_id: '{{ trigger.to_state.object_id }}'
+    tag: '{{ object_id | replace("_", "-") }}'
     icon: '{{ trigger.to_state.attributes.icon | replace("mdi:", "") }}'
     time: '{{ iif(trigger.to_state.state | int == 0, "today", "tomorrow", "") }}'
 - id: '1665689446961'
@@ -3075,22 +3075,6 @@
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
-- id: garbage_collection_holiday_adjustment
-  alias: "\U0001F4CB [Holiday in Week] Garbage Collection Adjustment"
-  description: Adjusts garbage collection days based on holidays
-  use_blueprint:
-    path: bruxy70/holiday_in_week.yaml
-    input:
-      garbage_collection_entity: sensor.garbage
-      holiday_entity: calendar.holidays
-- id: '1665700591941'
-  alias: "\U0001F4CB [Holiday in Week] Recycle Collection Adjustment"
-  description: Adjusts recycling collection days based on holidays
-  use_blueprint:
-    path: bruxy70/holiday_in_week.yaml
-    input:
-      garbage_collection_entity: sensor.recycling
-      holiday_entity: calendar.recycle_holiday
 - id: '1665723292840'
   alias: "\U0001F4CB [Controller] Hue Dimmer Switch"
   description: ''
@@ -4033,3 +4017,30 @@
     - media_player.living_room_shield
     - media_player.family_room_shield
     - media_player.master_bedroom_shield
+- id: '1682570311827'
+  alias: "\U0001F4C5 Garbage Collection Event Generator"
+  description: Creates collection events for the next year.
+  trigger:
+  - platform: time
+    at: 00:00:00
+  condition:
+  - condition: template
+    value_template: '{{ now().month == 12 and now().day == 1 }}'
+  action:
+  - service: script.generate_collection_dates
+    data:
+      frequency: '2'
+      pickup_day: '3'
+      name: Garbage
+      calendar: calendar.garbage_collection
+      holiday_entity: calendar.garbage_holiday
+      year: '{{ now().year + 1 }}'
+  - service: script.generate_collection_dates
+    data:
+      frequency: '0'
+      pickup_day: '2'
+      name: Recycle
+      calendar: calendar.recycle_collection
+      holiday_entity: calendar.recycle_holiday
+      year: '{{ now().year + 1 }}'
+  mode: single

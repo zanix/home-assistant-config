@@ -12,38 +12,39 @@ collection_at_curb:
       required: true
       selector:
         entity:
-          device_class: garbage_collection__schedule
+          domain: sensor
 
   variables:
-    name: '{{ states[entity].name }}'
+    name: '{{ states[entity].name | replace(" Collection", "") }}'
     object_id: '{{ states[entity].object_id }}'
+    tag: '{{ tag }}'
 
   sequence:
     - if:
         - condition: template
           value_template: '{{ states(entity) | int < 2 }}'
         - condition: template
-          value_template: '{{ is_state("input_boolean." ~ object_id ~ "_collection", "off") }}'
+          value_template: '{{ is_state("input_boolean." ~ object_id, "off") }}'
 
       then:
         - service: input_boolean.turn_on
           target:
-            entity_id: 'input_boolean.{{ object_id }}_collection'
+            entity_id: 'input_boolean.{{ object_id }}'
 
         - service: script.notify_mobile
           data:
-            who: 'parents'
-            message: 'clear_notification'
-            tag: '{{ object_id }}-collection'
+            who: parents
+            message: clear_notification
+            tag: '{{ tag }}'
 
         - service: script.notify_mobile
           data:
-            who: 'parents'
+            who: parents
             title: '{{ name }}'
             message: 'The {{ name }} can is at the curb'
             icon_url: 'local/icons/{{ states[entity].attributes.icon | replace("mdi:", "") }}.png'
-            group: 'Garbage'
-            tag: '{{ object_id }}-collection-out'
+            group: Collection
+            tag: '{{ tag }}-out'
         - service: script.notify_hass_agent
           data:
             entity:
