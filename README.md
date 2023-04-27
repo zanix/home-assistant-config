@@ -360,7 +360,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.10.1]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.11.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
