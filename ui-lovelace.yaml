@@ -1130,18 +1130,22 @@ decluttering_templates:
                   graphs:
                   - entities:
                     - entity: '[[person]]'
+                      process: "( state == \"home\" ) ? \"Home\"\n  : ( state == \"\
+                        not_home\" ) ? \"Away\"\n  : state"
                     title: Timeline
                     type: timeline
                   header: hide
                   labelAreaWidth: 0
                   labelsVisible: false
+                  stateColors:
+                    Away: rgb(57,64,70)
+                    Home: rgb(0,138,23)
                   stateTextMode: auto
                   tooltipShowDuration: true
                   tooltipSize: slim
                   type: custom:history-explorer-card
                   uiLayout:
                     selector: hide
-                    toolbar: hide
                 - cards:
                   - card_mod:
                       style:
@@ -1719,9 +1723,7 @@ views:
               action: navigate
               navigation_path: security
             type: template
-          - content: '{{ states("sensor.home_temperature") | round(1) }}
-
-              {{ state_attr("sensor.home_temperature", "unit_of_measurement") }}'
+          - content: '{{ states("sensor.home_temperature", with_unit=True) }}'
             entity: climate.home
             icon: mdi:thermostat-box
             icon_color: "{% if is_state_attr(entity, \"hvac_action\", \"heating\"\
@@ -2333,6 +2335,7 @@ views:
                 cards:
                 - card_config_version: 8
                   entity_apparent_temp: sensor.openweathermap_feels_like_temperature
+                  entity_extended: sensor.forecast
                   entity_forecast_icon: weather.openweathermap
                   entity_forecast_icon_1: weather.openweathermap
                   entity_forecast_max: sensor.openweathermap_forecast_temperature
@@ -2353,17 +2356,12 @@ views:
                   entity_visibility: sensor.openweathermap_visibility
                   entity_wind_bearing: sensor.openweathermap_wind_bearing
                   entity_wind_speed: sensor.openweathermap_wind_speed
-                  option_color_fire_danger: true
-                  option_static_icons: false
                   option_time_format: 12hour
-                  option_today_rainfall_decimals: false
-                  option_today_temperature_decimals: false
                   section_order:
                   - overview
                   - extended
                   - slots
                   - daily_forecast
-                  show_section_extended: false
                   slot_l1: forecast_max
                   slot_l2: forecast_min
                   slot_l3: wind
@@ -2542,10 +2540,13 @@ views:
                 cards:
                 - title: Allergens
                   type: custom:mushroom-title-card
-                - double_tap_action:
+                - card_mod:
+                    style: "ha-card {\n  /* Make card non-responsive to select and\
+                      \ pointer */\n  user-select: none;\n  pointer-events: none;\n\
+                      }\n"
+                  double_tap_action:
                     action: none
                   entity: sensor.allergy_index_today
-                  fill_container: false
                   hold_action:
                     action: none
                   multiline_secondary: true
@@ -6614,7 +6615,7 @@ views:
         variables:
         - name: Sliding Door
         - entity: binary_sensor.sliding_door_contact
-        - battery_entity: sensor.sliding_door_battery
+        - battery_entity: sensor.sliding_door_battery_level
         - icon: mdi:door-sliding
       - template: door_card
         type: custom:decluttering-card
@@ -6850,22 +6851,12 @@ views:
       - entity: sensor.pv_power
         icon: mdi:solar-power-variant
         type: entity
-      - content: "{%- if has_value(entity) -%}\n  {{ (states(entity) | float(default=0))\
-          \ | round(1) }}\n  {{ state_attr(entity, \"unit_of_measurement\") }}\n{%-\
-          \ endif -%}"
-        entity: sensor.grid_net_monthly
+      - entity: sensor.grid_net_monthly
         icon: mdi:power-plug
-        tap_action:
-          action: more-info
-        type: template
-      - content: '{{ iif(has_value(entity), states(entity) | float(default=0)) }}'
-        entity: sensor.month_power_cost
-        hold_action:
-          action: none
+        type: entity
+      - entity: sensor.month_power_cost
         icon: mdi:currency-usd
-        tap_action:
-          action: more-info
-        type: template
+        type: entity
       - content: '{{ iif(has_value(entity), states(entity) | int(default=0) ~ "%")
           }}'
         entity: sensor.battery_state_of_charge
@@ -6910,8 +6901,7 @@ views:
         {%- elif is_state(entity, \"summer_peak\") -%}\n  Summer Peak\n{%- elif is_state(entity,\
         \ \"winter_offpeak\") -%}\n  Winter Off-Peak\n{%- elif is_state(entity, \"\
         winter_peak\") -%}\n  Winter Peak\n{%- else -%}\n  Unknown\n{%- endif -%}"
-      secondary: '{{ states("sensor.tariff_price") }} {{ state_attr("sensor.tariff_price",
-        "unit_of_measurement") }}'
+      secondary: '{{ states("sensor.tariff_price", with_unit=True) }}'
       tap_action:
         action: more-info
       type: custom:mushroom-template-card
