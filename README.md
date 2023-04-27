@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2012 total entities**,
+This Home Assistant install has approximately **2013 total entities**,
 including **990 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -540,7 +540,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>144 Automations</summary>
+<details><summary>145 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -617,6 +617,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💬 Subaru Remote Start Expired Notification
 - 💬 Subaru Started Notification
 - 💬 Window Left Open (Disabled)
+- 📅 Garbage Collection Event Generator
 - 📋 [Controller] Hue Dimmer Switch
 - 📋 [Controller] Ikea 5-Button Remote
 - 📋 [Inovelli] Emma Switch
