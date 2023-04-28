@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2013 total entities**,
-including **990 sensors**.
+This Home Assistant install has approximately **2014 total entities**,
+including **992 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -302,7 +302,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>31 Lovelace Plugins</summary>
+<details><summary>30 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
 
@@ -411,10 +411,6 @@ A Home Assistant card for Steam integrations
 ### [Swipe Card](https://github.com/bramkragten/swipe-card) [v5.0.0]
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
-
-### [Time Picker Card](https://github.com/GeorgeSG/lovelace-time-picker-card) [v1.4.0]
-
-🕰️ Time Picker Card for Home Assistant's Lovelace UI
 
 ### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.26]
 
