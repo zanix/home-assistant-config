@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2040 total entities**,
+This Home Assistant install has approximately **2042 total entities**,
 including **993 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -33,6 +33,10 @@ The airnow integration uses the AirNow web service as a source for air quality d
 ### [Android Debug Bridge](https://www.home-assistant.io/integrations/androidtv)
 
 The Android Debug Bridge integration allows you to control an Android device or Amazon Fire TV device
+
+### [Android TV Remote](https://www.home-assistant.io/integrations/androidtv_remote)
+
+The Android TV Remote integration allows you to control an Android TV device by sending commands and launching apps
 
 ### [Default Config](https://www.home-assistant.io/integrations/default_config)
 
