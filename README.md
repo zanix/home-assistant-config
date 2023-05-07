@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2014 total entities**,
-including **992 sensors**.
+This Home Assistant install has approximately **2040 total entities**,
+including **993 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -30,9 +30,13 @@ Since some integrations can only be enabled from within the UI, here is a list o
 
 The airnow integration uses the AirNow web service as a source for air quality data for your location
 
-### [Android TV](https://www.home-assistant.io/integrations/androidtv)
+### [Android Debug Bridge](https://www.home-assistant.io/integrations/androidtv)
 
-The androidtv platform allows you to control an Android TV device or Amazon Fire TV device
+The Android Debug Bridge integration allows you to control an Android device or Amazon Fire TV device
+
+### [Default Config](https://www.home-assistant.io/integrations/default_config)
+
+This integration is a meta-component and configures a default set of integrations
 
 ### [Denon AVR Network Receivers](https://www.home-assistant.io/integrations/denonavr)
 
@@ -80,6 +84,10 @@ The iqvia sensor platform collects and displays allergy, asthma and disease info
 
 The influxdb integration makes it possible to transfer all state changes to an external InfluxDB database
 
+### [Local Calendar](https://www.home-assistant.io/integrations/local_calendar)
+
+The local calendar integration allows you to create a calendar of events for powering automations
+
 ### [Joaoapps Join](https://www.home-assistant.io/integrations/joaoapps_join)
 
 The joaoapps_join integration exposes services from [Join](https://joaoapps.com/join)
@@ -120,6 +128,14 @@ The OpenWeatherMap weather integrations uses OpenWeatherMap as a source for curr
 
 The plex integration allows you to connect to a Plex Media Server
 
+### [Proximity](https://www.home-assistant.io/integrations/proximity)
+
+The proximity integration allows you to monitor the proximity of devices or persons to a particular zone and the direction of travel
+
+### [Python Scripts](https://www.home-assistant.io/integrations/python_script)
+
+This integration allows you to write Python scripts that are exposed as services
+
 ### [Rachio](https://www.home-assistant.io/integrations/rachio)
 
 The rachio platform allows you to control your Rachio irrigation system
@@ -127,6 +143,14 @@ The rachio platform allows you to control your Rachio irrigation system
 ### [Radio Browser](https://www.home-assistant.io/integrations/radio_browser)
 
 The Radio Browser integration allows you to use the directory of radio stations collected on Radio Browser
+
+### [RESTful Command](https://www.home-assistant.io/integrations/rest_command)
+
+This integration can expose regular REST commands as services
+
+### [Shell Command](https://www.home-assistant.io/integrations/shell_command)
+
+This integration can expose regular shell commands as services
 
 ### [SNMP](https://www.home-assistant.io/integrations/snmp)
 
@@ -162,17 +186,25 @@ Monitors disk usage, memory usage, CPU usage, and running processes
 
 This integration allows to control of Tasmota devices over MQTT
 
+### [Text-to-Speech (TTS)](https://www.home-assistant.io/integrations/tts)
+
+Text-to-Speech (TTS) enables Home Assistant to speak to you
+
 ### [Twinkly](https://www.home-assistant.io/integrations/twinkly)
 
 The Twinkly integration allows you to control Twinkly LED string
 
-### [Ubiquiti UniFi](https://www.home-assistant.io/integrations/unifi)
+### [UniFi Network](https://www.home-assistant.io/integrations/unifi)
 
 The unifi integration allows you to connects to a UniFi controller and gather device tracking data
 
 ### [Uptime](https://www.home-assistant.io/integrations/uptime)
 
 The uptime integration provides a sensor that stores the timestamp (date and time) when Home Assistant was last started
+
+### [Utility Meter](https://www.home-assistant.io/integrations/utility_meter)
+
+The Utility Meter integration provides functionality to track consumptions of various utilities (e.g., energy, gas, water, heating)
 
 ### [Version](https://www.home-assistant.io/integrations/version)
 
@@ -182,9 +214,17 @@ The Version integration can display the current Home Assistant Core versions
 
 The vizio integration allows you to control SmartCast-compatible TVs and sound bars
 
+### [Wake on LAN](https://www.home-assistant.io/integrations/wake_on_lan)
+
+The wake_on_lan integration enables the ability to send magic packets to Wake on LAN capable devices to turn them on
+
 ### [WLED](https://www.home-assistant.io/integrations/wled)
 
 WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to control NeoPixel (WS2812B, WS2811, SK6812, APA102, and similar) LED's
+
+### [Workday](https://www.home-assistant.io/integrations/workday)
+
+The workday binary sensor indicates whether the current day is a workday or not
 
 ### [Yamaha MusicCast](https://www.home-assistant.io/integrations/yamaha_musiccast)
 
@@ -268,7 +308,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.13]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.14]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -352,7 +392,7 @@ A Lovelace card for Frigate in Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.45]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.46]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -380,7 +420,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.7.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.7.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -392,7 +432,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.0.9.6]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.1]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -400,7 +440,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.12.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.13.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -709,7 +749,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.4.6-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.5.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
