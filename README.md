@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2044 total entities**,
+This Home Assistant install has approximately **2045 total entities**,
 including **995 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -408,7 +408,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.8.3]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.9.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -436,7 +436,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.1]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.2]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -480,7 +480,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 🐵 Dark Blue Theme for Home Assistant
 
-### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.6]
+### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.7]
 
 Dark Grey Theme for Home Assistant
 
@@ -753,7 +753,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.5.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.5.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
