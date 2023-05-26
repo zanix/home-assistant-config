@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2045 total entities**,
-including **995 sensors**.
+This Home Assistant install has approximately **2053 total entities**,
+including **1001 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -244,13 +244,13 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>17 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.11.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.12.0]
 
 Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.1]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.2]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -388,7 +388,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v5.0.0]
+### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v5.1.1]
 
 A Lovelace card for Frigate in Home Assistant
 
@@ -436,7 +436,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.2]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.3]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -444,7 +444,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.13.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.14.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -753,7 +753,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.5.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.5.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
