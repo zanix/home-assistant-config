@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2053 total entities**,
+This Home Assistant install has approximately **2054 total entities**,
 including **1001 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -254,7 +254,7 @@ Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://g
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Dahua](https://github.com/rroller/dahua) [v0.9.44]
+### [Dahua](https://github.com/rroller/dahua) [v0.9.46]
 
 Dahua Camera and Doorbell Home Assistant Integration
 
@@ -300,7 +300,7 @@ HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capa
 
 Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
-### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.4]
+### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.6]
 
 📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
 
@@ -408,7 +408,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.9.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.9.3]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -436,7 +436,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.3]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.5.1]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 

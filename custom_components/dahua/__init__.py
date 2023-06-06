@@ -9,7 +9,10 @@ import time
 
 from datetime import timedelta
 
-from aiohttp import ClientError, ClientResponseError, ClientSession, TCPConnector
+from homeassistant.components.tag import async_scan_tag
+import hashlib
+
+from aiohttp import ClientError, ClientResponseError, ClientConnectorError, ClientSession, TCPConnector
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, Config, HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady, PlatformNotReady
@@ -70,6 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await coordinator.async_config_entry_first_refresh()
 
     if not coordinator.last_update_success:
+        _LOGGER.warning("dahua async_setup_entry for init, data not ready")
         raise ConfigEntryNotReady
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
@@ -179,6 +183,16 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.exception("serverConnect - failed to close session")
 
     async def _async_update_data(self):
+        try:
+            data = await self._async_update_data_int()
+            return data
+        except Exception as ex:
+            # If we let an exception bubble up, it seems to result in self being
+            # deleted. So clean up first.
+            await self._close_session()
+            raise
+    
+    async def _async_update_data_int(self):
         """Reload the camera information"""
         data = {}
 
@@ -280,9 +294,15 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
                     await self.async_start_vto_event_listener()
 
                 self.initialized = True
+            except (ClientConnectorError, asyncio.TimeoutError) as exception:
+                _LOGGER.warning(exception)
+                # Pass the exception on up. Our caller
+                # homeassistant/helpers/update_coordinator.py:_async_refresh()
+                # gracefully handles some common errors like timeout and connection errors.
+                raise
             except Exception as exception:
                 _LOGGER.error("Failed to initialize device at %s", self._address, exc_info=exception)
-                raise PlatformNotReady("Dahua device at " + self._address + " isn't fully initialized yet")
+                raise PlatformNotReady("Dahua device at " + self._address + " isn't fully initialized yet") from exception
 
         # This is the event loop code that's called every n seconds
         try:
@@ -374,6 +394,14 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
         # This is the event code, example: VideoMotion, CrossLineDetection, BackKeyLight, PhoneCallDetect, DoorStatus, etc
         code = self.translate_event_code(event)
         event_key = self.get_event_key(code)
+
+        if code == "AccessControl":
+            card_id = event.get("Data", {}).get("CardNo", "")
+            if card_id:
+                card_id_md5 = hashlib.md5(card_id.encode()).hexdigest()
+                asyncio.run_coroutine_threadsafe(
+                    async_scan_tag(self.hass, card_id_md5, self.get_device_name()), self.hass.loop
+                ).result()
 
         listener = self._dahua_event_listeners.get(event_key)
         if listener is not None:
@@ -522,7 +550,7 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
     def is_doorbell(self) -> bool:
         """ Returns true if this is a doorbell (VTO) """
         m = self.model.upper()
-        return m.startswith("VTO") or m.startswith("DH-VTO") or m.startswith("DHI") or self.is_amcrest_doorbell()
+        return m.startswith("VTO") or m.startswith("DH-VTO") or ("NVR" not in m and m.startswith("DHI")) or self.is_amcrest_doorbell()
 
     def is_amcrest_doorbell(self) -> bool:
         """ Returns true if this is an Amcrest doorbell """
