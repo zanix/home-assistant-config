@@ -42,11 +42,15 @@
   - service: input_boolean.turn_on
     target:
       entity_id: input_boolean.{{ trigger.event.data.action }}
-  - service: script.notify_mobile
-    data:
-      who: parents
-      message: clear_notification
-      tag: '{{ trigger.event.data.tag }}'
+  - if:
+    - condition: template
+      value_template: '{{ trigger.event.data.tag != "" }}'
+    then:
+    - service: script.notify_mobile
+      data:
+        who: parents
+        message: clear_notification
+        tag: '{{ trigger.event.data.tag }}'
   - service: script.notify_mobile
     data:
       who: parents
@@ -476,6 +480,9 @@
     from: 'off'
     to: 'on'
   condition:
+  - condition: template
+    value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"] }}"
   - condition: state
     entity_id: binary_sensor.tariff_summer
     state: 'on'
@@ -511,6 +518,9 @@
     entity_id: sensor.grid_in_monthly
     above: 699
   condition:
+  - condition: template
+    value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"] }}"
   - condition: state
     entity_id: binary_sensor.tariff_summer
     state: 'on'
@@ -548,6 +558,9 @@
     from: 'off'
     to: 'on'
   condition:
+  - condition: template
+    value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"] }}"
   - condition: state
     entity_id: binary_sensor.tariff_winter
     state: 'on'
@@ -583,6 +596,9 @@
     entity_id: sensor.grid_in_monthly
     above: 999
   condition:
+  - condition: template
+    value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"] }}"
   - condition: state
     entity_id: binary_sensor.tariff_winter
     state: 'on'
@@ -1383,6 +1399,15 @@
         - media_player.family_room_speaker
         - media_player.office_speaker
         message: '{{ message }}'
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: Doorbell
+        message: '{{ message }}'
+        icon_url: local/icons/doorbell-video.png
+        camera: camera.doorbell
+        url: lovelace/security
+        group: Doorbell
     - service: script.notify_hass_agent
       data:
         entity:
@@ -1465,13 +1490,22 @@
                 media_player: '{{ repeat.item }}'
                 media_location: '{{ media_location }}'
                 volume: '{{ volume }}'
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: Doorbell
+        message: '{{ message }}'
+        icon_url: local/icons/doorbell-video.png
+        camera: camera.doorbell
+        url: lovelace/security
+        group: Doorbell
     - service: script.notify_hass_agent
       data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Doorbell
-        message: Someone rang the doorbell
+        message: '{{ message }}'
         camera: camera.doorbell
         duration: 10
     - service: script.notify_pipup
@@ -1479,7 +1513,7 @@
         entity:
         - media_player.living_room_shield
         title: Doorbell
-        message: Someone rang the doorbell
+        message: '{{ message }}'
         duration: 10
         icon_url: local/icons/doorbell-video.png
     - service: script.notify_pipup
@@ -1488,7 +1522,7 @@
         - media_player.family_room_shield
         - media_player.master_bedroom_shield
         title: Doorbell
-        message: Someone rang the doorbell
+        message: '{{ message }}'
         icon_url: local/icons/doorbell-video.png
     - if:
       - condition: state
@@ -1515,6 +1549,7 @@
   variables:
     volume: '{{ iif(is_state("binary_sensor.quiet_hours", "on"), 40, 90) }}'
     media_location: media-source://media_source/sounds/ds9_doorchime.mp3
+    message: Ring Ring!
   mode: single
 - id: '1665688313389'
   alias: "\U0001F6A6 Garage Light Switch Status"
