@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2054 total entities**,
+This Home Assistant install has approximately **2069 total entities**,
 including **1001 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -244,7 +244,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>17 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.12.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.14.0]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -312,7 +312,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.14]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.16]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -404,11 +404,11 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.11.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.12.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v1.9.3]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v2.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -428,7 +428,7 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.8]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.9]
 
 Replace input_number sliders with plus and minus buttons
 
@@ -436,7 +436,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.5.1]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.5.3]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -753,7 +753,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.5.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.6.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
