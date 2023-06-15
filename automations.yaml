@@ -1404,7 +1404,7 @@
         who: parents
         title: Doorbell
         message: '{{ message }}'
-        icon_url: local/icons/doorbell-video.png
+        icon_url: local/icons/run-fast.png
         camera: camera.doorbell
         url: lovelace/security
         group: Doorbell
@@ -2542,6 +2542,26 @@
       - media_player.athos
       - media_player.erebus
       - media_player.nasya
+  - service: homeassistant.reload_config_entry
+    data: {}
+    target:
+      device_id:
+      - 1438f43ac5ba6d51f83aee2b589c67b6
+      - 3c59c68c332419cc5d6f8502972da5ad
+      - f1255320901422c29b8a2e48e400a7a6
+      - 027bfae722581f4da8413954e096c38b
+  - parallel:
+    - service: input_boolean.turn_off
+      data: {}
+      target:
+        entity_id:
+        - input_boolean.washer
+        - input_boolean.dryer
+    - service: input_select.select_option
+      data:
+        option: 'Off'
+      target:
+        entity_id: input_select.dishwasher_status
   - service: browser_mod.notification
     data:
       message: Startup automation complete...
@@ -4054,4 +4074,70 @@
       calendar: calendar.recycle_collection
       holiday_entity: calendar.recycle_holiday
       year: '{{ now().year + 1 }}'
+  mode: single
+- id: '1686541200011'
+  alias: "\U0001F514 Doorbell Unavailable"
+  description: Notifies when the Doorbell becomes unavailable
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.doorbell_button_pressed
+    - binary_sensor.doorbell_call_no_answered
+    - binary_sensor.doorbell_human
+    - binary_sensor.doorbell_motion
+    - switch.doorbell_disarming
+    to: unavailable
+    for:
+      minutes: 1
+  condition: []
+  action:
+  - service: homeassistant.reload_config_entry
+    data: {}
+    target:
+      device_id: 93ad7cb63f64246bb54529cd026254d3
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.doorbell_button_pressed
+      from: unavailable
+    timeout:
+      minutes: 2
+  - if:
+    - condition: state
+      entity_id: binary_sensor.doorbell_button_pressed
+      state: unavailable
+    then:
+    - parallel:
+      - service: script.notify_mobile
+        data:
+          who: josh
+          title: Doorbell
+          message: The service is unavilable and needs to be reloaded
+          icon_url: local/icons/doorbell-video.png
+          url: config/integrations
+          group: Doorbell
+      - service: script.notify_hass_agent
+        data:
+          entity:
+          - media_player.erebus
+          title: Doorbell
+          message: The service is unavilable and needs to be reloaded
+          duration: 10
+    else:
+    - parallel:
+      - service: script.notify_mobile
+        data:
+          who: josh
+          title: Doorbell
+          message: The service was unavilable and was reloaded
+          icon_url: local/icons/doorbell-video.png
+          url: config/integrations
+          group: Doorbell
+      - service: script.notify_hass_agent
+        data:
+          entity:
+          - media_player.erebus
+          title: Doorbell
+          message: The service was unavilable and was reloaded
+          duration: 10
   mode: single

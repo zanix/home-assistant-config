@@ -19,7 +19,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2069 total entities**,
+This Home Assistant install has approximately **2064 total entities**,
 including **1001 sensors**.
 
 <details><summary>Stock Integrations</summary>
@@ -580,7 +580,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>145 Automations</summary>
+<details><summary>146 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -712,6 +712,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🔔 Doorbell Human
 - 🔔 Doorbell Motion or Ring
 - 🔔 Doorbell Ring
+- 🔔 Doorbell Unavailable
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Ardena] Sleep When Harmony Off

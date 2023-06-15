@@ -19,10 +19,10 @@
   The result of this needs to be converted using from_json.
 #}
 {%- macro dict_flip(my_dict) -%}
-  {%- set new = namespace(items={}) %}
-  {%- for k, v in my_dict.items() %}
-    {%- set new.items = dict(new.items, **{v:k}) %}
-  {%- endfor %}
+  {%- set new = namespace(items={}) -%}
+  {%- for k, v in my_dict.items() -%}
+    {%- set new.items = dict(new.items, **{v:k}) -%}
+  {%- endfor -%}
   {{ new.items | to_json }}
 {%- endmacro -%}
 
@@ -37,8 +37,8 @@
   Returns color based on battery level.
 #}
 {%- macro battery_color(entity) -%}
-  {% if has_value(entity) %}
-    {% set battery_level = states(entity) | int // 10 * 10 %}
+  {%- if has_value(entity) -%}
+    {%- set battery_level = states(entity) | int // 10 * 10 -%}
     {{ {
       100: "green",
       90: "green",
@@ -52,72 +52,72 @@
       10: "red",
       0: "red"
     }[battery_level] }}
-  {% else %}
+  {%- else -%}
     red
-  {% endif %}
+  {%- endif -%}
 {%- endmacro -%}
 
 {#
   Returns battery icon based on battery level.
 #}
 {%- macro battery_icon(entity) -%}
-  {% if has_value(entity) %}
-    {% set battery_level = states(entity) | int %}
-    {% if battery_level == 100 %}
+  {%- if has_value(entity) -%}
+    {%- set battery_level = states(entity) | int -%}
+    {%- if battery_level == 100 -%}
       mdi:battery
-    {% elif battery_level >= 10 %}
+    {%- elif battery_level >= 10 -%}
       mdi:battery-{{ battery_level // 10 * 10 }}
-    {% elif battery_level < 10 %}
+    {%- elif battery_level < 10 -%}
       mdi:battery-outline
-    {% endif %}
-  {% else %}
+    {%- endif -%}
+  {%- else -%}
     mdi:battery-alert-variant-outline
-  {% endif %}
+  {%- endif -%}
 {%- endmacro -%}
 
 {#
   Returns battery icon based on battery level and charge state.
 #}
 {%- macro cell_battery_icon(entity, charge, type) -%}
-  {% if has_value(entity) %}
-    {% set state = "battery" %}
-    {% if is_state(charge, "charging") %}
-      {% set state = state ~ "-charging" %}
-      {% if is_state(type, "wireless") %}
-        {% set state = state ~ "-wireless" %}
-      {% endif %}
-    {% endif %}
-    {% set battery_level = states(entity) | int %}
-    {% if battery_level == 100 %}
+  {%- if has_value(entity) -%}
+    {%- set state = "battery" -%}
+    {%- if is_state(charge, "charging") -%}
+      {%- set state = state ~ "-charging" -%}
+      {%- if is_state(type, "wireless") -%}
+        {%- set state = state ~ "-wireless" -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- set battery_level = states(entity) | int -%}
+    {%- if battery_level == 100 -%}
       mdi:{{ state }}
-    {% elif battery_level >= 10 %}
+    {%- elif battery_level >= 10 -%}
       mdi:{{ state }}-{{ battery_level // 10 * 10 }}
-    {% elif battery_level < 10 %}
+    {%- elif battery_level < 10 -%}
       mdi:{{ state }}-outline
-    {% endif %}
-  {% else %}
+    {%- endif -%}
+  {%- else -%}
     mdi:battery-alert-variant-outline
-  {% endif %}
+  {%- endif -%}
 {%- endmacro -%}
 
 {#
   Return a count of running computers.
 #}
 {%- macro computer_count() -%}
-  {% set computers = expand([
+  {{ expand([
     "binary_sensor.erebus_connected",
     "binary_sensor.nasya_connected",
     "binary_sensor.ardena_connected",
     "binary_sensor.athos_connected"
-  ]) | selectattr("state", "==", "on") | map(attribute="entity_id") | list -%}
-  {{ computers | count }}
+  ]) | selectattr("state", "==", "on") | list | count
+  }}
 {%- endmacro -%}
 
 {#
   Return last changed using change history sensor.
 #}
 {%- macro custom_timedelta(entity) -%}
-  {% set last_changed = state_attr("sensor.nominal_change_history", "changes")[entity] | as_datetime -%}
+  {%- set last_changed = state_attr("sensor.nominal_change_history", "changes")[entity] | as_datetime -%}
   {%- if last_changed < today_at() - timedelta(days=6) -%}
     More than a week ago
   {%- elif last_changed < today_at() - timedelta(days=1) -%}
@@ -133,8 +133,8 @@
   Returns media player icon based on source.
 #}
 {%- macro media_icon(entity) -%}
-  {% set app = state_attr(entity, "source") %}
-  {% set app_list = {
+  {%- set app = state_attr(entity, "source") -%}
+  {%- set app_list = {
     "com.amazon.amazonvideo.livingroom": "fab:amazon",
     "com.crunchyroll.crunchyroid": "fapro:crunchyroll",
     "com.disney.datg.videoplatforms.android.watchdc": "fapro:disney_now",
@@ -146,29 +146,29 @@
     "com.spotify.tv.android": "mdi:spotify",
     "org.pbskids.video": "fapro:pbs_kids",
     "tv.twitch.android.viewer": "mdi:twitch",
-  } %}
-  {% set media_type = state_attr(entity, "media_content_type") %}
-  {% set media_type_list = {
+  } -%}
+  {%- set media_type = state_attr(entity, "media_content_type") -%}
+  {%- set media_type_list = {
     "tvshow": "mdi:television",
     "movie": "mdi:movie-open",
     "music": "mdi:music",
     "playlist": "mdi:playlist-music",
-  } %}
-  {% if media_type in media_type_list %}
+  } -%}
+  {%- if media_type in media_type_list -%}
     {{ media_type_list[media_type] }}
-  {% elif app in app_list %}
+  {%- elif app in app_list -%}
     {{ app_list[app] }}
-  {% else %}
+  {%- else -%}
     mdi:motion-play-outline
-  {% endif %}
+  {%- endif -%}
 {%- endmacro -%}
 
 {#
   Return a count of open doors or unlocked locks.
 #}
 {%- macro security_count() -%}
-  {% set security = expand("group.all_doors") | selectattr("state", "==", "on") | map(attribute="entity_id") | list -%}
-  {% set security = security + expand([
+  {%- set security = expand("group.all_doors") | selectattr("state", "==", "on") | map(attribute="entity_id") | list -%}
+  {%- set security = security + expand([
     "lock.lock_front",
     "cover.garage_door"
   ]) | selectattr("state", "in", ["open", "unlocked"]) | map(attribute="entity_id") | list -%}
@@ -179,26 +179,26 @@
   Returns wifi icon based on signal level.
 #}
 {%- macro wifi_icon(signal, connection) -%}
-  {% if not is_state(connection, "<not connected>") %}
-    {% if has_value(signal) %}
-      {% set signal_level = states(signal) | int | abs %}
-      {% if signal_level >= 100 %}
+  {%- if not is_state(connection, "<not connected>") -%}
+    {%- if has_value(signal) -%}
+      {%- set signal_level = states(signal) | int | abs -%}
+      {%- if signal_level >= 100 -%}
         mdi:wifi-strength-off
-      {% elif signal_level >= 96 %}
+      {%- elif signal_level >= 96 -%}
         mdi:wifi-strength-outline
-      {% elif signal_level >= 85 %}
+      {%- elif signal_level >= 85 -%}
         mdi:wifi-strength-1
-      {% elif signal_level >= 75 %}
+      {%- elif signal_level >= 75 -%}
         mdi:wifi-strength-2
-      {% elif signal_level >= 55 %}
+      {%- elif signal_level >= 55 -%}
         mdi:wifi-strength-3
-      {% elif signal_level >= 1 %}
+      {%- elif signal_level >= 1 -%}
         mdi:wifi-strength-4
-      {% endif %}
-    {% else %}
+      {%- endif -%}
+    {%- else -%}
       mdi:wifi-strength-off
-    {% endif %}
-  {% else %}
+    {%- endif -%}
+  {%- else -%}
     mdi:signal
-  {% endif %}
+  {%- endif -%}
 {%- endmacro -%}
