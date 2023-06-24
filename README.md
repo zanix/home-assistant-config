@@ -631,8 +631,8 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🏢 Office Night Mode
 - 💡 All Lights off when Away
 - 💡 Dim Front Lights at Night
-- 💡 Ethan Lamp off at Sunrise
-- 💡 Ethan Lamp on at Night
+- 💡 Ethan Lamp off at Sunrise (Disabled)
+- 💡 Ethan Lamp on at Night (Disabled)
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps off at Night
