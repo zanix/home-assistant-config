@@ -81,80 +81,80 @@ generate_collection_dates:
     pickup: '{{ pickup_day | int }}'
     collection_dates: >-
       {# Set up collection namespace to store dates #}
-      {%- set collection = namespace(days=[], week=[]) %}
+      {%- set collection = namespace(days=[], week=[]) -%}
 
       {# Find the first day of the first week of the year #}
-      {%- set f = (year_value ~ "-01-01") | as_datetime | as_local %}
-      {%- set first = f - timedelta(days=f.weekday()) %}
-      {%- if first.isocalendar().week > 1 %}
-        {%- set first = first + timedelta(days=7) %}
-      {%- endif %}
+      {%- set f = (year_value ~ "-01-01") | as_datetime | as_local -%}
+      {%- set first = f - timedelta(days=f.weekday()) -%}
+      {%- if first.isocalendar().week > 1 -%}
+        {%- set first = first + timedelta(days=7) -%}
+      {%- endif -%}
 
       {# Find the last week of the year #}
-      {%- set l = f.replace(year=year_value+1) %}
-      {%- if l.isocalendar().week == 1 %}
-        {%- set l = l - timedelta(days=7) %}
-      {%- endif %}
-      {%- set last_week = l.isocalendar().week %}
+      {%- set l = f.replace(year=year_value+1) -%}
+      {%- if l.isocalendar().week == 1 -%}
+        {%- set l = l - timedelta(days=7) -%}
+      {%- endif -%}
+      {%- set last_week = l.isocalendar().week -%}
 
       {# Generate range of weeks in a year #}
-      {%- set week_range = (range(0, last_week)) | list %}
+      {%- set week_range = (range(0, last_week)) | list -%}
 
       {# Set the pickup day #}
-      {%- set first = first + timedelta(days=pickup - first.weekday()) %}
+      {%- set first = first + timedelta(days=pickup - first.weekday()) -%}
 
       {# Generate collection dates #}
-      {%- for i in week_range %}
+      {%- for i in week_range -%}
         {# Skip week if enabled #}
-        {%- if i % 2 == skip %}
-          {%- continue %}
-        {%- endif %}
+        {%- if i % 2 == skip -%}
+          {%- continue -%}
+        {%- endif -%}
 
-        {%- set date = first + timedelta(days = 7 * (i)) %}
-        {%- set holiday = namespace(found=false, days=[], name="") %}
+        {%- set date = first + timedelta(days = 7 * (i)) -%}
+        {%- set holiday = namespace(found=false, days=[], name="") -%}
 
         {# Check for a holiday on or before the collection day during the week #}
-        {%- if holiday_entity is defined %}
+        {%- if holiday_entity is defined -%}
           {# Get list of holidays from calendar #}
-          {%- set holidays = states[holiday_entity].attributes.get("holidays") %}
-          {%- for i in range(date.weekday() + 1) %}
-            {% set d = (date - timedelta(days=i)) | as_timestamp | timestamp_custom("%Y-%m-%d", local=false) %}
-            {%- if d in holidays %}
-              {%- set holiday.found = true %}
-              {%- set holiday.name = holidays[d] %}
-              {%- set holiday.days = holiday.days + [d] %}
-            {%- endif %}
-          {%- endfor %}
-        {%- endif %}
+          {%- set holidays = states[holiday_entity].attributes.get("holidays") -%}
+          {%- for i in range(date.weekday() + 1) -%}
+            {%- set d = (date - timedelta(days=i)) | as_timestamp | timestamp_custom("%Y-%m-%d", local=false) -%}
+            {%- if d in holidays -%}
+              {%- set holiday.found = true -%}
+              {%- set holiday.name = holidays[d] -%}
+              {%- set holiday.days = holiday.days + [d] -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
 
-        {%- if holiday_entity is defined and holiday.found %}
+        {%- if holiday_entity is defined and holiday.found -%}
           {# Increase offset until we find a date that is not public holiday #}
-          {% set offset = namespace(days=1, found=false) %}
-          {% for _ in range(7) if not offset.found %}
-            {% set d = (date + timedelta(days=offset.days)) | as_timestamp | timestamp_custom("%Y-%m-%d", local=false) %}
-            {% if d in holiday.days %}
-              {% set offset.days = offset.days + 1 %}
-            {% else %}
-              {% set offset.found = true %}
-            {% endif %}
-          {% endfor %}
+          {%- set offset = namespace(days=1, found=false) -%}
+          {%- for _ in range(7) if not offset.found -%}
+            {%- set d = (date + timedelta(days=offset.days)) | as_timestamp | timestamp_custom("%Y-%m-%d", local=false) -%}
+            {%- if d in holiday.days -%}
+              {%- set offset.days = offset.days + 1 -%}
+            {%- else -%}
+              {%- set offset.found = true -%}
+            {%- endif -%}
+          {%- endfor -%}
           {# Set collection for offset #}
           {%- set collection.days = collection.days + [{
             "summary": name,
             "description": "Offset due to " ~ holiday.name,
             "start_date": (date + timedelta(days=offset.days)).strftime("%Y-%m-%d"),
             "end_date": (date + timedelta(days=offset.days+1)).strftime("%Y-%m-%d")
-          }] %}
-        {%- else %}
+          }] -%}
+        {%- else -%}
           {# Set collection for normal date #}
           {%- set collection.days = collection.days + [{
             "summary": name,
             "description": "",
             "start_date": date.strftime("%Y-%m-%d"),
             "end_date": (date + timedelta(days=1)).strftime("%Y-%m-%d")
-          }] %}
-        {%- endif %}
-      {%- endfor %}
+          }] -%}
+        {%- endif -%}
+      {%- endfor -%}
       {{ collection.days }}
 
   sequence:

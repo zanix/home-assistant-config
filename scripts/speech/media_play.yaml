@@ -70,7 +70,7 @@ media_play:
     # Special handling for Google devices
     is_google: '{{ "Google" in device_attr(media_player, "model") }}'
     # Define voice service so I don't have to hunt for it below
-    voice_service: 'script.say_{{ voice | default("google_cloud") }}'
+    voice_service: 'script.say_{{ voice | default("cloud") }}'
 
   sequence:
     # Actions for Google only
@@ -85,7 +85,7 @@ media_play:
           target:
             entity_id: "{{ media_player }}"
 
-        # Plays a 1 second silent track
+        # Play a 1 second silent track to mask bloop
         - service: media_player.play_media
           data:
             media_content_type: music
@@ -166,6 +166,16 @@ media_play:
               target:
                 entity_id: "{{ media_player }}"
 
+            # Play a 1 second silent track to mask bloop
+            - service: media_player.play_media
+              data:
+                media_content_type: music
+                media_content_id: media-source://media_source/sounds/1-second-of-silence.mp3
+              target:
+                entity_id: "{{ media_player }}"
+            - delay:
+                milliseconds: 200
+
         # Restore volume
         - service: media_player.volume_set
           data:
@@ -178,8 +188,6 @@ media_play:
             - condition: template
               value_template: '{{ is_google }}'
           then:
-            - delay:
-                milliseconds: 500
             # Unmute to allow other announcements
             - service: media_player.volume_mute
               data:
