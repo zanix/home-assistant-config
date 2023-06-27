@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2041 total entities**,
-including **981 sensors**.
+This Home Assistant install has approximately **2044 total entities**,
+including **983 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -318,7 +318,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.7]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.8]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -396,7 +396,7 @@ A Lovelace card for Frigate in Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.46]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.47]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -424,7 +424,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.8.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.8.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -436,7 +436,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6.1]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -456,7 +456,7 @@ A Home Assistant card for Steam integrations
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.28]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.28.1]
 
 A progress bar display for Home Assistant timers
 
