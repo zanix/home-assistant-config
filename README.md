@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2044 total entities**,
-including **983 sensors**.
+This Home Assistant install has approximately **2047 total entities**,
+including **985 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -312,13 +312,13 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.16]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.17]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.8]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.9]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -400,7 +400,7 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
-### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v0.9.0]
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v0.9.1]
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
@@ -424,11 +424,11 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v2.8.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.0.1]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.9]
+### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.11]
 
 Replace input_number sliders with plus and minus buttons
 
@@ -456,7 +456,7 @@ A Home Assistant card for Steam integrations
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.28.1]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.28.2]
 
 A progress bar display for Home Assistant timers
 
@@ -754,7 +754,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.6.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.7.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml

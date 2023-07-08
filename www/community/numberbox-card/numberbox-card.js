@@ -1,6 +1,6 @@
 ((LitElement) => {
 
-console.info('NUMBERBOX_CARD 4.9');
+console.info('NUMBERBOX_CARD 4.11');
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
 class NumberBox extends LitElement {
@@ -69,41 +69,57 @@ updated(x) {
 	}
 }
 
-
 secondaryInfo(){
-	const s=this.config.secondary_info;
+	let s=this.config.secondary_info;
 	if(!s){return;}
-	let r=s;
-	let h=s;
+	const lu='last_updated last_changed last-updated last-changed'.split(' ');
+	let ret=s;
+	if(lu.indexOf(s)>-1){
+		s='%'+this.config.entity+':'+(s.replace('-','_'));
+	}
+	let r=[];
 	if(s.indexOf('%')> -1){
+		ret='';
 		const j=s.split(' ');
-		for (let i in j) {
-			if(j[i][0]=='%'){
-				j[i]=j[i].substring(1).split(':');
+		while(j.length){
+			let t=j.shift();
+			if(t[0]=='%'){
+				t=t.substring(1).split(':');
 				let b=this._hass.states;
-				for (let d=0; d<j[i].length; d++){
-					if(b.hasOwnProperty(j[i][d])){
-						b=b[ j[i][d] ];
+				for (let d=0; d<t.length; d++){
+					if(lu.indexOf(t[d])>1){t[d]=t[d].replace('-','_');}
+					const id = t[d];
+					if(b.hasOwnProperty(id)){
+						b=b[id];
 						if(!d){
-							this.old.t[ j[i][d] ]=b.last_updated;
+							this.old.t[id]=b.last_updated;
+						}
+						if(lu.indexOf(id)> -1){
+							if(ret){
+								const div = document.createElement('div');
+								div.innerHTML=ret+' ';
+								r.push(html`${div}`);
+								ret = '';
+							}
+							r.push(html`<ha-relative-time .datetime=${new Date(b)} .hass=${this._hass} ></ha-relative-time> `);
+							b='';
+							break;
 						}
 					}
 				}
-				if( b !== Object(b) ){ j[i]=b;}
+				ret += (typeof b !== 'object')? b : t;
+			}else{
+				ret += t;
 			}
-		}
-		r = j.join(' ');
-		
-	}else{
-		const v=s.replace('-','_');
-		if(this.stateObj[v]){
-			h='';
-			r=html`<ha-relative-time .datetime=${new Date(this.stateObj[v])}
-						.hass=${this._hass} ></ha-relative-time>`;
+			ret += ' ';
 		}
 	}
-	if(h){h=r; r='';}
-	this.old.h=h;
+	ret=ret.trim();
+	if(ret){
+		const d2=document.createElement('div');
+		d2.innerHTML=ret;
+		r.push(html`${d2}`);
+	}
 	return html`<div class="secondary">${r}</div>`;
 }
 
@@ -112,10 +128,11 @@ renderNum(){
 	<section class="body">
 	<div class="main">
 		<div class="cur-box">
-		<ha-icon class="padl" 
+		<ha-icon class="padl" tabindex="0" role="button"
 			icon="${this.config.icon_plus}" 
 			@click="${() => this.setNumb(1)}" 
 			@mousedown="${() => this.Press(1)}"
+			@keydown="${(k) => this.Press(1,k)}"
 			@touchstart="${() => this.Press(1)}"
 			@mouseup="${() => this.Press(2)}"
 			@touchend="${() => this.Press(2)}"
@@ -124,10 +141,11 @@ renderNum(){
 		<div class="cur-num-box" @click="${() => this.moreInfo()}" >
 			<h3 class="cur-num ${(this.pending===false)? '':'upd'}"> ${this.niceNum()} </h3>
 		</div>
-		<ha-icon class="padr"
+		<ha-icon class="padr" tabindex="0" role="button"
 			icon="${this.config.icon_minus}"
 			@click="${() => this.setNumb(0)}"
 			@mousedown="${() => this.Press(0)}"
+			@keydown="${(k) => this.Press(0,k)}"
 			@touchstart="${() => this.Press(0)}"
 			@mouseup="${() => this.Press(2)}"
 			@touchend="${() => this.Press(2)}"
@@ -138,7 +156,12 @@ renderNum(){
 	</section>`;
 }
 
-Press(v) {
+
+
+Press(v,k) {
+	if( k && (k.keyCode == 13 || k.keyCode == 32) ){
+		this.setNumb(v); return;
+	}
 	if( this.config.speed>0 ){
 		clearInterval(this.rolling);
 		if(v<2){this.rolling = setInterval(() => this.setNumb(v), this.config.speed, this);}
@@ -487,14 +510,14 @@ render() {
 	></ha-textfield>
 </div><div class="side">
 	<ha-icon-picker
-		label="Icon Plus [mdi:plus]"
-		.value="${this.config.icon_plus}"
+		label="Icon Plus"
+		.value="${(this.config.icon_plus)?this.config.icon_plus:'mdi:plus'}"
 		.configValue=${'icon_plus'}
 		@value-changed=${this.updVal}
 	></ha-icon-picker>
 	<ha-icon-picker
-		label="Icon Minus [mdi:minus]"
-		.value="${this.config.icon_minus}"
+		label="Icon Minus"
+		.value="${(this.config.icon_minus)?this.config.icon_minus:'mdi:minus'}"
 		.configValue=${'icon_minus'}
 		@value-changed=${this.updVal}
 	></ha-icon-picker>
@@ -502,7 +525,7 @@ render() {
 <div class="side">
 	<ha-textfield
 		label="Initial [?]"
-		.value="${(this.config.initial!==undefined)?this.config.initial:''}"
+		.value="${(this.config.initial!==undefined)?this.config.initial:'?'}"
 		.configValue=${'initial'}
 		@input=${this.updVal}
 		type="number"
@@ -517,15 +540,15 @@ render() {
 </div>
 <div class="side">
 	<ha-textfield
-		label="Update Delay [1000] ms"
-		.value="${(this.config.delay!==undefined)?this.config.delay:''}"
+		label="Update Delay (ms)"
+		.value="${(this.config.delay!==undefined)?this.config.delay:'1000'}"
 		.configValue=${'delay'}
 		@input=${this.updVal}
 		type="number"
 	></ha-textfield>
 	<ha-textfield
-		label="Long press Speed [0] ms"
-		.value="${(this.config.speed!==undefined)?this.config.speed:''}"
+		label="Long press Speed (ms)"
+		.value="${(this.config.speed!==undefined)?this.config.speed:'0'}"
 		.configValue=${'speed'}
 		@input=${this.updVal}
 		type="number"
