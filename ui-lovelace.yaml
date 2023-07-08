@@ -1051,9 +1051,12 @@ decluttering_templates:
                   type: custom:mushroom-template-card
                 - subtitle: Tracking Numbers
                   type: custom:mushroom-title-card
-                - content: "{% for trk_number in state_attr(\"[[entity]]\", \"tracking_#\"\
-                    ) -%}\n  <ha-icon icon=\"mdi:package-variant-closed\"></ha-icon>\
-                    \ [{{ trk_number }}]([[url]]{{ trk_number }})\n{% endfor %}"
+                - content: "{%- set orders = state_attr(\"[[entity]]\", \"tracking_#\"\
+                    ) -%} {%- if state_attr(\"[[entity]]\", \"order\") -%}\n  {%-\
+                    \ set orders = state_attr(\"[[entity]]\", \"order\") -%}\n{%-\
+                    \ endif -%} {% for number in orders -%}\n  <ha-icon icon=\"mdi:package-variant-closed\"\
+                    ></ha-icon> [{{ number }}]({{ \"[[url]]\" | replace(\"##TRACK_ID##\"\
+                    , number) }})\n{% endfor %}"
                   type: markdown
                 type: custom:vertical-stack-in-card
               title: '[[name]] Tracking'
@@ -1280,32 +1283,24 @@ decluttering_templates:
                       \ rgba(var(--rgb-red), 0.4);\n}\n"
                   chips:
                   - content: Find Phone
+                    hold_action:
+                      action: call-service
+                      confirmation:
+                        text: Are you sure you want to ring this device?
+                      data:
+                        data:
+                          channel: alarm_stream
+                          importance: high
+                          priority: high
+                          tag: Find
+                          ttl: 0
+                        message: Ringing phone...
+                        title: Find Phone
+                      service: notify.mobile_app_[[phone_base]]
                     icon: mdi:target
                     icon_color: red
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        data:
-                          card_mod:
-                            style:
-                              ha-dialog$: "div.mdc-dialog div.mdc-dialog__actions\
-                                \ {\n  margin-bottom: 15px;\n}\n"
-                          content: Are you sure you want to ring this device?
-                          left_button: Cancel
-                          right_button: 'Yes'
-                          right_button_action:
-                            data:
-                              data:
-                                channel: alarm_stream
-                                importance: high
-                                priority: high
-                                tag: Find
-                                ttl: 0
-                              message: Ringing phone...
-                              title: Find Phone
-                            service: notify.mobile_app_[[phone_base]]
-                          title: Find Phone
-                        service: browser_mod.popup
+                      action: none;
                     type: template
                   type: custom:mushroom-chips-card
                 - card_mod:
@@ -1682,15 +1677,16 @@ decluttering_templates:
           grid-area: title
       - card_mod:
           style:
-            .: "h2 {\n  padding: 0 16px 12px;\n}\n.header {\n  --title-padding: 0;\n\
-              }\n"
+            .: "h2 {\n  transition: all 0s;\n  padding: 0 16px 12px;\n}\n.header {\n\
+              \  transition: all 0s;\n  --title-padding: 0;\n}\n"
         subtitle: '[[subtitle]]'
         type: custom:mushroom-title-card
         view_layout:
           grid-area: subtitle
       - alignment: end
         card_mod:
-          style: "ha-card {\n  transform: translateY(30%);\n}\n"
+          style: "ha-card {\n  transition: all 0s;\n  transform: translateY(30%);\n\
+            }\n"
         chips: '[[chips]]'
         type: custom:mushroom-chips-card
         view_layout:
@@ -2798,6 +2794,8 @@ views:
       conditions:
       - entity: sensor.mail_usps_mail
         state_not: '0'
+      - entity: sensor.mail_usps_mail
+        state_not: unavailable
       type: conditional
     - card:
         badge_icon: "{% if states(entity) | int > 0 %}\n  mdi:numeric-{{ states(entity)\
@@ -2822,6 +2820,8 @@ views:
       conditions:
       - entity: sensor.mail_packages_delivered
         state_not: '0'
+      - entity: sensor.mail_packages_delivered
+        state_not: unavailable
       type: conditional
     - template: package_delivery
       type: custom:decluttering-card
@@ -2830,7 +2830,7 @@ views:
       - name: USPS
       - icon: fab:usps
       - icon_color: blue
-      - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=
+      - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=##TRACK_ID##
     - template: package_delivery
       type: custom:decluttering-card
       variables:
@@ -2838,7 +2838,7 @@ views:
       - name: UPS
       - icon: fab:ups
       - icon_color: brown
-      - url: https://www.ups.com/track?loc=en_US&tracknum=
+      - url: https://www.ups.com/track?loc=en_US&tracknum=##TRACK_ID##
     - template: package_delivery
       type: custom:decluttering-card
       variables:
@@ -2846,7 +2846,7 @@ views:
       - name: FedEx
       - icon: fab:fedex
       - icon_color: purple
-      - url: https://www.fedex.com/fedextrack/?trknbr=
+      - url: https://www.fedex.com/fedextrack/?trknbr=##TRACK_ID##
     - template: package_delivery
       type: custom:decluttering-card
       variables:
@@ -2854,6 +2854,7 @@ views:
       - name: Amazon
       - icon: fab:amazon
       - icon_color: yellow
+      - url: https://www.amazon.com/gp/your-account/order-details?orderID=##TRACK_ID##
     - card:
         card_mod:
           style: "ha-card {\n  background: none;\n  box-shadow: none;\n  margin-top:\
@@ -3559,8 +3560,7 @@ views:
           icon: mdi:{{ iif(is_state(entity, "on"), "valve-open", "valve-closed") }}
           icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
           tap_action:
-            action: navigate
-            navigation_path: utility
+            action: none
           type: template
         - card_mod:
             style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n{% if is_state(config.entity,\
@@ -3570,8 +3570,7 @@ views:
           icon: mdi:{{ iif(is_state(entity, "on"), "water-alert", "water-check") }}
           icon_color: '{{ iif(is_state(entity, "on"), "red", "light-blue") }}'
           tap_action:
-            action: navigate
-            navigation_path: utility
+            action: none
           type: template
         - card_mod:
             style:
@@ -3587,8 +3586,7 @@ views:
             , \"on\") | map(attribute=\"entity_id\") | list | count %} {% if zones\
             \ > 0 %}\n  light-blue\n{% else %}\n  disabled\n{% endif %}"
           tap_action:
-            action: navigate
-            navigation_path: utility
+            action: none
           type: template
     columns: 2
     square: false
