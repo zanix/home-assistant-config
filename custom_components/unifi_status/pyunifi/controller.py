@@ -107,7 +107,7 @@ class Controller:  # pylint: disable=R0902,R0904
             raise APIError("%s controllers no longer supported" % version)
 
         if ssl_verify is False:
-            warnings.simplefilter("default", category=InsecureRequestWarning)
+            warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
         self.log.debug("Controller for %s", self.url)
         self._login()
