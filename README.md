@@ -587,7 +587,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
 - ⏯ Family Room Sound Mode
-- ⏯ Living Room Media Auto Off (Disabled)
+- ⏯ Living Room Media Auto Off
 - ⏯ Living Room Media State at Night (Disabled)
 - ⏯ Living Room Sound Mode
 - ⏯ Master Bedroom Media Auto Off

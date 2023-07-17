@@ -490,7 +490,7 @@
   description: Sets the current tariff to Summer Off-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_in_monthly
+    entity_id: sensor.grid_net_monthly
     below: 700
   - platform: state
     entity_id:
@@ -505,7 +505,7 @@
     entity_id: binary_sensor.tariff_summer
     state: 'on'
   - condition: numeric_state
-    entity_id: sensor.grid_in_monthly
+    entity_id: sensor.grid_net_monthly
     below: 700
   action:
   - service: select.select_option
@@ -533,8 +533,8 @@
   description: Sets the current tariff to Summer On-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_in_monthly
-    above: 699
+    entity_id: sensor.grid_net_monthly
+    above: 700
   condition:
   - condition: template
     value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
@@ -568,7 +568,7 @@
   description: Sets the current tariff to Winter Off-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_in_monthly
+    entity_id: sensor.grid_net_monthly
     below: 1000
   - platform: state
     entity_id:
@@ -583,7 +583,7 @@
     entity_id: binary_sensor.tariff_winter
     state: 'on'
   - condition: numeric_state
-    entity_id: sensor.grid_in_monthly
+    entity_id: sensor.grid_net_monthly
     below: 1000
   action:
   - service: select.select_option
@@ -611,8 +611,8 @@
   description: Sets the current tariff to Winter On-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_in_monthly
-    above: 999
+    entity_id: sensor.grid_net_monthly
+    above: 1000
   condition:
   - condition: template
     value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
@@ -2418,26 +2418,26 @@
   alias: ⚙️ Failed Login
   description: Sends a notification when there is a failed login
   trigger:
-  - platform: state
-    entity_id:
-    - persistent_notification.http_login
-    to: notifying
+  - platform: persistent_notification
+    update_type: added
   condition:
   - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] }}'
+    value_template: '{%- set notification = trigger.notification.message -%} {{ "Too
+      many login attempts" in notification or "invalid authentication" in notification
+      or "login attempt" in notification }}'
   action:
   - service: script.notify_mobile
     data:
       who: josh
-      title: '{{ trigger.to_state.attributes.title }}'
-      message: '{{ trigger.to_state.attributes.message }}'
+      title: '{{ trigger.notification.title }}'
+      message: '{{ trigger.notification.message }}'
       icon_url: local/icons/home-assistant.png
   - service: script.notify_hass_agent
     data:
       entity:
       - media_player.erebus
-      title: '{{ trigger.to_state.attributes.title }}'
-      message: '{{ trigger.to_state.attributes.message }}'
+      title: '{{ trigger.notification.title }}'
+      message: '{{ trigger.notification.message }}'
   mode: single
 - id: '1665696538493'
   alias: ⚙️ HACS Updates
