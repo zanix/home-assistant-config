@@ -524,6 +524,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 ### Sensor
 
 - [Aqara Door and Window Sensor](https://www.amazon.com/dp/B07D37VDM3)
+- [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
 - [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
   flashed for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
@@ -580,7 +581,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>145 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -638,10 +639,9 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💡 Living Room Lamps off at Night
 - 💡 Living Room Lamps on at Sunset
 - 💡 Turn Lights On when Arrive
-- 💧 Leak Detected
-- 💧 Leak Stopped
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
+- 💧 Water Leak Detected
 - 💬 Door Closed
 - 💬 Door Left Open
 - 💬 Door Left Open and Leaving

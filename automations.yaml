@@ -234,35 +234,53 @@
       action: turn_on_water
   condition: []
   action:
-  - service: switch.turn_on
-    target:
+  - parallel:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.water_main
+      data: {}
+    - service: script.notify_mobile
+      data:
+        who: parents
+        message: clear_notification
+        tag: water-leak
+    - service: persistent_notification.dismiss
+      data:
+        notification_id: water-leak
+  - wait_for_trigger:
+    - platform: state
       entity_id: switch.water_main
-    data: {}
-  - service: script.notify_mobile
-    data:
-      who: parents
-      title: Water Main
-      message: The water main has been turned back on after the leak was detected
-      icon_url: local/icons/water-alert.png
-      group: Water Leak
-      tag: water-leak-main-on
-  - service: script.notify_hass_agent
-    data:
-      entity:
-      - media_player.erebus
-      - media_player.nasya
-      title: Water Main
-      message: The water main has been turned back on after the leak was detected
-  - service: script.notify_pipup
-    data:
-      entity:
-      - media_player.living_room_shield
-      - media_player.family_room_shield
-      - media_player.master_bedroom_shield
-      title: Water Main
-      message: The water main has been turned back on after the leak was detected
-      icon_url: local/icons/water-alert.png
+      to: 'on'
+    timeout: 00:00:30
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon_url: local/icons/water-alert.png
+        group: Water Leak
+        tag: water-leak-main-on
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: '{{ title }}'
+        message: '{{ message }}'
+    - service: script.notify_pipup
+      data:
+        entity:
+        - media_player.living_room_shield
+        - media_player.family_room_shield
+        - media_player.master_bedroom_shield
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon_url: local/icons/water-alert.png
   mode: single
+  variables:
+    title: Water Main
+    message: The water main has been turned back on after the leak was detected.
 - id: '1665682232855'
   alias: "\U0001F5A5️ [Ardena] Power Actions"
   description: Actions to run when Ardena is on/off
@@ -2715,7 +2733,7 @@
   mode: parallel
   initial_state: false
 - id: '1665697122708'
-  alias: "\U0001F4A7 Leak Detected"
+  alias: "\U0001F4A7 Water Leak Detected"
   description: Shuts off the water main and sends a notification when a water leak
     is detected
   trigger:
@@ -2728,6 +2746,10 @@
     - binary_sensor.water_heater_leak_sensor_water_alarm_water_leak_detected
     - binary_sensor.laundry_leak_sensor_water_alarm_water_leak_detected
     - binary_sensor.water_main_water_leak_detected
+    - binary_sensor.under_bathroom_sink_water_leak
+    - binary_sensor.under_master_bathroom_left_sink_water_leak
+    - binary_sensor.under_master_bathroom_right_sink_water_leak
+    - binary_sensor.under_kitchen_sink_water_leak
     to: 'on'
   condition: []
   action:
@@ -2787,34 +2809,10 @@
   mode: single
   variables:
     title: Water Leak Detected
-    location: '{{ trigger.to_state.name | replace(" Leak Sensor", "") | replace("
-      Leak", "") | trim }}'
+    location: '{{ trigger.to_state.name | replace(" water leak", "") | replace(" Leak
+      Sensor", "") | replace(" Leak", "") | trim }}'
     message: There is a water leak in the {{ location }} and the water main has been
       shut off.
-- id: '1665697158654'
-  alias: "\U0001F4A7 Leak Stopped"
-  description: Clears notifications when the water leak is stopped
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.basement_bathroom_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.bathroom_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.fridge_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.master_bathroom_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.water_heater_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.laundry_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.water_main_water_leak_detected
-    to: 'off'
-    for:
-      minutes: 10
-  condition: []
-  action:
-  - service: script.notify_mobile
-    data:
-      who: parents
-      message: clear_notification
-      tag: water-leak
-  mode: single
 - id: '1665697614552'
   alias: "\U0001F4A7 Softener Salt Level Low"
   description: Sends a notification when the water softener salt level is low
