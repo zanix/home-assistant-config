@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2047 total entities**,
-including **985 sensors**.
+This Home Assistant install has approximately **2056 total entities**,
+including **993 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -250,7 +250,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.2.2]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -336,7 +336,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.1.1]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.2.1]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -400,7 +400,7 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
-### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v0.9.1]
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.0.0]
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
@@ -408,7 +408,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v2.0.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v3.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -424,7 +424,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.0.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.0.3]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -436,7 +436,7 @@ Replace input_number sliders with plus and minus buttons
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6.1]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6.2.1]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -754,7 +754,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.7.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.7.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml

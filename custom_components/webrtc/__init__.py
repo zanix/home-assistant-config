@@ -50,11 +50,16 @@ DASH_CAST_SCHEMA = vol.Schema(
 
 LINKS = {}  # 2 3 4
 
+# DDoS protection against requests to HLS proxy
+# streams are additionally protected by a random playlist identifier
+HLS_COOKIE = "webrtc-hls-session"
+HLS_SESSION = str(uuid.uuid4())
+
 
 async def async_setup(hass: HomeAssistantType, config: ConfigType):
     # 1. Serve lovelace card
     path = Path(__file__).parent / "www"
-    for name in ("video-rtc.js", "webrtc-camera.js"):
+    for name in ("video-rtc.js", "webrtc-camera.js", "digital-ptz.js"):
         utils.register_static_path(hass.http.app, "/webrtc/" + name, path / name)
 
     # 2. Add card to resources
@@ -68,7 +73,10 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
     # 4. Serve WebSocket API
     hass.http.register_view(WebSocketView)
 
-    # 5. Register webrtc.create_link and webrtc.dash_cast services:
+    # 5. Serve HLS proxy
+    hass.http.register_view(HLSView)
+
+    # 6. Register webrtc.create_link and webrtc.dash_cast services:
 
     async def create_link(call: ServiceCallType):
         link_id = call.data["link_id"]
@@ -157,12 +165,21 @@ async def ws_connect(hass: HomeAssistantType, params) -> str:
             params={"name": entity, "src": src},
             timeout=3,
         )
-        if r.ok:
-            src = entity
+        assert r.ok, f"Can't update URL for {entity}"
+        src = entity
 
     elif src := params.get("url"):
         if "{{" in src or "{%" in src:
             src = Template(src, hass).async_render()
+
+        session = async_get_clientsession(hass)
+        r = await session.patch(
+            urljoin(go_url, "api/streams"),
+            params={"name": src, "src": src},
+            timeout=3,
+        )
+        assert r.ok, f"Can't update URL for {src}"
+
     else:
         raise Exception("Missing url or entity")
 
@@ -201,6 +218,7 @@ class WebSocketView(HomeAssistantView):
             raise HTTPUnauthorized()
 
         ws_server = web.WebSocketResponse(autoclose=False, autoping=False)
+        ws_server.set_cookie(HLS_COOKIE, HLS_SESSION)
         await ws_server.prepare(request)
 
         try:
@@ -235,3 +253,28 @@ class WebSocketView(HomeAssistantView):
             await ws_server.send_json({"type": "error", "value": str(e)})
 
         return ws_server
+
+
+class HLSView(HomeAssistantView):
+    url = "/api/webrtc/hls/{filename}"
+    name = "api:webrtc:hls"
+    requires_auth = False
+
+    async def get(self, request: web.Request, filename: str):
+        if request.cookies.get(HLS_COOKIE) != HLS_SESSION:
+            raise HTTPUnauthorized()
+
+        if filename not in ("playlist.m3u8", "init.mp4", "segment.m4s", "segment.ts"):
+            raise HTTPNotFound()
+
+        hass: HomeAssistantType = request.app["hass"]
+        entry = hass.data[DOMAIN]
+        url = "http://localhost:1984/" if isinstance(entry, Server) else entry
+        url = urljoin(url, "api/hls/" + filename) + "?" + request.query_string
+
+        async with async_get_clientsession(hass).get(url) as r:
+            if not r.ok:
+                raise HTTPNotFound()
+
+            body = await r.read()
+            return web.Response(body=body, content_type=r.content_type)
