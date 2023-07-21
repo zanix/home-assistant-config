@@ -244,11 +244,11 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>17 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.14.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.16.1]
 
 Adaptive Lighting custom component for Home Assistant
 
-Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1).
+Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.0]
 
@@ -346,7 +346,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>30 Lovelace Plugins</summary>
+<details><summary>29 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
 
@@ -424,19 +424,15 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.0.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.0.5]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
-
-### [Number Box](https://github.com/htmltiger/numberbox-card) [v4.11]
-
-Replace input_number sliders with plus and minus buttons
 
 ### [Platinum Weather Card](https://github.com/Makin-Things/platinum-weather-card) [v1.0.5]
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6.2.1]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6.3]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
