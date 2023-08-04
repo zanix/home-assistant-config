@@ -244,7 +244,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>17 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.16.1]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.18.3]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -318,7 +318,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.9]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.10]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -432,7 +432,7 @@ Mushroom Cards - Build a beautiful dashboard easily 🍄
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.6.3]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.7]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -452,7 +452,7 @@ A Home Assistant card for Steam integrations
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
-### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.28.2]
+### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.29.1]
 
 A progress bar display for Home Assistant timers
 
@@ -750,7 +750,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.7.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.7.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
