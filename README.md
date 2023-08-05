@@ -577,7 +577,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>145 Automations</summary>
+<details><summary>146 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -611,6 +611,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ ZWave JS UI Update
 - ⚡ Power Mode Changed
 - ⚡ PVOutput
+- ⚡ SolarAssistant Not Updating
 - ⚡ Tariff Summer Off-Peak
 - ⚡ Tariff Summer Peak
 - ⚡ Tariff Winter Off-Peak
