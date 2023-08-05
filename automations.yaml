@@ -41,32 +41,26 @@
   action:
   - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.{{ trigger.event.data.action }}
-  - if:
-    - condition: template
-      value_template: '{{ trigger.event.data.tag != "" }}'
-    then:
-    - service: script.notify_mobile
-      data:
-        who: parents
-        message: clear_notification
-        tag: '{{ trigger.event.data.tag }}'
+      entity_id: input_boolean.{{ tag }}
   - service: script.notify_mobile
     data:
       who: parents
-      title: '{{ trigger.event.data.title }}'
-      message: The {{ trigger.event.data.title }} can is at the curb
+      title: '{{ title }} Collection'
+      message: The {{ title }} can is at the curb
       icon_url: '{{ trigger.event.data.icon_url }}'
       group: '{{ trigger.event.data.group }}'
-      tag: '{{ trigger.event.data.tag }}-out'
+      tag: '{{ tag }}'
   - service: script.notify_hass_agent
     data:
       entity:
       - media_player.erebus
       - media_player.nasya
-      title: '{{ trigger.event.data.title }}'
-      message: The {{ trigger.event.data.title }} can is at the curb
+      title: '{{ title }} Collection'
+      message: The {{ title }} can is at the curb
   mode: single
+  variables:
+    title: '{{ trigger.event.data.title }}'
+    tag: '{{ trigger.event.data.action }}'
 - id: '1665681528781'
   alias: ☑️ Ignore Door Alerts
   description: Ignore door open alerts when the action is pressed
@@ -1886,53 +1880,96 @@
       - action: close_garage
         title: Close
   mode: single
-- id: '1665689401522'
+- id: '1691033044070'
   alias: "\U0001F4AC Garbage Collection"
   description: Sends a notification when the garbage or recycling need to be taken
     to the curb.
   trigger:
-  - platform: state
-    entity_id:
-    - sensor.garbage_collection
-    - sensor.recycle_collection
-  condition:
-  - condition: template
-    value_template: "{{ trigger.to_state.state | int != trigger.from_state.state |
-      int\n  and not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
-      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"] }}"
+  - platform: calendar
+    event: start
+    offset: '-6:0:0'
+    entity_id: calendar.garbage_collection
+    alias: 'Garbage Collection: Tomorrow (6pm)'
+    id: garbage-tomorrow
+  - platform: calendar
+    event: start
+    offset: -0:0:0
+    entity_id: calendar.garbage_collection
+    alias: 'Garbage Collection: Today (12am)'
+    id: garbage-today
+  - platform: calendar
+    event: end
+    offset: -0:0:0
+    entity_id: calendar.garbage_collection
+    alias: 'Garbage Collection: Clear (12am)'
+    id: garbage-clear
+  - platform: calendar
+    event: start
+    offset: '-6:0:0'
+    entity_id: calendar.recycle_collection
+    alias: 'Recycle Collection: Tomorrow (6pm)'
+    id: recycle-tomorrow
+  - platform: calendar
+    event: start
+    offset: -0:0:0
+    entity_id: calendar.recycle_collection
+    alias: 'Recycle Collection: Today (12am)'
+    id: recycle-today
+  - platform: calendar
+    event: end
+    offset: -0:0:0
+    entity_id: calendar.recycle_collection
+    alias: 'Recycle Collection: Clear (12am)'
+    id: recycle-clear
+  condition: []
   action:
   - choose:
     - conditions:
+      - condition: trigger
+        id:
+        - garbage-today
+        - garbage-tomorrow
+        - recycle-today
+        - recycle-tomorrow
       - condition: template
-        value_template: '{{ trigger.to_state.state | int == 2 }}'
-      sequence:
-      - service: input_boolean.turn_off
-        target:
-          entity_id: input_boolean.{{ object_id }}
-    - conditions:
-      - condition: template
-        value_template: "{{ trigger.to_state.state | int < 2\n  and is_state(\"input_boolean.\"
-          ~ object_id, \"off\") }}"
+        value_template: '{{ is_state("input_boolean." ~ object_id, "off") }}'
       sequence:
       - service: script.notify_mobile
         data:
           who: parents
-          title: '{{ name }}'
-          message: '{{ name }} will be picked up {{ time }}'
+          title: '{{ name }} Collection'
+          message: The {{ name }} can will be picked up {{ day }}{{ description }}
           icon_url: local/icons/{{ icon }}.png
           group: Collection
           tag: '{{ tag }}'
           url: lovelace/main
           actions:
           - action: '{{ object_id }}'
-            title: Can on curb
-  mode: restart
+            title: Can is on the curb
+    - conditions:
+      - condition: trigger
+        id:
+        - garbage-clear
+        - recycle-clear
+      sequence:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.{{ object_id }}
+      - service: script.notify_mobile
+        data:
+          who: parents
+          message: clear_notification
+          tag: '{{ tag }}'
+  mode: parallel
   variables:
-    name: '{{ trigger.to_state.name | replace(" Collection", "") }}'
-    object_id: '{{ trigger.to_state.object_id }}'
-    tag: '{{ object_id | replace("_", "-") }}'
-    icon: '{{ trigger.to_state.attributes.icon | replace("mdi:", "") }}'
-    time: '{{ iif(trigger.to_state.state | int == 0, "today", "tomorrow", "") }}'
+    name: '{{ trigger.calendar_event.summary }}'
+    type: '{{ trigger.id.split("-")[0] }}'
+    day: '{{ trigger.id.split("-")[1] }}'
+    object_id: '{{ type ~ "_collection" }}'
+    tag: '{{ object_id }}'
+    icon: '{{ state_attr("calendar." ~ object_id, "icon") | replace("mdi:", "") }}'
+    description: '{%- if trigger.calendar_event.description != "" -%} ({{ trigger.calendar_event.description
+      }}){%- endif -%}'
 - id: '1665689446961'
   alias: "\U0001F4AC Potty Time"
   description: Reminder to go potty
@@ -4065,7 +4102,7 @@
     data:
       frequency: '0'
       pickup_day: '2'
-      name: Recycle
+      name: Recycling
       calendar: calendar.recycle_collection
       holiday_entity: calendar.recycle_holiday
       year: '{{ now().year + 1 }}'
