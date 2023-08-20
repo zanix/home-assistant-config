@@ -68,7 +68,7 @@
       message: The {{ title }} can is at the curb
   mode: single
   variables:
-    title: '{{ trigger.event.data.title }}'
+    title: '{{ iif(tag == "recycle_collection", "Recycling", "Garbage") }}'
     tag: '{{ trigger.event.data.action }}'
 - id: '1665681528781'
   alias: ☑️ Ignore Door Alerts
@@ -1588,63 +1588,57 @@
     entity_id:
     - cover.garage_door
     - light.garage
+    - timer.subaru_remote_start
   condition: []
   action:
   - choose:
     - conditions:
       - condition: state
-        entity_id: cover.garage_door
-        state: closed
-      - condition: state
-        entity_id: light.garage
-        state: 'off'
+        entity_id: timer.subaru_remote_start
+        state: active
       sequence:
       - service: script.inovelli_blue_led
         data:
-          target:
-            entity_id: light.garage
-    - conditions:
-      - condition: state
-        entity_id: cover.garage_door
-        state: closed
-      - condition: state
-        entity_id: light.garage
-        state: 'on'
-      sequence:
-      - service: script.inovelli_blue_led
-        data:
+          color: Blue
+          effect: Open/Close
+          level: 60
           target:
             entity_id: light.garage
     - conditions:
       - condition: state
         entity_id: cover.garage_door
         state: open
-      - condition: state
-        entity_id: light.garage
-        state: 'off'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
-          color: Red
-          effect: Pulse
-          level: 40
-          target:
+      - choose:
+        - conditions:
+          - condition: state
             entity_id: light.garage
-    - conditions:
-      - condition: state
-        entity_id: cover.garage_door
-        state: open
-      - condition: state
-        entity_id: light.garage
-        state: 'on'
-      sequence:
-      - service: script.inovelli_blue_led
-        data:
-          color: Purple
-          effect: Pulse
-          level: 40
-          target:
+            state: 'on'
+          sequence:
+          - service: script.inovelli_blue_led
+            data:
+              color: Orange
+              effect: Medium Rising
+              level: 40
+              target:
+                entity_id: light.garage
+        - conditions:
+          - condition: state
             entity_id: light.garage
+            state: 'off'
+          sequence:
+          - service: script.inovelli_blue_led
+            data:
+              color: Red
+              effect: Medium Rising
+              level: 40
+              target:
+                entity_id: light.garage
+    default:
+    - service: script.inovelli_blue_led
+      data:
+        target:
+          entity_id: light.garage
   mode: restart
 - id: '1665688406559'
   alias: "\U0001F6A6 Office Light Switch Status"
@@ -1684,6 +1678,7 @@
         data:
           color: Green
           effect: Solid
+          level: 40
           target:
             entity_id: light.office_switch
   mode: restart
@@ -2059,11 +2054,7 @@
     entity_id: binary_sensor.workday
     state: 'on'
   action:
-  - service: script.office_lights_day_mode
-    data: {}
-    enabled: false
   - service: light.turn_on
-    data: {}
     target:
       entity_id: light.office_lights
   - service: switch.turn_on
@@ -2081,12 +2072,7 @@
     entity_id: light.office_light
     state: 'on'
   action:
-  - service: script.office_lights_night_mode
-    data:
-      transition: 1800
-    enabled: false
   - service: light.turn_off
-    data: {}
     target:
       entity_id: light.office_shelf_led
   mode: single
@@ -3200,6 +3186,26 @@
       controller_entity: sensor.hue_dimmer_switch_action
       helper_last_controller_event: input_text.hue_dimmer_switch_event
       helper_double_press_delay: 400
+      action_button_on_short:
+      - service: homeassistant.turn_on
+        data: {}
+        target:
+          entity_id: light.office_desk_led
+      action_button_off_short:
+      - service: homeassistant.turn_off
+        data: {}
+        target:
+          entity_id: light.office_desk_led
+      action_button_up_short:
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id: light.office_shelf_led
+      action_button_down_short:
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.office_shelf_led
 - id: '1665723372482'
   alias: "\U0001F4CB [Controller] Ikea 5-Button Remote"
   description: ''
@@ -3318,18 +3324,33 @@
       switch: sensor.garage_action
       config_single:
       - parallel:
-        - service: script.inovelli_blue_led
-          data:
-            color: Yellow
-            effect: Chase
-            level: 40
-            duration: 3 Seconds
-            target:
-              entity_id: light.garage
         - service: cover.toggle
           data: {}
           target:
             entity_id: cover.garage_door
+        - choose:
+          - conditions:
+            - condition: state
+              entity_id: cover.garage_door
+              state: closed
+            sequence:
+            - service: script.inovelli_blue_led
+              data:
+                color: Yellow
+                effect: Fast Rising
+                level: 40
+                duration: 3 Seconds
+                target:
+                  entity_id: light.garage
+          default:
+          - service: script.inovelli_blue_led
+            data:
+              color: Yellow
+              effect: Fast Falling
+              level: 40
+              duration: 3 Seconds
+              target:
+                entity_id: light.garage
       - delay:
           seconds: 3
       - service: automation.trigger
@@ -3896,28 +3917,39 @@
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
       and not trigger.to_state.state in ["unknown", "unavailable"] }}'
   action:
-  - service: script.notify_mobile
+  - service: ecobee.set_fan_min_on_time
     data:
-      who: josh
-      title: Power Mode Changed
-      icon: local/icons/lightning-bolt.png
-      message: The power mode changed to {{ trigger.to_state.state }}
-  - service: script.notify_hass_agent
-    data:
-      entity:
-      - media_player.erebus
-      - media_player.nasya
-      title: Power Mode Changed
-      message: The power mode changed to {{ trigger.to_state.state }}
-  - service: script.notify_pipup
-    data:
-      entity:
-      - media_player.living_room_shield
-      - media_player.family_room_shield
-      - media_player.master_bedroom_shield
-      title: Power Mode Changed
-      icon: local/icons/lightning-bolt.png
-      message: The power mode changed to {{ trigger.to_state.state }}
+      entity_id: climate.ecobee
+      fan_min_on_time: 0
+    enabled: false
+  - parallel:
+    - service: persistent_notification.create
+      data:
+        notification_id: power_mode
+        title: Power Mode Changed
+        message: The power mode changed to {{ trigger.to_state.state }}
+    - service: script.notify_mobile
+      data:
+        who: josh
+        title: Power Mode Changed
+        icon_url: local/icons/lightning-bolt.png
+        message: The power mode changed to {{ trigger.to_state.state }}
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: Power Mode Changed
+        message: The power mode changed to {{ trigger.to_state.state }}
+    - service: script.notify_pipup
+      data:
+        entity:
+        - media_player.living_room_shield
+        - media_player.family_room_shield
+        - media_player.master_bedroom_shield
+        title: Power Mode Changed
+        icon_url: local/icons/lightning-bolt.png
+        message: The power mode changed to {{ trigger.to_state.state }}
+      enabled: false
   mode: single
 - id: '1677559331389'
   alias: "\U0001F5FA️ Leaving Zone"
