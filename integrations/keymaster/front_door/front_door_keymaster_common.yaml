@@ -169,6 +169,8 @@ automation:
       event_data:
         lockname: front_door
     condition:
+      - condition: template
+        value_template: "{{ trigger.event.data.action_code is undefined or trigger.event.data.code_slot == 0 }}"
       - condition: state
         entity_id: input_boolean.front_door_lock_notifications
         state: "on"
@@ -176,7 +178,7 @@ automation:
       - service: script.keymaster_front_door_manual_notify
         data_template:
           title: Front Door Lock
-          message: "{{ trigger.event.data.action_text }} {% if trigger.event.data.code_slot > 0 %}({{ trigger.event.data.code_slot_name }}){% endif %}"
+          message: "{{ trigger.event.data.action_text }}"
 
   - id: keymaster_front_door_user_notifications
     alias: "🔑 Front Door User Notifications"
@@ -190,9 +192,6 @@ automation:
         value_template: "{{ trigger.event.data.code_slot > 0 }}"
       - condition: template
         value_template: "{{ is_state('input_boolean.notify_front_door_' + trigger.event.data.code_slot | string, 'on') }}"
-      - condition: state
-        entity_id: input_boolean.front_door_lock_notifications
-        state: "off"
     action:
       - service: script.keymaster_front_door_manual_notify
         data_template:
@@ -232,9 +231,9 @@ automation:
     action:
       - service: persistent_notification.create
         data_template:
-          title: Front Door LOCK MANAGER
+          title: Front Door Lock
           message: >-
-            {{ 'You changed the PIN for Front Door code slot ' + trigger.entity_id.split('_')[-1] + '. Please enable it in order to make it active.'}}
+            {{ 'The PIN for Front Door code slot ' + trigger.entity_id.split('_')[-1] + ' was changed. Please enable it in order to make it active.'}}
       - service: input_boolean.turn_off
         data_template:
           entity_id: >-
