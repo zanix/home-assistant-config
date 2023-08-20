@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2062 total entities**,
-including **985 sensors**.
+This Home Assistant install has approximately **2115 total entities**,
+including **1045 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -37,6 +37,10 @@ The Android Debug Bridge integration allows you to control an Android device or 
 ### [Android TV Remote](https://www.home-assistant.io/integrations/androidtv_remote)
 
 The Android TV Remote integration allows you to control an Android TV device by sending commands and launching apps
+
+### [Bluetooth](https://www.home-assistant.io/integrations/bluetooth)
+
+The Bluetooth integration will detect nearby Bluetooth devices.
 
 ### [Default Config](https://www.home-assistant.io/integrations/default_config)
 
@@ -76,9 +80,9 @@ The glances integration allows you to monitor the system information provided by
 
 Google Cast integration
 
-### [HomeKit Controller](https://www.home-assistant.io/integrations/homekit_controller)
+### [HomeKit Device](https://www.home-assistant.io/integrations/homekit_controller)
 
-The HomeKit controller integration allows you to connect accessories with the "Works with HomeKit" logo
+The HomeKit Device integration allows you to connect accessories with the “Works with HomeKit” logo to Home Assistant.
 
 ### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
 
@@ -244,7 +248,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>17 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.18.3]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.19.1]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -364,7 +368,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Button Card](https://github.com/custom-cards/button-card) [v3.5.0]
+### [Button Card](https://github.com/custom-cards/button-card) [v4.1.1]
 
 ❇️ Lovelace button-card for home assistant
 
@@ -380,7 +384,7 @@ Battery state card for Home Assistant
 
 🧹 Declutter your lovelace configuration with the help of this card
 
-### [Expander Card](https://github.com/Alia5/lovelace-expander-card) [v0.0.3]
+### [Expander Card](https://github.com/Alia5/lovelace-expander-card) [v0.0.4]
 
 Expander card for HomeAssistant
 
@@ -392,7 +396,7 @@ Expander card for HomeAssistant
 
 A Lovelace card for Frigate in Home Assistant
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.35]
+### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.37]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
@@ -404,7 +408,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v4.12.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.0.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
