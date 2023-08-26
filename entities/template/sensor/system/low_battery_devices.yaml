@@ -10,28 +10,27 @@ sensor:
     icon: 'mdi:battery-{{ iif(this.state | int(default=0) == 0, "check", "alert") }}'
     state: '{{ this.attributes.get("entity_id", []) | count }}'
     attributes:
-      excluded_entities: >-
-        {{[
-          'sensor.galaxy_s21_battery_level',
-          'sensor.pixel_7_battery_level',
-          'sensor.ipad_josh_battery_level',
-          'sensor.quest_battery_level',
-          'sensor.load_percentage',
-          'sensor.battery_state_of_charge'
-        ]}}
+      custom_entities: >-
+        {{ {
+          'sensor.galaxy_s21_battery_level': 0,
+          'sensor.pixel_7_battery_level': 0,
+          'sensor.quest_battery_level': 15,
+          'sensor.load_percentage': 0,
+          'sensor.battery_state_of_charge': 40
+        } }}
       entity_id: >-
         {% set threshold = 30 %}
+        {% set custom_entities = this.attributes.get('custom_entities', {}) %}
         {% set result = namespace(devices=[]) %}
         {% set devices = states.sensor
           | reject('in', ['unknown', 'unavailable', 'undefined'])
           | rejectattr('state', 'in', ['unknown', 'unavailable', 'undefined'])
-          | rejectattr('entity_id', 'in', this.attributes.get('excluded_entities', []))
           | rejectattr('attributes.device_class', 'undefined')
           | selectattr('attributes.device_class', '==', 'battery')
           | list
         %}
         {% for device in devices %}
-          {% if device.state | int(-1) <= threshold %}
+          {% if device.state | int(-1) <= custom_entities[device.entity_id] | default(threshold) %}
             {% set result.devices = result.devices + [device.entity_id] %}
           {% endif %}
         {% endfor %}

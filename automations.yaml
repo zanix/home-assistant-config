@@ -2314,8 +2314,9 @@
     entity_id: sensor.low_battery_devices
   condition:
   - condition: template
-    value_template: "{{ trigger.to_state.state | int > 0\n  and trigger.to_state.state
-      | int != trigger.from_state.state | int\n}}"
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and trigger.to_state.state | int > 0\n  and trigger.to_state.state | int !=
+      trigger.from_state.state | int\n  and sensors != ''\n}}"
   action:
   - parallel:
     - service: persistent_notification.create
@@ -2340,12 +2341,13 @@
         message: '{{ sensors }}'
   mode: single
   variables:
-    sensors: "{% set result = namespace(sensors=[]) %} {% for entity in trigger.to_state.attributes.entity_id
-      %}\n  {% set device = states.sensor[entity.split('.')[1]] %}\n  {% set name
+    sensors: "{% if not trigger.to_state in ['unknown', 'unavailable', none] %}\n
+      \ {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
+      %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set name
       = device.name | replace(': Battery level', '') | replace(' Battery level', '')
-      | replace(' Battery Level', '') %}\n  {% set result.sensors = result.sensors
-      + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n{% endfor %} {{ iif(result.sensors|count
-      > 0, '- ', '') }}{{ result.sensors | join('\\n-') }}"
+      | replace(' Battery Level', '') %}\n    {% set result.sensors = result.sensors
+      + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
+      > 0, '- ', '') }}{{ result.sensors | join('\\n-') }}\n{% endif %}"
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
