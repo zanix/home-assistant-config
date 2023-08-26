@@ -1411,83 +1411,6 @@
       - action: ignore_door_alerts
         title: Ignore
   mode: single
-- id: '1665688061009'
-  alias: "\U0001F514 Doorbell Human"
-  description: Actions when the doorbell detects a person
-  trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.doorbell_human
-    to: 'on'
-  condition:
-  - condition: state
-    entity_id: binary_sensor.front_door_is_open
-    state: 'off'
-    for:
-      minutes: 5
-  action:
-  - parallel:
-    - service: script.notify_speech
-      data:
-        media_player:
-        - media_player.living_room_speaker
-        - media_player.family_room_speaker
-        - media_player.office_speaker
-        message: '{{ message }}'
-    - service: script.notify_mobile
-      data:
-        who: parents
-        title: Doorbell
-        message: '{{ message }}'
-        icon_url: local/icons/run-fast.png
-        camera: camera.doorbell
-        url: lovelace/security
-        group: Doorbell
-    - service: script.notify_hass_agent
-      data:
-        entity:
-        - media_player.erebus
-        - media_player.nasya
-        title: Doorbell
-        message: '{{ message }}'
-        camera: camera.doorbell
-        duration: 10
-    - service: script.notify_pipup
-      data:
-        entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
-        title: Doorbell
-        message: '{{ message }}'
-        icon_url: local/icons/run-fast.png
-    - if:
-      - condition: state
-        entity_id: light.office_desk_led
-        state: 'on'
-      then:
-      - service: number.set_value
-        data:
-          value: '80'
-        target:
-          entity_id: number.office_desk_led_speed
-      - service: light.turn_on
-        target:
-          entity_id: light.office_desk_led
-        data:
-          effect: Phased
-      - delay:
-          seconds: 5
-      - service: light.turn_on
-        target:
-          entity_id: light.office_desk_led
-        data:
-          effect: Solid
-  - delay:
-      minutes: 5
-  mode: single
-  variables:
-    message: There's a person at the front door.
 - id: '1665688080710'
   alias: "\U0001F514 Doorbell Ring"
   description: Actions when the ring doorbell is pressed
@@ -1498,6 +1421,12 @@
     to: 'on'
   condition: []
   action:
+  - service: webrtc.create_link
+    data:
+      link_id: '{{ link_id }}'
+      entity: '{{ camera }}'
+      open_limit: 0
+      time_to_live: 600
   - parallel:
     - if:
       - condition: state
@@ -1524,10 +1453,11 @@
         title: Doorbell
         message: '{{ message }}'
         icon_url: local/icons/doorbell-video.png
-        camera: camera.doorbell
+        camera: '{{ camera }}'
         url: lovelace/security
         group: Doorbell
         importance: high
+        actions: '{{ actions }}'
     - service: script.notify_hass_agent
       data:
         entity:
@@ -1535,8 +1465,9 @@
         - media_player.nasya
         title: Doorbell
         message: '{{ message }}'
-        camera: camera.doorbell
-        duration: 10
+        camera: '{{ camera }}'
+        duration: 20
+        actions: '{{ actions }}'
     - service: script.notify_pipup
       data:
         entity:
@@ -1544,7 +1475,7 @@
         title: Doorbell
         message: '{{ message }}'
         duration: 20
-        camera: camera.doorbell
+        camera: '{{ camera }}'
     - service: script.notify_pipup
       data:
         entity:
@@ -1576,9 +1507,19 @@
         data:
           effect: Solid
   variables:
-    volume: '{{ iif(is_state("binary_sensor.quiet_hours", "on"), 40, 90) }}'
+    camera: camera.doorbell
+    base_url: '{{ state_attr(''sensor.config'', ''external_url'') }}'
+    link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40) }}'
+    volume: '{{ iif(is_state(''binary_sensor.quiet_hours'', ''on''), 40, 90) }}'
     media_location: media-source://media_source/sounds/ds9_doorchime.mp3
     message: Ring Ring!
+    actions:
+    - action: URI
+      title: Snapshot
+      uri: '{{ base_url }}{{ state_attr(camera, ''entity_picture'') }}'
+    - action: URI
+      title: Stream
+      uri: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
   mode: single
 - id: '1665688313389'
   alias: "\U0001F6A6 Garage Light Switch Status"
@@ -1683,14 +1624,17 @@
             entity_id: light.office_switch
   mode: restart
 - id: '1665688920005'
-  alias: "\U0001F514 Doorbell Motion or Ring"
-  description: Activity when motion is detected or rung at night
+  alias: "\U0001F514 Doorbell Object or Ring"
+  description: Activity when an object is detected or rung at night
   trigger:
   - platform: state
     entity_id:
     - binary_sensor.doorbell_ring
-    - binary_sensor.doorbell_human
     to: 'on'
+  - platform: event
+    event_type: custom_frigate_doorbell_object
+    event_data:
+      object: person
   condition:
   - condition: or
     conditions:
@@ -4238,3 +4182,358 @@
       group: Power
       url: lovelace/power
   mode: restart
+- id: '1692245318569'
+  alias: "\U0001F514 Frigate Doorbell - Object Seen"
+  description: Sends a notification when an object is detected on a camera
+  trigger:
+  - platform: mqtt
+    topic: frigate/events
+    id: frigate-event
+    payload: Doorbell/new
+    value_template: '{{ value_json[''after''][''camera''] }}/{{ value_json[''type'']
+      }}'
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: silence-doorbell
+    id: silence
+  - platform: event
+    event_type: hass_agent_notifications
+    event_data:
+      action: silence-doorbell
+    id: silence
+  action:
+  - choose:
+    - alias: Silence New Object Notifications
+      conditions:
+      - condition: trigger
+        id: silence
+      sequence:
+      - service: automation.turn_off
+        target:
+          entity_id: '{{ this.entity_id }}'
+        data:
+          stop_actions: false
+      - delay:
+          minutes: 30
+      - service: automation.turn_on
+        target:
+          entity_id: '{{ this.entity_id }}'
+    - alias: Frigate Event
+      conditions:
+      - condition: trigger
+        id: frigate-event
+      - '{{ is_state(this.entity_id, ''on'') }}'
+      - '{{ not this.attributes.last_triggered or (now() - this.attributes.last_triggered).seconds
+        > cooldown }}'
+      - '{{ not disable_times | length or not now().hour in disable_times | map(''int'')
+        | list }}'
+      sequence:
+      - variables:
+          event: '{{ trigger.payload_json }}'
+          id: '{{ trigger.payload_json[''after''][''id''] }}'
+          object: '{{ trigger.payload_json[''after''][''label''] }}'
+          label: '{{ object | title }}'
+          entered_zones: '{{ trigger.payload_json[''after''][''entered_zones''] |
+            lower }}'
+          zone_multi_filter: '{{ zones | length and zone_all and entered_zones | length
+            and zones and zones | reject(''in'', entered_zones) | list | length ==
+            0 }}'
+          title: '{{ camera_name }} ({{ label }})'
+          message: A {{ label }} {{ 'is loitering' if loitering else 'was detected'
+            }} on the {{ camera_name }} camera{% if entered_zones %} in the {{ entered_zones
+            | join(', ') | replace('_',' ') }}{% endif %}.
+          video: /api/frigate/notifications/{{ id }}/{{ camera }}/clip.mp4
+          link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40)
+            }}'
+          stream: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
+          icon: mdi:{{ 'account-outline' if label == 'Person' else 'dog' if label
+            == 'Dog' else 'cat' if label == 'Cat' else 'car' if label == 'Car' else
+            'motorbike' if label == 'Motorcycle' else 'home-assistant' }}
+          actions:
+          - action: URI
+            title: Snapshot
+            uri: '{{ base_url }}/api/frigate/notifications/{{ id }}/snapshot.jpg'
+          - action: URI
+            title: Stream
+            uri: '{{ stream }}'
+          - action: silence-{{ camera }}
+            title: Silence
+            destructive: true
+      - service: webrtc.create_link
+        data:
+          link_id: '{{ link_id }}'
+          entity: camera.{{ camera | lower }}
+          open_limit: 0
+          time_to_live: 600
+      - alias: 'Debug: set notification'
+        choose:
+        - conditions:
+          - '{{ debug }}'
+          sequence:
+          - service: persistent_notification.create
+            data:
+              title: Frigate Notification
+              message: "Info:\n  FPS: {{ fps }}\n  Frigate event Id: {{ id }}\n  Object
+                (formatted): {{ object }} ({{ label }})\nConfig:\n  Camera(formatted):
+                {{ camera }}({{ camera_name }})\n  Base URL: {{ base_url }}\n  Alert
+                once: {{ alert_once }}\n  Update thumbnails: {{ update_thumbnail }}\n
+                \ Video: {{ video }}\n  Icon: {{ icon }}\n  Cooldown: {{ cooldown
+                }}s\n  Loiter timer: {{ loiter_timer }}s\n  Title: {{ title }}\n  Message:
+                {{ message }}\n  Actions: {{ actions | tojson }}\nFilters:\n  Zones:\n
+                \   Zone filter on: {{ zones | length }}\n    Required zones: {{ zones
+                | join(', ') }}\n    All Zones on: {{ zone_all }}\n    Entered Zones:
+                {{ entered_zones }}\n    Zone Filter TEST: {{ 'PASS (Multi)' if zone_multi_filter
+                else 'PASS' if ( not zones | length or not zone_all and zones | select('in',
+                entered_zones) | list | length ) else 'FAIL (Multi)' if zone_all else
+                'FAIL' }}\n  Required objects TEST:\n    Labels: {{ labels | join(',
+                ') }}\n    TEST: {{ 'PASS' if not labels | length or object in labels
+                else 'FAIL' }}\n  Disabled times: {{ disable_times }}\n  State Filter:\n
+                \   State filter on: {{ state_only }}\n    State filter entity: {{
+                state_entity }}\n    Required states: {{ states_filter | join(', ')
+                }}\n    State Filter TEST: {{ 'PASS' if not state_only or states(state_entity)
+                in states_filter and (as_timestamp(now()) - as_timestamp(states[state_entity].last_changed))
+                | int / 60 > state_last_changed else 'FAIL' }}\n"
+      - alias: Notifications enabled for object label
+        condition: template
+        value_template: '{{ not labels | length or object in labels }}'
+      - alias: Notify on new object
+        choose:
+        - conditions:
+          - '{{ not zones | length or (not zone_all and zones | select(''in'', entered_zones)
+            | list | length > 0) or (zone_all and entered_zones | length > 0 and zones
+            | reject(''in'', entered_zones) | list | length == 0) }}'
+          - "{{ not state_only or states(state_entity) in states_filter\n  and (as_timestamp(now())
+            - as_timestamp(states[state_entity].last_changed)) | int / 60 > state_last_changed
+            }}"
+          - condition: state
+            entity_id: binary_sensor.front_door_is_open
+            for:
+              minutes: 5
+            state: 'off'
+          sequence:
+          - alias: Fire event for other automations and scripts
+            event: custom_frigate_doorbell_object
+            event_data:
+              id: '{{ id }}'
+              camera_name: '{{ camera_name }}'
+              title: '{{ title }}'
+              message: '{{ message }}'
+              object: '{{ object }}'
+              label: '{{ label }}'
+              icon: '{{ icon }}'
+              image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
+              video: '{{ video }}'
+              actions: '{{ actions }}'
+      - repeat:
+          sequence:
+          - wait_for_trigger:
+            - platform: mqtt
+              topic: frigate/events
+              payload: '{{ id }}'
+              value_template: '{{ value_json[''after''][''id''] }}'
+            timeout:
+              minutes: 2
+            continue_on_timeout: false
+          - variables:
+              event: '{{ wait.trigger.payload_json }}'
+              loitering: '{{ loiter_timer and event[''before''][''motionless_count'']
+                / fps / 60 < loiter_timer and event[''after''][''motionless_count'']
+                / fps / 60 >= loiter_timer }}'
+              new_snapshot: '{{ update_thumbnail and event[''before''][''snapshot_time'']
+                != event[''after''][''snapshot_time''] }}'
+              last_zones: '{{ event[''before''][''entered_zones''] | lower }}'
+              entered_zones: '{{ event[''after''][''entered_zones''] | lower }}'
+              zone_filter: '{{ not zones | length or zones | select(''in'', entered_zones)
+                | list | length > 0 }}'
+              zone_multi_filter: '{{ not zones | length or not zone_all or ( entered_zones
+                | list | length > 0 and zones and zones | reject(''in'', entered_zones)
+                | list | length == 0 ) }}'
+              stationary_moved: '{{ event[''after''][''position_changes''] > event[''before''][''position_changes'']
+                }}'
+              zone_only_changed: '{{ zones | length and (entered_zones | length >
+                0 and not last_zones | length) }}'
+              entered_zones_changed: '{{ zones | length > 0 and (zones | select(''in'',
+                entered_zones) | list | length > 0 and not zones | select(''in'',
+                last_zones) | list | length) }}'
+              state_true: "{{ not state_only or states(state_entity) in states_filter\n
+                \ and (as_timestamp(now()) - as_timestamp(states[state_entity].last_changed))
+                | int / 60 > state_last_changed }}"
+              sub_label: '{{ event[''after''][''sub_label''] }}'
+              sub_label_changed: '{{ sub_label != event[''before''][''sub_label'']
+                }}'
+              update: '{{ alert_once or (new_snapshot and not loitering and not zone_only_changed
+                and not entered_zones_changed and not sub_label_changed) }}'
+              title: "{% if sub_label %}\n  {{ title | replace('A Person', sub_label
+                | title) | replace('Person', sub_label | title) }}\n{% else %}\n  {{
+                title }}\n{% endif %}\n"
+              message: "{% if sub_label %}\n  {{ message | replace('A Person', sub_label
+                | title) | replace('Person', sub_label | title) }}\n{% else %}\n  {{
+                message }}\n{% endif %}\n"
+          - alias: Update thumbnail at end of event
+            choose:
+            - conditions:
+              - '{{ wait.trigger.payload_json[''type''] == ''end'' }}'
+              - '{{ (attachment == ''snapshot'' and update_thumbnail) or video | length
+                > 0 }}'
+              sequence:
+              - delay:
+                  seconds: 5
+              - variables:
+                  new_snapshot: '{{ update_thumbnail }}'
+          - alias: 'Debug: set notification'
+            choose:
+            - conditions:
+              - '{{ debug }}'
+              sequence:
+              - service: persistent_notification.create
+                data:
+                  title: Frigate Notification Loop
+                  message: "Info:\n  Last Zones: {{ last_zones }}\n  Current zones:
+                    {{ entered_zones }}\n  Sublabel: {{ sub_label }}\n  URL: api/frigate/notifications/{{
+                    id }}/{{ camera + '/clip.mp4' if video | length > 0 and wait.trigger.payload_json['type']
+                    == 'end' else attachment + '.jpg' }}\n  Video: \"{{ video }}\"\nTriggers:\n
+                    \ New Snapshot: {{ new_snapshot }}\n  Stationary moved: {{ stationary_moved
+                    }}\n  Entered zones changed: {{ entered_zones_changed }}\n  Sublabel
+                    changed: {{ sub_label_changed }}\nConditions:\n  Loitering: {{
+                    loitering }}\n  Zone filter test: {{ 'ON' if zones | length else
+                    'OFF' }} - {{ 'PASS' if zone_filter else 'FAIL' }}\n  Multi-zone
+                    filter: {{ 'OFF' if not zones | length or not zone_all else 'ON'
+                    }} - {{ 'PASS' if not zones | length or not zone_all or ( entered_zones
+                    | length and zones and zones | reject('in', entered_zones) | list
+                    | length == 0 ) else 'FAIL' }}\n  Image: \"{{ base_url }}/api/frigate/notifications/{{
+                    id }}/{{ attachment }}.jpg\"\n"
+          - alias: Notify on loitering or significant change
+            choose:
+            - conditions: '{{ loitering or (zone_filter and zone_multi_filter and
+                state_true and (new_snapshot or stationary_moved or zone_only_changed
+                or entered_zones_changed or sub_label_changed)) }}'
+              sequence:
+              - alias: Fire event for other automations and scripts
+                event: custom_frigate_doorbell_object_update
+                event_data:
+                  id: '{{ id }}'
+                  camera_name: '{{ camera_name }}'
+                  title: '{{ title }}'
+                  message: '{{ message }}'
+                  loitering: '{{ loitering }}'
+                  object: '{{ object }}'
+                  label: '{{ label }}'
+                  icon: '{{ icon }}'
+                  image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
+                  video: '{{ video }}'
+                  actions: '{{ actions }}'
+          until:
+          - condition: template
+            value_template: '{{ not wait.trigger or wait.trigger.payload_json[''type'']
+              == ''end'' }}'
+  variables:
+    camera: doorbell
+    camera_name: '{{ camera | title }}'
+    base_url: '{{ state_attr(''sensor.config'', ''external_url'') }}'
+    attachment: snapshot
+    alert_once: false
+    update_thumbnail: true
+    zones: []
+    zone_all: false
+    labels:
+    - person
+    - cat
+    - dog
+    disable_times: []
+    cooldown: 60
+    loitering: false
+    loiter_timer: 0
+    fps: '{{ states(''sensor.'' + camera + ''_camera_fps'') | int(5) }}'
+    state_entity: binary_sensor.front_door_is_open
+    state_last_changed: 2
+    state_only: '{{ not state_entity in ['''', none] }}'
+    states_filter:
+    - 'off'
+    debug: false
+- id: '1693003933194'
+  alias: "\U0001F514 Frigate Doorbell - Event Handler"
+  description: Sends notifications when an object is detected on the Doorbell camera
+  trigger:
+  - platform: event
+    event_type: custom_frigate_doorbell_object
+    id: initial
+  - platform: event
+    event_type: custom_frigate_doorbell_object_update
+    id: update
+  condition: []
+  action:
+  - parallel:
+    - if:
+      - condition: trigger
+        id:
+        - initial
+      then:
+      - service: script.notify_speech
+        data:
+          media_player:
+          - media_player.living_room_speaker
+          - media_player.family_room_speaker
+          - media_player.office_speaker
+          message: A {{ label }} was detected at the front door.
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon_url: '{{ icon }}'
+        image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg?format=android
+        group: '{{ camera_name }} Notification{{ '' Loitering'' if loitering }}'
+        tag: '{{ id }}{{ ''-loitering'' if loitering }}'
+        importance: high
+        sticky: true
+        url: lovelace/security
+        actions: '{{ actions }}'
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: '{{ title }}'
+        message: '{{ message }}'
+        image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
+        duration: 10
+        actions: '{{ actions }}'
+    - service: script.notify_pipup
+      data:
+        entity:
+        - media_player.living_room_shield
+        - media_player.family_room_shield
+        - media_player.master_bedroom_shield
+        title: '{{ title }}'
+        message: '{{ message }}'
+        duration: 20
+        image: api/frigate/notifications/{{ id }}/snapshot.jpg
+    - if:
+      - condition: trigger
+        id:
+        - initial
+      then:
+      - if:
+        - condition: state
+          entity_id: light.office_desk_led
+          state: 'on'
+        then:
+        - service: number.set_value
+          data:
+            value: '80'
+          target:
+            entity_id: number.office_desk_led_speed
+        - service: light.turn_on
+          target:
+            entity_id: light.office_desk_led
+          data:
+            effect: Phased
+        - delay:
+            seconds: 5
+        - service: light.turn_on
+          target:
+            entity_id: light.office_desk_led
+          data:
+            effect: Solid
+  mode: single

@@ -581,7 +581,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>147 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -710,10 +710,11 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🔒 Front Door Lock Jammed (Disabled)
 - 🔒 Front Door Lock when Away
 - 🔒 Front Door Re-lock after Unlock
-- 🔔 Doorbell Human
-- 🔔 Doorbell Motion or Ring
+- 🔔 Doorbell Object or Ring
 - 🔔 Doorbell Ring
 - 🔔 Doorbell Unavailable
+- 🔔 Frigate Doorbell - Event Handler
+- 🔔 Frigate Doorbell - Object Seen
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Ardena] Sleep When Harmony Off
