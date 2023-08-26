@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2115 total entities**,
-including **1045 sensors**.
+This Home Assistant install has approximately **2130 total entities**,
+including **1070 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -340,7 +340,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.2.1]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.3.0]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -755,7 +755,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.8.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.8.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
