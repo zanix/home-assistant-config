@@ -1535,14 +1535,26 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: timer.subaru_remote_start
-        state: active
+        entity_id: cover.garage_door
+        state: opening
       sequence:
       - service: script.inovelli_blue_led
         data:
-          color: Blue
-          effect: Open/Close
-          level: 60
+          color: Yellow
+          effect: Fast Rising
+          level: 40
+          target:
+            entity_id: light.garage
+    - conditions:
+      - condition: state
+        entity_id: cover.garage_door
+        state: closing
+      sequence:
+      - service: script.inovelli_blue_led
+        data:
+          color: Yellow
+          effect: Fast Falling
+          level: 40
           target:
             entity_id: light.garage
     - conditions:
@@ -1575,6 +1587,18 @@
               level: 40
               target:
                 entity_id: light.garage
+    - conditions:
+      - condition: state
+        entity_id: timer.subaru_remote_start
+        state: active
+      sequence:
+      - service: script.inovelli_blue_led
+        data:
+          color: Blue
+          effect: Open/Close
+          level: 60
+          target:
+            entity_id: light.garage
     default:
     - service: script.inovelli_blue_led
       data:
@@ -2148,34 +2172,6 @@
       title: Quest is Charged
       message: The Quest is charged, you should unplug it
   mode: single
-- id: '1665696022820'
-  alias: "\U0001F5A5️ [Quest] Charge Soon"
-  description: Sends notification when Quest needs charging
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.quest_battery_level
-    below: '15'
-  condition:
-  - condition: state
-    entity_id: sensor.quest_battery_state
-    state: discharging
-  - condition: state
-    entity_id: binary_sensor.quest_interactive
-    state: 'off'
-  action:
-  - service: script.notify_mobile
-    data:
-      who: joshua
-      title: Quest Low Charge
-      message: The Quest needs to be charged
-      icon_url: local/icons/battery-alert.png
-  - service: script.notify_hass_agent
-    data:
-      entity:
-      - media_player.erebus
-      title: Quest Low Charge
-      message: The Quest needs to be charged
-  mode: single
 - id: '1665696049425'
   alias: "\U0001F5A5️ [Quest] Interactive"
   description: Actions to take when the Quest is being used
@@ -2429,10 +2425,11 @@
     - sensor.hacs_updates
   condition:
   - condition: template
-    value_template: "{{ not trigger.to_state.state in [\"unknown\", \"unavailable\",
-      none]\n  and not trigger.from_state.state in [\"unknown\", \"unavailable\",
-      none]\n  and not trigger.from_state in [\"unknown\", \"unavailable\", none]\n
-      \ and trigger.to_state.state != trigger.from_state.state\n}}"
+    value_template: "{{ not trigger.to_state in [\"unknown\", \"unavailable\", none]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\", none]\n  and
+      not trigger.from_state.state in [\"unknown\", \"unavailable\", none]\n  and
+      not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state
+      != trigger.from_state.state\n}}"
   action:
   - if:
     - condition: template
@@ -2489,7 +2486,8 @@
             | join('\\n') }}"
   mode: restart
   variables:
-    updates: '{{ trigger.to_state.state | int(default=0) }}'
+    updates: '{% if not trigger.to_state in [''unknown'', ''unavailable'', none] %}{{
+      trigger.to_state.state | int(default=0) }}{% endif %}'
     title: '{{ iif(updates == 1, ''Update'', ''Updates'', '''') }} Pending ({{ updates
       }})'
 - id: '1665696553212'
@@ -2802,7 +2800,7 @@
   trigger:
   - platform: numeric_state
     entity_id: sensor.salt_level
-    below: 25
+    below: 30
     for:
       hours: 24
   condition: []
@@ -3784,8 +3782,8 @@
     current_version: '{{ trigger.from_state.state }}'
     available_version: '{{ trigger.to_state.state }}'
 - id: '1673152651576'
-  alias: "\U0001F4AC Subaru Started Notification"
-  description: Sends a notification when the Subaru starts
+  alias: "\U0001F4AC Subaru Started"
+  description: Actions when the Subaru starts
   trigger:
   - platform: event
     event_type: subaru_command_successful
@@ -3794,10 +3792,15 @@
   condition: []
   action:
   - parallel:
-    - service: timer.start
-      data: {}
-      target:
-        entity_id: timer.subaru_remote_start
+    - if:
+      - condition: state
+        entity_id: binary_sensor.opengarage_vehicle_present
+        state: 'on'
+      then:
+      - service: timer.start
+        data: {}
+        target:
+          entity_id: timer.subaru_remote_start
     - service: script.notify_mobile
       data:
         who: parents

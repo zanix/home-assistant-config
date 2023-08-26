@@ -581,7 +581,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>147 Automations</summary>
+<details><summary>146 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -656,7 +656,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💬 Potty Time (Disabled)
 - 💬 Subaru Failed Notification
 - 💬 Subaru Remote Start Expired Notification
-- 💬 Subaru Started Notification
+- 💬 Subaru Started
 - 💬 Window Left Open (Disabled)
 - 📅 Garbage Collection Event Generator
 - 📋 [Controller] Hue Dimmer Switch
@@ -719,7 +719,6 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Ardena] Sleep When Harmony Off
 - 🖥️ [Quest] Charge Complete
-- 🖥️ [Quest] Charge Soon
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
