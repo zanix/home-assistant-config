@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2130 total entities**,
-including **1070 sensors**.
+This Home Assistant install has approximately **2132 total entities**,
+including **1071 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -408,7 +408,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.0.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.0.1]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -460,7 +460,7 @@ Card that allows you to swipe throught multiple cards for Home Assistant Lovelac
 
 A progress bar display for Home Assistant timers
 
-### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.14.0]
+### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.15.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
