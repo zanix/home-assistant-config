@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2132 total entities**,
-including **1071 sensors**.
+This Home Assistant install has approximately **2145 total entities**,
+including **1073 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -408,11 +408,11 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.0.1]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.1.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v3.0.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -428,7 +428,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.0.5]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.1.0]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
@@ -755,7 +755,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.8.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.9.0-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
