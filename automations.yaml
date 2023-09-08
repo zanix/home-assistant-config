@@ -799,6 +799,7 @@
         message: The dryer is done!
         icon_url: local/icons/tumble-dryer.png
   mode: single
+  max_exceeded: silent
 - id: '1665686051361'
   alias: "\U0001F9FA Washer Running"
   description: Actions when the washer is running and is done
@@ -850,6 +851,7 @@
         message: The washer is done!
         icon_url: local/icons/washing-machine.png
   mode: single
+  max_exceeded: silent
 - id: '1665686312416'
   alias: "\U0001F4A1 All Lights off when Away"
   description: Turns off all the lights when no one is home
@@ -1225,6 +1227,7 @@
         message: The dishwasher is done!
         icon_url: local/icons/dishwasher.png
   mode: single
+  max_exceeded: silent
 - id: '1665687879665'
   alias: "\U0001F4AC Door Closed"
   description: Clears notification when doors are closed
@@ -1424,7 +1427,7 @@
   - service: webrtc.create_link
     data:
       link_id: '{{ link_id }}'
-      entity: '{{ camera }}'
+      url: rtsp://127.0.0.1:8554/{{ camera | lower }}
       open_limit: 0
       time_to_live: 600
   - parallel:
@@ -3791,11 +3794,12 @@
       command: remote_start
   condition: []
   action:
+  - variables:
+      vehicle_present: '{{ states(''binary_sensor.opengarage_vehicle_present'') }}'
   - parallel:
     - if:
-      - condition: state
-        entity_id: binary_sensor.opengarage_vehicle_present
-        state: 'on'
+      - condition: template
+        value_template: '{{ vehicle_present == ''on'' }}'
       then:
       - service: timer.start
         data: {}
@@ -3819,27 +3823,35 @@
         title: Subaru Remote Start
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
-    - service: script.notify_speech
-      data:
-        media_player: media_player.living_room_speaker
-        message: '{{ message }}'
-  - wait_for_trigger:
-    - platform: state
-      entity_id:
-      - cover.garage_door
-      to: closed
-    - platform: event
-      event_type: subaru_command_successful
-      event_data:
-        command: remote_stop
-    timeout:
-      minutes: 10
-      seconds: 10
-    continue_on_timeout: false
-  - service: timer.cancel
-    data: {}
-    target:
-      entity_id: timer.subaru_remote_start
+    - if:
+      - condition: template
+        value_template: '{{ vehicle_present == ''on'' }}'
+      then:
+      - service: script.notify_speech
+        data:
+          media_player: media_player.living_room_speaker
+          message: '{{ message }}'
+  - if:
+    - condition: template
+      value_template: '{{ vehicle_present == ''on'' }}'
+    then:
+    - wait_for_trigger:
+      - platform: state
+        entity_id:
+        - cover.garage_door
+        to: closed
+      - platform: event
+        event_type: subaru_command_successful
+        event_data:
+          command: remote_stop
+      timeout:
+        minutes: 10
+        seconds: 5
+      continue_on_timeout: false
+    - service: timer.cancel
+      data: {}
+      target:
+        entity_id: timer.subaru_remote_start
   mode: single
   variables:
     message: The car started and is running.
@@ -4248,7 +4260,7 @@
           message: A {{ label }} {{ 'is loitering' if loitering else 'was detected'
             }} on the {{ camera_name }} camera{% if entered_zones %} in the {{ entered_zones
             | join(', ') | replace('_',' ') }}{% endif %}.
-          video: /api/frigate/notifications/{{ id }}/{{ camera }}/clip.mp4
+          clip: /api/frigate/notifications/{{ id }}/{{ camera }}/clip.mp4
           link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40)
             }}'
           stream: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
@@ -4268,7 +4280,7 @@
       - service: webrtc.create_link
         data:
           link_id: '{{ link_id }}'
-          entity: camera.{{ camera | lower }}
+          url: rtsp://127.0.0.1:8554/{{ camera | lower }}
           open_limit: 0
           time_to_live: 600
       - alias: 'Debug: set notification'
@@ -4283,8 +4295,8 @@
                 (formatted): {{ object }} ({{ label }})\nConfig:\n  Camera(formatted):
                 {{ camera }}({{ camera_name }})\n  Base URL: {{ base_url }}\n  Alert
                 once: {{ alert_once }}\n  Update thumbnails: {{ update_thumbnail }}\n
-                \ Video: {{ video }}\n  Icon: {{ icon }}\n  Cooldown: {{ cooldown
-                }}s\n  Loiter timer: {{ loiter_timer }}s\n  Title: {{ title }}\n  Message:
+                \ Clip: {{ clip }}\n  Icon: {{ icon }}\n  Cooldown: {{ cooldown }}s\n
+                \ Loiter timer: {{ loiter_timer }}s\n  Title: {{ title }}\n  Message:
                 {{ message }}\n  Actions: {{ actions | tojson }}\nFilters:\n  Zones:\n
                 \   Zone filter on: {{ zones | length }}\n    Required zones: {{ zones
                 | join(', ') }}\n    All Zones on: {{ zone_all }}\n    Entered Zones:
@@ -4328,7 +4340,7 @@
               label: '{{ label }}'
               icon: '{{ icon }}'
               image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
-              video: '{{ video }}'
+              clip: '{{ clip }}'
               actions: '{{ actions }}'
       - repeat:
           sequence:
@@ -4379,7 +4391,7 @@
             choose:
             - conditions:
               - '{{ wait.trigger.payload_json[''type''] == ''end'' }}'
-              - '{{ (attachment == ''snapshot'' and update_thumbnail) or video | length
+              - '{{ (attachment == ''snapshot'' and update_thumbnail) or clip | length
                 > 0 }}'
               sequence:
               - delay:
@@ -4396,8 +4408,8 @@
                   title: Frigate Notification Loop
                   message: "Info:\n  Last Zones: {{ last_zones }}\n  Current zones:
                     {{ entered_zones }}\n  Sublabel: {{ sub_label }}\n  URL: api/frigate/notifications/{{
-                    id }}/{{ camera + '/clip.mp4' if video | length > 0 and wait.trigger.payload_json['type']
-                    == 'end' else attachment + '.jpg' }}\n  Video: \"{{ video }}\"\nTriggers:\n
+                    id }}/{{ camera + '/clip.mp4' if clip | length > 0 and wait.trigger.payload_json['type']
+                    == 'end' else attachment + '.jpg' }}\n  Clip: \"{{ clip }}\"\nTriggers:\n
                     \ New Snapshot: {{ new_snapshot }}\n  Stationary moved: {{ stationary_moved
                     }}\n  Entered zones changed: {{ entered_zones_changed }}\n  Sublabel
                     changed: {{ sub_label_changed }}\nConditions:\n  Loitering: {{
@@ -4426,12 +4438,14 @@
                   label: '{{ label }}'
                   icon: '{{ icon }}'
                   image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
-                  video: '{{ video }}'
+                  clip: '{{ clip }}'
                   actions: '{{ actions }}'
           until:
           - condition: template
             value_template: '{{ not wait.trigger or wait.trigger.payload_json[''type'']
               == ''end'' }}'
+  mode: single
+  max_exceeded: silent
   variables:
     camera: doorbell
     camera_name: '{{ camera | title }}'
@@ -4487,7 +4501,7 @@
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: '{{ icon }}'
-        image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg?format=android
+        image: '{{ image }}?format=android'
         group: '{{ camera_name }} Notification{{ '' Loitering'' if loitering }}'
         tag: '{{ id }}{{ ''-loitering'' if loitering }}'
         importance: high
@@ -4501,9 +4515,8 @@
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
-        image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
+        image: '{{ image }}'
         duration: 10
-        actions: '{{ actions }}'
     - service: script.notify_pipup
       data:
         entity:
@@ -4513,7 +4526,7 @@
         title: '{{ title }}'
         message: '{{ message }}'
         duration: 20
-        image: api/frigate/notifications/{{ id }}/snapshot.jpg
+        image: '{{ image }}'
     - if:
       - condition: trigger
         id:
@@ -4542,3 +4555,15 @@
           data:
             effect: Solid
   mode: single
+  variables:
+    id: '{{ trigger.event.data.id }}'
+    camera_name: '{{ trigger.event.data.camera_name }}'
+    title: '{{ trigger.event.data.title }}'
+    message: '{{ trigger.event.data.message }}'
+    object: '{{ trigger.event.data.object }}'
+    label: '{{ trigger.event.data.label }}'
+    loitering: '{{ trigger.event.data.loitering }}'
+    icon: '{{ trigger.event.data.icon }}'
+    image: '{{ trigger.event.data.image }}'
+    clip: '{{ trigger.event.data.clip }}'
+    actions: '{{ trigger.event.data.actions }}'
