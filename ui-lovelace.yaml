@@ -22,24 +22,35 @@ decluttering_templates:
                 aspect_ratio_mode: dynamic
               live:
                 auto_unmute: all
-                controls:
-                  thumbnails:
-                    mode: below
-                  title:
-                    mode: popup-top-right
                 draggable: false
+                preload: true
               media_viewer:
                 transition_effect: slide
               menu:
                 buttons:
                   cameras:
                     enabled: false
+                  download:
+                    enabled: false
+                  frigate:
+                    enabled: false
+                  fullscreen:
+                    alignment: opposing
+                    priority: 40
                   media_player:
-                    enabled: true
+                    enabled: false
                   microphone:
+                    alignment: opposing
                     enabled: true
-                  recordings:
+                    type: toggle
+                  mute:
+                    alignment: opposing
                     enabled: true
+                  play:
+                    alignment: opposing
+                    enabled: true
+                    priority: 45
+                style: outside
               performance:
                 profile: high
               timeline:
@@ -180,42 +191,24 @@ decluttering_templates:
   computer_power:
     card:
       cards:
-      - card:
-          entity: switch.[[computer]]
-          hold_action:
-            action: call-service
-            service: switch.toggle
-            target:
-              entity_id: switch.[[computer]]
-          icon: mdi:power-off
-          icon_color: red
-          primary: Power
-          tap_action:
-            action: none
-          type: custom:mushroom-template-card
-        conditions:
-        - entity: binary_sensor.[[computer]]_connected
-          state: 'off'
-        type: conditional
-      - card:
-          card_mod:
-            style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n}\n"
-          entity: switch.[[computer]]
-          hold_action:
-            action: call-service
-            service: switch.toggle
-            target:
-              entity_id: switch.[[computer]]
-          icon: mdi:power
-          icon_color: green
-          layout: vertical
-          tap_action:
-            action: none
-          type: custom:mushroom-template-card
-        conditions:
-        - entity: binary_sensor.[[computer]]_connected
-          state: 'on'
-        type: conditional
+      - card_mod:
+          style: "{% if is_state(\"binary_sensor.[[computer]]_connected\", \"on\"\
+            ) %}\nha-card {\n  margin-left: auto;\n  margin-right: auto;\n}\n{% endif\
+            \ %}\n"
+        entity: switch.[[computer]]
+        hold_action:
+          action: call-service
+          service: switch.toggle
+          target:
+            entity_id: switch.[[computer]]
+        icon: "{% if is_state(\"binary_sensor.[[computer]]_connected\", \"on\") %}\n\
+          \  mdi:power\n{% else %}\n  mdi:power-off\n{% endif %}"
+        icon_color: "{% if is_state(\"binary_sensor.[[computer]]_connected\", \"on\"\
+          ) %}\n  green\n{% else %}\n  red\n{% endif %}"
+        primary: Power
+        tap_action:
+          action: none
+        type: custom:mushroom-template-card
       - card:
           card_mod:
             style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n}\n"
@@ -2631,7 +2624,8 @@ views:
                   tap_action:
                     action: none
                   type: custom:mushroom-template-card
-                - title: Forecast
+                - subtitle: Allergy
+                  title: Forecast
                   type: custom:mushroom-title-card
                 - animation:
                     state: 'on'
@@ -2640,9 +2634,67 @@ views:
                   - entity: sensor.allergy_index_today
                   - entity: sensor.allergy_index_tomorrow
                   - entity: sensor.allergy_index_forecasted_average
+                  max: 12
+                  min: 0
+                  positions:
+                    indicator: inside
+                  severity:
+                  - color: var(--green-color)
+                    from: '0'
+                    to: '2.5'
+                  - color: var(--light-green-color)
+                    from: '2.5'
+                    to: '4.9'
+                  - color: var(--amber-color)
+                    from: '4.9'
+                    to: '7.3'
+                  - color: var(--orange-color)
+                    from: '7.3'
+                    to: '9.7'
+                  - color: var(--red-color)
+                    from: '9.7'
+                    to: '12'
+                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                    \ var(--primary-background-color);\n}"
+                  type: custom:bar-card
+                - subtitle: Asthma
+                  type: custom:mushroom-title-card
+                - animation:
+                    state: 'on'
+                  decimal: 1
+                  entities:
                   - entity: sensor.asthma_index_today
                   - entity: sensor.asthma_index_tomorrow
                   - entity: sensor.asthma_index_forecasted_average
+                  max: 12
+                  min: 0
+                  positions:
+                    indicator: inside
+                  severity:
+                  - color: var(--green-color)
+                    from: '0'
+                    to: '2.5'
+                  - color: var(--light-green-color)
+                    from: '2.5'
+                    to: '4.9'
+                  - color: var(--amber-color)
+                    from: '4.9'
+                    to: '7.3'
+                  - color: var(--orange-color)
+                    from: '7.3'
+                    to: '9.7'
+                  - color: var(--red-color)
+                    from: '9.7'
+                    to: '12'
+                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                    \ var(--primary-background-color);\n}"
+                  type: custom:bar-card
+                - subtitle: Cold
+                  type: custom:mushroom-title-card
+                - animation:
+                    state: 'on'
+                  decimal: 1
+                  entities:
                   - entity: sensor.cold_flu_index_today
                   - entity: sensor.cold_flu_forecasted_average
                   max: 12
@@ -3261,7 +3313,7 @@ views:
       - chips:
         - chip:
             entity: light.smart_display
-            icon: mdi:mirror-rectangle
+            icon: mdi:apps-box
             icon_color: blue
             tap_action:
               action: more-info
@@ -4814,10 +4866,9 @@ views:
         type: entity
       - entity: sensor.garage_multisensor_humidity
         type: entity
-      - content: '{{ states(entity) }}%'
-        entity: sensor.garage_multisensor_illuminance
+      - entity: sensor.garage_multisensor_illuminance
         icon: mdi:brightness-6
-        type: template
+        type: entity
   - cards:
     - title: Lights
       type: custom:mushroom-title-card
@@ -6777,8 +6828,8 @@ views:
         - cards:
           - card_mod:
               style:
-                .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
-                  \ 0;\n}\n"
+                .: "ha-card {\n  --icon-size: 42px;\n  --ha-card-box-shadow: none;\n\
+                  \  --ha-card-border-width: 0;\n}\n"
                 mushroom-shape-icon$: "{% if (states(config.entity) | int) <= 60 %}\n\
                   {% from \"util.jinja\" import battery_color %}\n.shape {\n  /* Radial\
                   \ progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
@@ -6928,7 +6979,7 @@ views:
         type: custom:decluttering-card
         variables:
         - name: Family Room
-        - camera: camera.family_room
+        - camera: camera.familyroom
         - stream: familyroom
       - template: camera_card
         type: custom:decluttering-card
@@ -6954,31 +7005,41 @@ views:
                     go2rtc:
                       modes:
                       - webrtc
-                      - mse
-                      stream: doorbell_audio
+                      stream: doorbell
                     live_provider: go2rtc
                   dimensions:
                     aspect_ratio_mode: dynamic
                   live:
                     auto_unmute: all
-                    controls:
-                      thumbnails:
-                        mode: below
-                      title:
-                        mode: popup-top-right
                     draggable: false
+                    preload: true
                   media_viewer:
                     transition_effect: slide
                   menu:
                     buttons:
                       cameras:
                         enabled: false
+                      download:
+                        enabled: false
+                      frigate:
+                        enabled: false
+                      fullscreen:
+                        alignment: opposing
+                        priority: 40
                       media_player:
-                        enabled: true
+                        enabled: false
                       microphone:
+                        alignment: opposing
                         enabled: true
-                      recordings:
+                        type: toggle
+                      mute:
+                        alignment: opposing
                         enabled: true
+                      play:
+                        alignment: opposing
+                        enabled: true
+                        priority: 45
+                    style: outside
                   performance:
                     profile: high
                   timeline:
