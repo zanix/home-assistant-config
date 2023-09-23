@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2145 total entities**,
-including **1073 sensors**.
+This Home Assistant install has approximately **2158 total entities**,
+including **1086 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -258,7 +258,7 @@ Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://g
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Dahua](https://github.com/rroller/dahua) [v0.9.47]
+### [Dahua](https://github.com/rroller/dahua) [v0.9.48]
 
 Dahua Camera and Doorbell Home Assistant Integration
 
@@ -316,7 +316,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.17]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.18]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -396,11 +396,11 @@ Expander card for HomeAssistant
 
 A Lovelace card for Frigate in Home Assistant
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.37]
+### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.38]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.47]
+### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.50]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -436,7 +436,7 @@ Mushroom Cards - Build a beautiful dashboard easily 🍄
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.7]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.1.8.1]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -444,7 +444,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.14.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.14.1]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -755,7 +755,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.9.0-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.9.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
