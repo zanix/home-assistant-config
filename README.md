@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2158 total entities**,
-including **1086 sensors**.
+This Home Assistant install has approximately **2179 total entities**,
+including **1084 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -258,7 +258,7 @@ Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://g
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Dahua](https://github.com/rroller/dahua) [v0.9.48]
+### [Dahua](https://github.com/rroller/dahua) [v0.9.49]
 
 Dahua Camera and Doorbell Home Assistant Integration
 
@@ -292,7 +292,7 @@ A HACS repository for Govee light integration
 
 Authors: [@LaggAt](https://github.com/LaggAt).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.32.1]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.33.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -372,7 +372,7 @@ Battery state card for Home Assistant
 
 ❇️ Lovelace button-card for home assistant
 
-### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.2.2]
+### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.2.3]
 
 🔹 Add CSS styles to (almost) any lovelace card
 
@@ -396,7 +396,7 @@ Expander card for HomeAssistant
 
 A Lovelace card for Frigate in Home Assistant
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.38]
+### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.39]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
 
@@ -412,7 +412,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.0.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.1.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -444,7 +444,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.14.1]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.15.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -755,7 +755,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.9.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.10.0-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
