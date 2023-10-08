@@ -4026,6 +4026,10 @@
     - person.joshua
     - person.amy
     to: home
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
   condition:
   - condition: template
     value_template: '{{ trigger.from_state.state == "not_home" }}'
@@ -4066,6 +4070,7 @@
   - delay:
       minutes: 5
   mode: single
+  max_exceeded: silent
   variables:
     zone_name: '{{ trigger.from_state.state }}'
     name: '{{ trigger.to_state.attributes.friendly_name }}'
@@ -4076,7 +4081,7 @@
   description: ''
   trigger:
   - platform: time
-    at: 05:00:00
+    at: 04:30:00
   condition: []
   action:
   - repeat:
@@ -4240,7 +4245,7 @@
         data:
           stop_actions: false
       - delay:
-          minutes: 30
+          minutes: '{{ silence_timer }}'
       - service: automation.turn_on
         target:
           entity_id: '{{ this.entity_id }}'
@@ -4299,26 +4304,31 @@
           - service: persistent_notification.create
             data:
               title: Frigate Notification
-              message: "Info:\n  FPS: {{ fps }}\n  Frigate event Id: {{ id }}\n  Object
-                (formatted): {{ object }} ({{ label }})\nConfig:\n  Camera(formatted):
-                {{ camera }}({{ camera_name }})\n  Base URL: {{ base_url }}\n  Alert
-                once: {{ alert_once }}\n  Update thumbnails: {{ update_thumbnail }}\n
-                \ Clip: {{ clip }}\n  Icon: {{ icon }}\n  Cooldown: {{ cooldown }}s\n
-                \ Loiter timer: {{ loiter_timer }}s\n  Title: {{ title }}\n  Message:
-                {{ message }}\n  Actions: {{ actions | tojson }}\nFilters:\n  Zones:\n
-                \   Zone filter on: {{ zones | length }}\n    Required zones: {{ zones
-                | join(', ') }}\n    All Zones on: {{ zone_all }}\n    Entered Zones:
-                {{ entered_zones }}\n    Zone Filter TEST: {{ 'PASS (Multi)' if zone_multi_filter
-                else 'PASS' if ( not zones | length or not zone_all and zones | select('in',
-                entered_zones) | list | length ) else 'FAIL (Multi)' if zone_all else
-                'FAIL' }}\n  Required objects TEST:\n    Labels: {{ labels | join(',
-                ') }}\n    TEST: {{ 'PASS' if not labels | length or object in labels
-                else 'FAIL' }}\n  Disabled times: {{ disable_times }}\n  State Filter:\n
-                \   State filter on: {{ state_only }}\n    State filter entity: {{
-                state_entity }}\n    Required states: {{ states_filter | join(', ')
-                }}\n    State Filter TEST: {{ 'PASS' if not state_only or states(state_entity)
-                in states_filter and (as_timestamp(now()) - as_timestamp(states[state_entity].last_changed))
-                | int / 60 > state_last_changed else 'FAIL' }}\n"
+              message: "Info:\n  - FPS: {{ fps }}\n  - Frigate event Id: {{ id }}\n
+                \ - Object (formatted): {{ object }} ({{ label }})\nConfig:\n  - Camera(formatted):
+                {{ camera }}({{ camera_name }})\n  - Base URL: {{ base_url }}\n  -
+                Alert once: {{ alert_once }}\n  - Update thumbnails: {{ update_thumbnail
+                }}\n  - Clip: {{ clip }}\n  - Icon: {{ icon }}\n  - Cooldown: {{ cooldown
+                }}s\n  - Loiter timer: {{ loiter_timer }}s\n  - Title: {{ title }}\n
+                \ - Message: {{ message }}\n  - Actions: {{ actions | tojson }}\nFilters:\n
+                \ - Zones:\n    - Zone filter on: {{ zones | length }}\n    - Required
+                zones: {{ zones | join(', ') }}\n    - All Zones on: {{ zone_all }}\n
+                \   - Entered Zones: {{ entered_zones }}\n    - Zone Filter TEST:
+                {{ 'PASS (Multi)' if zone_multi_filter else 'PASS' if ( not zones
+                | length or not zone_all and zones | select('in', entered_zones) |
+                list | length ) else 'FAIL (Multi)' if zone_all else 'FAIL' }}\n  -
+                Required objects TEST:\n    - Labels: {{ labels | join(', ') }}\n
+                \   - TEST: {{ 'PASS' if not labels | length or object in labels else
+                'FAIL' }}\n  - Disabled times: {{ disable_times }}\n  - State Filter:\n
+                \   - State filter on: {{ iif(state_entities | list | count > 0, 'True',
+                'False') }}\n    - State filter entity: {{ state_entities | tojson
+                }}\n    - Required states: {{ states_filter | join(', ') }}\n  {%-
+                set state_filter = namespace(allow=[]) -%}\n  {%- for entity, time
+                in state_entities.items() -%}\n    {%- set state =\n      states(entity)
+                in states_filter\n      and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+                | int / 60 > time\n    -%}\n    {%- set state_filter.allow = state_filter.allow
+                + [state] -%}\n  {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow
+                | reject | first | default(true), 'PASS', 'FAIL') }}\n"
       - alias: Notifications enabled for object label
         condition: template
         value_template: '{{ not labels | length or object in labels }}'
@@ -4328,14 +4338,12 @@
           - '{{ not zones | length or (not zone_all and zones | select(''in'', entered_zones)
             | list | length > 0) or (zone_all and entered_zones | length > 0 and zones
             | reject(''in'', entered_zones) | list | length == 0) }}'
-          - "{{ not state_only or states(state_entity) in states_filter\n  and (as_timestamp(now())
-            - as_timestamp(states[state_entity].last_changed)) | int / 60 > state_last_changed
-            }}"
-          - condition: state
-            entity_id: binary_sensor.front_door_is_open
-            for:
-              minutes: 5
-            state: 'off'
+          - "{%- set state_filter = namespace(allow=[]) -%} {%- for entity, time in
+            state_entities.items() -%}\n  {%- set state =\n    states(entity) in states_filter\n
+            \   and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+            | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
+            + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first
+            | default(true), true, false) }}"
           sequence:
           - alias: Fire event for other automations and scripts
             event: custom_frigate_doorbell_object
@@ -4347,7 +4355,7 @@
               object: '{{ object }}'
               label: '{{ label }}'
               icon: '{{ icon }}'
-              image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
+              image: api/frigate/notifications/{{ id }}/{{ attachment }}
               clip: '{{ clip }}'
               actions: '{{ actions }}'
       - repeat:
@@ -4381,9 +4389,12 @@
               entered_zones_changed: '{{ zones | length > 0 and (zones | select(''in'',
                 entered_zones) | list | length > 0 and not zones | select(''in'',
                 last_zones) | list | length) }}'
-              state_true: "{{ not state_only or states(state_entity) in states_filter\n
-                \ and (as_timestamp(now()) - as_timestamp(states[state_entity].last_changed))
-                | int / 60 > state_last_changed }}"
+              state_true: "{%- set state_filter = namespace(allow=[]) -%} {%- for
+                entity, time in state_entities.items() -%}\n  {%- set state =\n    states(entity)
+                in states_filter\n    and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+                | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
+                + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject |
+                first | default(true), true, false) }}"
               sub_label: '{{ event[''after''][''sub_label''] }}'
               sub_label_changed: '{{ sub_label != event[''before''][''sub_label'']
                 }}'
@@ -4399,7 +4410,7 @@
             choose:
             - conditions:
               - '{{ wait.trigger.payload_json[''type''] == ''end'' }}'
-              - '{{ (attachment == ''snapshot'' and update_thumbnail) or clip | length
+              - '{{ (''snapshot'' in attachment and update_thumbnail) or clip | length
                 > 0 }}'
               sequence:
               - delay:
@@ -4414,20 +4425,21 @@
               - service: persistent_notification.create
                 data:
                   title: Frigate Notification Loop
-                  message: "Info:\n  Last Zones: {{ last_zones }}\n  Current zones:
-                    {{ entered_zones }}\n  Sublabel: {{ sub_label }}\n  URL: api/frigate/notifications/{{
+                  message: "Info:\n  - Last zones: {{ last_zones }}\n  - Current zones:
+                    {{ entered_zones }}\n  - Sublabel: {{ sub_label }}\n  - URL: api/frigate/notifications/{{
                     id }}/{{ camera + '/clip.mp4' if clip | length > 0 and wait.trigger.payload_json['type']
-                    == 'end' else attachment + '.jpg' }}\n  Clip: \"{{ clip }}\"\nTriggers:\n
-                    \ New Snapshot: {{ new_snapshot }}\n  Stationary moved: {{ stationary_moved
-                    }}\n  Entered zones changed: {{ entered_zones_changed }}\n  Sublabel
-                    changed: {{ sub_label_changed }}\nConditions:\n  Loitering: {{
-                    loitering }}\n  Zone filter test: {{ 'ON' if zones | length else
-                    'OFF' }} - {{ 'PASS' if zone_filter else 'FAIL' }}\n  Multi-zone
-                    filter: {{ 'OFF' if not zones | length or not zone_all else 'ON'
-                    }} - {{ 'PASS' if not zones | length or not zone_all or ( entered_zones
-                    | length and zones and zones | reject('in', entered_zones) | list
-                    | length == 0 ) else 'FAIL' }}\n  Image: \"{{ base_url }}/api/frigate/notifications/{{
-                    id }}/{{ attachment }}.jpg\"\n"
+                    == 'end' else attachment + '.jpg' }}\n  - Clip: \"{{ clip }}\"\nTriggers:\n
+                    \ - New snapshot: {{ new_snapshot }}\n  - Stationary moved: {{
+                    stationary_moved }}\n  - Entered zones changed: {{ entered_zones_changed
+                    }}\n  - Sublabel changed: {{ sub_label_changed }}\nConditions:\n
+                    \ - Loitering: {{ loitering }}\n  - Zone filter test: {{ 'ON'
+                    if zones | length else 'OFF' }} - {{ 'PASS' if zone_filter else
+                    'FAIL' }}\n  - Multi-zone filter: {{ 'OFF' if not zones | length
+                    or not zone_all else 'ON' }} - {{ 'PASS' if not zones | length
+                    or not zone_all or ( entered_zones | length and zones and zones
+                    | reject('in', entered_zones) | list | length == 0 ) else 'FAIL'
+                    }}\n  - Image: api/frigate/notifications/{{ id }}/{{ attachment
+                    }}\n"
           - alias: Notify on loitering or significant change
             choose:
             - conditions: '{{ loitering or (zone_filter and zone_multi_filter and
@@ -4445,20 +4457,19 @@
                   object: '{{ object }}'
                   label: '{{ label }}'
                   icon: '{{ icon }}'
-                  image: api/frigate/notifications/{{ id }}/{{ attachment }}.jpg
+                  image: api/frigate/notifications/{{ id }}/{{ attachment }}
                   clip: '{{ clip }}'
                   actions: '{{ actions }}'
           until:
           - condition: template
             value_template: '{{ not wait.trigger or wait.trigger.payload_json[''type'']
               == ''end'' }}'
-  mode: single
-  max_exceeded: silent
+  mode: parallel
   variables:
     camera: doorbell
     camera_name: '{{ camera | title }}'
     base_url: '{{ state_attr(''sensor.config'', ''external_url'') }}'
-    attachment: snapshot
+    attachment: snapshot.jpg
     alert_once: false
     update_thumbnail: true
     zones: []
@@ -4468,13 +4479,14 @@
     - cat
     - dog
     disable_times: []
-    cooldown: 60
+    cooldown: 30
+    silence_timer: 30
     loitering: false
     loiter_timer: 0
     fps: '{{ states(''sensor.'' + camera + ''_camera_fps'') | int(5) }}'
-    state_entity: binary_sensor.front_door_is_open
-    state_last_changed: 2
-    state_only: '{{ not state_entity in ['''', none] }}'
+    state_entities:
+      binary_sensor.front_door_is_open: 5
+      binary_sensor.doorbell_ring: 2
     states_filter:
     - 'off'
     debug: false
