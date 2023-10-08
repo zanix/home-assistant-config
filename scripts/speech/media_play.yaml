@@ -68,41 +68,45 @@ media_play:
 
   variables:
     # Special handling for Google devices
-    is_google: '{{ "Google" in device_attr(media_player, "model") }}'
+    is_google: "{{ 'Google' in device_attr(media_player, 'model') }}"
     # Define voice service so I don't have to hunt for it below
-    voice_service: 'script.say_{{ voice | default("cloud") }}'
+    voice_service: script.say_{{ voice | default("cloud") }}
 
   sequence:
-    # Actions for Google only
-    - if:
+    - alias: Actions for Google devices
+      if:
         - condition: template
-          value_template: '{{ is_google }}'
+          value_template: "{{ is_google }}"
       then:
-        # Mute to hide the Google bloop-bloop sound
-        - service: media_player.volume_mute
+        - alias: Mute to hide the Google bloop-bloop sound
+          service: media_player.volume_mute
           data:
             is_volume_muted: true
           target:
             entity_id: "{{ media_player }}"
 
-        # Play a 1 second silent track to mask bloop
-        - service: media_player.play_media
+        - alias: Play a 1 second silent track to mask bloop
+          service: media_player.play_media
           data:
             media_content_type: music
             media_content_id: media-source://media_source/sounds/1-second-of-silence.mp3
           target:
             entity_id: "{{ media_player }}"
-        - delay:
+        - alias: Delay for silence to start playing
+          delay:
             milliseconds: 200
 
-    # Store the current volume level (must be outside of the if block)
-    - variables:
-        current_volume: "{{ (state_attr(media_player, 'volume_level') | default(0.2)) | round(2) }}"
+    - alias: Store the current volume level (must be outside of other blocks)
+      variables:
+        current_volume: >-
+          {{ (state_attr(media_player, 'volume_level')
+            | default(0.2))
+            | round(2) }}
 
-    # Set the desired volume for the announcement
-    - if:
+    - alias: Set the desired volume for the announcement
+      if:
         - condition: template
-          value_template: '{{ volume is number }}'
+          value_template: "{{ volume is number }}"
       then:
         - service: media_player.volume_set
           data:
@@ -110,22 +114,25 @@ media_play:
           target:
             entity_id: "{{ media_player }}"
 
-    # Actions for Google only
-    - if:
+    - alias: Actions for Google devices
+      if:
         - condition: template
-          value_template: '{{ is_google }}'
+          value_template: "{{ is_google }}"
       then:
-        # Unmute after setting the volume to hide the volume change sound
-        - service: media_player.volume_mute
+        - alias: Unmute after setting the volume to hide the volume change sound
+          service: media_player.volume_mute
           data:
             is_volume_muted: false
           target:
             entity_id: "{{ media_player }}"
 
-    - choose:
-        - conditions: '{{ media_location is string }}'
+    - alias: Play media or TTS message
+      choose:
+        - conditions:
+            - alias: Play the desired media file
+              condition: template
+              value_template: "{{ media_location is string }}"
           sequence:
-            # Play the desired media file
             - service: media_player.play_media
               data:
                 media_content_type: "{{ media_type | default('music', true) }}"
@@ -133,41 +140,46 @@ media_play:
                 enqueue: play
               target:
                 entity_id: "{{ media_player }}"
-        - conditions: '{{ message is string }}'
+        - conditions:
+            - alias: Call the voice script directly
+              condition: template
+              value_template: "{{ message is string }}"
           sequence:
-            # Call the voice script directly since script.notify_speech calls this.
-            - service: '{{ voice_service }}'
+            - service: "{{ voice_service }}"
               data:
-                media_player: '{{ media_player }}'
-                message: '{{ message }}'
+                media_player: "{{ media_player }}"
+                message: "{{ message }}"
 
-    # Get the current media length (must be outside of the choose and if blocks)
-    - variables:
-        media_duration: "{{ state_attr(media_player, 'media_duration') | default(4, true) | round(0, 'ceil') }}"
+    - alias: Store the current media length (must be outside of other blocks)
+      variables:
+        media_duration: >-
+          {{ state_attr(media_player, 'media_duration')
+            | default(4, true)
+            | round(0, 'ceil') }}
 
-    # Restore volume if it was changed
-    - if:
+    - alias: Restore volume if it was changed
+      if:
         - condition: template
-          value_template: '{{ volume is number }}'
+          value_template: "{{ volume is number }}"
       then:
-        # Delay for the media file
-        - delay:
+        - alias: Delay for the media file length
+          delay:
             seconds: "{{ media_duration }}"
 
-        # Actions for Google only
-        - if:
+        - alias: Actions for Google devices
+          if:
             - condition: template
-              value_template: '{{ is_google }}'
+              value_template: "{{ is_google }}"
           then:
-            # Mute to hide the volume change sound
-            - service: media_player.volume_mute
+            - alias: Mute to hide the volume change sound
+              service: media_player.volume_mute
               data:
                 is_volume_muted: true
               target:
                 entity_id: "{{ media_player }}"
 
-            # Play a 1 second silent track to mask bloop
-            - service: media_player.play_media
+            - alias: Play a 1 second silent track to mask bloop
+              service: media_player.play_media
               data:
                 media_content_type: music
                 media_content_id: media-source://media_source/sounds/1-second-of-silence.mp3
@@ -176,33 +188,33 @@ media_play:
             - delay:
                 milliseconds: 200
 
-        # Restore volume
-        - service: media_player.volume_set
+        - alias: Restore volume
+          service: media_player.volume_set
           data:
             volume_level: "{{ current_volume }}"
           target:
             entity_id: "{{ media_player }}"
 
-        # Actions for Google only
-        - if:
+        - alias: Actions for Google devices
+          if:
             - condition: template
-              value_template: '{{ is_google }}'
+              value_template: "{{ is_google }}"
           then:
-            # Unmute to allow other announcements
-            - service: media_player.volume_mute
+            - alias: Unmute to allow other announcements
+              service: media_player.volume_mute
               data:
                 is_volume_muted: false
               target:
                 entity_id: "{{ media_player }}"
 
-    # Store Last Message
-    - service: script.store_mqtt_sensor
+    - alias: Store Last Message
+      service: script.store_mqtt_sensor
       data:
-        name: 'last_message'
-        state: '{{ iif(message is string, message, media_location) }}'
+        name: last_message
+        state: "{{ iif(message is string, message, media_location) }}"
 
-    # Store Last Speaker
-    - service: script.store_mqtt_sensor
+    - alias: Store Last Speaker
+      service: script.store_mqtt_sensor
       data:
-        name: 'last_speaker'
-        state: '{{ media_player }}'
+        name: last_speaker
+        state: "{{ media_player }}"
