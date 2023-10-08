@@ -78,7 +78,7 @@ decluttering_templates:
           type: custom:mushroom-chips-card
         - card_mod:
             style: "ha-card {\n  background-color: var(--primary-background-color)\
-              \ !important;\n  border-radius: var(--ha-card-border-radius) !important;\n\
+              \ !important;\n  border-radius: var(--ha-card-border-radius, 12px) !important;\n\
               \  --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-border-width:\
               \ 0;\n  --chip-spacing: 0;\n}\n"
           chips: '[[chips]]'
@@ -670,7 +670,8 @@ decluttering_templates:
             \  0% { background-position: 0% 50%; }\n  25% { background-position: 50%\
             \ 0%; }\n  50% { background-position: 100% 50%; }\n  75% { background-position:\
             \ 50% 100%; }\n  100% { background-position: 0% 50%; }\n"
-          expander-card$: ".header-overlay {\n  right: initial;\n  left: 0;\n}\n"
+          expander-card$: "/*.header-overlay {\n  right: initial;\n  left: 0;\n}*/\n\
+            .ripple {\n  border-radius: var(--ha-dialog-border-radius);\n}\n"
       cards:
       - card_mod:
           style: "ha_card {\n  --ha-card-border-width: 0;\n}\n"
@@ -681,8 +682,8 @@ decluttering_templates:
               card_mod:
                 style:
                   .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled), 0.15);\n\
-                    \  --ha-card-box-shadow: none;\n  --chip-box-shadow: 3px 3px 13px\
-                    \ -6px rgba(17,35,52,1);\n  --chip-border-radius: 12px;\n  --chip-height:\
+                    \  --ha-card-box-shadow: none;\n  --chip-box-shadow: 0 0 13px\
+                    \ -4px rgba(17,35,52,1);\n  --chip-border-radius: 12px;\n  --chip-height:\
                     \ 35px;\n  --chip-padding: 10px;\n  --chip-spacing: 18px;\n}\n\
                     .chip-container * {\n  margin-bottom: var(--chip-spacing) !important;\n\
                     }\n"
@@ -717,10 +718,10 @@ decluttering_templates:
                   style:
                     .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled),\
                       \ 0.15);\n  --ha-card-box-shadow: none;\n  --chip-box-shadow:\
-                      \ 3px 3px 13px -6px rgba(17,35,52,1);\n  --chip-border-radius:\
-                      \ 12px;\n  --chip-height: 35px;\n  --chip-padding: 10px;\n \
-                      \ --chip-spacing: 18px;\n}\n.chip-container * {\n  margin-bottom:\
-                      \ var(--chip-spacing) !important;\n}\n"
+                      \ 0 0 13px -4px rgba(17,35,52,1);\n  --chip-border-radius: 12px;\n\
+                      \  --chip-height: 35px;\n  --chip-padding: 10px;\n  --chip-spacing:\
+                      \ 18px;\n}\n.chip-container * {\n  margin-bottom: var(--chip-spacing)\
+                      \ !important;\n}\n"
                 chips:
                 - entity: '[[entity]]'
                   icon: mdi:volume-minus
@@ -767,7 +768,7 @@ decluttering_templates:
             card_mod:
               style:
                 mmp-shortcuts$: ".mmp-shortcuts__button {\n  --mmp-button-color: rgba(189,\
-                  \ 189, 189, 0.15);\n  box-shadow: 3px 3px 13px -6px rgba(17,35,52,1);\n\
+                  \ 189, 189, 0.15);\n  box-shadow: 0 0 13px -4px rgba(17,35,52,1);\n\
                   \  border-radius: 12px;\n}\n"
             entity: '[[entity]]'
             group: true
@@ -796,7 +797,7 @@ decluttering_templates:
             card_mod:
               style:
                 mmp-shortcuts$: ".mmp-shortcuts__button {\n  --mmp-button-color: rgba(189,\
-                  \ 189, 189, 0.15);\n  box-shadow: 3px 3px 13px -6px rgba(17,35,52,1);\n\
+                  \ 189, 189, 0.15);\n  box-shadow: 0 0 13px -4px rgba(17,35,52,1);\n\
                   \  border-radius: 12px;\n}\n"
             entity: '[[entity]]'
             group: true
@@ -823,23 +824,62 @@ decluttering_templates:
         child-padding: 0.5em
         expanded: '[[expanded]]'
         gap: 0em
-        overlay-margin: 0.5em
+        overlay-margin: 0
         padding: 0em
         title-card:
           cards:
+          - card:
+              card_mod:
+                style: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
+                  \ translate3d(0,0,0);\n  content: \"\";\n\n  {%- set app_name =\
+                  \ state_attr(\"[[entity]]\", \"source\") | lower -%}\n  {%- set\
+                  \ app_list = [\n    \"amazon\",\n    \"crunchyroll\",\n    \"disneynow\"\
+                  ,\n    \"netflix\",\n    \"pbs kids\",\n    \"smarttube\",\n   \
+                  \ \"spotify\",\n    \"youtube\",\n    \"youtube kids\"\n  ] %}\n\
+                  \n  background:\n  {%- if app_name in app_list -%}\n    url('/local/images/{{\
+                  \ app_name | lower | replace(\" \", \"-\") }}-logo.png') center\
+                  \ no-repeat\n  {%- elif not states(config.entity) in [\"off\", \"\
+                  unknown\", \"unavailable\", \"idle\"] and state_attr(config.entity,\
+                  \ \"entity_picture\") -%}\n    url('{{ state_attr(config.entity,\
+                  \ \"entity_picture\") }}') center no-repeat\n  {%- elif \"spotify\"\
+                  \ in config.entity -%}\n    url('/local/images/spotify-logo.png')\
+                  \ center no-repeat\n  {%- else -%}\n    url('/local/images/idle-media-player.png')\
+                  \ center no-repeat\n  {%- endif -%};\n  background-size: contain;\n\
+                  \n  border-radius: var(--control-border-radius);\n  {% set media_type\
+                  \ = state_attr(config.entity, 'media_content_type') %}\n  {% if\
+                  \ media_type == 'tvshow' %}\n    aspect-ratio: 16 / 9;\n    margin:\
+                  \ 0px 0px 0px -45px;\n    margin-top: 1px;\n  {% elif media_type\
+                  \ == 'movie' %}\n    aspect-ratio: 2 / 3;\n  {% else %}\n    aspect-ratio:\
+                  \ 1 / 1;\n    width: 99%;\n  {% endif %}\n}\nha-card {\n  transform:\
+                  \ translate3d(0,0,0);\n  -webkit-transform: translate3d(0,0,0);\n\
+                  \  border-radius: 30px;\n  overflow: visible !important;\n  box-shadow:\
+                  \ none !important;\n  background-color: transparent;\n  border:\
+                  \ none !important;\n}\n"
+              entity: '[[entity]]'
+              fill_container: false
+              icon_type: none
+              primary_info: none
+              secondary_info: none
+              show_volume_level: false
+              type: custom:mushroom-media-player-card
+              use_media_artwork: false
+              use_media_info: false
+            conditions:
+            - entity: '[[entity]]'
+              state_not: unavailable
+            - entity: '[[entity]]'
+              state_not: unknown
+            type: conditional
           - cards:
             - alignment: center
               card_mod:
                 style:
-                  .: "ha-card {\n  --ha-card-box-shadow: none;\n}\nh1 {\n  margin-left:\
-                    \ 1.2em !important;\n}\nh2 {\n  text-shadow: 0 0 18px rgba(0,\
-                    \ 0, 0, 0.5);\n}\n"
-              subtitle: "{% set entity = \"[[entity]]\" %} {% if states(entity) in\
-                \ [\"playing\", \"paused\", \"standby\"] %}\n  {{ states(entity) |\
-                \ title }}\n{% endif %}"
-              title: "{% if not \"[[\" in \"[[name]]\" %}\n  [[name]]\n{% else %}\n\
-                \  {{ state_attr(\"[[entity]]\", \"friendly_name\") | title }}\n{%\
-                \ endif %}"
+                  .: "ha-card {\n  --ha-card-box-shadow: none;\n}\nh1 {\n  text-shadow:\
+                    \ 0 0 5px rgba(17,35,52,1);\n}\nh2 {\n  color: var(--primary-text-color)\
+                    \ !important;\n  text-shadow: 0 0 5px rgba(17,35,52,1);\n}\n"
+              title: "{% set entity = \"[[entity]]\" %} {% if states(entity) in [\"\
+                playing\", \"paused\", \"standby\"] %}\n  {{ states(entity) | title\
+                \ }}\n{% endif %}"
               type: custom:mushroom-title-card
             - card:
                 alignment: center
@@ -847,10 +887,10 @@ decluttering_templates:
                   style:
                     .: "ha-card {\n  --chip-background: rgba(var(--rgb-disabled),\
                       \ 0.15);\n  --ha-card-box-shadow: none;\n  --chip-box-shadow:\
-                      \ 3px 3px 13px -6px rgba(17,35,52,1);\n  --chip-border-radius:\
-                      \ 12px;\n  --chip-height: 35px;\n  --chip-padding: 10px;\n \
-                      \ --chip-spacing: 18px;\n}\n.chip-container * {\n  margin-bottom:\
-                      \ var(--chip-spacing) !important;\n}\n"
+                      \ 0 0 13px -4px rgba(17,35,52,1);\n  --chip-border-radius: 12px;\n\
+                      \  --chip-height: 35px;\n  --chip-padding: 10px;\n  --chip-spacing:\
+                      \ 18px;\n}\n.chip-container * {\n  margin-bottom: var(--chip-spacing)\
+                      \ !important;\n}\n"
                 chips:
                 - entity: '[[entity]]'
                   icon: mdi:skip-backward
@@ -890,8 +930,9 @@ decluttering_templates:
                 alignment: center
                 card_mod:
                   style:
-                    .: "ha-card {\n  --ha-card-box-shadow: none;\n}\nh2 {\n  text-shadow:\
-                      \ 0 0 18px rgba(0, 0, 0, 0.5);\n}\n"
+                    .: "ha-card {\n  --ha-card-box-shadow: none;\n}\nh1 {\n  text-shadow:\
+                      \ 0 0 5px rgba(17,35,52,1);\n}\nh2 {\n  color: var(--primary-text-color)\
+                      \ !important;\n  text-shadow: 0 0 5px rgba(17,35,52,1);\n}\n"
                 subtitle: "{%- set episode = \"\" -%}\n{%- if state_attr(\"[[entity]]\"\
                   , \"media_season\")\n  and state_attr(\"[[entity]]\", \"media_episode\"\
                   ) -%}\n  {%- set episode =  \"S\" ~ state_attr(\"[[entity]]\", \"\
@@ -910,48 +951,6 @@ decluttering_templates:
                 state_not: idle
               type: conditional
             type: vertical-stack
-          - card:
-              card_mod:
-                style: "ha-card:before {\n  transform: translate3d(0,0,0);\n  -webkit-transform:\
-                  \ translate3d(0,0,0);\n  content: \"\";\n\n  {%- set app_name =\
-                  \ state_attr(\"[[entity]]\", \"app_name\") | lower -%}\n  {%- set\
-                  \ app_list = [\n    \"amazon\",\n    \"crunchyroll\",\n    \"disneynow\"\
-                  ,\n    \"netflix\",\n    \"pbs kids\",\n    \"spotify\",\n    \"\
-                  smarttube\",\n    \"youtube\",\n    \"youtube kids\"\n  ] %}\n\n\
-                  \  background:\n  {%- if app_name in app_list -%}\n    url('/local/images/{{\
-                  \ app_name | lower | replace(\" \", \"-\") }}-logo.png') center\
-                  \ no-repeat\n  {%- elif not states(config.entity) in [\"off\", \"\
-                  unknown\", \"unavailable\", \"idle\"] and state_attr(config.entity,\
-                  \ \"entity_picture\") -%}\n    url('{{ state_attr(config.entity,\
-                  \ \"entity_picture\") }}') center no-repeat\n  {%- elif \"spotify\"\
-                  \ in config.entity -%}\n    url('/local/images/spotify-logo.png')\
-                  \ center no-repeat\n  {%- else -%}\n    url('/local/images/idle-media-player.png')\
-                  \ center no-repeat\n  {%- endif -%};\n  background-size: contain;\n\
-                  \n  border-radius: var(--control-border-radius);\n  {% set media_type\
-                  \ = state_attr(config.entity, 'media_content_type') %}\n  {% if\
-                  \ media_type == 'tvshow' %}\n    aspect-ratio: 16 / 9;\n    margin:\
-                  \ 0px 0px 0px -45px;\n    margin-top: 1px;\n  {% elif media_type\
-                  \ == 'movie' %}\n    aspect-ratio: 2 / 3;\n  {% else %}\n    aspect-ratio:\
-                  \ 1 / 1;\n    width: 99%;\n  {% endif %}\n}\nha-card {\n  transform:\
-                  \ translate3d(0,0,0);\n  -webkit-transform: translate3d(0,0,0);\n\
-                  \  border-radius: 30px;\n  overflow: visible !important;\n  box-shadow:\
-                  \ none !important;\n  background-color: transparent;\n  border:\
-                  \ none !important;\n}\n"
-              entity: '[[entity]]'
-              fill_container: false
-              icon_type: none
-              primary_info: none
-              secondary_info: none
-              show_volume_level: false
-              type: custom:mushroom-media-player-card
-              use_media_artwork: false
-              use_media_info: false
-            conditions:
-            - entity: '[[entity]]'
-              state_not: unavailable
-            - entity: '[[entity]]'
-              state_not: unknown
-            type: conditional
           columns: 2
           square: false
           type: grid
@@ -1435,12 +1434,16 @@ decluttering_templates:
               action: fire-dom-event
               browser_mod:
                 data:
+                  card_mod:
+                    style:
+                      .: "div.container {\n  padding: 0 !important;\n}\n"
                   content:
                     template: media_card
                     type: custom:decluttering-card
                     variables:
                     - entity: '[[media]]'
                     - buttons: []
+                  title: Spotify ([[name]])
                 service: browser_mod.popup
             type: template
           conditions:
@@ -1750,8 +1753,8 @@ views:
         type: custom:mushroom-chips-card
       - card_mod:
           style: "ha-card {\n  background-color: var(--primary-background-color);\n\
-            \  border-radius: var(--ha-card-border-radius);\n  /*box-shadow: var(--ha-card-box-shadow,\
-            \ none);*/\n  border-width: 0;\n}\n"
+            \  border-radius: var(--ha-card-border-radius, 12px);\n  /*box-shadow:\
+            \ var(--ha-card-box-shadow, none);*/\n  border-width: 0;\n}\n"
         cards:
         - alignment: justify
           card_mod:
@@ -3079,11 +3082,13 @@ views:
             action: fire-dom-event
             browser_mod:
               data:
+                card_mod:
+                  style:
+                    .: "div.container {\n  padding: 0 !important;\n}\n"
                 content:
                   template: media_card
                   type: custom:decluttering-card
                   variables:
-                  - name: Living Room
                   - expanded: true
                   - entity: media_player.living_room_universal
                   - sound_buttons:
@@ -3099,6 +3104,7 @@ views:
                       id: MCh Stereo
                       name: Multi-Channel
                       type: sound_mode
+                title: Living Room
               service: browser_mod.popup
           type: template
         - entity: fan.living_room
@@ -3200,11 +3206,13 @@ views:
             action: fire-dom-event
             browser_mod:
               data:
+                card_mod:
+                  style:
+                    .: "div.container {\n  padding: 0 !important;\n}\n"
                 content:
                   template: media_card
                   type: custom:decluttering-card
                   variables:
-                  - name: Family Room
                   - expanded: true
                   - entity: media_player.family_room_universal
                   - sound_buttons:
@@ -3220,6 +3228,7 @@ views:
                       id: All Zone Stereo
                       name: Multi-Channel
                       type: sound_mode
+                title: Family Room
               service: browser_mod.popup
           type: template
         - card_mod:
@@ -3371,11 +3380,13 @@ views:
             action: fire-dom-event
             browser_mod:
               data:
+                card_mod:
+                  style:
+                    .: "div.container {\n  padding: 0 !important;\n}\n"
                 content:
                   template: media_card
                   type: custom:decluttering-card
                   variables:
-                  - name: Master Bedroom
                   - expanded: true
                   - entity: media_player.master_bedroom_universal
                   - buttons:
@@ -3407,6 +3418,7 @@ views:
                       id: com.spocky.projengmenu
                       name: Home
                       type: source
+                title: Master Bedroom
               service: browser_mod.popup
           type: template
         - entity: fan.master_bedroom
@@ -3939,7 +3951,6 @@ views:
         template: media_card
         type: custom:decluttering-card
         variables:
-        - name: Living Room
         - entity: media_player.living_room_universal
         - sound_buttons:
           - icon: mdi:surround-sound-5-1
@@ -4203,7 +4214,6 @@ views:
         template: media_card
         type: custom:decluttering-card
         variables:
-        - name: Family Room
         - entity: media_player.family_room_universal
         - sound_buttons:
           - icon: mdi:surround-sound-5-1
@@ -4220,7 +4230,7 @@ views:
             type: sound_mode
       conditions:
       - entity: sensor.family_room_denon_source
-        state: Shield
+        state_not: 'off'
       type: conditional
     - card:
         entity: media_player.denon_avr_s760h
@@ -4671,7 +4681,6 @@ views:
         template: media_card
         type: custom:decluttering-card
         variables:
-        - name: Master Bedroom
         - entity: media_player.master_bedroom_universal
         - buttons:
           - icon: mdi:plex
