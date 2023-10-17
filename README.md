@@ -19,8 +19,8 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Technical Details
 
-This Home Assistant install has approximately **2175 total entities**,
-including **1075 sensors**.
+This Home Assistant install has approximately **2189 total entities**,
+including **1088 sensors**.
 
 <details><summary>Stock Integrations</summary>
 
@@ -270,9 +270,11 @@ Home Assistant Service for sending commands to a Wifi enabled DreamScreen
 
 Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
 
-### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.1.5]
+### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.2.1]
 
 🔹 Use icons from fontawesome in home-assistant
+
+Authors: [@thomasloven](https://github.com/thomasloven).
 
 ### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v4.0.0]
 
@@ -340,7 +342,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.3.0]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.4.0]
 
 Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
 
@@ -412,7 +414,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.1.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.2.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -755,7 +757,7 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.10.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2023.10.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
