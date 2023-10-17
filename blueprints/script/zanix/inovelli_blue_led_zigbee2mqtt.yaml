@@ -1,7 +1,7 @@
 blueprint:
   name: "Inovelli Blue LED (Zigbee2MQTT)"
   description: |
-    Set LED effects for Inovelli VZM31-SN Blue Series 2-1 Switches using Zigbee2MQTT.
+    Set LED effects for Inovelli Blue Series Switches using Zigbee2MQTT.
 
     Features:
 
@@ -11,13 +11,18 @@ blueprint:
     - Debug info to diagnose issues
       - Warning: Debug mode will create a persistent message for every entity called in the script plus 1
 
+    Supported Models:
+
+    - Inovelli 2-in-1 switch + dimmer (VZM31-SN)
+    - Inovelli Fan Controller (VZM35-SN)
+
     Forum: https://community.home-assistant.io/t/z2m-inovelli-vzm31-sn-blue-series-2-1-switch-led-notification-script/489620
 
     GitHub: https://github.com/zanix/home-assistant-blueprints
 
-    ℹ️ Version: 2023.3.1
+    ℹ️ Version: 2023.10.1
   domain: script
-  source_url: https://github.com/zanix/home-assistant-blueprints/blob/master/script/inovelli_blue_led_zigbee2mqtt.yaml
+  source_url: https://github.com/zanix/home-assistant-blueprints/blob/main/script/inovelli_blue_led_zigbee2mqtt.yaml
 
 fields:
   target:
@@ -30,19 +35,12 @@ fields:
           manufacturer: Inovelli
         entity:
           integration: mqtt
-          domain: light
-  entity_id:
-    name: Entities
-    description: (Depricated, use Target) Inovelli devices to set effects.
-    example: light.living_room
-    selector:
-      entity:
-        domain: light
-        integration: mqtt
-        multiple: true
+          domain:
+            - light
+            - fan
   led:
     name: LED
-    description: Choose which LED to control. Default is All.
+    description: Choose which LED to control. Default is All. (Led 1 is at the bottom)
     default: All
     selector:
       select:
@@ -63,7 +61,6 @@ fields:
       select:
         custom_value: true
         options:
-          - "Off"
           - Red
           - Orange
           - Yellow
@@ -78,7 +75,7 @@ fields:
   level:
     name: Brightness level
     description: Value from 0 (off) to 100 (100% brightness).
-    default: 40
+    default: 100
     example: '40'
     selector:
       number:
@@ -96,22 +93,22 @@ fields:
           - 'Clear'
           - 'Solid'
           - 'Aurora'
+          - 'Slow Chase'
           - 'Chase'
-          - 'Fast Blink'
           - 'Fast Chase'
-          - 'Fast Falling'
-          - 'Fast Rising'
-          - 'Fast Siren'
+          - 'Slow Blink'
           - 'Medium Blink'
+          - 'Fast Blink'
+          - 'Slow Falling'
           - 'Medium Falling'
-          - 'Medium Rising'
+          - 'Fast Falling'
           - 'Open/Close'
           - 'Pulse'
-          - 'Slow Blink'
-          - 'Slow Chase'
-          - 'Slow Falling'
           - 'Slow Rising'
+          - 'Medium Rising'
+          - 'Fast Rising'
           - 'Slow Siren'
+          - 'Fast Siren'
           - 'Small to Big'
   duration:
     name: Duration
@@ -121,7 +118,6 @@ fields:
       select:
         custom_value: true
         options:
-          - 'Off'
           - 1 Second
           - 2 Seconds
           - 3 Seconds
@@ -198,12 +194,19 @@ variables:
   # Set to true to create a "persistent_notification" with debugging information.
   debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
 
+  # Domains and models to filter in the target entities.
+  domains:
+    - light
+    - fan
+  models:
+    - Inovelli 2-in-1 switch + dimmer (VZM31-SN)
+    - Inovelli Fan Controller (VZM35-SN)
+
   # Create a list of provided targets (areas, devices, entities)
   target: '{{ target|default([])|map(lower) }}'
   area: '{{ target.area_id|default([])|lower }}'
   device: '{{ target.device_id|default([])|lower }}'
   entity: '{{ target.entity_id|default([])|lower }}'
-  entity_id: '{{ entity_id|default([])|lower }}'
   command_path_map: '{{ command_path_map|default([]) }}'
   entity_list: >
     {% set switch = namespace(entities=[]) %}
@@ -226,7 +229,7 @@ variables:
       {# Detect switches #}
       {% for area in areas.areas %}
         {% for ent in area_entities(area) %}
-          {% if is_device_attr(ent, 'model', 'Inovelli 2-in-1 switch + dimmer (VZM31-SN)') and ent.split('.')[0] == 'light' %}
+          {% if device_attr(ent, 'model') in models and ent.split('.')[0] in domains %}
             {% set switch.entities = switch.entities + [ent|string|trim] %}
           {% endif %}
         {% endfor %}
@@ -250,7 +253,7 @@ variables:
       {# Detect switches #}
       {% for device in devices.devices %}
         {% for ent in device_entities(device) %}
-          {% if is_device_attr(ent, 'model', 'Inovelli 2-in-1 switch + dimmer (VZM31-SN)') and ent.split('.')[0] == 'light' %}
+          {% if device_attr(ent, 'model') in models and ent.split('.')[0] in domains %}
             {% set switch.entities = switch.entities + [ent|string|trim] %}
           {% endif %}
         {% endfor %}
@@ -273,33 +276,13 @@ variables:
       {% endif %}
       {# Detect switches #}
       {% for ent in entities.entities %}
-        {% if is_device_attr(ent, 'model', 'Inovelli 2-in-1 switch + dimmer (VZM31-SN)') and ent.split('.')[0] == 'light' %}
+        {% if device_attr(ent, 'model') in models and ent.split('.')[0] in domains %}
           {% set switch.entities = switch.entities + [ent|string|trim] %}
         {% endif %}
       {% endfor %}
     {% endif %}
 
-    {# Entity ID (backward compatibility) #}
-    {% set entities = namespace(entities=[]) %}
-    {% if entity_id %}
-      {# Convert to a list #}
-      {% if ',' in entity_id %}
-        {% set entitynum = entity_id.split(',') | count %}
-        {% for i in range(0, entitynum) %}
-          {% set entities.entities = entities.entities + [entity_id.split(',')[i]|string|trim ] %}
-        {% endfor %}
-      {% elif entity_id[0]|count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-        {% set entities.entities = entities.entities + [entity_id|string|trim] %}
-      {% else %}
-        {% set entities.entities = entity_id %}
-      {% endif %}
-      {# Detect switches #}
-      {% for ent in entities.entities %}
-        {% if is_device_attr(ent, 'model', 'Inovelli 2-in-1 switch + dimmer (VZM31-SN)') and ent.split('.')[0] == 'light' %}
-          {% set switch.entities = switch.entities + [ent|string|trim] %}
-        {% endif %}
-      {% endfor %}
-    {% endif %}
+    {# Output #}
     {{ switch.entities|unique|list|lower }}
 
   # Convert LED number to value
@@ -320,7 +303,7 @@ variables:
       {{ led|int(default=-1) }}
     {% endif %}
 
-  level: '{{ level|default(40) }}'
+  level: '{{ level|default(100) }}'
 
   # Convert Color to value
   colors:
@@ -446,8 +429,8 @@ variables:
     {% endif %}
 
 sequence:
-  # Set enable_debug = true above to provide output troubleshooting information.
-  - if:
+  - alias: "Debug: Send notification"
+    if:
       - condition: template
         value_template: '{{ debug == true }}'
     then:
@@ -465,12 +448,35 @@ sequence:
             duration: {{ duration }} ({{ duration_value }})
             command_path_map: {{ command_path_map }}
 
-  # Do not continue if we don't have at least one entity
-  - condition: template
+  - alias: "Check for an empty entity list"
+    condition: template
     value_template: |
       {{ entity_list|count > 0 }}
 
-  # Loop through entity_list
+  - variables:
+      payload: |-
+        {% if led_value == -1 %}
+          {% set payload_data = {
+              "led_effect": {
+                "effect": effect_value,
+                "color": color_value,
+                "level": level,
+                "duration": duration_value,
+              }
+            } %}
+        {% else %}
+          {% set payload_data = {
+              "individual_led_effect": {
+                "led": led_value,
+                "effect": effect_value,
+                "color": color_value,
+                "level": level,
+                "duration": duration_value,
+              }
+            } %}
+        {% endif %}
+        {{ payload_data | tojson }}
+
   - repeat:
       for_each: '{{ entity_list }}'
       sequence:
@@ -482,32 +488,9 @@ sequence:
               {% else %}
                 zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set
               {% endif %}
-            # Construct the payload
-            payload: |-
-              {% if led_value == -1 %}
-                {% set payload_data = {
-                    "led_effect": {
-                      "effect": effect_value,
-                      "color": color_value,
-                      "level": level,
-                      "duration": duration_value,
-                    }
-                  } %}
-              {% else %}
-                {% set payload_data = {
-                    "individual_led_effect": {
-                      "led": led_value,
-                      "effect": effect_value,
-                      "color": color_value,
-                      "level": level,
-                      "duration": duration_value,
-                    }
-                  } %}
-              {% endif %}
-              {{ payload_data|tojson }}
 
-        # Set enable_debug = true above to provide output troubleshooting information
-        - if:
+        - alias: "Debug: Send notification"
+          if:
             - condition: template
               value_template: '{{ debug == true }}'
           then:
@@ -521,8 +504,8 @@ sequence:
                   topic: {{ command_path }}
                   payload: {{ payload }}
 
-        # Send payload to the switch
-        - service: mqtt.publish
+        - alias: "Send payload to the switch"
+          service: mqtt.publish
           data:
             topic: '{{ command_path }}'
             payload_template: "{{ payload }}"
