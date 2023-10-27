@@ -1,6 +1,32 @@
 {# UTILITY MACROS #}
 
 {#
+  Checks list of entites for availability.
+  Expects a list of entities.
+    The number of entities are counted.
+    The number of entities that are NOT unknown, unavailable, empty, or none are counted.
+    If the 2 counts are the same, true is returned, else false, defaults to false.
+  Cast result to bool.
+
+  Example:
+    {% from 'util.jinja' import avail %}
+    {{- avail(['entity_1','entity_2']) | bool -}}
+#}
+{% macro avail(entity_list) %}
+  {# This 
+  #}
+  {# First tests to make sure this is a list #}
+  {%- if entity_list is iterable and
+    (entity_list is not string and entity_list is not mapping)
+  -%}
+    {{- entity_list | map('states') | reject('in', ['unknown', 'unavailable', 'none', ''])
+    | list | count == entity_list | count -}}
+  {%- else -%}
+    {{ false }}
+  {%- endif -%}
+{% endmacro %}
+
+{#
   Generate a friendly list of entity names.
   Accepts a list of entity objects or Entity IDs.
 #}
@@ -162,6 +188,7 @@
     "movie": "mdi:movie-open",
     "music": "mdi:music",
     "playlist": "mdi:playlist-music",
+    "game": "mdi:gamepad-variant",
   } -%}
   {%- if media_type in media_type_list -%}
     {{ media_type_list[media_type] }}
