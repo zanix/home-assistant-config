@@ -6,8 +6,8 @@
 {%- macro door_check() -%}
   {% set security = expand("binary_sensor.all_doors") | selectattr("state", "==", "on") | map(attribute="entity_id") | list %}
   {% set security = security + expand([
-    "lock.lock_front",
-    "cover.garage_door"
+    "lock.front_door",
+    "cover.opengarage"
   ]) | selectattr("state", "in", ["open", "unlocked"]) | map(attribute="entity_id") | list %}
 
   {% if security | length > 0 %}
@@ -41,6 +41,13 @@
 {%- endmacro -%}
 
 {#
+  Report the current inside temperature.
+#}
+{%- macro inside_weather() -%}
+  Inside the house, it is {{ states('sensor.ecobee_current_temperature') | int }} degrees.
+{%- endmacro -%}
+
+{#
   Report if any light is on.
 #}
 {%- macro light_check() -%}
@@ -50,13 +57,6 @@
   {% elif lights_on | length > 1 %}
     There are {{ lights_on | length }} lights on right now. The {{ get_friendly_names(lights_on) }}.
   {% endif %}
-{%- endmacro -%}
-
-{#
-  Report the current inside temperature.
-#}
-{%- macro inside_weather() -%}
-  Inside the house, it is {{ states('sensor.home_temperature') | int }} degrees.
 {%- endmacro -%}
 
 {#
@@ -74,11 +74,11 @@
     "wind_": "windy",
     "windy-variant": "windy",
   } -%}
-  {%- set condition = states('weather.openweathermap') -%}
+  {%- set condition = states('weather.owm_daily') -%}
   {%- if condition in conditions -%}
     {%- set condition = conditions[condition] -%}
   {%- endif -%}
-  {{ ['Currently', 'Right now'] | random }}, it is {{ state_attr('weather.openweathermap', 'temperature') | int }} degrees fahrenheit, and {{ condition }}. {{ states('sensor.forecast') }}
+  {{ ['Currently', 'Right now'] | random }}, it is {{ state_attr('weather.owm_daily', 'temperature') | int }} degrees fahrenheit, and {{ condition }}. {{ states('sensor.forecast') }}
 {%- endmacro -%}
 
 {#
