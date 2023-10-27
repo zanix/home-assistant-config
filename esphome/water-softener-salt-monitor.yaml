@@ -1,0 +1,110 @@
+---
+# Water Softener Salt Level Monitor
+# Monitors the salt level in a water softener using a sonic distance finder.
+#
+# Source: https://adonno.com/salt-level-sensor/
+# Source: https://www.chindemax.com/2020/10/14/walter-softener-salt-level-checker-uisng-nodemcu-homeassistant/
+
+esphome:
+  name: water-softener-salt-monitor
+  friendly_name: Water Softener Salt Monitor
+
+esp8266:
+  board: d1_mini
+
+substitutions:
+  device_name: "Water Softener Salt Monitor"
+  device_id: salt_monitor
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret encryption_key
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "AP"
+    password: !secret ap_password
+    ap_timeout: 3min
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: America/Boise
+
+preferences:
+  # The default of 1min is far too short--flash chip is rated for approx 100k writes.
+  flash_write_interval: "48h"
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: "IP"
+    ssid:
+      name: "SSID"
+    bssid:
+      name: "BSSID"
+
+button:
+  - platform: restart
+    name: "Restart"
+
+sensor:
+  - platform: uptime
+    name: "Uptime"
+    unit_of_measurement: h
+    filters:
+      - lambda: return int((x + 1800.0) / 3600.0);
+
+  - platform: wifi_signal
+    name: "Wifi Signal"
+    update_interval: 5min
+
+  - platform: ultrasonic
+    trigger_pin: D1
+    echo_pin: D2
+    name: "Salt level raw"
+    id: "${device_id}_raw"
+    update_interval: 1min
+    unit_of_measurement: "m"
+    filters:
+      - filter_out: nan
+      - sliding_window_moving_average:
+          window_size: 6
+          send_every: 6
+
+  - platform: template
+    name: "Salt level"
+    state_class: measurement
+    icon: "mdi:percent"
+    update_interval: 5min
+    unit_of_measurement: "%"
+    # ((Salt Height - Bottom) * 100 / (Max - Bottom)
+    # Bottom should be the lowest level, usually the brine level.
+    lambda: return ((id(${device_id}_raw).state - 0.72) * 100) / (0.21 - 0.72);
+
+  - platform: template
+    name: "Salt level cm"
+    device_class: distance
+    state_class: measurement
+    icon: "mdi:ruler"
+    update_interval: 5min
+    unit_of_measurement: "cm"
+    # (Tank Height - Salt Height) * 100
+    lambda: return (0.93 - id(${device_id}_raw).state) * 100;
