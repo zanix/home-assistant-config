@@ -13,8 +13,6 @@
     {{- avail(['entity_1','entity_2']) | bool -}}
 #}
 {% macro avail(entity_list) %}
-  {# This 
-  #}
   {# First tests to make sure this is a list #}
   {%- if entity_list is iterable and
     (entity_list is not string and entity_list is not mapping)
@@ -25,39 +23,6 @@
     {{ false }}
   {%- endif -%}
 {% endmacro %}
-
-{#
-  Generate a friendly list of entity names.
-  Accepts a list of entity objects or Entity IDs.
-#}
-{%- macro get_friendly_names(entity_list) -%}
-  {% for entity in entity_list -%}
-    {% set name = entity %}
-    {%- if not state_attr(entity, "friendly_name") in ["unavailable", "unknown"] -%}
-      {% set name = state_attr(entity, "friendly_name") %}
-    {%- endif -%}
-    {{ name }}{{ ', ' if loop.length > 2 and not loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
-  {%- endfor %}
-{%- endmacro -%}
-
-{#
-  Flips a dictionary keys and values.
-  The result of this needs to be converted using from_json.
-#}
-{%- macro dict_flip(my_dict) -%}
-  {%- set new = namespace(items={}) -%}
-  {%- for k, v in my_dict.items() -%}
-    {%- set new.items = dict(new.items, **{v:k}) -%}
-  {%- endfor -%}
-  {{ new.items | to_json }}
-{%- endmacro -%}
-
-{#
-  Converts various "true" states into a boolean true or false.
-#}
-{%- macro truthify(state) -%}
-  {{ state in ['on', 'true', 'open'] }}
-{%- endmacro -%}
 
 {#
   Returns color based on battery level.
@@ -140,14 +105,6 @@
 {%- endmacro -%}
 
 {#
-  Return a random string.
-#}
-{%- macro random_string(len) -%}
-  {% set char = 'abcdefghijklmnopqrstuvwxyz' %}
-  {{ ''.join((('0123456789' ~ char + char | upper)  * len) | slice(len) | map('random')) }}
-{%- endmacro -%}
-
-{#
   Return last changed using change history sensor.
 #}
 {%- macro custom_timedelta(entity) -%}
@@ -161,6 +118,32 @@
   {%- else -%}
     {{ relative_time(last_changed) }} ago
   {%- endif -%}
+{%- endmacro -%}
+
+{#
+  Flips a dictionary keys and values.
+  The result of this needs to be converted using from_json.
+#}
+{%- macro dict_flip(my_dict) -%}
+  {%- set new = namespace(items={}) -%}
+  {%- for k, v in my_dict.items() -%}
+    {%- set new.items = dict(new.items, **{v:k}) -%}
+  {%- endfor -%}
+  {{ new.items | to_json }}
+{%- endmacro -%}
+
+{#
+  Generate a friendly list of entity names.
+  Accepts a list of entity objects or Entity IDs.
+#}
+{%- macro get_friendly_names(entity_list) -%}
+  {% for entity in entity_list -%}
+    {% set name = entity %}
+    {%- if not state_attr(entity, "friendly_name") in ["unavailable", "unknown"] -%}
+      {% set name = state_attr(entity, "friendly_name") %}
+    {%- endif -%}
+    {{ name }}{{ ', ' if loop.length > 2 and not loop.last else ' ' }}{{ 'and ' if loop.length > 1 and loop.revindex0 == 1 }}
+  {%- endfor %}
 {%- endmacro -%}
 
 {#
@@ -200,15 +183,30 @@
 {%- endmacro -%}
 
 {#
+  Return a random string.
+#}
+{%- macro random_string(len) -%}
+  {% set char = 'abcdefghijklmnopqrstuvwxyz' %}
+  {{ ''.join((('0123456789' ~ char + char | upper)  * len) | slice(len) | map('random')) }}
+{%- endmacro -%}
+
+{#
   Return a count of open doors or unlocked locks.
 #}
 {%- macro security_count() -%}
   {%- set security = expand("binary_sensor.all_doors") | selectattr("state", "==", "on") | map(attribute="entity_id") | list -%}
   {%- set security = security + expand([
-    "lock.lock_front",
-    "cover.garage_door"
+    "lock.front_door",
+    "cover.opengarage"
   ]) | selectattr("state", "in", ["open", "unlocked"]) | map(attribute="entity_id") | list -%}
   {{ security | count }}
+{%- endmacro -%}
+
+{#
+  Converts various "true" states into a boolean true or false.
+#}
+{%- macro truthify(state) -%}
+  {{ state in ['on', 'true', 'open'] }}
 {%- endmacro -%}
 
 {#
