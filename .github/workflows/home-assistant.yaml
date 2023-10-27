@@ -1,0 +1,114 @@
+---
+# Source: https://github.com/frenck/action-home-assistant
+# Examples: https://github.com/frenck/home-assistant-config/blob/master/.github/workflows/home-assistant.yml
+#          https://github.com/metbril/home-assistant-config/blob/main/.github/workflows/ha-config-check.yml
+#
+name: Home Assistant CI
+# yamllint disable-line rule:truthy
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: 0 12 * * 4
+jobs:
+  yamllint:
+    name: 🧹 YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4.1.1
+      - name: 🚀 Run YAMLlint
+        uses: frenck/action-yamllint@v1.4.1
+
+  remarklint:
+    name: 🧹 Remark Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4.1.1
+      - name: 🚀 Run Remark lint
+        uses: "docker://pipelinecomponents/remark-lint:latest"
+        continue-on-error: true
+        with:
+          args: "remark --no-stdout --color --frail --use preset-lint-recommended ."
+
+  ha_version:
+    name: "🏠 Get HA Version"
+    runs-on: ubuntu-latest
+    outputs:
+      current_version: ${{ steps.currentver.outputs.current_version }}
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4.1.1
+      - name: 🚀 Get Installed Version from .HA_VERSION
+        id: currentver
+        run: |
+          HA_VERSION=$(<.HA_VERSION)
+          echo $HA_VERSION
+          echo "current_version=$HA_VERSION" >> $GITHUB_OUTPUT
+
+  home-assistant:
+    name: "🏠 HA Core ${{ matrix.version }} Check"
+    needs: [yamllint, ha_version]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ["${{ needs.ha_version.outputs.current_version }}", "stable", "beta", "dev"]
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4.1.1
+
+      - name: 📄 Create empty files
+        run: |
+          touch ./home-assistant_v2.db
+          touch ./home-assistant.log
+
+      - name: 📁 Create custom_components folder
+        run: |
+          mkdir -p ./custom_components
+
+      # Check out custom components that require YAML configuration.
+      # yamllint disable rule:line-length
+
+      - name: 📥 Clone custom component (Dreamscreen)
+        run: |
+          git clone https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service.git
+          mv -v Home-Assistant-DreamScreen-Service/custom_components/* ./custom_components
+
+      - name: 📥 Clone custom component (UniFi Status)
+        run: |
+          git clone https://github.com/zvldz/unifi_status.git
+          mv -v unifi_status/custom_components/* ./custom_components
+
+      # yamllint enable rule:line-length
+
+      - name: 🚀 Run Home Assistant Configuration Check
+        uses: frenck/action-home-assistant@v1.4
+        with:
+          path: "."
+          secrets: ./.stubs/secrets.yaml
+          version: "${{ matrix.version }}"
+
+  esphome:
+    name: "🛠️ ESPHome Check"
+    runs-on: ubuntu-latest
+    needs: [yamllint]
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4.1.1
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install esphome
+          pip list
+          esphome version
+      - name: Copy secrets stub into configuration folder
+        run: cp ./.stubs/espsecrets.yaml ./esphome/secrets.yaml
+      - name: 🚀 Run ESPHome on all files
+        # yamllint disable rule:line-length
+        run: |
+          for file in $(find ./esphome -type f -name "*.yaml" -maxdepth 1 -not -name "secrets.yaml"); do esphome config "${file}"; done

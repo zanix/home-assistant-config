@@ -1,0 +1,97 @@
+---
+# Car presence & position detection in Home Assistant with ESPHome
+# source: https://adonno.com/car-presence-position-detection/
+
+esphome:
+  name: car-presence
+  friendly_name: Car Presence
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret encryption_key
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "AP"
+    password: !secret ap_password
+    ap_timeout: 3min
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: America/Boise
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: "IP"
+    ssid:
+      name: "SSID"
+    bssid:
+      name: "BSSID"
+
+button:
+  - platform: restart
+    name: "Restart"
+
+binary_sensor:
+  - platform: template
+    name: "Left"
+    device_class: presence
+    lambda: |-
+      return id(car_presence_left_distance).state < 1.5;
+
+  - platform: template
+    name: "Right"
+    device_class: presence
+    lambda: |-
+      return id(car_presence_right_distance).state < 1.5;
+
+sensor:
+  - platform: uptime
+    name: "Uptime"
+    unit_of_measurement: h
+    filters:
+      - lambda: return int((x + 1800.0) / 3600.0);
+
+  - platform: wifi_signal
+    name: "Wifi Signal"
+    update_interval: 5min
+
+  - platform: ultrasonic
+    name: "Left Distance"
+    id: "car_presence_left_distance"
+    trigger_pin: D1
+    echo_pin: D2
+    update_interval: 10s
+    filters:
+      - filter_out: nan
+
+  - platform: ultrasonic
+    name: "Right Distance"
+    id: "car_presence_right_distance"
+    trigger_pin: D3
+    echo_pin: D0
+    update_interval: 10s
+    filters:
+      - filter_out: nan
