@@ -1,0 +1,204 @@
+---
+# The open source modular smart mirror platform.
+# This is a bunch of rest sensors and switches to interact with the
+# Remote Contol module for MagicMirror
+#
+# https://magicmirror.builders
+# https://github.com/Jopyth/MMM-Remote-Control
+# https://www.home-assistant.io/integrations/light.mqtt#default-schema
+# https://www.home-assistant.io/integrations/button.mqtt/
+# https://www.home-assistant.io/integrations/binary_sensor.mqtt/
+#
+mqtt:
+  binary_sensor:
+    name: Smart Display Connected
+    state_topic: "magicmirror/diningroom/availability"
+    payload_on: "online"
+    payload_off: "offline"
+
+  light:
+    name: Smart Display Monitor
+    optimistic: false
+    availability_topic: "magicmirror/diningroom/availability"
+    state_topic: "magicmirror/diningroom/monitor/state"
+    payload_on: "ON"
+    payload_off: "OFF"
+    command_topic: "magicmirror/diningroom/monitor/set"
+    on_command_type: first
+    brightness_state_topic: "magicmirror/diningroom/monitor/brightness"
+    brightness_command_topic: "magicmirror/diningroom/monitor/brightness/set"
+    brightness_command_template: '{ "action": "BRIGHTNESS", "value": "{{ value }}" }'
+    brightness_scale: 100
+
+  button:
+    - name: Smart Display Shutdown
+      availability_topic: "magicmirror/diningroom/availability"
+      command_topic: "magicmirror/diningroom/system"
+      payload_press: "SHUTDOWN"
+    - name: Smart Display Reboot
+      availability_topic: "magicmirror/diningroom/availability"
+      command_topic: "magicmirror/diningroom/system"
+      payload_press: "REBOOT"
+    - name: Smart Display Restart
+      availability_topic: "magicmirror/diningroom/availability"
+      command_topic: "magicmirror/diningroom/system"
+      payload_press: "RESTART"
+
+automation:
+  - id: smart_display_on_off_schedule
+    alias: "📱 Smart Display On/Off Schedule"
+    trigger:
+      - platform: state
+        entity_id: schedule.smart_display
+        to: "on"
+        id: "on"
+      - platform: state
+        entity_id: schedule.smart_display
+        to: "off"
+        id: "off"
+    condition: []
+    action:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: "on"
+              - condition: state
+                entity_id: group.people
+                state: home
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.smart_display_monitor
+          - conditions:
+              - condition: trigger
+                id: "off"
+            sequence:
+              - service: light.turn_off
+                target:
+                  entity_id: light.smart_display_monitor
+
+  - id: smart_display_brightness_on_lights_on_off
+    alias: "📱 Smart Display Brightness on Lights On/Off"
+    trigger:
+      - platform: state
+        entity_id: light.kitchen
+      - platform: state
+        entity_id: switch.dining_room_light
+      - platform: state
+        entity_id: light.kitchen
+        attribute: brightness
+    condition:
+      - condition: state
+        entity_id: group.people
+        state: home
+      - condition: state
+        entity_id: schedule.smart_display
+        state: "on"
+      - condition: sun
+        after: sunset
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: switch.dining_room_light
+                state: "off"
+              - or:
+                  - condition: state
+                    entity_id: light.kitchen
+                    state: "off"
+                  - condition: numeric_state
+                    entity_id: light.kitchen
+                    attribute: brightness
+                    below: 45
+            sequence:
+              - service: light.turn_on
+                data:
+                  brightness_pct: 40
+                target:
+                  entity_id: light.smart_display_monitor
+          - conditions:
+              - condition: state
+                entity_id: switch.dining_room_light
+                state: "on"
+              - and:
+                  - condition: state
+                    entity_id: light.kitchen
+                    state: "on"
+                  - condition: numeric_state
+                    entity_id: light.kitchen
+                    attribute: brightness
+                    above: 45
+            sequence:
+              - service: light.turn_on
+                data:
+                  brightness_pct: 100
+                target:
+                  entity_id: light.smart_display_monitor
+
+  - id: smart_display_dim_at_sunset
+    alias: "📱 Smart Display Dim at Sunset"
+    trigger:
+      platform: sun
+      event: sunset
+    condition:
+      - condition: state
+        entity_id: group.people
+        state: home
+      - condition: state
+        entity_id: switch.dining_room_light
+        state: "off"
+      - or:
+          - condition: state
+            entity_id: light.kitchen
+            state: "off"
+          - condition: numeric_state
+            entity_id: light.kitchen
+            attribute: brightness
+            below: 45
+      - condition: state
+        entity_id: schedule.smart_display
+        state: "on"
+    action:
+      - service: light.turn_on
+        target:
+          entity_id: light.smart_display_monitor
+        data:
+          brightness_pct: 40
+
+  - id: smart_display_on_off_presence
+    alias: "📱 Smart Display On/Off Presence"
+    trigger:
+      - platform: state
+        entity_id: group.people
+        to: not_home
+        from: home
+        for:
+          hours: 0
+          minutes: 5
+          seconds: 0
+        id: away
+      - platform: state
+        entity_id: group.people
+        from: not_home
+        to: home
+        id: home
+    condition:
+      - condition: state
+        entity_id: schedule.smart_display
+        state: "on"
+    action:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: home
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: light.smart_display_monitor
+          - conditions:
+              - condition: trigger
+                id: away
+            sequence:
+              - service: light.turn_off
+                target:
+                  entity_id: light.smart_display_monitor
