@@ -14,7 +14,7 @@
   action:
   - service: cover.close_cover
     target:
-      entity_id: cover.garage_door
+      entity_id: cover.opengarage
     data: {}
   - service: script.notify_mobile
     data:
@@ -84,9 +84,9 @@
       action: ignore_door_alerts
   condition: []
   action:
-  - service: input_boolean.turn_on
+  - service: input_boolean.turn_off
     target:
-      entity_id: input_boolean.ignore_alert_doors
+      entity_id: input_boolean.door_open_alerts
     data: {}
   - if:
     - condition: template
@@ -127,9 +127,9 @@
       action: ignore_garage_door_alerts
   condition: []
   action:
-  - service: input_boolean.turn_on
+  - service: input_boolean.turn_off
     target:
-      entity_id: input_boolean.ignore_alert_garage_door
+      entity_id: input_boolean.garage_door_open_alerts
     data: {}
   - service: script.notify_mobile
     data:
@@ -167,9 +167,9 @@
     event_data:
       action: ignore_window_alerts
   action:
-  - service: input_boolean.turn_on
+  - service: input_boolean.turn_off
     target:
-      entity_id: input_boolean.ignore_alert_windows
+      entity_id: input_boolean.window_open_alerts
     data: {}
   - if:
     - condition: template
@@ -240,7 +240,7 @@
   - parallel:
     - service: switch.turn_on
       target:
-        entity_id: switch.water_main
+        entity_id: switch.water_main_valve
       data: {}
     - service: script.notify_mobile
       data:
@@ -252,7 +252,7 @@
         notification_id: water-leak
   - wait_for_trigger:
     - platform: state
-      entity_id: switch.water_main
+      entity_id: switch.water_main_valve
       to: 'on'
     timeout: 00:00:30
   - parallel:
@@ -274,9 +274,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/water-alert.png
@@ -298,22 +298,22 @@
         entity_id: binary_sensor.ardena_connected
         state: 'on'
       sequence:
-      - service: switch.turn_on
-        entity_id: switch.computer_exhaust_fan
+      - service: fan.turn_on
+        entity_id: fan.computer
     - conditions:
       - condition: state
         entity_id: binary_sensor.ardena_connected
         state: 'off'
       sequence:
-      - service: switch.turn_off
-        entity_id: switch.computer_exhaust_fan
+      - service: fan.turn_off
+        entity_id: fan.computer
   mode: single
 - id: '1665682307865'
   alias: "\U0001F5A5️ [Ardena] Power on Activity"
   description: Turns on Ardena when the Family Room Harmony activity is set to Computer
   trigger:
   - platform: state
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
     attribute: current_activity
     to: Computer
   condition: []
@@ -326,7 +326,7 @@
   description: Puts Ardena to sleep when the Family Room Harmony activity is Off
   trigger:
   - platform: state
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
     attribute: current_activity
     from: Computer
     to: PowerOff
@@ -393,9 +393,9 @@
   - service: script.notify_pipup
     data:
       entity:
-      - media_player.living_room_shield
-      - media_player.family_room_shield
-      - media_player.master_bedroom_shield
+      - media_player.shield_living_room
+      - media_player.shield_family_room
+      - media_player.shield_master_bedroom
       title: Mail Today
       message: '{{ message }}'
       image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
@@ -436,9 +436,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Package Delivery
         message: '{{ message }}'
         icon_url: local/icons/package-variant.png
@@ -478,9 +478,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Package Delivery
         icon_url: local/icons/package.png
         message: '{{ message }}'
@@ -493,7 +493,7 @@
   description: Sets the current tariff to Summer Off-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_net_monthly
+    entity_id: sensor.sol_ark_grid_net_monthly
     below: 700
   - platform: state
     entity_id:
@@ -508,13 +508,13 @@
     entity_id: binary_sensor.tariff_summer
     state: 'on'
   - condition: numeric_state
-    entity_id: sensor.grid_net_monthly
+    entity_id: sensor.sol_ark_grid_net_monthly
     below: 700
   action:
   - service: select.select_option
     data:
       entity_id: select.monthly_energy
-      option: summer_offpeak
+      option: summer_off_peak
   - service: script.notify_mobile
     data:
       who: parents
@@ -536,7 +536,7 @@
   description: Sets the current tariff to Summer On-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_net_monthly
+    entity_id: sensor.sol_ark_grid_net_monthly
     above: 700
   condition:
   - condition: template
@@ -571,7 +571,7 @@
   description: Sets the current tariff to Winter Off-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_net_monthly
+    entity_id: sensor.sol_ark_grid_net_monthly
     below: 1000
   - platform: state
     entity_id:
@@ -586,13 +586,13 @@
     entity_id: binary_sensor.tariff_winter
     state: 'on'
   - condition: numeric_state
-    entity_id: sensor.grid_net_monthly
+    entity_id: sensor.sol_ark_grid_net_monthly
     below: 1000
   action:
   - service: select.select_option
     data:
       entity_id: select.monthly_energy
-      option: winter_offpeak
+      option: winter_off_peak
   - service: script.notify_mobile
     data:
       who: parents
@@ -614,7 +614,7 @@
   description: Sets the current tariff to Winter On-Peak and sends a notification.
   trigger:
   - platform: numeric_state
-    entity_id: sensor.grid_net_monthly
+    entity_id: sensor.sol_ark_grid_net_monthly
     above: 1000
   condition:
   - condition: template
@@ -657,101 +657,78 @@
   - service: mail_and_packages.update_image
     data: {}
   mode: single
-- id: '1665685849265'
-  alias: "\U0001F4A1 Ethan Lamp off at Sunrise"
-  description: Turns Ethan's lamp off at sunrise
-  trigger:
-  - platform: sun
-    event: sunrise
-    offset: +00:10:00
-  condition: []
-  action:
-  - service: switch.turn_off
-    entity_id: switch.ethans_lamp
-  mode: single
-- id: '1665685861972'
-  alias: "\U0001F4A1 Ethan Lamp on at Night"
-  description: Turn Ethan's lamp on at night
-  trigger:
-  - platform: time
-    at: input_datetime.ethans_lamp_on
-  condition: []
-  action:
-  - service: switch.turn_on
-    entity_id: switch.ethans_lamp
-  mode: single
 - id: '1665685949212'
   alias: ⏯ Family Room Media Auto Off
   description: Automatically turn off the Media Center in the Family Room
   trigger:
   - platform: state
-    entity_id: media_player.family_room_shield
+    entity_id: media_player.shield_family_room
     to: 'off'
   condition:
   - condition: template
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
       }}'
   - condition: state
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
     state: 'on'
   - condition: state
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
     attribute: current_activity
     state: Shield TV
   action:
   - service: remote.turn_off
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
   mode: restart
 - id: '1665685981903'
   alias: ⏯ Living Room Media Auto Off
   description: Automatically turn off the Media Center in the Living Room
   trigger:
   - platform: state
-    entity_id: media_player.living_room_shield
+    entity_id: media_player.shield_living_room
     to: 'off'
   condition:
   - condition: template
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
       }}'
   - condition: state
-    entity_id: remote.living_room
+    entity_id: remote.harmony_living_room
     state: 'on'
   - condition: state
-    entity_id: remote.living_room
+    entity_id: remote.harmony_living_room
     attribute: current_activity
     state: Shield TV
   action:
   - service: remote.turn_off
-    entity_id: remote.living_room
+    entity_id: remote.harmony_living_room
   mode: restart
 - id: '1665685997408'
   alias: ⏯ Master Bedroom Media Auto Off
   description: Automatically turn off the Media Center in the Master Bedroom
   trigger:
   - platform: state
-    entity_id: media_player.master_bedroom_shield
+    entity_id: media_player.shield_master_bedroom
     to: 'off'
   condition:
   - condition: template
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
       }}'
   - condition: state
-    entity_id: remote.master_bedroom
+    entity_id: remote.harmony_master_bedroom
     state: 'on'
   - condition: state
-    entity_id: remote.master_bedroom
+    entity_id: remote.harmony_master_bedroom
     attribute: current_activity
     state: Shield TV
   action:
   - service: remote.turn_off
-    entity_id: remote.master_bedroom
+    entity_id: remote.harmony_master_bedroom
   mode: restart
 - id: '1665686040957'
   alias: "\U0001F9FA Dryer Running"
   description: Actions when the dryer is running and is done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.dryer_power
+    entity_id: sensor.emporiavue_dryer_power
     for:
       minutes: 1
     above: 100
@@ -759,11 +736,11 @@
   action:
   - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.dryer
+      entity_id: input_boolean.dryer_status
     data: {}
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dryer_power
+      entity_id: sensor.emporiavue_dryer_power
       below: 100
       for:
         hours: 0
@@ -772,7 +749,7 @@
   - parallel:
     - service: input_boolean.turn_off
       target:
-        entity_id: input_boolean.dryer
+        entity_id: input_boolean.dryer_status
       data: {}
     - service: script.notify_mobile
       data:
@@ -792,9 +769,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Laundry
         message: The dryer is done!
         icon_url: local/icons/tumble-dryer.png
@@ -805,7 +782,7 @@
   description: Actions when the washer is running and is done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.washer_power
+    entity_id: sensor.emporiavue_washer_power
     for:
       minutes: 1
     above: 10
@@ -813,18 +790,18 @@
   action:
   - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.washer
+      entity_id: input_boolean.washer_status
     data: {}
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.washer_power
+      entity_id: sensor.emporiavue_washer_power
       below: 10
       for:
         minutes: 1
   - parallel:
     - service: input_boolean.turn_off
       target:
-        entity_id: input_boolean.washer
+        entity_id: input_boolean.washer_status
       data: {}
     - service: script.notify_mobile
       data:
@@ -844,9 +821,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Laundry
         message: The washer is done!
         icon_url: local/icons/washing-machine.png
@@ -1025,21 +1002,21 @@
     at: input_datetime.front_door_lock_night
   condition:
   - condition: state
-    entity_id: lock.lock_front
+    entity_id: lock.front_door
     state: unlocked
   - condition: state
-    entity_id: binary_sensor.front_door_is_open
+    entity_id: binary_sensor.front_door_contact_door_is_open
     state: 'off'
   action:
   - service: lock.lock
-    entity_id: lock.lock_front
+    entity_id: lock.front_door
   mode: single
 - id: '1665686891355'
   alias: "\U0001F512 Front Door Lock Jammed"
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.lock_front_access_control_lock_jammed
+    entity_id: binary_sensor.front_door_lock_lock_jammed
     to: 'on'
   condition: []
   action:
@@ -1061,15 +1038,15 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Front Door Lock Issue
         message: '{{ message }}'
         icon_url: local/icons/lock-smart.png
     - service: script.notify_speech
       data:
-        media_player: media_player.living_room_speaker
+        media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
   mode: single
   variables:
@@ -1092,12 +1069,12 @@
     after: input_datetime.front_door_auto_lock_off
     before: input_datetime.front_door_lock_night
   - condition: state
-    entity_id: lock.lock_front
+    entity_id: lock.front_door
     state: unlocked
   action:
   - parallel:
     - service: lock.lock
-      entity_id: lock.lock_front
+      entity_id: lock.front_door
     - service: script.notify_mobile
       data:
         who: parents
@@ -1111,7 +1088,7 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: lock.lock_front
+    entity_id: lock.front_door
     to: unlocked
     for:
       minutes: 2
@@ -1120,11 +1097,11 @@
     after: input_datetime.front_door_lock_night
     before: input_datetime.front_door_auto_lock_off
   - condition: state
-    entity_id: binary_sensor.front_door_is_open
+    entity_id: binary_sensor.front_door_contact_door_is_open
     state: 'off'
   action:
   - service: lock.lock
-    entity_id: lock.lock_front
+    entity_id: lock.front_door
   mode: single
 - id: '1665687778783'
   alias: "\U0001F37D️ Dishwasher is Running"
@@ -1132,7 +1109,7 @@
     done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.dishwasher_disposal_power
+    entity_id: sensor.emporiavue_dishwasher_disposal_power
     for:
       minutes: 2
     above: 40
@@ -1156,7 +1133,7 @@
       option: Washing
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_power
+      entity_id: sensor.emporiavue_dishwasher_disposal_power
       below: 20
       for:
         minutes: 2
@@ -1167,7 +1144,7 @@
       option: Draining
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_power
+      entity_id: sensor.emporiavue_dishwasher_disposal_power
       above: 200
       for:
         minutes: 2
@@ -1178,7 +1155,7 @@
       option: Rinsing
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_power
+      entity_id: sensor.emporiavue_dishwasher_disposal_power
       below: 20
       for:
         minutes: 2
@@ -1189,7 +1166,7 @@
       option: Drying
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.dishwasher_disposal_power
+      entity_id: sensor.emporiavue_dishwasher_disposal_power
       below: 20
       for:
         minutes: 5
@@ -1220,9 +1197,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Dishwasher
         message: The dishwasher is done!
         icon_url: local/icons/dishwasher.png
@@ -1234,10 +1211,10 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.front_door_is_open
+    - binary_sensor.front_door_contact_door_is_open
     - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_door_is_open
-    - binary_sensor.garage_side_door_is_open
+    - binary_sensor.garage_entry_door_contact_door_is_open
+    - binary_sensor.garage_side_door_contact_door_is_open
     from: 'on'
     to: 'off'
     for:
@@ -1254,9 +1231,9 @@
       value_template: '{{ expand("binary_sensor.all_doors") | selectattr("state",
         "==", "on") | map(attribute="entity_id") | list | count == 0 }}'
     then:
-    - service: input_boolean.turn_off
+    - service: input_boolean.turn_on
       target:
-        entity_id: input_boolean.ignore_alert_doors
+        entity_id: input_boolean.door_open_alerts
       data: {}
     - service: script.notify_mobile
       data:
@@ -1270,25 +1247,25 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.front_door_is_open
+    - binary_sensor.front_door_contact_door_is_open
     - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_door_is_open
-    - binary_sensor.garage_side_door_is_open
+    - binary_sensor.garage_entry_door_contact_door_is_open
+    - binary_sensor.garage_side_door_contact_door_is_open
     from: 'off'
     to: 'on'
     for:
       minutes: 5
   condition:
   - condition: state
-    entity_id: input_boolean.ignore_alert_doors
-    state: 'off'
+    entity_id: input_boolean.door_open_alerts
+    state: 'on'
   action:
   - repeat:
       until:
       - or:
         - condition: state
-          entity_id: input_boolean.ignore_alert_doors
-          state: 'on'
+          entity_id: input_boolean.door_open_alerts
+          state: 'off'
         - condition: template
           value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
       sequence:
@@ -1322,18 +1299,18 @@
         - service: script.notify_pipup
           data:
             entity:
-            - media_player.living_room_shield
-            - media_player.family_room_shield
-            - media_player.master_bedroom_shield
+            - media_player.shield_living_room
+            - media_player.shield_family_room
+            - media_player.shield_master_bedroom
             title: '{{ name }}'
             message: '{{ message }}'
             icon_url: local/icons/door-open.png
         - service: script.notify_speech
           data:
             media_player:
-            - media_player.living_room_speaker
-            - media_player.family_room_speaker
-            - media_player.office_speaker
+            - media_player.cast_living_room_speaker
+            - media_player.cast_family_room_speaker
+            - media_player.cast_office_speaker
             message: '{{ message }}'
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
@@ -1356,8 +1333,8 @@
     value_template: '{{ expand("binary_sensor.all_doors") | selectattr("state", "==",
       "on") | map(attribute="entity_id") | list | count > 0 }}'
   - condition: state
-    entity_id: input_boolean.ignore_alert_doors
-    state: 'off'
+    entity_id: input_boolean.door_open_alerts
+    state: 'on'
   action:
   - service: script.notify_mobile
     data:
@@ -1383,10 +1360,10 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.front_door_is_open
+    - binary_sensor.front_door_contact_door_is_open
     - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_door_is_open
-    - binary_sensor.garage_side_door_is_open
+    - binary_sensor.garage_entry_door_contact_door_is_open
+    - binary_sensor.garage_side_door_contact_door_is_open
     from: 'off'
     to: 'on'
   condition:
@@ -1397,8 +1374,8 @@
     entity_id: group.people
     state: not_home
   - condition: state
-    entity_id: input_boolean.ignore_alert_doors
-    state: 'off'
+    entity_id: input_boolean.door_open_alerts
+    state: 'on'
   action:
   - service: script.notify_mobile
     data:
@@ -1420,7 +1397,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.doorbell_ring
+    - binary_sensor.doorbell_alarm_local
     to: 'on'
   condition: []
   action:
@@ -1438,9 +1415,9 @@
       then:
       - repeat:
           for_each:
-          - media_player.living_room_speaker
-          - media_player.family_room_speaker
-          - media_player.office_speaker
+          - media_player.cast_living_room_speaker
+          - media_player.cast_family_room_speaker
+          - media_player.cast_office_speaker
           sequence:
           - service: script.turn_on
             target:
@@ -1474,7 +1451,7 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
+        - media_player.shield_living_room
         title: Doorbell
         message: '{{ message }}'
         duration: 20
@@ -1482,39 +1459,39 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Doorbell
         message: '{{ message }}'
         icon_url: local/icons/doorbell-video.png
     - if:
       - condition: state
-        entity_id: light.office_desk_led
+        entity_id: light.wled_office_desk
         state: 'on'
       then:
       - service: number.set_value
         data:
           value: '180'
         target:
-          entity_id: number.office_desk_led_speed
+          entity_id: number.wled_office_desk_speed
       - service: light.turn_on
         target:
-          entity_id: light.office_desk_led
+          entity_id: light.wled_office_desk
         data:
           effect: Sunrise
       - delay:
           seconds: 5
       - service: light.turn_on
         target:
-          entity_id: light.office_desk_led
+          entity_id: light.wled_office_desk
         data:
           effect: Solid
   variables:
     camera: camera.doorbell
-    base_url: '{{ state_attr(''sensor.config'', ''external_url'') }}'
+    base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
     link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40) }}'
-    volume: '{{ iif(is_state(''binary_sensor.quiet_hours'', ''on''), 40, 90) }}'
-    media_location: media-source://media_source/sounds/ds9_doorchime.mp3
+    volume: '{{ iif(is_state(''schedule.quiet_hours'', ''on''), 40, 90) }}'
+    media_location: media-source://media_source/local/sounds/ds9_doorchime.mp3
     message: Ring Ring!
     actions:
     - action: URI
@@ -1530,7 +1507,7 @@
   trigger:
   - platform: state
     entity_id:
-    - cover.garage_door
+    - cover.opengarage
     - light.garage
     - timer.subaru_remote_start
   condition: []
@@ -1538,7 +1515,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: cover.garage_door
+        entity_id: cover.opengarage
         state: opening
       sequence:
       - service: script.inovelli_blue_led
@@ -1550,7 +1527,7 @@
             entity_id: light.garage
     - conditions:
       - condition: state
-        entity_id: cover.garage_door
+        entity_id: cover.opengarage
         state: closing
       sequence:
       - service: script.inovelli_blue_led
@@ -1562,7 +1539,7 @@
             entity_id: light.garage
     - conditions:
       - condition: state
-        entity_id: cover.garage_door
+        entity_id: cover.opengarage
         state: open
       sequence:
       - choose:
@@ -1615,13 +1592,13 @@
   - platform: state
     id: 'on'
     entity_id:
-    - light.office_light
+    - light.office
     from: 'off'
     to: 'on'
   - platform: state
     id: 'off'
     entity_id:
-    - light.office_light
+    - light.office
     from: 'on'
     to: 'off'
   condition: []
@@ -1656,7 +1633,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.doorbell_ring
+    - binary_sensor.doorbell_alarm_local
     to: 'on'
   - platform: event
     event_type: custom_frigate_doorbell_object
@@ -1691,13 +1668,13 @@
   description: Clears notifications when the garage door closes
   trigger:
   - platform: state
-    entity_id: cover.garage_door
+    entity_id: cover.opengarage
     to: closed
   condition: []
   action:
-  - service: input_boolean.turn_off
+  - service: input_boolean.turn_on
     target:
-      entity_id: input_boolean.ignore_alert_garage_door
+      entity_id: input_boolean.garage_door_open_alerts
     data: {}
   - service: script.notify_mobile
     data:
@@ -1716,24 +1693,24 @@
   trigger:
   - platform: state
     entity_id:
-    - cover.garage_door
+    - cover.opengarage
     to: open
     for:
       minutes: 30
   condition:
   - condition: state
-    entity_id: binary_sensor.garage_occupancy
+    entity_id: binary_sensor.garage_multisensor_motion_detection
     state: 'off'
   - condition: state
-    entity_id: input_boolean.ignore_alert_garage_door
-    state: 'off'
+    entity_id: input_boolean.garage_door_open_alerts
+    state: 'on'
   action:
   - repeat:
       until:
       - or:
         - condition: state
-          entity_id: input_boolean.ignore_alert_garage_door
-          state: 'on'
+          entity_id: input_boolean.garage_door_open_alerts
+          state: 'off'
         - condition: template
           value_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
       sequence:
@@ -1771,18 +1748,18 @@
         - service: script.notify_pipup
           data:
             entity:
-            - media_player.living_room_shield
-            - media_player.family_room_shield
-            - media_player.master_bedroom_shield
+            - media_player.shield_living_room
+            - media_player.shield_family_room
+            - media_player.shield_master_bedroom
             title: '{{ name }}'
             message: '{{ message }}'
             icon_url: local/icons/garage-open.png
         - service: script.notify_speech
           data:
             media_player:
-            - media_player.living_room_speaker
-            - media_player.family_room_speaker
-            - media_player.office_speaker
+            - media_player.cast_living_room_speaker
+            - media_player.cast_family_room_speaker
+            - media_player.cast_office_speaker
             message: '{{ message }}'
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
         timeout: 00:30:00
@@ -1802,11 +1779,11 @@
     entity_id: input_boolean.guest_mode
     state: 'off'
   - condition: state
-    entity_id: cover.garage_door
+    entity_id: cover.opengarage
     state: open
   - condition: state
-    entity_id: input_boolean.ignore_alert_garage_door
-    state: 'off'
+    entity_id: input_boolean.garage_door_open_alerts
+    state: 'on'
   action:
   - service: script.notify_mobile
     data:
@@ -1828,7 +1805,7 @@
   description: Sends notification if the garage door is open people are away
   trigger:
   - platform: state
-    entity_id: cover.garage_door
+    entity_id: cover.opengarage
     to: open
   condition:
   - condition: state
@@ -1838,8 +1815,8 @@
     entity_id: group.people
     state: not_home
   - condition: state
-    entity_id: input_boolean.ignore_alert_garage_door
-    state: 'off'
+    entity_id: input_boolean.garage_door_open_alerts
+    state: 'on'
   action:
   - service: script.notify_mobile
     data:
@@ -1946,26 +1923,6 @@
     icon: '{{ state_attr("calendar." ~ object_id, "icon") | replace("mdi:", "") }}'
     description: '{% if trigger.calendar_event.description != "" %} ({{ trigger.calendar_event.description
       }}){%- endif -%}'
-- id: '1665689446961'
-  alias: "\U0001F4AC Potty Time"
-  description: Reminder to go potty
-  trigger:
-  - platform: time_pattern
-    hours: '*'
-  condition:
-  - condition: state
-    entity_id: input_boolean.audio_notifications
-    state: 'on'
-  - condition: state
-    entity_id: binary_sensor.quiet_hours
-    state: 'on'
-  action:
-  - service: script.media_play
-    data:
-      media_player: media_player.living_room_speaker
-      media_location: media-source://media_source/sounds/clementine.opus
-      volume: 90
-  mode: single
 - id: '1665689633891'
   alias: "\U0001F4AC Subaru Failed Notification"
   description: Sends a notification when the Subaru fails to start
@@ -1992,15 +1949,15 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Subaru Remote Start
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
     - service: script.notify_speech
       data:
-        media_player: media_player.living_room_speaker
+        media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
   mode: single
   variables:
@@ -2016,18 +1973,19 @@
   description: Turns on the office computer and all the lights on a workday
   trigger:
   - platform: time
-    at: input_datetime.office_day_mode
+    at: input_datetime.office_startup
   condition:
   - condition: state
     entity_id: person.joshua
     state: home
   - condition: state
-    entity_id: binary_sensor.workday
+    entity_id: binary_sensor.workday_sensor
     state: 'on'
   action:
   - service: light.turn_on
+    data: {}
     target:
-      entity_id: light.office_lights
+      area_id: office
   - service: switch.turn_on
     data:
       entity_id: switch.erebus
@@ -2040,12 +1998,12 @@
     at: input_datetime.office_night_mode
   condition:
   - condition: state
-    entity_id: light.office_light
+    entity_id: light.office
     state: 'on'
   action:
-  - service: light.turn_off
+  - service: switch.turn_off
     target:
-      entity_id: light.office_shelf_led
+      entity_id: switch.office_shelf_led
   mode: single
 - id: '1665695892233'
   alias: "\U0001F5A8️ Low Toner"
@@ -2133,11 +2091,11 @@
   description: Turns on the PS4 when the activity is active
   trigger:
   - platform: state
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
     to: 'on'
   condition:
   - condition: state
-    entity_id: remote.family_room
+    entity_id: remote.harmony_family_room
     attribute: current_activity
     state: PS4
   action:
@@ -2233,7 +2191,7 @@
   description: Changes the reciever sound mode based on Source
   trigger:
   - platform: state
-    entity_id: media_player.family_room_universal
+    entity_id: media_player.universal_family_room
     attribute: source
   - platform: state
     entity_id: media_player.denon_avr_s760h
@@ -2245,7 +2203,7 @@
       entity_id: media_player.denon_avr_s760h
       state: 'off'
     - condition: state
-      entity_id: media_player.family_room_universal
+      entity_id: media_player.universal_family_room
       attribute: source
       state: nl.rogro82.pipup
   - condition: template
@@ -2268,7 +2226,7 @@
   description: Changes the reciever sound mode based on Source
   trigger:
   - platform: state
-    entity_id: media_player.living_room_universal
+    entity_id: media_player.universal_living_room
     attribute: source
   condition:
   - condition: not
@@ -2277,7 +2235,7 @@
       entity_id: media_player.yamaha_rx_v679
       state: 'off'
     - condition: state
-      entity_id: media_player.living_room_universal
+      entity_id: media_player.universal_living_room
       attribute: source
       state: nl.rogro82.pipup
   - condition: template
@@ -2371,12 +2329,13 @@
   - service: tts.clear_cache
     data: {}
   mode: single
+  initial_state: false
 - id: '1665696511584'
   alias: ⚙️ Disk Space Low
   description: Sends a notification when the Disk space is low
   trigger:
   - platform: numeric_state
-    entity_id: sensor.disk_use_percent_config
+    entity_id: sensor.disk_use_percent
     above: 89
   condition: []
   action:
@@ -2556,17 +2515,16 @@
     data: {}
     target:
       device_id:
-      - 1438f43ac5ba6d51f83aee2b589c67b6
-      - 3c59c68c332419cc5d6f8502972da5ad
-      - f1255320901422c29b8a2e48e400a7a6
-      - 027bfae722581f4da8413954e096c38b
+      - 046ad4016aea54916dd414935e0008da
+      - fd4ff1a9970156bb319e4d85d4450657
+      - 1dee4aa37e70d346348224829cd7c84f
   - parallel:
     - service: input_boolean.turn_off
       data: {}
       target:
         entity_id:
-        - input_boolean.washer
-        - input_boolean.dryer
+        - input_boolean.washer_status
+        - input_boolean.dryer_status
     - service: input_select.select_option
       data:
         option: 'Off'
@@ -2580,14 +2538,20 @@
     data:
       stop_actions: false
     target:
-      entity_id: automation.system_startup
+      entity_id: automation.startup
   mode: single
 - id: '1665696665289'
-  alias: ⚙️ Upgrade Available
-  description: Sends a notification when a new release of Home Assistant is released
+  alias: ⚙️ Hass Core Update Available
+  description: Sends a notification when a new Home Assistant version is released
   trigger:
   - platform: state
-    entity_id: binary_sensor.docker_hub_update_available
+    entity_id:
+    - update.home_assistant_core_update
+    to: 'on'
+  - platform: state
+    entity_id:
+    - update.home_assistant_core_update
+    attribute: latest_version
   condition: []
   action:
   - if:
@@ -2603,9 +2567,6 @@
             }}_
 
 
-            {{ release_title }}
-
-
             [{{ action_1_title }}]({{ action_1_uri }}) | [{{ action_2_title }}]({{
             action_2_uri }})'
           notification_id: upgrade-available
@@ -2613,12 +2574,10 @@
         data:
           who: joshua
           title: Upgrade Available
-          message: '<b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{
-            available_version }}</em><br>
-
-            {{ release_title }}'
+          message: <b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{
+            available_version }}</em>
           icon_url: local/icons/update.png
-          url: '{{ release_notes }}'
+          url: '{{ release_url }}'
           group: Upgrade
           tag: upgrade-available
           actions:
@@ -2636,7 +2595,7 @@
           message: 'Home Assistant: {{ current_version }} -> {{ available_version
             }}
 
-            {{ release_title }}'
+            {{ release_summary }}'
     else:
     - service: persistent_notification.dismiss
       data:
@@ -2649,13 +2608,12 @@
   mode: single
   max_exceeded: silent
   variables:
-    info: sensor.home_assistant_website
-    release_notes: '{{ state_attr(info, "release_notes") }}'
-    release_title: '{{ state_attr(info, "release_title") }}'
-    current_version: '{{ states("sensor.current_version") }}'
-    available_version: '{{ states("sensor.available_version") }}'
+    info: update.home_assistant_core_update
+    release_url: '{{ state_attr(info, "release_url") }}'
+    current_version: '{{ state_attr(info, "installed_version") }}'
+    available_version: '{{ state_attr(info, "latest_version") }}'
     action_1_title: Release Notes
-    action_1_uri: '{{ release_notes }}'
+    action_1_uri: '{{ release_url }}'
     action_2_title: HassPodcast
     action_2_uri: https://hasspodcast.io/episodes
 - id: '1665696688106'
@@ -2729,24 +2687,24 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.basement_bathroom_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.bathroom_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.fridge_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.master_bathroom_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.water_heater_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.laundry_leak_sensor_water_alarm_water_leak_detected
-    - binary_sensor.water_main_water_leak_detected
-    - binary_sensor.under_bathroom_sink_water_leak
-    - binary_sensor.under_master_bathroom_left_sink_water_leak
-    - binary_sensor.under_master_bathroom_right_sink_water_leak
-    - binary_sensor.under_kitchen_sink_water_leak
-    - binary_sensor.under_basement_bathroom_sink_water_leak
+    - binary_sensor.basement_bathroom_toilet_leak_sensor_water_leak_detected
+    - binary_sensor.bathroom_toilet_leak_sensor_water_leak_detected
+    - binary_sensor.fridge_leak_sensor_water_leak_detected
+    - binary_sensor.master_bathroom_toilet_leak_sensor_water_leak_detected
+    - binary_sensor.water_heater_leak_sensor_water_leak_detected
+    - binary_sensor.washer_leak_sensor_water_leak_detected
+    - binary_sensor.water_main_valve_water_leak_detected
+    - binary_sensor.bathroom_sink_leak_water_leak
+    - binary_sensor.master_bathroom_left_sink_leak_water_leak
+    - binary_sensor.master_bathroom_right_sink_leak_water_leak
+    - binary_sensor.kitchen_sink_leak_water_leak
+    - binary_sensor.basement_bathroom_sink_leak_water_leak
     to: 'on'
   condition: []
   action:
   - parallel:
     - service: switch.turn_off
-      entity_id: switch.water_main
+      entity_id: switch.water_main_valve
     - service: persistent_notification.create
       data:
         title: '{{ title }}'
@@ -2755,22 +2713,22 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/water-alert.png
     - service: script.notify_speech
       data:
         media_player:
-        - media_player.living_room_speaker
-        - media_player.family_room_speaker
-        - media_player.office_speaker
+        - media_player.cast_living_room_speaker
+        - media_player.cast_family_room_speaker
+        - media_player.cast_office_speaker
         message: '{{ message }}'
   - wait_for_trigger:
     - platform: state
-      entity_id: switch.water_main
+      entity_id: switch.water_main_valve
       to: 'off'
     timeout: 00:00:30
   - service: script.notify_mobile
@@ -2810,7 +2768,7 @@
   description: Sends a notification when the water softener salt level is low
   trigger:
   - platform: numeric_state
-    entity_id: sensor.salt_level
+    entity_id: sensor.water_softener_salt_monitor_salt_level
     below: 30
     for:
       hours: 24
@@ -2842,7 +2800,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.water_main_overheat_detected
+    - binary_sensor.water_main_valve_overheat_detected
     to: 'on'
   condition: []
   action:
@@ -2870,18 +2828,18 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/water-alert.png
     - service: script.notify_speech
       data:
         media_player:
-        - media_player.living_room_speaker
-        - media_player.family_room_speaker
-        - media_player.office_speaker
+        - media_player.cast_living_room_speaker
+        - media_player.cast_family_room_speaker
+        - media_player.cast_office_speaker
         message: '{{ message }}'
   mode: single
   variables:
@@ -2965,7 +2923,7 @@
   trigger:
   - platform: state
     entity_id:
-    - lock.lock_front
+    - lock.front_door
   action:
   - choose:
     - conditions:
@@ -2994,7 +2952,7 @@
   trigger:
   - platform: state
     entity_id:
-    - media_player.living_room_shield
+    - media_player.shield_living_room
   condition:
   - condition: state
     entity_id: sun.sun
@@ -3006,7 +2964,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: media_player.living_room_shield
+        entity_id: media_player.shield_living_room
         state: paused
       sequence:
       - service: light.turn_on
@@ -3017,7 +2975,7 @@
           entity_id: light.living_room
     - conditions:
       - condition: state
-        entity_id: media_player.living_room_shield
+        entity_id: media_player.shield_living_room
         state: playing
       sequence:
       - service: light.turn_on
@@ -3030,7 +2988,7 @@
   trigger:
   - platform: state
     entity_id:
-    - media_player.family_room_shield
+    - media_player.shield_family_room
   condition:
   - condition: state
     entity_id: sun.sun
@@ -3042,7 +3000,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: media_player.family_room_shield
+        entity_id: media_player.shield_family_room
         state: paused
       sequence:
       - service: light.turn_on
@@ -3053,7 +3011,7 @@
           entity_id: light.family_room
     - conditions:
       - condition: state
-        entity_id: media_player.family_room_shield
+        entity_id: media_player.shield_family_room
         state: playing
       sequence:
       - service: light.turn_on
@@ -3066,22 +3024,22 @@
   description: Sends notification if a window is left open
   trigger:
   - platform: state
-    entity_id: binary_sensor.front_door_is_open
+    entity_id: binary_sensor.front_door_contact_door_is_open
     from: 'off'
     to: 'on'
     for:
       minutes: 30
   condition:
   - condition: state
-    entity_id: input_boolean.ignore_alert_windows
-    state: 'off'
+    entity_id: input_boolean.window_open_alerts
+    state: 'on'
   action:
   - repeat:
       until:
       - or:
         - condition: state
-          entity_id: input_boolean.ignore_alert_windows
-          state: 'on'
+          entity_id: input_boolean.window_open_alerts
+          state: 'off'
         - condition: template
           value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
       sequence:
@@ -3115,52 +3073,52 @@
         - service: script.notify_pipup
           data:
             entity:
-            - media_player.living_room_shield
-            - media_player.family_room_shield
-            - media_player.master_bedroom_shield
+            - media_player.shield_living_room
+            - media_player.shield_family_room
+            - media_player.shield_master_bedroom
             title: '{{ name }}'
             message: '{{ message }}'
             icon_url: local/icons/window-open.png
         - service: script.notify_speech
           data:
             media_player:
-            - media_player.living_room_speaker
-            - media_player.family_room_speaker
-            - media_player.office_speaker
+            - media_player.cast_living_room_speaker
+            - media_player.cast_family_room_speaker
+            - media_player.cast_office_speaker
             message: '{{ message }}'
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
 - id: '1665723292840'
-  alias: "\U0001F4CB [Controller] Hue Dimmer Switch"
+  alias: "\U0001F4CB [Controller] Hue Dimmer Remote"
   description: ''
   use_blueprint:
     path: EPMatt/philips_324131092621.yaml
     input:
       integration: Zigbee2MQTT
-      controller_entity: sensor.hue_dimmer_switch_action
-      helper_last_controller_event: input_text.hue_dimmer_switch_event
+      controller_entity: sensor.hue_dimmer_remote_action
+      helper_last_controller_event: input_text.hue_dimmer_remote_event
       helper_double_press_delay: 400
       action_button_on_short:
       - service: homeassistant.turn_on
         data: {}
         target:
-          entity_id: light.office_desk_led
+          entity_id: light.wled_office_desk
       action_button_off_short:
       - service: homeassistant.turn_off
         data: {}
         target:
-          entity_id: light.office_desk_led
+          entity_id: light.wled_office_desk
       action_button_up_short:
-      - service: light.turn_on
+      - service: switch.turn_on
         data: {}
         target:
-          entity_id: light.office_shelf_led
+          entity_id: switch.office_shelf_led
       action_button_down_short:
-      - service: light.turn_off
+      - service: switch.turn_off
         data: {}
         target:
-          entity_id: light.office_shelf_led
+          entity_id: switch.office_shelf_led
 - id: '1665723372482'
   alias: "\U0001F4CB [Controller] Ikea 5-Button Remote"
   description: ''
@@ -3182,13 +3140,13 @@
         data:
           percentage_step: 25
         target:
-          entity_id: fan.master_bedroom
+          entity_id: fan.master_bedroom_ceiling
       action_button_right_short:
       - service: fan.increase_speed
         data:
           percentage_step: 25
         target:
-          entity_id: fan.master_bedroom
+          entity_id: fan.master_bedroom_ceiling
       action_button_up_short:
       - service: light.turn_on
         data:
@@ -3227,46 +3185,29 @@
       - service: fan.toggle
         data: {}
         target:
-          entity_id: fan.master_bedroom
+          entity_id: fan.master_bedroom_ceiling
 - id: '1667779119970'
   alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.ethan_action
-      config_single:
-      - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
-            entity_id:
-            - light.ethan
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-        - service: switch.toggle
-          data: {}
-          target:
-            entity_id: switch.ethans_lamp
-        enabled: false
+      switch: sensor.ethan_light_action
+      config_single: []
 - id: '1673311612826'
   alias: "\U0001F4CB [Inovelli] Emma Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.emma_action
+      switch: sensor.emma_light_action
 - id: '1667779287274'
   alias: "\U0001F4CB [Inovelli] Family Room Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.family_room_action
+      switch: sensor.family_room_light_action
       config_single:
       - service: script.family_room_game_light_mode
         data: {}
@@ -3276,17 +3217,17 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.garage_action
+      switch: sensor.garage_light_action
       config_single:
       - parallel:
         - service: cover.toggle
           data: {}
           target:
-            entity_id: cover.garage_door
+            entity_id: cover.opengarage
         - choose:
           - conditions:
             - condition: state
-              entity_id: cover.garage_door
+              entity_id: cover.opengarage
               state: closed
             sequence:
             - service: script.inovelli_blue_led
@@ -3384,7 +3325,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.kitchen_action
+      switch: sensor.kitchen_light_action
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3426,7 +3367,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.living_room_action
+      switch: sensor.living_room_light_action
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3469,7 +3410,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.master_bedroom_action
+      switch: sensor.master_bedroom_light_action
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3515,7 +3456,7 @@
       - service: light.turn_off
         data: {}
         target:
-          entity_id: light.office_lights
+          area_id: office
       down_double:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3538,14 +3479,14 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.play_space_action
+      switch: sensor.play_space_light_action
 - id: '1667780182339'
   alias: "\U0001F4CB [Inovelli] Guest Room Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.guest_room_action
+      switch: sensor.amy_office_light_action
 - id: '1669666972148'
   alias: "\U0001F310 UniFi WAN Status"
   description: Sends notifications when the network status changes
@@ -3576,9 +3517,9 @@
         - service: script.notify_pipup
           data:
             entity:
-            - media_player.living_room_shield
-            - media_player.family_room_shield
-            - media_player.master_bedroom_shield
+            - media_player.shield_living_room
+            - media_player.shield_family_room
+            - media_player.shield_master_bedroom
             title: Network
             message: The Internet is back up
             icon_url: local/icons/web.png
@@ -3601,9 +3542,9 @@
       - service: script.notify_pipup
         data:
           entity:
-          - media_player.living_room_shield
-          - media_player.family_room_shield
-          - media_player.master_bedroom_shield
+          - media_player.shield_living_room
+          - media_player.shield_family_room
+          - media_player.shield_master_bedroom
           title: Network
           message: The Internet is down
           icon_url: local/icons/web.png
@@ -3615,183 +3556,6 @@
           title: Network
           message: The Internet is down
   mode: restart
-- id: '1672332473106'
-  alias: ⚙️ ZWave JS UI Update
-  description: Sends a notification when a new release of ZWave JS UI is released
-  trigger:
-  - platform: state
-    entity_id: sensor.zwave_js_zwave_js_ui_latest_release
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
-      trigger.from_state.state in ["unknown", "unavailable"] }}'
-  action:
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state != trigger.from_state.state }}'
-    then:
-    - parallel:
-      - service: persistent_notification.create
-        data:
-          title: Upgrade Available
-          message: '**ZWave JS UI** _{{ current_version }}_ -> _{{ available_version
-            }}_
-
-            [Release Notes]({{ release_notes }})'
-          notification_id: zwave_js-upgrade-available
-      - service: script.notify_mobile
-        data:
-          who: joshua
-          title: Upgrade Available
-          message: <b>ZWave JS UI</b> <em>{{ current_version }}</em> -> <em>{{ available_version
-            }}</em>
-          icon_url: local/icons/update.png
-          url: '{{ release_notes }}'
-          group: Upgrade
-          tag: zwave_js-upgrade-available
-          actions:
-          - action: URI
-            title: Release Notes
-            uri: '{{ release_notes }}'
-      - service: script.notify_hass_agent
-        data:
-          entity:
-          - media_player.erebus
-          title: Upgrade Available
-          message: 'ZWave JS UI: {{ current_version }} -> {{ available_version }}'
-    else:
-    - service: persistent_notification.dismiss
-      data:
-        notification_id: zwave_js-upgrade-available
-    - service: script.notify_mobile
-      data:
-        who: joshua
-        message: clear_notification
-        tag: zwave_js-upgrade-available
-  mode: single
-  max_exceeded: silent
-  variables:
-    release_notes: '{{ trigger.to_state.attributes.url }}'
-    current_version: '{{ trigger.from_state.state }}'
-    available_version: '{{ trigger.to_state.state }}'
-- id: '1672332601521'
-  alias: ⚙️ Zigbee2MQTT Update
-  description: Sends a notification when a new release of Zigbee2MQTT is released
-  trigger:
-  - platform: state
-    entity_id:
-    - sensor.koenkk_zigbee2mqtt_latest_release
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
-      not trigger.from_state.state in ["unknown", "unavailable"] }}'
-  action:
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state != trigger.from_state.state }}'
-    then:
-    - parallel:
-      - service: persistent_notification.create
-        data:
-          title: Upgrade Available
-          message: '**Zigbee2MQTT** _{{ current_version }}_ -> _{{ available_version
-            }}_
-
-            [Release Notes]({{ release_notes }})'
-          notification_id: zigbee2mqtt-upgrade-available
-      - service: script.notify_mobile
-        data:
-          who: joshua
-          title: Upgrade Available
-          message: <b>Zigbee2MQTT</b> <em>{{ current_version }}</em> -> <em>{{ available_version
-            }}</em>
-          icon_url: local/icons/update.png
-          url: '{{ release_notes }}'
-          group: Upgrade
-          tag: zigbee2mqtt-upgrade-available
-          actions:
-          - action: URI
-            title: Release Notes
-            uri: '{{ release_notes }}'
-      - service: script.notify_hass_agent
-        data:
-          entity:
-          - media_player.erebus
-          title: Upgrade Available
-          message: 'Zigbee2MQTT: {{ current_version }} -> {{ available_version }}'
-    else:
-    - service: persistent_notification.dismiss
-      data:
-        notification_id: zigbee2mqtt-upgrade-available
-    - service: script.notify_mobile
-      data:
-        who: joshua
-        message: clear_notification
-        tag: zigbee2mqtt-upgrade-available
-  mode: single
-  max_exceeded: silent
-  variables:
-    release_notes: '{{ trigger.to_state.attributes.url }}'
-    current_version: '{{ trigger.from_state.state }}'
-    available_version: '{{ trigger.to_state.state }}'
-- id: '1672948192087'
-  alias: ⚙️ ESPHome Update
-  description: Sends a notification when a new release of ESPHome is released
-  trigger:
-  - platform: state
-    entity_id: sensor.esphome_esphome_latest_release
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] and
-      not trigger.from_state.state in ["unknown", "unavailable"] }}'
-  action:
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state != trigger.from_state.state }}'
-    then:
-    - parallel:
-      - service: persistent_notification.create
-        data:
-          title: Upgrade Available
-          message: '**ESPHome** _{{ current_version }}_ -> _{{ available_version }}_
-
-            [Release Notes]({{ release_notes }})'
-          notification_id: esphome-upgrade-available
-      - service: script.notify_mobile
-        data:
-          who: joshua
-          title: Upgrade Available
-          message: <b>ESPHome</b> <em>{{ current_version }}</em> -> <em>{{ available_version
-            }}</em>
-          icon_url: local/icons/update.png
-          url: '{{ release_notes }}'
-          group: Upgrade
-          tag: esphome-upgrade-available
-          actions:
-          - action: URI
-            title: Release Notes
-            uri: '{{ release_notes }}'
-      - service: script.notify_hass_agent
-        data:
-          entity:
-          - media_player.erebus
-          title: Upgrade Available
-          message: 'ESPHome: {{ current_version }} -> {{ available_version }}'
-    else:
-    - service: persistent_notification.dismiss
-      data:
-        notification_id: esphome-upgrade-available
-    - service: script.notify_mobile
-      data:
-        who: joshua
-        message: clear_notification
-        tag: esphome-upgrade-available
-  mode: single
-  max_exceeded: silent
-  variables:
-    release_notes: '{{ trigger.to_state.attributes.url }}'
-    current_version: '{{ trigger.from_state.state }}'
-    available_version: '{{ trigger.to_state.state }}'
 - id: '1673152651576'
   alias: "\U0001F4AC Subaru Started"
   description: Actions when the Subaru starts
@@ -3803,7 +3567,7 @@
   condition: []
   action:
   - variables:
-      vehicle_present: '{{ states(''binary_sensor.opengarage_vehicle_present'') }}'
+      vehicle_present: '{{ states(''binary_sensor.opengarage_vehicle'') }}'
   - parallel:
     - if:
       - condition: template
@@ -3825,9 +3589,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Subaru Remote Start
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
@@ -3837,7 +3601,7 @@
       then:
       - service: script.notify_speech
         data:
-          media_player: media_player.living_room_speaker
+          media_player: media_player.cast_living_room_speaker
           message: '{{ message }}'
   - if:
     - condition: template
@@ -3846,7 +3610,7 @@
     - wait_for_trigger:
       - platform: state
         entity_id:
-        - cover.garage_door
+        - cover.opengarage
         to: closed
       - platform: event
         event_type: subaru_command_successful
@@ -3880,7 +3644,7 @@
   trigger:
   - platform: state
     entity_id:
-    - sensor.device_mode
+    - sensor.sol_ark_device_mode
   condition:
   - condition: template
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
@@ -3912,9 +3676,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Power Mode Changed
         icon_url: local/icons/lightning-bolt.png
         message: The power mode changed to {{ trigger.to_state.state }}
@@ -3960,9 +3724,9 @@
       - service: script.notify_speech
         data:
           media_player:
-          - media_player.living_room_speaker
-          - media_player.family_room_speaker
-          - media_player.office_speaker
+          - media_player.cast_living_room_speaker
+          - media_player.cast_family_room_speaker
+          - media_player.cast_office_speaker
           message: '{{ message }}'
   mode: single
   variables:
@@ -3982,10 +3746,10 @@
   - condition: or
     conditions:
     - condition: state
-      entity_id: cover.garage_door
+      entity_id: cover.opengarage
       state: open
     - condition: state
-      entity_id: binary_sensor.opengarage_vehicle_present
+      entity_id: binary_sensor.opengarage_vehicle
       state: 'on'
   action:
   - parallel:
@@ -4004,15 +3768,15 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: Subaru Remote Start
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
     - service: script.notify_speech
       data:
-        media_player: media_player.living_room_speaker
+        media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
   mode: single
   variables:
@@ -4042,7 +3806,7 @@
   - wait_for_trigger:
     - platform: state
       entity_id:
-      - binary_sensor.garage_entry_door_is_open
+      - binary_sensor.garage_entry_door_contact_door_is_open
       to: 'on'
     timeout:
       minutes: 2
@@ -4063,9 +3827,9 @@
     - service: script.notify_speech
       data:
         media_player:
-        - media_player.living_room_speaker
-        - media_player.family_room_speaker
-        - media_player.office_speaker
+        - media_player.cast_living_room_speaker
+        - media_player.cast_family_room_speaker
+        - media_player.cast_office_speaker
         message: '{{ message }}'
   - delay:
       minutes: 5
@@ -4095,9 +3859,9 @@
   mode: single
   variables:
     media_players:
-    - media_player.living_room_shield
-    - media_player.family_room_shield
-    - media_player.master_bedroom_shield
+    - media_player.shield_living_room
+    - media_player.shield_family_room
+    - media_player.shield_master_bedroom
 - id: '1682570311827'
   alias: "\U0001F4C5 Garbage Collection Event Generator"
   description: Creates collection events for the next year.
@@ -4131,11 +3895,8 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.doorbell_button_pressed
-    - binary_sensor.doorbell_call_no_answered
-    - binary_sensor.doorbell_human
-    - binary_sensor.doorbell_motion
-    - switch.doorbell_disarming
+    - binary_sensor.doorbell_alarm_local
+    - binary_sensor.doorbell_motion_alarm
     to: unavailable
     for:
       minutes: 1
@@ -4144,17 +3905,17 @@
   - service: homeassistant.reload_config_entry
     data: {}
     target:
-      device_id: 93ad7cb63f64246bb54529cd026254d3
+      device_id: 507344f5684d2af09535c985be65953e
   - wait_for_trigger:
     - platform: state
       entity_id:
-      - binary_sensor.doorbell_button_pressed
+      - binary_sensor.doorbell_alarm_local
       from: unavailable
     timeout:
       minutes: 2
   - if:
     - condition: state
-      entity_id: binary_sensor.doorbell_button_pressed
+      entity_id: binary_sensor.doorbell_alarm_local
       state: unavailable
     then:
     - parallel:
@@ -4197,8 +3958,8 @@
   trigger:
   - platform: state
     entity_id:
-    - sensor.load_power
-    - sensor.grid_power
+    - sensor.sol_ark_load_power
+    - sensor.sol_ark_grid_power
     for:
       minutes: 5
   condition: []
@@ -4468,7 +4229,7 @@
   variables:
     camera: doorbell
     camera_name: '{{ camera | title }}'
-    base_url: '{{ state_attr(''sensor.config'', ''external_url'') }}'
+    base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
     attachment: snapshot.jpg
     alert_once: false
     update_thumbnail: true
@@ -4485,8 +4246,8 @@
     loiter_timer: 0
     fps: '{{ states(''sensor.'' + camera + ''_camera_fps'') | int(5) }}'
     state_entities:
-      binary_sensor.front_door_is_open: 5
-      binary_sensor.doorbell_ring: 2
+      binary_sensor.front_door_contact_door_is_open: 2
+      binary_sensor.doorbell_alarm_local: 1
     states_filter:
     - 'off'
     debug: false
@@ -4511,9 +4272,9 @@
       - service: script.notify_speech
         data:
           media_player:
-          - media_player.living_room_speaker
-          - media_player.family_room_speaker
-          - media_player.office_speaker
+          - media_player.cast_living_room_speaker
+          - media_player.cast_family_room_speaker
+          - media_player.cast_office_speaker
           message: A {{ label }} was detected at the front door.
     - service: script.notify_mobile
       data:
@@ -4540,9 +4301,9 @@
     - service: script.notify_pipup
       data:
         entity:
-        - media_player.living_room_shield
-        - media_player.family_room_shield
-        - media_player.master_bedroom_shield
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
         duration: 20
@@ -4554,24 +4315,24 @@
       then:
       - if:
         - condition: state
-          entity_id: light.office_desk_led
+          entity_id: light.wled_office_desk
           state: 'on'
         then:
         - service: number.set_value
           data:
             value: '80'
           target:
-            entity_id: number.office_desk_led_speed
+            entity_id: number.wled_office_desk_speed
         - service: light.turn_on
           target:
-            entity_id: light.office_desk_led
+            entity_id: light.wled_office_desk
           data:
             effect: Phased
         - delay:
             seconds: 5
         - service: light.turn_on
           target:
-            entity_id: light.office_desk_led
+            entity_id: light.wled_office_desk
           data:
             effect: Solid
   mode: parallel
