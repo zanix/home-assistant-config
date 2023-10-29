@@ -843,14 +843,14 @@ decluttering_templates:
                   \ app_list = [\n    \"amazon\",\n    \"crunchyroll\",\n    \"disneynow\"\
                   ,\n    \"netflix\",\n    \"pbs kids\",\n    \"smarttube\",\n   \
                   \ \"spotify\",\n    \"youtube\",\n    \"youtube kids\"\n  ] %}\n\
-                  \n  background:\n  {%- if app_name in app_list -%}\n    url('/local/images/{{\
+                  \n  background:\n  {%- if app_name in app_list -%}\n    url('/local/logos/{{\
                   \ app_name | lower | replace(\" \", \"-\") }}-logo.png') center\
                   \ no-repeat\n  {%- elif not states(config.entity) in [\"off\", \"\
                   unknown\", \"unavailable\", \"idle\"] and state_attr(config.entity,\
                   \ \"entity_picture\") -%}\n    url('{{ state_attr(config.entity,\
                   \ \"entity_picture\") }}') center no-repeat\n  {%- elif \"spotify\"\
-                  \ in config.entity -%}\n    url('/local/images/spotify-logo.png')\
-                  \ center no-repeat\n  {%- else -%}\n    url('/local/images/idle-media-player.png')\
+                  \ in config.entity -%}\n    url('/local/logos/spotify-logo.png')\
+                  \ center no-repeat\n  {%- else -%}\n    url('/local/logos/idle-media-player.png')\
                   \ center no-repeat\n  {%- endif -%};\n  background-size: contain;\n\
                   \n  border-radius: var(--control-border-radius);\n  {% set media_type\
                   \ = state_attr(config.entity, 'media_content_type') %}\n  {% if\
@@ -1054,8 +1054,8 @@ decluttering_templates:
                   icon: '[[icon]]'
                   icon_color: '[[icon_color]]'
                   primary: '[[name]]'
-                  secondary: '{{ states(entity) }} {{ iif(states(entity) | int ==
-                    1, "package", "packages") }}'
+                  secondary: '{{ states(entity) }} {{ iif(states(entity) | default(0)
+                    | int == 1, "package", "packages") }}'
                   tap_action:
                     action: more-info
                   type: custom:mushroom-template-card
@@ -1512,7 +1512,7 @@ decluttering_templates:
     default:
     - primary: Room
     - entity: light.all_lights
-    - temperature: sensor.home_temperature
+    - temperature: sensor.ecobee_current_temperature
     - icon: mdi:home-assistant
     - icon_color: disabled
     - path: main
@@ -1687,7 +1687,7 @@ decluttering_templates:
             target:
               entity_id: '[[universal]]'
           type: icon
-        image: /local/images/tv-remote.png?raw=true
+        image: /local/backgrounds/tv-remote.png?raw=true
         type: picture-elements
       type: custom:vertical-stack-in-card
   title_chips:
@@ -1770,7 +1770,7 @@ views:
           chips:
           - content: '{% from "util.jinja" import security_count %} {{ iif(security_count()
               | int == 0, "Secure", "Not Secure") }}'
-            entity: lock.lock_front
+            entity: lock.front_door
             icon: '{% from "util.jinja" import security_count %} {{ iif(security_count()
               | int == 0, "mdi:shield-check", "mdi:shield-alert") }}'
             icon_color: '{% from "util.jinja" import security_count %} {{ iif(security_count()
@@ -1779,8 +1779,9 @@ views:
               action: navigate
               navigation_path: security
             type: template
-          - content: '{{ states("sensor.home_temperature", with_unit=True) }}'
-            entity: climate.home
+          - content: '{{ states("sensor.ecobee_current_temperature", with_unit=True)
+              }}'
+            entity: climate.ecobee
             icon: mdi:thermostat-box
             icon_color: "{% if is_state_attr(entity, \"hvac_action\", \"heating\"\
               ) %}\n  red\n{% elif is_state_attr(entity, \"hvac_action\", \"cooling\"\
@@ -1815,7 +1816,7 @@ views:
               \ | int | abs %}\n  {% if power > 1000 %}\n    {{ (power | float * 0.001)\
               \ | round(2) }} kWh\n  {% else %}\n    {{ power }} W\n  {% endif %}\n\
               {% endif %}"
-            entity: sensor.grid_power
+            entity: sensor.sol_ark_grid_power
             icon: "{% if has_value(entity) %}\n  {% if states(entity) | int < 0 %}\n\
               \    mdi:transmission-tower-export\n  {% else %}\n    mdi:transmission-tower-import\n\
               \  {% endif %}\n{% else %}\n  mdi:transmission-tower-off\n{% endif %}"
@@ -1834,14 +1835,14 @@ views:
           chips:
           - card_mod:
               style:
-                .: "{% from \"util.jinja\" import computer_count %}\n{% if (computer_count()\
-                  \ | int) > 0 %}\nha-card:after {\n  content: \"{{ computer_count()\
-                  \ | int }}\";\n  position: absolute;\n  color: var(--teal-color);\n\
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr(\"state\", \"==\", \"\
+                  on\") | list | count }}\";\n  position: absolute;\n  color: var(--teal-color);\n\
                   \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                   \ 12px;\n}\n{% endif %}\n"
+            entity: binary_sensor.computers
             icon: mdi:desktop-tower
-            icon_color: '{% from "util.jinja" import computer_count %} {{ "teal" if
-              computer_count() | int > 0 else "disabled" }}'
+            icon_color: '{{ "teal" if is_state(entity, "on") else "disabled" }}'
             tap_action:
               action: navigate
               navigation_path: computer
@@ -1921,7 +1922,7 @@ views:
                         {% endif %}"
                       type: custom:mushroom-template-card
                     - camera_view: live
-                      entity: camera.ender_3_pro
+                      entity: camera.octoprint
                       show_name: false
                       show_state: false
                       type: picture-entity
@@ -2280,53 +2281,6 @@ views:
                 service: browser_mod.popup
             type: template
           - chip:
-              content: "{%- if is_state(entity, \"on\") -%}\n  {{ states(\"sensor.available_version\"\
-                ) }}\n{%- endif -%}\n"
-              entity: binary_sensor.docker_hub_update_available
-              icon: mdi:arrow-up-bold-circle
-              icon_color: red
-              tap_action:
-                action: fire-dom-event
-                browser_mod:
-                  data:
-                    content:
-                      card_mod:
-                        style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                          \ 0;\n}\n"
-                      content: '__Home Assistant__ _{{ states("sensor.current_version")
-                        }}_ -> _{{ states("sensor.available_version") }}_
-
-
-                        {{ state_attr("sensor.home_assistant_website", "release_title")
-                        }}
-
-
-                        [Release Notes]({{ state_attr("sensor.home_assistant_website",
-                        "release_notes") }}) | [HassPodcast](https://hasspodcast.io/episodes)'
-                      type: markdown
-                    title: Upgrade Available
-                  service: browser_mod.popup
-              type: template
-            conditions:
-            - entity: binary_sensor.docker_hub_update_available
-              state: 'on'
-            type: conditional
-          - chip:
-              content: '{{ states(entity) | int }}'
-              entity: sensor.hacs_updates
-              icon: mdi:package-up
-              icon_color: red
-              tap_action:
-                action: navigate
-                navigation_path: /config/updates
-              type: template
-            conditions:
-            - entity: sensor.hacs_updates
-              state_not: '0'
-            - entity: sensor.hacs_updates
-              state_not: unavailable
-            type: conditional
-          - chip:
               content: '{{ states(entity) }}'
               entity: sensor.low_battery_devices
               icon: mdi:battery-alert
@@ -2393,7 +2347,7 @@ views:
         style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
           \  --chip-border-width: 0;\n  --chip-spacing: 0;\n}\n"
       chips:
-      - entity: weather.openweathermap
+      - entity: weather.owm_daily
         show_conditions: true
         show_temperature: true
         tap_action:
@@ -2406,28 +2360,28 @@ views:
                     \ 0;\n}\n"
                 cards:
                 - card_config_version: 8
-                  entity_apparent_temp: sensor.openweathermap_feels_like_temperature
+                  entity_apparent_temp: sensor.owm_daily_feels_like_temperature
                   entity_extended: sensor.forecast
-                  entity_forecast_icon: weather.openweathermap
-                  entity_forecast_icon_1: weather.openweathermap
-                  entity_forecast_max: sensor.openweathermap_forecast_temperature
-                  entity_forecast_max_1: weather.openweathermap
-                  entity_forecast_min: sensor.openweathermap_forecast_temperature_low
-                  entity_forecast_min_1: weather.openweathermap
-                  entity_humidity: sensor.openweathermap_humidity
-                  entity_pop: sensor.openweathermap_forecast_precipitation_probability
-                  entity_pop_1: weather.openweathermap
-                  entity_pos: sensor.openweathermap_forecast_precipitation
-                  entity_pos_1: weather.openweathermap
-                  entity_pressure: sensor.openweathermap_pressure
-                  entity_summary: weather.openweathermap
-                  entity_summary_1: weather.openweathermap
+                  entity_forecast_icon: weather.owm_daily
+                  entity_forecast_icon_1: weather.owm_daily
+                  entity_forecast_max: sensor.owm_daily_forecast_temperature
+                  entity_forecast_max_1: weather.owm_daily
+                  entity_forecast_min: sensor.owm_daily_forecast_temperature_low
+                  entity_forecast_min_1: weather.owm_daily
+                  entity_humidity: sensor.owm_daily_humidity
+                  entity_pop: sensor.owm_daily_forecast_precipitation_probability
+                  entity_pop_1: weather.owm_daily
+                  entity_pos: sensor.owm_daily_forecast_precipitation
+                  entity_pos_1: weather.owm_daily
+                  entity_pressure: sensor.owm_daily_pressure
+                  entity_summary: weather.owm_daily
+                  entity_summary_1: weather.owm_daily
                   entity_sun: sun.sun
-                  entity_temperature: weather.openweathermap
-                  entity_uv_alert_summary: sensor.openweathermap_uv_index
-                  entity_visibility: sensor.openweathermap_visibility
-                  entity_wind_bearing: sensor.openweathermap_wind_bearing
-                  entity_wind_speed: sensor.openweathermap_wind_speed
+                  entity_temperature: weather.owm_daily
+                  entity_uv_alert_summary: sensor.owm_daily_uv_index
+                  entity_visibility: sensor.owm_daily_visibility
+                  entity_wind_bearing: sensor.owm_daily_wind_bearing
+                  entity_wind_speed: sensor.owm_daily_wind_speed
                   option_time_format: 12hour
                   section_order:
                   - overview
@@ -2517,7 +2471,7 @@ views:
             service: browser_mod.popup
         type: weather
       - content: '{{ states(entity) | float(default=0) }}'
-        entity: sensor.airnow_aqi
+        entity: sensor.airnow_air_quality_index
         icon: '{{ iif(has_value(entity), "mdi:blur", "mdi:blur-off") }}'
         icon_color: "{% if has_value(entity) %}\n  {% set level = states(entity) |\
           \ float(default=0) %}\n  {% if level >= 300 %}\n    red\n  {% elif level\
@@ -2536,7 +2490,7 @@ views:
                 cards:
                 - double_tap_action:
                     action: none
-                  entity: sensor.airnow_aqi
+                  entity: sensor.airnow_air_quality_index
                   fill_container: false
                   hold_action:
                     action: none
@@ -2549,7 +2503,7 @@ views:
                     state: 'on'
                   decimal: 1
                   entities:
-                  - entity: sensor.airnow_aqi
+                  - entity: sensor.airnow_air_quality_index
                     max: 400
                     min: 0
                     severity:
@@ -2742,7 +2696,7 @@ views:
       variables:
       - person: person.joshua
       - name: Joshua
-      - media: media_player.spotify_josh
+      - media: media_player.spotify_joshua
       - proximity: proximity.joshua_home
       - phone_base: pixel_7
     - template: person_card
@@ -2754,7 +2708,7 @@ views:
       - proximity: proximity.amy_home
       - phone_base: galaxy_s21
     - card_mod:
-        style: "ha-card {\n  background:\n  {% set state = states(\"device_tracker.ascent_location\"\
+        style: "ha-card {\n  background:\n  {% set state = states(\"device_tracker.ascent\"\
           ) %}\n  {% if state == \"not_home\" %}\n    rgba(244, 67, 54, 0.2);\n  {%\
           \ elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(189, 189, 189,\
           \ 0.2);\n  {% elif state != \"home\" %}\n    rgba(33, 150, 243, 0.2);\n\
@@ -2780,7 +2734,7 @@ views:
               \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--accent-color)\
               \ {{ (remaining / duration * 100) | round() }}% 0%, var(--card-background-color)\
               \ 0% 100%);\n}\n{% endif %}\n"
-        entity: device_tracker.ascent_location
+        entity: device_tracker.ascent
         icon_type: entity-picture
         name: Ascent
         tap_action:
@@ -2988,7 +2942,7 @@ views:
             \ rotate(4deg); }\n}\n@keyframes drum {\n  50%  { clip-path: polygon(0\
             \ 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 34%\
             \ 68%, 35% 100%, 100% 100%, 100% 0); }\n}\n"
-        entity: input_boolean.washer
+        entity: input_boolean.washer_status
         icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:washing-machine\n{%- else\
           \ -%}\n  mdi:washing-machine-off\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  blue\n{%- else -%}\n \
@@ -2998,7 +2952,7 @@ views:
           action: more-info
         type: custom:mushroom-template-card
       conditions:
-      - entity: input_boolean.washer
+      - entity: input_boolean.washer_status
         state: 'on'
       type: conditional
     - card:
@@ -3011,7 +2965,7 @@ views:
             \ rotate(-4deg); }\n}\n@keyframes drum {\n  50%  { clip-path: polygon(0\
             \ 0, 0 100%, 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36%\
             \ 73%, 35% 100%, 100% 100%, 100% 0); }\n}\n"
-        entity: input_boolean.dryer
+        entity: input_boolean.dryer_status
         icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:tumble-dryer\n{%- else -%}\n\
           \  mdi:tumble-dryer-off\n{%- endif -%}"
         icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- else -%}\n\
@@ -3021,7 +2975,7 @@ views:
           action: more-info
         type: custom:mushroom-template-card
       conditions:
-      - entity: input_boolean.dryer
+      - entity: input_boolean.dryer_status
         state: 'on'
       type: conditional
     - card:
@@ -3074,12 +3028,12 @@ views:
       variables:
       - primary: Living Room
       - entity: light.living_room_lights
-      - temperature: sensor.home_temperature
+      - temperature: sensor.ecobee_current_temperature
       - icon: mdi:sofa-single
       - icon_color: 255, 152, 0
       - path: living
       - chips:
-        - entity: media_player.living_room_universal
+        - entity: media_player.universal_living_room
           icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity) }}'
           icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
             \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% elif state\
@@ -3097,7 +3051,7 @@ views:
                   type: custom:decluttering-card
                   variables:
                   - expanded: true
-                  - entity: media_player.living_room_universal
+                  - entity: media_player.universal_living_room
                   - sound_buttons:
                     - icon: mdi:surround-sound-5-1
                       id: Straight
@@ -3114,7 +3068,7 @@ views:
                 title: Living Room
               service: browser_mod.popup
           type: template
-        - entity: fan.living_room
+        - entity: fan.living_room_ceiling
           icon: mdi:fan
           icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
             \ 'percentage') %}\n  {{ {\n    25: \"green\",\n    50: \"yellow\",\n\
@@ -3153,7 +3107,7 @@ views:
                 title: Living Room Lights
               service: browser_mod.popup
           type: template
-        - entity: binary_sensor.home_occupancy
+        - entity: binary_sensor.ecobee_occupancy
           icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk") }}'
           icon_color: '{{ iif(is_state(entity, "on"), "blue", "disabled") }}'
           tap_action:
@@ -3191,7 +3145,7 @@ views:
           - entity: binary_sensor.quest_interactive
             state: 'on'
           type: conditional
-        - entity: select.family_room_activities
+        - entity: select.harmony_family_room_activities
           icon: "{% set state = states(entity) %}\n{% if state == \"Computer\" %}\n\
             \  mdi:desktop-tower\n{% elif state == \"PS3\" %}\n  fapro:ps3\n{% elif\
             \ state == \"PS4\" %}\n  fapro:ps4\n{% elif state == \"XBox\" %}\n  mdi:microsoft-xbox\n\
@@ -3203,7 +3157,7 @@ views:
           tap_action:
             action: none
           type: template
-        - entity: media_player.family_room_universal
+        - entity: media_player.universal_family_room
           icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity) }}'
           icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
             \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% elif state\
@@ -3221,7 +3175,7 @@ views:
                   type: custom:decluttering-card
                   variables:
                   - expanded: true
-                  - entity: media_player.family_room_universal
+                  - entity: media_player.universal_family_room
                   - sound_buttons:
                     - icon: mdi:surround-sound-5-1
                       id: Direct
@@ -3328,14 +3282,14 @@ views:
       - path: kitchen
       - chips:
         - chip:
-            entity: light.smart_display
+            entity: light.smart_display_monitor
             icon: mdi:apps-box
             icon_color: blue
             tap_action:
               action: more-info
             type: template
           conditions:
-          - entity: light.smart_display
+          - entity: light.smart_display_monitor
             state: 'on'
           type: conditional
         - card_mod:
@@ -3377,7 +3331,7 @@ views:
       - icon_color: 103, 58, 183
       - path: master
       - chips:
-        - entity: media_player.master_bedroom_universal
+        - entity: media_player.universal_master_bedroom
           icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity) }}'
           icon_color: "{% set state = states(entity) %}\n{% if state == \"playing\"\
             \ %}\n  green\n{% elif state == \"paused\" %}\n  amber\n{% elif state\
@@ -3395,7 +3349,7 @@ views:
                   type: custom:decluttering-card
                   variables:
                   - expanded: true
-                  - entity: media_player.master_bedroom_universal
+                  - entity: media_player.universal_master_bedroom
                   - buttons:
                     - icon: mdi:plex
                       id: Plex
@@ -3428,7 +3382,7 @@ views:
                 title: Master Bedroom
               service: browser_mod.popup
           type: template
-        - entity: fan.master_bedroom
+        - entity: fan.master_bedroom_ceiling
           icon: mdi:fan
           icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
             \ 'percentage') %}\n  {{ {\n    25: \"green\",\n    50: \"yellow\",\n\
@@ -3477,7 +3431,7 @@ views:
       type: custom:decluttering-card
       variables:
       - primary: Ethan
-      - entity: light.ethan_lights
+      - entity: light.ethans_lights
       - temperature: sensor.ethan_temperature
       - icon: mdi:robot
       - icon_color: 76, 175, 80
@@ -3490,7 +3444,7 @@ views:
                 \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
-          entity: light.ethan_lights
+          entity: light.ethans_lights
           icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
             }}'
           icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
@@ -3502,7 +3456,7 @@ views:
                   template: light_group_popup
                   type: custom:decluttering-card
                   variables:
-                  - entity: light.ethan_lights
+                  - entity: light.ethans_lights
                 title: Ethan's Lights
               service: browser_mod.popup
           type: template
@@ -3516,7 +3470,7 @@ views:
       type: custom:decluttering-card
       variables:
       - primary: Emma
-      - entity: light.emma_lights
+      - entity: light.emmas_lights
       - temperature: sensor.emma_temperature
       - icon: mdi:unicorn-variant
       - icon_color: 156, 39, 176
@@ -3529,7 +3483,7 @@ views:
                 \ | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
                 \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                 \ 12px;\n}\n{% endif %}\n"
-          entity: light.emma_lights
+          entity: light.emmas_lights
           icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
             }}'
           icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
@@ -3541,7 +3495,7 @@ views:
                   template: light_group_popup
                   type: custom:decluttering-card
                   variables:
-                  - entity: light.emma_lights
+                  - entity: light.emmas_lights
                 title: Emma's Lights
               service: browser_mod.popup
           type: template
@@ -3554,14 +3508,14 @@ views:
     - template: room_card
       type: custom:decluttering-card
       variables:
-      - primary: Guest
-      - entity: light.guest_room
+      - primary: Amy's Office
+      - entity: light.amy_office
       - temperature: sensor.guest_room_temperature
-      - icon: mdi:account
+      - icon: mdi:skull
       - icon_color: 244, 67, 54
-      - path: guest-room
+      - path: amy-office-room
       - chips:
-        - entity: light.guest_room
+        - entity: light.amy_office
           icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
             }}'
           icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
@@ -3580,8 +3534,8 @@ views:
       - primary: Garage
       - entity: light.garage
       - temperature: sensor.garage_multisensor_air_temperature
-      - icon: '{% if is_state(''cover.garage_door'', ''open'') %}mdi:garage-open-variant{%
-          elif states(''cover.garage_door'') in [''opening'', ''closing''] %}mdi:garage-alert-variant{%
+      - icon: '{% if is_state(''cover.opengarage'', ''open'') %}mdi:garage-open-variant{%
+          elif states(''cover.opengarage'') in [''opening'', ''closing''] %}mdi:garage-alert-variant{%
           else %}mdi:garage-variant{% endif %}'
       - icon_color: 96, 125, 139
       - path: garage
@@ -3590,7 +3544,7 @@ views:
             card_mod:
               style: "@keyframes phase {\n  50% {opacity: 0;}\n}\nha-card {\n  animation:\
                 \ phase 1.5s ease-out infinite;\n}"
-            entity: cover.garage_door
+            entity: cover.opengarage
             icon: "{%- if is_state(entity, \"open\") -%}\n  mdi:garage-open-variant\n\
               {%- elif states(entity) in [\"opening\", \"closing\"] -%}\n  mdi:garage-alert-variant\n\
               {%- endif -%}"
@@ -3600,7 +3554,7 @@ views:
               action: none
             type: template
           conditions:
-          - entity: cover.garage_door
+          - entity: cover.opengarage
             state_not: closed
           type: conditional
         - entity: light.garage
@@ -3610,7 +3564,7 @@ views:
           tap_action:
             action: none
           type: template
-        - entity: binary_sensor.garage_occupancy
+        - entity: binary_sensor.garage_multisensor_motion_detection
           icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk") }}'
           icon_color: '{{ iif(is_state(entity, "on"), "blue", "disabled") }}'
           tap_action:
@@ -3621,7 +3575,7 @@ views:
       variables:
       - primary: Outside
       - entity: light.outside_lights
-      - temperature: sensor.openweathermap_temperature
+      - temperature: sensor.owm_daily_temperature
       - icon: mdi:spa
       - icon_color: 139, 195, 74
       - path: outside
@@ -3649,7 +3603,7 @@ views:
                 title: Outside Lights
               service: browser_mod.popup
           type: template
-        - entity: binary_sensor.doorbell_human
+        - entity: binary_sensor.doorbell_person_occupancy
           icon: '{{ iif(is_state(entity, "on"), "mdi:motion-sensor", "mdi:walk") }}'
           icon_color: '{{ iif(is_state(entity, "on"), "blue", "disabled") }}'
           tap_action:
@@ -3660,7 +3614,7 @@ views:
       variables:
       - primary: Utility
       - entity: ''
-      - temperature: sensor.water_main_air_temperature
+      - temperature: sensor.water_main_valve_air_temperature
       - icon: mdi:progress-wrench
       - icon_color: 121, 85, 72
       - path: utility
@@ -3669,7 +3623,7 @@ views:
             style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n{% if is_state(config.entity,\
               \ \"off\") %}\nha-card {\n  animation: phase 1.5s ease-out infinite;\n\
               }\n{% endif %}\n"
-          entity: switch.water_main
+          entity: switch.water_main_valve
           icon: mdi:{{ iif(is_state(entity, "on"), "valve-open", "valve-closed") }}
           icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
           tap_action:
@@ -3746,7 +3700,7 @@ views:
                     type: custom:decluttering-card
                     variables:
                     - light: light.wled_mario_star
-                    - effect: select.mario_star_effect
+                    - effect: select.wled_effect_mario_star
                   title: Star
                 service: browser_mod.popup
             type: custom:mushroom-light-card
@@ -3780,16 +3734,16 @@ views:
     - icon_color: orange
     - chips:
       - content: '{{ iif(is_state(entity, "on"), "Detected", "Clear") }}'
-        entity: binary_sensor.home_occupancy
+        entity: binary_sensor.ecobee_occupancy
         icon: '{{ iif(is_state(entity, "on"), "mdi:home-circle", "mdi:circle-off-outline")
           }}'
         icon_color: '{{ iif(is_state(entity, "on"), "cyan", "") }}'
         tap_action:
           action: more-info
         type: template
-      - entity: sensor.home_temperature
+      - entity: sensor.ecobee_current_temperature
         type: entity
-      - entity: sensor.home_humidity
+      - entity: sensor.ecobee_current_humidity
         type: entity
   - cards:
     - template: title_chips
@@ -3853,7 +3807,7 @@ views:
       columns: 3
       square: false
       type: grid
-    - entity: fan.living_room
+    - entity: fan.living_room_ceiling
       icon_animation: true
       layout: horizontal
       name: Fan
@@ -3888,7 +3842,7 @@ views:
                 right_button: Send
                 right_button_action:
                   data:
-                    media_player: media_player.living_room_speaker
+                    media_player: media_player.cast_living_room_speaker
                     volume: 80
                   service: script.media_play
                 title: Send Message
@@ -3904,8 +3858,8 @@ views:
                   template: shield_remote
                   type: custom:decluttering-card
                   variables:
-                  - universal: media_player.living_room_universal
-                  - shield: remote.living_room_androidtv
+                  - universal: media_player.universal_living_room
+                  - shield: remote.androidtv_living_room
                 title: Living Room Remote
               service: browser_mod.popup
           type: template
@@ -3914,12 +3868,12 @@ views:
         primary: Harmony Unavailable
         type: custom:mushroom-template-card
       conditions:
-      - entity: remote.living_room
+      - entity: remote.harmony_living_room
         state: unavailable
       type: conditional
     - card:
         cards:
-        - entity: remote.living_room
+        - entity: remote.harmony_living_room
           icon: mdi:motion-play-outline
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"Shield TV\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -3930,10 +3884,10 @@ views:
               activity: Shield TV
             service: remote.turn_on
             target:
-              entity_id: remote.living_room
+              entity_id: remote.harmony_living_room
           type: custom:mushroom-template-card
         - card:
-            entity: remote.living_room
+            entity: remote.harmony_living_room
             icon: mdi:power
             icon_color: red
             primary: Power
@@ -3941,24 +3895,24 @@ views:
               action: call-service
               service: remote.turn_off
               target:
-                entity_id: remote.living_room
+                entity_id: remote.harmony_living_room
             type: custom:mushroom-template-card
           conditions:
-          - entity: remote.living_room
+          - entity: remote.harmony_living_room
             state: 'on'
           type: conditional
         columns: 2
         square: false
         type: grid
       conditions:
-      - entity: remote.living_room
+      - entity: remote.harmony_living_room
         state_not: unavailable
       type: conditional
     - card:
         template: media_card
         type: custom:decluttering-card
         variables:
-        - entity: media_player.living_room_universal
+        - entity: media_player.universal_living_room
         - sound_buttons:
           - icon: mdi:surround-sound-5-1
             id: Straight
@@ -3973,12 +3927,12 @@ views:
             name: Multi-Channel
             type: sound_mode
       conditions:
-      - entity: media_player.living_room_universal
+      - entity: media_player.universal_living_room
         state_not: 'off'
-      - entity: media_player.living_room_universal
+      - entity: media_player.universal_living_room
         state_not: unavailable
       type: conditional
-    - entity: media_player.living_room_speaker
+    - entity: media_player.cast_living_room_speaker
       hide:
         power: true
       icon: mdi:dots-horizontal-circle
@@ -4047,7 +4001,7 @@ views:
       show_brightness_control: true
       type: custom:mushroom-light-card
     - cards:
-      - entity: light.stair
+      - entity: light.stairway
         name: Stairs
         type: custom:mushroom-light-card
       - entity: script.family_room_game_light_mode
@@ -4099,7 +4053,7 @@ views:
                 right_button: Send
                 right_button_action:
                   data:
-                    media_player: media_player.family_room_speaker
+                    media_player: media_player.cast_family_room_speaker
                     volume: 90
                   service: script.media_play
                 title: Send Message
@@ -4115,8 +4069,8 @@ views:
                   template: shield_remote
                   type: custom:decluttering-card
                   variables:
-                  - universal: media_player.family_room_universal
-                  - shield: remote.family_room_androidtv
+                  - universal: media_player.universal_family_room
+                  - shield: remote.androidtv_family_room
                 title: Family Room Remote
               service: browser_mod.popup
           type: template
@@ -4125,12 +4079,12 @@ views:
         primary: Harmony Unavailable
         type: custom:mushroom-template-card
       conditions:
-      - entity: remote.family_room
+      - entity: remote.harmony_family_room
         state: unavailable
       type: conditional
     - card:
         cards:
-        - entity: remote.family_room
+        - entity: remote.harmony_family_room
           icon: mdi:motion-play-outline
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"Shield TV\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -4141,9 +4095,9 @@ views:
               activity: Shield TV
             service: remote.turn_on
             target:
-              entity_id: remote.family_room
+              entity_id: remote.harmony_family_room
           type: custom:mushroom-template-card
-        - entity: remote.family_room
+        - entity: remote.harmony_family_room
           icon: mdi:desktop-tower
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"Computer\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -4154,9 +4108,9 @@ views:
               activity: Computer
             service: remote.turn_on
             target:
-              entity_id: remote.family_room
+              entity_id: remote.harmony_family_room
           type: custom:mushroom-template-card
-        - entity: remote.family_room
+        - entity: remote.harmony_family_room
           icon: fapro:ps4
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"PS4\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -4167,9 +4121,9 @@ views:
               activity: PS4
             service: remote.turn_on
             target:
-              entity_id: remote.family_room
+              entity_id: remote.harmony_family_room
           type: custom:mushroom-template-card
-        - entity: remote.family_room
+        - entity: remote.harmony_family_room
           icon: fapro:ps3
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"PS3\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -4180,9 +4134,9 @@ views:
               activity: PS3
             service: remote.turn_on
             target:
-              entity_id: remote.family_room
+              entity_id: remote.harmony_family_room
           type: custom:mushroom-template-card
-        - entity: remote.family_room
+        - entity: remote.harmony_family_room
           icon: mdi:microsoft-xbox
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"XBox\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -4193,10 +4147,10 @@ views:
               activity: XBox
             service: remote.turn_on
             target:
-              entity_id: remote.family_room
+              entity_id: remote.harmony_family_room
           type: custom:mushroom-template-card
         - card:
-            entity: remote.family_room
+            entity: remote.harmony_family_room
             icon: mdi:power
             icon_color: red
             primary: Power
@@ -4204,24 +4158,24 @@ views:
               action: call-service
               service: remote.turn_off
               target:
-                entity_id: remote.family_room
+                entity_id: remote.harmony_family_room
             type: custom:mushroom-template-card
           conditions:
-          - entity: remote.family_room
+          - entity: remote.harmony_family_room
             state: 'on'
           type: conditional
         columns: 3
         square: false
         type: grid
       conditions:
-      - entity: remote.family_room
+      - entity: remote.harmony_family_room
         state_not: unavailable
       type: conditional
     - card:
         template: media_card
         type: custom:decluttering-card
         variables:
-        - entity: media_player.family_room_universal
+        - entity: media_player.universal_family_room
         - sound_buttons:
           - icon: mdi:surround-sound-5-1
             id: Direct
@@ -4272,7 +4226,7 @@ views:
       - entity: sensor.family_room_denon_source
         state_not: unavailable
       type: conditional
-    - entity: media_player.family_room_speaker
+    - entity: media_player.cast_family_room_speaker
       hide:
         power: true
       icon: mdi:dots-horizontal-circle
@@ -4426,7 +4380,7 @@ views:
           type: template
     - double_tap_action:
         action: more-info
-      entity: light.office_light
+      entity: light.office
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -4435,7 +4389,7 @@ views:
               template: light_wb_popup
               type: custom:decluttering-card
               variables:
-              - light: light.office_light
+              - light: light.office
             title: Main
           service: browser_mod.popup
       icon: mdi:lightbulb
@@ -4467,7 +4421,7 @@ views:
       use_light_color: true
     - double_tap_action:
         action: more-info
-      entity: light.office_desk_led
+      entity: light.wled_office_desk
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -4476,8 +4430,8 @@ views:
               template: light_wled_popup
               type: custom:decluttering-card
               variables:
-              - light: light.office_desk_led
-              - effect: select.office_desk_led_effect
+              - light: light.wled_office_desk
+              - effect: select.wled_effect_office_desk
             title: Desk
           service: browser_mod.popup
       icon: mdi:led-strip-variant
@@ -4491,7 +4445,7 @@ views:
       name: Shelf
       type: custom:mushroom-light-card
     type: vertical-stack
-  - entity: media_player.office_speaker
+  - entity: media_player.cast_office_speaker
     hide:
       power: true
     icon: mdi:dots-horizontal-circle
@@ -4611,7 +4565,7 @@ views:
       show_brightness_control: true
       show_color_temp_control: true
       type: custom:mushroom-light-card
-    - entity: fan.master_bedroom
+    - entity: fan.master_bedroom_ceiling
       icon_animation: true
       layout: horizontal
       name: Fan
@@ -4634,8 +4588,8 @@ views:
                   template: shield_remote
                   type: custom:decluttering-card
                   variables:
-                  - universal: media_player.master_bedroom_universal
-                  - shield: remote.master_bedroom_androidtv
+                  - universal: media_player.universal_master_bedroom
+                  - shield: remote.harmony_master_bedroom
                 title: Master Bedroom Remote
               service: browser_mod.popup
           type: template
@@ -4644,12 +4598,12 @@ views:
         primary: Harmony Unavailable
         type: custom:mushroom-template-card
       conditions:
-      - entity: remote.master_bedroom
+      - entity: remote.harmony_master_bedroom
         state: unavailable
       type: conditional
     - card:
         cards:
-        - entity: remote.master_bedroom
+        - entity: remote.harmony_master_bedroom
           icon: mdi:motion-play-outline
           icon_color: "{%- if has_value(entity) and is_state_attr(entity, \"current_activity\"\
             , \"Shield TV\") -%}\n  green\n{%- else -%}\n  grey\n{%- endif -%}"
@@ -4660,10 +4614,10 @@ views:
               activity: Shield TV
             service: remote.turn_on
             target:
-              entity_id: remote.master_bedroom
+              entity_id: remote.harmony_master_bedroom
           type: custom:mushroom-template-card
         - card:
-            entity: remote.master_bedroom
+            entity: remote.harmony_master_bedroom
             icon: mdi:power
             icon_color: red
             primary: Power
@@ -4671,24 +4625,24 @@ views:
               action: call-service
               service: remote.turn_off
               target:
-                entity_id: remote.master_bedroom
+                entity_id: remote.harmony_master_bedroom
             type: custom:mushroom-template-card
           conditions:
-          - entity: remote.master_bedroom
+          - entity: remote.harmony_master_bedroom
             state: 'on'
           type: conditional
         columns: 2
         square: false
         type: grid
       conditions:
-      - entity: remote.master_bedroom
+      - entity: remote.harmony_master_bedroom
         state_not: unavailable
       type: conditional
     - card:
         template: media_card
         type: custom:decluttering-card
         variables:
-        - entity: media_player.master_bedroom_universal
+        - entity: media_player.universal_master_bedroom
         - buttons:
           - icon: mdi:plex
             id: Plex
@@ -4719,9 +4673,9 @@ views:
             name: Home
             type: source
       conditions:
-      - entity: remote.master_bedroom
+      - entity: remote.harmony_master_bedroom
         state_not: 'off'
-      - entity: remote.master_bedroom
+      - entity: remote.harmony_master_bedroom
         state_not: unavailable
       type: conditional
     type: vertical-stack
@@ -4759,7 +4713,7 @@ views:
       - chips:
         - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
             }} / {{ expand(entity) | list | count }}'
-          entity: light.ethan_lights
+          entity: light.ethans_lights
           hold_action:
             action: toggle
           tap_action:
@@ -4805,7 +4759,7 @@ views:
       - chips:
         - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
             }} / {{ expand(entity) | list | count }}'
-          entity: light.emma_lights
+          entity: light.emmas_lights
           hold_action:
             action: toggle
           tap_action:
@@ -4829,8 +4783,8 @@ views:
   - template: chip_header
     type: custom:decluttering-card
     variables:
-    - primary: Guest
-    - icon: mdi:account
+    - primary: Amy's Office
+    - icon: mdi:skull
     - icon_color: red
     - chips:
       - content: '{{ iif(is_state(entity, "on"), "Detected", "Clear") }}'
@@ -4846,18 +4800,18 @@ views:
   - cards:
     - title: Lights
       type: custom:mushroom-title-card
-    - entity: light.guest_room
+    - entity: light.amy_office
       layout: horizontal
       name: Main
       show_brightness_control: true
       type: custom:mushroom-light-card
     type: vertical-stack
-  icon: mdi:account
+  icon: mdi:skull
   layout:
     max_cols: 1
-  path: guest-room
+  path: amy-office-room
   theme: Backend-selected
-  title: Guest Room
+  title: Amy's Office
   type: custom:masonry-layout
 - badges: []
   cards:
@@ -4865,13 +4819,13 @@ views:
     type: custom:decluttering-card
     variables:
     - primary: Garage
-    - icon: '{% if is_state(''cover.garage_door'', ''open'') %}mdi:garage-open-variant{%
-        elif states(''cover.garage_door'') in [''opening'', ''closing''] %}mdi:garage-alert-variant{%
+    - icon: '{% if is_state(''cover.opengarage'', ''open'') %}mdi:garage-open-variant{%
+        elif states(''cover.opengarage'') in [''opening'', ''closing''] %}mdi:garage-alert-variant{%
         else %}mdi:garage-variant{% endif %}'
     - icon_color: blue-grey
     - chips:
       - content: '{{ iif(is_state(entity, "on"), "Detected", "Clear") }}'
-        entity: binary_sensor.garage_occupancy
+        entity: binary_sensor.garage_multisensor_motion_detection
         icon: '{{ iif(is_state(entity, "on"), "mdi:home-circle", "mdi:circle-off-outline")
           }}'
         icon_color: '{{ iif(is_state(entity, "on"), "cyan", "") }}'
@@ -4893,7 +4847,7 @@ views:
       type: custom:mushroom-light-card
     type: vertical-stack
   - cards:
-    - entity: cover.garage_door
+    - entity: cover.opengarage
       icon: "{% if is_state(entity, \"open\") %}\n  mdi:garage-open-variant\n{% elif\
         \ is_state(entity, \"opening\") %}\n  mdi:garage-alert-variant\n{% elif is_state(entity,\
         \ \"closed\") %}\n  mdi:garage-variant\n{% else %}\n  mdi:garage-alert-variant\n\
@@ -4910,7 +4864,7 @@ views:
       tap_action:
         action: none
       type: custom:mushroom-template-card
-    - entity: cover.garage_door
+    - entity: cover.opengarage
       icon_type: none
       name: Garage Door
       primary_info: none
@@ -4924,7 +4878,7 @@ views:
   - card_mod:
       style: "ha-card {\n  height: 85px;\n}\n"
     cards:
-    - entity: binary_sensor.opengarage_vehicle_present
+    - entity: binary_sensor.opengarage_vehicle
       icon: fapro:subaru
       icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n  red\n\
         {%- endif -%}"
@@ -4941,7 +4895,7 @@ views:
       - entity: sensor.opengarage_distance
         icon: mdi:arrow-collapse-vertical
         type: entity
-      - entity: sensor.opengarage_rssi
+      - entity: sensor.opengarage_signal_strength
         type: entity
       type: custom:mushroom-chips-card
     type: custom:vertical-stack-in-card
@@ -4961,9 +4915,9 @@ views:
     - icon: mdi:spa
     - icon_color: light-green
     - chips:
-      - entity: sensor.openweathermap_temperature
+      - entity: sensor.owm_daily_temperature
         type: entity
-      - entity: sensor.openweathermap_humidity
+      - entity: sensor.owm_daily_humidity
         type: entity
   - cards:
     - template: title_chips
@@ -5014,7 +4968,7 @@ views:
     - icon: mdi:progress-wrench
     - icon_color: brown
     - chips:
-      - entity: sensor.water_main_air_temperature
+      - entity: sensor.water_main_valve_air_temperature
         type: entity
   - cards:
     - title: Water
@@ -5035,7 +4989,7 @@ views:
       sort:
         method: state
       type: custom:auto-entities
-    - entity: switch.water_main
+    - entity: switch.water_main_valve
       hold_action:
         action: toggle
       icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:valve-open\n{%- elif is_state(entity,\
@@ -5053,7 +5007,7 @@ views:
         state: 'on'
       decimal: 1
       entities:
-      - entity: sensor.salt_level
+      - entity: sensor.water_softener_salt_monitor_salt_level
         name: Water Softener Salt Level
       name: Water Softener Salt Level
       positions:
@@ -5132,7 +5086,7 @@ views:
         tap_action:
           action: more-info
         type: custom:mushroom-entity-card
-      - entity: switch.rachio_standby_mode
+      - entity: switch.rachio_standby
         hold_action:
           action: toggle
         icon_color: amber
@@ -5335,13 +5289,13 @@ views:
     - title: Location
       type: custom:mushroom-title-card
     - cards:
-      - entity: device_tracker.ascent_location
+      - entity: device_tracker.ascent
         icon_type: entity-picture
         name: Location
         primary_info: state
         secondary_info: none
         type: custom:mushroom-person-card
-      - entity: binary_sensor.opengarage_vehicle_present
+      - entity: binary_sensor.opengarage_vehicle
         icon: fapro:subaru
         icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
         primary: '{{ iif(is_state(entity, "on"), "In Garage", "Not in Garage") }}'
@@ -5404,7 +5358,7 @@ views:
             \  border-radius: 50%;\n}\n"
       default_zoom: 12
       entities:
-      - entity: device_tracker.ascent_location
+      - entity: device_tracker.ascent
       hours_to_show: 24
       type: map
     type: vertical-stack
@@ -5428,7 +5382,7 @@ views:
         type: custom:auto-entities
       type: vertical-stack
     conditions:
-    - entity: binary_sensor.ascent_doors_windows
+    - entity: binary_sensor.ascent_doors
       state: 'on'
     type: conditional
   - cards:
@@ -5560,14 +5514,14 @@ views:
     - chips:
       - card_mod:
           style:
-            .: "{% from \"util.jinja\" import computer_count %}\n{% if (computer_count()\
-              \ | int) > 0 %}\nha-card:after {\n  content: \"{{ computer_count() |\
-              \ int }}\";\n  position: absolute;\n  color: var(--teal-color);\n  font-weight:\
-              \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n}\n{% endif\
-              \ %}\n"
+            .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+              \ \"{{ expand(config.entity) | selectattr(\"state\", \"==\", \"on\"\
+              ) | list | count }}\";\n  position: absolute;\n  color: var(--teal-color);\n\
+              \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+              }\n{% endif %}\n"
+        entity: binary_sensor.computers
         icon: mdi:desktop-tower
-        icon_color: '{% from "util.jinja" import computer_count %} {{ "teal" if computer_count()
-          | int > 0 else "disabled" }}'
+        icon_color: '{{ "teal" if is_state(entity, "on") else "disabled" }}'
         tap_action:
           action: none
         type: template
@@ -5873,7 +5827,7 @@ views:
               .: "ha-card {\n  {% if is_state(config.entity, 'on') %}\n  animation:\
                 \ rotation 1.5s linear infinite;\n  {% endif %}\n}\n@keyframes rotation\
                 \ {\n  100% {\n    transform: rotate(-360deg);\n  }\n}\n"
-          entity: switch.computer_exhaust_fan
+          entity: fan.computer
           icon: mdi:fan
           icon_color: '{{ iif(is_state(entity, ''on''), "green", "disabled") }}'
           type: template
@@ -6134,7 +6088,7 @@ views:
     - subtitle: Raspberry Pi 4
       title: Smart Display
       type: custom:mushroom-title-card
-    - entity: light.smart_display
+    - entity: light.smart_display_monitor
       layout: horizontal
       name: Monitor
       show_brightness_control: true
@@ -6157,8 +6111,8 @@ views:
     - icon_color: indigo
     - chips:
       - content: "{% if is_state(entity, \"off\") %}\n  Off\n{% else %}\n  {{ state_attr(\"\
-          climate.home\", \"hvac_action\") | capitalize }}\n{% endif %}"
-        entity: climate.home
+          climate.ecobee\", \"hvac_action\") | capitalize }}\n{% endif %}"
+        entity: climate.ecobee
         icon: mdi:thermostat-box
         icon_color: "{% if is_state_attr(entity, \"hvac_action\", \"heating\") %}\n\
           \  red\n{% elif is_state_attr(entity, \"hvac_action\", \"cooling\") %}\n\
@@ -6178,7 +6132,7 @@ views:
           \ 'cool') %}\n    --card-mod-icon: mdi:snowflake;\n  {% elif is_state(config.entity,\
           \ 'fan_only') %}\n    --card-mod-icon: mdi:fan;\n  {% else %}\n    --card-mod-icon:\
           \ mdi:air-conditioner;\n  {% endif %}\n  display: flex;\n}\n"
-      entity: climate.home
+      entity: climate.ecobee
       hvac_modes:
       - heat_cool
       - heat
@@ -6191,12 +6145,12 @@ views:
         action: more-info
       type: custom:mushroom-climate-card
     - cards:
-      - entity: sensor.home_temperature
+      - entity: sensor.ecobee_current_temperature
         icon_color: green
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
-      - entity: sensor.home_humidity
+      - entity: sensor.ecobee_current_humidity
         icon_color: blue
         primary_info: state
         secondary_info: name
@@ -6253,32 +6207,32 @@ views:
         show_states: true
       series:
       - color: rgb(158,158,158)
-        entity: sensor.home_temperature
+        entity: sensor.ecobee_current_temperature
         name: Indoor Temp
         yaxis_id: temp
       - attribute: target_temp_high
         color: rgb(33,150,243)
-        entity: climate.home
+        entity: climate.ecobee
         name: Cool Setpoint
         stroke_width: 1
         unit: °F
         yaxis_id: temp
       - attribute: target_temp_low
         color: rgb(255,152,0)
-        entity: climate.home
+        entity: climate.ecobee
         name: Heat Setpoint
         stroke_width: 1
         unit: °F
         yaxis_id: temp
       - attribute: temperature
         color: rgb(33,150,243)
-        entity: climate.home
+        entity: climate.ecobee
         name: Setpoint
         stroke_width: 1
         unit: °F
         yaxis_id: temp
       - color: rgb(0,150,136)
-        entity: sensor.home_humidity
+        entity: sensor.ecobee_current_humidity
         name: Indoor Humidity
         yaxis_id: perc
       - color: rgb(96,125,139)
@@ -6325,7 +6279,7 @@ views:
         show_states: true
       series:
       - color: rgb(255,152,0)
-        entity: sensor.home_temperature
+        entity: sensor.ecobee_current_temperature
         name: Home
       - color: rgb(205,220,57)
         entity: sensor.kitchen_temperature
@@ -6347,9 +6301,9 @@ views:
         name: Office
       - color: rgb(0,188,212)
         entity: sensor.guest_room_temperature
-        name: Guest Room
+        name: Amy's Office
       - color: rgb(121,85,72)
-        entity: sensor.water_main_air_temperature
+        entity: sensor.water_main_valve_air_temperature
         name: Utility
       - color: rgb(96,125,139)
         entity: sensor.garage_multisensor_air_temperature
@@ -6478,7 +6432,7 @@ views:
       columns: 3
       square: false
       type: grid
-    - entity: fan.living_room
+    - entity: fan.living_room_ceiling
       icon_animation: true
       layout: horizontal
       name: Fan
@@ -6549,7 +6503,7 @@ views:
           tap_action:
             action: more-info
           type: template
-    - entity: light.office_light
+    - entity: light.office
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -6558,7 +6512,7 @@ views:
               template: light_wb_popup
               type: custom:decluttering-card
               variables:
-              - light: light.office_light
+              - light: light.office
             title: Main
           service: browser_mod.popup
       icon: mdi:lightbulb
@@ -6586,7 +6540,7 @@ views:
       show_color_temp_control: true
       type: custom:mushroom-light-card
       use_light_color: true
-    - entity: light.office_desk_led
+    - entity: light.wled_office_desk
       hold_action:
         action: fire-dom-event
         browser_mod:
@@ -6595,8 +6549,8 @@ views:
               template: light_wled_popup
               type: custom:decluttering-card
               variables:
-              - light: light.office_desk_led
-              - effect: select.office_desk_led_effect
+              - light: light.wled_office_desk
+              - effect: select.wled_effect_office_desk
             title: Desk
           service: browser_mod.popup
       icon: mdi:led-strip-variant
@@ -6639,7 +6593,7 @@ views:
       name: Lamp
       show_brightness_control: true
       type: custom:mushroom-light-card
-    - entity: light.stair
+    - entity: light.stairway
       name: Stairs
       type: custom:mushroom-light-card
     type: vertical-stack
@@ -6679,7 +6633,7 @@ views:
       show_brightness_control: true
       show_color_temp_control: true
       type: custom:mushroom-light-card
-    - entity: fan.master_bedroom
+    - entity: fan.master_bedroom_ceiling
       icon_animation: true
       layout: horizontal
       name: Fan
@@ -6694,7 +6648,7 @@ views:
       - chips:
         - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
             }} / {{ expand(entity) | list | count }}'
-          entity: light.ethan_lights
+          entity: light.ethans_lights
           hold_action:
             action: toggle
           tap_action:
@@ -6714,7 +6668,7 @@ views:
       - chips:
         - content: '{{ expand(entity) | selectattr("state", "==", "on") | list | count
             }} / {{ expand(entity) | list | count }}'
-          entity: light.emma_lights
+          entity: light.emmas_lights
           hold_action:
             action: toggle
           tap_action:
@@ -6727,9 +6681,9 @@ views:
       type: custom:mushroom-light-card
     type: vertical-stack
   - cards:
-    - title: Guest Room
+    - title: Amy's Office
       type: custom:mushroom-title-card
-    - entity: light.guest_room
+    - entity: light.amy_office
       layout: horizontal
       name: Main
       show_brightness_control: true
@@ -6789,7 +6743,7 @@ views:
     - chips:
       - content: '{% from "util.jinja" import security_count %} {{ iif(security_count()
           | int == 0, "Secure", "Not Secure") }}'
-        entity: lock.lock_front
+        entity: lock.front_door
         hold_action:
           action: none
         icon: '{% from "util.jinja" import security_count %} {{ iif(security_count()
@@ -6829,35 +6783,35 @@ views:
       - cards:
         - card_mod:
             style:
-              mushroom-shape-icon$: "{% if (states(\"sensor.front_door_battery_level\"\
+              mushroom-shape-icon$: "{% if (states(\"sensor.front_door_contact_battery_level\"\
                 ) | int) <= 60 %}\n{% from \"util.jinja\" import battery_color %}\n\
                 .shape {\n  /* Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
                 \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--{{\
-                \ battery_color(\"sensor.front_door_battery_level\") }}-color) {{\
-                \ states(\"sensor.front_door_battery_level\") }}% 0%, var(--card-background-color)\
+                \ battery_color(\"sensor.front_door_contact_battery_level\") }}-color)\
+                \ {{ states(\"sensor.front_door_contact_battery_level\") }}% 0%, var(--card-background-color)\
                 \ 0% 100%\n  );\n}\n.shape:after {\n  /* Add back icon shape */\n\
                 \  content: \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n\
                 \  border-radius: var(--icon-border-radius);\n  background: var(--shape-color);\n\
                 }\n{% endif %}\n"
-          entity: binary_sensor.front_door_is_open
+          entity: binary_sensor.front_door_contact_door_is_open
           hold_action:
             action: fire-dom-event
             browser_mod:
               data:
-                entity: sensor.front_door_battery_level
+                entity: sensor.front_door_contact_battery_level
               service: browser_mod.more_info
           icon: "{% if is_state(entity, \"on\") %}\n  mdi:door-open\n{% elif is_state(\"\
-            lock.lock_front\", \"unlocked\") and is_state(entity, \"off\") %}\n  mdi:door-closed\n\
-            {% elif is_state(\"lock.lock_front\", \"locked\") and is_state(entity,\
+            lock.front_door\", \"unlocked\") and is_state(entity, \"off\") %}\n  mdi:door-closed\n\
+            {% elif is_state(\"lock.front_door\", \"locked\") and is_state(entity,\
             \ \"off\") %}\n  mdi:door-closed-lock\n{% endif %}"
           icon_color: "{% if is_state(entity, \"on\") %}\n  red\n{% elif is_state(\"\
-            lock.lock_front\", \"unlocked\") and is_state(entity, \"off\") %}\n  yellow\n\
-            {% elif is_state(\"lock.lock_front\", \"locked\") and is_state(entity,\
+            lock.front_door\", \"unlocked\") and is_state(entity, \"off\") %}\n  yellow\n\
+            {% elif is_state(\"lock.front_door\", \"locked\") and is_state(entity,\
             \ \"off\") %}\n  green\n{% endif %}"
           multiline_secondary: true
           primary: Front Door
           secondary: "{% from \"util.jinja\" import custom_timedelta %} {% if is_state(entity,\
-            \ \"on\") -%}\n  Open\n{% elif is_state(\"lock.lock_front\", \"unlocked\"\
+            \ \"on\") -%}\n  Open\n{% elif is_state(\"lock.front_door\", \"unlocked\"\
             ) -%}\n  Closed and Unlocked\n{% else -%}\n  Closed and Locked\n{% endif\
             \ -%} {{ custom_timedelta(entity) }}"
           tap_action:
@@ -6877,12 +6831,12 @@ views:
                   \ {\n  /* Add back icon shape */\n  content: \"\";\n  height: 100%;\n\
                   \  width: 100%;\n  position: absolute;\n  border-radius: var(--icon-border-radius);\n\
                   \  background: var(--shape-color);\n}\n{% endif %}\n"
-            entity: sensor.lock_front_battery_level
+            entity: sensor.front_door_lock_battery_level
             hold_action:
               action: fire-dom-event
               browser_mod:
                 data:
-                  entity: sensor.lock_front_battery_level
+                  entity: sensor.front_door_lock_battery_level
                 service: browser_mod.more_info
             icon: mdi:lock-smart
             icon_color: disabled
@@ -6894,7 +6848,7 @@ views:
               style:
                 .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
                   \ 0;\n  background: none;\n}\n"
-            entity: lock.lock_front
+            entity: lock.front_door
             icon_type: none
             name: Front Door
             primary_info: none
@@ -6909,7 +6863,7 @@ views:
           type: custom:layout-card
         type: custom:vertical-stack-in-card
       - cards:
-        - entity: cover.garage_door
+        - entity: cover.opengarage
           icon: "{% if is_state(entity, \"open\") %}\n  mdi:garage-open-variant\n\
             {% elif states(entity) in [\"opening\", \"closing\"] %}\n  mdi:garage-alert-variant\n\
             {% elif is_state(entity, \"closed\") %}\n  mdi:garage-variant\n{% else\
@@ -6926,7 +6880,7 @@ views:
           tap_action:
             action: more-info
           type: custom:mushroom-template-card
-        - entity: cover.garage_door
+        - entity: cover.opengarage
           icon_type: none
           name: Garage Door
           primary_info: none
@@ -6939,21 +6893,21 @@ views:
         variables:
         - name: Sliding Door
         - entity: binary_sensor.sliding_door_contact
-        - battery_entity: sensor.sliding_door_battery_level
+        - battery_entity: sensor.sliding_door_contact_battery_level
         - icon: mdi:door-sliding
       - template: door_card
         type: custom:decluttering-card
         variables:
         - name: Garage Entry Door
-        - entity: binary_sensor.garage_entry_door_is_open
-        - battery_entity: sensor.garage_entry_door_battery_level
+        - entity: binary_sensor.garage_entry_door_contact_door_is_open
+        - battery_entity: sensor.garage_entry_door_contact_battery_level
         - icon: mdi:door
       - template: door_card
         type: custom:decluttering-card
         variables:
         - name: Garage Side Door
-        - entity: binary_sensor.garage_side_door_is_open
-        - battery_entity: sensor.garage_side_door_battery_level
+        - entity: binary_sensor.garage_side_door_contact_door_is_open
+        - battery_entity: sensor.garage_side_door_contact_battery_level
         - icon: mdi:door
       - cards:
         - card_mod:
@@ -6961,14 +6915,14 @@ views:
               .: "ha-card {\n  background: none;\n  box-shadow: none;\n  border-width:\
                 \ 0;\n  margin-top: 10px;\n}\n"
               mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity, \"\
-                on\") -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
+                off\") -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
                 }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow),\
                 \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent; }\n}\n"
-          entity: input_boolean.ignore_alert_doors
+          entity: input_boolean.door_open_alerts
           hold_action:
             action: toggle
           icon: mdi:door
-          icon_color: "{% if is_state(entity, \"on\") %}\n  yellow\n{% endif %}"
+          icon_color: "{% if is_state(entity, \"off\") %}\n  yellow\n{% endif %}"
           layout: vertical
           tap_action:
             action: none
@@ -6978,14 +6932,14 @@ views:
               .: "ha-card {\n  background: none;\n  box-shadow: none;\n  border-width:\
                 \ 0;\n  margin-top: 10px;\n}\n"
               mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity, \"\
-                on\") -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
+                off\") -%}\n  --shape-animation: ping 2s infinite;\n  {%- endif -%}\n\
                 }\n@keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow),\
                 \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent; }\n}\n"
-          entity: input_boolean.ignore_alert_garage_door
+          entity: input_boolean.garage_door_open_alerts
           hold_action:
             action: toggle
           icon: mdi:garage-variant
-          icon_color: "{% if is_state(entity, \"on\") %}\n  yellow\n{% endif %}"
+          icon_color: "{% if is_state(entity, \"off\") %}\n  yellow\n{% endif %}"
           layout: vertical
           tap_action:
             action: none
@@ -7017,7 +6971,7 @@ views:
         type: custom:decluttering-card
         variables:
         - name: Family Room
-        - camera: camera.familyroom
+        - camera: camera.family_room
         - stream: familyroom
       - template: camera_card
         type: custom:decluttering-card
@@ -7098,7 +7052,7 @@ views:
           tap_action:
             action: more-info
           type: state-icon
-        - entity: binary_sensor.doorbell_motion
+        - entity: binary_sensor.doorbell_motion_alarm
           icon: mdi:motion
           state_color: true
           style:
@@ -7112,7 +7066,7 @@ views:
         show_state: false
         type: picture-elements
       - cards:
-        - entity: binary_sensor.doorbell_ring
+        - entity: binary_sensor.doorbell_alarm_local
           icon: mdi:bell-ring
           icon_color: disabled
           primary: Last Ring
@@ -7139,7 +7093,7 @@ views:
     - title: Occupancy
       type: custom:mushroom-title-card
     - cards:
-      - entity: binary_sensor.home_occupancy
+      - entity: binary_sensor.ecobee_occupancy
         icon_color: light-green
         name: Home
         type: custom:mushroom-entity-card
@@ -7165,13 +7119,13 @@ views:
         type: custom:mushroom-entity-card
       - entity: binary_sensor.guest_room_occupancy
         icon_color: light-green
-        name: Guest Room
+        name: Amy's Office
         type: custom:mushroom-entity-card
       - entity: binary_sensor.office_occupancy
         icon_color: light-green
         name: Office
         type: custom:mushroom-entity-card
-      - entity: binary_sensor.garage_occupancy
+      - entity: binary_sensor.garage_multisensor_motion_detection
         icon_color: light-green
         name: Garage
         type: custom:mushroom-entity-card
@@ -7195,10 +7149,10 @@ views:
     - icon: mdi:transmission-tower
     - icon_color: red
     - chips:
-      - entity: sensor.pv_power
+      - entity: sensor.sol_ark_pv_power
         icon: mdi:solar-power-variant
         type: entity
-      - entity: sensor.grid_net_monthly
+      - entity: sensor.sol_ark_grid_net_monthly
         icon: mdi:power-plug
         type: entity
       - entity: sensor.month_power_cost
@@ -7206,7 +7160,7 @@ views:
         type: entity
       - content: '{{ iif(has_value(entity), states(entity) | int(default=0) ~ "%")
           }}'
-        entity: sensor.battery_state_of_charge
+        entity: sensor.sol_ark_battery_state_of_charge
         hold_action:
           action: none
         icon: '{% from "util.jinja" import battery_icon %}
@@ -7218,7 +7172,7 @@ views:
         tap_action:
           action: more-info
         type: template
-  - entity: sensor.device_mode
+  - entity: sensor.sol_ark_device_mode
     icon: mdi:transit-connection-variant
     name: Mode
     type: entity
@@ -7240,13 +7194,13 @@ views:
       type: grid
     - entity: select.monthly_energy
       icon: mdi:transmission-tower
-      icon_color: "{%- if is_state(entity, \"summer_offpeak\") -%}\n  yellow\n{%-\
+      icon_color: "{%- if is_state(entity, \"summer_off_peak\") -%}\n  yellow\n{%-\
         \ elif is_state(entity, \"summer_peak\") -%}\n  red\n{%- elif is_state(entity,\
-        \ \"winter_offpeak\") -%}\n  blue\n{%- elif is_state(entity, \"winter_peak\"\
+        \ \"winter_off_peak\") -%}\n  blue\n{%- elif is_state(entity, \"winter_peak\"\
         ) -%}\n  deep-orange\n{%- else -%}\n  grey\n{%- endif -%}"
-      primary: "{%- if is_state(entity, \"summer_offpeak\") -%}\n  Summer Off-Peak\n\
+      primary: "{%- if is_state(entity, \"summer_off_peak\") -%}\n  Summer Off-Peak\n\
         {%- elif is_state(entity, \"summer_peak\") -%}\n  Summer Peak\n{%- elif is_state(entity,\
-        \ \"winter_offpeak\") -%}\n  Winter Off-Peak\n{%- elif is_state(entity, \"\
+        \ \"winter_off_peak\") -%}\n  Winter Off-Peak\n{%- elif is_state(entity, \"\
         winter_peak\") -%}\n  Winter Peak\n{%- else -%}\n  Unknown\n{%- endif -%}"
       secondary: '{{ states("sensor.tariff_price", with_unit=True) }}'
       tap_action:
@@ -7258,42 +7212,42 @@ views:
       - cards:
         - title: Daily
           type: custom:mushroom-title-card
-        - entity: sensor.load_daily
+        - entity: sensor.sol_ark_load_daily
           icon: mdi:calendar-today
           icon_color: orange
           name: Load
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_net_daily
+        - entity: sensor.sol_ark_grid_net_daily
           icon: mdi:transmission-tower
           icon_color: blue
           name: Net
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.pv_daily
+        - entity: sensor.sol_ark_pv_daily
           icon: mdi:solar-panel
           icon_color: red
           name: Solar
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.battery_net_daily
+        - entity: sensor.sol_ark_battery_net_daily
           icon: mdi:battery-high
           icon_color: lime
           name: Battery
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_in_daily
+        - entity: sensor.sol_ark_grid_in_daily
           icon: mdi:transmission-tower-import
           icon_color: amber
           name: Import
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_out_daily
+        - entity: sensor.sol_ark_grid_out_daily
           icon: mdi:transmission-tower-export
           icon_color: green
           name: Export
@@ -7317,94 +7271,94 @@ views:
                   sections:
                   - entities:
                     - children:
-                      - sensor.load_daily
-                      - sensor.battery_in_daily
+                      - sensor.sol_ark_load_daily
+                      - sensor.sol_ark_battery_in_daily
                       color: var(--purple-color)
-                      entity_id: sensor.grid_in_daily
+                      entity_id: sensor.sol_ark_grid_in_daily
                       name: Grid Import
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                     - children:
-                      - sensor.load_daily
+                      - sensor.sol_ark_load_daily
                       color: var(--pink-color)
-                      entity_id: sensor.battery_out_daily
+                      entity_id: sensor.sol_ark_battery_out_daily
                       name: Battery
                     - children:
-                      - sensor.load_daily
-                      - sensor.battery_in_daily
-                      - sensor.grid_out_daily
+                      - sensor.sol_ark_load_daily
+                      - sensor.sol_ark_battery_in_daily
+                      - sensor.sol_ark_grid_out_daily
                       color: var(--orange-color)
-                      entity_id: sensor.pv_daily
+                      entity_id: sensor.sol_ark_pv_daily
                       name: Solar
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - children:
-                      - sensor.home_balance_energy
-                      - sensor.air_conditioner_energy
-                      - sensor.basement_bedrooms_energy
-                      - sensor.bedrooms_energy
-                      - sensor.dishwasher_disposal_energy
-                      - sensor.dryer_energy
-                      - sensor.entry_living_bath_lights_energy
-                      - sensor.family_room_energy
-                      - sensor.fridge_kitchen_outlets_energy
-                      - sensor.furnace_energy
-                      - sensor.garage_outlets_energy
-                      - sensor.living_room_master_bedroom_energy
-                      - sensor.mechanical_energy
-                      - sensor.microwave_energy
-                      - sensor.range_energy
-                      - sensor.theater_room_energy
-                      - sensor.washer_energy
+                      - sensor.emporiavue_balance_daily
+                      - sensor.emporiavue_air_conditioner_daily
+                      - sensor.emporiavue_basement_bedrooms_daily
+                      - sensor.emporiavue_bedrooms_daily
+                      - sensor.emporiavue_dishwasher_disposal_daily
+                      - sensor.emporiavue_dryer_daily
+                      - sensor.emporiavue_entry_living_room_bath_lights_daily
+                      - sensor.emporiavue_family_room_daily
+                      - sensor.emporiavue_fridge_kitchen_outlets_daily
+                      - sensor.emporiavue_furnace_daily
+                      - sensor.emporiavue_garage_outlets_daily
+                      - sensor.emporiavue_living_room_master_bedroom_daily
+                      - sensor.emporiavue_utility_room_daily
+                      - sensor.emporiavue_microwave_daily
+                      - sensor.emporiavue_range_daily
+                      - sensor.emporiavue_theater_room_daily
+                      - sensor.emporiavue_washer_daily
                       color: var(--cyan-color)
-                      entity_id: sensor.load_daily
+                      entity_id: sensor.sol_ark_load_daily
                       name: Total Energy Used
                       remaining:
                         color: var(--grey-color)
                         name: Other
                     - color: var(--pink-color)
-                      entity_id: sensor.battery_in_daily
+                      entity_id: sensor.sol_ark_battery_in_daily
                       name: Battery Charge
                     - color: var(--purple-color)
-                      entity_id: sensor.grid_out_daily
+                      entity_id: sensor.sol_ark_grid_out_daily
                       name: Grid Export
                   - entities:
-                    - entity_id: sensor.home_balance_energy
+                    - entity_id: sensor.emporiavue_balance_daily
                       name: Balance
-                    - entity_id: sensor.air_conditioner_energy
+                    - entity_id: sensor.emporiavue_air_conditioner_daily
                       name: Air Conditioner
-                    - entity_id: sensor.basement_bedrooms_energy
+                    - entity_id: sensor.emporiavue_basement_bedrooms_daily
                       name: Basement Bedrooms
-                    - entity_id: sensor.bedrooms_energy
+                    - entity_id: sensor.emporiavue_bedrooms_daily
                       name: Bedrooms
-                    - entity_id: sensor.dishwasher_disposal_energy
+                    - entity_id: sensor.emporiavue_dishwasher_disposal_daily
                       name: Dishwasher / Disposal
-                    - entity_id: sensor.dryer_energy
+                    - entity_id: sensor.emporiavue_dryer_daily
                       name: Dryer
-                    - entity_id: sensor.entry_living_bath_lights_energy
+                    - entity_id: sensor.emporiavue_entry_living_room_bath_lights_daily
                       name: Entry, Living Room, Bath Lights
-                    - entity_id: sensor.family_room_energy
+                    - entity_id: sensor.emporiavue_family_room_daily
                       name: Family Room
-                    - entity_id: sensor.fridge_kitchen_outlets_energy
+                    - entity_id: sensor.emporiavue_fridge_kitchen_outlets_daily
                       name: Fridge / Kitchen Outlets
-                    - entity_id: sensor.furnace_energy
+                    - entity_id: sensor.emporiavue_furnace_daily
                       name: Furnace
-                    - entity_id: sensor.garage_outlets_energy
+                    - entity_id: sensor.emporiavue_garage_outlets_daily
                       name: Garage Outlets
-                    - entity_id: sensor.living_room_master_bedroom_energy
+                    - entity_id: sensor.emporiavue_living_room_master_bedroom_daily
                       name: Living / Master Bed
-                    - entity_id: sensor.microwave_energy
+                    - entity_id: sensor.emporiavue_microwave_daily
                       name: Microwave
-                    - entity_id: sensor.mechanical_energy
+                    - entity_id: sensor.emporiavue_utility_room_daily
                       name: Utility
-                    - entity_id: sensor.range_energy
+                    - entity_id: sensor.emporiavue_range_daily
                       name: Range
-                    - entity_id: sensor.theater_room_energy
+                    - entity_id: sensor.emporiavue_theater_room_daily
                       name: Theater Room
-                    - entity_id: sensor.washer_energy
+                    - entity_id: sensor.emporiavue_washer_daily
                       name: Washer
                   show_names: true
                   type: custom:sankey-chart
@@ -7418,42 +7372,42 @@ views:
       - cards:
         - title: Monthly
           type: custom:mushroom-title-card
-        - entity: sensor.load_monthly
+        - entity: sensor.sol_ark_load_monthly
           icon: mdi:calendar-month
           icon_color: orange
           name: Load
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_net_monthly
+        - entity: sensor.sol_ark_grid_net_monthly
           icon: mdi:transmission-tower
           icon_color: blue
           name: Net
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.pv_monthly
+        - entity: sensor.sol_ark_pv_monthly
           icon: mdi:solar-panel
           icon_color: red
           name: Solar
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.battery_net_monthly
+        - entity: sensor.sol_ark_battery_net_monthly
           icon: mdi:battery-high
           icon_color: lime
           name: Battery
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_in_monthly
+        - entity: sensor.sol_ark_grid_in_monthly
           icon: mdi:transmission-tower-import
           icon_color: amber
           name: Import
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_out_monthly
+        - entity: sensor.sol_ark_grid_out_monthly
           icon: mdi:transmission-tower-export
           icon_color: green
           name: Export
@@ -7477,94 +7431,94 @@ views:
                   sections:
                   - entities:
                     - children:
-                      - sensor.load_monthly
-                      - sensor.battery_in_monthly
+                      - sensor.sol_ark_load_monthly
+                      - sensor.sol_ark_battery_in_monthly
                       color: var(--purple-color)
-                      entity_id: sensor.grid_in_monthly
+                      entity_id: sensor.sol_ark_grid_in_monthly
                       name: Grid Import
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                     - children:
-                      - sensor.load_monthly
+                      - sensor.sol_ark_load_monthly
                       color: var(--pink-color)
-                      entity_id: sensor.battery_out_monthly
+                      entity_id: sensor.sol_ark_battery_out_monthly
                       name: Battery
                     - children:
-                      - sensor.load_monthly
-                      - sensor.battery_in_monthly
-                      - sensor.grid_out_monthly
+                      - sensor.sol_ark_load_monthly
+                      - sensor.sol_ark_battery_in_monthly
+                      - sensor.sol_ark_grid_out_monthly
                       color: var(--orange-color)
-                      entity_id: sensor.pv_monthly
+                      entity_id: sensor.sol_ark_pv_monthly
                       name: Solar
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - children:
-                      - sensor.home_balance_monthly
-                      - sensor.air_conditioner_monthly
-                      - sensor.basement_bedrooms_monthly
-                      - sensor.bedrooms_monthly
-                      - sensor.dishwasher_disposal_monthly
-                      - sensor.dryer_monthly
-                      - sensor.entry_living_bath_lights_monthly
-                      - sensor.family_room_monthly
-                      - sensor.fridge_kitchen_outlets_monthly
-                      - sensor.furnace_monthly
-                      - sensor.garage_outlets_monthly
-                      - sensor.living_room_master_bedroom_monthly
-                      - sensor.mechanical_monthly
-                      - sensor.microwave_monthly
-                      - sensor.range_monthly
-                      - sensor.theater_room_monthly
-                      - sensor.washer_monthly
+                      - sensor.emporiavue_balance_monthly
+                      - sensor.emporiavue_air_conditioner_monthly
+                      - sensor.emporiavue_basement_bedrooms_monthly
+                      - sensor.emporiavue_bedrooms_monthly
+                      - sensor.emporiavue_dishwasher_disposal_monthly
+                      - sensor.emporiavue_dryer_monthly
+                      - sensor.emporiavue_entry_living_room_bath_lights_monthly
+                      - sensor.emporiavue_family_room_monthly
+                      - sensor.emporiavue_fridge_kitchen_outlets_monthly
+                      - sensor.emporiavue_furnace_monthly
+                      - sensor.emporiavue_garage_outlets_monthly
+                      - sensor.emporiavue_living_room_master_bedroom_monthly
+                      - sensor.emporiavue_utility_room_monthly
+                      - sensor.emporiavue_microwave_monthly
+                      - sensor.emporiavue_range_monthly
+                      - sensor.emporiavue_theater_room_monthly
+                      - sensor.emporiavue_washer_monthly
                       color: var(--cyan-color)
-                      entity_id: sensor.load_monthly
+                      entity_id: sensor.sol_ark_load_monthly
                       name: Total Energy Used
                       remaining:
                         color: var(--grey-color)
                         name: Other
                     - color: var(--pink-color)
-                      entity_id: sensor.battery_in_monthly
+                      entity_id: sensor.sol_ark_battery_in_monthly
                       name: Battery Charge
                     - color: var(--purple-color)
-                      entity_id: sensor.grid_out_monthly
+                      entity_id: sensor.sol_ark_grid_out_monthly
                       name: Grid Export
                   - entities:
-                    - entity_id: sensor.home_balance_monthly
+                    - entity_id: sensor.emporiavue_balance_monthly
                       name: Balance
-                    - entity_id: sensor.air_conditioner_monthly
+                    - entity_id: sensor.emporiavue_air_conditioner_monthly
                       name: Air Conditioner
-                    - entity_id: sensor.basement_bedrooms_monthly
+                    - entity_id: sensor.emporiavue_basement_bedrooms_monthly
                       name: Basement Bedrooms
-                    - entity_id: sensor.bedrooms_monthly
+                    - entity_id: sensor.emporiavue_bedrooms_monthly
                       name: Bedrooms
-                    - entity_id: sensor.dishwasher_disposal_monthly
+                    - entity_id: sensor.emporiavue_dishwasher_disposal_monthly
                       name: Dishwasher / Disposal
-                    - entity_id: sensor.dryer_monthly
+                    - entity_id: sensor.emporiavue_dryer_monthly
                       name: Dryer
-                    - entity_id: sensor.entry_living_bath_lights_monthly
+                    - entity_id: sensor.emporiavue_entry_living_room_bath_lights_monthly
                       name: Entry, Living Room, Bath Lights
-                    - entity_id: sensor.family_room_monthly
+                    - entity_id: sensor.emporiavue_family_room_monthly
                       name: Family Room
-                    - entity_id: sensor.fridge_kitchen_outlets_monthly
+                    - entity_id: sensor.emporiavue_fridge_kitchen_outlets_monthly
                       name: Fridge / Kitchen Outlets
-                    - entity_id: sensor.furnace_monthly
+                    - entity_id: sensor.emporiavue_furnace_monthly
                       name: Furnace
-                    - entity_id: sensor.garage_outlets_monthly
+                    - entity_id: sensor.emporiavue_garage_outlets_monthly
                       name: Garage Outlets
-                    - entity_id: sensor.living_room_master_bedroom_monthly
+                    - entity_id: sensor.emporiavue_living_room_master_bedroom_monthly
                       name: Living / Master Bed
-                    - entity_id: sensor.microwave_monthly
+                    - entity_id: sensor.emporiavue_microwave_monthly
                       name: Microwave
-                    - entity_id: sensor.mechanical_monthly
+                    - entity_id: sensor.emporiavue_utility_room_monthly
                       name: Utility
-                    - entity_id: sensor.range_monthly
+                    - entity_id: sensor.emporiavue_range_monthly
                       name: Range
-                    - entity_id: sensor.theater_room_monthly
+                    - entity_id: sensor.emporiavue_theater_room_monthly
                       name: Theater Room
-                    - entity_id: sensor.washer_monthly
+                    - entity_id: sensor.emporiavue_washer_monthly
                       name: Washer
                   show_names: true
                   type: custom:sankey-chart
@@ -7580,42 +7534,42 @@ views:
       - cards:
         - title: Yearly
           type: custom:mushroom-title-card
-        - entity: sensor.load_yearly
+        - entity: sensor.sol_ark_load_yearly
           icon: mdi:calendar-multiple
           icon_color: orange
           name: Load
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_net_yearly
+        - entity: sensor.sol_ark_grid_net_yearly
           icon: mdi:transmission-tower
           icon_color: blue
           name: Net
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.pv_yearly
+        - entity: sensor.sol_ark_pv_yearly
           icon: mdi:solar-panel
           icon_color: red
           name: Solar
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.battery_net_yearly
+        - entity: sensor.sol_ark_battery_net_yearly
           icon: mdi:battery-high
           icon_color: lime
           name: Battery
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_in_yearly
+        - entity: sensor.sol_ark_battery_net_yearly
           icon: mdi:transmission-tower-import
           icon_color: amber
           name: Import
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_out_yearly
+        - entity: sensor.sol_ark_grid_out_yearly
           icon: mdi:transmission-tower-export
           icon_color: green
           name: Export
@@ -7639,41 +7593,41 @@ views:
                   sections:
                   - entities:
                     - children:
-                      - sensor.load_yearly
-                      - sensor.battery_in_yearly
+                      - sensor.sol_ark_load_yearly
+                      - sensor.sol_ark_battery_in_yearly
                       color: var(--purple-color)
-                      entity_id: sensor.grid_in_yearly
+                      entity_id: sensor.sol_ark_battery_net_yearly
                       name: Grid Import
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                     - children:
-                      - sensor.load_yearly
+                      - sensor.sol_ark_load_yearly
                       color: var(--pink-color)
-                      entity_id: sensor.battery_out_yearly
+                      entity_id: sensor.sol_ark_battery_out_yearly
                       name: Battery
                     - children:
-                      - sensor.load_yearly
-                      - sensor.battery_in_yearly
-                      - sensor.grid_out_yearly
+                      - sensor.sol_ark_load_yearly
+                      - sensor.sol_ark_battery_in_yearly
+                      - sensor.sol_ark_grid_out_yearly
                       color: var(--orange-color)
-                      entity_id: sensor.pv_yearly
+                      entity_id: sensor.sol_ark_pv_yearly
                       name: Solar
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - color: var(--cyan-color)
-                      entity_id: sensor.load_yearly
+                      entity_id: sensor.sol_ark_load_yearly
                       name: Total Energy Used
                       remaining:
                         color: var(--grey-color)
                         name: Other
                     - color: var(--pink-color)
-                      entity_id: sensor.battery_in_yearly
+                      entity_id: sensor.sol_ark_battery_in_yearly
                       name: Battery Charge
                     - color: var(--purple-color)
-                      entity_id: sensor.grid_out_yearly
+                      entity_id: sensor.sol_ark_grid_out_yearly
                       name: Grid Export
                   show_names: true
                   type: custom:sankey-chart
@@ -7687,21 +7641,21 @@ views:
       - cards:
         - title: Lifetime
           type: custom:mushroom-title-card
-        - entity: sensor.load_energy
+        - entity: sensor.sol_ark_load_energy
           icon: mdi:calendar-multiple
           icon_color: orange
           name: Load
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_energy_in
+        - entity: sensor.sol_ark_grid_energy_in
           icon: mdi:transmission-tower
           icon_color: blue
           name: Net
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.pv_energy
+        - entity: sensor.sol_ark_pv_energy
           icon: mdi:solar-panel
           icon_color: red
           name: Solar
@@ -7713,14 +7667,14 @@ views:
           primary: No Data
           secondary: Battery
           type: custom:mushroom-template-card
-        - entity: sensor.grid_energy_in
+        - entity: sensor.sol_ark_grid_energy_in
           icon: mdi:transmission-tower-import
           icon_color: amber
           name: Import
           primary_info: state
           secondary_info: name
           type: custom:mushroom-entity-card
-        - entity: sensor.grid_energy_out
+        - entity: sensor.sol_ark_grid_energy_out
           icon: mdi:transmission-tower-export
           icon_color: green
           name: Export
@@ -7744,41 +7698,41 @@ views:
                   sections:
                   - entities:
                     - children:
-                      - sensor.load_energy
-                      - sensor.battery_energy_in
+                      - sensor.sol_ark_load_energy
+                      - sensor.sol_ark_battery_energy_in
                       color: var(--purple-color)
-                      entity_id: sensor.grid_energy_in
+                      entity_id: sensor.sol_ark_grid_energy_in
                       name: Grid Import
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                     - children:
-                      - sensor.load_energy
+                      - sensor.sol_ark_load_energy
                       color: var(--pink-color)
-                      entity_id: sensor.battery_energy_out
+                      entity_id: sensor.sol_ark_battery_energy_out
                       name: Battery
                     - children:
-                      - sensor.load_energy
-                      - sensor.battery_energy_in
-                      - sensor.grid_energy_out
+                      - sensor.sol_ark_load_energy
+                      - sensor.sol_ark_battery_energy_in
+                      - sensor.sol_ark_grid_energy_out
                       color: var(--orange-color)
-                      entity_id: sensor.pv_energy
+                      entity_id: sensor.sol_ark_pv_energy
                       name: Solar
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - color: var(--cyan-color)
-                      entity_id: sensor.load_energy
+                      entity_id: sensor.sol_ark_load_energy
                       name: Total Energy Used
                       remaining:
                         color: var(--grey-color)
                         name: Other
                     - color: var(--pink-color)
-                      entity_id: sensor.battery_energy_in
+                      entity_id: sensor.sol_ark_battery_energy_in
                       name: Battery Charge
                     - color: var(--purple-color)
-                      entity_id: sensor.grid_energy_out
+                      entity_id: sensor.sol_ark_grid_energy_out
                       name: Grid Export
                   show_names: true
                   type: custom:sankey-chart
@@ -7801,15 +7755,15 @@ views:
       entities:
         battery:
           entity:
-            consumption: sensor.battery_power_out
-            production: sensor.battery_power_in
-          state_of_charge: sensor.battery_state_of_charge
+            consumption: sensor.sol_ark_battery_power_out
+            production: sensor.sol_ark_battery_power_in
+          state_of_charge: sensor.sol_ark_battery_state_of_charge
         grid:
-          entity: sensor.grid_power
+          entity: sensor.sol_ark_grid_power
         home:
-          entity: sensor.load_power
+          entity: sensor.sol_ark_load_power
         solar:
-          entity: sensor.pv_power
+          entity: sensor.sol_ark_pv_power
       kw_decimals: 1
       max_expected_power: 2000
       max_flow_rate: 6
@@ -7825,7 +7779,7 @@ views:
     - animate: true
       entities:
       - color: var(--green-color)
-        entity: sensor.pv_power
+        entity: sensor.sol_ark_pv_power
         name: PV Power
       height: 60
       hours_to_show: 24
@@ -7842,7 +7796,7 @@ views:
     - title: Battery
       type: custom:mushroom-title-card
     - entities:
-      - entity: sensor.battery_state_of_charge
+      - entity: sensor.sol_ark_battery_state_of_charge
         icon: mdi:battery-high
         max: 100
         min: 0
@@ -7863,7 +7817,7 @@ views:
         - color: var(--green-color)
           from: 90
           to: 100
-      - entity: sensor.battery_voltage
+      - entity: sensor.sol_ark_battery_voltage
         icon: mdi:sine-wave
         max: 56
         min: 44
@@ -7884,7 +7838,7 @@ views:
         - color: var(--red-color)
           from: 54
           to: 56
-      - entity: sensor.battery_temperature
+      - entity: sensor.sol_ark_battery_temperature
         icon: mdi:thermometer
         max: 150
         min: -10
@@ -7936,94 +7890,94 @@ views:
                   sections:
                   - entities:
                     - children:
-                      - sensor.load_power
-                      - sensor.battery_power_in
+                      - sensor.sol_ark_load_power
+                      - sensor.sol_ark_battery_power_in
                       color: var(--purple-color)
-                      entity_id: sensor.grid_power_in
+                      entity_id: sensor.sol_ark_grid_power_in
                       name: Grid Import
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                     - children:
-                      - sensor.load_power
+                      - sensor.sol_ark_load_power
                       color: var(--pink-color)
-                      entity_id: sensor.battery_power_out
+                      entity_id: sensor.sol_ark_battery_power_out
                       name: Battery
                     - children:
-                      - sensor.load_power
-                      - sensor.battery_power_in
-                      - sensor.grid_power_out
+                      - sensor.sol_ark_load_power
+                      - sensor.sol_ark_battery_power_in
+                      - sensor.sol_ark_grid_power_out
                       color: var(--orange-color)
-                      entity_id: sensor.pv_power
+                      entity_id: sensor.sol_ark_pv_power
                       name: Solar
                       remaining:
                         color: var(--grey-color)
                         name: Inverter
                   - entities:
                     - children:
-                      - sensor.home_balance_power
-                      - sensor.air_conditioner_power
-                      - sensor.basement_bedrooms_power
-                      - sensor.bedrooms_power
-                      - sensor.dishwasher_disposal_power
-                      - sensor.dryer_power
-                      - sensor.entry_living_bath_lights_power
-                      - sensor.family_room_power
-                      - sensor.fridge_kitchen_outlets_power
-                      - sensor.furnace_power
-                      - sensor.garage_outlets_power
-                      - sensor.living_room_master_bedroom_power
-                      - sensor.mechanical_power
-                      - sensor.microwave_power
-                      - sensor.range_power
-                      - sensor.theater_room_power
-                      - sensor.washer_power
+                      - sensor.emporiavue_balance_power
+                      - sensor.emporiavue_air_conditioner_power
+                      - sensor.emporiavue_basement_bedrooms_power
+                      - sensor.emporiavue_bedrooms_power
+                      - sensor.emporiavue_dishwasher_disposal_power
+                      - sensor.emporiavue_dryer_power
+                      - sensor.emporiavue_entry_living_room_bath_lights_power
+                      - sensor.emporiavue_family_room_power
+                      - sensor.emporiavue_fridge_kitchen_outlets_power
+                      - sensor.emporiavue_furnace_power
+                      - sensor.emporiavue_garage_outlets_power
+                      - sensor.emporiavue_living_room_master_bedroom_power
+                      - sensor.emporiavue_utility_room_power
+                      - sensor.emporiavue_microwave_power
+                      - sensor.emporiavue_range_power
+                      - sensor.emporiavue_theater_room_power
+                      - sensor.emporiavue_washer_power
                       color: var(--cyan-color)
-                      entity_id: sensor.load_power
+                      entity_id: sensor.sol_ark_load_power
                       name: Total Power Used
                       remaining:
                         color: var(--grey-color)
                         name: Other
                     - color: var(--pink-color)
-                      entity_id: sensor.battery_power_in
+                      entity_id: sensor.sol_ark_battery_power_in
                       name: Battery Charge
                     - color: var(--purple-color)
-                      entity_id: sensor.grid_power_out
+                      entity_id: sensor.sol_ark_grid_power_out
                       name: Grid Export
                   - entities:
-                    - entity_id: sensor.home_balance_power
+                    - entity_id: sensor.emporiavue_balance_power
                       name: Balance
-                    - entity_id: sensor.air_conditioner_power
+                    - entity_id: sensor.emporiavue_air_conditioner_power
                       name: Air Conditioner
-                    - entity_id: sensor.basement_bedrooms_power
+                    - entity_id: sensor.emporiavue_basement_bedrooms_power
                       name: Basement Bedrooms
-                    - entity_id: sensor.bedrooms_power
+                    - entity_id: sensor.emporiavue_bedrooms_power
                       name: Bedrooms
-                    - entity_id: sensor.dishwasher_disposal_power
+                    - entity_id: sensor.emporiavue_dishwasher_disposal_power
                       name: Dishwasher / Disposal
-                    - entity_id: sensor.dryer_power
+                    - entity_id: sensor.emporiavue_dryer_power
                       name: Dryer
-                    - entity_id: sensor.entry_living_bath_lights_power
+                    - entity_id: sensor.emporiavue_entry_living_room_bath_lights_power
                       name: Entry, Living Room, Bath Lights
-                    - entity_id: sensor.family_room_power
+                    - entity_id: sensor.emporiavue_family_room_power
                       name: Family Room
-                    - entity_id: sensor.fridge_kitchen_outlets_power
+                    - entity_id: sensor.emporiavue_fridge_kitchen_outlets_power
                       name: Fridge / Kitchen Outlets
-                    - entity_id: sensor.furnace_power
+                    - entity_id: sensor.emporiavue_furnace_power
                       name: Furnace
-                    - entity_id: sensor.garage_outlets_power
+                    - entity_id: sensor.emporiavue_garage_outlets_power
                       name: Garage Outlets
-                    - entity_id: sensor.living_room_master_bedroom_power
+                    - entity_id: sensor.emporiavue_living_room_master_bedroom_power
                       name: Living / Master Bed
-                    - entity_id: sensor.microwave_power
+                    - entity_id: sensor.emporiavue_microwave_power
                       name: Microwave
-                    - entity_id: sensor.mechanical_power
+                    - entity_id: sensor.emporiavue_utility_room_power
                       name: Utility
-                    - entity_id: sensor.range_power
+                    - entity_id: sensor.emporiavue_range_power
                       name: Range
-                    - entity_id: sensor.theater_room_power
+                    - entity_id: sensor.emporiavue_theater_room_power
                       name: Theater Room
-                    - entity_id: sensor.washer_power
+                    - entity_id: sensor.emporiavue_washer_power
                       name: Washer
                   show_names: true
                   type: custom:sankey-chart
@@ -8036,7 +7990,7 @@ views:
     - subtitle: System
       type: custom:mushroom-title-card
     - entities:
-      - entity: sensor.grid_power
+      - entity: sensor.sol_ark_grid_power
         icon: mdi:transmission-tower
         min: -5500
         name: Grid Power
@@ -8071,7 +8025,7 @@ views:
           from: '38400'
           to: '48000'
         target: '0'
-      - entity: sensor.load_power
+      - entity: sensor.sol_ark_load_power
         icon: mdi:power-plug
         name: Load Power
         severity:
@@ -8090,7 +8044,7 @@ views:
         - color: var(--red-color)
           from: 38400
           to: 48000
-      - entity: sensor.pv_power
+      - entity: sensor.sol_ark_pv_power
         icon: mdi:solar-power-variant
         max: 5500
         name: Solar
@@ -8110,7 +8064,7 @@ views:
         - color: var(--green-color)
           from: 4000
           to: 5500
-      - entity: sensor.battery_power
+      - entity: sensor.sol_ark_battery_power
         icon: mdi:battery-high
         max: 12960
         min: -12960
@@ -8159,7 +8113,7 @@ views:
       type: custom:mushroom-title-card
     - decimal: 1
       entities:
-      - entity: sensor.home_balance_power
+      - entity: sensor.emporiavue_balance_power
         icon: mdi:home-analytics
         max: 9600
         name: Home Balance
@@ -8179,7 +8133,7 @@ views:
         - color: var(--red-color)
           from: 7680
           to: 9600
-      - entity: sensor.air_conditioner_power
+      - entity: sensor.emporiavue_air_conditioner_power
         icon: mdi:air-conditioner
         max: 7200
         name: Air Conditioner
@@ -8199,16 +8153,16 @@ views:
         - color: var(--red-color)
           from: 5760
           to: 7200
-      - entity: sensor.basement_bedrooms_power
+      - entity: sensor.emporiavue_basement_bedrooms_power
         icon: mdi:home-floor-0
         name: Basement Bedrooms
-      - entity: sensor.bedrooms_power
+      - entity: sensor.emporiavue_bedrooms_power
         icon: mdi:home-floor-1
         name: Bedrooms
-      - entity: sensor.dishwasher_disposal_power
+      - entity: sensor.emporiavue_dishwasher_disposal_power
         icon: mdi:dishwasher
         name: Dishwasher / Disposal
-      - entity: sensor.dryer_power
+      - entity: sensor.emporiavue_dryer_power
         icon: mdi:tumble-dryer
         max: 7200
         name: Dryer
@@ -8228,16 +8182,16 @@ views:
         - color: var(--red-color)
           from: 5760
           to: 7200
-      - entity: sensor.family_room_power
+      - entity: sensor.emporiavue_family_room_power
         icon: mdi:gamepad-circle
         name: Family Room
-      - entity: sensor.fridge_kitchen_outlets_power
+      - entity: sensor.emporiavue_fridge_kitchen_outlets_power
         icon: mdi:fridge-variant
         name: Fridge / Kitchen Outlets
-      - entity: sensor.furnace_power
+      - entity: sensor.emporiavue_furnace_power
         icon: mdi:hvac
         name: Furance
-      - entity: sensor.entry_living_bath_lights_power
+      - entity: sensor.emporiavue_entry_living_room_bath_lights_power
         icon: mdi:lightbulb-group
         max: 1800
         name: Entry, Living Room, Bath Lights
@@ -8257,16 +8211,16 @@ views:
         - color: var(--red-color)
           from: 1440
           to: 1800
-      - entity: sensor.garage_outlets_power
+      - entity: sensor.emporiavue_garage_outlets_power
         icon: mdi:garage-variant
         name: Garage Outlets
-      - entity: sensor.living_room_master_bedroom_power
+      - entity: sensor.emporiavue_living_room_master_bedroom_power
         icon: mdi:sofa-single
         name: Living / Master Bed
-      - entity: sensor.microwave_power
+      - entity: sensor.emporiavue_microwave_power
         icon: mdi:microwave
         name: Microwave
-      - entity: sensor.mechanical_power
+      - entity: sensor.emporiavue_utility_room_power
         icon: mdi:progress-wrench
         max: 1800
         name: Utility
@@ -8286,7 +8240,7 @@ views:
         - color: var(--red-color)
           from: 1440
           to: 1800
-      - entity: sensor.range_power
+      - entity: sensor.emporiavue_range_power
         icon: mdi:stove
         max: 9600
         name: Range
@@ -8306,10 +8260,10 @@ views:
         - color: var(--red-color)
           from: 7680
           to: 9600
-      - entity: sensor.theater_room_power
+      - entity: sensor.emporiavue_theater_room_power
         icon: mdi:theater
         name: Theater Room
-      - entity: sensor.washer_power
+      - entity: sensor.emporiavue_washer_power
         icon: mdi:washing-machine
         name: Washer
       height: 30px
@@ -8341,27 +8295,27 @@ views:
     - title: Measurements
       type: custom:mushroom-title-card
     - cards:
-      - entity: sensor.phase_a_voltage
+      - entity: sensor.emporiavue_phase_a_voltage
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
-      - entity: sensor.phase_b_voltage
+      - entity: sensor.emporiavue_phase_b_voltage
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
-      - entity: sensor.phase_a_current
+      - entity: sensor.emporiavue_phase_a_current
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
-      - entity: sensor.phase_b_current
+      - entity: sensor.emporiavue_phase_b_current
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
-      - entity: sensor.phase_a_frequency
+      - entity: sensor.emporiavue_phase_a_frequency
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
-      - entity: sensor.phase_b_phase_angle
+      - entity: sensor.emporiavue_phase_b_phase_angle
         primary_info: state
         secondary_info: name
         type: custom:mushroom-entity-card
@@ -8391,3 +8345,5 @@ views:
   theme: Backend-selected
   title: Test
   type: custom:masonry-layout
+  visible:
+  - user: f615672fc2554783beab56221097564e
