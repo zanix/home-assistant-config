@@ -2,25 +2,40 @@
 
 | zanix/home-assistant-config | Home Assistant Community |
 | :---: | :---: |
-| [![Home Assistant Version][ha-version-shield]][ha-version] [![Github Action Status][github-build-status-shield]][github-build-status] [![Github Linter Status][github-linter-status-shield]][github-linter-status] | [![Home Assistant Community Forum][forum-shield]][forum] |
-| [![Last Commit][github-last-commit]][github-master] [![GitHub Activity][commits-shield]][commits] [![Lines of Code][code-lines-shield]][code-link] | [![Discord][discord-shield]][discord] |
+| [![Home Assistant Version][ha-version-shield]][ha-version] [![Github Action Status][github-build-status-shield]][github-build-status] | [![Home Assistant Community Forum][forum-shield]][forum] |
+| [![Last Commit][github-last-commit]][github-master] [![GitHub Activity][commits-shield]][commits] | [![Discord][discord-shield]][discord] |
 
-This is my Home Assistant Configuration created for use with the [docker container](https://www.home-assistant.io/docs/installation/docker/)
+This is my Home Assistant Configuration created for use with the [Home Assistant OS](https://www.home-assistant.io/docs/installation/docker/)
 version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
-If you want to back up your own Home Assistant configuration to GitHub, follow [this guide](https://home-assistant.io/docs/ecosystem/backup/backup_github/).
+If you want to back up your own Home Assistant configuration to GitHub, follow [this guide](https://community.home-assistant.io/t/sharing-your-configuration-on-github/195144).
 
 ## Software
 
-- [Home Assistant][home-assistant]
-- [MQTT](https://mosquitto.org) - MQTT Broker docker container
-- [Zigbee2MQTT](https://www.zigbee2mqtt.io) - Zigbee to MQTT bridge, get rid of your proprietary Zigbee bridges
-- [Z-Wave JS UI](https://zwave-js.github.io/zwave-js-ui/#/) - Full featured Z-Wave Control Panel and MQTT Gateway.
+<details><summary>8 Add-ons</summary>
+
+- Mosquitto broker
+- ESPHome
+- AdGuard Home
+- Advanced SSH & Web Terminal
+- Studio Code Server
+- UniFi Network Application
+- Zigbee2MQTT
+- Z-Wave JS UI
+
+---
+
+</details>
 
 ## Technical Details
 
-This Home Assistant install has approximately **2189 total entities**,
-including **1088 sensors**.
+Description    | Value
+-------------- | --
+All Entities   | 2031
+Sensors        | 781
+Binary Sensors | 196
+Lights         | 47
+Switches       | 105
 
 <details><summary>Stock Integrations</summary>
 
@@ -50,7 +65,7 @@ This integration is a meta-component and configures a default set of integration
 
 The denonavr platform allows you to control Denon Network Receivers
 
-### [ecobee](https://www.home-assistant.io/integrations/ecobee)
+### [EcoBee](https://www.home-assistant.io/integrations/ecobee)
 
 The ecobee integration lets you control and view sensor data from ecobee thermostats
 
@@ -63,14 +78,6 @@ Connect ESPHome devices directly with the native ESPHome API
 ### [Forecast.Solar](https://www.home-assistant.io/integrations/forecast_solar)
 
 The Forecast.Solar service provides solar production forecasting for your solar panel system, based on historic averages combined with weather forecasting
-
-### [Generic Camera](https://www.home-assistant.io/integrations/github)
-
-The generic camera platform allows you to integrate any IP camera or other URL
-
-### [GitHub](https://www.home-assistant.io/integrations/generic)
-
-The GitHub integration allows you to monitor your favorite GitHub repositories
 
 ### [Glances](https://www.home-assistant.io/integrations/glances)
 
@@ -95,10 +102,6 @@ The influxdb integration makes it possible to transfer all state changes to an e
 ### [Local Calendar](https://www.home-assistant.io/integrations/local_calendar)
 
 The local calendar integration allows you to create a calendar of events for powering automations
-
-### [Joaoapps Join](https://www.home-assistant.io/integrations/joaoapps_join)
-
-The joaoapps_join integration exposes services from [Join](https://joaoapps.com/join)
 
 ### [Logitech Harmony](https://www.home-assistant.io/integrations/harmony)
 
@@ -146,7 +149,7 @@ This integration allows you to write Python scripts that are exposed as services
 
 ### [Rachio](https://www.home-assistant.io/integrations/rachio)
 
-The rachio platform allows you to control your Rachio irrigation system
+The Rachio platform allows you to control your Rachio irrigation system
 
 ### [Radio Browser](https://www.home-assistant.io/integrations/radio_browser)
 
@@ -342,9 +345,9 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.4.0]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.5.0]
 
-Home Assistant custom component for viewing almost any camera stream in real time using WebRTC and other technologies.
+Home Assistant custom component for real-time viewing of almost any camera stream using WebRTC and other technologies.
 
 Authors: [@AlexxIT](https://github.com/AlexxIT).
 
@@ -352,7 +355,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>29 Lovelace Plugins</summary>
+<details><summary>27 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
 
@@ -369,10 +372,6 @@ Customizable Animated Bar card for Home Assistant Lovelace
 ### [Battery State Card / Entity Row](https://github.com/maxwroc/battery-state-card) [v2.1.1]
 
 Battery state card for Home Assistant
-
-### [Button Card](https://github.com/custom-cards/button-card) [v4.1.1]
-
-❇️ Lovelace button-card for home assistant
 
 ### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.2.3]
 
@@ -410,11 +409,11 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.1.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v5.2.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.2.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.3.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -446,13 +445,9 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.15.1]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v1.17.1]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
-
-### [Steam Card](https://github.com/Kibibit/kb-steam-card) [v1.1.1]
-
-A Home Assistant card for Steam integrations
 
 ### [Swipe Card](https://github.com/bramkragten/swipe-card) [v5.0.0]
 
@@ -472,33 +467,11 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ---
 
-</details><details><summary>3 Themes</summary>
+</details><details><summary>1 Themes</summary>
 
 ### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9.1]
 
 🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
-
-### [Noctis](https://github.com/aFFekopp/noctis) [v2.15]
-
-🐵 Dark Blue Theme for Home Assistant
-
-### [Noctis Grey](https://github.com/chaptergy/noctis-grey) [v1.3.7]
-
-Dark Grey Theme for Home Assistant
-
----
-
-</details>
-
-<details><summary>Unused Integrations</summary>
-
-This is a list of integrations that are currently disabled, but have not been removed because I think I still might use them someday.
-
-### Python Zwave Fade
-
-Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), more stable for longer fades.
-
-[Forum Post](https://community.home-assistant.io/t/light-fade-in/35509/19) | [My Current Code](https://github.com/zanix/home-assistant-config/blob/master/python_scripts/zwave_fade.py)
 
 ---
 
@@ -583,7 +556,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>137 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -605,16 +578,13 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - ⚙️ Battery Level Low
 - ⚙️ Clear TTS Cache (Disabled)
 - ⚙️ Disk Space Low
-- ⚙️ ESPHome Update
 - ⚙️ Event Sniffer [Actionable Event] (Disabled)
 - ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
 - ⚙️ Failed Login
 - ⚙️ HACS Updates
+- ⚙️ Hass Core Update Available
 - ⚙️ RAM Usage High
 - ⚙️ Startup
-- ⚙️ Upgrade Available
-- ⚙️ Zigbee2MQTT Update
-- ⚙️ ZWave JS UI Update
 - ⚡ Power Mode Changed
 - ⚡ PVOutput
 - ⚡ SolarAssistant Not Updating
@@ -635,8 +605,6 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🏢 Office Night Mode
 - 💡 All Lights off when Away
 - 💡 Dim Front Lights at Night
-- 💡 Ethan Lamp off at Sunrise (Disabled)
-- 💡 Ethan Lamp on at Night (Disabled)
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps off at Night
@@ -649,19 +617,18 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 💬 Door Left Open
 - 💬 Door Left Open and Leaving
 - 💬 Door Opened and Away
-- 💬 Ender 3 Pro
 - 💬 Garage Door Closed
 - 💬 Garage Door Left Open
 - 💬 Garage Door Left Open and Leaving
 - 💬 Garage Door Opened and Away
 - 💬 Garbage Collection
-- 💬 Potty Time (Disabled)
+- 💬 OctoPrint
 - 💬 Subaru Failed Notification
 - 💬 Subaru Remote Start Expired Notification
 - 💬 Subaru Started
 - 💬 Window Left Open (Disabled)
 - 📅 Garbage Collection Event Generator
-- 📋 [Controller] Hue Dimmer Switch
+- 📋 [Controller] Hue Dimmer Remote
 - 📋 [Controller] Ikea 5-Button Remote
 - 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
@@ -678,13 +645,10 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 📦 Packages Delivered
 - 📦 Packages Out for Delivery
 - 📦 Update USPS Mail Camera
-- 📱 Smart Display Brighten when Kitchen Light On
+- 📱 Smart Display Brightness on Lights On/Off
 - 📱 Smart Display Dim at Sunset
-- 📱 Smart Display Dim when Kitchen Light Off
-- 📱 Smart Display Off at Night
-- 📱 Smart Display Off when Away
-- 📱 Smart Display On at Morning
-- 📱 Smart Display On when Arrive
+- 📱 Smart Display On/Off Presence
+- 📱 Smart Display On/Off Schedule
 - 🔑 Front Door Changed Code
 - 🔑 Front Door Decrement Access Count
 - 🔑 Front Door Lock Notifications
@@ -709,7 +673,7 @@ Fade Zwave lights over time. It's super buggy for short fades (< 60 seconds), mo
 - 🔑 Turn on Access Limit Front Door 7
 - 🔑 Turn on Access Limit Front Door 8
 - 🔒 Front Door Lock at Night
-- 🔒 Front Door Lock Jammed (Disabled)
+- 🔒 Front Door Lock Jammed
 - 🔒 Front Door Lock when Away
 - 🔒 Front Door Re-lock after Unlock
 - 🔔 Doorbell Object or Ring
@@ -754,24 +718,21 @@ See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
 
 **Configuration files are tested against the stable and beta versions of Home Assistant using [Github Actions](https://github.com/zanix/home-assistant-config/actions).**
 
+Readme generated by the [custom readme integration](https://github.com/custom-components/readme)
+
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2023.10.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/unknown-555555?style=flat-square&logo=home-assistant
 
-[github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/build.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
-[github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/build.yaml
-[github-linter-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/linters.yaml?branch=master&style=flat-square&label=linters&logo=github-actions&logoColor=838B95
-[github-linter-status]: https://github.com/zanix/home-assistant-config/actions/workflows/linters.yaml
+[github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
+[github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
 
 [github-last-commit]: https://img.shields.io/github/last-commit/zanix/home-assistant-config/master?style=flat-square&logo=github&logoColor=838B95
 [github-master]: https://github.com/zanix/home-assistant-config/commits/master
 
 [commits-shield]: https://img.shields.io/github/commit-activity/m/zanix/home-assistant-config/master?style=flat-square&logo=github&logoColor=838B95
 [commits]: https://github.com/zanix/home-assistant-config/commits/master
-
-[code-lines-shield]: https://img.shields.io/tokei/lines/github/zanix/home-assistant-config?style=flat-square
-[code-link]: https://github.com/zanix/home-assistant-config/pulse
 
 [forum-shield]: https://img.shields.io/discourse/topics?style=flat-square&label=community&logo=discourse&color=46B4ED&logoColor=46B4ED&server=https%3A%2F%2Fcommunity.home-assistant.io
 [forum]: https://community.home-assistant.io
