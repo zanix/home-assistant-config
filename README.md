@@ -31,9 +31,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2031
-Sensors        | 781
-Binary Sensors | 196
+All Entities   | 2042
+Sensors        | 788
+Binary Sensors | 201
 Lights         | 47
 Switches       | 105
 
@@ -74,6 +74,10 @@ The ecobee integration lets you control and view sensor data from ecobee thermos
 ### [ESPHome](https://www.home-assistant.io/integrations/esphome)
 
 Connect ESPHome devices directly with the native ESPHome API
+
+### [File Size](https://www.home-assistant.io/integrations/filesize)
+
+The filesize sensor is for displaying the size in MB of a file.
 
 ### [Forecast.Solar](https://www.home-assistant.io/integrations/forecast_solar)
 
@@ -556,7 +560,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>137 Automations</summary>
+<details><summary>138 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -585,6 +589,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ⚙️ Hass Core Update Available
 - ⚙️ RAM Usage High
 - ⚙️ Startup
+- ⚙️ Update Database Filesize Sensor
 - ⚡ Power Mode Changed
 - ⚡ PVOutput
 - ⚡ SolarAssistant Not Updating
