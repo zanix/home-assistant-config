@@ -41,6 +41,10 @@ Switches       | 105
 
 Since some integrations can only be enabled from within the UI, here is a list of integrations that are enabled via the Integrations UI on my Home Assistant.
 
+### [AdGuard](https://www.home-assistant.io/integrations/adguard)
+
+The AdGuard integration allows you to control and monitor your AdGuard Home instance.
+
 ### [AirNow](https://www.home-assistant.io/integrations/airnow)
 
 The airnow integration uses the AirNow web service as a source for air quality data for your location
@@ -331,7 +335,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.10]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.11]
 
 Subaru STARLINK custom component for Home Assistant.
 
