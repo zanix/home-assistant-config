@@ -2387,12 +2387,12 @@
       message: '{{ trigger.notification.message }}'
   mode: single
 - id: '1665696538493'
-  alias: ⚙️ HACS Updates
-  description: Create a notification when there are updates pending in HACS
+  alias: ⚙️ Updates Available
+  description: Create a notification when there are updates pending
   trigger:
   - platform: state
     entity_id:
-    - sensor.hacs_updates
+    - sensor.updates
   condition:
   - condition: template
     value_template: "{{ not trigger.to_state in [\"unknown\", \"unavailable\", none]\n
@@ -2458,8 +2458,7 @@
   variables:
     updates: '{% if not trigger.to_state in [''unknown'', ''unavailable'', none] %}{{
       trigger.to_state.state | int(default=0) }}{% endif %}'
-    title: '{{ iif(updates == 1, ''Update'', ''Updates'', '''') }} Pending ({{ updates
-      }})'
+    title: Update{{ iif(updates > 1, 's', '') }} Pending ({{ updates }})
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
   description: Sends a notification when the RAM usage is high
@@ -2540,82 +2539,6 @@
     target:
       entity_id: automation.startup
   mode: single
-- id: '1665696665289'
-  alias: ⚙️ Hass Core Update Available
-  description: Sends a notification when a new Home Assistant version is released
-  trigger:
-  - platform: state
-    entity_id:
-    - update.home_assistant_core_update
-    to: 'on'
-  - platform: state
-    entity_id:
-    - update.home_assistant_core_update
-    attribute: latest_version
-  condition: []
-  action:
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state == "on" and trigger.from_state.state
-        != "on" }}'
-    then:
-    - parallel:
-      - service: persistent_notification.create
-        data:
-          title: Upgrade Available
-          message: '__Home Assistant__ _{{ current_version }}_ -> _{{ available_version
-            }}_
-
-
-            [{{ action_1_title }}]({{ action_1_uri }}) | [{{ action_2_title }}]({{
-            action_2_uri }})'
-          notification_id: upgrade-available
-      - service: script.notify_mobile
-        data:
-          who: joshua
-          title: Upgrade Available
-          message: <b>Home Assistant</b> <em>{{ current_version }}</em> -> <em>{{
-            available_version }}</em>
-          icon_url: local/icons/update.png
-          url: '{{ release_url }}'
-          group: Upgrade
-          tag: upgrade-available
-          actions:
-          - action: URI
-            title: '{{ action_1_title }}'
-            uri: '{{ action_1_uri }}'
-          - action: URI
-            title: '{{ action_2_title }}'
-            uri: '{{ action_2_uri }}'
-      - service: script.notify_hass_agent
-        data:
-          entity:
-          - media_player.erebus
-          title: Upgrade Available
-          message: 'Home Assistant: {{ current_version }} -> {{ available_version
-            }}
-
-            {{ release_summary }}'
-    else:
-    - service: persistent_notification.dismiss
-      data:
-        notification_id: upgrade-available
-    - service: script.notify_mobile
-      data:
-        who: joshua
-        message: clear_notification
-        tag: upgrade-available
-  mode: single
-  max_exceeded: silent
-  variables:
-    info: update.home_assistant_core_update
-    release_url: '{{ state_attr(info, "release_url") }}'
-    current_version: '{{ state_attr(info, "installed_version") }}'
-    available_version: '{{ state_attr(info, "latest_version") }}'
-    action_1_title: Release Notes
-    action_1_uri: '{{ release_url }}'
-    action_2_title: HassPodcast
-    action_2_uri: https://hasspodcast.io/episodes
 - id: '1665696688106'
   alias: ⚙️ Event Sniffer [Z-Wave JS]
   description: Listen for Z-Wave JS events
