@@ -16,11 +16,11 @@ blueprint:
     - Inovelli 2-in-1 switch + dimmer (VZM31-SN)
     - Inovelli Fan Controller (VZM35-SN)
 
-    Forum: https://community.home-assistant.io/t/z2m-inovelli-vzm31-sn-blue-series-2-1-switch-led-notification-script/489620
+    Forum: https://community.home-assistant.io/t/z2m-inovelli-blue-series-switch-led-notification-script-vzm31-sn-vzm35-sn/489620
 
     GitHub: https://github.com/zanix/home-assistant-blueprints
 
-    ℹ️ Version: 2023.10.1
+    ℹ️ Version: 2023.10.3
   domain: script
   source_url: https://github.com/zanix/home-assistant-blueprints/blob/main/script/inovelli_blue_led_zigbee2mqtt.yaml
 
@@ -199,8 +199,8 @@ variables:
     - light
     - fan
   models:
-    - Inovelli 2-in-1 switch + dimmer (VZM31-SN)
-    - Inovelli Fan Controller (VZM35-SN)
+    - VZM31-SN
+    - VZM35-SN
 
   # Create a list of provided targets (areas, devices, entities)
   target: '{{ target|default([])|map(lower) }}'
@@ -217,7 +217,7 @@ variables:
       {# Convert to a list #}
       {% if ',' in area %}
         {% set areanum = area.split(',') | count %}
-        {% for i in range(0,areanum) %}
+        {% for i in range(0, areanum) %}
           {% set areas.areas = areas.areas + [area.split(',')[i]|string|trim ] %}
         {% endfor %}
       {% elif area[0]|count == 1 %}
@@ -229,9 +229,11 @@ variables:
       {# Detect switches #}
       {% for area in areas.areas %}
         {% for ent in area_entities(area) %}
-          {% if device_attr(ent, 'model') in models and ent.split('.')[0] in domains %}
-            {% set switch.entities = switch.entities + [ent|string|trim] %}
-          {% endif %}
+          {% for model in models %}
+            {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+              {% set switch.entities = switch.entities + [ent|string|trim] %}
+            {% endif %}
+          {% endfor %}
         {% endfor %}
       {% endfor %}
     {% endif %}
@@ -242,7 +244,7 @@ variables:
       {# Convert to a list #}
       {% if ',' in device %}
         {% set devicenum = device.split(',') | count %}
-        {% for i in range(0,devicenum) %}
+        {% for i in range(0, devicenum) %}
           {% set devices.devices = devices.devices + [device.split(',')[i]|string|trim ] %}
         {% endfor %}
       {% elif device[0]|count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
@@ -253,9 +255,11 @@ variables:
       {# Detect switches #}
       {% for device in devices.devices %}
         {% for ent in device_entities(device) %}
-          {% if device_attr(ent, 'model') in models and ent.split('.')[0] in domains %}
-            {% set switch.entities = switch.entities + [ent|string|trim] %}
-          {% endif %}
+          {% for model in models %}
+            {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+              {% set switch.entities = switch.entities + [ent|string|trim] %}
+            {% endif %}
+          {% endfor %}
         {% endfor %}
       {% endfor %}
     {% endif %}
@@ -276,9 +280,11 @@ variables:
       {% endif %}
       {# Detect switches #}
       {% for ent in entities.entities %}
-        {% if device_attr(ent, 'model') in models and ent.split('.')[0] in domains %}
-          {% set switch.entities = switch.entities + [ent|string|trim] %}
-        {% endif %}
+          {% for model in models %}
+            {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+              {% set switch.entities = switch.entities + [ent|string|trim] %}
+            {% endif %}
+          {% endfor %}
       {% endfor %}
     {% endif %}
 
@@ -439,6 +445,7 @@ sequence:
           notification_id: 'inovelli_blue_led'
           title: 'DEBUG: script.inovelli_blue_led'
           message: |-
+            target list: {{ target }}
             entity list: {{ entity_list }}
             entity count: {{ entity_list|count }}
             led: {{ led }} ({{ led_value }})
