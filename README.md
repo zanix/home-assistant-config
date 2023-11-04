@@ -31,10 +31,10 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2092
+All Entities   | 2122
 Sensors        | 835
 Binary Sensors | 202
-Lights         | 49
+Lights         | 59
 Switches       | 106
 
 <details><summary>Stock Integrations</summary>
@@ -236,6 +236,10 @@ The vizio integration allows you to control SmartCast-compatible TVs and sound b
 ### [Wake on LAN](https://www.home-assistant.io/integrations/wake_on_lan)
 
 The wake_on_lan integration enables the ability to send magic packets to Wake on LAN capable devices to turn them on
+
+### [Withings](https://www.home-assistant.io/integrations/withings)
+
+The Withings integration consumes data from various health products produced by Withings.
 
 ### [WLED](https://www.home-assistant.io/integrations/wled)
 
