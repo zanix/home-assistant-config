@@ -50,12 +50,12 @@ automation:
     trigger:
       - platform: state
         entity_id: schedule.smart_display
-        to: "on"
         id: "on"
+        to: "on"
       - platform: state
         entity_id: schedule.smart_display
-        to: "off"
         id: "off"
+        to: "off"
     condition: []
     action:
       - choose:
@@ -67,6 +67,8 @@ automation:
                 state: home
             sequence:
               - service: light.turn_on
+                data:
+                  brightness_pct: 100
                 target:
                   entity_id: light.smart_display_monitor
           - conditions:
@@ -84,9 +86,14 @@ automation:
         entity_id: light.kitchen
       - platform: state
         entity_id: switch.dining_room_light
-      - platform: state
+      - platform: numeric_state
         entity_id: light.kitchen
         attribute: brightness
+        above: 45
+      - platform: numeric_state
+        entity_id: light.kitchen
+        attribute: brightness
+        below: 45
     condition:
       - condition: state
         entity_id: group.people
@@ -98,24 +105,6 @@ automation:
         after: sunset
     action:
       - choose:
-          - conditions:
-              - condition: state
-                entity_id: switch.dining_room_light
-                state: "off"
-              - or:
-                  - condition: state
-                    entity_id: light.kitchen
-                    state: "off"
-                  - condition: numeric_state
-                    entity_id: light.kitchen
-                    attribute: brightness
-                    below: 45
-            sequence:
-              - service: light.turn_on
-                data:
-                  brightness_pct: 40
-                target:
-                  entity_id: light.smart_display_monitor
           - conditions:
               - condition: state
                 entity_id: switch.dining_room_light
@@ -132,6 +121,24 @@ automation:
               - service: light.turn_on
                 data:
                   brightness_pct: 100
+                target:
+                  entity_id: light.smart_display_monitor
+          - conditions:
+              - condition: state
+                entity_id: switch.dining_room_light
+                state: "off"
+              - or:
+                  - condition: state
+                    entity_id: light.kitchen
+                    state: "off"
+                  - condition: numeric_state
+                    entity_id: light.kitchen
+                    attribute: brightness
+                    below: 45
+            sequence:
+              - service: light.turn_on
+                data:
+                  brightness_pct: 40
                 target:
                   entity_id: light.smart_display_monitor
 
@@ -170,18 +177,18 @@ automation:
     trigger:
       - platform: state
         entity_id: group.people
+        id: away
         to: not_home
         from: home
         for:
           hours: 0
           minutes: 5
           seconds: 0
-        id: away
       - platform: state
         entity_id: group.people
+        id: home
         from: not_home
         to: home
-        id: home
     condition:
       - condition: state
         entity_id: schedule.smart_display
