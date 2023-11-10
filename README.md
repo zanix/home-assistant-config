@@ -31,9 +31,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2122
-Sensors        | 835
-Binary Sensors | 202
+All Entities   | 2138
+Sensors        | 854
+Binary Sensors | 201
 Lights         | 59
 Switches       | 106
 
