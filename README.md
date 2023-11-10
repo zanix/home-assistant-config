@@ -321,7 +321,7 @@ HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capa
 
 Authors: [@fillefilip8](https://github.com/fillefilip8), [@LAB02-Admin](https://github.com/LAB02-Admin).
 
-### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.6]
+### [Holidays](https://github.com/bruxy70/Holidays) [v1.9.8]
 
 📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
 
@@ -339,7 +339,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.11]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.12]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -425,7 +425,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.3.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v4.4.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
