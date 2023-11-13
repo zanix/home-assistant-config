@@ -618,10 +618,8 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ✨ DreamScreen Scene Changed
 - 🌐 UniFi WAN Status
 - 🍽️ Dishwasher is Running
-- 🎄 XMas Lights Off (Disabled)
-- 🎄 XMas Lights On (Disabled)
-- 🎄 XMas Tree Off (Disabled)
-- 🎄 XMas Tree On (Disabled)
+- 🎄 XMas Lights On/Off (Disabled)
+- 🎄 XMas Tree On/Off (Disabled)
 - 🏢 Office Day Mode
 - 🏢 Office Night Mode
 - 💡 All Lights off when Away
@@ -649,6 +647,8 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 💬 Subaru Started
 - 💬 Window Left Open (Disabled)
 - 📅 Garbage Collection Event Generator
+- 📅 Living Room Fan On/Off
+- 📅 Master Bedroom Fan On/Off
 - 📋 [Controller] Hue Dimmer Remote
 - 📋 [Controller] Ikea 5-Button Remote
 - 📋 [Inovelli] Emma Switch
