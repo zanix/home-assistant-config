@@ -237,6 +237,9 @@
       action: turn_on_water
   condition: []
   action:
+  - variables:
+      title: Water Main
+      message: The water main has been turned back on after the leak was detected.
   - parallel:
     - service: switch.turn_on
       target:
@@ -281,9 +284,6 @@
         message: '{{ message }}'
         icon_url: local/icons/water-alert.png
   mode: single
-  variables:
-    title: Water Main
-    message: The water main has been turned back on after the leak was detected.
 - id: '1665682232855'
   alias: "\U0001F5A5️ [Ardena] Power Actions"
   description: Actions to run when Ardena is on/off
@@ -373,6 +373,9 @@
       trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
       in [\"unknown\", \"unavailable\"] }}"
   action:
+  - variables:
+      message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
+        "1" else "items" }} will be in the mailbox today.'
   - service: script.notify_mobile
     data:
       who: parents
@@ -401,9 +404,6 @@
       image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
       duration: 15
   mode: single
-  variables:
-    message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
-      "1" else "items" }} will be in the mailbox today.'
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
   description: Notifies when packages have been delivered
@@ -417,6 +417,9 @@
       trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
       in [\"unknown\", \"unavailable\"] }}"
   action:
+  - variables:
+      message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
+        == "1" else "packages are" }} delivered.'
   - parallel:
     - service: script.notify_mobile
       data:
@@ -443,9 +446,6 @@
         message: '{{ message }}'
         icon_url: local/icons/package-variant.png
   mode: single
-  variables:
-    message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
-      == "1" else "packages are" }} delivered.'
 - id: '1665682458887'
   alias: "\U0001F4E6 Packages Out for Delivery"
   description: Notifies when packages are out for delivery
@@ -459,6 +459,9 @@
       trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
       in [\"unknown\", \"unavailable\"] }}"
   action:
+  - variables:
+      message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
+        == "1" else "packages are" }} out for delivery.'
   - parallel:
     - service: script.notify_mobile
       data:
@@ -485,9 +488,6 @@
         icon_url: local/icons/package.png
         message: '{{ message }}'
   mode: single
-  variables:
-    message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
-      == "1" else "packages are" }} out for delivery.'
 - id: '1665683659569'
   alias: ⚡ Tariff Summer Off-Peak
   description: Sets the current tariff to Summer Off-Peak and sends a notification.
@@ -1020,6 +1020,8 @@
     to: 'on'
   condition: []
   action:
+  - variables:
+      message: Check the front door, something is wrong with the lock.
   - parallel:
     - service: script.notify_mobile
       data:
@@ -1049,8 +1051,6 @@
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
   mode: single
-  variables:
-    message: Check the front door, something is wrong with the lock.
 - id: '1665686913548'
   alias: "\U0001F512 Front Door Lock when Away"
   description: ''
@@ -1340,7 +1340,12 @@
     data:
       who: parents
       title: Door Left Open
-      message: '{{ message }}'
+      message: "{%- from \"util.jinja\" import get_friendly_names -%} {%- set doors
+        = expand(\"binary_sensor.all_doors\") | selectattr(\"state\", \"==\", \"on\")
+        | map(attribute=\"entity_id\") | list -%} {%- if doors | length == 1 -%}\n
+        \ The {{ get_friendly_names(doors) }} was open when you left!\n{%- else -%}\n
+        \ The {{ get_friendly_names(doors) }} were open when you left!\n{%- endif
+        -%}"
       icon_url: local/icons/door-open.png
       group: Security
       url: lovelace/security
@@ -1348,12 +1353,6 @@
       - action: ignore_door_alerts
         title: Ignore
   mode: single
-  variables:
-    message: "{% from \"util.jinja\" import get_friendly_names %} {% set doors = expand(\"binary_sensor.all_doors\")
-      | selectattr(\"state\", \"==\", \"on\") | map(attribute=\"entity_id\") | list
-      %} {% if doors | length == 1 %}\n  The {{ get_friendly_names(doors) }} was open
-      when you left!\n{% else %}\n  The {{ get_friendly_names(doors) }} were open
-      when you left!\n{% endif %}"
 - id: '1665687990814'
   alias: "\U0001F4AC Door Opened and Away"
   description: Sends notification if a door is open when people are away
@@ -1401,6 +1400,21 @@
     to: 'on'
   condition: []
   action:
+  - variables:
+      camera: camera.doorbell
+      base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
+      link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40)
+        }}'
+      volume: '{{ iif(is_state(''schedule.quiet_hours'', ''on''), 40, 90) }}'
+      media_location: media-source://media_source/local/sounds/ds9_doorchime.mp3
+      message: Ring Ring!
+      actions:
+      - action: URI
+        title: Snapshot
+        uri: '{{ base_url }}{{ state_attr(camera, ''entity_picture'') }}'
+      - action: URI
+        title: Stream
+        uri: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
   - service: webrtc.create_link
     data:
       link_id: '{{ link_id }}'
@@ -1486,20 +1500,6 @@
           entity_id: light.wled_office_desk
         data:
           effect: Solid
-  variables:
-    camera: camera.doorbell
-    base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
-    link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40) }}'
-    volume: '{{ iif(is_state(''schedule.quiet_hours'', ''on''), 40, 90) }}'
-    media_location: media-source://media_source/local/sounds/ds9_doorchime.mp3
-    message: Ring Ring!
-    actions:
-    - action: URI
-      title: Snapshot
-      uri: '{{ base_url }}{{ state_attr(camera, ''entity_picture'') }}'
-    - action: URI
-      title: Stream
-      uri: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
   mode: single
 - id: '1665688313389'
   alias: "\U0001F6A6 Garage Light Switch Status"
@@ -1876,6 +1876,16 @@
     id: recycle-clear
   condition: []
   action:
+  - variables:
+      name: '{{ trigger.calendar_event.summary }}'
+      type: '{{ trigger.id.split("-")[0] }}'
+      day: '{{ trigger.id.split("-")[1] }}'
+      object_id: '{{ type ~ "_collection" }}'
+      tag: '{{ object_id }}'
+      icon: '{{ state_attr("calendar." ~ object_id, "icon") | replace("mdi:", "")
+        }}'
+      description: '{% if trigger.calendar_event.description != "" %} ({{ trigger.calendar_event.description
+        }}){%- endif -%}'
   - choose:
     - conditions:
       - condition: trigger
@@ -1914,15 +1924,6 @@
           message: clear_notification
           tag: '{{ tag }}'
   mode: parallel
-  variables:
-    name: '{{ trigger.calendar_event.summary }}'
-    type: '{{ trigger.id.split("-")[0] }}'
-    day: '{{ trigger.id.split("-")[1] }}'
-    object_id: '{{ type ~ "_collection" }}'
-    tag: '{{ object_id }}'
-    icon: '{{ state_attr("calendar." ~ object_id, "icon") | replace("mdi:", "") }}'
-    description: '{% if trigger.calendar_event.description != "" %} ({{ trigger.calendar_event.description
-      }}){%- endif -%}'
 - id: '1665689633891'
   alias: "\U0001F4AC Subaru Failed Notification"
   description: Sends a notification when the Subaru fails to start
@@ -1933,6 +1934,14 @@
       command: remote_start
   condition: []
   action:
+  - variables:
+      message: "The car didn't start.{{ \" \" }}\n{%- if 'doorNotLocked' in trigger.event.data.service_data.message
+        -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.service_data.message
+        -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.service_data.message
+        -%}\n  The {{ trigger.event.data.service_data.message }}\n{%- elif 'fuelLevelTooLow'
+        in trigger.event.data.service_data.message -%}\n  The gas is low.\n{%- elif
+        'unknown' in trigger.event.data.service_data.message -%}\n  I have no idea
+        why. Please try again.\n{% endif %}"
   - parallel:
     - service: script.notify_mobile
       data:
@@ -1960,14 +1969,6 @@
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
   mode: single
-  variables:
-    message: "The car didn't start.{{ \" \" }}\n{%- if 'doorNotLocked' in trigger.event.data.service_data.message
-      -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.service_data.message
-      -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.service_data.message
-      -%}\n  The {{ trigger.event.data.service_data.message }}\n{%- elif 'fuelLevelTooLow'
-      in trigger.event.data.service_data.message -%}\n  The gas is low.\n{%- elif
-      'unknown' in trigger.event.data.service_data.message -%}\n  I have no idea why.
-      Please try again.\n{% endif %}"
 - id: '1665689705099'
   alias: "\U0001F3E2 Office Day Mode"
   description: Turns on the office computer and all the lights on a workday
@@ -2025,6 +2026,8 @@
   - condition: template
     value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] }}'
   action:
+  - variables:
+      message: The {{ trigger.to_state.attributes.friendly_name }} is low
   - parallel:
     - service: persistent_notification.create
       data:
@@ -2048,8 +2051,6 @@
         title: Printer Alert
         message: '{{ message }}'
   mode: single
-  variables:
-    message: The {{ trigger.to_state.attributes.friendly_name }} is low
 - id: '1665695909455'
   alias: "\U0001F5A8️ Out of Paper"
   description: Sends a notification when the printer runs out of paper
@@ -2061,6 +2062,8 @@
   - condition: template
     value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] }}'
   action:
+  - variables:
+      message: The {{ trigger.to_state.attributes.friendly_name }} is out of paper
   - parallel:
     - service: persistent_notification.create
       data:
@@ -2084,8 +2087,6 @@
         title: Printer Alert
         message: '{{ message }}'
   mode: single
-  variables:
-    message: The {{ trigger.to_state.attributes.friendly_name }} is out of paper
 - id: '1665695943529'
   alias: ⏯ PS4 Harmony Activity
   description: Turns on the PS4 when the activity is active
@@ -2266,11 +2267,9 @@
   - service: persistent_notification.create
     data:
       title: Actionable Event Sniffer
-      message: '{{ event_data }}'
+      message: '{{ trigger.event.data | default("") }}'
   mode: parallel
   initial_state: false
-  variables:
-    event_data: '{{ trigger.event.data | default("") }}'
 - id: '1665696464819'
   alias: ⚙️ Battery Level Low
   description: Sends a notification when a device battery level is low
@@ -2281,8 +2280,16 @@
   - condition: template
     value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
       \ and trigger.to_state.state | int > 0\n  and trigger.to_state.state | int !=
-      trigger.from_state.state | int\n  and sensors != ''\n}}"
+      trigger.from_state.state | int\n}}"
   action:
+  - variables:
+      sensors: "{% if not trigger.to_state in ['unknown', 'unavailable', none] %}\n
+        \ {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
+        %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set
+        name = device.name | replace(': Battery level', '') | replace(' Battery level',
+        '') | replace(' Battery Level', '') %}\n    {% set result.sensors = result.sensors
+        + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
+        > 0, '- ', '') }}{{ result.sensors | join('\\n- ') }}\n{% endif %}"
   - parallel:
     - service: persistent_notification.create
       data:
@@ -2305,14 +2312,6 @@
         title: Low Battery Levels
         message: '{{ sensors }}'
   mode: single
-  variables:
-    sensors: "{% if not trigger.to_state in ['unknown', 'unavailable', none] %}\n
-      \ {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
-      %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set name
-      = device.name | replace(': Battery level', '') | replace(' Battery level', '')
-      | replace(' Battery Level', '') %}\n    {% set result.sensors = result.sensors
-      + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
-      > 0, '- ', '') }}{{ result.sensors | join('\\n-') }}\n{% endif %}"
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
@@ -2401,6 +2400,10 @@
       not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state
       != trigger.from_state.state\n}}"
   action:
+  - variables:
+      updates: '{% if not trigger.to_state in [''unknown'', ''unavailable'', none]
+        %}{{ trigger.to_state.state | int(default=0) }}{% endif %}'
+      title: Update{{ iif(updates > 1, 's', '') }} Pending ({{ updates }})
   - if:
     - condition: template
       value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
@@ -2455,10 +2458,6 @@
             = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
             | join('\\n') }}"
   mode: restart
-  variables:
-    updates: '{% if not trigger.to_state in [''unknown'', ''unavailable'', none] %}{{
-      trigger.to_state.state | int(default=0) }}{% endif %}'
-    title: Update{{ iif(updates > 1, 's', '') }} Pending ({{ updates }})
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
   description: Sends a notification when the RAM usage is high
@@ -2582,25 +2581,21 @@
     topic: zigbee2mqtt/+/action
   condition: []
   action:
+  - variables:
+      device: '{{ trigger.topic.split("/")[1] }}'
+      action: '{{ trigger.payload }}'
   - service: persistent_notification.create
     data:
       title: Zigbee Event Sniffer
       message: 'device: {{ device }}
 
-        action: {{ action }}
-
-        '
+        action: {{ action }}'
   - service: browser_mod.notification
     data:
       duration: 10000
       message: 'device: {{ device }}
 
-        action: {{ action }}
-
-        '
-  variables:
-    device: '{{ trigger.topic.split("/")[1] }}'
-    action: '{{ trigger.payload }}'
+        action: {{ action }}'
   mode: parallel
   initial_state: false
 - id: '1665697122708'
@@ -2625,6 +2620,12 @@
     to: 'on'
   condition: []
   action:
+  - variables:
+      title: Water Leak Detected
+      location: '{{ trigger.to_state.name | replace(" water leak", "") | replace("
+        Leak Sensor", "") | replace(" Leak", "") | trim }}'
+      message: There is a water leak in the {{ location }} and the water main has
+        been shut off.
   - parallel:
     - service: switch.turn_off
       entity_id: switch.water_main_valve
@@ -2680,12 +2681,6 @@
   - delay:
       minutes: 5
   mode: single
-  variables:
-    title: Water Leak Detected
-    location: '{{ trigger.to_state.name | replace(" water leak", "") | replace(" Leak
-      Sensor", "") | replace(" Leak", "") | trim }}'
-    message: There is a water leak in the {{ location }} and the water main has been
-      shut off.
 - id: '1665697614552'
   alias: "\U0001F4A7 Softener Salt Level Low"
   description: Sends a notification when the water softener salt level is low
@@ -2727,6 +2722,9 @@
     to: 'on'
   condition: []
   action:
+  - variables:
+      title: Water Valve Overheated
+      message: The water main shut-off valve has overheated.
   - parallel:
     - service: persistent_notification.create
       data:
@@ -2765,9 +2763,6 @@
         - media_player.cast_office_speaker
         message: '{{ message }}'
   mode: single
-  variables:
-    title: Water Valve Overheated
-    message: The water main shut-off valve has overheated.
 - id: '1665697728164'
   alias: "\U0001F384 XMas Lights On/Off"
   description: ''
@@ -2795,9 +2790,10 @@
       - condition: trigger
         id: 'off'
       sequence:
-      - service: light.turn_off
+      - service: switch.turn_off
         target:
-          entity_id: light.xmas_light
+          entity_id: switch.xmas_light
+        data: {}
   mode: single
 - id: '1665697781484'
   alias: "\U0001F384 XMas Tree On/Off"
@@ -3154,7 +3150,7 @@
         data: {}
       - service: remote.turn_on
         data:
-          activity: PC
+          activity: Computer
         target:
           entity_id: remote.harmony_family_room
 - id: '1667779442976'
@@ -3513,20 +3509,17 @@
   condition: []
   action:
   - variables:
-      vehicle_present: '{{ states(''binary_sensor.opengarage_vehicle'') }}'
+      title: Subaru Remote Start
+      message: The car started and is running.
   - parallel:
-    - if:
-      - condition: template
-        value_template: '{{ vehicle_present == ''on'' }}'
-      then:
-      - service: timer.start
-        data: {}
-        target:
-          entity_id: timer.subaru_remote_start
+    - service: timer.start
+      data: {}
+      target:
+        entity_id: timer.subaru_remote_start
     - service: script.notify_mobile
       data:
         who: parents
-        title: Subaru Remote Start
+        title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
         group: Subaru
@@ -3538,21 +3531,13 @@
         - media_player.shield_living_room
         - media_player.shield_family_room
         - media_player.shield_master_bedroom
-        title: Subaru Remote Start
+        title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
-    - if:
-      - condition: template
-        value_template: '{{ vehicle_present == ''on'' }}'
-      then:
-      - service: script.notify_speech
-        data:
-          media_player: media_player.cast_living_room_speaker
-          message: '{{ message }}'
-  - if:
-    - condition: template
-      value_template: '{{ vehicle_present == ''on'' }}'
-    then:
+    - service: script.notify_speech
+      data:
+        media_player: media_player.cast_living_room_speaker
+        message: '{{ message }}'
     - wait_for_trigger:
       - platform: state
         entity_id:
@@ -3571,8 +3556,6 @@
       target:
         entity_id: timer.subaru_remote_start
   mode: single
-  variables:
-    message: The car started and is running.
 - id: '1673168239995'
   alias: ⚡ PVOutput
   description: Send PV and Energy data to PVOutput.org
@@ -3649,6 +3632,12 @@
     after: 08:00:00
     before: '22:00:00'
   action:
+  - variables:
+      zone_name: '{{ trigger.from_state.state }}'
+      name: '{{ trigger.to_state.attributes.friendly_name }}'
+      message: '{%- from "message.jinja" import arriving_home -%} {%- set person =
+        {"Amy": "Mom", "Joshua": "Dad"}[name] -%} {{ arriving_home(person, zone_name)
+        }}'
   - parallel:
     - service: script.notify_mobile
       data:
@@ -3663,23 +3652,14 @@
         - media_player.nasya
         title: '{{ name }} Leaving {{ zone_name }}'
         message: '{{ message }}'
-    - if:
-      - condition: template
-        value_template: '{{ not zone_name in ["Pre-School"] }}'
-      then:
-      - service: script.notify_speech
-        data:
-          media_player:
-          - media_player.cast_living_room_speaker
-          - media_player.cast_family_room_speaker
-          - media_player.cast_office_speaker
-          message: '{{ message }}'
+    - service: script.notify_speech
+      data:
+        media_player:
+        - media_player.cast_living_room_speaker
+        - media_player.cast_family_room_speaker
+        - media_player.cast_office_speaker
+        message: '{{ message }}'
   mode: single
-  variables:
-    zone_name: '{{ trigger.from_state.state }}'
-    name: '{{ trigger.to_state.attributes.friendly_name }}'
-    message: '{% from "message.jinja" import arriving_home %} {% set person = {"Amy":
-      "Mom", "Joshua": "Dad"}[name] %} {{ arriving_home(person, zone_name) }}'
 - id: '1678829415008'
   alias: "\U0001F4AC Subaru Remote Start Expired Notification"
   description: Sends a notification when the Subaru remote start expires
@@ -3698,11 +3678,14 @@
       entity_id: binary_sensor.opengarage_vehicle
       state: 'on'
   action:
+  - variables:
+      title: Subaru Remote Start
+      message: The car shut off and is no longer running.
   - parallel:
     - service: script.notify_mobile
       data:
         who: parents
-        title: Subaru Remote Start
+        title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
         group: Subaru
@@ -3717,7 +3700,7 @@
         - media_player.shield_living_room
         - media_player.shield_family_room
         - media_player.shield_master_bedroom
-        title: Subaru Remote Start
+        title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
     - service: script.notify_speech
@@ -3725,8 +3708,6 @@
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
   mode: single
-  variables:
-    message: The car shut off and is no longer running.
 - id: '1679340622496'
   alias: "\U0001F5FA️ Arriving Home"
   description: Sends a notification when someone is arriving home.
@@ -3749,6 +3730,10 @@
     after: 08:00:00
     before: '22:00:00'
   action:
+  - variables:
+      name: '{{ trigger.to_state.attributes.friendly_name }}'
+      message: '{%- from "message.jinja" import welcome_home -%} {%- set person =
+        {"Amy": "Mom", "Joshua": "Dad"}[name] -%} {{ welcome_home(person) }}'
   - wait_for_trigger:
     - platform: state
       entity_id:
@@ -3781,11 +3766,6 @@
       minutes: 5
   mode: single
   max_exceeded: silent
-  variables:
-    zone_name: '{{ trigger.from_state.state }}'
-    name: '{{ trigger.to_state.attributes.friendly_name }}'
-    message: '{% from "message.jinja" import welcome_home %} {% set person = {"Amy":
-      "Mom", "Joshua": "Dad"}[name] %} {{ welcome_home(person) }}'
 - id: '1679462212869'
   alias: ⏯ Ensure PiPup is Running
   description: ''
@@ -3794,6 +3774,11 @@
     at: 04:30:00
   condition: []
   action:
+  - variables:
+      media_players:
+      - media_player.shield_living_room
+      - media_player.shield_family_room
+      - media_player.shield_master_bedroom
   - repeat:
       for_each: '{{ media_players }}'
       sequence:
@@ -3803,11 +3788,6 @@
         target:
           entity_id: '{{ repeat.item }}'
   mode: single
-  variables:
-    media_players:
-    - media_player.shield_living_room
-    - media_player.shield_family_room
-    - media_player.shield_master_bedroom
 - id: '1682570311827'
   alias: "\U0001F4C5 Garbage Collection Event Generator"
   description: Creates collection events for the next year.
@@ -3940,6 +3920,31 @@
       action: silence-doorbell
     id: silence
   action:
+  - variables:
+      camera: doorbell
+      camera_name: '{{ camera | title }}'
+      base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
+      attachment: snapshot.jpg
+      alert_once: false
+      update_thumbnail: true
+      zones: []
+      zone_all: false
+      labels:
+      - person
+      - cat
+      - dog
+      disable_times: []
+      cooldown: 30
+      silence_timer: 30
+      loitering: false
+      loiter_timer: 0
+      fps: '{{ states(''sensor.'' + camera + ''_camera_fps'') | int(5) }}'
+      state_entities:
+        binary_sensor.front_door_contact_door_is_open: 2
+        binary_sensor.doorbell_alarm_local: 1
+      states_filter:
+      - 'off'
+      debug: false
   - choose:
     - alias: Silence New Object Notifications
       conditions:
@@ -4172,31 +4177,6 @@
             value_template: '{{ not wait.trigger or wait.trigger.payload_json[''type'']
               == ''end'' }}'
   mode: parallel
-  variables:
-    camera: doorbell
-    camera_name: '{{ camera | title }}'
-    base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
-    attachment: snapshot.jpg
-    alert_once: false
-    update_thumbnail: true
-    zones: []
-    zone_all: false
-    labels:
-    - person
-    - cat
-    - dog
-    disable_times: []
-    cooldown: 30
-    silence_timer: 30
-    loitering: false
-    loiter_timer: 0
-    fps: '{{ states(''sensor.'' + camera + ''_camera_fps'') | int(5) }}'
-    state_entities:
-      binary_sensor.front_door_contact_door_is_open: 2
-      binary_sensor.doorbell_alarm_local: 1
-    states_filter:
-    - 'off'
-    debug: false
 - id: '1693003933194'
   alias: "\U0001F514 Frigate Doorbell - Event Handler"
   description: Sends notifications when an object is detected on the Doorbell camera
@@ -4209,6 +4189,18 @@
     id: update
   condition: []
   action:
+  - variables:
+      id: '{{ trigger.event.data.id }}'
+      camera_name: '{{ trigger.event.data.camera_name }}'
+      title: '{{ trigger.event.data.title }}'
+      message: '{{ trigger.event.data.message }}'
+      object: '{{ trigger.event.data.object }}'
+      label: '{{ trigger.event.data.label }}'
+      loitering: '{{ trigger.event.data.loitering | default(false) }}'
+      icon: '{{ trigger.event.data.icon }}'
+      image: '{{ trigger.event.data.image }}'
+      clip: '{{ trigger.event.data.clip }}'
+      actions: '{{ trigger.event.data.actions }}'
   - parallel:
     - if:
       - condition: trigger
@@ -4282,18 +4274,6 @@
           data:
             effect: Solid
   mode: parallel
-  variables:
-    id: '{{ trigger.event.data.id }}'
-    camera_name: '{{ trigger.event.data.camera_name }}'
-    title: '{{ trigger.event.data.title }}'
-    message: '{{ trigger.event.data.message }}'
-    object: '{{ trigger.event.data.object }}'
-    label: '{{ trigger.event.data.label }}'
-    loitering: '{{ trigger.event.data.loitering | default(false) }}'
-    icon: '{{ trigger.event.data.icon }}'
-    image: '{{ trigger.event.data.image }}'
-    clip: '{{ trigger.event.data.clip }}'
-    actions: '{{ trigger.event.data.actions }}'
 - id: '1698644135975'
   alias: ⚙️ Update Database Filesize Sensor
   description: Updates the file size sensor for the database.
@@ -4315,7 +4295,9 @@
   trigger:
   - platform: time
     at: 03:00:00
-  condition: []
+  condition:
+  - condition: template
+    value_template: '{{ now().isoweekday() == 0 }}'
   action:
   - service: hassio.backup_full
     data:
