@@ -7,10 +7,6 @@
 mqtt:
   sensor:
     - name: OctoPrint Layer Progress
-      availability:
-        - topic: "octoprint/hass/Connected"
-      payload_available: "Connected"
-      payload_not_available: "Disconnected"
       state_topic: "octoprint/event/DisplayLayerProgress_layerChanged"
       json_attributes_topic: "octoprint/event/DisplayLayerProgress_layerChanged"
       icon: mdi:tray-full
@@ -22,34 +18,23 @@ template:
         availability: "{{ not states('sensor.octoprint_print_time') in ['unknown', 'unavailable', 'None'] }}"
         state: >-
           {%- if not states('sensor.octoprint_print_time') in ['unknown', 'unavailable', 'None'] -%}
-            {%- set time = states('sensor.octoprint_print_time').split(':') -%}
-            {%- set seconds = time[2] | int -%}
-            {%- set minutes = time[1] | int -%}
-            {%- set hours = time[0] | int -%}
-            {%- set days = 0 -%}
-            {%- if time | length > 3 -%}
-              {% set seconds = time[3] | int %}
-              {% set minutes = time[2] | int %}
-              {% set hours = time[1] | int %}
-              {% set days = time[0] | int %}
-            {%- endif -%}
+            {%- set uptime = states('sensor.octoprint_print_time') | int -%}
+            {%- set minutes = ((uptime % 3600) / 60) | int -%}
+            {%- set hours = ((uptime % 86400) / 3600) | int -%}
+            {%- set days = (uptime / 86400) | int -%}
             {%- if days > 0 -%}
-              {{ days }}d
+              {{ days }} day{% if days > 1 %}s{% endif %}
             {%- endif -%}
             {%- if hours > 0 -%}
-              {%- if days > 0 %}, {% endif -%}
-              {{ hours }}h
+              {%- if days > 0 %} {% endif -%}
+              {{ hours }} hour{% if hours > 1 %}s{% endif %}
             {%- endif -%}
             {%- if minutes > 0 -%}
-              {%- if hours > 0 or days > 0 %}, {% endif -%}
-              {{ minutes }}m
+              {%- if hours > 0 or days > 0 %} {% endif -%}
+              {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
             {%- endif -%}
-            {%- if seconds > 0 -%}
-              {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
-              {{ seconds }}s
-            {%- endif %}
           {%- else -%}
-            0:0:0
+            0
           {%- endif -%}
         icon: mdi:clock-start
 
@@ -57,32 +42,21 @@ template:
         availability: "{{ not states('sensor.octoprint_print_time_left') in ['unknown', 'unavailable', 'None'] }}"
         state: >-
           {%- if not states('sensor.octoprint_print_time_left') in ['unknown', 'unavailable', 'None'] -%}
-            {%- set time = states('sensor.octoprint_print_time_left').split(':') -%}
-            {%- set seconds = time[2] | int -%}
-            {%- set minutes = time[1] | int -%}
-            {%- set hours = time[0] | int -%}
-            {%- set days = 0 -%}
-            {%- if time | length > 3 -%}
-              {% set seconds = time[3] | int %}
-              {% set minutes = time[2] | int %}
-              {% set hours = time[1] | int %}
-              {% set days = time[0] | int %}
-            {%- endif -%}
+            {%- set uptime = states('sensor.octoprint_print_time_left') | int -%}
+            {%- set minutes = ((uptime % 3600) / 60) | int -%}
+            {%- set hours = ((uptime % 86400) / 3600) | int -%}
+            {%- set days = (uptime / 86400) | int -%}
             {%- if days > 0 -%}
-              {{ days }}d
+              {{ days }} day{% if days > 1 %}s{% endif %}
             {%- endif -%}
             {%- if hours > 0 -%}
-              {%- if days > 0 %}, {% endif -%}
-              {{ hours }}h
+              {%- if days > 0 %} {% endif -%}
+              {{ hours }} hour{% if hours > 1 %}s{% endif %}
             {%- endif -%}
             {%- if minutes > 0 -%}
-              {%- if hours > 0 or days > 0 %}, {% endif -%}
-              {{ minutes }}m
+              {%- if hours > 0 or days > 0 %} {% endif -%}
+              {{ minutes }} minute{% if minutes > 1 %}s{% endif %}
             {%- endif -%}
-            {%- if seconds > 0 -%}
-              {%- if minutes > 0 or hours > 0 or days > 0 %}, {% endif -%}
-              {{ seconds }}s
-            {%- endif %}
           {%- else -%}
             0
           {%- endif -%}
@@ -157,11 +131,11 @@ automation:
     trigger:
       - platform: state
         entity_id: sensor.octoprint_print_status
-        from: Printing
+        from: Finishing
         to: Operational
-    variables:
-      message: "{{ states('sensor.octoprint_print_file') }} finished printing in {{ states('sensor.octoprint_print_time_format') }}"
     action:
+      - variables:
+          message: "{{ states('sensor.octoprint_print_file') }} finished printing in {{ states('sensor.octoprint_print_time_format') }}"
       - service: script.notify_mobile
         data:
           who: joshua
