@@ -3137,7 +3137,7 @@
           entity_id:
           - light.family_room
           - light.play_space
-      config_double:
+      config_triple:
       - service: light.turn_on
         data:
           brightness_pct: 100
@@ -3511,11 +3511,11 @@
   - variables:
       title: Subaru Remote Start
       message: The car started and is running.
+  - service: timer.start
+    data: {}
+    target:
+      entity_id: timer.subaru_remote_start
   - parallel:
-    - service: timer.start
-      data: {}
-      target:
-        entity_id: timer.subaru_remote_start
     - service: script.notify_mobile
       data:
         who: parents
@@ -3538,23 +3538,23 @@
       data:
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
-    - wait_for_trigger:
-      - platform: state
-        entity_id:
-        - cover.opengarage
-        to: closed
-      - platform: event
-        event_type: subaru_command_successful
-        event_data:
-          command: remote_stop
-      timeout:
-        minutes: 10
-        seconds: 5
-      continue_on_timeout: false
-    - service: timer.cancel
-      data: {}
-      target:
-        entity_id: timer.subaru_remote_start
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - cover.opengarage
+      to: closed
+    - platform: event
+      event_type: subaru_command_successful
+      event_data:
+        command: remote_stop
+    timeout:
+      minutes: 10
+      seconds: 5
+    continue_on_timeout: false
+  - service: timer.cancel
+    data: {}
+    target:
+      entity_id: timer.subaru_remote_start
   mode: single
 - id: '1673168239995'
   alias: ⚡ PVOutput
@@ -3737,8 +3737,8 @@
   - wait_for_trigger:
     - platform: state
       entity_id:
-      - binary_sensor.garage_entry_door_contact_door_is_open
-      to: 'on'
+      - cover.opengarage
+      to: open
     timeout:
       minutes: 2
   - parallel:
@@ -4297,7 +4297,7 @@
     at: 03:00:00
   condition:
   - condition: template
-    value_template: '{{ now().isoweekday() == 0 }}'
+    value_template: '{{ now().isoweekday() == 7 }}'
   action:
   - service: hassio.backup_full
     data:
