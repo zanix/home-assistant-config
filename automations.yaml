@@ -4367,3 +4367,24 @@
         target:
           entity_id: fan.master_bedroom_ceiling
   mode: single
+- id: '1702017706466'
+  alias: ⚙️ Scan Interval
+  description: Devices with custom scan intervals
+  trigger:
+  - platform: time_pattern
+    minutes: '*'
+  action:
+  - variables:
+      entities:
+        binary_sensor.canon_mf743c_online: 1
+      total_mins: '{{ (now().timestamp() / 60) | int }}'
+  - repeat:
+      for_each: '{{ entities | dictsort }}'
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ total_mins % repeat.item[1] == 0 }}'
+        then:
+        - service: homeassistant.update_entity
+          target:
+            entity_id: '{{ repeat.item[0] }}'
