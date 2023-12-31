@@ -3110,34 +3110,34 @@ views:
               \ wash {\n  50% { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%,\
               \ 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100% 100%,\
               \ 100% 0); }\n}\n"
-            mushroom-shape-icon$: "{% set timer = \"timer.dishwasher_run_time\" %}\n\
-              {% if state_attr(timer, \"finishes_at\") %}\n  {% set remaining = (as_datetime(state_attr(timer,\
-              \ \"finishes_at\")) - now()).total_seconds() | int %}\n  {% set duration\
-              \ =\n    (state_attr(timer, \"duration\").split(\":\")[0] | int * 60\
-              \ * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[1] |\
-              \ int * 60)\n      + (state_attr(timer, \"duration\").split(\":\")[2]\
-              \ | int)\n  %}\n.shape {\n  /* Radial progress bar */\n  background:\n\
-              \    radial-gradient(var(--card-background-color) 60%, transparent calc(60%\
-              \ + 1px)),\n    conic-gradient(var(--icon-color) {{ ((duration - remaining)\
-              \ / duration * 100) | round() }}% 0%, var(--card-background-color) 0%\
-              \ 100%);\n}\n.shape:after {\n  /* Add back icon shape */\n  content:\
+            mushroom-shape-icon$: "{%- if not is_state(config.entity, \"Off\") -%}\n\
+              {%- set entity_remain = states(\"sensor.ge_dishwasher_time_remaining\"\
+              ) -%}\n{%- set entity_duration = states(\"sensor.ge_dishwasher_duration\"\
+              ) -%}\n{%- set remaining =\n  (int(entity_remain.split(\":\")[0], 0)\
+              \ * 60)\n    + (int(entity_remain.split(\":\")[1], 0))\n-%}\n{%- set\
+              \ duration =\n  (int(entity_duration.split(\":\")[0], 0) * 60)\n   \
+              \ + (int(entity_duration.split(\":\")[1], 0))\n-%}\n.shape {\n  /* Radial\
+              \ progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--icon-color)\
+              \ {{ ((duration - remaining) / duration * 100) | round() }}% 0%, var(--card-background-color)\
+              \ 0% 100%);\n}\n.shape:after {\n  /* Add back icon shape */\n  content:\
               \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
               \ var(--icon-border-radius);\n  background: var(--shape-color);\n}\n\
-              {% endif %}\n"
-        entity: input_select.dishwasher_status
-        icon: "{%- if not is_state(entity, \"Off\") -%}\n  mdi:dishwasher\n{%- else\
-          \ -%}\n  mdi:dishwasher-off\n{%- endif -%}"
-        icon_color: "{%- if is_state(entity, \"Washing\") -%}\n  purple\n{%- elif\
-          \ is_state(entity, \"Draining\") -%}\n  lime\n{%- elif is_state(entity,\
+              {%- endif -%}\n"
+        entity: sensor.ge_dishwasher_cycle_state
+        icon: mdi:dishwasher
+        icon_color: "{%- if is_state(entity, \"Pre Wash\") -%}\n  purple\n{%- elif\
+          \ is_state(entity, \"Main Wash\") -%}\n  cyan\n{%- elif is_state(entity,\
           \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
-          \  orange\n{%- elif is_state(entity, \"Clean\") -%}\n  cyan\n{%- else -%}\n\
-          \  disabled\n{%- endif -%}"
+          \  orange\n{%- elif is_state(\"binary_sensor.ge_dishwasher_is_clean\", \"\
+          on\") -%}\n  green\n{%- else -%}\n  disabled\n{%- endif -%}"
         layout: vertical
         tap_action:
           action: more-info
         type: custom:mushroom-template-card
       conditions:
-      - entity: input_select.dishwasher_status
+      - condition: state
+        entity: sensor.ge_dishwasher_operating_mode
         state_not: 'Off'
       type: conditional
     type: horizontal-stack

@@ -1104,81 +1104,15 @@
     entity_id: lock.front_door
   mode: single
 - id: '1665687778783'
-  alias: "\U0001F37D️ Dishwasher is Running"
-  description: Sets dishwasher status and sends notification when the dishwasher is
-    done
+  alias: "\U0001F37D️ Dishwasher is Done"
+  description: Sends notification when the dishwasher is done
   trigger:
-  - platform: numeric_state
-    entity_id: sensor.emporiavue_dishwasher_disposal_power
-    for:
-      minutes: 2
-    above: 40
-  condition:
-  - or:
-    - condition: state
-      entity_id: input_select.dishwasher_status
-      state: 'Off'
-    - condition: state
-      entity_id: input_select.dishwasher_status
-      state: Clean
+  - platform: state
+    entity_id:
+    - sensor.ge_dishwasher_operating_mode
+    to: Cycle Complete
+  condition: []
   action:
-  - service: timer.start
-    target:
-      entity_id: timer.dishwasher_run_time
-    data: {}
-  - service: input_select.select_option
-    target:
-      entity_id: input_select.dishwasher_status
-    data:
-      option: Washing
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.emporiavue_dishwasher_disposal_power
-      below: 20
-      for:
-        minutes: 2
-  - service: input_select.select_option
-    target:
-      entity_id: input_select.dishwasher_status
-    data:
-      option: Draining
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.emporiavue_dishwasher_disposal_power
-      above: 200
-      for:
-        minutes: 2
-  - service: input_select.select_option
-    target:
-      entity_id: input_select.dishwasher_status
-    data:
-      option: Rinsing
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.emporiavue_dishwasher_disposal_power
-      below: 20
-      for:
-        minutes: 2
-  - service: input_select.select_option
-    target:
-      entity_id: input_select.dishwasher_status
-    data:
-      option: Drying
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.emporiavue_dishwasher_disposal_power
-      below: 20
-      for:
-        minutes: 5
-  - service: input_select.select_option
-    target:
-      entity_id: input_select.dishwasher_status
-    data:
-      option: 'Off'
-  - service: timer.finish
-    target:
-      entity_id: timer.dishwasher_run_time
-    data: {}
   - parallel:
     - service: script.notify_mobile
       data:
@@ -2523,11 +2457,6 @@
         entity_id:
         - input_boolean.washer_status
         - input_boolean.dryer_status
-    - service: input_select.select_option
-      data:
-        option: 'Off'
-      target:
-        entity_id: input_select.dishwasher_status
   - service: browser_mod.notification
     data:
       message: Startup automation complete...
@@ -2617,6 +2546,7 @@
     - binary_sensor.master_bathroom_right_sink_leak_water_leak
     - binary_sensor.kitchen_sink_leak_water_leak
     - binary_sensor.basement_bathroom_sink_leak_water_leak
+    - binary_sensor.dishwasher_leak_water_leak
     to: 'on'
   condition: []
   action:

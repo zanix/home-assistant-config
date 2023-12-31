@@ -31,11 +31,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2185
-Sensors        | 873
-Binary Sensors | 200
+All Entities   | 2233
+Sensors        | 909
+Binary Sensors | 198
 Lights         | 60
-Switches       | 106
+Switches       | 108
 
 <details><summary>Stock Integrations</summary>
 
@@ -261,7 +261,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>17 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.20.0]
 
@@ -296,6 +296,12 @@ Authors: [@thomasloven](https://github.com/thomasloven).
 Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear).
+
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v0.6.8]
+
+GE Home Appliances (SmartHQ) for Home Assistant
+
+Authors: [@simbaja](https://github.com/simbaja).
 
 ### [Generate Readme](https://github.com/custom-components/readme) [v0.5.0]
 
