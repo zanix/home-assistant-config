@@ -7,6 +7,7 @@
 #
 sensor:
   - name: Day Power Cost
+    unique_id: day_power_cost
     unit_of_measurement: USD
     device_class: monetary
     icon: mdi:currency-usd
@@ -15,3 +16,19 @@ sensor:
       {% set energy = states('sensor.sol_ark_grid_net_daily') | float(default=0) %}
       {% set cost = states('sensor.tariff_price') | float(default=0) %}
       {{ (energy * cost) | round(2) }}
+
+  - name: Day ToU Power Cost
+    unique_id: day_tou_power_cost
+    unit_of_measurement: USD
+    device_class: monetary
+    icon: mdi:currency-usd
+    availability: "{{ has_value('sensor.sol_ark_grid_net_daily') }}"
+    state: >-
+      {%- set tariffs = ["summer_off_peak", "summer_peak", "winter_off_peak", "winter_peak"] -%}
+      {%- set ns = namespace(cost=0) -%}
+      {% for tariff in tariffs -%}
+        {%- set usage = states('sensor.sol_ark_grid_net_tou_daily_' ~ tariff) | float(default=0) -%}
+        {%- set rate = states('input_text.tariff_tou_' ~ tariff) | float(default=0) -%}
+        {%- set ns.cost = ns.cost + (usage * rate) -%}
+      {%- endfor -%}
+      {{ ns.cost | round(2) }}

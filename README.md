@@ -580,7 +580,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>139 Automations</summary>
+<details><summary>143 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -616,6 +616,10 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ⚡ SolarAssistant Not Updating
 - ⚡ Tariff Summer Off-Peak
 - ⚡ Tariff Summer Peak
+- ⚡ Tariff ToU Summer Off-Peak
+- ⚡ Tariff ToU Summer Peak
+- ⚡ Tariff ToU Winter Off-Peak
+- ⚡ Tariff ToU Winter Peak
 - ⚡ Tariff Winter Off-Peak
 - ⚡ Tariff Winter Peak
 - ✨ DreamScreen Harmony Power Off
