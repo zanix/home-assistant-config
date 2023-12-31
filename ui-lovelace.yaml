@@ -1140,6 +1140,8 @@ decluttering_templates:
         state_not: '0'
       - entity: '[[entity]]'
         state_not: unavailable
+      - entity: '[[entity]]'
+        state_not: unknown
       type: conditional
   person_card:
     card:
@@ -1476,6 +1478,19 @@ decluttering_templates:
             \ 0.1);\n  --chip-border-width: 0;\n  --chip-spacing: 1px;\n}\n"
         chips:
         - chip:
+            entity: sensor.[[phone_base]]_do_not_disturb_sensor
+            icon: mdi:minus-circle
+            icon_color: amber
+            tap_action:
+              action: none
+            type: template
+          conditions:
+          - entity: sensor.[[phone_base]]_do_not_disturb_sensor
+            state_not: unavailable
+          - entity: sensor.[[phone_base]]_do_not_disturb_sensor
+            state_not: 'off'
+          type: conditional
+        - chip:
             double_tap_action:
               action: none
             entity: '[[proximity]]'
@@ -1566,7 +1581,7 @@ decluttering_templates:
         icon_color: '[[icon_color]]'
         primary: '[[primary]]'
         secondary: "{%- if has_value(\"[[temperature]]\") -%}\n  {{ states(\"[[temperature]]\"\
-          , rounded=True, with_unit=True) }}\n{%- endif -%}\n"
+          , rounded=True, with_unit=True) }}\n{%- else -%}\n  -\n{%- endif -%}\n"
         tap_action:
           action: navigate
           navigation_path: '[[path]]'
@@ -2324,8 +2339,8 @@ views:
                 service: browser_mod.popup
             type: template
           - content: "{% if has_value(entity) %}\n  {{ states(\"sensor.meater_probe_internal\"\
-              ) }} °F\n  {% if has_value(\"sensor.meater_probe_remaining_time\") \
-              \ %}\n    {% set t = (states(\"sensor.meater_probe_remaining_time\"\
+              ) }} °F\n  {% if has_value(\"sensor.meater_probe_cook_time_remaining\"\
+              )  %}\n    {% set t = (states(\"sensor.meater_probe_cook_time_remaining\"\
               ) | as_datetime - now()).total_seconds() %}\n    | {{ t | timestamp_custom('%-H\
               \ hr %-M min' if t > 3600 else '%-M min', false) }}\n  {% endif %}\n\
               {% endif %}"
@@ -2341,19 +2356,19 @@ views:
                       style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
                         \ 0;\n}\n"
                     cards:
-                    - entity: sensor.meater_probe_cooking
+                    - entity: sensor.meater_probe_cook_name
                       icon: mdi:food-steak
                       name: Cooking
                       primary_info: state
                       secondary_info: name
                       type: custom:mushroom-entity-card
                     - cards:
-                      - entity: sensor.meater_probe_elapsed_time
+                      - entity: sensor.meater_probe_cook_time_elapsed
                         name: Elapsed Time
                         primary_info: state
                         secondary_info: name
                         type: custom:mushroom-entity-card
-                      - entity: sensor.meater_probe_remaining_time
+                      - entity: sensor.meater_probe_cook_time_remaining
                         name: Remaining Time
                         primary_info: state
                         secondary_info: name
@@ -2407,7 +2422,7 @@ views:
                         name: Ambient
                         stroke_width: 4
                       - color: rgb(233,30,99)
-                        entity: sensor.meater_probe_target
+                        entity: sensor.meater_probe_cook_target_temp
                         name: Target
                         opacity: 0.2
                         stroke_width: 1
@@ -2673,6 +2688,9 @@ views:
                   type: custom:mushroom-template-card
                 - animation:
                     state: 'on'
+                  card_mod:
+                    style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                      \ var(--primary-background-color);\n}\n"
                   decimal: 1
                   entities:
                   - entity: sensor.airnow_air_quality_index
@@ -2715,8 +2733,6 @@ views:
                       to: '100'
                   positions:
                     indicator: inside
-                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
-                    \ var(--primary-background-color);\n}"
                   type: custom:bar-card
                 type: custom:vertical-stack-in-card
               title: Air Quality
@@ -2765,6 +2781,9 @@ views:
                   type: custom:mushroom-title-card
                 - animation:
                     state: 'on'
+                  card_mod:
+                    style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                      \ var(--primary-background-color);\n}\n"
                   decimal: 1
                   entities:
                   - entity: sensor.allergy_index_today
@@ -2790,13 +2809,14 @@ views:
                   - color: var(--red-color)
                     from: '9.7'
                     to: '12'
-                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
-                    \ var(--primary-background-color);\n}"
                   type: custom:bar-card
                 - subtitle: Asthma
                   type: custom:mushroom-title-card
                 - animation:
                     state: 'on'
+                  card_mod:
+                    style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                      \ var(--primary-background-color);\n}\n"
                   decimal: 1
                   entities:
                   - entity: sensor.asthma_index_today
@@ -2822,13 +2842,14 @@ views:
                   - color: var(--red-color)
                     from: '9.7'
                     to: '12'
-                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
-                    \ var(--primary-background-color);\n}"
                   type: custom:bar-card
                 - subtitle: Cold
                   type: custom:mushroom-title-card
                 - animation:
                     state: 'on'
+                  card_mod:
+                    style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
+                      \ var(--primary-background-color);\n}\n"
                   decimal: 1
                   entities:
                   - entity: sensor.cold_flu_index_today
@@ -2853,8 +2874,6 @@ views:
                   - color: var(--red-color)
                     from: '9.7'
                     to: '12'
-                  style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px\
-                    \ var(--primary-background-color);\n}"
                   type: custom:bar-card
                 type: custom:vertical-stack-in-card
               title: Allergy / Asthma
@@ -3140,6 +3159,28 @@ views:
         entity: sensor.ge_dishwasher_operating_mode
         state_not: 'Off'
       type: conditional
+    - card:
+        card_mod:
+          style: "ha-card {\n  background: none;\n  box-shadow: none;\n  border: 0;\n\
+            \  margin-top: 10px;\n}\nha-state-icon:before {\n  content: \"\";\n  position:\
+            \ absolute;\n  width: 25%;\n  height: 25%;\n  margin: 10%;\n  animation:\
+            \ cook 1s linear infinite;\n}\n@keyframes cook { \n  0%, 100% { background:\
+            \ linear-gradient(90deg, white 0%, transparent 50%, transparent 100%);\
+            \ }\n  33% { background: linear-gradient(90deg, transparent 0%, white\
+            \ 50%, transparent 100%); }\n  66% { background: linear-gradient(90deg,\
+            \ transparent 0%, transparent 50%, white 100%); }\n}\n"
+        entity: sensor.emporiavue_microwave_power
+        icon: mdi:microwave
+        icon_color: amber
+        layout: vertical
+        tap_action:
+          action: more-info
+        type: custom:mushroom-template-card
+      conditions:
+      - above: 20
+        condition: numeric_state
+        entity: sensor.emporiavue_microwave_power
+      type: conditional
     type: horizontal-stack
   - cards:
     - template: room_card
@@ -3187,19 +3228,20 @@ views:
                 title: Living Room
               service: browser_mod.popup
           type: template
-        - entity: fan.living_room_ceiling
+        - card_mod:
+            style: ".content {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
+              \ speed = state_attr(config.entity, 'percentage') %}\n    {% set duration\
+              \ = {\n      25: \"1.33333s\",\n      50: \"0.942809s\",\n      75:\
+              \ \"0.7698s\",\n      100: \"0.666667s\"\n    }[speed] %}\n    animation:\
+              \ rotation linear infinite;\n    animation-duration: {{ duration }};\n\
+              \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
+              \  }\n}\n"
+          entity: fan.living_room_ceiling
           icon: mdi:fan
           icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
             \ 'percentage') %}\n  {{ {\n    25: \"green\",\n    50: \"yellow\",\n\
             \    75: \"orange\",\n    100: \"red\"\n  }[speed] }}\n{% else %}\n  disabled\n\
             {% endif %}"
-          style: ".content {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
-            \ speed = state_attr(config.entity, 'percentage') %}\n    {% set duration\
-            \ = {\n      25: \"1.33333s\",\n      50: \"0.942809s\",\n      75: \"\
-            0.7698s\",\n      100: \"0.666667s\"\n    }[speed] %}\n    animation:\
-            \ rotation linear infinite;\n    animation-duration: {{ duration }};\n\
-            \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
-            \  }\n}\n"
           tap_action:
             action: more-info
           type: template
@@ -3501,19 +3543,20 @@ views:
                 title: Master Bedroom
               service: browser_mod.popup
           type: template
-        - entity: fan.master_bedroom_ceiling
+        - card_mod:
+            style: ".content {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
+              \ speed = state_attr(config.entity, 'percentage') %}\n    {% set duration\
+              \ = {\n      25: \"1.33333s\",\n      50: \"0.942809s\",\n      75:\
+              \ \"0.7698s\",\n      100: \"0.666667s\"\n    }[speed] %}\n    animation:\
+              \ rotation linear infinite;\n    animation-duration: {{ duration }};\n\
+              \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
+              \  }\n}\n"
+          entity: fan.master_bedroom_ceiling
           icon: mdi:fan
           icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
             \ 'percentage') %}\n  {{ {\n    25: \"green\",\n    50: \"yellow\",\n\
             \    75: \"orange\",\n    100: \"red\"\n  }[speed] }}\n{% else %}\n  disabled\n\
             {% endif %}"
-          style: ".content {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
-            \ speed = state_attr(config.entity, 'percentage') %}\n    {% set duration\
-            \ = {\n      25: \"1.33333s\",\n      50: \"0.942809s\",\n      75: \"\
-            0.7698s\",\n      100: \"0.666667s\"\n    }[speed] %}\n    animation:\
-            \ rotation linear infinite;\n    animation-duration: {{ duration }};\n\
-            \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
-            \  }\n}\n"
           tap_action:
             action: more-info
           type: template
@@ -5115,7 +5158,7 @@ views:
         {%- elif is_state(entity, \"closed\") %}\n  Closed\n{%- else %}\n  Unknown\n\
         {%- endif %}\n{{ custom_timedelta(entity) }}"
       tap_action:
-        action: none
+        action: more-info
       type: custom:mushroom-template-card
     - entity: cover.opengarage
       icon_type: none
@@ -5258,6 +5301,9 @@ views:
       type: custom:mushroom-template-card
     - animation:
         state: 'on'
+      card_mod:
+        style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+          }\n"
       decimal: 1
       entities:
       - entity: sensor.water_softener_salt_monitor_salt_level
@@ -5281,8 +5327,6 @@ views:
       - color: var(--green-color)
         from: 70
         to: 100
-      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-        }"
       type: custom:bar-card
     type: vertical-stack
   - cards:
@@ -5411,6 +5455,11 @@ views:
       type: custom:mushroom-entity-card
     - animation:
         state: 'on'
+      card_mod:
+        style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n#states {\n\
+          \  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n  text-shadow:\
+          \ 1px 1px var(--primary-background-color);\n}\nbar-card-backgroundbar {\n\
+          \  background-color: var(--primary-background-color);\n}\n"
       decimal: 1
       entities:
       - entity: sensor.ascent_range
@@ -5436,10 +5485,6 @@ views:
       - color: var(--green-color)
         from: 200
         to: 345
-      style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n#states {\n \
-        \ padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n  text-shadow: 1px\
-        \ 1px var(--primary-background-color);\n}\nbar-card-backgroundbar {\n  background-color:\
-        \ var(--primary-background-color);\n}"
       type: custom:bar-card
     - cards:
       - card_mod:
@@ -5705,6 +5750,7 @@ views:
               \ return \"warning\";\nelse if (temp < 35)\n  return \"normal\";\nelse\
               \ if (temp < 37)\n  return \"warning\";\nelse\n  return \"danger\";\n"
         - entities:
+          - binary_sensor.ascent_hood
           - binary_sensor.ascent_front_left_door
           - binary_sensor.ascent_front_right_door
           - binary_sensor.ascent_rear_left_door
@@ -6119,6 +6165,9 @@ views:
           - card:
               animation:
                 state: 'on'
+              card_mod:
+                style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                  }\n"
               decimal: 0
               entities:
               - entity: sensor.nasya_battery_charge_remaining_percentage
@@ -6141,8 +6190,6 @@ views:
               - color: var(--green-color)
                 from: 80
                 to: 100
-              style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                }"
               type: custom:bar-card
             conditions:
             - entity: binary_sensor.nasya_connected
@@ -6719,6 +6766,9 @@ views:
         card:
           animation:
             state: 'on'
+          card_mod:
+            style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+              }\n"
           decimal: 0
           entities:
           - entity: sensor.quest_battery_level
@@ -6741,8 +6791,6 @@ views:
           - color: var(--green-color)
             from: 80
             to: 100
-          style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-            }"
           type: custom:bar-card
       - attributes:
           icon: mdi:chart-areaspline
@@ -7098,7 +7146,10 @@ views:
               \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') | list\
               \ | count }}\";\n  position: absolute;\n  color: var(--green-color);\n\
               \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
-              }\n{% endif %}\n"
+              }\n{% endif %}\n.content {\n  {% if is_state(config.entity, 'on') %}\n\
+              \    animation: rotation linear infinite;\n    animation-duration: 1s;\n\
+              \  {% endif %}\n}\n@keyframes rotation {\n  100% {\n    transform: rotate(360deg);\n\
+              \  }\n}\n"
         entity: fan.all_fans
         hold_action:
           action: call-service
@@ -8164,7 +8215,10 @@ views:
   - cards:
     - title: Battery
       type: custom:mushroom-title-card
-    - entities:
+    - card_mod:
+        style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+          }\n"
+      entities:
       - entity: sensor.sol_ark_battery_state_of_charge
         icon: mdi:battery-high
         max: 100
@@ -8235,8 +8289,6 @@ views:
       height: 30px
       positions:
         indicator: inside
-      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-        }"
       type: custom:bar-card
     - cards:
       - card_mod:
@@ -8271,7 +8323,10 @@ views:
     - subtitle: System
       title: Realtime Power
       type: custom:mushroom-title-card
-    - entities:
+    - card_mod:
+        style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+          }\n"
+      entities:
       - entity: sensor.sol_ark_grid_power
         icon: mdi:transmission-tower
         min: -5500
@@ -8388,12 +8443,13 @@ views:
       min: 0
       positions:
         indicator: inside
-      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-        }"
       type: custom:bar-card
     - subtitle: Circuits
       type: custom:mushroom-title-card
-    - decimal: 1
+    - card_mod:
+        style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+          }\n"
+      decimal: 1
       entities:
       - entity: sensor.emporiavue_balance_power
         icon: mdi:home-analytics
@@ -8569,8 +8625,6 @@ views:
       - color: var(--red-color)
         from: 1920
         to: 2400
-      style: "bar-card-name,\nbar-card-value {\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-        }"
       type: custom:bar-card
     type: vertical-stack
   - cards:
