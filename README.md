@@ -586,7 +586,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>143 Automations</summary>
+<details><summary>144 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -658,6 +658,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 💬 Garbage Collection
 - 💬 OctoPrint
 - 💬 Subaru Failed Notification
+- 💬 Subaru Fuel Level Low
 - 💬 Subaru Remote Start Expired Notification
 - 💬 Subaru Started
 - 💬 Window Left Open (Disabled)

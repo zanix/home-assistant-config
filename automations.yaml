@@ -1869,13 +1869,13 @@
   condition: []
   action:
   - variables:
-      message: "The car didn't start.{{ \" \" }}\n{%- if 'doorNotLocked' in trigger.event.data.service_data.message
-        -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.service_data.message
-        -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.service_data.message
-        -%}\n  The {{ trigger.event.data.service_data.message }}\n{%- elif 'fuelLevelTooLow'
-        in trigger.event.data.service_data.message -%}\n  The gas is low.\n{%- elif
-        'unknown' in trigger.event.data.service_data.message -%}\n  I have no idea
-        why. Please try again.\n{% endif %}"
+      message: "The car didn't start.{{ \" \" }} {% if 'doorNotLocked' in trigger.event.data.message
+        -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.message
+        -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.message
+        -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow' in
+        trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'unknown' in
+        trigger.event.data.message -%}\n  I have no idea why. Please try again.\n{%
+        endif %}"
   - parallel:
     - service: script.notify_mobile
       data:
@@ -4442,4 +4442,35 @@
       entity_id:
       - select.monthly_tou_energy
       - select.sol_ark_grid_net_tou_daily
+  mode: single
+- id: '1704385020720'
+  alias: "\U0001F4AC Subaru Fuel Level Low"
+  description: Sends a notification when Subaru fuel level is low
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.ascent_range
+    below: 30
+    for:
+      hours: 1
+  condition: []
+  action:
+  - parallel:
+    - service: persistent_notification.create
+      data:
+        title: Subaru Fuel Low
+        message: The fuel level in the Subaru is low.
+        notification_id: water-softener
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: Subaru Fuel Low
+        message: The fuel level in the Subaru is low.
+        icon_url: local/icons/car-estate.png
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Subaru Fuel Low
+        message: The fuel level in the Subaru is low.
   mode: single
