@@ -582,6 +582,10 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 - [Schlage Connect Lock](https://www.amazon.com/gp/product/B00OV49YXU) - Z-Wave controllable lock. Nice to give temp codes for guests or when you forget the keys
 
+### Other
+
+- [Aqara Pet Feeder C1](https://www.amazon.com/dp/B0B9XZ96PH) - Zigbee controlled pet feeder
+
 ## Automations
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
