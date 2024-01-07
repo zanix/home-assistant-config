@@ -363,7 +363,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.5.0]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.5.1]
 
 Home Assistant custom component for real-time viewing of almost any camera stream using WebRTC and other technologies.
 
@@ -387,7 +387,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 Customizable Animated Bar card for Home Assistant Lovelace
 
-### [Battery State Card / Entity Row](https://github.com/maxwroc/battery-state-card) [v3.1.0]
+### [Battery State Card / Entity Row](https://github.com/maxwroc/battery-state-card) [v3.1.1]
 
 Battery state card for Home Assistant
 
@@ -419,9 +419,9 @@ Expander card for HomeAssistant
 
 A Lovelace card for Frigate in Home Assistant
 
-### [Ha Floorplan](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.40]
+### [Ha Floorplan 🖌🎨   Your Imagination Just Become The New Limit](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.43]
 
-Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just become the new limit.
+Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just became the new limit.
 
 ### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.51]
 
@@ -435,7 +435,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v5.1.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v5.2.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -451,7 +451,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.2.2]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.2.3]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
