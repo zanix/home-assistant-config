@@ -590,7 +590,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>144 Automations</summary>
+<details><summary>145 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -667,6 +667,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 💬 Subaru Started
 - 💬 Window Left Open (Disabled)
 - 📅 Garbage Collection Event Generator
+- 📅 Grow Light On/Off
 - 📅 Living Room Fan On/Off
 - 📅 Master Bedroom Fan On/Off
 - 📋 [Controller] Hue Dimmer Remote
