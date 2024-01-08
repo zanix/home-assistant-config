@@ -31,11 +31,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2233
-Sensors        | 909
+All Entities   | 2336
+Sensors        | 960
 Binary Sensors | 198
 Lights         | 60
-Switches       | 108
+Switches       | 114
 
 <details><summary>Stock Integrations</summary>
 
@@ -528,6 +528,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ### Sensor
 
+- [Apollo MSR-1](https://shop.apolloautomation.cloud/products/multisensor-mk1) - mmWave CO2 Multisensor
 - [Aqara Door and Window Sensor](https://www.amazon.com/dp/B07D37VDM3)
 - [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
@@ -590,7 +591,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>145 Automations</summary>
+<details><summary>146 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -635,6 +636,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
+- ✴️ Office Light On/Off Presence
 - 🌐 UniFi WAN Status
 - 🍽️ Dishwasher is Done
 - 🎄 XMas Lights On/Off (Disabled)
