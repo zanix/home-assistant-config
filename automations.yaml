@@ -4548,3 +4548,35 @@
           area_id: office
         data: {}
   mode: single
+- id: '1705012937411'
+  alias: ⌚ [Pixel Watch] Charge Complete
+  description: Sends notification when the Pixel Watch is done charging
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.pixel_watch_joshua_battery_level
+    above: '98'
+    id: joshua
+  - platform: numeric_state
+    entity_id: sensor.pixel_watch_amy_battery_level
+    above: '98'
+    id: amy
+  condition:
+  - alias: Test if the watch is currently charging
+    condition: template
+    value_template: '{%- set battery_state = "sensor.pixel_watch_" ~ trigger.id ~
+      "_battery_state" -%}
+
+      {%- set charger_type = "sensor.pixel_watch_" ~ trigger.id ~ "_battery_state"
+      -%}
+
+      {{ is_state(battery_state, "charging") and is_state(charger_type, "wireless")
+      }}'
+  action:
+  - service: script.notify_mobile
+    data:
+      who: '{{ trigger.id }}'
+      title: Watch is Charged
+      message: Your watch is fully charged, you should take it off the charger
+      icon_url: local/icons/battery-charging-high.png
+  mode: parallel
+  max: 4
