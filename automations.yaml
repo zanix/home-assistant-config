@@ -2042,8 +2042,9 @@
   description: Sends notification when Quest is done charging
   trigger:
   - platform: numeric_state
-    entity_id: sensor.quest_battery_level
-    above: '95'
+    entity_id:
+    - sensor.quest_battery_level
+    above: 95
   condition:
   - condition: state
     entity_id: sensor.quest_battery_state
@@ -3896,11 +3897,14 @@
       conditions:
       - condition: trigger
         id: frigate-event
-      - '{{ is_state(this.entity_id, ''on'') }}'
-      - '{{ not this.attributes.last_triggered or (now() - this.attributes.last_triggered).seconds
-        > cooldown }}'
-      - '{{ not disable_times | length or not now().hour in disable_times | map(''int'')
-        | list }}'
+      - condition: template
+        value_template: '{{ is_state(this.entity_id, ''on'') }}'
+      - condition: template
+        value_template: '{{ not this.attributes.last_triggered or (now() - this.attributes.last_triggered).seconds
+          > cooldown }}'
+      - condition: template
+        value_template: '{{ not disable_times | length or not now().hour in disable_times
+          | map(''int'') | list }}'
       sequence:
       - variables:
           event: '{{ trigger.payload_json }}'
@@ -3942,7 +3946,8 @@
       - alias: 'Debug: set notification'
         choose:
         - conditions:
-          - '{{ debug }}'
+          - condition: template
+            value_template: '{{ debug }}'
           sequence:
           - service: persistent_notification.create
             data:
@@ -3978,15 +3983,18 @@
       - alias: Notify on new object
         choose:
         - conditions:
-          - '{{ not zones | length or (not zone_all and zones | select(''in'', entered_zones)
-            | list | length > 0) or (zone_all and entered_zones | length > 0 and zones
-            | reject(''in'', entered_zones) | list | length == 0) }}'
-          - "{%- set state_filter = namespace(allow=[]) -%} {%- for entity, time in
-            state_entities.items() -%}\n  {%- set state =\n    states(entity) in states_filter\n
-            \   and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
-            | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
-            + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first
-            | default(true), true, false) }}"
+          - condition: template
+            value_template: '{{ not zones | length or (not zone_all and zones | select(''in'',
+              entered_zones) | list | length > 0) or (zone_all and entered_zones |
+              length > 0 and zones | reject(''in'', entered_zones) | list | length
+              == 0) }}'
+          - condition: template
+            value_template: "{%- set state_filter = namespace(allow=[]) -%} {%- for
+              entity, time in state_entities.items() -%}\n  {%- set state =\n    states(entity)
+              in states_filter\n    and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+              | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
+              + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first
+              | default(true), true, false) }}"
           sequence:
           - alias: Fire event for other automations and scripts
             event: custom_frigate_doorbell_object
@@ -4038,9 +4046,11 @@
                 | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
                 + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject |
                 first | default(true), true, false) }}"
-              sub_label: '{{ event[''after''][''sub_label''] }}'
-              sub_label_changed: '{{ sub_label != event[''before''][''sub_label'']
-                }}'
+              sub_label: "{% if event['after']['sub_label'] %} \n  {{event['after']['sub_label'][0]}}\n{%else%}\n
+                \ {{event['after']['sub_label']}}\n{%endif%}\n"
+              sub_label_before: "{% if event['before']['sub_label'] %} \n  {{event['before']['sub_label'][0]}}\n{%else%}\n
+                \ {{event['before']['sub_label']}}\n{%endif%}\n"
+              sub_label_changed: '{{ sub_label != sub_label_before }}'
               update: '{{ alert_once or (new_snapshot and not loitering and not zone_only_changed
                 and not entered_zones_changed and not sub_label_changed) }}'
               title: "{% if sub_label %}\n  {{ title | replace('A Person', sub_label
@@ -4052,9 +4062,12 @@
           - alias: Update thumbnail at end of event
             choose:
             - conditions:
-              - '{{ wait.trigger.payload_json[''type''] == ''end'' }}'
-              - '{{ (''snapshot'' in attachment and update_thumbnail) or clip | length
-                > 0 }}'
+              - condition: template
+                value_template: '{{ wait.trigger.payload_json[''type''] == ''end''
+                  }}'
+              - condition: template
+                value_template: '{{ (''snapshot'' in attachment and update_thumbnail)
+                  or clip | length > 0 }}'
               sequence:
               - delay:
                   seconds: 5
@@ -4063,7 +4076,8 @@
           - alias: 'Debug: set notification'
             choose:
             - conditions:
-              - '{{ debug }}'
+              - condition: template
+                value_template: '{{ debug }}'
               sequence:
               - service: persistent_notification.create
                 data:
@@ -4085,9 +4099,11 @@
                     }}\n"
           - alias: Notify on loitering or significant change
             choose:
-            - conditions: '{{ loitering or (zone_filter and zone_multi_filter and
-                state_true and (new_snapshot or stationary_moved or zone_only_changed
-                or entered_zones_changed or sub_label_changed)) }}'
+            - conditions:
+              - condition: template
+                value_template: '{{ loitering or (zone_filter and zone_multi_filter
+                  and state_true and (new_snapshot or stationary_moved or zone_only_changed
+                  or entered_zones_changed or sub_label_changed)) }}'
               sequence:
               - alias: Fire event for other automations and scripts
                 event: custom_frigate_doorbell_object_update
@@ -4167,6 +4183,7 @@
         message: '{{ message }}'
         image: '{{ image }}'
         duration: 10
+        actions: '{{ actions }}'
     - service: script.notify_pipup
       data:
         entity:
@@ -4548,25 +4565,108 @@
           area_id: office
         data: {}
   mode: single
+- id: '1704733260383'
+  alias: ✴️ Office CO2 Levels
+  description: Alerts when CO2 levels in the Office are high
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.apollo_msr_1_bcbde8_co2
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        above: 2000
+      sequence:
+      - service: esphome.apollo_msr_1_bcbde8_play_buzzer
+        data:
+          song_str: Cantina:d=4,o=5,b=250:8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p
+      - service: light.turn_on
+        data:
+          rgb_color:
+          - 255
+          - 0
+          - 0
+          brightness: 255
+        target:
+          entity_id: light.apollo_msr_1_bcbde8_rgb_light
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        above: 1500
+        below: 2000
+      sequence:
+      - service: light.turn_on
+        data:
+          rgb_color:
+          - 255
+          - 174
+          - 0
+          brightness: 255
+        target:
+          entity_id: light.apollo_msr_1_bcbde8_rgb_light
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        above: 1000
+        below: 1500
+      sequence:
+      - service: light.turn_on
+        data:
+          rgb_color:
+          - 255
+          - 247
+          - 0
+          brightness: 255
+        target:
+          entity_id: light.apollo_msr_1_bcbde8_rgb_light
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        below: 1000
+      sequence:
+      - service: light.turn_off
+        target:
+          entity_id: light.apollo_msr_1_bcbde8_rgb_light
+        data: {}
+  - delay:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  mode: single
+  max_exceeded: silent
 - id: '1705012937411'
   alias: ⌚ [Pixel Watch] Charge Complete
   description: Sends notification when the Pixel Watch is done charging
   trigger:
   - platform: numeric_state
-    entity_id: sensor.pixel_watch_joshua_battery_level
-    above: '98'
+    entity_id:
+    - sensor.pixel_watch_joshua_battery_level
+    above: 90
     id: joshua
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
   - platform: numeric_state
-    entity_id: sensor.pixel_watch_amy_battery_level
-    above: '98'
+    entity_id:
+    - sensor.pixel_watch_amy_battery_level
+    above: 90
     id: amy
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
   condition:
   - alias: Test if the watch is currently charging
     condition: template
     value_template: '{%- set battery_state = "sensor.pixel_watch_" ~ trigger.id ~
       "_battery_state" -%}
 
-      {%- set charger_type = "sensor.pixel_watch_" ~ trigger.id ~ "_battery_state"
+      {%- set charger_type = "sensor.pixel_watch_" ~ trigger.id ~ "_charger_type"
       -%}
 
       {{ is_state(battery_state, "charging") and is_state(charger_type, "wireless")

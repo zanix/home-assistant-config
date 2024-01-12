@@ -591,8 +591,9 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>148 Automations</summary>
 
+- ⌚ [Pixel Watch] Charge Complete
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)
@@ -636,6 +637,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
+- ✴️ Office CO2 Levels
 - ✴️ Office Light On/Off Presence
 - 🌐 UniFi WAN Status
 - 🍽️ Dishwasher is Done
