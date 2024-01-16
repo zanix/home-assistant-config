@@ -1144,8 +1144,9 @@ decluttering_templates:
             service: browser_mod.popup
         type: custom:mushroom-template-card
       conditions:
-      - entity: '[[entity]]'
-        state_not: '0'
+      - above: 0
+        condition: numeric_state
+        entity: '[[entity]]'
       - entity: '[[entity]]'
         state_not: unavailable
       - entity: '[[entity]]'
@@ -1594,6 +1595,8 @@ decluttering_templates:
           - entity: sensor.[[phone_base]]_[[person]]_do_not_disturb_sensor
             state_not: unavailable
           - entity: sensor.[[phone_base]]_[[person]]_do_not_disturb_sensor
+            state_not: unknown
+          - entity: sensor.[[phone_base]]_[[person]]_do_not_disturb_sensor
             state_not: 'off'
           type: conditional
         - chip:
@@ -1617,6 +1620,10 @@ decluttering_templates:
           conditions:
           - entity: person.[[person]]
             state_not: home
+          - entity: person.[[person]]
+            state_not: unavailable
+          - entity: person.[[person]]
+            state_not: unknown
           type: conditional
         - chip:
             entity: media_player.spotify_[[person]]
@@ -1644,6 +1651,8 @@ decluttering_templates:
           conditions:
           - entity: media_player.spotify_[[person]]
             state_not: unavailable
+          - entity: media_player.spotify_[[person]]
+            state_not: unknown
           type: conditional
         - entity: sensor.[[phone_base]]_[[person]]_wifi_signal_strength
           icon: '{% from "util.jinja" import wifi_icon %}
@@ -2510,7 +2519,6 @@ views:
                         layout_type: masonry
                         type: custom:layout-card
                       filter:
-                        exclude: []
                         include:
                         - group: binary_sensor.all_doors
                           options:
@@ -3052,8 +3060,9 @@ views:
                   service: browser_mod.popup
               type: template
             conditions:
-            - entity: sensor.low_battery_devices
-              state_not: '0'
+            - above: 0
+              condition: numeric_state
+              entity: sensor.low_battery_devices
             type: conditional
           - chip:
               card_mod:
@@ -3075,25 +3084,42 @@ views:
                           \ 0;\n}\n"
                       cards:
                       - card:
-                          card_mod:
-                            style: "ha-card {\n  border-style: none;\n  background:\
-                              \ none;\n}\ndiv.card-content {\n  padding: 0px;\n}\n"
-                          type: entities
+                          cards: []
+                          layout:
+                            margin: 0
+                            padding: 0
+                          layout_type: masonry
+                          type: custom:layout-card
                         filter:
-                          template: "{%- for dev in expand(states | selectattr('domain',\
-                            \ '==', 'update') | selectattr('state', '==', 'on')) %}\n\
-                            \  {{-\n    { 'type': 'custom:mushroom-update-card',\n\
-                            \      'entity': dev.entity_id,\n      'show_buttons_control':\
-                            \ true,\n      'layout': 'horizontal'\n    }\n  }},\n\
-                            {%- endfor %}\n"
+                          exclude:
+                          - state: 'off'
+                          - state: unavailable
+                          - state: unknown
+                          include:
+                          - domain: update
+                            options:
+                              features:
+                              - backup: ask
+                                type: update-actions
+                              state_content:
+                              - installed_version
+                              - latest_version
+                              - skipped_version
+                              type: tile
+                        sort:
+                          method: friendly_name
                         type: custom:auto-entities
                       type: custom:vertical-stack-in-card
                     title: Available Updates
                   service: browser_mod.popup
               type: template
             conditions:
-            - entity: sensor.updates
-              state_not: '0'
+            - above: 0
+              condition: numeric_state
+              entity: sensor.updates
+            - condition: user
+              users:
+              - f615672fc2554783beab56221097564e
             type: conditional
           type: custom:mushroom-chips-card
         type: custom:vertical-stack-in-card
@@ -3583,10 +3609,9 @@ views:
             service: browser_mod.popup
         type: custom:mushroom-template-card
       conditions:
-      - entity: sensor.mail_usps_mail
-        state_not: '0'
-      - entity: sensor.mail_usps_mail
-        state_not: unavailable
+      - above: 0
+        condition: numeric_state
+        entity: sensor.mail_usps_mail
       type: conditional
     - card:
         badge_icon: "{% if int(states(entity), 0) > 0 %}\n  mdi:numeric-{{ states(entity)\
@@ -3611,10 +3636,9 @@ views:
           action: none
         type: custom:mushroom-template-card
       conditions:
-      - entity: sensor.mail_packages_delivered
-        state_not: '0'
-      - entity: sensor.mail_packages_delivered
-        state_not: unavailable
+      - above: 0
+        condition: numeric_state
+        entity: sensor.mail_packages_delivered
       type: conditional
     - template: package_delivery
       type: custom:decluttering-card
@@ -4531,6 +4555,10 @@ views:
           conditions:
           - entity: cover.opengarage
             state_not: closed
+          - entity: cover.opengarage
+            state_not: unavailable
+          - entity: cover.opengarage
+            state_not: unknown
           type: conditional
         - entity: light.garage
           icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
@@ -4837,8 +4865,12 @@ views:
         primary: Harmony Unavailable
         type: custom:mushroom-template-card
       conditions:
-      - entity: remote.harmony_living_room
-        state: unavailable
+      - condition: or
+        conditions:
+        - entity: remote.harmony_living_room
+          state: unavailable
+        - entity: remote.harmony_living_room
+          state: unknown
       type: conditional
     - card:
         cards:
@@ -4876,6 +4908,8 @@ views:
       conditions:
       - entity: remote.harmony_living_room
         state_not: unavailable
+      - entity: remote.harmony_living_room
+        state_not: unknown
       type: conditional
     - card:
         template: media_card
@@ -4900,6 +4934,8 @@ views:
         state_not: 'off'
       - entity: media_player.universal_living_room
         state_not: unavailable
+      - entity: media_player.universal_living_room
+        state_not: unknown
       type: conditional
     - entity: media_player.cast_living_room_speaker
       hide:
@@ -5074,8 +5110,12 @@ views:
         primary: Harmony Unavailable
         type: custom:mushroom-template-card
       conditions:
-      - entity: remote.harmony_family_room
-        state: unavailable
+      - condition: or
+        conditions:
+        - entity: remote.harmony_family_room
+          state: unavailable
+        - entity: remote.harmony_family_room
+          state: unknown
       type: conditional
     - card:
         cards:
@@ -5165,6 +5205,8 @@ views:
       conditions:
       - entity: remote.harmony_family_room
         state_not: unavailable
+      - entity: remote.harmony_family_room
+        state_not: unknown
       type: conditional
     - card:
         template: media_card
@@ -5187,6 +5229,10 @@ views:
       conditions:
       - entity: sensor.family_room_denon_source
         state_not: 'off'
+      - entity: sensor.family_room_denon_source
+        state_not: unavailable
+      - entity: sensor.family_room_denon_source
+        state_not: unknown
       type: conditional
     - card:
         entity: media_player.denon_avr_s760h
@@ -5220,6 +5266,8 @@ views:
         state_not: 'off'
       - entity: sensor.family_room_denon_source
         state_not: unavailable
+      - entity: sensor.family_room_denon_source
+        state_not: unknown
       type: conditional
     - entity: media_player.cast_family_room_speaker
       hide:
@@ -5660,8 +5708,12 @@ views:
         primary: Harmony Unavailable
         type: custom:mushroom-template-card
       conditions:
-      - entity: remote.harmony_master_bedroom
-        state: unavailable
+      - condition: or
+        conditions:
+        - entity: remote.harmony_master_bedroom
+          state: unavailable
+        - entity: remote.harmony_master_bedroom
+          state: unknown
       type: conditional
     - card:
         cards:
@@ -5699,6 +5751,8 @@ views:
       conditions:
       - entity: remote.harmony_master_bedroom
         state_not: unavailable
+      - entity: remote.harmony_master_bedroom
+        state_not: unknown
       type: conditional
     - card:
         template: media_card
@@ -5739,6 +5793,8 @@ views:
         state_not: 'off'
       - entity: remote.harmony_master_bedroom
         state_not: unavailable
+      - entity: remote.harmony_master_bedroom
+        state_not: unknown
       type: conditional
     type: vertical-stack
   icon: mdi:bed-king
@@ -6768,12 +6824,9 @@ views:
                 service: browser_mod.popup
             type: template
           conditions:
-          - entity: sensor.erebus_windows_updates_available_software_updates
-            state_not: '0'
-          - entity: sensor.erebus_windows_updates_available_software_updates
-            state_not: unavailable
-          - entity: sensor.erebus_windows_updates_available_software_updates
-            state_not: unknown
+          - above: 0
+            condition: numeric_state
+            entity: sensor.erebus_windows_updates_available_software_updates
           type: conditional
         - chip:
             content: '{{ int(states(entity), 0) }}'
@@ -6794,12 +6847,9 @@ views:
                 service: browser_mod.popup
             type: template
           conditions:
-          - entity: sensor.erebus_windows_updates_available_driver_updates
-            state_not: '0'
-          - entity: sensor.erebus_windows_updates_available_driver_updates
-            state_not: unavailable
-          - entity: sensor.erebus_windows_updates_available_driver_updates
-            state_not: unknown
+          - above: 0
+            condition: numeric_state
+            entity: sensor.erebus_windows_updates_available_driver_updates
           type: conditional
         - entity: button.erebus_publish_sensors
           hold_action:
@@ -6827,6 +6877,8 @@ views:
           conditions:
           - entity: media_player.erebus
             state_not: unavailable
+          - entity: media_player.erebus
+            state_not: unknown
           - entity: media_player.erebus
             state_not: 'off'
           type: conditional
@@ -6936,12 +6988,9 @@ views:
                 service: browser_mod.popup
             type: template
           conditions:
-          - entity: sensor.nasya_windows_updates_available_software_updates
-            state_not: '0'
-          - entity: sensor.nasya_windows_updates_available_software_updates
-            state_not: unavailable
-          - entity: sensor.nasya_windows_updates_available_software_updates
-            state_not: unknown
+          - above: 0
+            condition: numeric_state
+            entity: sensor.nasya_windows_updates_available_software_updates
           type: conditional
         - chip:
             content: '{{ int(states(entity), 0) }}'
@@ -6962,12 +7011,9 @@ views:
                 service: browser_mod.popup
             type: template
           conditions:
-          - entity: sensor.nasya_windows_updates_available_driver_updates
-            state_not: '0'
-          - entity: sensor.nasya_windows_updates_available_driver_updates
-            state_not: unavailable
-          - entity: sensor.nasya_windows_updates_available_driver_updates
-            state_not: unknown
+          - above: 0
+            condition: numeric_state
+            entity: sensor.nasya_windows_updates_available_driver_updates
           type: conditional
         - entity: button.nasya_publish_sensors
           hold_action:
@@ -6995,6 +7041,8 @@ views:
           conditions:
           - entity: media_player.nasya
             state_not: unavailable
+          - entity: media_player.nasya
+            state_not: unknown
           - entity: media_player.nasya
             state_not: 'off'
           type: conditional
@@ -7047,8 +7095,6 @@ views:
             conditions:
             - entity: binary_sensor.nasya_connected
               state: 'on'
-            - entity: sensor.nasya_battery_charge_remaining_percentage
-              state_not: unavailable
             type: conditional
           - template: four_graphs
             type: custom:decluttering-card
@@ -7155,12 +7201,9 @@ views:
                 service: browser_mod.popup
             type: template
           conditions:
-          - entity: sensor.ardena_windows_updates_available_software_updates
-            state_not: '0'
-          - entity: sensor.ardena_windows_updates_available_software_updates
-            state_not: unavailable
-          - entity: sensor.ardena_windows_updates_available_software_updates
-            state_not: unknown
+          - above: 0
+            condition: numeric_state
+            entity: sensor.ardena_windows_updates_available_software_updates
           type: conditional
         - chip:
             content: '{{ int(states(entity), 0) }}'
@@ -7181,12 +7224,9 @@ views:
                 service: browser_mod.popup
             type: template
           conditions:
-          - entity: sensor.ardena_windows_updates_available_driver_updates
-            state_not: '0'
-          - entity: sensor.ardena_windows_updates_available_driver_updates
-            state_not: unavailable
-          - entity: sensor.ardena_windows_updates_available_driver_updates
-            state_not: unknown
+          - above: 0
+            condition: numeric_state
+            entity: sensor.ardena_windows_updates_available_driver_updates
           type: conditional
         - entity: button.ardena_publish_sensors
           hold_action:
@@ -7215,6 +7255,8 @@ views:
           - entity: media_player.ardena
             state_not: unavailable
           - entity: media_player.ardena
+            state_not: unknown
+          - entity: media_player.ardena
             state_not: 'off'
           type: conditional
       - attributes:
@@ -7232,7 +7274,7 @@ views:
               - computer: ardena
             conditions:
             - entity: binary_sensor.ardena_connected
-              state_not: 'off'
+              state: 'on'
             type: conditional
           type: vertical-stack
       - attributes:
@@ -8129,7 +8171,6 @@ views:
                     layout_type: masonry
                     type: custom:layout-card
                   filter:
-                    exclude: []
                     include:
                     - group: fan.all_fans
                       options:
