@@ -87,7 +87,7 @@ decluttering_templates:
             style: "ha-card {\n  transition: all 0s;\n  background-color: var(--primary-background-color)\
               \ !important;\n  border-radius: var(--ha-card-border-radius, 12px) !important;\n\
               \  --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-border-width:\
-              \ 0;\n  --chip-spacing: 0;\n}\n"
+              \ 0;\n  --chip-spacing: 0;\n  --chip-icon-size: 0.65em;\n}\n"
           chips: '[[chips]]'
           type: custom:mushroom-chips-card
         layout:
@@ -1602,10 +1602,10 @@ decluttering_templates:
             entity: proximity.[[person]]_home
             hold_action:
               action: none
-            icon: "{% if int(states(entity), 0) >= 400 %}\n  {% set icon = \"map-marker-distance\"\
-              \ %}\n  {% if is_state_attr(entity, \"dir_of_travel\", \"towards\")\
-              \ %}\n    mdi:map-marker-left\n  {% elif is_state_attr(entity, \"dir_of_travel\"\
-              , \"away_from\") %}\n    mdi:map-marker-right\n  {% else %}\n    mdi:map-marker-distance\n\
+            icon: "{% if int(states(entity), 0) >= 400 %}\n  {% if is_state_attr(entity,\
+              \ \"dir_of_travel\", \"towards\") %}\n    mdi:map-marker-left\n  {%\
+              \ elif is_state_attr(entity, \"dir_of_travel\", \"away_from\") %}\n\
+              \    mdi:map-marker-right\n  {% else %}\n    mdi:map-marker-distance\n\
               \  {% endif %}\n{% endif %}"
             icon_color: "{% if is_state_attr(entity, \"dir_of_travel\", \"towards\"\
               ) %}\n  green\n{% elif is_state_attr(entity, \"dir_of_travel\", \"away_from\"\
@@ -1691,7 +1691,7 @@ decluttering_templates:
         icon_color: '[[icon_color]]'
         primary: '[[primary]]'
         secondary: "{%- if has_value(\"[[temperature]]\") -%}\n  {{ states(\"[[temperature]]\"\
-          , rounded=True, with_unit=True) }}\n{%- else -%}\n  {{ \" \" }}\n{%- endif\
+          , rounded=True, with_unit=True) }}\n{%- else -%}\n  {{ \"-\" }}\n{%- endif\
           \ -%}\n"
         tap_action:
           action: navigate
@@ -2472,7 +2472,8 @@ views:
         - alignment: justify
           card_mod:
             style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-              \  --chip-border-width: 0;\n  --chip-spacing: 0;\n}\n"
+              \  --chip-border-width: 0;\n  --chip-spacing: 0;\n  --chip-icon-size:\
+              \ 0.65em;\n}\n"
           chips:
           - content: '{% from "util.jinja" import security_count %} {{ iif(security_count()
               | int == 0, "Secure", "Not Secure") }}'
@@ -2484,73 +2485,6 @@ views:
             tap_action:
               action: navigate
               navigation_path: security
-            type: template
-          - content: '{{ states("sensor.ecobee_current_temperature", with_unit=True)
-              }}'
-            entity: sensor.ecobee_mode
-            icon: mdi:thermostat-box
-            icon_color: "{% if is_state(entity, \"Heating\") %}\n  red\n{% elif is_state(entity,\
-              \ \"Cooling\") %}\n  light-blue\n{% elif is_state(entity, \"Fan\") %}\n\
-              \  amber\n{% elif is_state(entity, \"Off\") %}\n  grey\n{% else %}\n\
-              \  blue-grey\n{% endif %}"
-            tap_action:
-              action: navigate
-              navigation_path: climate
-            type: template
-          - card_mod:
-              style:
-                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
-                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
-                  \ list | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
-                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
-                  \ 12px;\n}\n{% endif %}\n"
-            entity: light.all_lights
-            hold_action:
-              action: call-service
-              service: light.turn_off
-              target:
-                entity_id: light.all_lights
-            icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-group", "mdi:lightbulb-group-off")
-              }}'
-            icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
-            tap_action:
-              action: navigate
-              navigation_path: lights
-            type: template
-          - content: "{% if has_value(entity) %}\n  {% set power = int(states(entity),\
-              \ 0) | abs %}\n  {% if power > 1000 %}\n    {{ (power | float * 0.001)\
-              \ | round(2) }} kWh\n  {% else %}\n    {{ power }} W\n  {% endif %}\n\
-              {% endif %}"
-            entity: sensor.sol_ark_grid_power
-            icon: "{% if has_value(entity) %}\n  {% if int(states(entity), 0) < 0\
-              \ %}\n    mdi:transmission-tower-export\n  {% else %}\n    mdi:transmission-tower-import\n\
-              \  {% endif %}\n{% else %}\n  mdi:transmission-tower-off\n{% endif %}"
-            icon_color: "{% if has_value(entity) %}\n  {% if int(states(entity), 0)\
-              \ < 0 %}\n    lime\n  {% else %}\n    deep-orange\n  {% endif %}\n{%\
-              \ else %}\n  disabled\n{% endif %}"
-            tap_action:
-              action: navigate
-              navigation_path: power
-            type: template
-          type: custom:mushroom-chips-card
-        - alignment: justify
-          card_mod:
-            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-              \  --chip-border-width: 0;\n  --chip-spacing: 0;\n}\n"
-          chips:
-          - card_mod:
-              style:
-                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
-                  \ \"{{ expand(config.entity) | selectattr(\"state\", \"==\", \"\
-                  on\") | list | count }}\";\n  position: absolute;\n  color: var(--teal-color);\n\
-                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
-                  \ 12px;\n}\n{% endif %}\n"
-            entity: binary_sensor.computers
-            icon: mdi:desktop-tower
-            icon_color: '{{ "teal" if is_state(entity, "on") else "disabled" }}'
-            tap_action:
-              action: navigate
-              navigation_path: computer
             type: template
           - card_mod:
               style:
@@ -2597,6 +2531,62 @@ views:
                     type: custom:vertical-stack-in-card
                   title: All Doors
                 service: browser_mod.popup
+            type: template
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr('state', '==', 'on') |\
+                  \ list | count }}\";\n  position: absolute;\n  color: var(--amber-color);\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
+            entity: light.all_lights
+            hold_action:
+              action: call-service
+              service: light.turn_off
+              target:
+                entity_id: light.all_lights
+            icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-group", "mdi:lightbulb-group-off")
+              }}'
+            icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
+            tap_action:
+              action: navigate
+              navigation_path: lights
+            type: template
+          - content: "{% if has_value(entity) %}\n  {% set power = int(states(entity),\
+              \ 0) | abs %}\n  {% if power > 1000 %}\n    {{ (power | float * 0.001)\
+              \ | round(2) }} kWh\n  {% else %}\n    {{ power }} W\n  {% endif %}\n\
+              {% endif %}"
+            entity: sensor.sol_ark_grid_power
+            icon: "{% if has_value(entity) %}\n  {% if int(states(entity), 0) < 0\
+              \ %}\n    mdi:transmission-tower-export\n  {% else %}\n    mdi:transmission-tower-import\n\
+              \  {% endif %}\n{% else %}\n  mdi:transmission-tower-off\n{% endif %}"
+            icon_color: "{% if has_value(entity) %}\n  {% if int(states(entity), 0)\
+              \ < 0 %}\n    lime\n  {% else %}\n    deep-orange\n  {% endif %}\n{%\
+              \ else %}\n  disabled\n{% endif %}"
+            tap_action:
+              action: navigate
+              navigation_path: power
+            type: template
+          type: custom:mushroom-chips-card
+        - alignment: justify
+          card_mod:
+            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
+              \  --chip-border-width: 0;\n  --chip-spacing: 0;\n  --chip-icon-size:\
+              \ 0.65em;\n}\n"
+          chips:
+          - card_mod:
+              style:
+                .: "{% if is_state(config.entity, \"on\") %}\nha-card:after {\n  content:\
+                  \ \"{{ expand(config.entity) | selectattr(\"state\", \"==\", \"\
+                  on\") | list | count }}\";\n  position: absolute;\n  color: var(--teal-color);\n\
+                  \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                  \ 12px;\n}\n{% endif %}\n"
+            entity: binary_sensor.computers
+            icon: mdi:desktop-tower
+            icon_color: '{{ "teal" if is_state(entity, "on") else "disabled" }}'
+            tap_action:
+              action: navigate
+              navigation_path: computer
             type: template
           - content: "{% if is_state(entity, \"on\") and has_value(\"sensor.octoprint_layer_progress\"\
               ) %}\n  {{ progress }}\n{% endif %}"
@@ -3008,7 +2998,12 @@ views:
                 service: browser_mod.popup
             type: template
           - chip:
-              content: '{{ states(entity) }}'
+              card_mod:
+                style:
+                  .: "{% if int(states(config.entity), 0) > 0 %}\nha-card:after {\n\
+                    \  content: \"{{ states(config.entity) }}\";\n  position: absolute;\n\
+                    \  color: var(--red-color);\n  font-weight: bolder;\n  top: -2px;\n\
+                    \  right: 2px;\n  font-size: 12px;\n}\n{% endif %}\n"
               entity: sensor.low_battery_devices
               icon: mdi:battery-alert
               icon_color: red
@@ -3061,7 +3056,12 @@ views:
               state_not: '0'
             type: conditional
           - chip:
-              content: '{{ states(entity) }}'
+              card_mod:
+                style:
+                  .: "{% if int(states(config.entity), 0) > 0 %}\nha-card:after {\n\
+                    \  content: \"{{ states(config.entity) }}\";\n  position: absolute;\n\
+                    \  color: var(--red-color);\n  font-weight: bolder;\n  top: -2px;\n\
+                    \  right: 2px;\n  font-size: 12px;\n}\n{% endif %}\n"
               entity: sensor.updates
               icon: mdi:package-up
               icon_color: red
@@ -3107,7 +3107,8 @@ views:
     - alignment: justify
       card_mod:
         style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: none;\n\
-          \  --chip-border-width: 0;\n  --chip-spacing: 0;\n}\n"
+          \  --chip-border-width: 0;\n  --chip-spacing: 0;\n  --chip-icon-size: 0.65em;\n\
+          }\n"
       chips:
       - entity: weather.owm_daily
         show_conditions: true
@@ -3232,6 +3233,17 @@ views:
               title: Weather
             service: browser_mod.popup
         type: weather
+      - content: '{{ states("sensor.ecobee_current_temperature", with_unit=True) }}'
+        entity: sensor.ecobee_mode
+        icon: mdi:thermostat-box
+        icon_color: "{% if is_state(entity, \"Heating\") %}\n  red\n{% elif is_state(entity,\
+          \ \"Cooling\") %}\n  light-blue\n{% elif is_state(entity, \"Fan\") %}\n\
+          \  amber\n{% elif is_state(entity, \"Off\") %}\n  grey\n{% else %}\n  blue-grey\n\
+          {% endif %}"
+        tap_action:
+          action: navigate
+          navigation_path: climate
+        type: template
       - content: '{{ states(entity) | float(default=0) }}'
         entity: sensor.airnow_air_quality_index
         icon: '{{ iif(has_value(entity), "mdi:blur", "mdi:blur-off") }}'
@@ -4590,7 +4602,8 @@ views:
           tap_action:
             action: more-info
           type: template
-        - content: '{{ states(entity) }}mpg'
+        - content: "{% if has_value(entity) %}\n  {{ states(entity) | round(1) }}mpg\n\
+            {% endif %}"
           double_tap_action:
             action: none
           entity: sensor.ascent_avg_fuel_consumption
@@ -4691,12 +4704,32 @@ views:
           \  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else -%}\n\
           \  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.ecobee_current_temperature
         type: entity
       - entity: sensor.ecobee_current_humidity
         type: entity
+      - icon: mdi:remote-tv
+        icon_color: orange
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                template: shield_remote
+                type: custom:decluttering-card
+                variables:
+                - remote: remote.androidtv_living_room
+                - media: media_player.universal_living_room
+              style: '--popup-min-width: 380px;
+
+                --popup-max-width: 380px;
+
+                '
+              title: Living Room Remote
+            service: browser_mod.popup
+        type: template
       - icon: mdi:dots-horizontal-circle
         icon_color: blue
         tap_action:
@@ -4797,31 +4830,8 @@ views:
       type: custom:mushroom-fan-card
     type: vertical-stack
   - cards:
-    - template: title_chips
-      type: custom:decluttering-card
-      variables:
-      - title: Media
-      - chips:
-        - icon: mdi:remote-tv
-          icon_color: orange
-          tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  template: shield_remote
-                  type: custom:decluttering-card
-                  variables:
-                  - remote: remote.androidtv_living_room
-                  - media: media_player.universal_living_room
-                style: '--popup-min-width: 380px;
-
-                  --popup-max-width: 380px;
-
-                  '
-                title: Living Room Remote
-              service: browser_mod.popup
-          type: template
+    - title: Media
+      type: custom:mushroom-title-card
     - card:
         icon: mdi:progress-question
         primary: Harmony Unavailable
@@ -4925,7 +4935,7 @@ views:
           ) -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else\
           \ -%}\n  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.family_room_temperature
         type: entity
@@ -4950,6 +4960,26 @@ views:
                 - stream: familyroom
               size: fullscreen
               title: Family Room
+            service: browser_mod.popup
+        type: template
+      - icon: mdi:remote-tv
+        icon_color: orange
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                template: shield_remote
+                type: custom:decluttering-card
+                variables:
+                - remote: remote.androidtv_family_room
+                - media: media_player.universal_family_room
+              style: '--popup-min-width: 380px;
+
+                --popup-max-width: 380px;
+
+                '
+              title: Family Room Remote
             service: browser_mod.popup
         type: template
       - icon: mdi:dots-horizontal-circle
@@ -5037,31 +5067,8 @@ views:
       type: grid
     type: vertical-stack
   - cards:
-    - template: title_chips
-      type: custom:decluttering-card
-      variables:
-      - title: Media
-      - chips:
-        - icon: mdi:remote-tv
-          icon_color: orange
-          tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  template: shield_remote
-                  type: custom:decluttering-card
-                  variables:
-                  - remote: remote.androidtv_family_room
-                  - media: media_player.universal_family_room
-                style: '--popup-min-width: 380px;
-
-                  --popup-max-width: 380px;
-
-                  '
-                title: Family Room Remote
-              service: browser_mod.popup
-          type: template
+    - title: Media
+      type: custom:mushroom-title-card
     - card:
         icon: mdi:progress-question
         primary: Harmony Unavailable
@@ -5325,13 +5332,11 @@ views:
           , \"on\") -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n\
           {%- else -%}\n  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.office_temperature
         type: entity
       - entity: sensor.apollo_msr_1_bcbde8_co2
-        type: entity
-      - entity: sensor.apollo_msr_1_bcbde8_ltr390_ambient_light
         type: entity
   - cards:
     - template: title_chips
@@ -5474,7 +5479,7 @@ views:
           \  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else -%}\n\
           \  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.kitchen_temperature
         type: entity
@@ -5544,10 +5549,11 @@ views:
       icon: mdi:food
       name: Daily Weight
       type: sensor
-    - content: "{%- set schedules = states(\"sensor.cat_feeder_schedule\") | replace(\"\
-        '\", '\"') | from_json -%}\n{%- for schedule in schedules -%}\n  {{ schedule.size\
-        \ }} portions at {{ as_timestamp(today_at(schedule.hour ~ \":\" ~ schedule.minute))\
-        \ | timestamp_custom(\"%-I:%M %p\", True) }}\n{% endfor %}"
+    - content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n{%- set schedules\
+        \ = states(\"sensor.cat_feeder_schedule\") | replace(\"'\", '\"') | from_json\
+        \ -%}\n{%- for schedule in schedules -%}\n  {{ schedule.size }} portions at\
+        \ {{ as_timestamp(today_at(schedule.hour ~ \":\" ~ schedule.minute)) | timestamp_custom(\"\
+        %-I:%M %p\", True) }}\n{% endfor -%}\n{%- endif -%}"
       title: Schedule
       type: markdown
     type: vertical-stack
@@ -5577,10 +5583,30 @@ views:
           ) -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else\
           \ -%}\n  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.master_bedroom_temperature
         type: entity
+      - icon: mdi:remote-tv
+        icon_color: orange
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                template: shield_remote
+                type: custom:decluttering-card
+                variables:
+                - remote: remote.harmony_master_bedroom
+                - media: media_player.universal_master_bedroom
+              style: '--popup-min-width: 380px;
+
+                --popup-max-width: 380px;
+
+                '
+              title: Master Bedroom Remote
+            service: browser_mod.popup
+        type: template
   - cards:
     - template: title_chips
       type: custom:decluttering-card
@@ -5627,31 +5653,8 @@ views:
       type: custom:mushroom-fan-card
     type: vertical-stack
   - cards:
-    - template: title_chips
-      type: custom:decluttering-card
-      variables:
-      - title: Media
-      - chips:
-        - icon: mdi:remote-tv
-          icon_color: orange
-          tap_action:
-            action: fire-dom-event
-            browser_mod:
-              data:
-                content:
-                  template: shield_remote
-                  type: custom:decluttering-card
-                  variables:
-                  - remote: remote.harmony_master_bedroom
-                  - media: media_player.universal_master_bedroom
-                style: '--popup-min-width: 380px;
-
-                  --popup-max-width: 380px;
-
-                  '
-                title: Master Bedroom Remote
-              service: browser_mod.popup
-          type: template
+    - title: Media
+      type: custom:mushroom-title-card
     - card:
         icon: mdi:progress-question
         primary: Harmony Unavailable
@@ -5764,7 +5767,7 @@ views:
           \  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else -%}\n\
           \  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.ethan_temperature
         type: entity
@@ -5831,7 +5834,7 @@ views:
           \  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else -%}\n\
           \  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.emma_temperature
         type: entity
@@ -5898,7 +5901,7 @@ views:
           \ -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else\
           \ -%}\n  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.guest_room_temperature
         type: entity
@@ -5936,13 +5939,24 @@ views:
         tap_action:
           action: more-info
         type: template
-      - entity: sensor.garage_multisensor_air_temperature
-        type: entity
-      - entity: sensor.garage_multisensor_humidity
-        type: entity
-      - entity: sensor.garage_multisensor_illuminance
+      - content: '{{ int(states(entity), 0) }} °F'
+        entity: sensor.garage_multisensor_air_temperature
+        icon: mdi:thermometer
+        tap_action:
+          action: more-info
+        type: template
+      - content: '{{ int(states(entity), 0) }} %'
+        entity: sensor.garage_multisensor_humidity
+        icon: mdi:water-percent
+        tap_action:
+          action: more-info
+        type: template
+      - content: '{{ int(states(entity), 0) }} %'
+        entity: sensor.garage_multisensor_illuminance
         icon: mdi:brightness-6
-        type: entity
+        tap_action:
+          action: more-info
+        type: template
       - entity: camera.garage
         icon: mdi:cctv
         icon_color: white
@@ -6044,7 +6058,7 @@ views:
           ) -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n  cyan\n{%- else\
           \ -%}\n  disabled\n{%- endif -%}"
         tap_action:
-          action: none
+          action: more-info
         type: template
       - entity: sensor.owm_daily_temperature
         type: entity
@@ -8102,7 +8116,37 @@ views:
         icon: '{{ iif(is_state(entity, "on"), "mdi:fan", "mdi:fan-off") }}'
         icon_color: '{{ iif(is_state(entity, "on"), "green", "grey") }}'
         tap_action:
-          action: none
+          action: fire-dom-event
+          browser_mod:
+            data:
+              content:
+                card_mod:
+                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+                    \ 0;\n}\n"
+                cards:
+                - card:
+                    cards: []
+                    layout_type: masonry
+                    type: custom:layout-card
+                  filter:
+                    exclude: []
+                    include:
+                    - group: fan.all_fans
+                      options:
+                        card_mod:
+                          style: "ha-card {\n  transition: all 0s;\n  padding: 4px\
+                            \ 12px !important;\n  border-width: 0;\n}\n"
+                        icon_animation: true
+                        layout: horizontal
+                        show_percentage_control: true
+                        type: custom:mushroom-fan-card
+                  show_empty: false
+                  sort:
+                    method: friendly_name
+                  type: custom:auto-entities
+                type: custom:vertical-stack-in-card
+              title: All Fans
+            service: browser_mod.popup
         type: template
   - cards:
     - template: title_chips
@@ -8491,6 +8535,12 @@ views:
         icon_color: '{{ iif(is_state(entity, "on"), "cyan", "disabled") }}'
         tap_action:
           action: none
+        type: template
+      - entity: input_boolean.guest_mode
+        icon: mdi:account-question
+        icon_color: '{{ iif(is_state(entity, "on"), "green", "disabled") }}'
+        tap_action:
+          action: more-info
         type: template
       - icon: mdi:chart-gantt
         tap_action:
@@ -8945,6 +8995,8 @@ views:
       - content: '{{ int(states(entity), 0) }} kWh'
         entity: sensor.sol_ark_grid_net_monthly
         icon: mdi:power-plug
+        tap_action:
+          action: more-info
         type: template
       - content: '{{ int(states(entity), 0) }}%'
         entity: sensor.sol_ark_battery_state_of_charge
