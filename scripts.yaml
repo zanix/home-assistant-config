@@ -156,15 +156,48 @@ generate_readme:
 subaru_remote_start:
   alias: Subaru Remote Start
   sequence:
-  - parallel:
+  - variables:
+      door_closed: '{{ is_state("cover.opengarage", "closed") }}'
+      car_in_garage: '{{ is_state("binary_sensor.opengarage_vehicle", "on") }}'
+      title: Subaru Remote Start
+      message: Starting the car
+  - alias: Check the garage door is closed and the car is in the garage
+    if:
+    - condition: template
+      value_template: '{{ door_closed and car_in_garage }}'
+    then:
     - service: cover.open_cover
-      data: {}
       target:
         entity_id: cover.opengarage
-    - service: button.press
       data: {}
-      target:
-        entity_id: button.ascent_remote_start
+  - service: button.press
+    target:
+      entity_id: button.ascent_remote_start
+    data: {}
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon_url: local/icons/subaru.png
+        group: Subaru
+        tag: subaru
+        url: lovelace/subaru
+    - alias: Check the car is in the garage
+      if:
+      - condition: template
+        value_template: '{{ car_in_garage }}'
+      then:
+      - service: script.notify_pipup
+        data:
+          entity:
+          - media_player.shield_living_room
+          - media_player.shield_family_room
+          - media_player.shield_master_bedroom
+          title: '{{ title }}'
+          message: '{{ message }}'
+          icon_url: local/icons/subaru.png
   description: Starts the Subaru and opens the garage door.
   icon: fapro:subaru
   mode: single

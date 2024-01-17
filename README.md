@@ -591,9 +591,8 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>148 Automations</summary>
+<details><summary>147 Automations</summary>
 
-- ⌚ [Pixel Watch] Charge Complete
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night (Disabled)

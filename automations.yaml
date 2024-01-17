@@ -782,10 +782,11 @@
   description: Actions when the washer is running and is done
   trigger:
   - platform: numeric_state
-    entity_id: sensor.emporiavue_washer_power
+    entity_id:
+    - sensor.emporiavue_washer_power
     for:
       minutes: 1
-    above: 10
+    above: 40
   condition: []
   action:
   - service: input_boolean.turn_on
@@ -4545,7 +4546,7 @@
     to: 'off'
     for:
       hours: 0
-      minutes: 1
+      minutes: 5
       seconds: 0
   condition: []
   action:
@@ -4563,8 +4564,9 @@
       - service: light.turn_off
         target:
           area_id: office
-        data: {}
-  mode: single
+        data:
+          transition: 20
+  mode: restart
 - id: '1704733260383'
   alias: ✴️ Office CO2 Levels
   description: Alerts when CO2 levels in the Office are high
@@ -4638,45 +4640,3 @@
       milliseconds: 0
   mode: single
   max_exceeded: silent
-- id: '1705012937411'
-  alias: ⌚ [Pixel Watch] Charge Complete
-  description: Sends notification when the Pixel Watch is done charging
-  trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.pixel_watch_joshua_battery_level
-    above: 90
-    id: joshua
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-  - platform: numeric_state
-    entity_id:
-    - sensor.pixel_watch_amy_battery_level
-    above: 90
-    id: amy
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-  condition:
-  - alias: Test if the watch is currently charging
-    condition: template
-    value_template: '{%- set battery_state = "sensor.pixel_watch_" ~ trigger.id ~
-      "_battery_state" -%}
-
-      {%- set charger_type = "sensor.pixel_watch_" ~ trigger.id ~ "_charger_type"
-      -%}
-
-      {{ is_state(battery_state, "charging") and is_state(charger_type, "wireless")
-      }}'
-  action:
-  - service: script.notify_mobile
-    data:
-      who: '{{ trigger.id }}'
-      title: Watch is Charged
-      message: Your watch is fully charged, you should take it off the charger
-      icon_url: local/icons/battery-charging-high.png
-  mode: parallel
-  max: 4
