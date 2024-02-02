@@ -12,7 +12,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Software
 
-<details><summary>8 Add-ons</summary>
+<details><summary>9 Add-ons</summary>
 
 - Mosquitto broker
 - ESPHome
@@ -22,6 +22,7 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 - UniFi Network Application
 - Zigbee2MQTT
 - Z-Wave JS UI
+- Govee to MQTT Bridge
 
 ---
 
@@ -297,7 +298,12 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v0.6.9-de6]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.6]
+
+Component to integrate with GasBuddy fuel price tracker.
+
+Authors: [@firstof9](https://github.com/firstof9).
+
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
@@ -308,12 +314,6 @@ Authors: [@simbaja](https://github.com/simbaja).
 Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
-
-### [Govee](https://github.com/LaggAt/hacs-govee) [v2023.11.1]
-
-A HACS repository for Govee light integration
-
-Authors: [@LaggAt](https://github.com/LaggAt).
 
 ### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.34.0]
 
@@ -597,7 +597,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>147 Automations</summary>
+<details><summary>148 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -650,6 +650,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 🎄 XMas Tree On/Off (Disabled)
 - 🏢 Office Day Mode
 - 🏢 Office Night Mode
+- 🐱 Cat Feeder Notification
 - 💡 All Lights off when Away
 - 💡 Dim Front Lights at Night
 - 💡 Front Lights off at Sunrise
