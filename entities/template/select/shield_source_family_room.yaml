@@ -7,22 +7,21 @@
 #
 select:
   - name: Shield Source Family Room
-    availability: '{{ has_value("media_player.shield_family_room") and has_value("media_player.androidtv_family_room") }}'
+    availability: '{{ has_value("media_player.androidtv_family_room") }}'
     state: |-
-      {%- from "variables.jinja" import androidtv %}
+      {%- from "variables.jinja" import androidtv_app_id %}
       {%- set source = state_attr('media_player.androidtv_family_room', 'app_id') | default('off', true) -%}
-      {%- set sources = androidtv() | from_json -%}
+      {%- set sources = androidtv_app_id() | from_json -%}
       {{ iif(source in sources, sources[source], source) }}
     options: |-
-      {%- from "variables.jinja" import androidtv %}
-      {{ (androidtv() | from_json).values() | list }}
+      {%- from "variables.jinja" import androidtv_app_id %}
+      {{ (androidtv_app_id() | from_json).values() | list }}
     select_option:
-      - service: media_player.select_source
+      - service: remote.turn_on
         target:
-          entity_id: media_player.shield_family_room
+          entity_id: remote.androidtv_family_room
         data:
           source: |-
-            {%- from "util.jinja" import dict_flip %}
-            {%- from "variables.jinja" import androidtv %}
-            {%- set sources = dict_flip(androidtv() | from_json) | from_json -%}
+            {%- from "variables.jinja" import androidtv_deeplink %}
+            {%- set sources = androidtv_deeplink() | from_json -%}
             {{ iif(option in sources, sources[option], option) }}
