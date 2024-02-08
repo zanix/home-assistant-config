@@ -32,9 +32,9 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2467
-Sensors        | 1078
-Binary Sensors | 209
+All Entities   | 2477
+Sensors        | 1090
+Binary Sensors | 207
 Lights         | 55
 Switches       | 115
 
@@ -292,7 +292,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.0.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.0.1]
 
 Frigate integration for Home Assistant
 
@@ -304,7 +304,7 @@ Component to integrate with GasBuddy fuel price tracker.
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v0.6.10-de0]
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v0.6.10]
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
@@ -346,7 +346,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Spook 👻 Not Your Homie](https://github.com/frenck/spook) [v2.1.1]
+### [Spook 👻 Not Your Homie](https://github.com/frenck/spook) [v2.1.2]
 
 Spook 👻 Not your homie
 
@@ -458,7 +458,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.4.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.4.2]
 
 Mushroom Cards - Build a beautiful dashboard easily 🍄
 
