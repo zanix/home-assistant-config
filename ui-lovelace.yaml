@@ -2264,7 +2264,6 @@ decluttering_templates:
               - media: '[[media]]'
               - name: Home
               - source: Home
-              - style: 'max-height: px !important;'
             type: vertical-stack
         type: custom:tabbed-card
       - artwork: material
@@ -2323,29 +2322,42 @@ decluttering_templates:
     - style: ''
   shield_remote_source:
     card:
-      card_mod:
-        style:
-          .: "ha-card {\n  [[style]]\n  min-height: 145px !important;\n  max-height:\
-            \ 145px !important;\n}\n"
-          mushroom-shape-icon$: ".shape {\n  --icon-size: [[icon_size]]px !important;\n\
-            \  --shape-color: none !important;\n  background-color: transparent !important;\n\
-            }\n"
-          mushroom-state-info$: ".primary {\n  color: [[icon_color]] !important;\n\
-            \  font-size: 1.04em !important;\n  text-align: start;\n  margin-top:\
-            \ -20px;\n  font-weight: 400 !important;\n  white-space: initial !important;\n\
-            }\n"
-      fill_container: true
-      icon: '[[icon]]'
-      icon_color: '[[icon_color]]'
-      layout: vertical
-      primary: '[[name]]'
-      tap_action:
-        data:
-          source: '[[source]]'
-        service: media_player.select_source
-        target:
-          entity_id: '[[media]]'
-      type: custom:mushroom-template-card
+      cards:
+      - card_mod:
+          style:
+            .: "ha-card {\n  transition: all 0s;\n  min-height: 145px !important;\n\
+              \  max-height: 145px !important;\n  [[style]]\n}\n"
+            mushroom-shape-icon$: ".shape {\n  --icon-size: 100px !important;\n  --shape-color:\
+              \ none !important;\n  background-color: transparent !important;\n}\n"
+            mushroom-state-info$: ".primary {\n  color: [[icon_color]] !important;\n\
+              \  font-size: 1.04em !important;\n  text-align: start;\n  margin-top:\
+              \ -20px;\n  font-weight: 400 !important;\n  white-space: initial !important;\n\
+              }\n"
+        fill_container: true
+        icon: '[[icon]]'
+        icon_color: '[[icon_color]]'
+        layout: vertical
+        primary: '[[name]]'
+        tap_action:
+          data:
+            source: '[[source]]'
+          service: media_player.select_source
+          target:
+            entity_id: '[[media]]'
+        type: custom:mushroom-template-card
+      - alignment: end
+        card_mod:
+          style: "ha-card {\n  position: absolute;\n  top: 0px;\n  right: 0px;\n \
+            \ --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-border-width:\
+            \ 0;\n}\n"
+        chips:
+        - entity: '[[media]]'
+          icon: "{% if is_state_attr(entity, \"source\", \"[[source]]\") %}\n  mdi:checkbox-blank-circle\n\
+            {% endif %}"
+          icon_color: '[[icon_color]]'
+          type: template
+        type: custom:mushroom-chips-card
+      type: custom:vertical-stack-in-card
     default:
     - icon: mdi:remote
     - icon_color: white
@@ -3068,9 +3080,10 @@ views:
           - chip:
               card_mod:
                 style:
-                  .: "ha-card:after {\n  content: \"!\";\n  position: absolute;\n\
-                    \  color: var(--red-color);\n  font-weight: bolder;\n  top: -2px;\n\
-                    \  right: 2px;\n  font-size: 12px;\n}\n"
+                  .: "ha-card:after {\n  content: \"{{ states(config.entity) | round(0)\
+                    \ }}\";\n  position: absolute;\n  color: var(--red-color);\n \
+                    \ font-weight: bolder;\n  top: -2px;\n  right: -2px;\n  font-size:\
+                    \ 12px;\n}\n"
               entity: sensor.water_softener_salt_monitor_salt_level
               icon: mdi:arrow-expand-vertical
               icon_color: cyan
@@ -3738,9 +3751,10 @@ views:
         icon: mdi:dishwasher
         icon_color: "{%- if is_state(entity, \"Pre Wash\") -%}\n  purple\n{%- elif\
           \ is_state(entity, \"Main Wash\") -%}\n  cyan\n{%- elif is_state(entity,\
-          \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Drying\") -%}\n\
-          \  orange\n{%- elif is_state(\"binary_sensor.ge_dishwasher_is_clean\", \"\
-          on\") -%}\n  green\n{%- else -%}\n  disabled\n{%- endif -%}"
+          \ \"Rinsing\") -%}\n  blue\n{%- elif is_state(entity, \"Sanitizing\") -%}\n\
+          \  light-blue\n{%- elif is_state(entity, \"Drying\") -%}\n  orange\n{%-\
+          \ elif is_state(\"binary_sensor.ge_dishwasher_is_clean\", \"on\") -%}\n\
+          \  green\n{%- else -%}\n  disabled\n{%- endif -%}"
         layout: vertical
         tap_action:
           action: more-info
@@ -6557,12 +6571,23 @@ views:
           type: custom:mushroom-template-card
         - bar_background: var(--disabled-color)
           bar_direction: rtl
+          bar_foreground: var(--lime-color)
+          bar_height: 12px
+          bar_radius: var(--ha-card-border-radius, 12px)
           compressed: true
           entities:
           - entity: timer.subaru_remote_start
             name: Timer
           filter: true
           invert: true
+          modifications:
+          - bar_foreground: var(--amber-color)
+            remaining: 00:03:00
+          - bar_foreground: var(--orange-color)
+            remaining: 00:02:00
+          - bar_foreground: var(--red-color)
+            remaining: 00:01:00
+          state_color: true
           type: custom:timer-bar-card
         type: custom:vertical-stack-in-card
       title-card-padding: 0em
@@ -9178,6 +9203,9 @@ views:
       - card:
           bar_background: var(--disabled-color)
           bar_direction: rtl
+          bar_foreground: var(--lime-color)
+          bar_height: 12px
+          bar_radius: var(--ha-card-border-radius, 12px)
           compressed: true
           entities:
           - active_state: 'on'
@@ -9190,10 +9218,13 @@ views:
           filter: true
           invert: true
           modifications:
-          - bar_foreground: orange
+          - bar_foreground: var(--amber-color)
             remaining: 00:30:00
-          - bar_foreground: red
+          - bar_foreground: var(--orange-color)
+            remaining: 00:20:00
+          - bar_foreground: var(--red-color)
             remaining: 00:10:00
+          state_color: true
           type: custom:timer-bar-card
         conditions:
         - condition: state
@@ -9203,6 +9234,9 @@ views:
       - card:
           bar_background: var(--disabled-color)
           bar_direction: rtl
+          bar_foreground: var(--lime-color)
+          bar_height: 12px
+          bar_radius: var(--ha-card-border-radius, 12px)
           compressed: true
           entities:
           - active_state: 'on'
@@ -9215,10 +9249,13 @@ views:
           filter: true
           invert: true
           modifications:
-          - bar_foreground: orange
+          - bar_foreground: var(--amber-color)
             remaining: 00:30:00
-          - bar_foreground: red
+          - bar_foreground: var(--orange-color)
+            remaining: 00:20:00
+          - bar_foreground: var(--red-color)
             remaining: 00:10:00
+          state_color: true
           type: custom:timer-bar-card
         conditions:
         - condition: state
@@ -9856,18 +9893,18 @@ views:
                 icon: mdi:solar-power-variant-outline
                 name: Solar
               - children:
+                - sensor.sol_ark_battery_house_used_power
+                color: var(--energy-battery-out-color)
+                entity_id: sensor.sol_ark_battery_power_out
+                icon: mdi:home-battery-outline
+                name: Battery
+              - children:
                 - sensor.sol_ark_grid_house_used_power
                 - sensor.sol_ark_grid_battery_used_power
                 color: var(--energy-grid-consumption-color)
                 entity_id: sensor.sol_ark_grid_power_in
                 icon: mdi:transmission-tower-export
                 name: Grid
-              - children:
-                - sensor.sol_ark_battery_house_used_power
-                color: var(--energy-battery-out-color)
-                entity_id: sensor.sol_ark_battery_power_out
-                icon: mdi:home-battery-outline
-                name: Battery
             - entities:
               - children:
                 - sensor.sol_ark_load_power
@@ -9880,9 +9917,9 @@ views:
                 entity_id: sensor.sol_ark_pv_battery_used_power
                 name: ' '
               - children:
-                - sensor.sol_ark_battery_power_in
-                color: var(--energy-grid-consumption-color)
-                entity_id: sensor.sol_ark_grid_battery_used_power
+                - sensor.sol_ark_load_power
+                color: var(--energy-battery-out-color)
+                entity_id: sensor.sol_ark_battery_house_used_power
                 name: ' '
               - children:
                 - sensor.sol_ark_load_power
@@ -9890,9 +9927,9 @@ views:
                 entity_id: sensor.sol_ark_grid_house_used_power
                 name: ' '
               - children:
-                - sensor.sol_ark_load_power
-                color: var(--energy-battery-out-color)
-                entity_id: sensor.sol_ark_battery_house_used_power
+                - sensor.sol_ark_battery_power_in
+                color: var(--energy-grid-consumption-color)
+                entity_id: sensor.sol_ark_grid_battery_used_power
                 name: ' '
               - children:
                 - sensor.sol_ark_grid_power_out
@@ -10468,18 +10505,18 @@ views:
                 icon: mdi:transmission-tower-export
                 name: Grid
             - entities:
-              - color: var(--energy-grid-return-color)
-                entity_id: sensor.sol_ark_grid_out_lifetime
-                icon: mdi:transmission-tower-import
-                name: Grid
-              - color: var(--energy-battery-in-color)
-                entity_id: sensor.sol_ark_battery_in_lifetime
-                icon: mdi:home-battery-outline
-                name: Battery
               - color: var(--energy-grid-consumption-color)
                 entity_id: sensor.sol_ark_load_lifetime
                 icon: mdi:home-import-outline
                 name: Home
+              - color: var(--energy-battery-in-color)
+                entity_id: sensor.sol_ark_battery_in_lifetime
+                icon: mdi:home-battery-outline
+                name: Battery
+              - color: var(--energy-grid-return-color)
+                entity_id: sensor.sol_ark_grid_out_lifetime
+                icon: mdi:transmission-tower-import
+                name: Grid
             show_icons: true
             show_names: true
             show_units: true
