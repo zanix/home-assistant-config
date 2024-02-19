@@ -2707,8 +2707,9 @@
   description: Sends a notification when the water softener salt level is low
   trigger:
   - platform: numeric_state
-    entity_id: sensor.water_softener_salt_monitor_salt_level
-    below: 30
+    entity_id:
+    - sensor.water_softener_salt_monitor_salt_level
+    below: 15
     for:
       hours: 24
   condition: []
@@ -4778,13 +4779,69 @@
     above: 1440
   condition: []
   action:
-  - service: script.notify_mobile
+  - parallel:
+    - service: script.notify_mobile
+      metadata: {}
+      data:
+        who: parents
+        title: Cat Feeder
+        message: The Cat feeder is nearly empty
+        notification_icon: mdi:paw
+        color: '#FF9800'
+        icon_url: local/icons/paw.png
+        actions:
+        - action: cat_feeder_full
+          title: Feeder Full
+        tag: cat-feeder
+    - service: script.notify_hass_agent
+      metadata: {}
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Cat Feeder
+        message: The Cat feeder is nearly empty
+        actions:
+        - action: cat_feeder_full
+          title: Feeder Full
+  mode: single
+- id: '1708236514239'
+  alias: ☑️ Cat Feeder Filled
+  description: Resets the cat feeder level when the action is pressed
+  trigger:
+  - platform: event
+    event_type: mobile_app_notification_action
+    event_data:
+      action: cat_feeder_full
+  - platform: event
+    event_type: hass_agent_notifications
+    event_data:
+      action: cat_feeder_full
+  condition: []
+  action:
+  - service: utility_meter.calibrate
     metadata: {}
     data:
-      who: parents
-      title: Cat Feeder Empty
-      message: The Cat feeder is nearly empty
-      notification_icon: mdi:paw
-      color: '#FF9800'
-      icon_url: local/icons/paw.png
+      value: '0'
+    target:
+      entity_id: sensor.cat_feeder_total_weight
+  - parallel:
+    - service: script.notify_mobile
+      metadata: {}
+      data:
+        who: parents
+        title: Cat Feeder
+        message: The Cat feeder was refilled
+        notification_icon: mdi:paw
+        color: '#FF9800'
+        icon_url: local/icons/paw.png
+        tag: cat-feeder
+    - service: script.notify_hass_agent
+      metadata: {}
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Cat Feeder
+        message: The Cat feeder was refilled
   mode: single

@@ -598,7 +598,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>148 Automations</summary>
+<details><summary>149 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -609,6 +609,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ⏯ Living Room Sound Mode
 - ⏯ Master Bedroom Media Auto Off
 - ⏯ PS4 Harmony Activity
+- ☑️ Cat Feeder Filled
 - ☑️ Close Garage Door
 - ☑️ Garbage Collection
 - ☑️ Ignore Door Alerts
