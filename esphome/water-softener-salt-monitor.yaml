@@ -5,16 +5,16 @@
 # Source: https://adonno.com/salt-level-sensor/
 # Source: https://www.chindemax.com/2020/10/14/walter-softener-salt-level-checker-uisng-nodemcu-homeassistant/
 
-esphome:
+substitutions:
   name: water-softener-salt-monitor
   friendly_name: Water Softener Salt Monitor
 
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
 esp8266:
   board: d1_mini
-
-substitutions:
-  device_name: "Water Softener Salt Monitor"
-  device_id: salt_monitor
 
 # Enable logging
 logger:
@@ -34,7 +34,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "AP"
+    ssid: "AP-${name}"
     password: !secret ap_password
     ap_timeout: 3min
 
@@ -80,7 +80,7 @@ sensor:
     trigger_pin: D1
     echo_pin: D2
     name: "Salt level raw"
-    id: "${device_id}_raw"
+    id: "${name}_raw"
     update_interval: 1min
     unit_of_measurement: "m"
     filters:
@@ -97,7 +97,7 @@ sensor:
     unit_of_measurement: "%"
     # ((Salt Height - Bottom) * 100 / (Max - Bottom)
     # Bottom should be the lowest level, usually the brine level.
-    lambda: return ((id(${device_id}_raw).state - 0.72) * 100) / (0.21 - 0.72);
+    lambda: return ((id(${name}_raw).state - 0.72) * 100) / (0.21 - 0.72);
 
   - platform: template
     name: "Salt level cm"
@@ -107,4 +107,4 @@ sensor:
     update_interval: 5min
     unit_of_measurement: "cm"
     # (Tank Height - Salt Height) * 100
-    lambda: return (0.93 - id(${device_id}_raw).state) * 100;
+    lambda: return (0.93 - id(${name}_raw).state) * 100;
