@@ -1942,9 +1942,10 @@
         -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.message
         -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.message
         -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow' in
-        trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'unknown' in
-        trigger.event.data.message -%}\n  I have no idea why. Please try again.\n{%
-        endif %}"
+        trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'otherCommandsOngoing'
+        in trigger.event.data.message -%}\n  Another command is in-progress.\n{%-
+        elif 'unknown' in trigger.event.data.message -%}\n  I have no idea why. Please
+        try again.\n{% endif %}"
   - parallel:
     - service: script.notify_mobile
       data:
@@ -4698,22 +4699,56 @@
   alias: ✴️ Office CO2 Levels
   description: Alerts when CO2 levels in the Office are high
   trigger:
-  - platform: state
+  - platform: numeric_state
     entity_id:
     - sensor.apollo_msr_1_bcbde8_co2
-  - platform: homeassistant
-    event: start
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    above: 2000
+    id: high
+  - platform: numeric_state
+    entity_id:
+    - sensor.apollo_msr_1_bcbde8_co2
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    above: 1500
+    below: 2000
+    id: medium
+  - platform: numeric_state
+    entity_id:
+    - sensor.apollo_msr_1_bcbde8_co2
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    below: 1500
+    above: 1000
+    id: low
+  - platform: numeric_state
+    entity_id:
+    - sensor.apollo_msr_1_bcbde8_co2
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    below: 1000
+    id: safe
   condition: []
   action:
   - choose:
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.apollo_msr_1_bcbde8_co2
-        above: 2000
+      - condition: trigger
+        id:
+        - high
       sequence:
       - service: esphome.apollo_msr_1_bcbde8_play_buzzer
         data:
           song_str: Cantina:d=4,o=5,b=250:8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p
+        enabled: false
       - service: light.turn_on
         data:
           rgb_color:
@@ -4724,10 +4759,9 @@
         target:
           entity_id: light.apollo_msr_1_bcbde8_rgb_light
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.apollo_msr_1_bcbde8_co2
-        above: 1500
-        below: 2000
+      - condition: trigger
+        id:
+        - medium
       sequence:
       - service: light.turn_on
         data:
@@ -4739,10 +4773,9 @@
         target:
           entity_id: light.apollo_msr_1_bcbde8_rgb_light
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.apollo_msr_1_bcbde8_co2
-        above: 1000
-        below: 1500
+      - condition: trigger
+        id:
+        - low
       sequence:
       - service: light.turn_on
         data:
@@ -4754,9 +4787,9 @@
         target:
           entity_id: light.apollo_msr_1_bcbde8_rgb_light
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.apollo_msr_1_bcbde8_co2
-        below: 1000
+      - condition: trigger
+        id:
+        - safe
       sequence:
       - service: light.turn_off
         target:
