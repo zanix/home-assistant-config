@@ -535,6 +535,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ### Sensor
 
+- [AirGradient One](https://www.airgradient.com/indoor/) - Indoor Air Quality Monitor
 - [Apollo MSR-1](https://shop.apolloautomation.cloud/products/multisensor-mk1) - mmWave CO2 Multisensor
 - [Aqara Door and Window Sensor](https://www.amazon.com/dp/B07D37VDM3)
 - [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
