@@ -12,14 +12,13 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 ## Software
 
-<details><summary>9 Add-ons</summary>
+<details><summary>8 Add-ons</summary>
 
 - Mosquitto broker
 - ESPHome
 - AdGuard Home
 - Advanced SSH & Web Terminal
 - Studio Code Server
-- UniFi Network Application
 - Zigbee2MQTT
 - Z-Wave JS UI
 - Govee to MQTT Bridge
@@ -32,11 +31,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 Description    | Value
 -------------- | --
-All Entities   | 2535
-Sensors        | 1147
+All Entities   | 2588
+Sensors        | 1151
 Binary Sensors | 207
-Lights         | 55
-Switches       | 115
+Lights         | 56
+Switches       | 128
 
 <details><summary>Stock Integrations</summary>
 
@@ -581,11 +580,11 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 - [Aeon Labs Z Wave Stick (GEN 5)](https://www.amazon.com/dp/B00X0AWA6E)
 - [SONOFF Zigbee 3.0 USB Dongle Plus Gateway](https://sonoff.tech/product/diy-smart-switch/sonoff-dongle-plus/)
-- [Ubiquiti Access Point WiFi 6 Pro](https://store.ui.com/collections/unifi-network-wireless/products/unifi-ap6-professional)
-- [Ubiquiti Switch 24 PoE (250W)](https://store.ui.com/collections/unifi-network-switching/products/unifiswitch-24-250w)
-- [Ubiquiti Switch 8](https://store.ui.com/collections/unifi-network-switching/products/unifi-switch-8)
-- [Ubiquiti Switch Flex Mini](https://store.ui.com/collections/unifi-network-switching/products/usw-flex-mini)
-- [Ubiquiti Unifi Security Gateway](https://store.ui.com/products/unifi-security-gateway)
+- [Ubiquiti Unifi Cloud Gateway Ultra](https://store.ui.com/us/en/products/ucg-ultra)
+- [Ubiquiti Switch 24 PoE (250W)](https://store.ui.com/us/en/collections/unifi-switching-standard-power-over-ethernet/products/us-24-250w)
+- [Ubiquiti Switch 8](https://store.ui.com/us/en/products/us-8)
+- [Ubiquiti Switch Flex Mini](https://store.ui.com/us/en/collections/unifi-switching-utility-mini/products/usw-flex-mini)
+- [Ubiquiti Access Point WiFi 6 Pro](https://store.ui.com/us/en/collections/unifi-wifi-flagship-high-capacity/products/u6-pro)
 
 ### Security
 
