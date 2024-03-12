@@ -261,7 +261,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>19 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.20.0]
 
@@ -356,12 +356,6 @@ Authors: [@frenck](https://github.com/frenck).
 Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
-
-### [Unifi Status](https://github.com/zvldz/unifi_status)
-
-High level health status of UniFi Security Gateway devices via UniFi Controller
-
-Authors: [@jchasey](https://github.com/jchasey), [@zvldz](https://github.com/zvldz).
 
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.1]
 
