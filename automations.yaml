@@ -4699,51 +4699,19 @@
   alias: ✴️ Office CO2 Levels
   description: Alerts when CO2 levels in the Office are high
   trigger:
-  - platform: numeric_state
+  - platform: state
     entity_id:
     - sensor.apollo_msr_1_bcbde8_co2
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    above: 2000
-    id: high
-  - platform: numeric_state
-    entity_id:
-    - sensor.apollo_msr_1_bcbde8_co2
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    above: 1500
-    below: 2000
-    id: medium
-  - platform: numeric_state
-    entity_id:
-    - sensor.apollo_msr_1_bcbde8_co2
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    below: 1500
-    above: 1000
-    id: low
-  - platform: numeric_state
-    entity_id:
-    - sensor.apollo_msr_1_bcbde8_co2
-    for:
-      hours: 0
-      minutes: 3
-      seconds: 0
-    below: 1000
-    id: safe
+    to:
+  - platform: homeassistant
+    event: start
   condition: []
   action:
   - choose:
     - conditions:
-      - condition: trigger
-        id:
-        - high
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        above: 1666
       sequence:
       - service: esphome.apollo_msr_1_bcbde8_play_buzzer
         data:
@@ -4759,9 +4727,10 @@
         target:
           entity_id: light.apollo_msr_1_bcbde8_rgb_light
     - conditions:
-      - condition: trigger
-        id:
-        - medium
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        above: 1333
+        below: 1666
       sequence:
       - service: light.turn_on
         data:
@@ -4773,9 +4742,10 @@
         target:
           entity_id: light.apollo_msr_1_bcbde8_rgb_light
     - conditions:
-      - condition: trigger
-        id:
-        - low
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        above: 700
+        below: 1333
       sequence:
       - service: light.turn_on
         data:
@@ -4787,9 +4757,9 @@
         target:
           entity_id: light.apollo_msr_1_bcbde8_rgb_light
     - conditions:
-      - condition: trigger
-        id:
-        - safe
+      - condition: numeric_state
+        entity_id: sensor.apollo_msr_1_bcbde8_co2
+        below: 700
       sequence:
       - service: light.turn_off
         target:
@@ -4803,8 +4773,8 @@
   mode: single
   max_exceeded: silent
 - id: '1706291631355'
-  alias: "\U0001F431 Cat Feeder Notification"
-  description: ''
+  alias: "\U0001F431 Cat Feeder Empty Notification"
+  description: Sends a notification when the Cat feeder is nearly empty
   trigger:
   - platform: numeric_state
     entity_id:
@@ -4877,4 +4847,34 @@
         - media_player.nasya
         title: Cat Feeder
         message: The Cat feeder was refilled
+  mode: single
+- id: '1709917613454'
+  alias: "\U0001F431 Cat Feeder Error"
+  description: Sends a notification when the Cat feeder has an error
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.cat_feeder_error
+    to: 'on'
+  condition: []
+  action:
+  - parallel:
+    - service: script.notify_mobile
+      metadata: {}
+      data:
+        who: parents
+        title: Cat Feeder Error
+        message: The Cat feeder is stuck
+        notification_icon: mdi:paw
+        color: '#FF0000'
+        icon_url: local/icons/paw.png
+        tag: cat-feeder
+    - service: script.notify_hass_agent
+      metadata: {}
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Cat Feeder Error
+        message: The Cat feeder is stuck
   mode: single

@@ -598,7 +598,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>149 Automations</summary>
+<details><summary>150 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -652,7 +652,8 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 🎄 XMas Tree On/Off (Disabled)
 - 🏢 Office Day Mode
 - 🏢 Office Night Mode
-- 🐱 Cat Feeder Notification
+- 🐱 Cat Feeder Empty Notification
+- 🐱 Cat Feeder Error
 - 💡 All Lights off when Away
 - 💡 Dim Front Lights at Night
 - 💡 Front Lights off at Sunrise
