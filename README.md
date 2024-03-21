@@ -592,7 +592,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>150 Automations</summary>
+<details><summary>154 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -673,6 +673,8 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 💬 Subaru Remote Start Expired Notification
 - 💬 Subaru Started
 - 💬 Window Left Open (Disabled)
+- 📅 Emma's Projector On/Off
+- 📅 Ethan's Projector On/Off
 - 📅 Garbage Collection Event Generator
 - 📅 Grow Light On/Off
 - 📅 Living Room Fan On/Off
@@ -739,6 +741,8 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 🖨️ Out of Paper
 - 🗺️ Arriving Home (Disabled)
 - 🗺️ Leaving Zone
+- 🚦 Emma Light Switch Status
+- 🚦 Ethan Light Switch Status
 - 🚦 Front Door Light Switch Status
 - 🚦 Garage Light Switch Status
 - 🚦 Office Light Switch Status
