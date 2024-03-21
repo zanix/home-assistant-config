@@ -694,10 +694,10 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 📦 Packages Delivered
 - 📦 Packages Out for Delivery
 - 📦 Update USPS Mail Camera
-- 📱 Smart Display Brightness on Lights On/Off
-- 📱 Smart Display Dim at Sunset
-- 📱 Smart Display On/Off Presence
-- 📱 Smart Display On/Off Schedule
+- 📱 MagicMirror Brightness on Lights On/Off
+- 📱 MagicMirror Dim at Sunset
+- 📱 MagicMirror On/Off Presence
+- 📱 MagicMirror On/Off Schedule
 - 🔑 Front Door Changed Code
 - 🔑 Front Door Decrement Access Count
 - 🔑 Front Door Lock Notifications
