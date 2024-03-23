@@ -1,0 +1,105 @@
+---
+# The amcrest camera platform allows you to integrate your Amcrest or Dahua IP
+# camera or doorbell
+#
+# https://www.home-assistant.io/integrations/amcrest
+#
+amcrest:
+  - host: !secret amcrest_host
+    username: !secret amcrest_username
+    password: !secret amcrest_password
+    name: Doorbell
+    resolution: low
+    stream_source: snapshot
+    binary_sensors:
+      - online
+
+# Shell command to get/change settings.
+shell_command:
+  doorbell_set_config: >-
+    curl \
+      -X GET \
+      -s --digest \
+      -u {{ username }}:{{ password }} \
+      'http://{{ ip_address }}/cgi-bin/configManager.cgi?action=setConfig&{{ setting }}={{ value }}'
+  doorbell_get_config: >-
+    curl \
+      -X GET \
+      -s --digest \
+      -u {{ username }}:{{ password }} \
+      'http://{{ ip_address }}/cgi-bin/configManager.cgi?action=getConfig&name={{ setting }}'
+
+# Binary sensor that triggers on the start/stop AlarmLocal event
+template:
+  - trigger:
+      - platform: event
+        event_type: amcrest
+        id: start
+        event_data:
+          camera: Doorbell
+          event: AlarmLocal
+          payload:
+            Code: AlarmLocal
+            action: Start
+      - platform: event
+        event_type: amcrest
+        id: stop
+        event_data:
+          camera: Doorbell
+          event: AlarmLocal
+          payload:
+            Code: AlarmLocal
+            action: Stop
+    binary_sensor:
+      - name: Doorbell Ring
+        icon: "{{ (trigger.platform == 'event') | iif('mdi:bell-ring', 'mdi:bell-outline') }}"
+        device_class: safety
+        state: >-
+          {{ iif(trigger.id == "start", "on", "off") }}
+
+  - trigger:
+      - platform: time_pattern
+        seconds: "/30"
+      - platform: homeassistant
+        event: start
+      - platform: event
+        event_type: event_template_reloaded
+    action:
+      - service: shell_command.doorbell_get_config
+        data:
+          ip_address: !secret amcrest_host
+          username: !secret amcrest_username
+          password: !secret amcrest_password
+          setting: ExternalDoorBell.Enable
+        response_variable: response
+    binary_sensor:
+      - name: Doorbell Chime
+        icon: '{{ iif(response["stdout"].split("=")[-1] == "true", "mdi:bell-ring", "mdi:bell-outline") }}'
+        device_class: connectivity
+        state: >-
+          {{ iif(response["stdout"].split("=")[-1] == "true", "on", "off") }}
+
+# Switch to control the mechanical door chime
+switch:
+  - platform: template
+    switches:
+      doorbell_chime:
+        friendly_name: Doorbell Chime
+        icon_template: '{{ is_state("binary_sensor.doorbell_chime", "on") | iif("mdi:bell-ring", "mdi:bell-outline") }}'
+        value_template: '{{ is_state("binary_sensor.doorbell_chime", "on") }}'
+        turn_on:
+          service: shell_command.doorbell_set_config
+          data:
+            ip_address: !secret amcrest_host
+            username: !secret amcrest_username
+            password: !secret amcrest_password
+            setting: ExternalDoorBell.Enable
+            value: 'true'
+        turn_off:
+          service: shell_command.doorbell_set_config
+          data:
+            ip_address: !secret amcrest_host
+            username: !secret amcrest_username
+            password: !secret amcrest_password
+            setting: ExternalDoorBell.Enable
+            value: 'false'

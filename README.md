@@ -31,11 +31,11 @@ If you want to back up your own Home Assistant configuration to GitHub, follow [
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2625 |
+| All Entities   | 2619 |
 | Sensors        | 1158 |
-| Binary Sensors | 209 |
-| Lights         | 60 |
-| Switches       | 130 |
+| Binary Sensors | 210 |
+| Lights         | 58 |
+| Switches       | 128 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -48,6 +48,10 @@ The AdGuard integration allows you to control and monitor your AdGuard Home inst
 ### [AirNow](https://www.home-assistant.io/integrations/airnow)
 
 The airnow integration uses the AirNow web service as a source for air quality data for your location
+
+### [Amcrest](https://www.home-assistant.io/integrations/amcrest)
+
+The amcrest camera platform allows you to integrate your Amcrest or Dahua IP camera or doorbell in Home Assistant.
 
 ### [Android Debug Bridge](https://www.home-assistant.io/integrations/androidtv)
 
@@ -261,7 +265,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>17 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.20.0]
 
@@ -272,12 +276,6 @@ Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://g
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
-
-### [Dahua](https://github.com/rroller/dahua) [v0.9.51]
-
-Dahua Camera and Doorbell Home Assistant Integration
-
-Authors: [@rroller](https://github.com/rroller).
 
 ### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
 
@@ -593,7 +591,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>155 Automations</summary>
+<details><summary>154 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -731,7 +729,6 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - 🔒 Front Door Re-lock after Unlock
 - 🔔 Doorbell Object or Ring
 - 🔔 Doorbell Ring
-- 🔔 Doorbell Unavailable
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
 - 🖥️ [Ardena] Power Actions
