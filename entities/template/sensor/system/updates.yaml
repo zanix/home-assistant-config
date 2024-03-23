@@ -10,10 +10,16 @@ sensor:
     icon: 'mdi:package-{{ iif(this.state | int(default=0) == 0, "check", "up") }}'
     state: '{{ this.attributes.get("entity_id", []) | count }}'
     attributes:
+      ignore: >-
+        {{ [
+          'update.plex_media_server_lantea'
+        ] }}
       entity_id: >-
+        {% set ignore = this.attributes.get('ignore', {}) %}
         {{ expand(states.update)
           | selectattr('state', '==', 'on')
           | map(attribute='entity_id')
+          | reject('in', ignore)
           | list
         }}
       in_progress: >-

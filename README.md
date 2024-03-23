@@ -523,6 +523,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - [Inovelli LZW30-SN Red Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-sn-spec-sheet)
 - [Inovelli VZM31-SN Blue Series Smart 2-1 Switch](https://inovelli.com/products/blue-series-smart-2-1-switch-on-off-or-dimmer)
 - [Philips Hue White Ambiance](https://www.amazon.com/dp/B0753H5GKN)
+- [Tuya Star Projector](https://solution.tuya.com/projects/CMamw6tl7mwgzm) - Light and laser projector, [hacked](https://github.com/seberm/esphome-SK20-Nebula-Light/tree/master) with [Tuya Cloudcutter](https://github.com/tuya-cloudcutter/tuya-cloudcutter)
 - [WLED](https://github.com/Aircoookie/WLED) - DIY light strip
 - [Zooz ZEN71 On-Off Switch](https://www.getzooz.com/zooz-zen71-on-off-switch/)
 
@@ -592,7 +593,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>154 Automations</summary>
+<details><summary>155 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -620,6 +621,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 - ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
 - ⚙️ Failed Login
 - ⚙️ RAM Usage High
+- ⚙️ Reload Addons and Integrations
 - ⚙️ Scan Interval (Disabled)
 - ⚙️ Startup
 - ⚙️ Update Database Filesize Sensor

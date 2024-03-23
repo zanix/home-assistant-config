@@ -1944,8 +1944,9 @@
         -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow' in
         trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'otherCommandsOngoing'
         in trigger.event.data.message -%}\n  Another command is in-progress.\n{%-
-        elif 'unknown' in trigger.event.data.message -%}\n  I have no idea why. Please
-        try again.\n{% endif %}"
+        elif 'never received' in trigger.event.data.message -%}\n  The message wasn't
+        recieved.\n{%- elif 'unknown' in trigger.event.data.message -%}\n  I have
+        no idea why. Please try again.\n{% endif %}"
   - parallel:
     - service: script.notify_mobile
       data:
@@ -4197,8 +4198,8 @@
               loitering: '{{ loiter_timer and event[''before''][''motionless_count'']
                 / fps / 60 < loiter_timer and event[''after''][''motionless_count'']
                 / fps / 60 >= loiter_timer }}'
-              new_snapshot: '{{ update_thumbnail and event[''before''][''snapshot_time'']
-                != event[''after''][''snapshot_time''] }}'
+              new_snapshot: '{{ update_thumbnail and event[''before''][''snapshot''][''frame_time'']
+                != event[''after''][''snapshot''][''frame_time''] }}'
               last_zones: '{{ event[''before''][''entered_zones''] | lower }}'
               entered_zones: '{{ event[''after''][''entered_zones''] | lower }}'
               zone_filter: '{{ not zones | length or zones | select(''in'', entered_zones)
@@ -4219,10 +4220,10 @@
                 | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
                 + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject |
                 first | default(true), true, false) }}"
-              sub_label: "{% if event['after']['sub_label'] %} \n  {{event['after']['sub_label'][0]}}\n{%else%}\n
-                \ {{event['after']['sub_label']}}\n{%endif%}\n"
-              sub_label_before: "{% if event['before']['sub_label'] %} \n  {{event['before']['sub_label'][0]}}\n{%else%}\n
-                \ {{event['before']['sub_label']}}\n{%endif%}\n"
+              sub_label: "{% if event['after']['sub_label'] %}\n  {{ event['after']['sub_label'][0]
+                }}\n{% else %}\n  {{ event['after']['sub_label'] }}\n{% endif %}\n"
+              sub_label_before: "{% if event['before']['sub_label'] %}\n  {{ event['before']['sub_label'][0]
+                }}\n{% else %}\n  {{ event['before']['sub_label'] }}\n{% endif %}\n"
               sub_label_changed: '{{ sub_label != sub_label_before }}'
               update: '{{ alert_once or (new_snapshot and not loitering and not zone_only_changed
                 and not entered_zones_changed and not sub_label_changed) }}'
@@ -4943,6 +4944,9 @@
     - conditions:
       - condition: trigger
         id: 'on'
+      - condition: state
+        entity_id: light.nebula_projector_emma_light
+        state: 'off'
       sequence:
       - service: switch.turn_on
         data: {}
@@ -4975,6 +4979,9 @@
     - conditions:
       - condition: trigger
         id: 'on'
+      - condition: state
+        entity_id: light.nebula_projector_ethan_light
+        state: 'off'
       sequence:
       - service: switch.turn_on
         data: {}
@@ -5055,3 +5062,22 @@
           effect: Pulse
           color: Red
   mode: restart
+- id: '1711138066935'
+  alias: ⚙️ Reload Addons and Integrations
+  description: Reload AddOns and Integrations since they don't work after Home Assistant
+    is restarted.
+  trigger:
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - service: hassio.addon_restart
+    metadata: {}
+    data:
+      addon: 45df7312_zigbee2mqtt
+  - service: homeassistant.reload_config_entry
+    metadata: {}
+    data: {}
+    target:
+      device_id: 4d8e4dbe89e0c2955f1faf921bc35550
+  mode: single
