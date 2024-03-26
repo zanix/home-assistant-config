@@ -1287,8 +1287,8 @@ decluttering_templates:
                             \ }})\n  {% else %}\n    var(--state-person-zone)\n  {%\
                             \ endif %};\n}\nha-card {\n  /* Remove default card styling\
                             \ without affecting child elements */\n  box-shadow: none;\n\
-                            \  border-width: 0;\n  border-radius: 0px 0px var(--ha-card-border-radius,\
-                            \ 12px) var(--ha-card-border-radius, 12px);\n  transition:\
+                            \  border-width: 0;\n  /*border-radius: 0px 0px var(--ha-card-border-radius,\
+                            \ 12px) var(--ha-card-border-radius, 12px);*/\n  transition:\
                             \ all 0s;\n}\nha-icon-button {\n  /* Position center button\
                             \ */\n  bottom: 12px;\n  left: 12px !important;\n  top:\
                             \ auto !important;\n\n  /* Style center button to match\
@@ -1308,15 +1308,15 @@ decluttering_templates:
                             \ avatar */\n  transform: rotate(45deg);\n  border-radius:\
                             \ 50%;\n}\n"
                           ha-map $: "path:first-child {\n  /* Style accuracy radius\
-                            \ */\n  stroke: var(--state-person);\n  fill: color-mix(in\
-                            \ srgb, var(--state-person) 50%, transparent);\n  stroke-width:\
-                            \ 0px;\n}\npath:nth-child(even) {\n  /* Styling for waypoints\
-                            \ */\n  stroke: var(--purple-color);\n  fill: var(--purple-color);\n\
-                            \  stroke-width: 4px;\n}\npath:nth-child(odd):not(:first-child)\
-                            \ {\n  /* Styling for lines */\n  stroke: var(--purple-color);\n\
-                            \  stroke-width: 4px;\n}\n.leaflet-control-attribution\
-                            \ {\n  /* Style attribution text */\n  background: rgba(var(--rgb-card-background-color),\
-                            \ 0.4) !important;\n  font-size: 10px;\n}\n.leaflet-container\
+                            \ */\n  fill: color-mix(in srgb, var(--state-person) 50%,\
+                            \ transparent);\n  stroke-width: 0px;\n}\npath:nth-child(even)\
+                            \ {\n  /* Styling for waypoints */\n  stroke: var(--primary-color);\n\
+                            \  fill: var(--primary-color);\n  stroke-width: 4px;\n\
+                            }\npath:nth-child(odd):not(:first-child) {\n  /* Styling\
+                            \ for lines */\n  stroke: var(--primary-color);\n  stroke-width:\
+                            \ 4px;\n}\n.leaflet-control-attribution {\n  /* Style\
+                            \ attribution text */\n  background: rgba(var(--rgb-card-background-color),\
+                            \ 0.2) !important;\n  font-size: 8px;\n}\n.leaflet-container\
                             \ a {\n  /* Set color of zoom icons & attribution text\
                             \ */\n  color: var(--secondary-text-color);\n}\n.leaflet-control-zoom-in,\n\
                             .leaflet-control-zoom-out {\n  /* Style zoom buttons like\
@@ -4719,27 +4719,41 @@ views:
                     tap_action:
                       action: more-info
           - type: custom:vertical-stack-in-card
+            card_mod:
+              style: "{% set state = states(\"device_tracker.ascent\") %}\n{% if state\
+                \ != \"home\" %}\nha-card {\n  {% if state == \"not_home\" %}\n  \
+                \  background: rgba(244, 67, 54, 0.2)\n  {% elif state in [\"unknown\"\
+                , \"unavailable\"] %}\n    background: rgba(189, 189, 189, 0.2)\n\
+                \  {% else %}\n    background: rgba(33, 150, 243, 0.2)\n  {% endif\
+                \ %};\n}\n{% endif %}\n"
             cards:
-              - type: custom:mushroom-entity-card
+              - type: custom:mushroom-template-card
                 entity: device_tracker.ascent
-                icon_type: entity-picture
+                primary: Ascent
+                secondary: '{{ states("sensor.ascent_odometer", with_unit=true) }}'
+                picture: '{{ state_attr(entity, "entity_picture") }}'
                 tap_action:
                   action: navigate
                   navigation_path: subaru
+                badge_icon: "{% if is_state(\"binary_sensor.ascent_trouble\", \"on\"\
+                  ) %}\n  mdi:alert\n{% endif %}"
+                badge_color: "{% if is_state(\"binary_sensor.ascent_trouble\", \"\
+                  on\") %}\n  red\n{% endif %}"
                 card_mod:
                   style:
                     .: "{% set state = states(config.entity) %}\n:host {\n  transition:\
                       \ all 0s;\n  --mush-card-primary-font-size: 16px;\n  --mush-card-secondary-font-size:\
                       \ 13px;\n  --mush-icon-size: 4.84em;\n  {% if not is_state(config.entity,\
-                      \ \"home\") %}\n  --ha-card-background:\n    {% if state ==\
-                      \ \"not_home\" %}\n      rgba(244, 67, 54, 0.05)\n    {% elif\
+                      \ \"home\") %}\n  --ha-card-background:\n    {% if is_state(config.entity,\
+                      \ \"not_home\") %}\n      rgba(244, 67, 54, 0.05)\n    {% elif\
                       \ state in [\"unknown\", \"unavailable\"] %}\n      rgba(189,\
                       \ 189, 189, 0.05)\n    {% else %}\n      rgba(33, 150, 243,\
                       \ 0.05)\n    {% endif %};\n  {% endif %}\n}\nha-card {\n  transition:\
                       \ all 0s;\n  padding-bottom: 0 !important;\n}\nmushroom-state-info\
                       \ {\n  z-index: 1;\n}\nmushroom-shape-avatar {\n  position:\
                       \ absolute;\n  top: -30px;\n  left: -10px;\n}\nmushroom-state-info\
-                      \ {\n  padding-left: 50px;\n  z-index: 1;\n}\n"
+                      \ {\n  padding-left: 50px;\n  z-index: 1;\n}\nmushroom-badge-icon\
+                      \ {\n  margin-right: -55px;\n  margin-top: -20px;\n}\n"
                     mushroom-shape-avatar$: "{% set timer = \"timer.subaru_remote_start\"\
                       \ %}\n{% if state_attr(timer, \"finishes_at\") %}\n.picture\
                       \ {\n  {% set remaining = (as_datetime(state_attr(timer, \"\
@@ -4753,6 +4767,11 @@ views:
                       \ 0% 100%);\n}\n{% endif %}\n"
               - type: custom:mushroom-chips-card
                 alignment: end
+                card_mod:
+                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                    \ rgba(var(--rgb-disabled), 0.1);\n  --chip-border-width: 0;\n\
+                    \  --chip-spacing: 1px;\n  margin-right: calc(var(--ha-card-border-radius,\
+                    \ 12px) / 2);\n}\n"
                 chips:
                   - type: template
                     entity: sensor.ascent_range
@@ -4782,17 +4801,6 @@ views:
                       action: none
                     double_tap_action:
                       action: none
-                card_mod:
-                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
-                    \ rgba(var(--rgb-disabled), 0.1);\n  --chip-border-width: 0;\n\
-                    \  --chip-spacing: 1px;\n  margin-right: calc(var(--ha-card-border-radius,\
-                    \ 12px) / 2);\n}\n"
-            card_mod:
-              style: "ha-card {\n  background:\n  {% set state = states(\"device_tracker.ascent\"\
-                ) %}\n  {% if state == \"not_home\" %}\n    rgba(244, 67, 54, 0.2)\n\
-                \  {% elif state in [\"unknown\", \"unavailable\"] %}\n    rgba(189,\
-                \ 189, 189, 0.2)\n  {% elif state != \"home\" %}\n    rgba(33, 150,\
-                \ 243, 0.2)\n  {% endif %};\n}\n"
       - type: vertical-stack
         cards:
           - type: conditional
@@ -6533,46 +6541,144 @@ views:
                 entity: sensor.ascent_odometer
               - type: entity
                 entity: sensor.ascent_avg_fuel_consumption
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: binary_sensor.ascent_trouble
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: binary_sensor.ascent_trouble
+                  icon_color: red
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Trouble Codes
+                        content:
+                          type: markdown
+                          content: "{%- set codes = {\n  \"ABS_MIL\": \"Anti-lock\
+                            \ Brake System\",\n  \"AHBL_MIL\": \"Automatic Headlight\
+                            \ Beam Leveller\",\n  \"ATF_MIL\": \"ATF\",\n  \"AWD_MIL\"\
+                            : \"AWD\",\n  \"BSDRCT_MIL\": \"Blind Spot Detection/Rear\
+                            \ Cross Traffic Alert\",\n  \"CEL_MIL\": \"Check Engine\
+                            \ Light\",\n  \"EBD_MIL\": \"Electronic Brake-force Distribution\"\
+                            ,\n  \"EOL_MIL\": \"EOL\",\n  \"EPAS_MIL\": \"Electric\
+                            \ Power Assisted Steering\",\n  \"EPB_MIL\": \"Electronic\
+                            \ Parking Brake\",\n  \"ESS_MIL\": \"Engine Start-Stop\"\
+                            ,\n  \"HEVCM_MIL\": \"HEVCM\",\n  \"HEV_MIL\": \"HEV\"\
+                            ,\n  \"OPL_MIL\": \"OPL\",\n  \"RAB_MIL\": \"Reverse Automatic\
+                            \ Braking\",\n  \"SRS_MIL\": \"Airbag System\",\n  \"\
+                            TEL_MIL\": \"Telematics\",\n  \"TPMS_MIL\": \"Tire Preassure\
+                            \ Monitoring\",\n  \"VDC_MIL\": \"Multi-mode Vehicle Dynamics\
+                            \ Control\",\n  \"WASH_MIL\": \"Washer Fluid\"\n} -%}\n\
+                            {%- set entity_id = \"binary_sensor.ascent_trouble\" -%}\n\
+                            {%- for attribute, value in states[entity_id].attributes.items()\
+                            \ -%}\n{%- if attribute in codes -%}\n- {{ codes[attribute]\
+                            \ }} ({{ attribute }})\n{% endif -%}\n{%- endfor -%}"
       - type: vertical-stack
         cards:
-          - type: custom:mushroom-entity-card
-            entity: device_tracker.ascent
-            layout: horizontal
-            icon_type: entity-picture
-            primary_info: state
-            secondary_info: none
-            tap_action:
-              action: none
-            hold_action:
-              action: none
-            card_mod:
-              style:
-                .: ":host {\n  /* Define Person State colors. Can be added to theme\
-                  \ */\n  --state-person-home: var(--green-color);\n  --state-person-not-home:\
-                  \ var(--red-color);\n  --state-person-zone: var(--blue-color);\n\
-                  \  --state-person-unknown: var(--grey-color);\n\n  /* Set Person\
-                  \ State color */\n  --state-person:\n  {% if is_state(config.entity,\
-                  \ ['home', 'not_home', 'unknown']) %}\n    var(--state-person-{{\
-                  \ states(config.entity) | replace('_', '-') }})\n  {% else %}\n\
-                  \    var(--state-person-zone)\n  {% endif %};\n\n  /* Match styling\
-                  \ to Mushroom Title */\n  --mush-card-primary-font-size: var(--mush-title-font-size,\
-                  \ 24px);\n  --mush-card-primary-font-weight: var(--mush-title-font-weight,\
-                  \ normal);\n  --mush-card-primary-line-height: var(--ush-title-line-height,\
-                  \ 1.2);\n  --mush-card-secondary-font-size: var(--mush-title-font-size,\
-                  \ 16px);\n  --mush-card-secondary-font-weight: var(--mush-title-font-weight,\
-                  \ normal);\n  --mush-card-secondary-line-height: var(--mush-title-line-height,\
-                  \ 1.2);\n}\nha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                  \ none;\n  box-shadow: none;\n  --ha-card-border-width: 0;\n\n \
-                  \ /* Increase icon size */\n  --icon-size: 72px;\n\n  /* Center\
-                  \ card */\n  margin: 10px auto;\n  width: fit-content;\n\n  /* Add\
-                  \ padding to bottom of card */\n  padding: 0px 0px var(--mush-title-spacing,\
-                  \ 12px) 0px !important;\n\n  /* Make card non-responsive to select\
-                  \ and pointer */\n  user-select: none;\n  pointer-events: none;\n\
-                  \n  transition: all 0s;\n}\n"
-                mushroom-shape-avatar$: ".picture {\n  /* Style shadow around avatar\
-                  \ */\n  background-color: var(--state-person);\n  box-shadow: 0\
-                  \ 0 4px 2px var(--state-person);\n  margin-right: var(--mush-title-spacing,\
-                  \ 12px);\n}\n"
+          - type: custom:layout-card
+            layout_type: custom:grid-layout
+            layout:
+              grid-template-columns: 100px max-content
+              grid-template-rows: auto
+              margin: 0
+              padding: 5px
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: device_tracker.ascent
+                primary_info: state
+                secondary_info: none
+                icon_type: entity-picture
+                layout: vertical
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                card_mod:
+                  style:
+                    .: ":host {\n  /* Define Person State colors. Can be added to\
+                      \ theme */\n  --state-person-home: var(--green-color);\n  --state-person-not-home:\
+                      \ var(--red-color);\n  --state-person-zone: var(--blue-color);\n\
+                      \  --state-person-unknown: var(--grey-color);\n\n  /* Set Person\
+                      \ State color */\n  --state-person:\n  {% if is_state(config.entity,\
+                      \ ['home', 'not_home', 'unknown']) %}\n    var(--state-person-{{\
+                      \ states(config.entity) | replace('_', '-') }})\n  {% else %}\n\
+                      \    var(--state-person-zone)\n  {% endif %};\n\n  /* Match\
+                      \ styling to Mushroom Title */\n  --mush-card-primary-font-size:\
+                      \ var(--mush-title-font-size, 24px);\n  --mush-card-primary-font-weight:\
+                      \ var(--mush-title-font-weight, normal);\n  --mush-card-primary-line-height:\
+                      \ var(--ush-title-line-height, 1.2);\n  --mush-card-secondary-font-size:\
+                      \ var(--mush-title-font-size, 16px);\n  --mush-card-secondary-font-weight:\
+                      \ var(--mush-title-font-weight, normal);\n  --mush-card-secondary-line-height:\
+                      \ var(--mush-title-line-height, 1.2);\n}\nha-card {\n    /*\
+                      \ Remove default card styling */\n  --ha-card-background: none;\n\
+                      \  box-shadow: none;\n  --ha-card-border-width: 0;\n\n  /* Increase\
+                      \ icon size */\n  --icon-size: 72px;\n\n  /* Center card */\n\
+                      \  # margin: 10px auto;\n  # width: fit-content;\n\n  /* Add\
+                      \ padding to bottom of card */\n  padding: 0px 0px var(--mush-title-spacing,\
+                      \ 12px) 0px !important;\n\n  /* Make card non-responsive to\
+                      \ select and pointer */\n  user-select: none;\n  pointer-events:\
+                      \ none;\n\n  transition: all 0s;\n}\n"
+                    mushroom-shape-avatar$: ".picture {\n  /* Style shadow around\
+                      \ avatar */\n  background-color: var(--state-person);\n  box-shadow:\
+                      \ 0 0 4px 2px var(--state-person);\n}\n"
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.ascent_avg_fuel_consumption
+                    layout: vertical
+                    name: MPG
+                    icon_color: green
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                          \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                          \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
+                          \  margin: auto;\n}\n"
+                  - type: custom:mushroom-template-card
+                    entity: binary_sensor.opengarage_vehicle
+                    layout: vertical
+                    primary: '{{ iif(is_state(entity, "on"), "In Garage", "Not in
+                      Garage") }}'
+                    icon: mdi:garage-variant
+                    icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                          \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                          \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
+                          \  margin: auto;\n}\n"
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.ascent_odometer
+                    layout: vertical
+                    name: Odometer
+                    icon_color: blue
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                          \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                          \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
+                          \  margin: auto;\n}\n"
+                  - type: custom:mushroom-template-card
+                    entity: sensor.maverik_regular_gas
+                    layout: vertical
+                    primary: Gas Price
+                    secondary: ${{ states(entity) }}/gal
+                    icon: mdi:gas-station
+                    icon_color: amber
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                          \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                          \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
+                          \  margin: auto;\n}\n"
           - type: custom:bar-card
             card_mod:
               style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n#states\
@@ -6607,60 +6713,6 @@ views:
               - color: var(--green-color)
                 from: 200
                 to: 345
-          - type: horizontal-stack
-            cards:
-              - type: custom:mushroom-entity-card
-                entity: sensor.ascent_avg_fuel_consumption
-                layout: vertical
-                name: MPG
-                icon_color: green
-                card_mod:
-                  style:
-                    .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                      \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
-                      \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
-                      \  margin: auto;\n}\n"
-              - type: custom:mushroom-template-card
-                entity: binary_sensor.opengarage_vehicle
-                layout: vertical
-                primary: '{{ iif(is_state(entity, "on"), "In Garage", "Not in Garage")
-                  }}'
-                icon: mdi:garage-variant
-                icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
-                tap_action:
-                  action: more-info
-                card_mod:
-                  style:
-                    .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                      \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
-                      \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
-                      \  margin: auto;\n}\n"
-              - type: custom:mushroom-entity-card
-                entity: sensor.ascent_odometer
-                layout: vertical
-                name: Odometer
-                icon_color: blue
-                card_mod:
-                  style:
-                    .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                      \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
-                      \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
-                      \  margin: auto;\n}\n"
-              - type: custom:mushroom-template-card
-                entity: sensor.maverik_regular_gas
-                layout: vertical
-                primary: Gas Price
-                secondary: ${{ states(entity) }}/gal
-                icon: mdi:gas-station
-                icon_color: amber
-                tap_action:
-                  action: more-info
-                card_mod:
-                  style:
-                    .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                      \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
-                      \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
-                      \  margin: auto;\n}\n"
           - type: custom:expander-card
             gap: 0em
             padding: 0em
@@ -6734,21 +6786,6 @@ views:
                       style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
                         }\n"
                   - type: entity
-                    entity: lock.ascent_door_locks
-                    name: Unlock
-                    icon: mdi:lock-open
-                    content_info: name
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: call-service
-                      service: lock.unlock
-                      target:
-                        entity_id: lock.ascent_door_locks
-                    card_mod:
-                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
-                        }\n"
-                  - type: entity
                     entity: button.ascent_remote_start
                     name: Remote Start
                     icon: mdi:key-wireless
@@ -6760,21 +6797,6 @@ views:
                       service: button.press
                       target:
                         entity_id: button.ascent_remote_start
-                    card_mod:
-                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
-                        }\n"
-                  - type: entity
-                    entity: button.ascent_remote_stop
-                    name: Remote Stop
-                    icon: mdi:stop-circle-outline
-                    content_info: name
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.ascent_remote_stop
                     card_mod:
                       style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
                         }\n"
@@ -6794,21 +6816,6 @@ views:
                       style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
                         }\n"
                   - type: entity
-                    entity: button.ascent_lights_stop
-                    name: Stop Flash Lights
-                    icon: mdi:lightbulb-off
-                    content_info: name
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: call-service
-                      service: button.press
-                      target:
-                        entity_id: button.ascent_lights_stop
-                    card_mod:
-                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
-                        }\n"
-                  - type: entity
                     entity: button.ascent_horn_start
                     name: Sound Horn
                     icon: mdi:volume-high
@@ -6820,6 +6827,51 @@ views:
                       service: button.press
                       target:
                         entity_id: button.ascent_horn_start
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+                  - type: entity
+                    entity: lock.ascent_door_locks
+                    name: Unlock
+                    icon: mdi:lock-open
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: lock.unlock
+                      target:
+                        entity_id: lock.ascent_door_locks
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+                  - type: entity
+                    entity: button.ascent_remote_stop
+                    name: Remote Stop
+                    icon: mdi:stop-circle-outline
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      target:
+                        entity_id: button.ascent_remote_stop
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+                  - type: entity
+                    entity: button.ascent_lights_stop
+                    name: Stop Flash Lights
+                    icon: mdi:lightbulb-off
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      target:
+                        entity_id: button.ascent_lights_stop
                     card_mod:
                       style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
                         }\n"
@@ -6841,7 +6893,8 @@ views:
               - type: custom:mushroom-chips-card
                 card_mod:
                   style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
-                    \ 1fr 1fr;\n  margin-top: 15px;\n}\n"
+                    \ max-content max-content;\n  margin-top: 15px;\n  place-content:\
+                    \ space-around !important;\n}\n"
                 chips:
                   - type: entity
                     entity: button.ascent_refresh
@@ -6894,9 +6947,9 @@ views:
                   \ states(config.entities[0].entity) | replace('_', '-') }})\n  {%\
                   \ else %}\n    var(--state-person-zone)\n  {% endif %};\n}\nha-card\
                   \ {\n  /* Remove default card styling without affecting child elements\
-                  \ */\n  box-shadow: none;\n  border-width: 0;\n  border-radius:\
+                  \ */\n  box-shadow: none;\n  border-width: 0;\n  /*border-radius:\
                   \ 0px 0px var(--ha-card-border-radius, 12px) var(--ha-card-border-radius,\
-                  \ 12px);\n  transition: all 0s;\n}\nha-icon-button {\n  /* Position\
+                  \ 12px);*/\n  transition: all 0s;\n}\nha-icon-button {\n  /* Position\
                   \ center button */\n  bottom: 12px;\n  left: 12px !important;\n\
                   \  top: auto !important;\n\n  /* Style center button to match Chip\
                   \ */\n  color: var(--deep-orange-color) !important;\n  background:\
@@ -6912,18 +6965,18 @@ views:
                   \ !important;\n}\n.entity-picture {\n  /* Correct orientation of\
                   \ person avatar */\n  transform: rotate(45deg);\n  border-radius:\
                   \ 50%;\n}\n"
-                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  stroke:\
-                  \ var(--state-person);\n  fill: color-mix(in srgb, var(--state-person)\
-                  \ 50%, transparent);\n  stroke-width: 0px;\n}\npath:nth-child(even)\
-                  \ {\n  /* Styling for waypoints */\n  stroke: var(--blue-color);\n\
+                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  fill:\
+                  \ color-mix(in srgb, var(--state-person) 50%, transparent);\n  stroke-width:\
+                  \ 0px;\n}\npath:nth-child(even) {\n  /* Styling for waypoints */\n\
+                  \  stroke: var(--primary-color);\n  fill: var(--primary-color);\n\
                   \  stroke-width: 4px;\n}\npath:nth-child(odd):not(:first-child)\
-                  \ {\n  /* Styling for lines */\n  stroke: var(--blue-color);\n \
-                  \ stroke-width: 4px;\n}\n.leaflet-control-attribution {\n  /* Style\
+                  \ {\n  /* Styling for lines */\n  stroke: var(--primary-color);\n\
+                  \  stroke-width: 4px;\n}\n.leaflet-control-attribution {\n  /* Style\
                   \ attribution text */\n  background: rgba(var(--rgb-card-background-color),\
-                  \ 0.4) !important;\n  font-size: 10px;\n}\n.leaflet-container a\
-                  \ {\n  /* Set color of zoom icons & attribution text */\n  color:\
-                  \ var(--secondary-text-color);\n}\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out\
-                  \ {\n  /* Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
+                  \ 0.2) !important;\n  font-size: 8px;\n}\n.leaflet-container a {\n\
+                  \  /* Set color of zoom icons & attribution text */\n  color: var(--secondary-text-color);\n\
+                  }\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out {\n  /*\
+                  \ Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
                   \ 19px) !important;\n  padding: 3px;\n  background: rgb(var(--rgb-secondary-text-color),\
                   \ 0.2) !important;\n  margin: 8px 12px 0px;\n  border: var(--ha-card-border-width,\
                   \ 1px) solid var(--ha-card-border-color, var(--divider-color, #e0e0e0))\
