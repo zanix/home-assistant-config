@@ -52,7 +52,7 @@
   action:
   - variables:
       tag: '{{ trigger.event.data.tag }}'
-      title: '{{ iif(tag == ''recycle_collection'', ''Recycling'', ''Garbage'') }}'
+      type: '{{ iif(tag == ''recycle_collection'', ''Recycling'', ''Garbage'') }}'
   - service: input_boolean.turn_on
     target:
       entity_id: input_boolean.{{ tag }}
@@ -60,8 +60,8 @@
     - service: script.notify_mobile
       data:
         who: parents
-        title: '{{ title }} Collection'
-        message: The {{ title }} can is at the curb
+        title: '{{ type }} Collection'
+        message: The {{ type }} can is at the curb
         notification_icon: '{{ trigger.event.data.notification_icon }}'
         color: '{{ trigger.event.data.color }}'
         icon_url: '{{ trigger.event.data.icon_url }}'
@@ -72,8 +72,8 @@
         entity:
         - media_player.erebus
         - media_player.nasya
-        title: '{{ title }} Collection'
-        message: The {{ title }} can is at the curb
+        title: '{{ type }} Collection'
+        message: The {{ type }} can is at the curb
   mode: single
 - id: '1665681528781'
   alias: ☑️ Ignore Door Alerts
@@ -248,9 +248,9 @@
       title: Water Main
       message: The water main has been turned back on after the leak was detected.
   - parallel:
-    - service: switch.turn_on
+    - service: valve.open_valve
       target:
-        entity_id: switch.water_main_valve
+        entity_id: valve.water_main_valve
       data: {}
     - service: script.notify_mobile
       data:
@@ -262,8 +262,9 @@
         notification_id: water-leak
   - wait_for_trigger:
     - platform: state
-      entity_id: switch.water_main_valve
-      to: 'on'
+      entity_id:
+      - valve.water_main_valve
+      to: open
     timeout: 00:00:30
   - parallel:
     - service: script.notify_mobile
@@ -2648,8 +2649,10 @@
       message: There is a water leak in the {{ location }} and the water main has
         been shut off.
   - parallel:
-    - service: switch.turn_off
-      entity_id: switch.water_main_valve
+    - service: valve.close_valve
+      target:
+        entity_id: valve.water_main_valve
+      data: {}
     - service: persistent_notification.create
       data:
         title: '{{ title }}'
@@ -2673,8 +2676,9 @@
         message: '{{ message }}'
   - wait_for_trigger:
     - platform: state
-      entity_id: switch.water_main_valve
-      to: 'off'
+      entity_id:
+      - valve.water_main_valve
+      to: closed
     timeout: 00:00:30
   - service: script.notify_mobile
     data:
@@ -3514,18 +3518,23 @@
   trigger:
   - platform: state
     entity_id:
-    - sensor.unifi_status_www
-  condition:
-  - condition: template
-    value_template: "{{ not trigger.from_state.state in [\"unknown\", \"unavailable\"]\n
-      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\"]\n  and trigger.from_state.state
-      != trigger.to_state.state }}"
+    - sensor.ucg_ultra_state
+    to: Connected
+    from: Disconnected
+    id: connected
+  - platform: state
+    entity_id:
+    - sensor.ucg_ultra_state
+    to: Disconnected
+    from:
+    id: disconnected
+  condition: []
   action:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: sensor.unifi_status_www
-        state: OK
+      - condition: trigger
+        id:
+        - connected
       sequence:
       - parallel:
         - service: script.notify_mobile
@@ -3553,33 +3562,38 @@
             - media_player.nasya
             title: Network
             message: The Internet is back up
-    default:
-    - parallel:
-      - service: script.notify_mobile
-        data:
-          who: parents
-          title: Network
-          message: The Internet is down
-          notification_icon: mdi:web
-          color: '#e91e63'
-          icon_url: local/icons/web.png
-          tag: unifi-www
-      - service: script.notify_pipup
-        data:
-          entity:
-          - media_player.shield_living_room
-          - media_player.shield_family_room
-          - media_player.shield_master_bedroom
-          title: Network
-          message: The Internet is down
-          icon_url: local/icons/web.png
-      - service: script.notify_hass_agent
-        data:
-          entity:
-          - media_player.erebus
-          - media_player.nasya
-          title: Network
-          message: The Internet is down
+    - conditions:
+      - condition: trigger
+        id:
+        - disconnected
+      sequence:
+      - parallel:
+        - service: script.notify_mobile
+          data:
+            who: parents
+            title: Network
+            message: The Internet is down
+            notification_icon: mdi:web
+            color: '#e91e63'
+            icon_url: local/icons/web.png
+            tag: unifi-www
+        - service: script.notify_pipup
+          data:
+            entity:
+            - media_player.shield_living_room
+            - media_player.shield_family_room
+            - media_player.shield_master_bedroom
+            title: Network
+            message: The Internet is down
+            icon_url: local/icons/web.png
+        - service: script.notify_hass_agent
+          data:
+            entity:
+            - media_player.erebus
+            - media_player.nasya
+            title: Network
+            message: The Internet is down
+    default: []
   mode: restart
 - id: '1673152651576'
   alias: "\U0001F4AC Subaru Started"
@@ -3657,54 +3671,6 @@
   action:
   - service: shell_command.pvoutputcurl
     data: {}
-  mode: single
-- id: '1674833464205'
-  alias: ⚡ Power Mode Changed
-  description: Sens a notification when the Power mode changes on the inverter.
-  trigger:
-  - platform: state
-    entity_id:
-    - sensor.sol_ark_device_mode
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      and not trigger.to_state.state in ["unknown", "unavailable"] }}'
-  action:
-  - service: ecobee.set_fan_min_on_time
-    data:
-      entity_id: climate.ecobee
-      fan_min_on_time: 0
-    enabled: false
-  - parallel:
-    - service: persistent_notification.create
-      data:
-        notification_id: power_mode
-        title: Power Mode Changed
-        message: The power mode changed to {{ trigger.to_state.state }}
-    - service: script.notify_mobile
-      data:
-        who: joshua
-        title: Power Mode Changed
-        notification_icon: mdi:lightning-bolt
-        color: '#ffeb3b'
-        icon_url: local/icons/lightning-bolt.png
-        message: The power mode changed to {{ trigger.to_state.state }}
-    - service: script.notify_hass_agent
-      data:
-        entity:
-        - media_player.erebus
-        title: Power Mode Changed
-        message: The power mode changed to {{ trigger.to_state.state }}
-    - service: script.notify_pipup
-      data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_master_bedroom
-        title: Power Mode Changed
-        icon_url: local/icons/lightning-bolt.png
-        message: The power mode changed to {{ trigger.to_state.state }}
-      enabled: false
   mode: single
 - id: '1677559331389'
   alias: "\U0001F5FA️ Leaving Zone"
@@ -4358,6 +4324,7 @@
   - service: hassio.backup_full
     data:
       compressed: false
+      location: Lantea
   mode: single
 - id: '1699834374599'
   alias: "\U0001F4C5 Living Room Fan On/Off"
@@ -4573,8 +4540,9 @@
   description: Sends a notification when Subaru fuel level is low
   trigger:
   - platform: numeric_state
-    entity_id: sensor.ascent_range
-    below: 30
+    entity_id:
+    - sensor.ascent_range
+    below: 31
     for:
       hours: 1
   condition: []
@@ -5013,4 +4981,86 @@
     data: {}
     target:
       device_id: 4d8e4dbe89e0c2955f1faf921bc35550
+  mode: single
+- id: '1711472015573'
+  alias: ⚡ Emergency Power Engaged
+  description: Battery is supplying power outside of ToU times.
+  trigger:
+  - platform: numeric_state
+    entity_id:
+    - sensor.sol_ark_battery_power
+    below: -200
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+  condition:
+  - condition: state
+    entity_id: schedule.tou_winter_peak
+    state: 'off'
+  - condition: state
+    entity_id: schedule.tou_summer_peak
+    state: 'off'
+  action:
+  - variables:
+      volume: '{{ iif(is_state(''schedule.quiet_hours'', ''on''), 40, 90) }}'
+      media_location: media-source://media_source/local/sounds/emergency_power_engaged.mp3
+      message: Battery is supplying power outside of ToU peak times.
+  - parallel:
+    - if:
+      - condition: state
+        entity_id: input_boolean.audio_notifications
+        state: 'on'
+      then:
+      - repeat:
+          for_each:
+          - media_player.cast_living_room_speaker
+          - media_player.cast_family_room_speaker
+          - media_player.cast_office_speaker
+          sequence:
+          - service: script.turn_on
+            target:
+              entity_id: script.media_play
+            data:
+              variables:
+                media_player: '{{ repeat.item }}'
+                media_location: '{{ media_location }}'
+                volume: '{{ volume }}'
+    - service: persistent_notification.create
+      data:
+        notification_id: power_mode
+        title: Emergency Power Engaged
+        message: '{{ message }}'
+    - service: script.notify_mobile
+      data:
+        who: parents
+        title: Emergency Power Engaged
+        message: '{{ message }}'
+        notification_icon: mdi:lightning-bolt
+        color: '#ffeb3b'
+        icon_url: local/icons/lightning-bolt.png
+        group: Power
+        tag: emergency-power
+        url: lovelace/power
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: Emergency Power Engaged
+        message: '{{ message }}'
+    - service: script.notify_pipup
+      data:
+        entity:
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_master_bedroom
+        title: Power Mode Changed
+        icon_url: local/icons/lightning-bolt.png
+        message: '{{ message }}'
+      enabled: false
+  - service: ecobee.set_fan_min_on_time
+    data:
+      entity_id: climate.ecobee
+      fan_min_on_time: 0
+    enabled: false
   mode: single

@@ -629,7 +629,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⚙️ Startup
 - ⚙️ Update Database Filesize Sensor
 - ⚙️ Updates Available
-- ⚡ Power Mode Changed
+- ⚡ Emergency Power Engaged
 - ⚡ PVOutput
 - ⚡ SolarAssistant Not Updating
 - ⚡ Tariff Summer Off-Peak
@@ -645,7 +645,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ✨ DreamScreen Scene Changed
 - ✴️ Office CO2 Levels
 - ✴️ Office Light On/Off Presence
-- 🌐 UniFi WAN Status
+- 🌐 UniFi WAN Status (Disabled)
 - 🍽️ Dishwasher is Done
 - 🎄 XMas Lights On/Off (Disabled)
 - 🎄 XMas Tree On/Off (Disabled)
