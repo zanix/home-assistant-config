@@ -3,26 +3,63 @@ blueprint:
   description: |
     Set LED effects for Inovelli Blue Series Switches using Zigbee2MQTT.
 
-    Features:
+    ℹ️ Version: 2024.4.0
 
-    - Select one or multiple devices, entities, or areas with Inovelli switches
+    To update this blueprint, read [Re-importing a blueprint](https://www.home-assistant.io/docs/automation/using_blueprints/#re-importing-a-blueprint)
+
+    ✨ Features:
+
+    - Select one or multiple devices, entities, floors, labels, or areas with Inovelli switches
     - Selectors for LED Number, Color, Brightness Level, Effect, and Duration
     - LED Number, Color, Effect, and Duration can accept direct values or the “friendly name” listed in the dropdown
     - Debug info to diagnose issues
       - Warning: Debug mode will create a persistent message for every entity called in the script plus 1
 
-    Supported Models:
+    ✅ Supported Models:
 
     - Inovelli 2-in-1 switch + dimmer (VZM31-SN)
     - Inovelli Fan Controller (VZM35-SN)
 
-    Forum: https://community.home-assistant.io/t/z2m-inovelli-blue-series-switch-led-notification-script-vzm31-sn-vzm35-sn/489620
+    💬 Forum: https://community.home-assistant.io/t/z2m-inovelli-blue-series-switch-led-notification-script-vzm31-sn-vzm35-sn/489620
 
-    GitHub: https://github.com/zanix/home-assistant-blueprints
+    📜 GitHub: https://github.com/zanix/home-assistant-blueprints
 
-    ℹ️ Version: 2023.10.3
+    ## Using this Blueprint
+
+    See [Using the Blueprint](https://community.home-assistant.io/t/z2m-inovelli-blue-series-switch-led-notification-script-vzm31-sn-vzm35-sn/489620#using-the-blueprint-13) in the forum topic.
+
+    > The main idea is you set the LED values when you call the script, the inputs below are for default values.
+
+    ## Default Values
+
+    The fields below are set as defaults for the instance of the script created from this blueprint.
+
   domain: script
+  author: zanixmechanix
+  homeassistant:
+    min_version: 2024.4.0
   source_url: https://github.com/zanix/home-assistant-blueprints/blob/main/script/inovelli_blue_led_zigbee2mqtt.yaml
+
+  input:
+    command_path_base:
+      name: Default Command Path Base
+      description: Set the base path for the MQTT command path. This is `zigbee2mqtt` by default.
+      default: zigbee2mqtt
+      selector:
+        text:
+    command_path_map:
+      name: Default Command Path Map
+      description: |
+        Map of Entity IDs with a MQTT command path map when HA and Z2M do not match up.
+
+        Enter a new row for each mapping:
+
+        ```
+        light.entity_name: "zigbee2mqtt/path/to/device/set"
+        ```
+      default: ""
+      selector:
+        object:
 
 fields:
   target:
@@ -181,12 +218,20 @@ fields:
       constant:
         value: true
         label: Enabled
+  command_path_base:
+    name: Command Path Base
+    description: |
+      Set the base path for the MQTT command path. This is 'zigbee2mqtt' by default.
+      This overrides the Blueprint input `command_path_base`.
+    selector:
+      text:
   command_path_map:
     name: Command Path Map
     description: |
       Map of Entity IDs with a MQTT command path map when HA and Z2M do not match up.
-      Enter a new row for each mapping: light.entity_name: "zigbee2mqtt/path/to/device/set"'.
-      You can also use a template but you need to use YAML mode to do so.
+      Enter a new row for each mapping: `light.entity_name: "zigbee2mqtt/path/to/device/set"`.
+      You can use a template but you need to use YAML mode to do so.
+      This overrides the Blueprint input `command_path_map`.
     selector:
       object:
 
@@ -202,14 +247,52 @@ variables:
     - VZM31-SN
     - VZM35-SN
 
-  # Create a list of provided targets (areas, devices, entities)
+  # Create a list of provided targets (floors, areas, labels, devices, entities)
   target: '{{ target|default([])|map(lower) }}'
+  floor: '{{ target.floor_id|default([])|lower }}'
   area: '{{ target.area_id|default([])|lower }}'
   device: '{{ target.device_id|default([])|lower }}'
   entity: '{{ target.entity_id|default([])|lower }}'
-  command_path_map: '{{ command_path_map|default([]) }}'
+  label: '{{ target.label_id|default([])|lower }}'
+
+  # Get default values set in the blueprint.
+  input_command_path_base: !input command_path_base
+  command_path_base: '{{ command_path_base|default(input_command_path_base|default("zigbee2mqtt")) }}'
+  input_command_path_map: !input command_path_map
+  command_path_map: '{{ command_path_map|default(input_command_path_map|default([])) }}'
+
+  # Parse target selector for entities
   entity_list: >
     {% set switch = namespace(entities=[]) %}
+
+    {# Floors #}
+    {% set floors = namespace(floors=[]) %}
+    {% if floor %}
+      {# Convert to a list #}
+      {% if ',' in floor %}
+        {% set floornum = floor.split(',') | count %}
+        {% for i in range(0, floornum) %}
+          {% set floors.floors = floors.floors + [floor.split(',')[i]|string|trim ] %}
+        {% endfor %}
+      {% elif floor[0]|count == 1 %}
+        {# if the first item in the list has only a single character, it can't be a valid entity #}
+        {% set floors.floors = floors.floors + [floor|string|trim] %}
+      {% else %}
+        {% set floors.floors = floor %}
+      {% endif %}
+      {# Detect switches #}
+      {% for floor in floors.floors %}
+        {% for area in floor_areas(floor) %}
+          {% for ent in area_entities(area) %}
+            {% for model in models %}
+              {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+                {% set switch.entities = switch.entities + [ent|string|trim] %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
 
     {# Areas #}
     {% set areas = namespace(areas=[]) %}
@@ -285,6 +368,33 @@ variables:
               {% set switch.entities = switch.entities + [ent|string|trim] %}
             {% endif %}
           {% endfor %}
+      {% endfor %}
+    {% endif %}
+
+    {# Labels #}
+    {% set labels = namespace(labels=[]) %}
+    {% if label %}
+      {# Convert to a list #}
+      {% if ',' in label %}
+        {% set labelnum = label.split(',') | count %}
+        {% for i in range(0, labelnum) %}
+          {% set labels.labels = labels.labels + [label.split(',')[i]|string|trim ] %}
+        {% endfor %}
+      {% elif label[0]|count == 1 %}
+        {# if the first item in the list has only a single character, it can't be a valid entity #}
+        {% set labels.labels = labels.labels + [label|string|trim] %}
+      {% else %}
+        {% set labels.labels = label %}
+      {% endif %}
+      {# Detect switches #}
+      {% for label in labels.labels %}
+        {% for ent in label_entities(label) %}
+          {% for model in models %}
+            {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+              {% set switch.entities = switch.entities + [ent|string|trim] %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
       {% endfor %}
     {% endif %}
 
@@ -453,6 +563,7 @@ sequence:
             level: {{ level }}
             effect: {{ effect }} ({{ effect_value }})
             duration: {{ duration }} ({{ duration_value }})
+            command_path_base: {{ command_path_base }}
             command_path_map: {{ command_path_map }}
 
   - alias: "Check for an empty entity list"
@@ -488,12 +599,15 @@ sequence:
       for_each: '{{ entity_list }}'
       sequence:
         - variables:
-            # Check for a command_path override.
+            device_identifier: >-
+              {% set identifiers = device_attr(repeat.item, "identifiers") | first %}
+              {{ identifiers[1].split('_')[1] }}
+            # Check for command_path override.
             command_path: >-
               {% if repeat.item in command_path_map %}
                 {{ command_path_map[repeat.item] }}
               {% else %}
-                zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set
+                {{ command_path_base }}/{{ device_identifier }}/set
               {% endif %}
 
         - alias: "Debug: Send notification"
@@ -508,6 +622,7 @@ sequence:
                 message: |-
                   entity: {{ repeat.item }}
                   device name: {{ device_attr(repeat.item, "name") }}
+                  device identifier: {{ device_identifier }}
                   topic: {{ command_path }}
                   payload: {{ payload }}
 
