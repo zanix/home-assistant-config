@@ -2985,32 +2985,27 @@ views:
                             card_config_version: 8
                             entity_apparent_temp: sensor.owm_daily_feels_like_temperature
                             entity_extended: sensor.forecast
-                            entity_forecast_icon: weather.owm_daily
-                            entity_forecast_icon_1: weather.owm_daily
+                            entity_forecast_icon: sensor.owm_daily_condition
                             entity_forecast_max: sensor.owm_daily_forecast_temperature
-                            entity_forecast_max_1: weather.owm_daily
                             entity_forecast_min: sensor.owm_daily_forecast_temperature_low
-                            entity_forecast_min_1: weather.owm_daily
                             entity_humidity: sensor.owm_daily_humidity
                             entity_pop: sensor.owm_daily_forecast_precipitation_probability
-                            entity_pop_1: weather.owm_daily
                             entity_pos: sensor.owm_daily_forecast_precipitation
-                            entity_pos_1: weather.owm_daily
                             entity_pressure: sensor.owm_daily_pressure
-                            entity_summary: weather.owm_daily
-                            entity_summary_1: weather.owm_daily
+                            entity_summary: sensor.owm_daily_condition
                             entity_sun: sun.sun
-                            entity_temperature: weather.owm_daily
+                            entity_temperature: sensor.owm_daily_temperature
                             entity_uv_alert_summary: sensor.owm_daily_uv_index
                             entity_visibility: sensor.owm_daily_visibility
                             entity_wind_bearing: sensor.owm_daily_wind_bearing
                             entity_wind_speed: sensor.owm_daily_wind_speed
-                            option_time_format: 12hour
                             section_order:
                               - overview
                               - extended
                               - slots
                               - daily_forecast
+                            show_section_daily_forecast: false
+                            show_section_slots: true
                             slot_l1: forecast_max
                             slot_l2: forecast_min
                             slot_l3: wind
@@ -3027,6 +3022,11 @@ views:
                             slot_r6: remove
                             slot_r7: remove
                             slot_r8: remove
+                          - type: weather-forecast
+                            show_current: false
+                            show_forecast: true
+                            entity: weather.owm_daily
+                            forecast_type: daily
                           - type: custom:layout-card
                             layout_type: custom:grid-layout
                             layout:
@@ -3304,13 +3304,13 @@ views:
                                     duration: 10min
                                   color_threshold:
                                     - value: 0
-                                      color: green
+                                      color: '#4caf50'
                                     - value: 700
-                                      color: yellow
+                                      color: '#ffeb3b'
                                     - value: 1333
-                                      color: orange
+                                      color: '#ff9800'
                                     - value: 1666
-                                      color: red
+                                      color: '#f44336'
                                 span:
                                   end: minute
                                 graph_span: 1d
@@ -3798,10 +3798,14 @@ views:
               - condition: numeric_state
                 entity: sensor.sol_ark_battery_state_of_charge
                 below: 100
-              - condition: numeric_state
-                entity: sensor.sol_ark_battery_power
-                above: 200
-                below: -200
+              - condition: or
+                conditions:
+                  - condition: numeric_state
+                    entity: sensor.sol_ark_battery_power
+                    above: 200
+                  - condition: numeric_state
+                    entity: sensor.sol_ark_battery_power
+                    below: -200
             card:
               type: custom:mushroom-template-card
               entity: sensor.sol_ark_battery_state_of_charge
@@ -4544,15 +4548,16 @@ views:
               - path: utility
               - chips:
                   - type: template
-                    entity: switch.water_main_valve
-                    icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
-                    icon: mdi:{{ iif(is_state(entity, "on"), "valve-open", "valve-closed")
+                    entity: valve.water_main_valve
+                    icon_color: '{{ iif(is_state(entity, "open"), "green", "red")
+                      }}'
+                    icon: mdi:{{ iif(is_state(entity, "open"), "valve-open", "valve-closed")
                       }}
                     tap_action:
                       action: none
                     card_mod:
                       style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n{% if is_state(config.entity,\
-                        \ \"off\") %}\n.content {\n  animation: phase 1.5s ease-out\
+                        \ \"closed\") %}\n.content {\n  animation: phase 1.5s ease-out\
                         \ infinite;\n}\n{% endif %}\n"
                   - type: template
                     entity: binary_sensor.water_leak_detected
@@ -4832,6 +4837,7 @@ views:
                       entity: light.xmas
                       name: Outside
                       icon: mdi:string-lights
+                      vertical: true
   - title: Living
     theme: Backend-selected
     path: living
@@ -4934,16 +4940,20 @@ views:
             name: Main
             features:
               - type: light-brightness
-          - type: tile
-            entity: light.living_room_lamp
-            name: Lamp
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.living_room_floor_lamp
-            name: Floor Lamp
-            features:
-              - type: light-brightness
+          - type: grid
+            square: false
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.living_room_lamp
+                name: Lamp
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.living_room_floor_lamp
+                name: Floor Lamp
+                features:
+                  - type: light-brightness
           - type: grid
             square: false
             columns: 3
@@ -4951,12 +4961,15 @@ views:
               - type: tile
                 entity: light.hallway
                 name: Hallway
+                vertical: true
               - type: tile
                 entity: light.front_entry
                 name: Entry
+                vertical: true
               - type: tile
                 entity: light.garage_entry
                 name: Garage Entry
+                vertical: true
           - type: tile
             entity: fan.living_room_ceiling
             name: Fan
@@ -5199,6 +5212,14 @@ views:
               - title: Lights
               - chips:
                   - type: template
+                    entity: script.family_room_game_light_mode
+                    icon: mdi:light-flood-up
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  amber\n{%-\
+                      \ else -%}\n  grey\n{%- endif -%}"
+                    tap_action:
+                      action: call-service
+                      service: script.family_room_game_light_mode
+                  - type: template
                     entity: light.family_room_lights
                     content: '{{ expand(entity) | selectattr("state", "==", "on")
                       | list | count }} / {{ expand(entity) | list | count }}'
@@ -5206,39 +5227,29 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - type: tile
-            entity: light.family_room
-            name: Main
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.play_space
-            name: Play Space
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.family_room_lamp
-            name: Lamp
-            features:
-              - type: light-brightness
           - type: grid
             square: false
             columns: 2
             cards:
               - type: tile
+                entity: light.family_room
+                name: Main
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.play_space
+                name: Play Space
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.family_room_lamp
+                name: Lamp
+                features:
+                  - type: light-brightness
+              - type: tile
                 entity: light.stairway
                 name: Stairs
-              - type: custom:mushroom-template-card
-                primary: Game Lighting
-                secondary: Set lighting for Games
-                icon: mdi:light-flood-up
-                icon_color: "{%- if is_state(entity, \"on\") -%}\n  amber\n{%- else\
-                  \ -%}\n  grey\n{%- endif -%}"
-                entity: script.family_room_game_light_mode
-                tap_action:
-                  action: call-service
-                  service: script.family_room_game_light_mode
-                  target: {}
+                vertical: true
       - type: vertical-stack
         cards:
           - type: custom:mushroom-title-card
@@ -5571,18 +5582,18 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - type: tile
-            entity: light.office
-            name: Main
-            features:
-              - type: light-brightness
-            state_content:
-              - brightness
-              - color_temp_kelvin
           - type: grid
             square: false
             columns: 2
             cards:
+              - type: tile
+                entity: light.office
+                name: Main
+                features:
+                  - type: light-brightness
+                state_content:
+                  - brightness
+                  - color_temp_kelvin
               - type: tile
                 entity: light.office_lamp
                 name: Lamp
@@ -5599,9 +5610,9 @@ views:
                 state_content:
                   - brightness
                   - effect
-          - type: tile
-            entity: light.office_shelf_led
-            name: Shelf
+              - type: tile
+                entity: light.office_shelf_led
+                name: Shelf
       - type: custom:mini-media-player
         entity: media_player.cast_office_speaker
         name: Google Home
@@ -5673,82 +5684,130 @@ views:
         cards:
           - type: custom:mushroom-title-card
             title: Luna
-          - type: custom:mushroom-template-card
-            primary: Feed Luna
-            secondary: Press and Hold to Dispense
-            entity: script.feeder_start
-            icon: mdi:cat
-            icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else -%}\n\
-              \  grey\n{%- endif -%}"
-            tap_action:
-              action: none
-            hold_action:
-              action: call-service
-              service: script.feeder_start
-              data:
-                feeder: Cat Feeder
-          - type: custom:mushroom-number-card
-            entity: number.cat_feeder_serving_size
-            name: Servings
-            icon: mdi:location-enter
-            secondary_info: none
-            layout: horizontal
-            display_mode: buttons
-          - type: custom:mushroom-lock-card
-            entity: lock.cat_feeder_child_lock
-            name: Local Control
-            fill_container: false
-            layout: horizontal
-          - graph: line
-            type: sensor
-            entity: sensor.cat_feeder_weight_per_day
-            name: Daily Weight
-            icon: mdi:food
-            hours_to_show: 48
-            detail: 1
-          - type: custom:bar-card
-            card_mod:
-              style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n#states\
-                \ {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n  font-weight:\
-                \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
-                }\n"
-            name: Food Level
-            entities:
-              - entity: sensor.cat_feeder_food_level
-            animation:
-              state: 'on'
-            positions:
-              indicator: inside
-              icon: inside
-            height: 24px
-            min: 0
-            max: 100
-            decimal: 1
-            severity:
-              - color: var(--red-color)
-                from: 0
-                to: 10
-              - color: var(--orange-color)
-                from: 10
-                to: 20
-              - color: var(--amber-color)
-                from: 20
-                to: 40
-              - color: var(--light-green-color)
-                from: 40
-                to: 70
-              - color: var(--green-color)
-                from: 70
-                to: 100
-          - type: markdown
-            content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n{%- set\
-              \ schedules = states(\"sensor.cat_feeder_schedule\") | replace(\"'\"\
-              , '\"') | from_json -%}\n{%- for schedule in schedules -%}\n  {{ schedule.size\
-              \ }} portions at {{ as_timestamp(today_at(schedule.hour ~ \":\" ~ schedule.minute))\
-              \ | timestamp_custom(\"%-I:%M %p\", True) }}\n{% endfor -%}\n{%- endif\
-              \ -%}"
-            title: Schedule
+          - type: custom:expander-card
+            gap: 0em
+            padding: 0em
+            child-padding: 0.5em
+            title-card-padding: 0em
+            title-card:
+              type: custom:mushroom-template-card
+              primary: Feed Luna
+              secondary: Press and Hold to Dispense
+              entity: script.feeder_start
+              icon: mdi:cat
+              icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- else\
+                \ -%}\n  grey\n{%- endif -%}"
+              tap_action:
+                action: none
+              hold_action:
+                action: call-service
+                service: script.feeder_start
+                data:
+                  feeder: Cat Feeder
+            cards:
+              - type: custom:mushroom-number-card
+                entity: number.cat_feeder_serving_size
+                name: Servings
+                icon: mdi:location-enter
+                secondary_info: none
+                layout: horizontal
+                display_mode: buttons
+              - type: custom:mushroom-lock-card
+                entity: lock.cat_feeder_child_lock
+                name: Local Control
+                fill_container: false
+                layout: horizontal
+              - type: markdown
+                title: Schedule
+                content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n{%-\
+                  \ set schedules = states(\"sensor.cat_feeder_schedule\") | replace(\"\
+                  '\", '\"') | from_json -%}\n{%- for schedule in schedules -%}\n\
+                  \  {{ schedule.size }} portions at {{ as_timestamp(today_at(schedule.hour\
+                  \ ~ \":\" ~ schedule.minute)) | timestamp_custom(\"%-I:%M %p\",\
+                  \ True) }}\n{% endfor -%}\n{%- endif -%}"
+              - type: custom:bar-card
+                card_mod:
+                  style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n\
+                    #states {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value\
+                    \ {\n  font-weight: 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                    }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
+                    }\n"
+                name: Food Level
+                entities:
+                  - entity: sensor.cat_feeder_food_level
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                  icon: inside
+                height: 24px
+                min: 0
+                max: 100
+                decimal: 1
+                severity:
+                  - color: var(--red-color)
+                    from: 0
+                    to: 10
+                  - color: var(--orange-color)
+                    from: 10
+                    to: 20
+                  - color: var(--amber-color)
+                    from: 20
+                    to: 40
+                  - color: var(--light-green-color)
+                    from: 40
+                    to: 70
+                  - color: var(--green-color)
+                    from: 70
+                    to: 100
+              - type: custom:apexcharts-card
+                apex_config:
+                  chart:
+                    foreColor: '#7B7B7B'
+                    toolbar:
+                      show: false
+                  grid:
+                    borderColor: '#7B7B7B'
+                  xaxis:
+                    tooltip:
+                      enabled: false
+                experimental:
+                  color_threshold: true
+                header:
+                  show: false
+                all_series_config:
+                  extend_to: now
+                  stroke_width: 2
+                  type: line
+                  group_by:
+                    func: min
+                    duration: 1hour
+                  color_threshold:
+                    - value: 0
+                      color: '#f44336'
+                    - value: 10
+                      color: '#ff9800'
+                    - value: 20
+                      color: '#ffc107'
+                    - value: 40
+                      color: '#8bc34a'
+                    - value: 70
+                      color: '#4caf50'
+                span:
+                  end: minute
+                graph_span: 10d
+                yaxis:
+                  - decimals: 0
+                    min: ~0
+                    max: ~100
+                    apex_config:
+                      tickAmount: 4
+                      title:
+                        text: '%'
+                series:
+                  - entity: sensor.cat_feeder_food_level
+                    name: Food Level
+                    color: rgb(158,158,158)
   - title: Master
     theme: Backend-selected
     path: master
@@ -5815,16 +5874,20 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - type: tile
-            entity: light.master_bedroom
-            name: Main
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.master_bedroom_floor_lamp
-            name: Floor Lamp
-            features:
-              - type: light-brightness
+          - type: grid
+            square: false
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.master_bedroom
+                name: Main
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.master_bedroom_floor_lamp
+                name: Floor Lamp
+                features:
+                  - type: light-brightness
           - type: tile
             entity: fan.master_bedroom_ceiling
             name: Fan
@@ -6021,11 +6084,11 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - features:
-              - type: light-brightness
-            type: tile
+          - type: tile
             entity: light.ethan
             name: Main
+            features:
+              - type: light-brightness
       - type: vertical-stack
         cards:
           - type: custom:mushroom-title-card
@@ -6041,12 +6104,12 @@ views:
                 name: Light
                 features:
                   - type: light-brightness
-              - features:
-                  - type: light-brightness
-                type: tile
+              - type: tile
                 entity: light.nebula_projector_ethan_laser
                 name: Laser
                 color: green
+                features:
+                  - type: light-brightness
           - type: conditional
             conditions:
               - entity: switch.nebula_projector_ethan_main_switch
@@ -6142,12 +6205,12 @@ views:
                 name: Light
                 features:
                   - type: light-brightness
-              - features:
-                  - type: light-brightness
-                type: tile
+              - type: tile
                 entity: light.nebula_projector_emma_laser
                 name: Laser
                 color: green
+                features:
+                  - type: light-brightness
           - type: conditional
             conditions:
               - entity: switch.nebula_projector_emma_main_switch
@@ -6267,11 +6330,11 @@ views:
           - type: tile
             entity: light.garage
             name: Main
-      - features:
-          - type: cover-open-close
-        type: tile
+      - type: tile
         entity: cover.opengarage
         color: green
+        features:
+          - type: cover-open-close
         state_content:
           - state
           - last-changed
@@ -6412,48 +6475,107 @@ views:
                 - state: unknown
           - type: custom:mushroom-template-card
             primary: Water Main Valve
-            secondary: "{%- if is_state(entity, \"on\") -%}\n  Press and Hold to close\n\
-              {%- elif is_state(entity, \"off\") -%}\n  Press and Hold to open\n{%-\
-              \ endif -%}"
-            entity: switch.water_main_valve
-            icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:valve-open\n{%- elif\
-              \ is_state(entity, \"off\") -%}\n  mdi:valve-closed\n{%- else -%}\n\
+            secondary: "{%- if is_state(entity, \"open\") -%}\n  Press and hold to\
+              \ close\n{%- elif is_state(entity, \"closed\") -%}\n  Press and hold\
+              \ to open\n{%- endif -%}"
+            entity: valve.water_main_valve
+            icon: "{%- if is_state(entity, \"open\") -%}\n  mdi:valve-open\n{%- elif\
+              \ is_state(entity, \"closed\") -%}\n  mdi:valve-closed\n{%- else -%}\n\
               \  mdi:valve\n{%- endif -%}"
-            icon_color: "{%- if is_state(entity, \"on\") -%}\n  green\n{%- elif is_state(entity,\
-              \ \"off\") -%}\n  red\n{%- else -%}\n  grey\n{%- endif -%}"
+            icon_color: "{%- if is_state(entity, \"open\") -%}\n  green\n{%- elif\
+              \ is_state(entity, \"closed\") -%}\n  red\n{%- else -%}\n  grey\n{%-\
+              \ endif -%}"
             tap_action:
               action: more-info
             hold_action:
               action: toggle
-          - type: custom:bar-card
-            card_mod:
-              style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n  text-shadow:\
-                \ 1px 1px var(--primary-background-color);\n}\n"
-            name: Water Softener Salt Level
-            entities:
-              - entity: sensor.water_softener_salt_monitor_salt_level
-                name: Water Softener Salt Level
-            decimal: 1
-            animation:
-              state: 'on'
-            positions:
-              indicator: inside
-            severity:
-              - color: var(--red-color)
-                from: 0
-                to: 10
-              - color: var(--orange-color)
-                from: 10
-                to: 20
-              - color: var(--amber-color)
-                from: 20
-                to: 40
-              - color: var(--light-green-color)
-                from: 40
-                to: 70
-              - color: var(--green-color)
-                from: 70
-                to: 100
+          - type: custom:expander-card
+            gap: 0em
+            padding: 0em
+            child-padding: 0.5em
+            title-card-padding: 0em
+            title-card:
+              type: custom:bar-card
+              card_mod:
+                style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n#states\
+                  \ {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n\
+                  \  font-weight: 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                  }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
+                  }\n"
+              name: Water Softener Salt Level
+              entities:
+                - entity: sensor.water_softener_salt_monitor_salt_level
+                  name: Water Softener Salt Level
+              decimal: 1
+              animation:
+                state: 'on'
+              positions:
+                indicator: inside
+              severity:
+                - color: var(--red-color)
+                  from: 0
+                  to: 10
+                - color: var(--orange-color)
+                  from: 10
+                  to: 20
+                - color: var(--amber-color)
+                  from: 20
+                  to: 40
+                - color: var(--light-green-color)
+                  from: 40
+                  to: 70
+                - color: var(--green-color)
+                  from: 70
+                  to: 100
+            cards:
+              - type: custom:apexcharts-card
+                apex_config:
+                  chart:
+                    foreColor: '#7B7B7B'
+                    toolbar:
+                      show: false
+                  grid:
+                    borderColor: '#7B7B7B'
+                  xaxis:
+                    tooltip:
+                      enabled: false
+                experimental:
+                  color_threshold: true
+                header:
+                  show: false
+                all_series_config:
+                  extend_to: now
+                  stroke_width: 2
+                  type: line
+                  group_by:
+                    func: min
+                    duration: 1hour
+                  color_threshold:
+                    - value: 0
+                      color: '#f44336'
+                    - value: 10
+                      color: '#ff9800'
+                    - value: 20
+                      color: '#ffc107'
+                    - value: 40
+                      color: '#8bc34a'
+                    - value: 70
+                      color: '#4caf50'
+                span:
+                  end: minute
+                graph_span: 10d
+                yaxis:
+                  - decimals: 0
+                    min: ~0
+                    max: ~100
+                    apex_config:
+                      tickAmount: 4
+                      title:
+                        text: '%'
+                series:
+                  - entity: sensor.water_softener_salt_monitor_salt_level
+                    name: Salt Level
+                    color: rgb(158,158,158)
       - type: vertical-stack
         cards:
           - type: custom:mushroom-title-card
@@ -8534,12 +8656,15 @@ views:
               - type: tile
                 entity: light.hallway
                 name: Hallway
+                vertical: true
               - type: tile
                 entity: light.front_entry
                 name: Entry
+                vertical: true
               - type: tile
                 entity: light.garage_entry
                 name: Garage Entry
+                vertical: true
           - type: tile
             entity: fan.living_room_ceiling
             name: Fan
@@ -8593,12 +8718,19 @@ views:
                       action: toggle
           - type: tile
             entity: light.kitchen
-            name: Kitchen
+            name: Main
             features:
               - type: light-brightness
-          - type: tile
-            entity: light.dining_room
-            name: Dining
+          - type: grid
+            square: false
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.dining_room
+                name: Dining
+              - type: tile
+                entity: switch.grow_light
+                name: Grow Light
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
@@ -8641,28 +8773,38 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - type: tile
-            entity: light.office
-            name: Main
-            features:
-              - type: light-brightness
           - type: grid
             square: false
             columns: 2
             cards:
               - type: tile
+                entity: light.office
+                name: Main
+                features:
+                  - type: light-brightness
+                state_content:
+                  - brightness
+                  - color_temp_kelvin
+              - type: tile
                 entity: light.office_lamp
                 name: Lamp
                 features:
                   - type: light-brightness
+                state_content:
+                  - brightness
+                  - color_temp_kelvin
               - type: tile
                 entity: light.wled_office_desk
                 name: Desk
                 features:
                   - type: light-brightness
-          - type: tile
-            entity: light.office_shelf_led
-            name: Shelf
+                state_content:
+                  - brightness
+                  - effect
+              - type: tile
+                entity: light.office_shelf_led
+                name: Shelf
+                vertical: true
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
@@ -8678,24 +8820,29 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - type: tile
-            entity: light.family_room
-            name: Family Room
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.play_space
-            name: Play Space
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.family_room_lamp
-            name: Lamp
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.stairway
-            name: Stairs
+          - type: grid
+            square: false
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.family_room
+                name: Main
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.play_space
+                name: Play Space
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.family_room_lamp
+                name: Lamp
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.stairway
+                name: Stairs
+                vertical: true
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
@@ -8711,16 +8858,20 @@ views:
                       action: more-info
                     hold_action:
                       action: toggle
-          - type: tile
-            entity: light.master_bedroom
-            name: Main
-            features:
-              - type: light-brightness
-          - type: tile
-            entity: light.master_bedroom_floor_lamp
-            name: Floor Lamp
-            features:
-              - type: light-brightness
+          - type: grid
+            square: false
+            columns: 2
+            cards:
+              - type: tile
+                entity: light.master_bedroom
+                name: Main
+                features:
+                  - type: light-brightness
+              - type: tile
+                entity: light.master_bedroom_floor_lamp
+                name: Floor Lamp
+                features:
+                  - type: light-brightness
           - type: tile
             entity: fan.master_bedroom_ceiling
             name: Fan
@@ -8833,15 +8984,47 @@ views:
               - type: tile
                 entity: light.outside_side
                 name: Side
+                vertical: true
               - type: tile
                 entity: light.outside_back
                 name: Back
+                vertical: true
               - type: tile
-                entity: light.xmas
-                name: XMas
-          - type: tile
-            entity: light.garage
-            name: Garage
+                entity: light.garage
+                name: Garage
+                vertical: true
+      - type: vertical-stack
+        cards:
+          - type: conditional
+            conditions:
+              - entity: binary_sensor.is_xmas
+                state: 'on'
+            card:
+              type: vertical-stack
+              cards:
+                - type: custom:mushroom-title-card
+                  title: XMas
+                - type: grid
+                  columns: 3
+                  square: false
+                  cards:
+                    - type: tile
+                      entity: light.xmas_tree
+                      name: Tree
+                      icon: mdi:pine-tree
+                      features:
+                        - type: light-brightness
+                    - type: tile
+                      entity: light.wled_mario_star_main
+                      name: Star
+                      icon: mdi:star-face
+                      features:
+                        - type: light-brightness
+                    - type: tile
+                      entity: light.xmas
+                      name: Outside
+                      icon: mdi:string-lights
+                      vertical: true
   - title: Security
     theme: Backend-selected
     path: security
