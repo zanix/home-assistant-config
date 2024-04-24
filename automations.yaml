@@ -5064,3 +5064,49 @@
       fan_min_on_time: 0
     enabled: false
   mode: single
+- id: '1713385133443'
+  alias: ⚙️ Offline Devices
+  description: Sends a notification when a device is offline
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.offline_devices
+  condition:
+  - condition: template
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and trigger.to_state.state | int > 0\n  and trigger.to_state.state | int !=
+      trigger.from_state.state | int\n}}"
+  action:
+  - variables:
+      sensors: "{% if not trigger.to_state in ['unknown', 'unavailable', none] %}\n
+        \ {% set result = namespace(sensors=[]) %}\n  {% for entity_id in trigger.to_state.attributes.entity_id
+        %}\n    {% set state = states(entity_id) %}\n    {% set time = ' (' ~ relative_time(strptime(state,
+        '%Y-%m-%dT%H:%M:%S%z', 'unavailable')) ~ ')' %}\n    {% set name = state_attr(entity_id,
+        \"friendly_name\") | regex_replace(find = ' last seen', replace = '', ignorecase
+        = true) %}\n    {% set result.sensors = result.sensors + [name ~ time] %}\n
+        \ {% endfor %}\n  {{ iif(result.sensors | count > 0, '- ', '') }}{{ result.sensors
+        | join('\\n- ') }}\n{% endif %}"
+  - parallel:
+    - service: persistent_notification.create
+      data:
+        title: Offline Devices
+        message: '{{ sensors }}'
+        notification_id: offline-devices
+    - service: script.notify_mobile
+      data:
+        who: joshua
+        title: Offline Devices
+        message: '{{ sensors }}'
+        notification_icon: mdi:network-off
+        color: '#f44336'
+        icon_url: local/icons/network-off.png
+        group: System
+        tag: offline-devices
+        url: dashboard-system/overview
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: Offline Devices
+        message: '{{ sensors }}'
+  mode: single

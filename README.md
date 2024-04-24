@@ -596,7 +596,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>154 Automations</summary>
+<details><summary>155 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -623,6 +623,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⚙️ Event Sniffer [Actionable Event] (Disabled)
 - ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
 - ⚙️ Failed Login
+- ⚙️ Offline Devices
 - ⚙️ RAM Usage High
 - ⚙️ Reload Addons and Integrations
 - ⚙️ Scan Interval (Disabled)
