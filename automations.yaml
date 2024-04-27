@@ -2295,15 +2295,16 @@
   condition:
   - condition: template
     value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
-      \ and trigger.to_state.state | int > 0\n  and trigger.to_state.state | int !=
-      trigger.from_state.state | int\n}}"
+      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
+      trigger.to_state.state | int > 0\n  and trigger.to_state.state | int != trigger.from_state.state
+      | int\n}}"
   action:
   - variables:
-      sensors: "{% if not trigger.to_state in ['unknown', 'unavailable', none] %}\n
-        \ {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
+      sensors: "{% if not trigger.to_state.state in ['unknown', 'unavailable', none]
+        %}\n  {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
         %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set
-        name = device.name | replace(': Battery level', '') | replace(' Battery level',
-        '') | replace(' Battery Level', '') %}\n    {% set result.sensors = result.sensors
+        name = device.name | replace(':', '') | regex_replace(find = ' battery level',
+        replace = '', ignorecase = true) %}\n    {% set result.sensors = result.sensors
         + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
         > 0, '- ', '') }}{{ result.sensors | join('\\n- ') }}\n{% endif %}"
   - parallel:
@@ -2416,15 +2417,13 @@
     - sensor.updates
   condition:
   - condition: template
-    value_template: "{{ not trigger.to_state in [\"unknown\", \"unavailable\", none]\n
-      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\", none]\n  and
-      not trigger.from_state.state in [\"unknown\", \"unavailable\", none]\n  and
-      not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state
-      != trigger.from_state.state\n}}"
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
+      not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and not trigger.from_state.state
+      in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
   action:
   - variables:
-      updates: '{% if not trigger.to_state in [''unknown'', ''unavailable'', none]
-        %}{{ trigger.to_state.state | int(default=0) }}{% endif %}'
+      updates: '{{ trigger.to_state.state | int(default=0) }}'
       title: Update{{ iif(updates > 1, 's', '') }} Pending ({{ updates }})
   - if:
     - condition: template
@@ -3705,6 +3704,7 @@
         message: '{{ message }}'
         notification_icon: mdi:map-marker-account
         color: '#ff5722'
+        icon_url: local/icons/map-marker-account.png
         group: Presence
     - service: script.notify_hass_agent
       data:
@@ -3813,6 +3813,7 @@
         message: '{{ message }}'
         notification_icon: mdi:map-marker-account
         color: '#ff5722'
+        icon_url: local/icons/map-marker-account.png
         group: Presence
     - service: script.notify_hass_agent
       data:
@@ -5073,19 +5074,19 @@
     - sensor.offline_devices
   condition:
   - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
-      \ and trigger.to_state.state | int > 0\n  and trigger.to_state.state | int !=
-      trigger.from_state.state | int\n}}"
+    value_template: "{{ not trigger.to_state in [\"unknown\", \"unavailable\", none]\n
+      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\", none]\n  and
+      trigger.to_state.state | int > 0\n  and trigger.to_state.state | int != trigger.from_state.state
+      | int\n}}"
   action:
   - variables:
-      sensors: "{% if not trigger.to_state in ['unknown', 'unavailable', none] %}\n
-        \ {% set result = namespace(sensors=[]) %}\n  {% for entity_id in trigger.to_state.attributes.entity_id
-        %}\n    {% set state = states(entity_id) %}\n    {% set time = ' (' ~ relative_time(strptime(state,
-        '%Y-%m-%dT%H:%M:%S%z', 'unavailable')) ~ ')' %}\n    {% set name = state_attr(entity_id,
-        \"friendly_name\") | regex_replace(find = ' last seen', replace = '', ignorecase
-        = true) %}\n    {% set result.sensors = result.sensors + [name ~ time] %}\n
-        \ {% endfor %}\n  {{ iif(result.sensors | count > 0, '- ', '') }}{{ result.sensors
-        | join('\\n- ') }}\n{% endif %}"
+      sensors: "{% set result = namespace(sensors=[]) %} {% for entity_id in trigger.to_state.attributes.entity_id
+        %}\n  {% set state = states(entity_id) %}\n  {% set time = iif(has_value(entity_id),
+        \" (\" ~ as_datetime(state) | relative_time ~ \")\", \" (Unknown)\") %}\n
+        \ {% set name = state_attr(entity_id, \"friendly_name\") | regex_replace(find
+        = \" last seen\", replace = \"\", ignorecase = true) %}\n  {% set result.sensors
+        = result.sensors + [name ~ time] %}\n{% endfor %} {{ iif(result.sensors |
+        count > 0, \"- \", \"\") }}{{ result.sensors | join(\"\\n- \") }}"
   - parallel:
     - service: persistent_notification.create
       data:

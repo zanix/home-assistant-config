@@ -326,8 +326,8 @@ decluttering_templates:
       type: custom:mushroom-template-card
       entity: '[[entity]]'
       primary: '[[name]]'
-      secondary: '{% from "util.jinja" import custom_timedelta %} {{ iif(is_state(entity,
-        "on"), "Open", "Closed") }} ⸱ {{ custom_timedelta(entity) }}'
+      secondary: '{% from "util.jinja" import nominal_change_history %} {{ iif(is_state(entity,
+        "on"), "Open", "Closed") }} ⸱ {{ nominal_change_history(entity) }}'
       icon: '[[icon]]{{ iif(is_state(entity, "on"), "-open", "") }}'
       icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
       tap_action:
@@ -2890,9 +2890,12 @@ views:
                                             options:
                                               type: custom:mushroom-template-card
                                               primary: '{{ state_attr(entity, "friendly_name")
-                                                | regex_replace(find=" Last seen",
-                                                replace="") }}'
-                                              secondary: '{{ states(entity) }}'
+                                                | regex_replace(find=" last seen",
+                                                replace="", ignorecase = true) }}'
+                                              secondary: "{%- if has_value(entity)\
+                                                \ -%}\n  {{ as_datetime(states(entity)).strftime(\"\
+                                                %Y-%m-%d %-I:%M %p\") }}\n{%- else\
+                                                \ -%}\n  Unknown\n{%- endif -%}"
                                               icon: mdi:network-off
                                               icon_color: yellow
                                               layout: horizontal
@@ -9146,10 +9149,10 @@ views:
                   - type: custom:mushroom-template-card
                     entity: binary_sensor.front_door_contact_door_is_open
                     primary: Front Door
-                    secondary: "{% from \"util.jinja\" import custom_timedelta %}\
-                      \ {% if is_state(entity, \"on\") -%}\n  Open\n{% endif -%} {%\
-                      \ if is_state(\"lock.front_door\", \"unlocked\") -%}\n  Unlocked\n\
-                      {% else -%}\n  Locked\n{% endif -%} ⸱ {{ custom_timedelta(entity)\
+                    secondary: "{% from \"util.jinja\" import nominal_change_history\
+                      \ %} {% if is_state(entity, \"on\") -%}\n  Open\n{% endif -%}\
+                      \ {% if is_state(\"lock.front_door\", \"unlocked\") -%}\n  Unlocked\n\
+                      {% else -%}\n  Locked\n{% endif -%} ⸱ {{ nominal_change_history(entity)\
                       \ }}"
                     icon: "{% if is_state(entity, \"on\") %}\n  mdi:door-open\n{%\
                       \ elif is_state(\"lock.front_door\", \"unlocked\") and is_state(entity,\
@@ -9235,8 +9238,9 @@ views:
                     entity: cover.opengarage
                     primary: Garage Door
                     multiline_secondary: true
-                    secondary: '{% from "util.jinja" import custom_timedelta %} {{
-                      states(entity) | title }} ⸱ {{ custom_timedelta(entity) }}'
+                    secondary: '{% from "util.jinja" import nominal_change_history
+                      %} {{ states(entity) | title }} ⸱ {{ nominal_change_history(entity)
+                      }}'
                     icon: "{% if is_state(entity, \"open\") %}\n  mdi:garage-open-variant\n\
                       {% elif states(entity) in [\"opening\", \"closing\"] %}\n  mdi:garage-alert-variant\n\
                       {% elif is_state(entity, \"closed\") %}\n  mdi:garage-variant\n\
@@ -9469,8 +9473,8 @@ views:
                   - type: custom:mushroom-template-card
                     entity: binary_sensor.doorbell_ring
                     primary: Last Ring
-                    secondary: '{% from "util.jinja" import custom_timedelta %} {{
-                      custom_timedelta(entity) }}'
+                    secondary: '{% from "util.jinja" import nominal_change_history
+                      %} {{ nominal_change_history(entity) }}'
                     icon: mdi:bell-ring
                     icon_color: disabled
                     tap_action:
@@ -9478,8 +9482,8 @@ views:
                   - type: custom:mushroom-template-card
                     entity: sensor.doorbell_person_count
                     primary: Last Person
-                    secondary: '{% from "util.jinja" import custom_timedelta %} {{
-                      custom_timedelta(entity) }}'
+                    secondary: '{% from "util.jinja" import nominal_change_history
+                      %} {{ nominal_change_history(entity) }}'
                     icon: mdi:walk
                     icon_color: disabled
                     tap_action:

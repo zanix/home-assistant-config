@@ -92,19 +92,22 @@
 {%- endmacro -%}
 
 {#
-  Return last changed using change history sensor.
+  Return a custom "last changed" string.
 #}
-{%- macro custom_timedelta(entity) -%}
-  {%- set last_changed = state_attr("sensor.nominal_change_history", "changes")[entity] | as_datetime -%}
-  {%- if last_changed < today_at() - timedelta(days=6) -%}
+{%- macro custom_timedelta(date) -%}
+  {% if date > today_at() + timedelta(days=6) -%}
+    > a week
+  {% elif date < today_at() - timedelta(days=6) -%}
     > a week ago
-  {%- elif last_changed < today_at() - timedelta(days=1) -%}
-    {{ last_changed.timestamp() | timestamp_custom("%A %-I:%M %p") }}
-  {%- elif last_changed < today_at() -%}
-    {{ last_changed.timestamp() | timestamp_custom("Yesterday %-I:%M %p") }}
+  {%- elif date > today_at() + timedelta(days=1) and date < today_at() + timedelta(days=2) -%}
+    {{ date.timestamp() | timestamp_custom("Tomorrow %-I:%M %p") }}
+  {%- elif date < today_at() and date > today_at() - timedelta(days=1) -%}
+    {{ date.timestamp() | timestamp_custom("Yesterday %-I:%M %p") }}
+  {%- elif date > today_at() + timedelta(days=1) or date < today_at() - timedelta(days=1) -%}
+    {{ date.timestamp() | timestamp_custom("%A %-I:%M %p") }}
   {%- else -%}
-    {{ relative_time(last_changed) }} ago
-  {%- endif -%}
+    {{ date.timestamp() | timestamp_custom("%-I:%M %p") }}
+  {%- endif %}
 {%- endmacro -%}
 
 {#
@@ -168,6 +171,14 @@
   {%- else -%}
     mdi:motion-play-outline
   {%- endif -%}
+{%- endmacro -%}
+
+{#
+  Return last changed using change history sensor.
+#}
+{%- macro nominal_change_history(entity) -%}
+  {%- set last_changed = state_attr("sensor.nominal_change_history", "changes")[entity] | as_datetime -%}
+  {{ custom_timedelta(last_changed) }}
 {%- endmacro -%}
 
 {#
