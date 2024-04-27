@@ -66,6 +66,8 @@ decluttering_templates:
         draggable: false
         auto_unmute: all
         preload: true
+        controls:
+          builtin: false
       timeline:
         controls:
           thumbnails:
@@ -4047,7 +4049,7 @@ views:
                   - type: template
                     entity: camera.family_room
                     icon: mdi:cctv
-                    icon_color: cyan
+                    icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
@@ -4422,7 +4424,7 @@ views:
                   - type: template
                     entity: camera.ethan
                     icon: mdi:cctv
-                    icon_color: cyan
+                    icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
@@ -4499,7 +4501,7 @@ views:
                   - type: template
                     entity: camera.emma
                     icon: mdi:cctv
-                    icon_color: cyan
+                    icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
@@ -4659,7 +4661,7 @@ views:
                   - type: template
                     entity: camera.doorbell
                     icon: mdi:doorbell-video
-                    icon_color: cyan
+                    icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
@@ -4727,7 +4729,7 @@ views:
                   - type: template
                     entity: camera.garage
                     icon: mdi:cctv
-                    icon_color: cyan
+                    icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
@@ -5271,8 +5273,7 @@ views:
                   - type: template
                     entity: script.family_room_game_light_mode
                     icon: mdi:light-flood-up
-                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  amber\n{%-\
-                      \ else -%}\n  grey\n{%- endif -%}"
+                    icon_color: pink
                     tap_action:
                       action: call-service
                       service: script.family_room_game_light_mode
@@ -6153,33 +6154,41 @@ views:
           - type: tile
             entity: switch.nebula_projector_ethan_main_switch
             name: Main
-          - type: horizontal-stack
-            cards:
-              - type: tile
-                entity: light.nebula_projector_ethan_light
-                icon: mdi:crystal-ball
-                name: Light
-                features:
-                  - type: light-brightness
-              - type: tile
-                entity: light.nebula_projector_ethan_laser
-                name: Laser
-                color: green
-                features:
-                  - type: light-brightness
           - type: conditional
             conditions:
               - entity: switch.nebula_projector_ethan_main_switch
                 state: 'on'
             card:
-              features:
-                - type: select-options
-              type: tile
-              entity: select.nebula_projector_ethan_scene
-              name: Scene
-              icon: mdi:play-box-outline
-              hide_state: true
-              vertical: false
+              type: vertical-stack
+              cards:
+                - type: tile
+                  entity: select.nebula_projector_ethan_scene
+                  name: Scene
+                  icon: mdi:play-box-outline
+                  hide_state: true
+                  features:
+                    - type: select-options
+                - type: grid
+                  square: false
+                  columns: 3
+                  cards:
+                    - type: tile
+                      entity: light.nebula_projector_ethan_light
+                      icon: mdi:crystal-ball
+                      name: Light
+                      features:
+                        - type: light-brightness
+                    - type: tile
+                      entity: light.nebula_projector_ethan_laser
+                      name: Laser
+                      color: green
+                      features:
+                        - type: light-brightness
+                    - type: tile
+                      entity: fan.nebula_projector_ethan_motor
+                      name: Motor
+                      features:
+                        - type: fan-speed
   - title: Emma
     theme: Backend-selected
     path: emma
@@ -6254,32 +6263,41 @@ views:
           - type: tile
             entity: switch.nebula_projector_emma_main_switch
             name: Main
-          - type: horizontal-stack
-            cards:
-              - type: tile
-                entity: light.nebula_projector_emma_light
-                icon: mdi:crystal-ball
-                name: Light
-                features:
-                  - type: light-brightness
-              - type: tile
-                entity: light.nebula_projector_emma_laser
-                name: Laser
-                color: green
-                features:
-                  - type: light-brightness
           - type: conditional
             conditions:
               - entity: switch.nebula_projector_emma_main_switch
                 state: 'on'
             card:
-              features:
-                - type: select-options
-              type: tile
-              entity: select.nebula_projector_emma_scene
-              name: Scene
-              icon: mdi:play-box-outline
-              hide_state: true
+              type: vertical-stack
+              cards:
+                - type: tile
+                  entity: select.nebula_projector_emma_scene
+                  name: Scene
+                  icon: mdi:play-box-outline
+                  hide_state: true
+                  features:
+                    - type: select-options
+                - type: grid
+                  square: false
+                  columns: 3
+                  cards:
+                    - type: tile
+                      entity: light.nebula_projector_emma_light
+                      icon: mdi:crystal-ball
+                      name: Light
+                      features:
+                        - type: light-brightness
+                    - type: tile
+                      entity: light.nebula_projector_emma_laser
+                      name: Laser
+                      color: green
+                      features:
+                        - type: light-brightness
+                    - type: tile
+                      entity: fan.nebula_projector_emma_motor
+                      name: Motor
+                      features:
+                        - type: fan-speed
   - title: Amy's Office
     theme: Backend-selected
     path: amy-office
@@ -8049,7 +8067,7 @@ views:
         cards:
           - type: custom:mushroom-title-card
             title: MagicMirror
-            subtitle: Raspberry Pi 4
+            subtitle: Raspberry Pi 5
           - type: custom:tabbed-card
             styles:
               --mdc-theme-primary: var(--primary-color)
@@ -8722,42 +8740,12 @@ views:
                 entity: light.garage_entry
                 name: Garage Entry
                 vertical: true
-          - type: tile
+          - type: custom:mushroom-fan-card
             entity: fan.living_room_ceiling
             name: Fan
-            features:
-              - type: fan-speed
-            card_mod:
-              style:
-                .: "ha-tile-icon {\n  --tile-color:\n    {% if is_state(config.entity,\
-                  \ 'on') %}\n    {% set perc = state_attr(config.entity, 'percentage')\
-                  \ | int(0) %}\n    {% if perc <= 25 %} var(--green-color)\n    {%\
-                  \ elif perc <= 50 %} var(--yellow-color)\n    {% elif perc <= 75\
-                  \ %} var(--orange-color)\n    {% else %} var(--red-color)\n    {%\
-                  \ endif %}\n    {% else %} var(--state-inactive-color)\n    {% endif\
-                  \ %};\n}\nha-state-icon {\n  animation:\n    {% if is_state(config.entity,\
-                  \ 'on') %}\n      {% set perc = state_attr(config.entity, 'percentage')\
-                  \ | int %}\n      {% set base = 'rotation infinite linear' %}\n\
-                  \      {% if perc <= 25 %} 1.3s {{base}}\n      {% elif perc <=\
-                  \ 50 %} 1s {{base}}\n      {% elif perc <= 75 %} 0.75s {{base}}\n\
-                  \      {% else  %} 0.66s {{base}}\n      {% endif %}\n    {% else\
-                  \ %} none\n    {% endif %};\n}\n@keyframes rotation {\n  0% {transform:\
-                  \ rotate(0deg);}\n  100% {transform: rotate(360deg);}\n}\n"
-                hui-card-features$:
-                  hui-fan-speed-card-feature$: "ha-control-slider {\n  --control-slider-color:\n\
-                    \    {% if is_state(config.entity, 'on') %}\n    {% set perc =\
-                    \ state_attr(config.entity, 'percentage')|int(0) %}\n    {% if\
-                    \ perc <= 25 %} var(--green-color)\n    {% elif perc <= 50 %}\
-                    \ var(--yellow-color)\n    {% elif perc <= 75 %} var(--orange-color)\n\
-                    \    {% else %} var(--red-color)\n    {% endif %}\n    {% else\
-                    \ %} var(--state-inactive-color)\n    {% endif %} !important;\n\
-                    \  --control-slider-background:\n    {% if is_state(config.entity,\
-                    \ 'on') %}\n    {% set perc = state_attr(config.entity, 'percentage')|int(0)\
-                    \ %}\n    {% if perc <= 25 %} var(--green-color)\n    {% elif\
-                    \ perc <= 50 %} var(--yellow-color)\n    {% elif perc <= 75 %}\
-                    \ var(--orange-color)\n    {% else %} var(--red-color)\n    {%\
-                    \ endif %}\n    {% else %} var(--state-inactive-color)\n    {%\
-                    \ endif %} !important;\n}\n"
+            icon_animation: true
+            show_percentage_control: true
+            layout: horizontal
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
@@ -8929,42 +8917,12 @@ views:
                 name: Floor Lamp
                 features:
                   - type: light-brightness
-          - type: tile
+          - type: custom:mushroom-fan-card
             entity: fan.master_bedroom_ceiling
             name: Fan
-            features:
-              - type: fan-speed
-            card_mod:
-              style:
-                .: "ha-tile-icon {\n  --tile-color:\n    {% if is_state(config.entity,\
-                  \ 'on') %}\n    {% set perc = state_attr(config.entity, 'percentage')\
-                  \ | int(0) %}\n    {% if perc <= 25 %} var(--green-color)\n    {%\
-                  \ elif perc <= 50 %} var(--yellow-color)\n    {% elif perc <= 75\
-                  \ %} var(--orange-color)\n    {% else %} var(--red-color)\n    {%\
-                  \ endif %}\n    {% else %} var(--state-inactive-color)\n    {% endif\
-                  \ %};\n}\nha-state-icon {\n  animation:\n    {% if is_state(config.entity,\
-                  \ 'on') %}\n      {% set perc = state_attr(config.entity, 'percentage')\
-                  \ | int %}\n      {% set base = 'rotation infinite linear' %}\n\
-                  \      {% if perc <= 25 %} 1.3s {{base}}\n      {% elif perc <=\
-                  \ 50 %} 1s {{base}}\n      {% elif perc <= 75 %} 0.75s {{base}}\n\
-                  \      {% else  %} 0.66s {{base}}\n      {% endif %}\n    {% else\
-                  \ %} none\n    {% endif %};\n}\n@keyframes rotation {\n  0% {transform:\
-                  \ rotate(0deg);}\n  100% {transform: rotate(360deg);}\n}\n"
-                hui-card-features$:
-                  hui-fan-speed-card-feature$: "ha-control-slider {\n  --control-slider-color:\n\
-                    \    {% if is_state(config.entity, 'on') %}\n    {% set perc =\
-                    \ state_attr(config.entity, 'percentage')|int(0) %}\n    {% if\
-                    \ perc <= 25 %} var(--green-color)\n    {% elif perc <= 50 %}\
-                    \ var(--yellow-color)\n    {% elif perc <= 75 %} var(--orange-color)\n\
-                    \    {% else %} var(--red-color)\n    {% endif %}\n    {% else\
-                    \ %} var(--state-inactive-color)\n    {% endif %} !important;\n\
-                    \  --control-slider-background:\n    {% if is_state(config.entity,\
-                    \ 'on') %}\n    {% set perc = state_attr(config.entity, 'percentage')|int(0)\
-                    \ %}\n    {% if perc <= 25 %} var(--green-color)\n    {% elif\
-                    \ perc <= 50 %} var(--yellow-color)\n    {% elif perc <= 75 %}\
-                    \ var(--orange-color)\n    {% else %} var(--red-color)\n    {%\
-                    \ endif %}\n    {% else %} var(--state-inactive-color)\n    {%\
-                    \ endif %} !important;\n}\n"
+            icon_animation: true
+            show_percentage_control: true
+            layout: horizontal
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
@@ -9401,53 +9359,11 @@ views:
                           title: Doorbell
                           size: fullscreen
                           content:
-                            type: custom:frigate-card
-                            cameras:
-                              - camera_entity: camera.doorbell
-                                live_provider: go2rtc
-                                go2rtc:
-                                  modes:
-                                    - webrtc
-                                  stream: doorbell
-                            dimensions:
-                              aspect_ratio_mode: dynamic
-                            menu:
-                              style: outside
-                              buttons:
-                                frigate:
-                                  enabled: false
-                                cameras:
-                                  enabled: false
-                                media_player:
-                                  enabled: false
-                                download:
-                                  enabled: false
-                                microphone:
-                                  enabled: true
-                                  type: toggle
-                                  alignment: opposing
-                                mute:
-                                  enabled: true
-                                  alignment: opposing
-                                play:
-                                  enabled: true
-                                  alignment: opposing
-                                  priority: 45
-                                fullscreen:
-                                  alignment: opposing
-                                  priority: 40
-                            live:
-                              draggable: false
-                              auto_unmute: all
-                              preload: true
-                            timeline:
-                              controls:
-                                thumbnails:
-                                  mode: below
-                            media_viewer:
-                              transition_effect: slide
-                            performance:
-                              profile: high
+                            type: custom:decluttering-card
+                            template: camera_popup
+                            variables:
+                              - camera: camera.doorbell
+                              - stream: doorbell
                   - type: state-icon
                     entity: sensor.doorbell_person_count
                     icon: mdi:walk
