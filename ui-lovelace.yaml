@@ -328,8 +328,8 @@ decluttering_templates:
       type: custom:mushroom-template-card
       entity: '[[entity]]'
       primary: '[[name]]'
-      secondary: '{% from "util.jinja" import nominal_change_history %} {{ iif(is_state(entity,
-        "on"), "Open", "Closed") }} ⸱ {{ nominal_change_history(entity) }}'
+      secondary: '{% from "util.jinja" import nominal_change_history %} {{ state_translated(entity)
+        }} ⸱ {{ nominal_change_history(entity) }}'
       icon: '[[icon]]{{ iif(is_state(entity, "on"), "-open", "") }}'
       icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
       tap_action:
@@ -570,8 +570,8 @@ decluttering_templates:
                   - type: custom:mushroom-title-card
                     alignment: center
                     title: "{% set entity = \"[[entity]]\" %} {% if states(entity)\
-                      \ in [\"playing\", \"paused\", \"standby\"] %}\n  {{ states(entity)\
-                      \ | title }}\n{% endif %}"
+                      \ in [\"playing\", \"paused\", \"standby\"] %}\n  {{ state_translated(entity)\
+                      \ }}\n{% endif %}"
                     card_mod:
                       style:
                         .: "ha-card {\n  --ha-card-box-shadow: none;\n}\nh1 {\n  text-shadow:\
@@ -1165,7 +1165,7 @@ decluttering_templates:
                           entity: sensor.[[watch_base]]_[[person]]_activity_state
                           layout: vertical
                           primary: Activity
-                          secondary: '{{ states(entity) }}'
+                          secondary: '{{ states(entity) | title }}'
                           icon: mdi:account-reactivate
                           icon_color: pink
                           tap_action:
@@ -2957,6 +2957,23 @@ views:
                                       - color: var(--red-color)
                                         from: '50'
                                         to: '100'
+                                  - entity: sensor.airgradient_kitchen_voc_index
+                                    name: VOC
+                                    min: 0
+                                    max: 500
+                                    severity:
+                                      - color: var(--green-color)
+                                        from: '0'
+                                        to: '150'
+                                      - color: var(--yellow-color)
+                                        from: '150'
+                                        to: '250'
+                                      - color: var(--orange-color)
+                                        from: '250'
+                                        to: '400'
+                                      - color: var(--red-color)
+                                        from: '400'
+                                        to: '500'
                           - type: vertical-stack
                             cards:
                               - type: custom:mushroom-title-card
@@ -5362,6 +5379,7 @@ views:
               - type: tile
                 entity: light.office_shelf_led
                 name: Shelf
+                vertical: true
       - type: custom:mini-media-player
         entity: media_player.cast_office_speaker
         name: Google Home
@@ -6122,7 +6140,7 @@ views:
                 \ 13px;\n  --mush-icon-size: 2.84em;\n  --mush-icon-symbol-size: 1.3em;\n\
                 }\nha-card {\n  transition: all 0s;\n  padding-bottom: 0 !important;\n\
                 }\nmushroom-shape-icon {\n  position: absolute;\n  top: -57px;\n \
-                \ left: -40px;\n}\nmushroom-state-info {\n  padding-left: 34px;\n\
+                \ left: -40px;\n}\nmushroom-state-info {\n  padding-left: 64px;\n\
                 \  z-index: 1;\n}\n"
           - type: custom:mushroom-chips-card
             alignment: end
@@ -8823,18 +8841,17 @@ views:
                         service: browser_mod.more_info
                     card_mod:
                       style:
-                        mushroom-shape-icon$: "{% if (states(\"sensor.front_door_contact_battery_level\"\
-                          ) | int) <= 60 %} {% from \"util.jinja\" import battery_color\
-                          \ %} .shape {\n  /* Radial progress bar */\n  background:\n\
-                          \    radial-gradient(var(--card-background-color) 60%, transparent\
-                          \ calc(60% + 1px)),\n    conic-gradient(var(--{{ battery_color(\"\
-                          sensor.front_door_contact_battery_level\") }}-color) {{\
-                          \ states(\"sensor.front_door_contact_battery_level\") }}%\
-                          \ 0%, var(--card-background-color) 0% 100%\n  );\n} .shape:after\
-                          \ {\n  /* Add back icon shape */\n  content: \"\";\n  height:\
-                          \ 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
-                          \ var(--icon-border-radius);\n  background: var(--shape-color);\n\
-                          } {% endif %}"
+                        mushroom-shape-icon$: "{% set battery_entity = \"sensor.front_door_contact_battery_level\"\
+                          \ %} {% if (states(battery_entity) | int) <= 60 %} {% from\
+                          \ \"util.jinja\" import battery_color %} .shape {\n  /*\
+                          \ Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+                          \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--{{\
+                          \ battery_color(battery_entity) }}-color) {{ states(battery_entity)\
+                          \ }}% 0%, var(--card-background-color) 0% 100%\n  );\n}\
+                          \ .shape:after {\n  /* Add back icon shape */\n  content:\
+                          \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n\
+                          \  border-radius: var(--icon-border-radius);\n  background:\
+                          \ var(--shape-color);\n} {% endif %}"
                   - type: custom:layout-card
                     layout_type: custom:grid-layout
                     layout:
@@ -8886,9 +8903,8 @@ views:
                   - type: custom:mushroom-template-card
                     entity: cover.opengarage
                     primary: Garage Door
-                    multiline_secondary: true
                     secondary: '{% from "util.jinja" import nominal_change_history
-                      %} {{ states(entity) | title }} ⸱ {{ nominal_change_history(entity)
+                      %} {{ state_translated(entity) }} ⸱ {{ nominal_change_history(entity)
                       }}'
                     icon: "{% if is_state(entity, \"open\") %}\n  mdi:garage-open-variant\n\
                       {% elif states(entity) in [\"opening\", \"closing\"] %}\n  mdi:garage-alert-variant\n\

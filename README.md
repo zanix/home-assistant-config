@@ -559,14 +559,15 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [Leviton ZW4SF-1BW Smart 4 Speed Fan Controller](https://www.amazon.com/dp/B08GQJWSRG)
 - [Philips Hue Dimmer Remote 324131092621](https://www.amazon.com/dp/B0167Z0P3I)
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
-- [SONOFF S31 Lite 15A Zigbee Smart Plug](https://www.amazon.com/dp/B08Y87WD1X) -  Smart plug
+- [SONOFF S31 Lite 15A Zigbee Smart Plug](https://www.amazon.com/dp/B08Y87WD1X) - Smart plug
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
+- [THIRDREALITY ZigBee Smart Plug Gen2](https://www.amazon.com/dp/B0BPY5D1KC) - Smart plug with power monitoring
 - [Zooz Titan Water Valve Actuator](https://www.thesmartesthouse.com/products/zooz-z-wave-plus-700-series-titan-water-valve-actuator-zac36) - Control the water main
 
 ### Camera
 
 - [Amcrest AD410 Doorbell](https://www.amazon.com/dp/B091KMT9GB)
-- [Wyze Cam v2](https://www.amazon.com/dp/B09XJ36RP2)
+- [Tapo C210 2K Pan/Tilt Camera](https://www.amazon.com/dp/B09Y8TLP25/)
 
 ### Media
 
@@ -603,7 +604,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>157 Automations</summary>
+<details><summary>158 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -746,6 +747,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🔔 Doorbell Ring
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
+- 🔔 Reset Stuck Doorbell Ring
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Ardena] Sleep When Harmony Off
