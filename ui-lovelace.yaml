@@ -2411,334 +2411,25 @@ views:
                               \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
                               \ 12px;\n}\n{% endif %}\n"
                       - type: template
-                        entity: switch.octoprint_psu
+                        entity: sensor.bambu_p1s_print_status
                         icon: mdi:printer-3d
-                        icon_color: '{{ iif(is_state(entity, "on"), "green", "disabled")
-                          }}'
-                        content: "{% if is_state(entity, \"on\") and has_value(\"\
-                          sensor.octoprint_layer_progress\") %}\n  {{ progress }}\n\
-                          {% endif %}"
+                        icon_color: "{% if is_state(\"sensor.bambu_p1s_current_stage\"\
+                          , \"idle\") %}\n  disabled\n{% elif is_state(entity, \"\
+                          running\") %}\n  green\n{% elif is_state(entity, \"finish\"\
+                          ) %}\n  orange\n{% elif states(entity) in [\"idle\", \"\
+                          pause\"] %}\n  yellow\n{% elif states(entity) in [\"init\"\
+                          , \"prepare\", \"slicing\"] %}\n  light-blue\n{% elif is_state(entity,\
+                          \ \"failed\") %}\n  red\n{% else %}\n  disabled\n{% endif\
+                          \ %}"
+                        content: "{% if is_state(entity, \"running\") and has_value(\"\
+                          sensor.bambu_p1s_current_layer\") %}\n  {{ states('sensor.bambu_p1s_current_layer')\
+                          \ }} / {{\n  states('sensor.bambu_p1s_total_layer_count')\
+                          \ }}\n{% endif %}"
                         hold_action:
                           action: none
                         tap_action:
-                          action: fire-dom-event
-                          browser_mod:
-                            service: browser_mod.popup
-                            data:
-                              title: 3D Printer
-                              content:
-                                type: custom:vertical-stack-in-card
-                                card_mod:
-                                  style: "ha-card {\n  --ha-card-background: none;\n\
-                                    \  --ha-card-border-width: 0;\n}\n"
-                                cards:
-                                  - type: custom:mushroom-template-card
-                                    primary: Power
-                                    entity: switch.octoprint_psu
-                                    icon: "{% if is_state(entity, \"on\") %}\n  mdi:power\n\
-                                      {% else %}\n  mdi:power-off\n{% endif %}"
-                                    icon_color: "{% if is_state(entity, \"on\") %}\n\
-                                      \  green\n{% else %}\n  grey\n{% endif %}"
-                                    hold_action:
-                                      action: toggle
-                                    secondary: "{% if is_state(entity, \"on\") %}\n\
-                                      \  Press and hold to power off\n{% else %}\n\
-                                      \  Press and hold to power on\n{% endif %}"
-                                  - type: picture-entity
-                                    entity: camera.octoprint
-                                    camera_view: live
-                                    show_name: false
-                                    show_state: false
-                                  - type: conditional
-                                    conditions:
-                                      - entity: binary_sensor.octoprint_connected
-                                        state: 'on'
-                                    card:
-                                      type: vertical-stack
-                                      cards:
-                                        - type: horizontal-stack
-                                          cards:
-                                            - type: custom:mushroom-template-card
-                                              entity: switch.octoprint_pause_print
-                                              icon: "{% if is_state(entity, \"on\"\
-                                                ) %}\n  mdi:play\n{% else %}\n  mdi:pause\n\
-                                                {% endif %}"
-                                              icon_color: "{% if is_state(entity,\
-                                                \ \"on\") %}\n  yellow\n{% else %}\n\
-                                                \  grey\n{% endif %}"
-                                              layout: vertical
-                                              tap_action:
-                                                action: none
-                                              hold_action:
-                                                action: toggle
-                                              card_mod:
-                                                style:
-                                                  .: "ha-card {\n  background: none;\n\
-                                                    \  box-shadow: none;\n  border:\
-                                                    \ 0;\n  margin-top: 10px;\n}\n"
-                                                  mushroom-shape-icon$: ".shape {\n\
-                                                    \  {% if is_state(config.entity,\
-                                                    \ \"on\") %}\n  --shape-animation:\
-                                                    \ ping 2s infinite;\n  {% else\
-                                                    \ %}\n  box-shadow: 0 0 1px 15px\
-                                                    \ rgba(var(--rgb-grey), 0.1) !important;\n\
-                                                    \  {% endif %}\n}\n@keyframes\
-                                                    \ ping {\n  0% { box-shadow: 0\
-                                                    \ 0 1px 15px rgba(var(--rgb-yellow),\
-                                                    \ 0.7); }\n  100% { box-shadow:\
-                                                    \ 0 0 1px 15px transparent; }\n\
-                                                    }\n"
-                                            - type: custom:mushroom-template-card
-                                              entity: button.octoprint_cancel_print
-                                              icon: mdi:cancel
-                                              icon_color: amber
-                                              layout: vertical
-                                              tap_action:
-                                                action: none
-                                              hold_action:
-                                                action: call-service
-                                                service: button.press
-                                                target:
-                                                  entity_id: button.octoprint_cancel_print
-                                              card_mod:
-                                                style:
-                                                  .: "ha-card {\n  background: none;\n\
-                                                    \  box-shadow: none;\n  border:\
-                                                    \ 0;\n  margin-top: 10px;\n}\n"
-                                                  mushroom-shape-icon$: ".shape {\n\
-                                                    \  box-shadow: 0 0 1px 15px rgba(var(--rgb-{{\
-                                                    \ config.icon_color }}), 0.1)\
-                                                    \ !important;\n}\n"
-                                            - type: custom:mushroom-template-card
-                                              entity: button.octoprint_emergency_stop
-                                              icon: mdi:alert-octagon
-                                              icon_color: pink
-                                              layout: vertical
-                                              tap_action:
-                                                action: none
-                                              hold_action:
-                                                action: call-service
-                                                service: button.press
-                                                target:
-                                                  entity_id: button.octoprint_emergency_stop
-                                              card_mod:
-                                                style:
-                                                  .: "ha-card {\n  background: none;\n\
-                                                    \  box-shadow: none;\n  border:\
-                                                    \ 0;\n  margin-top: 10px;\n}\n"
-                                                  mushroom-shape-icon$: ".shape {\n\
-                                                    \  box-shadow: 0 0 1px 15px rgba(var(--rgb-{{\
-                                                    \ config.icon_color }}), 0.1)\
-                                                    \ !important;\n}\n"
-                                            - type: custom:mushroom-template-card
-                                              entity: button.octoprint_shutdown_system
-                                              icon: mdi:power
-                                              icon_color: orange
-                                              layout: vertical
-                                              tap_action:
-                                                action: none
-                                              hold_action:
-                                                action: call-service
-                                                service: button.press
-                                                target:
-                                                  entity_id: button.octoprint_shutdown_system
-                                              card_mod:
-                                                style:
-                                                  .: "ha-card {\n  background: none;\n\
-                                                    \  box-shadow: none;\n  border:\
-                                                    \ 0;\n  margin-top: 10px;\n}\n"
-                                                  mushroom-shape-icon$: ".shape {\n\
-                                                    \  box-shadow: 0 0 1px 15px rgba(var(--rgb-{{\
-                                                    \ config.icon_color }}), 0.1)\
-                                                    \ !important;\n}\n"
-                                        - type: custom:layout-card
-                                          layout_type: custom:grid-layout
-                                          layout:
-                                            grid-template-columns: 197px auto
-                                            margin: -4px -4px -8px -4px
-                                          cards:
-                                            - type: vertical-stack
-                                              cards:
-                                                - type: custom:mushroom-entity-card
-                                                  entity: sensor.octoprint_print_status
-                                                  name: Status
-                                                  icon_color: green
-                                                  tap_action:
-                                                    action: none
-                                                  icon: mdi:printer-3d-nozzle
-                                                  primary_info: state
-                                                  secondary_info: name
-                                                - type: custom:mushroom-entity-card
-                                                  entity: sensor.octoprint_print_time_left_format
-                                                  name: Est. Finish Time
-                                                  icon_color: light-blue
-                                                  tap_action:
-                                                    action: none
-                                                  primary_info: state
-                                                  secondary_info: name
-                                                - type: custom:mushroom-entity-card
-                                                  entity: sensor.octoprint_layer_progress
-                                                  name: Layer
-                                                  icon_color: lime
-                                                  tap_action:
-                                                    action: none
-                                                  primary_info: state
-                                                  secondary_info: name
-                                            - type: custom:vertical-stack-in-card
-                                              card_mod:
-                                                style: "ha-card {\n  height: 225px;\n\
-                                                  }\n"
-                                              cards:
-                                                - type: custom:apexcharts-card
-                                                  header:
-                                                    show: false
-                                                  series:
-                                                    - entity: sensor.octoprint_print_progress
-                                                      name: Job Progress
-                                                      color: rgb(3, 169, 244)
-                                                      show:
-                                                        legend_value: false
-                                                  chart_type: radialBar
-                                                  apex_config:
-                                                    legend:
-                                                      show: false
-                                                    chart:
-                                                      height: 250px
-                                                    plotOptions:
-                                                      radialBar:
-                                                        hollow:
-                                                          size: 80%
-                                                        dataLabels:
-                                                          name:
-                                                            show: false
-                                                          value:
-                                                            show: false
-                                                        track:
-                                                          strokeWidth: 80%
-                                                          margin: 0
-                                                    fill:
-                                                      type: gradient
-                                                      gradient:
-                                                        shade: light
-                                                        type: horizontal
-                                                        shadeIntensity: 0.3
-                                                        inverseColors: false
-                                                        opacityFrom: 1
-                                                        opacityTo: 1
-                                                        stops:
-                                                          - 0
-                                                          - 50
-                                                          - 55
-                                                          - 90
-                                                - type: custom:mushroom-entity-card
-                                                  entity: sensor.octoprint_print_progress
-                                                  primary_info: state
-                                                  secondary_info: name
-                                                  name: Job Progress
-                                                  icon_color: light-blue
-                                                  layout: vertical
-                                                  card_mod:
-                                                    style: "ha-card {\n  border-radius:\
-                                                      \ 50%;\n  background: none;\n\
-                                                      \  margin-top: -175px;\n  width:\
-                                                      \ 140px;\n  margin-left: auto;\n\
-                                                      \  margin-right: auto;\n}\n"
-                                        - type: custom:mushroom-title-card
-                                          subtitle: Print Info
-                                        - type: grid
-                                          square: false
-                                          columns: 2
-                                          cards:
-                                            - type: custom:mushroom-entity-card
-                                              entity: sensor.octoprint_print_file
-                                              name: File
-                                            - type: custom:mushroom-entity-card
-                                              entity: sensor.octoprint_print_file_size
-                                              name: Print File Size
-                                              primary_info: state
-                                              secondary_info: name
-                                            - type: custom:mushroom-entity-card
-                                              entity: sensor.octoprint_filament_cost
-                                              name: Filament Cost
-                                              primary_info: state
-                                              secondary_info: name
-                                            - type: custom:mushroom-entity-card
-                                              entity: sensor.octoprint_filament_length
-                                              name: Filament Length
-                                              primary_info: state
-                                              secondary_info: name
-                                        - type: custom:mushroom-title-card
-                                          subtitle: Temperature
-                                        - type: custom:apexcharts-card
-                                          card_mod:
-                                            style: "ha-card {\n  padding: 0px;\n \
-                                              \ border: none;\n  box-shadow: none;\n\
-                                              \  margin-bottom: -15px;\n}\n.apexcharts-tooltip-series-group\
-                                              \ {\n  padding-top: 0px !important;\n\
-                                              \  padding-bottom: 0px !important;\n\
-                                              \  margin-top: 0px !important;\n  margin-bottom:\
-                                              \ 0px !important;\n  display: none;\n\
-                                              \  text-align: left;\n  justify-content:\
-                                              \ left;\n  align-items: center;\n}\n"
-                                          apex_config:
-                                            chart:
-                                              toolbar:
-                                                show: false
-                                            grid:
-                                              borderColor: '#7B7B7B'
-                                            legend:
-                                              show: false
-                                            tooltip:
-                                              shared: true
-                                            xaxis:
-                                              tooltip:
-                                                enabled: false
-                                          header:
-                                            show: true
-                                            show_states: true
-                                            colorize_states: true
-                                          experimental:
-                                            brush: true
-                                          all_series_config:
-                                            stroke_width: 3
-                                            extend_to: now
-                                            float_precision: 2
-                                            curve: stepline
-                                          brush:
-                                            selection_span: 1h
-                                            apex_config:
-                                              chart:
-                                                foreColor: '#7B7B7B'
-                                                toolbar:
-                                                  show: false
-                                              grid:
-                                                borderColor: '#7B7B7B'
-                                              xaxis:
-                                                tooltip:
-                                                  enabled: false
-                                          series:
-                                            - entity: sensor.octoprint_tool_0_temperature
-                                              name: Nozzle
-                                              color: rgb(244,67,54)
-                                              show:
-                                                in_brush: true
-                                            - entity: sensor.octoprint_bed_temperature
-                                              name: Bed
-                                              color: rgb(3,169,244)
-                                              show:
-                                                in_brush: true
-                                            - entity: sensor.octoprint_tool_0_target
-                                              name: Nozzle Target
-                                              type: area
-                                              opacity: 0.2
-                                              stroke_width: 1
-                                              color: rgb(255,235,59)
-                                            - entity: sensor.octoprint_bed_target
-                                              name: Bed Target
-                                              type: area
-                                              opacity: 0.2
-                                              stroke_width: 1
-                                              color: rgb(233,30,99)
+                          action: navigate
+                          navigation_path: bambu
                       - type: template
                         entity: sensor.meater_probe_cook_state
                         icon: mdi:food-drumstick
@@ -9508,6 +9199,751 @@ views:
                   enabled: true
                 microphone:
                   enabled: true
+  - title: Bambu
+    path: bambu
+    icon: mdi:printer-3d
+    cards:
+      - type: custom:decluttering-card
+        template: chip_header
+        variables:
+          - primary: Bambu Lab P1S
+          - icon: fapro:bambu-lab
+          - icon_color: lime
+          - chips:
+              - type: template
+                entity: light.bambu_p1s_chamber_light
+                icon: mdi:lightbulb
+                icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled") }}'
+              - type: template
+                entity: sensor.bambu_p1s_print_status
+                icon: mdi:file-tree
+                content: "{% if is_state(\"sensor.bambu_p1s_current_stage\", \"idle\"\
+                  ) %}\n  {{ state_translated(\"sensor.bambu_p1s_current_stage\")\
+                  \ }}\n{% else %}\n  {{ state_translated(entity) }}\n{% endif %}"
+                tap_action:
+                  action: more-info
+              - type: entity
+                entity: sensor.bambu_p1s_wi_fi_signal
+              - type: template
+                entity: binary_sensor.bambu_p1s_hms_errors
+                icon: mdi:{{ iif(is_state(entity, "on"), "alert-circle", "check-circle")
+                  }}
+                icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      title: Bambu P1S HMS Errors
+                      content:
+                        type: markdown
+                        card_mod:
+                          style: "ha-card {\n  --ha-card-background: none\n}\n"
+                        content: "{%- set entity_id = \"binary_sensor.bambu_p1s_hms_errors\"\
+                          \ -%}\n{%- set errors = namespace(message=[],severity=[],url=[])\
+                          \ -%}\n{%- for attribute, value in states[entity_id].attributes.items()\
+                          \ -%}\n  {%- if attribute.split('-') | count > 1 -%}\n \
+                          \   {%- set id, type = attribute.split('-') -%}\n    {%-\
+                          \ if type | count > 1 -%}\n      {%- if type == \"Error\"\
+                          \ -%}\n        {% set errors.message = dict(errors.message,\
+                          \ **{id: value}) %}\n      {%- endif -%}\n      {%- if type\
+                          \ == \"Severity\" -%}\n        {% set errors.severity =\
+                          \ dict(errors.severity, **{id: value}) %}\n      {%- endif\
+                          \ -%}\n      {%- if type == \"Wiki\" -%}\n        {% set\
+                          \ errors.url = dict(errors.url, **{id: value}) %}\n    \
+                          \  {%- endif -%}\n    {%- endif -%}\n  {%- endif -%}\n{%-\
+                          \ endfor -%}\n{%- set levels = {\n  \"fatal\": \"mdi:alert-decagram\"\
+                          ,\n  \"serious\": \"mdi:alert-circle\",\n  \"common\": \"\
+                          mdi:minus-circle\",\n  \"info\": \"mdi:information\",\n\
+                          \  \"unknown\": \"mdi:help-circle\"\n} -%}\n{% for id in\
+                          \ errors.message %}\n<ha-icon icon=\"{{ levels[errors.severity[id]]\
+                          \ }}\"></ha-icon> {{ errors.message[id] }}\n<a href=\"{{\
+                          \ errors.url[id] }}\">Support</a>\n{% endfor %}"
+      - type: vertical-stack
+        cards:
+          - type: custom:vertical-stack-in-card
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Power
+                secondary: Press and hold to power {{ iif(is_state(entity, "on"),
+                  "off", "on") }}
+                entity: switch.bambu_p1s
+                icon: mdi:power{{ iif(is_state(entity, "off"), "-off", "") }}
+                icon_color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
+                tap_action:
+                  action: none
+                hold_action:
+                  action: toggle
+                card_mod:
+                  style: ":host {\n  --mush-card-primary-font-size: 16px;\n  --mush-card-secondary-font-size:\
+                    \ 13px;\n  --mush-icon-size: 2.84em;\n  --mush-icon-symbol-size:\
+                    \ 1.3em;\n}\nha-card {\n  transition: all 0s;\n  padding-bottom:\
+                    \ 0 !important;\n}\nmushroom-shape-icon {\n  position: absolute;\n\
+                    \  top: -57px;\n  left: -40px;\n}\nmushroom-state-info {\n  padding-left:\
+                    \ 64px;\n  z-index: 1;\n}\n"
+              - type: custom:mushroom-chips-card
+                alignment: end
+                chips:
+                  - type: entity
+                    entity: sensor.bambu_p1s_power
+                  - type: entity
+                    entity: sensor.bambu_p1s_energy
+                card_mod:
+                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                    \ rgba(var(--rgb-disabled), 0.1);\n  --chip-border-width: 0;\n\
+                    \  --chip-spacing: 1px;\n  margin-right: calc(var(--ha-card-border-radius,\
+                    \ 12px) / 2);\n}\n"
+          - type: custom:tabbed-card
+            styles:
+              --mdc-theme-primary: var(--primary-color)
+            attributes:
+              isMinWidthIndicator: true
+            tabs:
+              - card:
+                  show_state: false
+                  show_name: false
+                  camera_view: live
+                  type: picture-entity
+                  entity: image.bambu_p1s_camera
+                attributes:
+                  icon: mdi:camera-document
+                  label: Camera
+              - card:
+                  type: picture-entity
+                  entity: image.bambu_p1s_cover_image
+                  camera_view: live
+                  show_name: false
+                  show_state: false
+                attributes:
+                  icon: mdi:cube-outline
+                  label: Model
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.bambu_p1s_print_status
+                    state: running
+                  - condition: state
+                    entity: sensor.bambu_p1s_print_status
+                    state: pause
+            card:
+              type: horizontal-stack
+              cards:
+                - type: conditional
+                  conditions:
+                    - condition: state
+                      entity: sensor.bambu_p1s_print_status
+                      state: running
+                  card:
+                    type: custom:mushroom-template-card
+                    entity: sensor.bambu_p1s_print_status
+                    icon: mdi:pause
+                    icon_color: yellow
+                    layout: vertical
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      service_data:
+                        entity_id: button.bambu_p1s_pause_printing
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                          \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                          \  margin-top: 10px;\n}\n"
+                        mushroom-shape-icon$: ".shape {\n  box-shadow: 0 0 1px 15px\
+                          \ rgba(var(--rgb-yellow), 0.1) !important;\n}\n"
+                - type: conditional
+                  conditions:
+                    - condition: state
+                      entity: sensor.bambu_p1s_print_status
+                      state: pause
+                  card:
+                    type: custom:mushroom-template-card
+                    entity: sensor.bambu_p1s_print_status
+                    icon: mdi:play
+                    icon_color: green
+                    layout: vertical
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      data: {}
+                      target:
+                        entity_id: button.bambu_p1s_resume_printing
+                    card_mod:
+                      style:
+                        .: "ha-card {\n    --ha-card-background: none;\n    --ha-card-box-shadow:\
+                          \ none;\n    --ha-card-border-width: 0;\n    --icon-size:\
+                          \ 48px;\n    margin-top: 10px;\n}\n"
+                        mushroom-shape-icon$: ".shape {\n  box-shadow: 0 0 1px 15px\
+                          \ rgba(var(--rgb-green), 0.1) !important;\n}\n"
+                - type: conditional
+                  conditions:
+                    - condition: or
+                      conditions:
+                        - condition: state
+                          entity: sensor.bambu_p1s_print_status
+                          state: running
+                        - condition: state
+                          entity: sensor.bambu_p1s_print_status
+                          state: pause
+                  card:
+                    type: custom:mushroom-template-card
+                    entity: sensor.bambu_p1s_print_status
+                    icon: mdi:stop
+                    icon_color: red
+                    layout: vertical
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: button.press
+                      data: {}
+                      target:
+                        entity_id: button.bambu_p1s_stop_printing
+                    card_mod:
+                      style:
+                        .: "ha-card {\n    --ha-card-background: none;\n    --ha-card-box-shadow:\
+                          \ none;\n    --ha-card-border-width: 0;\n    --icon-size:\
+                          \ 48px;\n    margin-top: 10px;\n}\n"
+                        mushroom-shape-icon$: ".shape {\n  box-shadow: 0 0 1px 15px\
+                          \ rgba(var(--rgb-red), 0.1) !important;\n}\n"
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.bambu_p1s_print_status
+                    state: running
+                  - condition: state
+                    entity: sensor.bambu_p1s_print_status
+                    state: pause
+            card:
+              type: horizontal-stack
+              cards:
+                - type: custom:mushroom-template-card
+                  entity: select.bambu_p1s_printing_speed
+                  primary: Silent
+                  icon: mdi:speedometer-slow
+                  icon_color: '{{ iif(is_state(entity, "silent"), "yellow", "disabled")
+                    }}'
+                  layout: vertical
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: select.select_option
+                    data:
+                      option: silent
+                    target:
+                      entity_id: select.bambu_p1s_printing_speed
+                  card_mod:
+                    style:
+                      .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                        \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                        \  margin-top: 10px;\n}\n"
+                - type: custom:mushroom-template-card
+                  entity: select.bambu_p1s_printing_speed
+                  primary: Standard
+                  icon: mdi:speedometer-medium
+                  icon_color: '{{ iif(is_state(entity, "standard"), "yellow", "disabled")
+                    }}'
+                  layout: vertical
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: select.select_option
+                    data:
+                      option: standard
+                    target:
+                      entity_id: select.bambu_p1s_printing_speed
+                  card_mod:
+                    style:
+                      .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                        \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                        \  margin-top: 10px;\n}\n"
+                - type: custom:mushroom-template-card
+                  entity: select.bambu_p1s_printing_speed
+                  primary: Sport
+                  icon: mdi:speedometer
+                  icon_color: '{{ iif(is_state(entity, "sport"), "yellow", "disabled")
+                    }}'
+                  layout: vertical
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: select.select_option
+                    data:
+                      option: sport
+                    target:
+                      entity_id: select.bambu_p1s_printing_speed
+                  card_mod:
+                    style:
+                      .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                        \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                        \  margin-top: 10px;\n}\n"
+                - type: custom:mushroom-template-card
+                  entity: select.bambu_p1s_printing_speed
+                  primary: Ludicrous
+                  icon: mdi:play-speed
+                  icon_color: '{{ iif(is_state(entity, "ludicrous"), "yellow", "disabled")
+                    }}'
+                  layout: vertical
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: select.select_option
+                    data:
+                      option: ludicrous
+                    target:
+                      entity_id: select.bambu_p1s_printing_speed
+                  card_mod:
+                    style:
+                      .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                        \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                        \  margin-top: 10px;\n}\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:layout-card
+                layout_type: custom:grid-layout
+                layout:
+                  grid-template-columns: 20% 80%
+                  grid-template-rows: auto
+                  grid-template-areas: '"ext ams"'
+                  reflow: true
+                  margin: 0
+                  padding: 0
+                cards:
+                  - type: custom:mushroom-title-card
+                    title: EXT
+                  - type: custom:decluttering-card
+                    template: title_chips
+                    variables:
+                      - title: AMS
+                      - chips:
+                          - type: template
+                            entity: sensor.bambu_p1s_ams_humidity_index
+                            content: '{{ states(entity) }}'
+                            icon: mdi:water-opacity
+                            icon_color: "{% if is_state(entity, \"1\") %}\n  green\n\
+                              {% elif is_state(entity, \"2\") %}\n  light-green\n\
+                              {% elif is_state(entity, \"3\") %}\n  yellow\n{% elif\
+                              \ is_state(entity, \"4\") %}\n  orange\n{% elif is_state(entity,\
+                              \ \"5\") %}\n  red\n{% else %}\n  grey\n{% endif %}"
+                            tap_action:
+                              action: more-info
+              - type: custom:vertical-stack-in-card
+                card_mod:
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                cards:
+                  - type: custom:layout-card
+                    layout_type: custom:grid-layout
+                    layout:
+                      grid-template-columns: 20% 80%
+                      grid-template-rows: auto
+                      grid-template-areas: '"ext ams"'
+                      reflow: true
+                      margin: 0
+                      padding: 0
+                    cards:
+                      - type: horizontal-stack
+                        cards:
+                          - type: custom:mushroom-template-card
+                            entity: sensor.bambu_p1s_external_spool_external_spool
+                            secondary: '{{ state_translated(entity) }}'
+                            multiline_secondary: true
+                            icon: mdi:circle-slice-8
+                            icon_color: '{{ state_attr(entity, "color") }}'
+                            layout: vertical
+                            tap_action:
+                              action: more-info
+                            card_mod:
+                              style:
+                                .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                                  \ none;\n  --ha-card-border-width: 0;\n  --icon-size:\
+                                  \ 48px;\n  margin-top: 10px;\n}\n"
+                                mushroom-shape-icon$: ".shape {\n  {% if is_state_attr(config.entity,\
+                                  \ \"active\", true) %}\n  --shape-animation: ping\
+                                  \ 2s infinite;\n  {% elif states(config.entity)\
+                                  \ not in [\"Empty\", \"unknown\"] %}\n  box-shadow:\
+                                  \ 0 0 1px 15px rgba(111,111,111, 0.2) !important;\n\
+                                  \  {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                                  \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100%\
+                                  \ { box-shadow: 0 0 1px 15px transparent; }\n}\n"
+                      - type: horizontal-stack
+                        cards:
+                          - type: custom:mushroom-template-card
+                            entity: sensor.bambu_p1s_ams_tray_1
+                            secondary: '{{ state_translated(entity) }}'
+                            multiline_secondary: true
+                            icon: mdi:circle-slice-8
+                            icon_color: '{{ state_attr(entity, "color") }}'
+                            layout: vertical
+                            tap_action:
+                              action: more-info
+                            card_mod:
+                              style:
+                                .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                                  \ none;\n  --ha-card-border-width: 0;\n  --icon-size:\
+                                  \ 48px;\n  margin-top: 10px;\n}\n{% if has_value(config.entity)\
+                                  \ and states(config.entity) not in [\"Empty\", \"\
+                                  unknown\"] %}\nha-card:after {\n  content: \"{{\
+                                  \ state_attr(config.entity, \"remain\") }}%\";\n\
+                                  \  position: absolute;\n  font-weight: bolder;\n\
+                                  \  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                                  }\n{% endif %}\n"
+                                mushroom-shape-icon$: ".shape {\n  {% if is_state_attr(config.entity,\
+                                  \ \"active\", true) %}\n  --shape-animation: ping\
+                                  \ 2s infinite;\n  {% elif states(config.entity)\
+                                  \ not in [\"Empty\", \"unknown\"] %}\n  box-shadow:\
+                                  \ 0 0 1px 15px rgba(111,111,111, 0.2) !important;\n\
+                                  \  {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                                  \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100%\
+                                  \ { box-shadow: 0 0 1px 15px transparent; }\n}\n"
+                          - type: custom:mushroom-template-card
+                            entity: sensor.bambu_p1s_ams_tray_2
+                            secondary: '{{ state_translated(entity) }}'
+                            multiline_secondary: true
+                            icon: mdi:circle-slice-8
+                            icon_color: '{{ state_attr(entity, "color") }}'
+                            layout: vertical
+                            tap_action:
+                              action: more-info
+                            card_mod:
+                              style:
+                                .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                                  \ none;\n  --ha-card-border-width: 0;\n  --icon-size:\
+                                  \ 48px;\n  margin-top: 10px;\n}\n{% if has_value(config.entity)\
+                                  \ and states(config.entity) not in [\"Empty\", \"\
+                                  unknown\"] %}\nha-card:after {\n  content: \"{{\
+                                  \ state_attr(config.entity, \"remain\") }}%\";\n\
+                                  \  position: absolute;\n  font-weight: bolder;\n\
+                                  \  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                                  }\n{% endif %}\n"
+                                mushroom-shape-icon$: ".shape {\n  {% if is_state_attr(config.entity,\
+                                  \ \"active\", true) %}\n  --shape-animation: ping\
+                                  \ 2s infinite;\n  {% elif states(config.entity)\
+                                  \ not in [\"Empty\", \"unknown\"] %}\n  box-shadow:\
+                                  \ 0 0 1px 15px rgba(111,111,111, 0.2) !important;\n\
+                                  \  {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                                  \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100%\
+                                  \ { box-shadow: 0 0 1px 15px transparent; }\n}\n"
+                          - type: custom:mushroom-template-card
+                            entity: sensor.bambu_p1s_ams_tray_3
+                            secondary: '{{ state_translated(entity) }}'
+                            multiline_secondary: true
+                            icon: mdi:circle-slice-8
+                            icon_color: '{{ state_attr(entity, "color") }}'
+                            layout: vertical
+                            tap_action:
+                              action: more-info
+                            card_mod:
+                              style:
+                                .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                                  \ none;\n  --ha-card-border-width: 0;\n  --icon-size:\
+                                  \ 48px;\n  margin-top: 10px;\n}\n{% if has_value(config.entity)\
+                                  \ and states(config.entity) not in [\"Empty\", \"\
+                                  unknown\"] %}\nha-card:after {\n  content: \"{{\
+                                  \ state_attr(config.entity, \"remain\") }}%\";\n\
+                                  \  position: absolute;\n  font-weight: bolder;\n\
+                                  \  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                                  }\n{% endif %}\n"
+                                mushroom-shape-icon$: ".shape {\n  {% if is_state_attr(config.entity,\
+                                  \ \"active\", true) %}\n  --shape-animation: ping\
+                                  \ 2s infinite;\n  {% elif states(config.entity)\
+                                  \ not in [\"Empty\", \"unknown\"] %}\n  box-shadow:\
+                                  \ 0 0 1px 15px rgba(111,111,111, 0.2) !important;\n\
+                                  \  {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                                  \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100%\
+                                  \ { box-shadow: 0 0 1px 15px transparent; }\n}\n"
+                          - type: custom:mushroom-template-card
+                            entity: sensor.bambu_p1s_ams_tray_4
+                            secondary: '{{ state_translated(entity) }}'
+                            multiline_secondary: true
+                            icon: mdi:circle-slice-8
+                            icon_color: '{{ state_attr(entity, "color") }}'
+                            layout: vertical
+                            tap_action:
+                              action: more-info
+                            card_mod:
+                              style:
+                                .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                                  \ none;\n  --ha-card-border-width: 0;\n  --icon-size:\
+                                  \ 48px;\n  margin-top: 10px;\n}\n{% if has_value(config.entity)\
+                                  \ and states(config.entity) not in [\"Empty\", \"\
+                                  unknown\"] %}\nha-card:after {\n  content: \"{{\
+                                  \ state_attr(config.entity, \"remain\") }}%\";\n\
+                                  \  position: absolute;\n  font-weight: bolder;\n\
+                                  \  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                                  }\n{% endif %}\n"
+                                mushroom-shape-icon$: ".shape {\n  {% if is_state_attr(config.entity,\
+                                  \ \"active\", true) %}\n  --shape-animation: ping\
+                                  \ 2s infinite;\n  {% elif states(config.entity)\
+                                  \ not in [\"Empty\", \"unknown\"] %}\n  box-shadow:\
+                                  \ 0 0 1px 15px rgba(111,111,111, 0.2) !important;\n\
+                                  \  {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                                  \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100%\
+                                  \ { box-shadow: 0 0 1px 15px transparent; }\n}\n"
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Printer
+          - type: custom:mushroom-entity-card
+            entity: sensor.bambu_p1s_task_name
+            name: Task
+          - type: custom:vertical-stack-in-card
+            cards:
+              - type: custom:layout-card
+                layout_type: custom:grid-layout
+                layout:
+                  grid-template-columns: 210px auto
+                  margin: -4px -4px -8px -4px
+                cards:
+                  - type: vertical-stack
+                    cards:
+                      - type: custom:mushroom-entity-card
+                        entity: sensor.bambu_p1s_current_stage
+                        name: Stage
+                        icon_color: green
+                        icon: mdi:printer-3d-nozzle
+                        primary_info: state
+                        secondary_info: name
+                      - type: custom:mushroom-template-card
+                        entity: sensor.bambu_p1s_start_time
+                        icon: mdi:clock-start
+                        icon_color: blue
+                        primary: "{%- from \"util.jinja\" import custom_timedelta\
+                          \ -%}\n{%- if has_value(entity) -%}\n  {%- set time = as_local(states(entity)\
+                          \ | as_datetime) -%}\n  {{ custom_timedelta(time) }}\n{%-\
+                          \ endif -%}"
+                        secondary: Start Time
+                        tap_action:
+                          action: more-info
+                      - type: custom:mushroom-template-card
+                        entity: sensor.bambu_p1s_end_time
+                        icon: mdi:clock-end
+                        icon_color: blue
+                        primary: "{%- from \"util.jinja\" import custom_timedelta\
+                          \ -%}\n{%- if has_value(entity) -%}\n  {%- set time = as_local(states(entity)\
+                          \ | as_datetime) -%}\n  {{ custom_timedelta(time) }}\n{%-\
+                          \ endif -%}"
+                        secondary: End Time
+                        tap_action:
+                          action: more-info
+                      - type: custom:mushroom-template-card
+                        primary: '{{ states(''sensor.bambu_p1s_current_layer'') }}
+                          / {{ states(''sensor.bambu_p1s_total_layer_count'') }}'
+                        secondary: Layer
+                        icon: mdi:layers
+                        icon_color: lime
+                        tap_action:
+                          action: none
+                  - type: custom:vertical-stack-in-card
+                    cards:
+                      - type: custom:apexcharts-card
+                        header:
+                          show: false
+                        series:
+                          - entity: sensor.bambu_p1s_print_progress
+                            name: Job Progress
+                            color: rgb(3, 169, 244)
+                            show:
+                              legend_value: false
+                        chart_type: radialBar
+                        apex_config:
+                          legend:
+                            show: false
+                          chart:
+                            height: 300px
+                          plotOptions:
+                            radialBar:
+                              hollow:
+                                size: 60%
+                              dataLabels:
+                                name:
+                                  show: false
+                                value:
+                                  show: false
+                              track:
+                                strokeWidth: 80%
+                                margin: 0
+                          fill:
+                            type: gradient
+                            gradient:
+                              shade: light
+                              type: horizontal
+                              shadeIntensity: 0.3
+                              inverseColors: false
+                              opacityFrom: 1
+                              opacityTo: 1
+                              stops:
+                                - 0
+                                - 50
+                                - 55
+                                - 90
+                      - type: custom:mushroom-entity-card
+                        entity: sensor.bambu_p1s_print_progress
+                        primary_info: state
+                        secondary_info: name
+                        name: Job Progress
+                        icon_color: light-blue
+                        layout: vertical
+                        card_mod:
+                          style: "ha-card {\n  border-radius: 50%;\n  background:\
+                            \ none;\n  margin-top: -195px;\n  width: 140px;\n  margin-left:\
+                            \ auto;\n  margin-right: auto;\n}\n"
+                    card_mod:
+                      style: "ha-card {\n  height: 288px;\n}\n"
+            card_mod:
+              style: "ha-card > div {\n  --ha-card-border-width: 0;\n}\n"
+          - type: grid
+            square: false
+            columns: 2
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: sensor.bambu_p1s_print_weight
+                name: Filament Weight
+                primary_info: state
+                secondary_info: name
+              - type: custom:mushroom-entity-card
+                entity: sensor.bambu_p1s_print_length
+                name: Filament Length
+                primary_info: state
+                secondary_info: name
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Fans
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: fan.bambu_p1s_aux_fan
+                state_not: unavailable
+              - condition: state
+                entity: sensor.bambu_p1s_aux_fan
+                state_not: unknown
+            card:
+              type: custom:mushroom-fan-card
+              entity: fan.bambu_p1s_aux_fan
+              name: Aux Fan
+              icon_animation: true
+              show_percentage_control: true
+              fill_container: false
+              layout: horizontal
+          - type: conditional
+            card:
+              type: custom:mushroom-fan-card
+              entity: fan.bambu_p1s_chamber_fan
+              name: Chamber Fan
+              icon_animation: true
+              show_percentage_control: true
+              fill_container: false
+              layout: horizontal
+            conditions:
+              - condition: state
+                entity: fan.bambu_p1s_chamber_fan
+                state_not: unavailable
+              - condition: state
+                entity: sensor.bambu_p1s_chamber_fan
+                state_not: unknown
+          - type: conditional
+            card:
+              type: custom:mushroom-fan-card
+              entity: fan.bambu_p1s_cooling_fan
+              name: Part Cooling Fan
+              icon_animation: true
+              show_percentage_control: true
+              fill_container: false
+              layout: horizontal
+            conditions:
+              - condition: state
+                entity: fan.bambu_p1s_cooling_fan
+                state_not: unavailable
+              - condition: state
+                entity: sensor.bambu_p1s_cooling_fan
+                state_not: unknown
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Temperature
+          - type: custom:apexcharts-card
+            card_mod:
+              style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow: none;\n\
+                \  margin-bottom: -15px;\n}\n.apexcharts-tooltip-series-group {\n\
+                \  padding-top: 0px !important;\n  padding-bottom: 0px !important;\n\
+                \  margin-top: 0px !important;\n  margin-bottom: 0px !important;\n\
+                \  display: none;\n  text-align: left;\n  justify-content: left;\n\
+                \  align-items: center;\n}\n"
+            apex_config:
+              chart:
+                toolbar:
+                  show: false
+              grid:
+                borderColor: '#7B7B7B'
+              legend:
+                show: false
+              tooltip:
+                shared: true
+              xaxis:
+                tooltip:
+                  enabled: false
+            header:
+              show: true
+              show_states: true
+              colorize_states: true
+            experimental:
+              brush: true
+            all_series_config:
+              stroke_width: 3
+              extend_to: now
+              float_precision: 2
+              curve: stepline
+            brush:
+              selection_span: 1h
+              apex_config:
+                chart:
+                  foreColor: '#7B7B7B'
+                  toolbar:
+                    show: false
+                grid:
+                  borderColor: '#7B7B7B'
+                xaxis:
+                  tooltip:
+                    enabled: false
+            series:
+              - entity: sensor.bambu_p1s_nozzle_temperature
+                name: Nozzle
+                color: rgb(244,67,54)
+                show:
+                  in_brush: true
+              - entity: sensor.bambu_p1s_nozzle_target_temperature
+                name: Nozzle Target
+                type: area
+                opacity: 0.2
+                stroke_width: 1
+                color: rgb(255,235,59)
+              - entity: sensor.bambu_p1s_bed_temperature
+                name: Bed
+                color: rgb(3,169,244)
+                show:
+                  in_brush: true
+              - entity: sensor.bambu_p1s_target_bed_temperature
+                name: Bed Target
+                type: area
+                opacity: 0.2
+                stroke_width: 1
+                color: rgb(233,30,99)
+    type: custom:masonry-layout
+    sections: []
+    layout:
+      max_cols: 2
   - title: Power
     theme: Backend-selected
     path: power

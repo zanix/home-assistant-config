@@ -5111,3 +5111,164 @@
         title: Offline Devices
         message: '{{ sensors }}'
   mode: single
+- id: '1713973263507'
+  alias: "\U0001F4AC Bambu P1S Print Status"
+  description: Notify current print status every 10% (or 25% for short prints).
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.bambu_p1s_print_progress
+    to:
+    from:
+  condition:
+  - alias: Update at 10% intervals
+    condition: template
+    value_template: "{%- if has_value(\"sensor.bambu_p1s_end_time\")\n  and has_value(\"sensor.bambu_p1s_start_time\")\n
+      \ and has_value(\"sensor.bambu_p1s_print_progress\")\n  and not is_state(\"sensor.bambu_p1s_print_progress\",
+      \"100\")\n-%}\n  {%- set total_time = (as_datetime(states(\"sensor.bambu_p1s_end_time\"))
+      - as_datetime(states(\"sensor.bambu_p1s_start_time\"))).total_seconds() / 60
+      -%}\n  {%- if total_time > 60 -%}\n    {%- set step = 10 -%}\n  {%- else -%}\n
+      \   {%- set step = 25 -%}\n  {%- endif -%}\n  {{ states(\"sensor.bambu_p1s_print_progress\")
+      | int % step == 0 }}\n{%- else -%}\n  {{ false }}\n{%- endif -%}"
+  action:
+  - variables:
+      message: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".gcode","")
+        }} is at {{ states("sensor.bambu_p1s_print_progress") }}%'
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: joshua
+        title: 3D Print Status
+        message: '{{ message }}'
+        notification_icon: mdi:printer-3d
+        color: '#16c344'
+        icon_url: local/icons/bambu-lab.png
+        image: /api/image_proxy/image.bambu_p1s_camera
+        group: 3d-printer
+        tag: 3d-printer
+        priority: high
+        url: lovelace/bambu
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: 3D Print Status
+        message: '{{ message }}'
+        camera: image.bambu_p1s_camera
+  mode: single
+- id: '1713983450425'
+  alias: "\U0001F4AC Bambu P1S Print Completed"
+  description: Notify when the print is finished or failed.
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.bambu_p1s_print_status
+    to: finish
+    id: Completed
+  - platform: state
+    entity_id:
+    - sensor.bambu_p1s_print_status
+    to: failed
+    id: Failed
+  condition:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
+      "offline"] }}'
+  action:
+  - variables:
+      time: '{{ as_timestamp(now()) | timestamp_custom("%-m/%-d/%Y %-I:%M %p") }}'
+      model: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".gcode","")
+        }} {{ trigger.id | lower }}'
+      message: '{{ model }} {{ trigger.id | lower }} printing {{ time }}'
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: joshua
+        title: 3D Print {{ trigger.id }}
+        message: '{{ message }}'
+        notification_icon: mdi:printer-3d
+        color: '#16c344'
+        icon_url: local/icons/bambu-lab.png
+        image: /api/image_proxy/image.bambu_p1s_camera
+        group: 3d-printer
+        priority: high
+        tag: 3d-printer
+        url: lovelace/bambu
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: 3D Print {{ trigger.id }}
+        message: '{{ message }}'
+        camera: image.bambu_p1s_camera
+  - alias: Wait for bed to cool
+    wait_for_trigger:
+    - platform: numeric_state
+      entity_id:
+      - sensor.bambu_p1s_bed_temperature
+      below: 46.3
+    timeout:
+      hours: 0
+      minutes: 20
+      seconds: 0
+      milliseconds: 0
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: joshua
+        title: 3D Print {{ trigger.id }}
+        message: Bed has cooled down, you can remove {{ model }}
+        notification_icon: mdi:printer-3d
+        color: '#16c344'
+        icon_url: local/icons/bambu-lab.png
+        image: /api/image_proxy/image.bambu_p1s_camera
+        group: 3d-printer
+        priority: high
+        tag: 3d-printer
+        url: lovelace/bambu
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: 3D Print {{ trigger.id }}
+        message: Bed has cooled down, you can remove {{ model }}
+        camera: image.bambu_p1s_camera
+  mode: single
+- id: '1714000511725'
+  alias: "\U0001F4AC Bambu P1S Printer Error"
+  description: Notify on printer errors.
+  trigger:
+  - platform: device
+    device_id: b9e70ce89bcabdccae4b86eeae1918f2
+    domain: bambu_lab
+    type: event_printer_error
+  condition: []
+  action:
+  - variables:
+      title: P1S Issue Detected - {{ trigger.event.data.hms_code }}
+      message: '{{ trigger.event.data.description }}'
+  - parallel:
+    - service: script.notify_mobile
+      data:
+        who: joshua
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: mdi:printer-3d
+        color: '#16c344'
+        icon_url: local/icons/bambu-lab.png
+        group: 3d-printer-error
+        priority: high
+        sticky: true
+        url: lovelace/bambu
+        actions:
+        - action: URI
+          title: Bambu Lab Wiki
+          uri: '{{ trigger.event.data.url }}'
+    - service: script.notify_hass_agent
+      data:
+        entity:
+        - media_player.erebus
+        title: '{{ title }}'
+        message: '{{ message }}'
+        camera: image.bambu_p1s_camera
+  mode: single

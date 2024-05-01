@@ -32,8 +32,8 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2697 |
-| Sensors        | 1132 |
+| All Entities   | 2703 |
+| Sensors        | 1137 |
 | Binary Sensors | 216 |
 | Lights         | 59 |
 | Switches       | 131 |
@@ -266,13 +266,19 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>17 Custom Integrations</summary>
+<details><summary>18 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.21.1]
 
 Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
+
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.21]
+
+A Home Assistant Integration for Bambu Lab Printers
+
+Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.0]
 
@@ -591,12 +597,13 @@ A Material You and Google Home app influenced theme for Home Assistant
 ### Other
 
 - [Aqara Pet Feeder C1](https://www.amazon.com/dp/B0B9XZ96PH) - Zigbee controlled pet feeder
+- [Bambu Lab P1S](https://us.store.bambulab.com/products/p1s) - 3D printer
 
 ## Automations
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>155 Automations</summary>
+<details><summary>157 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -664,6 +671,9 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
 - 💧 Water Leak Detected
+- 💬 Bambu P1S Print Completed
+- 💬 Bambu P1S Print Status
+- 💬 Bambu P1S Printer Error
 - 💬 Door Closed
 - 💬 Door Left Open
 - 💬 Door Left Open and Leaving
@@ -673,7 +683,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💬 Garage Door Left Open and Leaving
 - 💬 Garage Door Opened and Away
 - 💬 Garbage Collection
-- 💬 OctoPrint
 - 💬 Subaru Failed Notification
 - 💬 Subaru Fuel Level Low
 - 💬 Subaru Remote Start Expired Notification
