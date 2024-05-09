@@ -378,7 +378,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>30 Lovelace Plugins</summary>
+<details><summary>31 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
 
@@ -395,6 +395,10 @@ Customizable Animated Bar card for Home Assistant Lovelace
 ### [Battery State Card / Entity Row](https://github.com/maxwroc/battery-state-card) [v3.2.1]
 
 Battery state card for Home Assistant
+
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.0.0-beta.6]
+
+Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
 ### [Button Card](https://github.com/custom-cards/button-card) [v4.1.2]
 
