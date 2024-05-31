@@ -1443,6 +1443,8 @@
         url: lovelace/security
         group: Doorbell
         priority: high
+        channel: Doorbell Ring
+        importance: high
         actions: '{{ actions }}'
     - service: script.notify_hass_agent
       data:
@@ -2237,7 +2239,7 @@
       STEREO\n{%- elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
       'YouTube Kids', 'DisneyNow', 'PBS Kids'] -%}\n  DOLBY DIGITAL\n{%- else -%}\n
       \ DIRECT\n{%- endif -%}"
-  mode: single
+  mode: restart
 - id: '1665696345535'
   alias: ⏯ Living Room Sound Mode
   description: Changes the reciever sound mode based on Source
@@ -2269,7 +2271,7 @@
       elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube', 'YouTube
       Kids', 'DisneyNow', 'PBS Kids'] -%}\n  surr_decoder\n{%- else -%}\n  straight\n{%-
       endif -%}"
-  mode: single
+  mode: restart
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer [Actionable Event]
   description: Listen for Actionable events
@@ -2690,6 +2692,8 @@
       group: Water Leak
       tag: water-leak
       priority: high
+      channel: Water Leak
+      importance: high
       url: lovelace/utility
       actions:
       - action: turn_on_water
@@ -4247,6 +4251,8 @@
         tag: '{{ id }}{{ ''-loitering'' if loitering }}'
         priority: high
         sticky: true
+        channel: Doorbell Motion
+        importance: high
         url: lovelace/security
         actions: '{{ actions }}'
     - service: script.notify_hass_agent
@@ -5110,7 +5116,7 @@
         - media_player.erebus
         title: Offline Devices
         message: '{{ sensors }}'
-  mode: single
+  mode: restart
 - id: '1713973263507'
   alias: "\U0001F4AC Bambu P1S Print Status"
   description: Notify current print status every 10% (or 25% for short prints).
@@ -5124,21 +5130,23 @@
   - alias: Update at 10% intervals
     condition: template
     value_template: "{%- if has_value(\"sensor.bambu_p1s_end_time\")\n  and has_value(\"sensor.bambu_p1s_start_time\")\n
-      \ and has_value(\"sensor.bambu_p1s_print_progress\")\n  and not is_state(\"sensor.bambu_p1s_print_progress\",
-      \"100\")\n-%}\n  {%- set total_time = (as_datetime(states(\"sensor.bambu_p1s_end_time\"))
+      \ and has_value(\"sensor.bambu_p1s_print_progress\")\n  and not states(\"sensor.bambu_p1s_print_progress\")
+      in [\"0\", \"100\"]\n-%}\n  {%- set total_time = (as_datetime(states(\"sensor.bambu_p1s_end_time\"))
       - as_datetime(states(\"sensor.bambu_p1s_start_time\"))).total_seconds() / 60
       -%}\n  {%- if total_time > 60 -%}\n    {%- set step = 10 -%}\n  {%- else -%}\n
       \   {%- set step = 25 -%}\n  {%- endif -%}\n  {{ states(\"sensor.bambu_p1s_print_progress\")
       | int % step == 0 }}\n{%- else -%}\n  {{ false }}\n{%- endif -%}"
   action:
   - variables:
+      progress: '{{ states("sensor.bambu_p1s_print_progress") }}%'
+      title: 3D Print Status {{ progress }}
       message: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".gcode","")
-        }} is at {{ states("sensor.bambu_p1s_print_progress") }}%'
+        }} is at {{ progress }}'
   - parallel:
     - service: script.notify_mobile
       data:
         who: joshua
-        title: 3D Print Status
+        title: '{{ title }}'
         message: '{{ message }}'
         notification_icon: mdi:printer-3d
         color: '#16c344'
@@ -5152,7 +5160,7 @@
       data:
         entity:
         - media_player.erebus
-        title: 3D Print Status
+        title: '{{ title }}'
         message: '{{ message }}'
         camera: image.bambu_p1s_camera
   mode: single
@@ -5206,7 +5214,7 @@
     - platform: numeric_state
       entity_id:
       - sensor.bambu_p1s_bed_temperature
-      below: 46.3
+      below: 46
     timeout:
       hours: 0
       minutes: 20
@@ -5217,7 +5225,7 @@
       data:
         who: joshua
         title: 3D Print {{ trigger.id }}
-        message: Bed has cooled down, you can remove {{ model }}
+        message: Bed has cooled down. {{ message }}
         notification_icon: mdi:printer-3d
         color: '#16c344'
         icon_url: local/icons/bambu-lab.png
@@ -5233,6 +5241,11 @@
         title: 3D Print {{ trigger.id }}
         message: Bed has cooled down, you can remove {{ model }}
         camera: image.bambu_p1s_camera
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.bambu_p1s_chamber_light
   mode: single
 - id: '1714000511725'
   alias: "\U0001F4AC Bambu P1S Printer Error"
@@ -5271,4 +5284,8 @@
         title: '{{ title }}'
         message: '{{ message }}'
         camera: image.bambu_p1s_camera
+        actions:
+        - action: URI
+          title: Bambu Lab Wiki
+          uri: '{{ trigger.event.data.url }}'
   mode: single
