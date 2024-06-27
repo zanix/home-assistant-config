@@ -140,10 +140,6 @@ The Moon integration tracks the phases of the moon
 
 Allows extremely lightweight publish/subscribe messaging transport
 
-### [OpenGarage](https://www.home-assistant.io/integrations/opengarage)
-
-The OpenGarage integration lets you control the open-source OpenGarage.io device
-
 ### [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap)
 
 The OpenWeatherMap weather integrations uses OpenWeatherMap as a source for current meteorological data for your location
@@ -553,7 +549,6 @@ A Material You and Google Home app influenced theme for Home Assistant
   - Bluetooth proxy
   - Car presense
   - Soft water salt level sensor
-- [OpenGarage](https://opengarage.io) - Opens, closes, and reads the status of my garage door as well detecting the presence of my car
 - [Vision Z-Wave Plus Recessed Door and Window Sensor](https://www.amazon.com/dp/B01JNOCQL4)
 - [Zooz 700 Series Z-Wave Plus 4-in-1 Sensor ZSE40](https://www.amazon.com/dp/B01AKSO80O)
 
