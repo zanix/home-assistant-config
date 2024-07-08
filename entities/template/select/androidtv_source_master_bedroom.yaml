@@ -6,22 +6,23 @@
 # https://www.home-assistant.io/integrations/template/
 #
 select:
-  - name: Shield Source Living Room
-    availability: '{{ has_value("media_player.androidtv_living_room") }}'
+  - name: AndroidTV Source Master Bedroom
+    availability: '{{ has_value("media_player.androidtv_master_bedroom") }}'
     state: |-
       {%- from "variables.jinja" import androidtv_app_id %}
-      {%- set source = state_attr('media_player.androidtv_living_room', 'app_id') | default('off', true) -%}
+      {%- set source = state_attr('media_player.androidtv_master_bedroom', 'app_id') | default('off', true) -%}
       {%- set sources = androidtv_app_id() | from_json -%}
       {{ iif(source in sources, sources[source], source) }}
     options: |-
       {%- from "variables.jinja" import androidtv_app_id %}
       {{ (androidtv_app_id() | from_json).values() | list }}
     select_option:
-      - service: remote.turn_on
+      - service: media_player.play_media
         target:
-          entity_id: remote.androidtv_living_room
+          entity_id: media_player.androidtv_master_bedroom
         data:
-          source: |-
-            {%- from "variables.jinja" import androidtv_deeplink %}
-            {%- set sources = androidtv_deeplink() | from_json -%}
-            {{ iif(option in sources, sources[option], option) }}
+          media_content_type: app
+          media_content_id: |-
+            {%- from "variables.jinja" import androidtv_app_id %}
+            {%- set sources = androidtv_app_id() | from_json -%}
+            {{ (dict_flip(sources) | from_json)[option] }}
