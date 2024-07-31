@@ -1036,39 +1036,29 @@
   - service: homeassistant.turn_off
     entity_id: switch.garage_entry_light
   mode: single
-- id: '1665686852635'
-  alias: "\U0001F512 Front Door Lock at Night"
-  description: ''
-  trigger:
-  - platform: time
-    at: input_datetime.front_door_lock_night
-  condition:
-  - condition: state
-    entity_id: lock.front_door
-    state: unlocked
-  - condition: state
-    entity_id: binary_sensor.front_door_contact_door_is_open
-    state: 'off'
-  action:
-  - service: lock.lock
-    entity_id: lock.front_door
-  mode: single
 - id: '1665686891355'
-  alias: "\U0001F512 Front Door Lock Jammed"
+  alias: "\U0001F512 Door Lock Jammed"
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.front_door_lock_lock_jammed
+    entity_id:
+    - binary_sensor.front_door_lock_jammed
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.garage_entry_lock_jammed
     to: 'on'
   condition: []
   action:
   - variables:
-      message: Check the front door, something is wrong with the lock.
+      lock: '{{ trigger.to_state.attributes.friendly_name | replace('' jammed'', '''')
+        }}'
+      message: Check the {{ lock }}, something is wrong.
   - parallel:
     - service: script.notify_mobile
       data:
         who: parents
-        title: Front Door Lock Issue
+        title: '{{ lock }} Issue'
         message: '{{ message }}'
         notification_icon: mdi:lock-smart
         color: '#03a9f4'
@@ -1079,7 +1069,7 @@
         entity:
         - media_player.erebus
         - media_player.nasya
-        title: Front Door Lock Issue
+        title: '{{ lock }} Issue'
         message: '{{ message }}'
     - service: script.notify_pipup
       data:
@@ -1087,7 +1077,7 @@
         - media_player.shield_living_room
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Front Door Lock Issue
+        title: '{{ lock }} Issue'
         message: '{{ message }}'
         icon_url: local/icons/lock-smart.png
     - service: script.notify_speech
@@ -1096,7 +1086,7 @@
         message: '{{ message }}'
   mode: single
 - id: '1665686913548'
-  alias: "\U0001F512 Front Door Lock when Away"
+  alias: "\U0001F512 Lock Doors when Away"
   description: ''
   trigger:
   - platform: state
@@ -1109,16 +1099,39 @@
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
-  - condition: time
-    after: input_datetime.front_door_auto_lock_off
-    before: input_datetime.front_door_lock_night
+  action:
+  - if:
+    - condition: state
+      entity_id: schedule.front_door_auto_lock
+      state: 'off'
   - condition: state
     entity_id: lock.front_door
     state: unlocked
-  action:
-  - parallel:
+    - condition: state
+      entity_id: binary_sensor.front_door_window_door_is_open
+      state: 'off'
+    then:
     - service: lock.lock
+      metadata: {}
+      data: {}
+      target:
       entity_id: lock.front_door
+  - if:
+    - condition: state
+      entity_id: schedule.garage_entry_auto_lock
+      state: 'off'
+    - condition: state
+      entity_id: lock.garage_entry
+      state: unlocked
+    - condition: state
+      entity_id: binary_sensor.garage_entry_window_door_is_open
+      state: 'off'
+    then:
+    - service: lock.lock
+      metadata: {}
+      data: {}
+      target:
+        entity_id: lock.garage_entry
     - service: script.notify_mobile
       data:
         who: parents
@@ -1128,26 +1141,6 @@
         color: '#03a9f4'
         icon_url: local/icons/lock-smart.png
         group: Security
-  mode: single
-- id: '1665686933625'
-  alias: "\U0001F512 Front Door Re-lock after Unlock"
-  description: ''
-  trigger:
-  - platform: state
-    entity_id: lock.front_door
-    to: unlocked
-    for:
-      minutes: 2
-  condition:
-  - condition: time
-    after: input_datetime.front_door_lock_night
-    before: input_datetime.front_door_auto_lock_off
-  - condition: state
-    entity_id: binary_sensor.front_door_contact_door_is_open
-    state: 'off'
-  action:
-  - service: lock.lock
-    entity_id: lock.front_door
   mode: single
 - id: '1665687778783'
   alias: "\U0001F37D️ Dishwasher is Done"
@@ -1194,9 +1187,9 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.front_door_contact_door_is_open
+    - binary_sensor.front_door_window_door_is_open
     - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_door_contact_door_is_open
+    - binary_sensor.garage_entry_window_door_is_open
     - binary_sensor.garage_side_door_contact_door_is_open
     from: 'on'
     to: 'off'
@@ -1230,9 +1223,9 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.front_door_contact_door_is_open
+    - binary_sensor.front_door_window_door_is_open
     - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_door_contact_door_is_open
+    - binary_sensor.garage_entry_window_door_is_open
     - binary_sensor.garage_side_door_contact_door_is_open
     from: 'off'
     to: 'on'
@@ -1348,9 +1341,9 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.front_door_contact_door_is_open
+    - binary_sensor.front_door_window_door_is_open
     - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_door_contact_door_is_open
+    - binary_sensor.garage_entry_window_door_is_open
     - binary_sensor.garage_side_door_contact_door_is_open
     from: 'off'
     to: 'on'
@@ -2985,7 +2978,7 @@
   description: Sends notification if a window is left open
   trigger:
   - platform: state
-    entity_id: binary_sensor.front_door_contact_door_is_open
+    entity_id: binary_sensor.front_door_window_door_is_open
     from: 'off'
     to: 'on'
     for:
@@ -3920,7 +3913,7 @@
       loiter_timer: 0
       fps: '{{ states(''sensor.'' + camera + ''_camera_fps'') | int(5) }}'
       state_entities:
-        binary_sensor.front_door_contact_door_is_open: 2
+        binary_sensor.front_door_window_door_is_open: 2
         binary_sensor.doorbell_ring: 1
       states_filter:
       - 'off'

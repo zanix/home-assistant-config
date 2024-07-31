@@ -10,8 +10,8 @@
 influxdb:
   exclude:
     entity_globs:
-      - sensor.*_code_slot_*
-      - sensor.connected_*
+      - sensor.front_door_code_slot_*
+      - sensor.connected_front_door_*
 
 ###############  input_boolean:  #################
 input_boolean:
@@ -24,6 +24,12 @@ input_boolean:
   front_door_reset_lock:
     name: Reset Lock
     icon: mdi:lock-reset
+  keymaster_front_door_autolock:
+    name: Auto Lock
+    icon: mdi:key-remove
+  keymaster_front_door_retry:
+    name: Retry Auto Lock
+    icon: mdi:lock-clock
 
 ###################  script:  ####################
 script:
@@ -128,11 +134,75 @@ script:
               data_template:
                 entity_id: "input_boolean.{{ days[repeat.index - 1] }}_inc_front_door_{{ code_slot | string }}"
 
+  keymaster_front_door_start_timer:
+    alias: '🔑 Front Door Start Timer'
+    icon: mdi:clock-start
+    sequence:
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_autolock
+        state: "on"
+      - condition: state
+        entity_id: lock.front_door
+        state: "unlocked"
+      - service: timer.cancel
+        entity_id: timer.keymaster_front_door_autolock
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_night') }}
+              - condition: state
+                entity_id: schedule.front_door_auto_lock
+                state: "on"
+            sequence:
+              - service: timer.start
+                metadata: {}
+                data:
+                  duration: >-
+                    {{ states('input_text.keymaster_front_door_autolock_door_time_night') }}
+                target:
+                  entity_id: timer.keymaster_front_door_autolock
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_day') }}
+              - condition: state
+                entity_id: schedule.front_door_auto_lock
+                state: "off"
+            sequence:
+              - service: timer.start
+                metadata: {}
+                data:
+                  duration: >-
+                    {{ states('input_text.keymaster_front_door_autolock_door_time_day') }}
+                target:
+                  entity_id: timer.keymaster_front_door_autolock
+
+  boltchecked_lock_front_door:
+    alias: '🔑 Front Door Boltchecked'
+    icon: mdi:lock-open-check
+    sequence:
+      - service: lock.lock
+        data:
+          entity_id: lock.front_door
+
+  boltchecked_retry_front_door:
+    alias: '🔑 Front Door Boltchecked Retry'
+    icon: mdi:lock-reset
+    sequence:
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
+      - service: persistent_notification.create
+        data_template:
+          title: "Front Door Lock"
+          message: >-
+            {{ 'Unable to lock Front Door as the sensor indicates the door is currently opened. The operation will be automatically retried when the door is closed.'}}
+
 ###################  automation:  ####################
 automation:
-
-  - id: keymaster_front_door_reset_codeslot
-    alias: "🔑 Front Door Reset Codeslot"
+  - alias: "🔑 Front Door Reset Codeslot"
+    id: keymaster_front_door_reset_codeslot
     trigger:
       entity_id: input_boolean.reset_codeslot_front_door_1,input_boolean.reset_codeslot_front_door_2,input_boolean.reset_codeslot_front_door_3,input_boolean.reset_codeslot_front_door_4,input_boolean.reset_codeslot_front_door_5,input_boolean.reset_codeslot_front_door_6,input_boolean.reset_codeslot_front_door_7,input_boolean.reset_codeslot_front_door_8
       platform: state
@@ -142,8 +212,8 @@ automation:
         data_template:
           code_slot: "{{ trigger.entity_id.split('_')[-1] }}"
 
-  - id: keymaster_front_door_lock_notifications
-    alias: "🔑 Front Door Lock Notifications"
+  - alias: "🔑 Front Door Lock Notifications"
+    id: keymaster_front_door_lock_notifications
     trigger:
       platform: event
       event_type: keymaster_lock_state_changed
@@ -159,11 +229,11 @@ automation:
       - service: script.keymaster_front_door_manual_notify
         data_template:
           title: Front Door Lock
-          message: "{{ trigger.event.data.action_text }}"
+          message: "{{ trigger.event.data.action_text }} {% if trigger.event.data.code_slot > 0 %}({{ trigger.event.data.code_slot_name }}){% endif %}"
           who: joshua
 
-  - id: keymaster_front_door_user_notifications
-    alias: "🔑 Front Door User Notifications"
+  - alias: "🔑 Front Door User Notifications"
+    id: keymaster_front_door_user_notifications
     trigger:
       platform: event
       event_type: keymaster_lock_state_changed
@@ -180,10 +250,10 @@ automation:
           title: Front Door Lock
           message: "{{ trigger.event.data.action_text }} ({{ trigger.event.data.code_slot_name }})"
 
-  - id: keymaster_front_door_open_and_close
-    alias: "🔑 Front Door Open and Close"
+  - alias: "🔑 Front Door Open and Close"
+    id: keymaster_front_door_open_and_close
     trigger:
-      entity_id: binary_sensor.front_door_contact_door_is_open
+      entity_id: binary_sensor.front_door_window_door_is_open
       platform: state
     condition:
       - condition: state
@@ -197,8 +267,8 @@ automation:
           title: Front Door Lock
           message: "{% if trigger.to_state.state == 'on' %}Door Opened{% else %}Door Closed{% endif %}"
 
-  - id: keymaster_front_door_changed_code
-    alias: "🔑 Front Door Changed Code"
+  - alias: "🔑 Front Door Changed Code"
+    id: keymaster_front_door_changed_code
     trigger:
       entity_id: input_text.front_door_pin_1,input_text.front_door_pin_2,input_text.front_door_pin_3,input_text.front_door_pin_4,input_text.front_door_pin_5,input_text.front_door_pin_6,input_text.front_door_pin_7,input_text.front_door_pin_8
       platform: state
@@ -221,8 +291,8 @@ automation:
           entity_id: >-
             {{ 'input_boolean.enabled_front_door_' + trigger.entity_id.split('_')[-1] }}
 
-  - id: keymaster_front_door_reset
-    alias: "🔑 Front Door Reset"
+  - alias: "🔑 Front Door Reset"
+    id: keymaster_front_door_reset
     trigger:
       entity_id: input_boolean.front_door_reset_lock
       platform: state
@@ -233,8 +303,8 @@ automation:
       - service: input_boolean.turn_off
         entity_id: input_boolean.front_door_reset_lock
 
-  - id: keymaster_front_door_decrement_access_count
-    alias: "🔑 Front Door Decrement Access Count"
+  - alias: "🔑 Front Door Decrement Access Count"
+    id: keymaster_front_door_decrement_access_count
     trigger:
       platform: event
       event_type: keymaster_lock_state_changed
@@ -257,8 +327,184 @@ automation:
         data_template:
           entity_id: "{{ 'input_number.accesscount_front_door_' + trigger.event.data.code_slot | string }}"
 
+  - alias: "🔑 Front Door Locked"
+    id: keymaster_front_door_locked
+    trigger:
+      entity_id: lock.front_door
+      platform: state
+      to: locked
+    action:
+      - service: timer.cancel
+        entity_id: timer.keymaster_front_door_autolock
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
+
+  - alias: "🔑 Retry Bolt Closed Front Door"
+    id: keymaster_retry_bolt_closed_front_door
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_door_window_door_is_open
+      to: "off"
+    condition:
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_retry
+        state: "on" 
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_autolock
+        state: "on"
+    action:
+      - service: persistent_notification.create
+        data_template:
+          title: Front Door Lock
+          message: >-
+            {{ 'The Front Door sensor indicates the door has been closed, re-attempting to lock.'}}
+      - service: lock.lock
+        entity_id: lock.boltchecked_front_door
+
+  - alias: "🔑 Front Door Opened"
+    id: keymaster_front_door_opened
+    trigger:
+      platform: state
+      entity_id: binary_sensor.front_door_window_door_is_open
+      to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_autolock
+        state: "on"
+    action:
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_night') }}
+              - condition: state
+                entity_id: schedule.front_door_auto_lock
+                state: "on"
+            sequence:
+              - service: timer.start
+                metadata: {}
+                data:
+                  duration: >-
+                    {{ states('input_text.keymaster_front_door_autolock_door_time_night') }}
+                target:
+                  entity_id: timer.keymaster_front_door_autolock
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_day') }}
+              - condition: state
+                entity_id: schedule.front_door_auto_lock
+                state: "off"
+            sequence:
+              - service: timer.start
+                metadata: {}
+                data:
+                  duration: >-
+                    {{ states('input_text.keymaster_front_door_autolock_door_time_day') }}
+                target:
+                  entity_id: timer.keymaster_front_door_autolock
+
+  - alias: "🔑 Front Door Unlocked Start Auto-lock"
+    id: keymaster_front_door_unlocked_start_autolock
+    trigger:
+      entity_id: lock.front_door
+      platform: state
+      to: unlocked
+    condition:
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_autolock
+        state: "on"
+    action:
+      - service: script.turn_on
+        entity_id: script.keymaster_front_door_start_timer
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
+
+  - alias: "🔑 Front Door Timer Finished"
+    id: keymaster_front_door_timer_finished
+    condition:
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_autolock
+        state: "on"
+    trigger:
+      platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.keymaster_front_door_autolock
+    action:
+      - service: lock.lock
+        entity_id: lock.boltchecked_front_door
+
+  - alias: "🔑 Front Door Timer Canceled"
+    id: keymaster_front_door_timer_canceled
+    trigger:
+      platform: event
+      event_type: timer.cancelled
+      event_data:
+        entity_id: timer.keymaster_front_door_autolock
+    action:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
+
+  - alias: "🔑 Front Door Disable Auto-lock"
+    id: keymaster_front_door_disable_auto_lock
+    trigger:
+      entity_id: input_boolean.keymaster_front_door_autolock
+      platform: state
+      to: "off"
+    action:
+      - service: timer.cancel
+        entity_id:
+          - timer.keymaster_front_door_autolock
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
+
+  - alias: "🔑 Front Door Enable Auto-lock"
+    id: keymaster_front_door_enable_auto_lock
+    trigger:
+      entity_id: input_boolean.keymaster_front_door_autolock
+      platform: state
+      to: "on"
+    action:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
+      - service: timer.cancel
+        entity_id:
+          - timer.keymaster_front_door_autolock
+      - service: script.turn_on
+        entity_id: script.keymaster_front_door_start_timer
+
+###################  timer:  ####################
+timer:
+  keymaster_front_door_autolock:
+    name: "Auto Lock Timer"
+
+###################  lock:  ####################
+lock:
+  - platform: template
+    name: Boltchecked Front Door
+    unique_id: "lock.boltchecked_front_door"
+    value_template: "{{ is_state('lock.front_door', 'locked') }}"
+    lock:
+      service: "{{ 'script.boltchecked_retry_front_door' if (is_state('binary_sensor.front_door_window_door_is_open', 'on')) else 'script.boltchecked_lock_front_door' }}"
+    unlock:
+      service: lock.unlock
+      data:
+        entity_id: lock.front_door
+
+
 ###############  input_text:  #################
 input_text:
   front_door_lockname:
     initial: front_door
     name: "Lock Name"
+
+  keymaster_front_door_autolock_door_time_day:
+    name: "Front Door Day Auto Lock HH:MM:SS"
+  keymaster_front_door_autolock_door_time_night:
+    name: "Front Door Night Auto Lock HH:MM:SS"

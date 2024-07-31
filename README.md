@@ -542,16 +542,11 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
   flashed for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
 - [ESPHome](https://esphome.io) - DIY devices
-  - Bluetooth proxy
-  - Car presense
-  - Soft water salt level sensor
-- [Vision Z-Wave Plus Recessed Door and Window Sensor](https://www.amazon.com/dp/B01JNOCQL4)
 - [Zooz 700 Series Z-Wave Plus 4-in-1 Sensor ZSE40](https://www.amazon.com/dp/B01AKSO80O)
 
 ### Switch
 
 - [IKEA E1524/E1810 5-Button Remote Control](https://www.amazon.com/dp/B07KM1YZWW)
-- [Leviton ZW4SF-1BW Smart 4 Speed Fan Controller](https://www.amazon.com/dp/B08GQJWSRG)
 - [Philips Hue Dimmer Remote 324131092621](https://www.amazon.com/dp/B0167Z0P3I)
 - [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
 - [SONOFF S31 Lite 15A Zigbee Smart Plug](https://www.amazon.com/dp/B08Y87WD1X) - Smart plug
@@ -578,17 +573,17 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 ### Network
 
-- [Aeon Labs Z Wave Stick (GEN 5)](https://www.amazon.com/dp/B00X0AWA6E)
-- [SONOFF Zigbee 3.0 USB Dongle Plus Gateway](https://sonoff.tech/product/diy-smart-switch/sonoff-dongle-plus/)
+- [SONOFF Zigbee 3.0 USB Dongle Plus Gateway](https://sonoff.tech/product/diy-smart-switch/sonoff-dongle-plus)
 - [Ubiquiti Unifi Cloud Gateway Ultra](https://store.ui.com/us/en/products/ucg-ultra)
 - [Ubiquiti Switch 24 PoE (250W)](https://store.ui.com/us/en/collections/unifi-switching-standard-power-over-ethernet/products/us-24-250w)
 - [Ubiquiti Switch 8](https://store.ui.com/us/en/products/us-8)
 - [Ubiquiti Switch Flex Mini](https://store.ui.com/us/en/collections/unifi-switching-utility-mini/products/usw-flex-mini)
 - [Ubiquiti Access Point WiFi 6 Pro](https://store.ui.com/us/en/collections/unifi-wifi-flagship-high-capacity/products/u6-pro)
+- [Zooz 800 Series Z-Wave Long Range S2](https://www.amazon.com/gp/product/B0BW171KP3)
 
 ### Security
 
-- [Schlage Connect Lock](https://www.amazon.com/gp/product/B00OV49YXU) - Z-Wave controllable lock. Nice to give temp codes for guests or when you forget the keys
+- [Yale Assure Lock 2](https://www.amazon.com/gp/product/B0BMS871H7) - Z-Wave controllable lock. Nice to give temp codes for guests or when you forget the keys.
 
 ### Other
 

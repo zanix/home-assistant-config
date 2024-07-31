@@ -9796,10 +9796,14 @@ views:
                   action: none
               - type: template
                 entity: input_boolean.guest_mode
+                icon: '{{ iif(is_state(entity, "on"), "mdi:account-question", "mdi:account-question-outline")
+                  }}'
                 icon_color: '{{ iif(is_state(entity, "on"), "green", "disabled") }}'
                 icon: mdi:account-question
                 tap_action:
                   action: more-info
+                hold_action:
+                  action: toggle
               - type: template
                 icon: mdi:chart-gantt
                 icon_color: light-green
@@ -9808,8 +9812,41 @@ views:
                   navigation_path: frigate
       - type: vertical-stack
         cards:
-          - type: custom:mushroom-title-card
-            title: Doors
+          - type: custom:decluttering-card
+            template: title_chips
+            variables:
+              - title: Doors
+              - chips:
+                  - type: template
+                    entity: input_boolean.door_open_alerts
+                    icon: mdi:door-open
+                    icon_color: "{% if is_state(entity, \"off\") %}\n  yellow\n{%\
+                      \ else %}\n  green\n{% endif %}"
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: toggle
+                    card_mod:
+                      style: "ha-card {\n  {%- if is_state(config.entity, \"off\"\
+                        ) -%}\n  animation: ping 2s infinite;\n  {%- endif -%}\n}\n\
+                        @keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow),\
+                        \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent;\
+                        \ }\n}\n"
+                  - type: template
+                    entity: input_boolean.garage_door_open_alerts
+                    icon: mdi:garage-variant
+                    icon_color: "{% if is_state(entity, \"off\") %}\n  yellow\n{%\
+                      \ else %}\n  green\n{% endif %}"
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: toggle
+                    card_mod:
+                      style: "ha-card {\n  {%- if is_state(config.entity, \"off\"\
+                        ) -%}\n  animation: ping 2s infinite;\n  {%- endif -%}\n}\n\
+                        @keyframes ping {\n  0% { box-shadow: 0 0 1px 1px rgba(var(--rgb-yellow),\
+                        \ 0.7); }\n  100% { box-shadow: 0 0 5px 15px transparent;\
+                        \ }\n}\n"
           - type: grid
             square: false
             columns: 2
@@ -9817,7 +9854,7 @@ views:
               - type: custom:vertical-stack-in-card
                 cards:
                   - type: custom:mushroom-template-card
-                    entity: binary_sensor.front_door_contact_door_is_open
+                    entity: binary_sensor.front_door_window_door_is_open
                     primary: Front Door
                     secondary: "{% from \"util.jinja\" import nominal_change_history\
                       \ %} {% if is_state(entity, \"on\") -%}\n  Open\n{% endif -%}\
@@ -9840,11 +9877,11 @@ views:
                       action: fire-dom-event
                       browser_mod:
                         data:
-                          entity: sensor.front_door_contact_battery_level
+                          entity: sensor.front_door_battery_level
                         service: browser_mod.more_info
                     card_mod:
                       style:
-                        mushroom-shape-icon$: "{% set battery_entity = \"sensor.front_door_contact_battery_level\"\
+                        mushroom-shape-icon$: "{% set battery_entity = \"sensor.front_door_battery_level\"\
                           \ %} {% if (states(battery_entity) | int) <= 60 %} {% from\
                           \ \"util.jinja\" import battery_color %} .shape {\n  /*\
                           \ Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
@@ -9864,33 +9901,38 @@ views:
                       padding: 0
                     cards:
                       - type: custom:mushroom-template-card
-                        entity: sensor.front_door_lock_battery_level
+                        entity: sensor.front_door_battery_level
                         icon: mdi:lock-smart
                         icon_color: disabled
                         tap_action:
                           action: navigate
-                          navigation_path: /lock-admin
+                          navigation_path: /lock-admin/front-door
                         hold_action:
                           action: fire-dom-event
                           browser_mod:
                             data:
-                              entity: sensor.front_door_lock_battery_level
+                              entity: sensor.front_door_battery_level
                             service: browser_mod.more_info
                         card_mod:
                           style:
                             .: "ha-card {\n  --icon-size: 42px;\n  --ha-card-box-shadow:\
                               \ none;\n  --ha-card-border-width: 0;\n}\n"
-                            mushroom-shape-icon$: "{% if int(states(config.entity),\
-                              \ 0) <= 60 %}\n{% from \"util.jinja\" import battery_color\
-                              \ %}\n.shape {\n  /* Radial progress bar */\n  background:\n\
-                              \    radial-gradient(var(--card-background-color) 60%,\
-                              \ transparent calc(60% + 1px)),\n    conic-gradient(var(--{{\
-                              \ battery_color(config.entity) }}-color) {{ states(config.entity)\
-                              \ }}% 0%, var(--card-background-color) 0% 100%\n  );\n\
-                              }\n.shape:after {\n  /* Add back icon shape */\n  content:\
+                            mushroom-shape-icon$: "{% set timer = \"timer.keymaster_front_door_autolock\"\
+                              \ %} {% if state_attr(timer, \"finishes_at\") %} {%\
+                              \ set remaining = (as_datetime(state_attr(timer, \"\
+                              finishes_at\")) - now()).total_seconds() | int %} {%\
+                              \ set duration =\n  (state_attr(timer, \"duration\"\
+                              ).split(\":\")[0] | int * 60 * 60)\n  + (state_attr(timer,\
+                              \ \"duration\").split(\":\")[1] | int * 60)\n  + (state_attr(timer,\
+                              \ \"duration\").split(\":\")[2] | int)\n%} .shape {\n\
+                              \  /* Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+                              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--icon-color)\
+                              \ {{ ((duration - remaining) / duration * 100) | round()\
+                              \ }}% 0%, var(--card-background-color) 0% 100%);\n}\
+                              \ .shape:after {\n  /* Add back icon shape */\n  content:\
                               \ \"\";\n  height: 100%;\n  width: 100%;\n  position:\
                               \ absolute;\n  border-radius: var(--icon-border-radius);\n\
-                              \  background: var(--shape-color);\n}\n{% endif %}\n"
+                              \  background: var(--shape-color);\n} {%- endif -%}\n"
                       - type: custom:mushroom-lock-card
                         entity: lock.front_door
                         name: Front Door
@@ -9901,6 +9943,112 @@ views:
                           style:
                             .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
                               \ 0;\n  background: none;\n}\n"
+              - type: custom:vertical-stack-in-card
+                cards:
+                  - type: custom:mushroom-template-card
+                    entity: binary_sensor.garage_entry_window_door_is_open
+                    primary: Garage Entry
+                    secondary: "{% from \"util.jinja\" import nominal_change_history\
+                      \ %} {% if is_state(entity, \"on\") -%}\n  Open\n{% endif -%}\
+                      \ {% if is_state(\"lock.garage_entry\", \"unlocked\") -%}\n\
+                      \  Unlocked\n{% else -%}\n  Locked\n{% endif -%} ⸱ {{ nominal_change_history(entity)\
+                      \ }}"
+                    icon: "{% if is_state(entity, \"on\") %}\n  mdi:door-open\n{%\
+                      \ elif is_state(\"lock.garage_entry\", \"unlocked\") and is_state(entity,\
+                      \ \"off\") %}\n  mdi:door-closed\n{% elif is_state(\"lock.garage_entry\"\
+                      , \"locked\") and is_state(entity, \"off\") %}\n  mdi:door-closed-lock\n\
+                      {% endif %}"
+                    icon_color: "{% if is_state(entity, \"on\") %}\n  red\n{% elif\
+                      \ is_state(\"lock.garage_entry\", \"unlocked\") and is_state(entity,\
+                      \ \"off\") %}\n  yellow\n{% elif is_state(\"lock.garage_entry\"\
+                      , \"locked\") and is_state(entity, \"off\") %}\n  green\n{%\
+                      \ endif %}"
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        data:
+                          entity: sensor.garage_entry_battery_level
+                        service: browser_mod.more_info
+                    card_mod:
+                      style:
+                        mushroom-shape-icon$: "{% set battery_entity = \"sensor.garage_entry_battery_level\"\
+                          \ %} {% if (states(battery_entity) | int) <= 60 %} {% from\
+                          \ \"util.jinja\" import battery_color %} .shape {\n  /*\
+                          \ Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+                          \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--{{\
+                          \ battery_color(battery_entity) }}-color) {{ states(battery_entity)\
+                          \ }}% 0%, var(--card-background-color) 0% 100%\n  );\n}\
+                          \ .shape:after {\n  /* Add back icon shape */\n  content:\
+                          \ \"\";\n  height: 100%;\n  width: 100%;\n  position: absolute;\n\
+                          \  border-radius: var(--icon-border-radius);\n  background:\
+                          \ var(--shape-color);\n} {% endif %}"
+                  - type: custom:layout-card
+                    layout_type: custom:grid-layout
+                    layout:
+                      grid-template-columns: 65px auto
+                      grid-template-rows: auto
+                      margin: 0 -2px -10px -2px
+                      padding: 0
+                    cards:
+                      - type: custom:mushroom-template-card
+                        entity: sensor.garage_entry_battery_level
+                        icon: mdi:lock-smart
+                        icon_color: disabled
+                        tap_action:
+                          action: navigate
+                          navigation_path: /lock-admin/garage-entry
+                        hold_action:
+                          action: fire-dom-event
+                          browser_mod:
+                            data:
+                              entity: sensor.garage_entry_battery_level
+                            service: browser_mod.more_info
+                        card_mod:
+                          style:
+                            .: "ha-card {\n  --icon-size: 42px;\n  --ha-card-box-shadow:\
+                              \ none;\n  --ha-card-border-width: 0;\n}\n"
+                            mushroom-shape-icon$: "{% set timer = \"timer.keymaster_garage_entry_autolock\"\
+                              \ %} {% if state_attr(timer, \"finishes_at\") %} {%\
+                              \ set remaining = (as_datetime(state_attr(timer, \"\
+                              finishes_at\")) - now()).total_seconds() | int %} {%\
+                              \ set duration =\n  (state_attr(timer, \"duration\"\
+                              ).split(\":\")[0] | int * 60 * 60)\n  + (state_attr(timer,\
+                              \ \"duration\").split(\":\")[1] | int * 60)\n  + (state_attr(timer,\
+                              \ \"duration\").split(\":\")[2] | int)\n%} .shape {\n\
+                              \  /* Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+                              \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--icon-color)\
+                              \ {{ ((duration - remaining) / duration * 100) | round()\
+                              \ }}% 0%, var(--card-background-color) 0% 100%);\n}\
+                              \ .shape:after {\n  /* Add back icon shape */\n  content:\
+                              \ \"\";\n  height: 100%;\n  width: 100%;\n  position:\
+                              \ absolute;\n  border-radius: var(--icon-border-radius);\n\
+                              \  background: var(--shape-color);\n} {%- endif -%}\n"
+                      - type: custom:mushroom-lock-card
+                        entity: lock.garage_entry
+                        name: Garage Entry
+                    primary_info: none
+                    secondary_info: none
+                    icon_type: none
+                        card_mod:
+                          style:
+                            .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                              \ 0;\n  background: none;\n}\n"
+              - type: custom:decluttering-card
+                template: door_card
+                variables:
+                  - name: Sliding Door
+                  - entity: binary_sensor.sliding_door_contact
+                  - battery_entity: sensor.sliding_door_contact_battery_level
+                  - icon: mdi:door-sliding
+              - type: custom:decluttering-card
+                template: door_card
+                variables:
+                  - name: Garage Side Door
+                  - entity: binary_sensor.garage_side_door_contact_door_is_open
+                  - battery_entity: sensor.garage_side_door_contact_battery_level
+                  - icon: mdi:door
               - type: custom:vertical-stack-in-card
                 cards:
                   - type: custom:mushroom-template-card
@@ -9926,89 +10074,7 @@ views:
                     primary_info: none
                     secondary_info: none
                     icon_type: none
-              - type: custom:decluttering-card
-                template: door_card
-                variables:
-                  - name: Sliding Door
-                  - entity: binary_sensor.sliding_door_contact
-                  - battery_entity: sensor.sliding_door_contact_battery_level
-                  - icon: mdi:door-sliding
-              - type: custom:decluttering-card
-                template: door_card
-                variables:
-                  - name: Garage Entry Door
-                  - entity: binary_sensor.garage_entry_door_contact_door_is_open
-                  - battery_entity: sensor.garage_entry_door_contact_battery_level
-                  - icon: mdi:door
-              - type: custom:decluttering-card
-                template: door_card
-                variables:
-                  - name: Garage Side Door
-                  - entity: binary_sensor.garage_side_door_contact_door_is_open
-                  - battery_entity: sensor.garage_side_door_contact_battery_level
-                  - icon: mdi:door
-              - type: grid
-                square: false
-                columns: 3
-                cards:
-                  - type: custom:mushroom-template-card
-                    layout: vertical
-                    entity: input_boolean.door_open_alerts
-                    icon: mdi:door
-                    icon_color: "{% if is_state(entity, \"off\") %}\n  yellow\n{%\
-                      \ endif %}"
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: toggle
-                    card_mod:
-                      style:
-                        .: "ha-card {\n  background: none;\n  box-shadow: none;\n\
-                          \  border-width: 0;\n  margin-top: 10px;\n}\n"
-                        mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity,\
-                          \ \"off\") -%}\n  --shape-animation: ping 2s infinite;\n\
-                          \  {%- endif -%}\n}\n@keyframes ping {\n  0% { box-shadow:\
-                          \ 0 0 1px 1px rgba(var(--rgb-yellow), 0.7); }\n  100% {\
-                          \ box-shadow: 0 0 5px 15px transparent; }\n}\n"
-                  - type: custom:mushroom-template-card
-                    layout: vertical
-                    entity: input_boolean.garage_door_open_alerts
-                    icon: mdi:garage-variant
-                    icon_color: "{% if is_state(entity, \"off\") %}\n  yellow\n{%\
-                      \ endif %}"
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: toggle
-                    card_mod:
-                      style:
-                        .: "ha-card {\n  background: none;\n  box-shadow: none;\n\
-                          \  border-width: 0;\n  margin-top: 10px;\n}\n"
-                        mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity,\
-                          \ \"off\") -%}\n  --shape-animation: ping 2s infinite;\n\
-                          \  {%- endif -%}\n}\n@keyframes ping {\n  0% { box-shadow:\
-                          \ 0 0 1px 1px rgba(var(--rgb-yellow), 0.7); }\n  100% {\
-                          \ box-shadow: 0 0 5px 15px transparent; }\n}\n"
-                  - type: custom:mushroom-template-card
-                    layout: vertical
-                    entity: input_boolean.guest_mode
-                    icon: '{{ iif(is_state(entity, "on"), "mdi:account-question",
-                      "mdi:account-question-outline") }}'
-                    icon_color: '{{ iif(is_state(entity, "on"), "green", "disabled")
-                      }}'
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: toggle
-                    card_mod:
-                      style:
-                        .: "ha-card {\n  background: none;\n  box-shadow: none;\n\
-                          \  border-width: 0;\n  margin-top: 10px;\n}\n"
-                        mushroom-shape-icon$: ".shape {\n  {%- if is_state(config.entity,\
-                          \ \"on\") -%}\n  --shape-animation: ping 2s infinite;\n\
-                          \  {%- endif -%}\n}\n@keyframes ping {\n  0% { box-shadow:\
-                          \ 0 0 1px 1px rgba(var(--rgb-yellow), 0.7); }\n  100% {\
-                          \ box-shadow: 0 0 5px 15px transparent; }\n}\n"
+                    show_position_control: true
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
