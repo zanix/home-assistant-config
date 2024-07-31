@@ -589,6 +589,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 - [Aqara Pet Feeder C1](https://www.amazon.com/dp/B0B9XZ96PH) - Zigbee controlled pet feeder
 - [Bambu Lab P1S](https://us.store.bambulab.com/products/p1s) - 3D printer
+- [Ratgdo](https://paulwieland.github.io/ratgdo/) - WiFi control board for Chamberlain or Liftmaster garage door openers
 
 ## Automations
 
