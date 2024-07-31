@@ -50,10 +50,6 @@ The AdGuard integration allows you to control and monitor your AdGuard Home inst
 
 The airnow integration uses the AirNow web service as a source for air quality data for your location
 
-### [Amcrest](https://www.home-assistant.io/integrations/amcrest)
-
-The amcrest camera platform allows you to integrate your Amcrest or Dahua IP camera or doorbell in Home Assistant.
-
 ### [Android Debug Bridge](https://www.home-assistant.io/integrations/androidtv)
 
 The Android Debug Bridge integration allows you to control an Android device or Amazon Fire TV device
@@ -159,6 +155,10 @@ The Rachio platform allows you to control your Rachio irrigation system
 ### [Radio Browser](https://www.home-assistant.io/integrations/radio_browser)
 
 The Radio Browser integration allows you to use the directory of radio stations collected on Radio Browser
+
+### [Reolink IP NVR/camera](https://www.home-assistant.io/integrations/reolink)
+
+The integration allows you to control Reolink NVRs or cameras.
 
 ### [RESTful Command](https://www.home-assistant.io/integrations/rest_command)
 
