@@ -148,10 +148,6 @@ The proximity integration allows you to monitor the proximity of devices or pers
 
 This integration allows you to write Python scripts that are exposed as services
 
-### [Rachio](https://www.home-assistant.io/integrations/rachio)
-
-The Rachio platform allows you to control your Rachio irrigation system
-
 ### [Radio Browser](https://www.home-assistant.io/integrations/radio_browser)
 
 The Radio Browser integration allows you to use the directory of radio stations collected on Radio Browser
@@ -342,6 +338,12 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.3.5]
+
+OpenSprinkler Integration for Home Assistant
+
+Authors: [@vinteo](https://github.com/vinteo).
+
 ### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v3.0.1]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
@@ -456,7 +458,10 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Build a beautiful Home Assistant dashboard easily
 
-### [Platinum Weather Card](https://github.com/Makin-Things/platinum-weather-card) [v1.0.5]
+### [Opensprinkler Card](https://github.com/rianadon/opensprinkler-card) [v1.13]
+
+Home Assistant card for collecting OpenSprinkler status
+
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
@@ -548,7 +553,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 - [IKEA E1524/E1810 5-Button Remote Control](https://www.amazon.com/dp/B07KM1YZWW)
 - [Philips Hue Dimmer Remote 324131092621](https://www.amazon.com/dp/B0167Z0P3I)
-- [Rachio Sprinkler Controller](https://www.amazon.com/dp/B01D1NMLJU) - Smart Sprinkler controller
 - [SONOFF S31 Lite 15A Zigbee Smart Plug](https://www.amazon.com/dp/B08Y87WD1X) - Smart plug
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
 - [THIRDREALITY ZigBee Smart Plug Gen2](https://www.amazon.com/dp/B0BPY5D1KC) - Smart plug with power monitoring
@@ -589,6 +593,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 - [Aqara Pet Feeder C1](https://www.amazon.com/dp/B0B9XZ96PH) - Zigbee controlled pet feeder
 - [Bambu Lab P1S](https://us.store.bambulab.com/products/p1s) - 3D printer
+- [OpenSprinkler](https://opensprinkler.com) - Automate and access sprinklers from anywhere
 - [Ratgdo](https://paulwieland.github.io/ratgdo/) - WiFi control board for Chamberlain or Liftmaster garage door openers
 
 ## Automations
