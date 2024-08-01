@@ -268,7 +268,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -284,7 +284,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.2.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.3.0]
 
 Frigate integration for Home Assistant
 
@@ -374,7 +374,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>31 Lovelace Plugins</summary>
 
-### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.0.4]
+### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
@@ -390,7 +390,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.1.0-beta.2]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.1.1]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -434,7 +434,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.0.1]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.1.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -454,7 +454,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v3.6.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.0]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -462,6 +462,7 @@ Build a beautiful Home Assistant dashboard easily
 
 Home Assistant card for collecting OpenSprinkler status
 
+### [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) [v1.2.0]
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
@@ -473,7 +474,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.2.2]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.2.3]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
