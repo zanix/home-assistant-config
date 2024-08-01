@@ -32,10 +32,10 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2715 |
-| Sensors        | 727 |
-| Binary Sensors | 191 |
-| Lights         | 29 |
+| All Entities   | 2718 |
+| Sensors        | 731 |
+| Binary Sensors | 187 |
+| Lights         | 31 |
 | Switches       | 93 |
 
 <details><summary>Stock Integrations</summary>
