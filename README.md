@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2535 |
-| Sensors        | 1064 |
-| Binary Sensors | 245 |
-| Lights         | 39 |
-| Switches       | 129 |
+| All Entities   | 2715 |
+| Sensors        | 727 |
+| Binary Sensors | 191 |
+| Lights         | 29 |
+| Switches       | 93 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -76,6 +76,10 @@ The ecobee integration lets you control and view sensor data from ecobee thermos
 
 (Also connected via HomeKit Controller integration for local control)
 
+### [Electricity Maps](https://www.home-assistant.io/integrations/co2signal)
+
+Queries the Electricity Maps API for the CO2 intensity of a specific region.
+
 ### [ESPHome](https://www.home-assistant.io/integrations/esphome)
 
 Connect ESPHome devices directly with the native ESPHome API
@@ -96,6 +100,10 @@ Google Cast integration
 
 The HomeKit Device integration allows you to connect accessories with the “Works with HomeKit” logo to Home Assistant.
 
+### [iBeacon Tracker](https://www.home-assistant.io/integrations/ibeacon)
+
+iBeacons are Bluetooth-enabled devices that advertise identifiers to announce their location
+
 ### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
 
 The iqvia sensor platform collects and displays allergy, asthma and disease information
@@ -108,9 +116,13 @@ The influxdb integration makes it possible to transfer all state changes to an e
 
 The local calendar integration allows you to create a calendar of events for powering automations
 
-### [Logitech Harmony](https://www.home-assistant.io/integrations/harmony)
+### [Logitech Harmony Hub](https://www.home-assistant.io/integrations/harmony)
 
 The harmony remote platform allows you to control the state of your Harmony Hub Device
+
+### [Mealie](https://www.home-assistant.io/integrations/mealie)
+
+The Mealie integration will fetch data from your Mealie instance
 
 ### [Meater](https://www.home-assistant.io/integrations/meater)
 
@@ -132,9 +144,17 @@ The Moon integration tracks the phases of the moon
 
 Allows extremely lightweight publish/subscribe messaging transport
 
+### [MusicCast](https://www.home-assistant.io/integrations/yamaha_musiccast)
+
+The Yamaha MusicCast integration allows you to control Yamaha MusicCast Receivers
+
 ### [OpenWeatherMap](https://www.home-assistant.io/integrations/openweathermap)
 
 The OpenWeatherMap weather integrations uses OpenWeatherMap as a source for current meteorological data for your location
+
+### [Ping (ICMP)](https://www.home-assistant.io/integrations/ping)
+
+Uses ICMP pings to check if a device is online
 
 ### [Plex](https://www.home-assistant.io/integrations/plex)
 
@@ -164,11 +184,13 @@ This integration can expose regular REST commands as services
 
 This integration can expose regular shell commands as services
 
+### [Shopping list](https://www.home-assistant.io/integrations/shopping_list)
+
+The Shopping list integration allows you to keep track of shopping list items
+
 ### [SNMP](https://www.home-assistant.io/integrations/snmp)
 
 This is a standardized method for monitoring/managing network connected devices. SNMP uses a tree-like hierarchy where each node is an object.
-
-This is used to get printer status data
 
 ### [Sony Playstation 4](https://www.home-assistant.io/integrations/ps4)
 
@@ -242,10 +264,6 @@ WLED is a fast and feature-rich implementation of an ESP8266/ESP32 webserver to 
 
 The workday binary sensor indicates whether the current day is a workday or not
 
-### [Yamaha MusicCast](https://www.home-assistant.io/integrations/yamaha_musiccast)
-
-The Yamaha MusicCast integration allows you to control Yamaha MusicCast Receivers
-
 ### [Z-Wave JS](https://www.home-assistant.io/integrations/zwave_js)
 
 The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS UI](https://zwave-js.github.io/zwave-js-ui) driver. This is the recommended Z-Wave integration for Home Assistant
@@ -254,7 +272,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>18 Custom Integrations</summary>
+<details><summary>19 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.22.0]
 
@@ -372,7 +390,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>31 Lovelace Plugins</summary>
+<details><summary>32 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -506,7 +524,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 </details><details><summary>2 Themes</summary>
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.0.3]
+### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.0.5]
 
 A Material You and Google Home app influenced theme for Home Assistant
 
@@ -522,12 +540,12 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 ### Climate
 
-- [EcoBee3 Thermostat](https://www.amazon.com/dp/B00ZIRV39M) - Smart Thermostat with [extra sensors](https://www.amazon.com/dp/B00NXRYOIQ/)
+- [EcoBee Enhanced Thermostat](https://www.amazon.com/dp/B09XXTQPXC) - Smart Thermostat with [extra sensors](https://www.amazon.com/dp/B07NQVWRR3)
 
 ### Lighting
 
 - [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
-- [DreamScreen](https://www.amazon.com/dp/B01M6UETVR/) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
+- [DreamScreen](https://www.amazon.com/dp/B01M6UETVR) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
 - [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
 - [Honeywell 39348/ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Inovelli LZW30 Black Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-spec-sheet)
@@ -542,7 +560,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 - [AirGradient One](https://www.airgradient.com/indoor/) - Indoor Air Quality Monitor
 - [Apollo MSR-1](https://shop.apolloautomation.cloud/products/multisensor-mk1) - mmWave CO2 Multisensor
-- [Aqara Door and Window Sensor](https://www.amazon.com/dp/B07D37VDM3)
 - [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
 - [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
@@ -561,8 +578,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 ### Camera
 
-- [Amcrest AD410 Doorbell](https://www.amazon.com/dp/B091KMT9GB)
-- [Tapo C210 2K Pan/Tilt Camera](https://www.amazon.com/dp/B09Y8TLP25/)
+- [Reolink Doorbell](https://www.amazon.com/gp/product/B0B7S3JSG7)
+- [Tapo C210 2K Pan/Tilt Camera](https://www.amazon.com/dp/B09Y8TLP25)
 
 ### Media
 
@@ -601,71 +618,70 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>158 Automations</summary>
+<details><summary>129 Automations</summary>
 
-- ⏯ Ensure PiPup is Running
-- ⏯ Family Room Media Auto Off
-- ⏯ Family Room Media State at Night (Disabled)
-- ⏯ Family Room Sound Mode
-- ⏯ Living Room Media Auto Off
-- ⏯ Living Room Media State at Night (Disabled)
-- ⏯ Living Room Sound Mode
-- ⏯ Master Bedroom Media Auto Off
+> Keymaster automations are hidden
+
+- ⏯ Ensure PiPup is Running 🚫
+- ⏯ Family Room Media Auto Off 🚫
+- ⏯ Family Room Media State at Night 🚫
+- ⏯ Family Room Sound Mode 🚫
+- ⏯ Living Room Media Auto Off 🚫
+- ⏯ Living Room Media State at Night 🚫
+- ⏯ Living Room Sound Mode 🚫
+- ⏯ Main Bedroom Media Auto Off 🚫
 - ⏯ PS4 Harmony Activity
 - ☑️ Cat Feeder Filled
 - ☑️ Close Garage Door
 - ☑️ Garbage Collection
 - ☑️ Ignore Door Alerts
 - ☑️ Ignore Garage Door Alerts
-- ☑️ Ignore Window Alerts (Disabled)
+- ☑️ Ignore Window Alerts 🚫
 - ☑️ Retry Remote Start Subaru
 - ☑️ Turn on Water Main
-- ⚙️ Action Sniffer [Zigbee] (Disabled)
+- ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
 - ⚙️ Battery Level Low
-- ⚙️ Clear TTS Cache (Disabled)
+- ⚙️ Clear TTS Cache 🚫
 - ⚙️ Disk Space Low
-- ⚙️ Event Sniffer [Actionable Event] (Disabled)
-- ⚙️ Event Sniffer [Z-Wave JS] (Disabled)
+- ⚙️ Event Sniffer [Actionable Event] 🚫
+- ⚙️ Event Sniffer [Z-Wave JS] 🚫
 - ⚙️ Failed Login
 - ⚙️ Offline Devices
 - ⚙️ RAM Usage High
 - ⚙️ Reload Addons and Integrations
-- ⚙️ Scan Interval (Disabled)
+- ⚙️ Scan Interval 🚫
 - ⚙️ Startup
 - ⚙️ Update Database Filesize Sensor
 - ⚙️ Updates Available
-- ⚡ Emergency Power Engaged
-- ⚡ PVOutput
-- ⚡ SolarAssistant Not Updating
-- ⚡ Tariff Summer Off-Peak
-- ⚡ Tariff Summer Peak
-- ⚡ Tariff ToU Summer Off-Peak
-- ⚡ Tariff ToU Summer Peak
-- ⚡ Tariff ToU Winter Off-Peak
-- ⚡ Tariff ToU Winter Peak
-- ⚡ Tariff Winter Off-Peak
-- ⚡ Tariff Winter Peak
+- ⚡ Tariff Summer Off-Peak 🚫
+- ⚡ Tariff Summer Peak 🚫
+- ⚡ Tariff ToU Summer Off-Peak 🚫
+- ⚡ Tariff ToU Summer Peak 🚫
+- ⚡ Tariff ToU Winter Off-Peak 🚫
+- ⚡ Tariff ToU Winter Peak 🚫
+- ⚡ Tariff Winter Off-Peak 🚫
+- ⚡ Tariff Winter Peak 🚫
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
-- ✴️ Office CO2 Levels
-- ✴️ Office Light On/Off Presence
-- 🌐 UniFi WAN Status (Disabled)
+- ✴️ Joshua Office CO2 Levels
+- ✴️ Joshua Office Light On/Off Presence
+- 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done
-- 🎄 XMas Lights On/Off (Disabled)
-- 🎄 XMas Tree On/Off (Disabled)
-- 🏢 Office Day Mode
-- 🏢 Office Night Mode
+- 🎄 XMas Lights On/Off 🚫
+- 🎄 XMas Tree On/Off 🚫
+- 🏢 Joshua Office Day Mode
+- 🏢 Joshua Office Night Mode
 - 🐱 Cat Feeder Empty Notification
 - 🐱 Cat Feeder Error
-- 💡 All Lights off when Away
-- 💡 Dim Front Lights at Night
-- 💡 Front Lights off at Sunrise
-- 💡 Front Lights on at Sunset
+- 💡 All Lights off when Away 🚫
+- 💡 Dim Front Lights at Night 🚫
+- 💡 Front Lights off at Sunrise 🚫
+- 💡 Front Lights on at Sunset 🚫
 - 💡 Living Room Lamps off at Night
 - 💡 Living Room Lamps on at Sunset
-- 💡 Turn Lights On when Arrive
+- 💡 Turn Lights On when Arrive 🚫
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
 - 💧 Water Leak Detected
@@ -685,66 +701,40 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💬 Subaru Fuel Level Low
 - 💬 Subaru Remote Start Expired Notification
 - 💬 Subaru Started
-- 💬 Window Left Open (Disabled)
+- 💬 Window Left Open 🚫
 - 📅 Emma's Projector On/Off
 - 📅 Ethan's Projector On/Off
 - 📅 Garbage Collection Event Generator
-- 📅 Grow Light On/Off
-- 📅 Living Room Fan On/Off
-- 📅 Master Bedroom Fan On/Off
-- 📋 [Controller] Hue Dimmer Remote
-- 📋 [Controller] Ikea 5-Button Remote
-- 📋 [Inovelli] Emma Switch
-- 📋 [Inovelli] Ethan Switch
-- 📋 [Inovelli] Family Room Switch
-- 📋 [Inovelli] Garage Switch
-- 📋 [Inovelli] Guest Room Switch
-- 📋 [Inovelli] Kitchen Switch
-- 📋 [Inovelli] Living Room Switch
-- 📋 [Inovelli] Master Bedroom Switch
-- 📋 [Inovelli] Office Switch
-- 📋 [Inovelli] Play Space Switch
+- 📅 Grow Light On/Off 🚫
+- 📅 Living Room Fan On/Off 🚫
+- 📅 Main Bedroom Fan On/Off 🚫
+- 📋 [Controller] Hue Dimmer Remote 🚫
+- 📋 [Controller] Ikea 5-Button Remote 🚫
+- 📋 [Inovelli] Amy Office Switch 🚫
+- 📋 [Inovelli] Emma Switch 🚫
+- 📋 [Inovelli] Ethan Switch 🚫
+- 📋 [Inovelli] Family Room Switch 🚫
+- 📋 [Inovelli] Garage Switch 🚫
+- 📋 [Inovelli] Joshua Office Switch 🚫
+- 📋 [Inovelli] Kitchen Switch 🚫
+- 📋 [Inovelli] Living Room Switch 🚫
+- 📋 [Inovelli] Main Bedroom Switch 🚫
+- 📋 [Inovelli] Play Space Switch 🚫
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Today
 - 📦 Packages Delivered
 - 📦 Packages Out for Delivery
 - 📦 Update USPS Mail Camera
-- 📱 MagicMirror Brightness on Lights On/Off
-- 📱 MagicMirror Dim at Sunset
+- 📱 MagicMirror Brightness on Lights On/Off 🚫
+- 📱 MagicMirror Dim at Sunset 🚫
 - 📱 MagicMirror On/Off Presence
 - 📱 MagicMirror On/Off Schedule
-- 🔑 Front Door Changed Code
-- 🔑 Front Door Decrement Access Count
-- 🔑 Front Door Lock Notifications
-- 🔑 Front Door Open and Close
-- 🔑 Front Door Reset
-- 🔑 Front Door Reset Codeslot
-- 🔑 Front Door User Notifications
-- 🔑 Synchronize Codeslot Front Door 1
-- 🔑 Synchronize Codeslot Front Door 2
-- 🔑 Synchronize Codeslot Front Door 3
-- 🔑 Synchronize Codeslot Front Door 4
-- 🔑 Synchronize Codeslot Front Door 5
-- 🔑 Synchronize Codeslot Front Door 6
-- 🔑 Synchronize Codeslot Front Door 7
-- 🔑 Synchronize Codeslot Front Door 8
-- 🔑 Turn on Access Limit Front Door 1
-- 🔑 Turn on Access Limit Front Door 2
-- 🔑 Turn on Access Limit Front Door 3
-- 🔑 Turn on Access Limit Front Door 4
-- 🔑 Turn on Access Limit Front Door 5
-- 🔑 Turn on Access Limit Front Door 6
-- 🔑 Turn on Access Limit Front Door 7
-- 🔑 Turn on Access Limit Front Door 8
-- 🔒 Front Door Lock at Night
-- 🔒 Front Door Lock Jammed
-- 🔒 Front Door Lock when Away
-- 🔒 Front Door Re-lock after Unlock
-- 🔔 Doorbell Object or Ring
+- 🔒 Door Lock Jammed
+- 🔒 Lock Doors when Away
+- 🔔 Doorbell Object or Ring 🚫
 - 🔔 Doorbell Ring
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
-- 🔔 Reset Stuck Doorbell Ring
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Ardena] Sleep When Harmony Off
@@ -752,13 +742,13 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
-- 🗺️ Arriving Home (Disabled)
+- 🗺️ Arriving Home 🚫
 - 🗺️ Leaving Zone
-- 🚦 Emma Light Switch Status
-- 🚦 Ethan Light Switch Status
-- 🚦 Front Door Light Switch Status
-- 🚦 Garage Light Switch Status
-- 🚦 Office Light Switch Status
+- 🚦 Emma Light Switch Status 🚫
+- 🚦 Ethan Light Switch Status 🚫
+- 🚦 Front Door Light Switch Status 🚫
+- 🚦 Garage Light Switch Status 🚫
+- 🚦 Joshua Office Light Switch Status 🚫
 - 🧺 Dryer Running
 - 🧺 Washer Running
 
@@ -771,7 +761,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [433Mhz Transmitter and receiver](https://www.amazon.com/dp/B00M2CUALS) - For 433Mhz based devices
 - LED RGB [Wifi Controller](https://www.amazon.com/dp/B01JZ2SI6Q) flux_led compatible with [LED Strip kits](https://www.amazon.com/dp/B01CUILC3I) - ~100 Feet
 - [First Alert 2-in-1 Z-Wave Wireless Smoke Detector & Carbon Monoxide Alarm](https://www.amazon.com/gp/product/B00KMHXFAI)
-- Aqara Zigbee devices: [Wireless Mini Switch](https://www.amazon.com/gp/product/B07D19YXND/), [Motion Sensor](https://www.amazon.com/gp/product/B07D1CRRVF/), [Temperature and Humidity Sensor](https://www.amazon.com/gp/product/B07D37FKGY/), [Vibration Sensor](https://www.amazon.com/gp/product/B07PJT939B/)
 
 ## Todo List
 
@@ -788,7 +777,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2024.7.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2024.7.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
