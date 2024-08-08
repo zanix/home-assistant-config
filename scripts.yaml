@@ -82,12 +82,6 @@ family_room_game_light_mode:
             brightness_pct: 20
           target:
             entity_id: light.family_room
-        - service: light.turn_on
-          data:
-            transition: 1
-            brightness_pct: 6
-          target:
-            entity_id: light.play_space
     default:
     - parallel:
       - service: switch.turn_off
@@ -100,46 +94,44 @@ family_room_game_light_mode:
           transition: 1
         target:
           entity_id: light.family_room
-      - service: light.turn_on
-        data:
-          transition: 1
-          brightness_pct: 80
-        target:
-          entity_id: light.play_space
   description: Adjusts the lights in the Family Room for Games.
   icon: mdi:light-flood-up
   mode: single
 office_lights_on:
   alias: Office Lights On
   sequence:
-  - choose:
-    - conditions:
-      - condition: or
-        conditions:
-        - condition: time
-          after: input_datetime.office_night_mode
-        - condition: sun
-          before: sunrise
-          before_offset: -00:20:00
-      sequence:
-      - service: light.turn_on
-        data: {}
-        target:
-          entity_id:
-          - light.joshua_office
-          - light.joshua_office_lamp
-          - light.wled_joshua_office_desk
-    default:
+  - if:
+    - condition: or
+      conditions:
+      - condition: time
+        after: input_datetime.office_night_mode
+      - condition: sun
+        before: sunrise
+        before_offset: -00:20:00
+    then:
     - service: light.turn_on
+      data: {}
       target:
         entity_id:
         - light.joshua_office
         - light.joshua_office_lamp
         - light.wled_joshua_office_desk
+    else:
+    - service: light.turn_on
+      target:
+        entity_id:
+        - light.joshua_office
+    - service: light.turn_on
+      target:
+        entity_id:
+        - light.joshua_office_lamp
+        - light.wled_joshua_office_desk
+      data: {}
     - service: switch.turn_on
       target:
         entity_id:
-        - switch.office_shelf_led
+        - switch.joshua_office_shelf_led
+      data: {}
   description: Turns on the office lights based on time of day.
   icon: mdi:chair-rolling
   mode: single
@@ -219,6 +211,14 @@ media_player_mute:
       data:
         is_volume_muted: '{{ not state_attr(media_player , ''is_volume_muted'') }}'
   max: 10
+  fields:
+    media_player:
+      name: Media Player
+      selector:
+        entity:
+          filter:
+            domain: media_player
+      required: true
 feeder_start:
   alias: Feeder Start
   icon: mdi:paw
@@ -237,3 +237,85 @@ feeder_start:
           options:
           - Cat Feeder
           - Dog Feeder
+office_lights_day_mode:
+  alias: Office Lights Day Mode
+  sequence:
+  - parallel:
+    - service: light.turn_on
+      target:
+        entity_id:
+        - light.joshua_office
+        - light.joshua_office_lamp
+      data:
+        color_temp: 181
+        brightness: 255
+        transition: '{{ transition | default(1) }}'
+    - service: light.turn_on
+      target:
+        entity_id: light.wled_joshua_office_desk
+      data:
+        rgb_color:
+        - 255
+        - 255
+        - 255
+        brightness: 255
+        transition: '{{ transition | default(1) }}'
+    - service: switch.turn_on
+      target:
+        entity_id: switch.joshua_office_shelf_led
+      data: {}
+  description: Turns on the office lights and sets them to full-bright and daylight.
+  icon: mdi:lightbulb-auto
+  fields:
+    transition:
+      name: Transition
+      description: Time to transition the change.
+      example: '600'
+      selector:
+        number:
+          mode: box
+          unit_of_measurement: seconds
+          min: 1
+          max: 36000
+office_lights_night_mode:
+  alias: Office Lights Night Mode
+  sequence:
+  - parallel:
+    - service: light.turn_on
+      data:
+        brightness: 204
+        color_temp: 370
+        transition: '{{ transition | default(1) }}'
+      target:
+        entity_id: light.joshua_office_lamp
+    - service: light.turn_on
+      data:
+        brightness: 140
+        color_temp: 370
+        transition: '{{ transition | default(1) }}'
+      target:
+        entity_id: light.joshua_office
+    - service: light.turn_on
+      data:
+        brightness: 140
+        color_temp: 250
+        transition: '{{ transition | default(1) }}'
+      target:
+        entity_id: light.wled_joshua_office_desk
+    - service: switch.turn_off
+      target:
+        entity_id: switch.joshua_office_shelf_led
+      data: {}
+  description: Dims and sets the office lights to soft.
+  icon: mdi:lightbulb-night
+  fields:
+    transition:
+      name: Transition
+      description: Time to transition the change.
+      example: '600'
+      selector:
+        number:
+          mode: box
+          unit_of_measurement: seconds
+          min: 1
+          max: 36000

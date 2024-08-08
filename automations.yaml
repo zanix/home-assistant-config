@@ -705,29 +705,6 @@
   - service: remote.turn_off
     entity_id: remote.harmony_family_room
   mode: restart
-- id: '1665685981903'
-  alias: ⏯ Living Room Media Auto Off
-  description: Automatically turn off the Media Center in the Living Room
-  trigger:
-  - platform: state
-    entity_id:
-    - remote.androidtv_living_room
-    to: 'off'
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      }}'
-  - condition: state
-    entity_id: remote.harmony_living_room
-    state: 'on'
-  - condition: state
-    entity_id: remote.harmony_living_room
-    attribute: current_activity
-    state: Shield TV
-  action:
-  - service: remote.turn_off
-    entity_id: remote.harmony_living_room
-  mode: restart
 - id: '1665685997408'
   alias: ⏯ Main Bedroom Media Auto Off
   description: Automatically turn off the Media Center in the Main Bedroom
@@ -914,9 +891,9 @@
   - service: light.turn_on
     data:
       transition: 360
-      brightness_pct: 8
+      brightness_pct: 25
     target:
-      entity_id: light.outside_front
+      entity_id: light.outside_garage
   mode: single
 - id: '1665686521519'
   alias: "\U0001F4A1 Front Lights off at Sunrise"
@@ -928,7 +905,7 @@
   condition: []
   action:
   - service: light.turn_off
-    entity_id: light.outside_front
+    entity_id: light.outside_garage
   mode: single
 - id: '1665686549835'
   alias: "\U0001F4A1 Front Lights on at Sunset"
@@ -946,7 +923,7 @@
     data:
       brightness_pct: 100
     target:
-      entity_id: light.outside_front
+      entity_id: light.outside_garage
   mode: single
 - id: '1665686584864'
   alias: "\U0001F4A1 Living Room Lamps off at Night"
@@ -1099,6 +1076,9 @@
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
+  - condition: state
+    entity_id: lock.all_locks
+    state: unlocked
   action:
   - if:
     - condition: state
@@ -1135,8 +1115,8 @@
   - service: script.notify_mobile
     data:
       who: parents
-      title: Front Door Lock
-      message: The Front Door has been locked since no one is home.
+      title: Door Lock
+      message: The doors have been locked since no one is home.
       notification_icon: mdi:lock
       color: '#03a9f4'
       icon_url: local/icons/lock-smart.png
@@ -1977,7 +1957,7 @@
   mode: single
 - id: '1665689705099'
   alias: "\U0001F3E2 Joshua Office Day Mode"
-  description: Turns on the office computer and all the lights on a workday
+  description: Turns on the office computer on a workday
   trigger:
   - platform: time
     at: input_datetime.office_startup
@@ -1989,18 +1969,13 @@
     entity_id: binary_sensor.workday_sensor
     state: 'on'
   action:
-  - service: light.turn_on
-    data: {}
-    target:
-      area_id: office
-    enabled: false
   - service: switch.turn_on
     data:
       entity_id: switch.erebus
   mode: single
 - id: '1665689732088'
   alias: "\U0001F3E2 Joshua Office Night Mode"
-  description: Dims and sets the office lights to warm in the evening
+  description: Turn off the non-dimmable lights in the office at night.
   trigger:
   - platform: time
     at: input_datetime.office_night_mode
@@ -2011,7 +1986,7 @@
   action:
   - service: switch.turn_off
     target:
-      entity_id: switch.office_shelf_led
+      entity_id: switch.joshua_office_shelf_led
     data: {}
   mode: single
 - id: '1665695892233'
@@ -2170,12 +2145,6 @@
             brightness_pct: 100
           target:
             entity_id: light.family_room
-        - service: light.turn_on
-          data:
-            transition: 1
-            brightness_pct: 100
-          target:
-            entity_id: light.play_space
     - conditions:
       - condition: state
         entity_id: binary_sensor.quest_interactive
@@ -2194,12 +2163,6 @@
             brightness_pct: 25
           target:
             entity_id: light.family_room
-        - service: light.turn_on
-          data:
-            transition: 1
-            brightness_pct: 25
-          target:
-            entity_id: light.play_space
     default: []
   mode: single
 - id: '1665696328059'
@@ -2526,13 +2489,6 @@
       message: Startup automation starting...
   - delay:
       seconds: 60
-  - service: script.hass_publish_sensors
-    data:
-      entity:
-      - media_player.ardena
-      - media_player.athos
-      - media_player.erebus
-      - media_player.nasya
   - service: homeassistant.reload_config_entry
     data: {}
     target:
@@ -2540,6 +2496,13 @@
       - 046ad4016aea54916dd414935e0008da
       - fd4ff1a9970156bb319e4d85d4450657
       - 1dee4aa37e70d346348224829cd7c84f
+  - service: script.hass_publish_sensors
+    data:
+      entity:
+      - media_player.ardena
+      - media_player.athos
+      - media_player.erebus
+      - media_player.nasya
   - parallel:
     - service: input_boolean.turn_off
       data: {}
@@ -2624,14 +2587,14 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.basement_bathroom_toilet_leak_sensor_water_leak_detected
+    - binary_sensor.basement_bathroom_toilet_water_leak_detected
     - binary_sensor.bathroom_toilet_leak_sensor_water_leak_detected
     - binary_sensor.fridge_leak_sensor_water_leak_detected
     - binary_sensor.main_bathroom_toilet_leak_sensor_water_leak_detected
     - binary_sensor.water_heater_leak_sensor_water_leak_detected
     - binary_sensor.washer_leak_sensor_water_leak_detected
     - binary_sensor.water_main_valve_water_leak_detected
-    - binary_sensor.bathroom_sink_leak_water_leak
+    - binary_sensor.basement_bathroom_sink_water_leak
     - binary_sensor.main_bathroom_left_sink_leak_water_leak
     - binary_sensor.main_bathroom_right_sink_leak_water_leak
     - binary_sensor.kitchen_sink_leak_water_leak
@@ -3070,12 +3033,12 @@
       - service: switch.turn_on
         data: {}
         target:
-          entity_id: switch.office_shelf_led
+          entity_id: switch.joshua_office_shelf_led
       action_button_down_short:
       - service: switch.turn_off
         data: {}
         target:
-          entity_id: switch.office_shelf_led
+          entity_id: switch.joshua_office_shelf_led
 - id: '1665723372482'
   alias: "\U0001F4CB [Controller] Ikea 5-Button Remote"
   description: ''
@@ -3148,7 +3111,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.ethan_bedroom_light_action
+      switch: sensor.ethan_bedroom_action
       config_single:
       - service: switch.toggle
         metadata: {}
@@ -3179,7 +3142,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.emma_bedroom_light_action
+      switch: sensor.emma_bedroom_action
       config_single:
       - service: switch.toggle
         metadata: {}
@@ -3210,7 +3173,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.family_room_light_action
+      switch: sensor.family_room_action
       config_single:
       - service: light.turn_on
         data:
@@ -3218,15 +3181,6 @@
         target:
           entity_id:
           - light.family_room
-          - light.play_space
-      config_double:
-      - service: light.turn_on
-        data:
-          brightness_pct: 100
-        target:
-          entity_id:
-          - light.family_room
-          - light.play_space
       up_triple:
       - parallel:
         - service: script.family_room_game_light_mode
@@ -3242,7 +3196,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.garage_light_action
+      switch: sensor.garage_action
       config_single:
       - parallel:
         - service: cover.toggle
@@ -3291,6 +3245,7 @@
             target:
               entity_id: light.garage
         - service: light.turn_on
+          enabled: false
           target:
             entity_id:
             - light.living_room
@@ -3334,6 +3289,7 @@
             target:
               entity_id: light.garage
         - service: light.turn_off
+          enabled: false
           target:
             entity_id: light.inside_lights
           data: {}
@@ -3350,7 +3306,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.kitchen_light_action
+      switch: sensor.kitchen_action
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3392,7 +3348,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.living_room_light_action
+      switch: sensor.living_room_action
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3435,7 +3391,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.main_bedroom_light_action
+      switch: sensor.main_bedroom_action
       config_single:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3481,7 +3437,7 @@
       - service: light.turn_off
         data: {}
         target:
-          area_id: office
+          entity_id: light.joshua_office_lights
       down_double:
       - parallel:
         - service: script.inovelli_blue_led_status_start
@@ -3498,20 +3454,13 @@
         - service: script.office_lights_night_mode
           data: {}
       switch: sensor.joshua_office_switch_action
-- id: '1667779947579'
-  alias: "\U0001F4CB [Inovelli] Play Space Switch"
-  description: Custom button actions for the Inovelli switch
-  use_blueprint:
-    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
-    input:
-      switch: sensor.play_space_light_action
 - id: '1667780182339'
   alias: "\U0001F4CB [Inovelli] Amy Office Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.amy_office_light_action
+      switch: sensor.amy_office_action
 - id: '1669666972148'
   alias: "\U0001F310 UniFi WAN Status"
   description: Sends notifications when the network status changes
@@ -3899,7 +3848,7 @@
       base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
       attachment: snapshot.jpg
       alert_once: false
-      update_thumbnail: true
+      update_thumbnail: false
       zones: []
       zone_all: false
       labels:
@@ -4564,8 +4513,6 @@
         target:
           entity_id:
           - switch.grow_light
-          device_id: []
-          area_id: []
         data: {}
     - conditions:
       - condition: trigger
@@ -4610,7 +4557,7 @@
       sequence:
       - service: light.turn_off
         target:
-          area_id: office
+          entity_id: light.joshua_office_lights
         data:
           transition: 20
   mode: restart
@@ -4632,7 +4579,7 @@
         entity_id: sensor.apollo_msr_1_office_co2
         above: 1666
       sequence:
-      - service: esphome.apollo_msr_1_office_play_buzzer
+      - service: esphome.apollo_msr_1_bcbde8_play_buzzer
         data:
           song_str: Cantina:d=4,o=5,b=250:8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p
         enabled: false
@@ -4884,7 +4831,7 @@
       - service: script.inovelli_blue_led
         data:
           target:
-            entity_id: light.ethan
+            entity_id: light.ethan_bedroom
           led: Led 1
     - conditions:
       - condition: state
@@ -4895,7 +4842,7 @@
         data:
           level: 40
           target:
-            entity_id: light.ethan
+            entity_id: light.ethan_bedroom
           led: Led 1
           effect: Pulse
           color: Red
@@ -4917,7 +4864,7 @@
       - service: script.inovelli_blue_led
         data:
           target:
-            entity_id: light.emma
+            entity_id: light.emma_bedroom
           led: Led 1
     - conditions:
       - condition: state
@@ -4928,7 +4875,7 @@
         data:
           level: 40
           target:
-            entity_id: light.emma
+            entity_id: light.emma_bedroom
           led: Led 1
           effect: Pulse
           color: Red
@@ -5170,3 +5117,33 @@
           title: Bambu Lab Wiki
           uri: '{{ trigger.event.data.url }}'
   mode: single
+- id: '1722871416531'
+  alias: "\U0001F6A6 Garage Entry Light Switch Status"
+  description: Set garage entry light switch LED when garage entry lock state has
+    changed
+  trigger:
+  - platform: state
+    entity_id:
+    - lock.garage_entry
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state.state == ''locked'' }}'
+      sequence:
+      - service: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state.state == ''unlocked'' }}'
+      sequence:
+      - service: script.inovelli_blue_led
+        data:
+          color: Red
+          effect: Open/Close
+          level: 40
+          target:
+            entity_id: light.outside_garage_switch
+  mode: restart
