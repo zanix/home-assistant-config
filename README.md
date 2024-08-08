@@ -272,7 +272,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>20 Custom Integrations</summary>
+<details><summary>22 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.22.0]
 
@@ -350,13 +350,19 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.3.31]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.0]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.3.5]
+### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2024.4.0]
+
+Home Assistant integration for Nintendo Switch Parental Controls
+
+Authors: [@pantherale0](https://github.com/pantherale0).
+
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.3.7]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -368,16 +374,23 @@ YASSI (Yet another Samsung Soundbar integration) is a HomeAssistant integration 
 
 Authors: [@samuelspagl](https://github.com/samuelspagl).
 
+### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v3.1.0]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
 Authors: [@frenck](https://github.com/frenck).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.14]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.15]
 
 Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
+
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.6.0]
+
+Control for Tapo cameras as a Home Assistant component
+
+Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.3]
 
@@ -453,7 +466,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.0.2]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.1.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -477,7 +490,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.0]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.2]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -529,7 +542,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 </details><details><summary>2 Themes</summary>
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.0.5]
+### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.0]
 
 A Material You and Google Home app influenced theme for Home Assistant
 
