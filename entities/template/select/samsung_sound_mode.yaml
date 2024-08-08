@@ -1,0 +1,30 @@
+---
+# The template integration allows creating entities which derive their values
+# from other data. This is done by specifying templates for properties of an
+# entity, like the name or the state.
+#
+# https://www.home-assistant.io/integrations/template/
+#
+select:
+  - name: "Samsung Soundbar Sound Mode"
+    availability: '{{ has_value("media_player.samsung_soundbar") }}'
+    state: |-
+      {{ states('input_text.samsung_soundbar_sound_mode') | default('off', true) }}
+    options: |-
+      {%- from "variables.jinja" import samsung %}
+      {{ (samsung() | from_json).values() | list }}
+    select_option:
+      - service: samsung_soundbar.select_soundmode
+        target:
+          entity_id: media_player.samsung_soundbar
+        data:
+          sound_mode: |-
+            {%- from "util.jinja" import dict_flip %}
+            {%- from "variables.jinja" import samsung %}
+            {%- set modes = samsung() | from_json -%}
+            {{ (dict_flip(modes) | from_json)[option] }}
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.samsung_soundbar_sound_mode
+        data:
+          value: "{{ option }}"

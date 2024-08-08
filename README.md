@@ -272,7 +272,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>19 Custom Integrations</summary>
+<details><summary>20 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.22.0]
 
@@ -362,7 +362,12 @@ OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
-### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v3.0.1]
+### [Samsung Soundbar](https://github.com/samuelspagl/ha_samsung_soundbar) [v0.4.0]
+
+YASSI (Yet another Samsung Soundbar integration) is a HomeAssistant integration for Samsung Soundbars.
+
+Authors: [@samuelspagl](https://github.com/samuelspagl).
+
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
@@ -626,11 +631,11 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⏯ Family Room Media Auto Off 🚫
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode 🚫
-- ⏯ Living Room Media Auto Off 🚫
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode 🚫
 - ⏯ Main Bedroom Media Auto Off 🚫
-- ⏯ PS4 Harmony Activity
+- ⏯️ Samsung Soundbar Night Mode
+- ⏯️ Samsung Soundbar Voice Enhancer
 - ☑️ Cat Feeder Filled
 - ☑️ Close Garage Door
 - ☑️ Garbage Collection
