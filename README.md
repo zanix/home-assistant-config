@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2718 |
-| Sensors        | 731 |
-| Binary Sensors | 187 |
-| Lights         | 31 |
-| Switches       | 93 |
+| All Entities   | 2900 |
+| Sensors        | 811 |
+| Binary Sensors | 202 |
+| Lights         | 44 |
+| Switches       | 103 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -636,7 +636,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>129 Automations</summary>
+<details><summary>504 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -647,6 +647,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode 🚫
 - ⏯ Main Bedroom Media Auto Off 🚫
+- ⏯ PS4 Harmony Activity 🚫
 - ⏯️ Samsung Soundbar Night Mode
 - ⏯️ Samsung Soundbar Voice Enhancer
 - ☑️ Cat Feeder Filled
@@ -656,7 +657,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ☑️ Ignore Garage Door Alerts
 - ☑️ Ignore Window Alerts 🚫
 - ☑️ Retry Remote Start Subaru
-- ☑️ Turn on Water Main
+- ☑️ Turn on Water Main 🚫
 - ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
 - ⚙️ Battery Level Low
@@ -686,23 +687,23 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ✴️ Joshua Office CO2 Levels
 - ✴️ Joshua Office Light On/Off Presence
 - 🌐 UniFi WAN Status 🚫
-- 🍽️ Dishwasher is Done
+- 🍽️ Dishwasher is Done 🚫
 - 🎄 XMas Lights On/Off 🚫
 - 🎄 XMas Tree On/Off 🚫
 - 🏢 Joshua Office Day Mode
 - 🏢 Joshua Office Night Mode
 - 🐱 Cat Feeder Empty Notification
 - 🐱 Cat Feeder Error
-- 💡 All Lights off when Away 🚫
-- 💡 Dim Front Lights at Night 🚫
-- 💡 Front Lights off at Sunrise 🚫
-- 💡 Front Lights on at Sunset 🚫
+- 💡 All Lights off when Away
+- 💡 Dim Front Lights at Night
+- 💡 Front Lights off at Sunrise
+- 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps off at Night
 - 💡 Living Room Lamps on at Sunset
 - 💡 Turn Lights On when Arrive 🚫
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
-- 💧 Water Leak Detected
+- 💧 Water Leak Detected 🚫
 - 💬 Bambu P1S Print Completed
 - 💬 Bambu P1S Print Status
 - 💬 Bambu P1S Printer Error
@@ -724,20 +725,19 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📅 Ethan's Projector On/Off
 - 📅 Garbage Collection Event Generator
 - 📅 Grow Light On/Off 🚫
-- 📅 Living Room Fan On/Off 🚫
+- 📅 Living Room Fan On/Off
 - 📅 Main Bedroom Fan On/Off 🚫
 - 📋 [Controller] Hue Dimmer Remote 🚫
 - 📋 [Controller] Ikea 5-Button Remote 🚫
 - 📋 [Inovelli] Amy Office Switch 🚫
 - 📋 [Inovelli] Emma Switch 🚫
-- 📋 [Inovelli] Ethan Switch 🚫
-- 📋 [Inovelli] Family Room Switch 🚫
-- 📋 [Inovelli] Garage Switch 🚫
-- 📋 [Inovelli] Joshua Office Switch 🚫
+- 📋 [Inovelli] Ethan Switch
+- 📋 [Inovelli] Family Room Switch
+- 📋 [Inovelli] Garage Switch
+- 📋 [Inovelli] Joshua Office Switch
 - 📋 [Inovelli] Kitchen Switch 🚫
 - 📋 [Inovelli] Living Room Switch 🚫
 - 📋 [Inovelli] Main Bedroom Switch 🚫
-- 📋 [Inovelli] Play Space Switch 🚫
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Today
 - 📦 Packages Delivered
@@ -763,12 +763,13 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🗺️ Arriving Home 🚫
 - 🗺️ Leaving Zone
 - 🚦 Emma Light Switch Status 🚫
-- 🚦 Ethan Light Switch Status 🚫
+- 🚦 Ethan Light Switch Status
 - 🚦 Front Door Light Switch Status 🚫
-- 🚦 Garage Light Switch Status 🚫
+- 🚦 Garage Entry Light Switch Status
+- 🚦 Garage Light Switch Status
 - 🚦 Joshua Office Light Switch Status 🚫
-- 🧺 Dryer Running
-- 🧺 Washer Running
+- 🧺 Dryer Running 🚫
+- 🧺 Washer Running 🚫
 
 ---
 
