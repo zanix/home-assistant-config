@@ -3755,6 +3755,78 @@ views:
                       action: none
                     double_tap_action:
                       action: none
+          - type: custom:vertical-stack-in-card
+            cards:
+              - type: custom:mushroom-template-card
+                entity: device_tracker.kona_location
+                primary: Kona
+                secondary: '{{ states("sensor.kona_odometer", with_unit=true) }}'
+                picture: '{{ state_attr(entity, "entity_picture") }}'
+                fill_container: true
+                tap_action:
+                  action: navigate
+                  navigation_path: kona
+                badge_icon: "{% if is_state(\"binary_sensor.kona_trouble\", \"on\"\
+                  ) %}\n  mdi:alert\n{% endif %}"
+                badge_color: "{% if is_state(\"binary_sensor.kona_trouble\", \"on\"\
+                  ) %}\n  red\n{% endif %}"
+                card_mod:
+                  style:
+                    .: "{% set state = states(config.entity) %}\n:host {\n  transition:\
+                      \ all 0s;\n  --mush-card-primary-font-size: 16px;\n  --mush-card-secondary-font-size:\
+                      \ 13px;\n  --mush-icon-size: 4.84em;\n  {% if not is_state(config.entity,\
+                      \ \"home\") %}\n  --ha-card-background:\n    {% if is_state(config.entity,\
+                      \ \"not_home\") %}\n      rgba(244, 67, 54, 0.05)\n    {% elif\
+                      \ state in [\"unknown\", \"unavailable\"] %}\n      rgba(189,\
+                      \ 189, 189, 0.05)\n    {% else %}\n      rgba(33, 150, 243,\
+                      \ 0.05)\n    {% endif %};\n  {% endif %}\n}\nha-card {\n  transition:\
+                      \ all 0s;\n  padding-bottom: 0 !important;\n}\nmushroom-state-info\
+                      \ {\n  z-index: 1;\n}\nmushroom-shape-avatar {\n  position:\
+                      \ absolute;\n  top: -30px;\n  left: -10px;\n}\nmushroom-state-info\
+                      \ {\n  padding-left: 50px;\n  z-index: 1;\n}\nmushroom-badge-icon\
+                      \ {\n  margin-right: -55px;\n  margin-top: -20px;\n}\n"
+                    mushroom-shape-avatar$: "{% set timer = \"timer.kona_remote_start\"\
+                      \ %}\n{% if state_attr(timer, \"finishes_at\") %}\n.picture\
+                      \ {\n  {% set remaining = (as_datetime(state_attr(timer, \"\
+                      finishes_at\")) - now()).total_seconds() | int %}\n  {% set\
+                      \ duration =\n    (state_attr(timer, \"duration\").split(\"\
+                      :\")[0] | int * 60 * 60)\n    + (state_attr(timer, \"duration\"\
+                      ).split(\":\")[1] | int * 60)\n    + (state_attr(timer, \"duration\"\
+                      ).split(\":\")[2] | int)\n  %}\n  background:\n    radial-gradient(var(--card-background-color)\
+                      \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--accent-color)\
+                      \ {{ (remaining / duration * 100) | round() }}% 0%, var(--card-background-color)\
+                      \ 0% 100%);\n}\n{% endif %}\n"
+              - type: custom:mushroom-chips-card
+                alignment: end
+                chips:
+                  - type: template
+                    entity: sensor.kona_fuel_driving_range
+                    content: "{% if has_value(entity) %}\n  {{ states(entity) | round(0)\
+                      \ }}mi\n{% endif %}"
+                    icon: mdi:gas-station
+                    icon_color: "{% if has_value(entity) %}\n  {% set range = int(states(entity),\
+                      \ 0) %}\n  {% if range > 200 %}\n    green\n  {% elif range\
+                      \ > 70 %}\n    light-green\n  {% elif range > 50 %}\n    amber\n\
+                      \  {% elif range > 30 %}\n    orange\n  {% else %}\n    red\n\
+                      \  {% endif %}\n{% endif %}"
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: none
+                    double_tap_action:
+                      action: none
+                card_mod:
+                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                    \ rgba(var(--rgb-disabled), 0.1);\n  --chip-border-width: 0;\n\
+                    \  --chip-spacing: 1px;\n  margin-right: calc(var(--ha-card-border-radius,\
+                    \ 12px) / 2);\n}\n"
+            card_mod:
+              style: "{% set state = states(\"device_tracker.kona\") %}\n{% if state\
+                \ != \"home\" %}\nha-card {\n  {% if state == \"not_home\" %}\n  \
+                \  background: rgba(244, 67, 54, 0.2)\n  {% elif state in [\"unknown\"\
+                , \"unavailable\"] %}\n    background: rgba(189, 189, 189, 0.2)\n\
+                \  {% else %}\n    background: rgba(33, 150, 243, 0.2)\n  {% endif\
+                \ %};\n}\n{% endif %}\n"
       - type: vertical-stack
         cards:
           - type: conditional
@@ -6871,7 +6943,7 @@ views:
               icon: inside
             height: 24px
             max: 345
-            decimal: 1
+            decimal: 0
             severity:
               - color: var(--red-color)
                 from: 0
@@ -7207,6 +7279,428 @@ views:
                     - binary_sensor.ascent_front_right_window
                     - binary_sensor.ascent_rear_left_window
                     - binary_sensor.ascent_rear_right_window
+                  state_action:
+                    service: floorplan.class_set
+                    service_data: '${(entity.state === "on") ? "layer-visible " :
+                      "layer-hidden"}'
+  - title: Kona
+    path: kona
+    icon: fapro:hyundai
+    type: custom:masonry-layout
+    layout:
+      max_cols: 2
+    cards:
+      - type: custom:decluttering-card
+        template: chip_header
+        variables:
+          - primary: Kona
+          - secondary: Press and Hold to Activate Actions
+          - icon: fapro:hyundai
+          - icon_color: red
+          - chips:
+              - type: entity
+                entity: sensor.kona_odometer
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: binary_sensor.kona_trouble
+                    state: 'on'
+                chip:
+                  type: entity
+                  entity: binary_sensor.kona_trouble
+                  icon_color: red
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Trouble Codes
+                        content:
+                          type: markdown
+                          content: "{%- set codes = {\n  \"ABS_MIL\": \"Anti-lock\
+                            \ Brake System\",\n  \"AHBL_MIL\": \"Automatic Headlight\
+                            \ Beam Leveller\",\n  \"ATF_MIL\": \"ATF\",\n  \"AWD_MIL\"\
+                            : \"AWD\",\n  \"BSDRCT_MIL\": \"Blind Spot Detection/Rear\
+                            \ Cross Traffic Alert\",\n  \"CEL_MIL\": \"Check Engine\
+                            \ Light\",\n  \"EBD_MIL\": \"Electronic Brake-force Distribution\"\
+                            ,\n  \"EOL_MIL\": \"EOL\",\n  \"EPAS_MIL\": \"Electric\
+                            \ Power Assisted Steering\",\n  \"EPB_MIL\": \"Electronic\
+                            \ Parking Brake\",\n  \"ESS_MIL\": \"Engine Start-Stop\"\
+                            ,\n  \"HEVCM_MIL\": \"HEVCM\",\n  \"HEV_MIL\": \"HEV\"\
+                            ,\n  \"OPL_MIL\": \"OPL\",\n  \"RAB_MIL\": \"Reverse Automatic\
+                            \ Braking\",\n  \"SRS_MIL\": \"Airbag System\",\n  \"\
+                            TEL_MIL\": \"Telematics\",\n  \"TPMS_MIL\": \"Tire Preassure\
+                            \ Monitoring\",\n  \"VDC_MIL\": \"Multi-mode Vehicle Dynamics\
+                            \ Control\",\n  \"WASH_MIL\": \"Washer Fluid\"\n} -%}\n\
+                            {%- set entity_id = \"binary_sensor.kona_trouble\" -%}\n\
+                            {%- for attribute, value in states[entity_id].attributes.items()\
+                            \ -%}\n{%- if attribute in codes -%}\n- {{ codes[attribute]\
+                            \ }} ({{ attribute }})\n{% endif -%}\n{%- endfor -%}"
+      - type: vertical-stack
+        cards:
+          - type: custom:layout-card
+            layout_type: custom:grid-layout
+            layout:
+              grid-template-columns: 180px max-content
+              grid-template-rows: auto
+              margin: 0
+              padding: 5px
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: device_tracker.kona_location
+                primary_info: state
+                secondary_info: none
+                icon_type: entity-picture
+                layout: vertical
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                card_mod:
+                  style:
+                    .: ":host {\n  /* Define Person State colors. Can be added to\
+                      \ theme */\n  --state-person-home: var(--green-color);\n  --state-person-not-home:\
+                      \ var(--red-color);\n  --state-person-zone: var(--blue-color);\n\
+                      \  --state-person-unknown: var(--grey-color);\n\n  /* Set Person\
+                      \ State color */\n  --state-person:\n  {% if is_state(config.entity,\
+                      \ ['home', 'not_home', 'unknown']) %}\n    var(--state-person-{{\
+                      \ states(config.entity) | replace('_', '-') }})\n  {% else %}\n\
+                      \    var(--state-person-zone)\n  {% endif %};\n\n  /* Match\
+                      \ styling to Mushroom Title */\n  --mush-card-primary-font-size:\
+                      \ var(--mush-title-font-size, 24px);\n  --mush-card-primary-font-weight:\
+                      \ var(--mush-title-font-weight, normal);\n  --mush-card-primary-line-height:\
+                      \ var(--ush-title-line-height, 1.2);\n  --mush-card-secondary-font-size:\
+                      \ var(--mush-title-font-size, 16px);\n  --mush-card-secondary-font-weight:\
+                      \ var(--mush-title-font-weight, normal);\n  --mush-card-secondary-line-height:\
+                      \ var(--mush-title-line-height, 1.2);\n}\nha-card {\n    /*\
+                      \ Remove default card styling */\n  --ha-card-background: none;\n\
+                      \  box-shadow: none;\n  --ha-card-border-width: 0;\n\n  /* Increase\
+                      \ icon size */\n  --icon-size: 72px;\n\n  /* Center card */\n\
+                      \  # margin: 10px auto;\n  # width: fit-content;\n\n  /* Add\
+                      \ padding to bottom of card */\n  padding: 0px 0px var(--mush-title-spacing,\
+                      \ 12px) 0px !important;\n\n  /* Make card non-responsive to\
+                      \ select and pointer */\n  user-select: none;\n  pointer-events:\
+                      \ none;\n\n  transition: all 0s;\n}\n"
+                    mushroom-shape-avatar$: ".picture {\n  /* Style shadow around\
+                      \ avatar */\n  background-color: var(--state-person);\n  box-shadow:\
+                      \ 0 0 4px 2px var(--state-person);\n}\n"
+              - type: horizontal-stack
+                cards:
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.kona_odometer
+                    layout: vertical
+                    name: Odometer
+                    icon_color: blue
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                          \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                          \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
+                          \  margin: auto;\n}\n"
+                  - type: custom:mushroom-template-card
+                    entity: sensor.maverik_regular_gas
+                    layout: vertical
+                    primary: Gas Price
+                    secondary: ${{ states(entity) }}/gal
+                    icon: mdi:gas-station
+                    icon_color: amber
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                          \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                          \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n\
+                          \  margin: auto;\n}\n"
+          - type: custom:bar-card
+            card_mod:
+              style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n#states\
+                \ {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n  font-weight:\
+                \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
+                }\n"
+            name: Fuel
+            entities:
+              - entity: sensor.kona_fuel_level
+            animation:
+              state: 'on'
+            positions:
+              indicator: inside
+              icon: inside
+            height: 24px
+            max: 100
+            decimal: 0
+            severity:
+              - color: var(--red-color)
+                from: 0
+                to: 10
+              - color: var(--orange-color)
+                from: 10
+                to: 20
+              - color: var(--amber-color)
+                from: 20
+                to: 30
+              - color: var(--light-green-color)
+                from: 30
+                to: 70
+              - color: var(--green-color)
+                from: 70
+                to: 100
+          - type: custom:yet-another-expander-card
+            gap: 0em
+            padding: 0em
+            child-padding: 0.5em
+            title-card-padding: 0em
+            title-card-button-overlay: true
+            overlay-margin: calc(var(--ha-card-border-radius, 12px) / 2) auto
+            title-card:
+              type: vertical-stack
+              cards:
+                - type: custom:mushroom-template-card
+                  primary: Remote Start
+                  secondary: "{%- if is_state(\"device_tracker.kona_location\", \"\
+                    home\") -%}\n  Open the Garage and Start the Kona\n{%- else -%}\n\
+                    \  Start the Kona\n{%- endif -%}"
+                  icon: mdi:key-wireless
+                  entity: script.kona_remote_start
+                  icon_color: amber
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    target:
+                      entity_id: script.kona_remote_start
+                - type: custom:timer-bar-card
+                  filter: true
+                  invert: true
+                  state_color: true
+                  bar_height: 12px
+                  bar_radius: var(--ha-card-border-radius, 12px)
+                  bar_direction: rtl
+                  bar_foreground: var(--lime-color)
+                  bar_background: var(--disabled-color)
+                  compressed: true
+                  modifications:
+                    - remaining: 00:03:00
+                      bar_foreground: var(--amber-color)
+                    - remaining: 00:02:00
+                      bar_foreground: var(--orange-color)
+                    - remaining: 00:01:00
+                      bar_foreground: var(--red-color)
+                  entities:
+                    - entity: timer.subaru_remote_start
+                      name: Timer
+            cards:
+              - type: custom:mushroom-select-card
+                entity: select.kona_climate_preset
+                layout: horizontal
+                name: Climate Preset
+                secondary_info: none
+                icon_color: pink
+              - type: custom:mushroom-chips-card
+                card_mod:
+                  style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
+                    \ 1fr 1fr 1fr 1fr;\n}\n"
+                chips:
+                  - type: entity
+                    entity: lock.kona_door_lock
+                    name: Lock
+                    icon: mdi:lock
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: lock.lock
+                      target:
+                        entity_id: lock.kona_door_lock
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+                  - type: entity
+                    entity: device_tracker.kona_location
+                    name: Remote Start
+                    icon: mdi:key-wireless
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: kia_uvo.start_climate
+                      device_id: f27d2038fd3fe30bc627505de54ddea8
+                      duration: 10
+                      climate: true
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+                  - type: entity
+                    entity: lock.kona_door_lock
+                    name: Unlock
+                    icon: mdi:lock-open
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: lock.unlock
+                      target:
+                        entity_id: lock.kona_door_lock
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+                  - type: entity
+                    entity: device_tracker.kona_location
+                    name: Remote Stop
+                    icon: mdi:stop-circle-outline
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: kia_uvo.start_climate
+                      data:
+                        device_id: f27d2038fd3fe30bc627505de54ddea8
+                    card_mod:
+                      style: "ha-card:hover {\n  --chip-background: rgb(var(--rgb-disabled));\n\
+                        }\n"
+              - type: custom:mushroom-chips-card
+                card_mod:
+                  style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
+                    \ max-content max-content;\n  margin-top: 15px;\n  place-content:\
+                    \ space-around !important;\n}\n"
+                chips:
+                  - type: entity
+                    entity: device_tracker.kona_location
+                    name: Update
+                    icon: mdi:refresh
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: kia_uvo.update
+                      data:
+                        device_id: f27d2038fd3fe30bc627505de54ddea8
+                    card_mod:
+                      style: "ha-card {\n  justify-content: center;\n}\nha-card:hover\
+                        \ {\n  --chip-background: rgb(var(--rgb-disabled));\n}\n"
+                  - type: entity
+                    entity: device_tracker.kona_location
+                    name: Force Update
+                    icon: mdi:car-connected
+                    content_info: name
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: kia_uvo.force_update
+                      data:
+                        device_id: f27d2038fd3fe30bc627505de54ddea8
+                    card_mod:
+                      style: "ha-card {\n  justify-content: center;\n}\nha-card:hover\
+                        \ {\n  --chip-background: rgb(var(--rgb-disabled));\n}\n"
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Location
+          - type: map
+            entities:
+              - entity: device_tracker.kona_location
+            aspect_ratio: '4:3'
+            hours_to_show: 24
+            default_zoom: 12
+            card_mod:
+              style:
+                .: ":host {\n  /* Define Person State colors. Can be added to theme\
+                  \ */\n  --state-person-home: var(--green-color);\n  --state-person-not-home:\
+                  \ var(--red-color);\n  --state-person-zone: var(--blue-color);\n\
+                  \  --state-person-unknown: var(--grey-color);\n\n  /* Set person\
+                  \ state color */\n  --state-person:\n  {% if is_state(config.entities[0].entity,\
+                  \ ['home', 'not_home', 'unknown']) %}\n    var(--state-person-{{\
+                  \ states(config.entities[0].entity) | replace('_', '-') }})\n  {%\
+                  \ else %}\n    var(--state-person-zone)\n  {% endif %};\n}\nha-card\
+                  \ {\n  /* Remove default card styling without affecting child elements\
+                  \ */\n  box-shadow: none;\n  border-width: 0;\n  /*border-radius:\
+                  \ 0px 0px var(--ha-card-border-radius, 12px) var(--ha-card-border-radius,\
+                  \ 12px);*/\n  transition: all 0s;\n}\nha-icon-button {\n  /* Position\
+                  \ center button */\n  bottom: 12px;\n  left: 12px !important;\n\
+                  \  top: auto !important;\n\n  /* Style center button to match Chip\
+                  \ */\n  color: var(--deep-orange-color) !important;\n  background:\
+                  \ color-mix(in srgb, var(--deep-orange-color) 20%, transparent);\n\
+                  \  border-radius: var(--mush-chip-border-radius, 19px);\n  border:\
+                  \ var(--ha-card-border-width, 1px) solid var(--ha-card-border-color,\
+                  \ var(--divider-color, #e0e0e0)) !important;\n}\n"
+                ha-map $ ha-entity-marker $: ".marker {\n  /* Style person marker\
+                  \ & adjust position to avoid blocking waypoints */\n  border: 3px\
+                  \ solid var(--state-person) !important;\n  border-radius: 50% 50%\
+                  \ 50% 0px !important;\n  transform: rotate(-45deg) translate(50%,\
+                  \ -50%);\n  overflow: visible !important;\n  background: var(--state-person)\
+                  \ !important;\n}\n.entity-picture {\n  /* Correct orientation of\
+                  \ person avatar */\n  transform: rotate(45deg);\n  border-radius:\
+                  \ 50%;\n}\n"
+                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  fill:\
+                  \ color-mix(in srgb, var(--state-person) 50%, transparent);\n  stroke-width:\
+                  \ 0px;\n}\npath:nth-child(even) {\n  /* Styling for waypoints */\n\
+                  \  stroke: var(--primary-color);\n  fill: var(--primary-color);\n\
+                  \  stroke-width: 4px;\n}\npath:nth-child(odd):not(:first-child)\
+                  \ {\n  /* Styling for lines */\n  stroke: var(--primary-color);\n\
+                  \  stroke-width: 4px;\n}\n.leaflet-control-attribution {\n  /* Style\
+                  \ attribution text */\n  background: rgba(var(--rgb-card-background-color),\
+                  \ 0.2) !important;\n  font-size: 8px;\n}\n.leaflet-container a {\n\
+                  \  /* Set color of zoom icons & attribution text */\n  color: var(--secondary-text-color);\n\
+                  }\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out {\n  /*\
+                  \ Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
+                  \ 19px) !important;\n  padding: 3px;\n  background: rgb(var(--rgb-secondary-text-color),\
+                  \ 0.2) !important;\n  margin: 8px 12px 0px;\n  border: var(--ha-card-border-width,\
+                  \ 1px) solid var(--ha-card-border-color, var(--divider-color, #e0e0e0))\
+                  \ !important;\n}\n.leaflet-top {\n  /* Move zoom buttons to bottom\
+                  \ of map */\n  bottom: 0px !important;\n}\n.leaflet-control-zoom\
+                  \ {\n  /* Allow buttons to be moved */\n  position: absolute !important;\n\
+                  \n  /* Adjust spacing for border */\n  bottom: calc(2 * var(--ha-card-border-width,\
+                  \ 1px) + 56px);\n\n  /* Remove extra margin */\n  margin: 0px !important;\n\
+                  \n  /* Remove zoom control border */\n  border: none !important;\n\
+                  }\n"
+                ha-icon-button $ mwc-icon-button $: "button {\n  /* Size center button\
+                  \ to match Chip */\n  height: var(--mush-chip-height, 36px) !important;\n\
+                  \  width: var(--mush-chip-height, 36px) !important;\n  --mdc-icon-size:\
+                  \ 22px;\n}\n"
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-title-card
+            title: Overview
+          - type: custom:floorplan-card
+            config:
+              image: /local/floorplan/kona.svg
+              stylesheet: /local/floorplan/kona.css
+              defaults:
+                hover_action: hover-info
+                tap_action: more-info
+                hold_action: more-info
+              console_log_level: warn
+              rules:
+                - name: Tires
+                  entities:
+                    - binary_sensor.kona_tire_pressure_front_left
+                    - binary_sensor.kona_tire_pressure_front_right
+                    - binary_sensor.kona_tire_pressure_rear_left
+                    - binary_sensor.kona_tire_pressure_rear_right
+                  state_action:
+                    service: floorplan.class_set
+                    service_data: '${(entity.state === "on") ? "layer-visible " :
+                      "layer-hidden"}'
+                - name: Openables
+                  entities:
+                    - binary_sensor.kona_hood
+                    - binary_sensor.kona_front_left_door
+                    - binary_sensor.kona_front_right_door
+                    - binary_sensor.kona_back_left_door
+                    - binary_sensor.kona_back_right_door
+                    - binary_sensor.kona_trunk
+                    - binary_sensor.kona_front_left_window
+                    - binary_sensor.kona_front_right_window
+                    - binary_sensor.kona_back_left_window
+                    - binary_sensor.kona_back_right_window
                   state_action:
                     service: floorplan.class_set
                     service_data: '${(entity.state === "on") ? "layer-visible " :

@@ -319,3 +319,45 @@ office_lights_night_mode:
           unit_of_measurement: seconds
           min: 1
           max: 36000
+kona_remote_start:
+  alias: Kona Remote Start
+  sequence:
+  - variables:
+      door_closed: '{{ is_state("cover.garage_door", "closed") }}'
+      car_in_garage: '{{ is_state("device_tracker.kona_location", "home") }}'
+  - alias: Check the garage door is closed and the car is in the garage
+    if:
+    - condition: template
+      value_template: '{{ door_closed and car_in_garage }}'
+    then:
+    - service: cover.open_cover
+      target:
+        entity_id: cover.garage_door
+      data: {}
+  - service: kia_uvo.start_climate
+    data:
+      duration: 10
+      climate: true
+      heating: '0'
+      device_id: f27d2038fd3fe30bc627505de54ddea8
+  description: Starts the Kona and opens the garage door.
+  icon: fapro:hyundai
+  mode: single
+kona_remote_stop:
+  alias: Kona Remote Stop
+  sequence:
+  - service: kia_uvo.stop_climate
+    data:
+      device_id: f27d2038fd3fe30bc627505de54ddea8
+  - if:
+    - condition: state
+      entity_id: cover.garage_door
+      state: open
+    then:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.garage_door
+      data: {}
+  description: Stops the Kona and closes the garage door.
+  icon: fapro:hyundai
+  mode: single

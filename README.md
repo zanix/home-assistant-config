@@ -32,9 +32,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2900 |
-| Sensors        | 811 |
-| Binary Sensors | 202 |
+| All Entities   | 2945 |
+| Sensors        | 823 |
+| Binary Sensors | 229 |
 | Lights         | 44 |
 | Switches       | 103 |
 
@@ -272,7 +272,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>22 Custom Integrations</summary>
+<details><summary>23 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.22.0]
 
@@ -349,6 +349,12 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
+
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.26.1]
+
+A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
+
+Authors: [@fuatakgun](https://github.com/fuatakgun).
 
 ### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.0]
 
