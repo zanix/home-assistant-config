@@ -694,6 +694,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ✴️ Joshua Office Light On/Off Presence
 - 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done 🚫
+- 🍽️ Oven is Preheated
+- 🍽️ Oven Timer Completed
 - 🎄 XMas Lights On/Off 🚫
 - 🎄 XMas Tree On/Off 🚫
 - 🏢 Joshua Office Day Mode

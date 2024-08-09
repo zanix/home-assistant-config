@@ -2874,28 +2874,42 @@ views:
                     \ var(--shape-color);\n} {%- endif -%}\n"
           - type: conditional
             conditions:
-              - condition: numeric_state
-                entity: sensor.emporiavue_microwave_power
-                above: 200
+              - entity: sensor.ge_oven_current_state
+                state_not: 'Off'
             card:
               type: custom:mushroom-template-card
-              entity: sensor.emporiavue_microwave_power
+              entity: sensor.ge_oven_current_state
               layout: vertical
-              icon: mdi:microwave
-              icon_color: amber
+              icon: mdi:stove
+              icon_color: "{%- if is_state(entity, \"Preheat\") -%}\n  purple\n{%-\
+                \ elif is_state(entity, \"Bake\") -%}\n  red\n{%- elif is_state(entity,\
+                \ \"Air Fry\") -%}\n  orange\n{%- elif is_state(entity, \"Convection\"\
+                ) -%}\n  yellow\n{%- else -%}\n  disabled\n{%- endif -%}"
               tap_action:
                 action: more-info
               card_mod:
-                style: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                  \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
-                  \ 0;\n  --icon-size: 48px;\n}\nha-state-icon:before {\n  content:\
-                  \ \"\";\n  position: absolute;\n  width: 25%;\n  height: 25%;\n\
-                  \  margin: 18% 0 0 10%;\n  animation: cook 1s linear infinite;\n\
-                  }\n@keyframes cook {\n  0%, 100% { background: linear-gradient(90deg,\
-                  \ white 0%, transparent 50%, transparent 100%); }\n  33% { background:\
-                  \ linear-gradient(90deg, transparent 0%, white 50%, transparent\
-                  \ 100%); }\n  66% { background: linear-gradient(90deg, transparent\
-                  \ 0%, transparent 50%, white 100%); }\n}\n"
+                style:
+                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
+                    \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                    \ 0;\n  --icon-size: 48px;\n}\n"
+                  mushroom-shape-icon$: "{%- if not is_state(config.entity, \"Off\"\
+                    )\n  and has_value(\"sensor.ge_oven_kitchen_timer\")\n  and has_value(\"\
+                    sensor.ge_oven_timer_duration\")\n  and not is_state(\"sensor.ge_oven_timer_duration\n\
+                    -%} {%- set entity_remain = states(\"sensor.ge_oven_kitchen_timer\"\
+                    ) -%} {%- set entity_duration = states(\"sensor.ge_oven_timer_duration\"\
+                    ) -%} {%- set remaining =\n  (int(entity_remain.split(\":\")[0],\
+                    \ 0) * 60)\n    + (int(entity_remain.split(\":\")[1], 0))\n-%}\
+                    \ {%- set duration =\n  (int(entity_duration.split(\":\")[0],\
+                    \ 0) * 60)\n    + (int(entity_duration.split(\":\")[1], 0))\n\
+                    -%} .shape {\n  /* Radial progress bar */\n  background:\n   \
+                    \ radial-gradient(var(--card-background-color) 60%, transparent\
+                    \ calc(60% + 1px)),\n    conic-gradient(var(--icon-color) {{ ((duration\
+                    \ - remaining) / duration * 100) | round() }}% 0%, var(--card-background-color)\
+                    \ 0% 100%);\n} .shape:after {\n  /* Add back icon shape */\n \
+                    \ content: \"\";\n  height: 100%;\n  width: 100%;\n  position:\
+                    \ absolute;\n  border-radius: var(--icon-border-radius);\n  background:\
+                    \ var(--shape-color);\n} {%- endif -%}\n"
+              badge_icon: ''
       - type: grid
         square: false
         columns: 2
@@ -5899,6 +5913,155 @@ views:
                 layout: horizontal
                 tap_action:
                   action: more-info
+              - type: custom:layout-card
+                layout_type: custom:grid-layout
+                layout:
+                  grid-template-columns: 33% 33% 33%
+                  grid-template-rows: auto
+                  grid-template-areas: '"left center right"'
+                  reflow: true
+                  margin: 0
+                  padding: 0
+                cards:
+                  - type: custom:mushroom-template-card
+                    entity: binary_sensor.ge_oven_cooktop_status_left_rear_on
+                    secondary: Left Rear
+                    multiline_secondary: true
+                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:circle-slice-8\n\
+                      {%- else -%}\n  mdi:circle-outline\n{%- endif -%}"
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
+                      \ -%}\n  disabled\n{%- endif -%}"
+                    layout: vertical
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                          \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                          \  margin-top: 10px;\n}\n{% set power = \"sensor.ge_oven_cooktop_status_left_rear_power_pct\"\
+                          \ %}\n{% if has_value(power) and states(power) not in [\"\
+                          Empty\", \"unknown\"] %}\nha-card:after {\n  content: \"\
+                          {{ states(power) }}%\";\n  position: absolute;\n  font-weight:\
+                          \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                          }\n{% endif %}\n"
+                        mushroom-shape-icon$: ".shape {\n  {% if is_state(config.entity,\
+                          \ \"on\") %}\n  --shape-animation: ping 2s infinite;\n \
+                          \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                          \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
+                          \ 0 0 1px 15px transparent; }\n}\n"
+                  - type: custom:mushroom-template-card
+                    entity: binary_sensor.ge_oven_cooktop_status_center_rear_on
+                    secondary: Warmer
+                    multiline_secondary: true
+                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:circle-slice-8\n\
+                      {%- else -%}\n  mdi:circle-outline\n{%- endif -%}"
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
+                      \ -%}\n  disabled\n{%- endif -%}"
+                    layout: vertical
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                          \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                          \  margin-top: 10px;\n}\n"
+                        mushroom-shape-icon$: ".shape {\n  {% if is_state(config.entity,\
+                          \ \"on\") %}\n  --shape-animation: ping 2s infinite;\n \
+                          \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                          \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
+                          \ 0 0 1px 15px transparent; }\n}\n"
+                  - type: custom:mushroom-template-card
+                    entity: binary_sensor.ge_oven_cooktop_status_right_rear_on
+                    secondary: Right Rear
+                    multiline_secondary: true
+                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:circle-slice-8\n\
+                      {%- else -%}\n  mdi:circle-outline\n{%- endif -%}"
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
+                      \ -%}\n  disabled\n{%- endif -%}"
+                    layout: vertical
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                          \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                          \  margin-top: 10px;\n}\n{% set power = \"sensor.ge_oven_cooktop_status_right_rear_power_pct\"\
+                          \ %}\n{% if has_value(power) and states(power) not in [\"\
+                          Empty\", \"unknown\"] %}\nha-card:after {\n  content: \"\
+                          {{ states(power) }}%\";\n  position: absolute;\n  font-weight:\
+                          \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                          }\n{% endif %}\n"
+                        mushroom-shape-icon$: ".shape {\n  {% if is_state(config.entity,\
+                          \ \"on\") %}\n  --shape-animation: ping 2s infinite;\n \
+                          \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                          \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
+                          \ 0 0 1px 15px transparent; }\n}\n"
+              - type: custom:layout-card
+                layout_type: custom:grid-layout
+                layout:
+                  grid-template-columns: 33% 33% 33%
+                  grid-template-rows: auto
+                  grid-template-areas: '"left . right"'
+                  reflow: true
+                  margin: 0
+                  padding: 0
+                cards:
+                  - type: custom:mushroom-template-card
+                    view_layout:
+                      grid-area: left
+                    entity: binary_sensor.ge_oven_cooktop_status_left_front_on
+                    secondary: Left Front
+                    multiline_secondary: true
+                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:circle-slice-8\n\
+                      {%- else -%}\n  mdi:circle-outline\n{%- endif -%}"
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
+                      \ -%}\n  disabled\n{%- endif -%}"
+                    layout: vertical
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                          \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                          \  margin-top: 10px;\n}\n{% set power = \"sensor.ge_oven_cooktop_status_left_front_power_pct\"\
+                          \ %}\n{% if has_value(power) and states(power) not in [\"\
+                          Empty\", \"unknown\"] %}\nha-card:after {\n  content: \"\
+                          {{ states(power) }}%\";\n  position: absolute;\n  font-weight:\
+                          \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                          }\n{% endif %}\n"
+                        mushroom-shape-icon$: ".shape {\n  {% if is_state(config.entity,\
+                          \ \"on\") %}\n  --shape-animation: ping 2s infinite;\n \
+                          \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                          \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
+                          \ 0 0 1px 15px transparent; }\n}\n"
+                  - type: custom:mushroom-template-card
+                    view_layout:
+                      grid-area: right
+                    entity: binary_sensor.ge_oven_cooktop_status_right_front_on
+                    secondary: Right Front
+                    multiline_secondary: true
+                    icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:circle-slice-8\n\
+                      {%- else -%}\n  mdi:circle-outline\n{%- endif -%}"
+                    icon_color: "{%- if is_state(entity, \"on\") -%}\n  red\n{%- else\
+                      \ -%}\n  disabled\n{%- endif -%}"
+                    layout: vertical
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                          \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
+                          \  margin-top: 10px;\n}\n{% set power = \"sensor.ge_oven_cooktop_status_right_front_power_pct\"\
+                          \ %}\n{% if has_value(power) and states(power) not in [\"\
+                          Empty\", \"unknown\"] %}\nha-card:after {\n  content: \"\
+                          {{ states(power) }}%\";\n  position: absolute;\n  font-weight:\
+                          \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                          }\n{% endif %}\n"
+                        mushroom-shape-icon$: ".shape {\n  {% if is_state(config.entity,\
+                          \ \"on\") %}\n  --shape-animation: ping 2s infinite;\n \
+                          \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
+                          \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
+                          \ 0 0 1px 15px transparent; }\n}\n"
       - type: vertical-stack
         cards:
           - type: custom:mushroom-title-card
