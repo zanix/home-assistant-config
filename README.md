@@ -32,10 +32,10 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 2945 |
-| Sensors        | 823 |
+| All Entities   | 2947 |
+| Sensors        | 826 |
 | Binary Sensors | 229 |
-| Lights         | 44 |
+| Lights         | 45 |
 | Switches       | 103 |
 
 <details><summary>Stock Integrations</summary>
@@ -642,7 +642,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>504 Automations</summary>
+<details><summary>502 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -681,10 +681,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⚙️ Updates Available
 - ⚡ Tariff Summer Off-Peak 🚫
 - ⚡ Tariff Summer Peak 🚫
-- ⚡ Tariff ToU Summer Off-Peak 🚫
-- ⚡ Tariff ToU Summer Peak 🚫
-- ⚡ Tariff ToU Winter Off-Peak 🚫
-- ⚡ Tariff ToU Winter Peak 🚫
 - ⚡ Tariff Winter Off-Peak 🚫
 - ⚡ Tariff Winter Peak 🚫
 - ✨ DreamScreen Harmony Power Off
