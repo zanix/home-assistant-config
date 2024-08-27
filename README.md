@@ -642,7 +642,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>502 Automations</summary>
+<details><summary>505 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -753,7 +753,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📱 MagicMirror On/Off Schedule
 - 🔒 Door Lock Jammed
 - 🔒 Lock Doors when Away
-- 🔔 Doorbell Object or Ring 🚫
+- 🔔 Doorbell Object or Ring
 - 🔔 Doorbell Ring
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
@@ -768,10 +768,10 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🗺️ Leaving Zone
 - 🚦 Emma Light Switch Status 🚫
 - 🚦 Ethan Light Switch Status
-- 🚦 Front Door Light Switch Status 🚫
 - 🚦 Garage Entry Light Switch Status
 - 🚦 Garage Light Switch Status
 - 🚦 Joshua Office Light Switch Status 🚫
+- 🚦 Outside Entry Light Switch Status
 - 🧺 Dryer Running 🚫
 - 🧺 Washer Running 🚫
 

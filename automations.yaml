@@ -888,12 +888,18 @@
     at: input_datetime.lights_front_night_dim
   condition: []
   action:
-  - service: light.turn_on
-    data:
+  - data:
       transition: 360
       brightness_pct: 25
     target:
       entity_id: light.outside_garage
+    action: light.turn_on
+  - data:
+      transition: 360
+      brightness_pct: 8
+    target:
+      entity_id: light.outside_entry
+    action: light.turn_on
   mode: single
 - id: '1665686521519'
   alias: "\U0001F4A1 Front Lights off at Sunrise"
@@ -904,8 +910,12 @@
     offset: +00:20:00
   condition: []
   action:
-  - service: light.turn_off
-    entity_id: light.outside_garage
+  - action: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.outside_garage
+      - light.outside_entry
   mode: single
 - id: '1665686549835'
   alias: "\U0001F4A1 Front Lights on at Sunset"
@@ -919,11 +929,13 @@
     before: input_datetime.lights_front_night_dim
     after: 00:00:00
   action:
-  - service: light.turn_on
-    data:
+  - data:
       brightness_pct: 100
     target:
-      entity_id: light.outside_garage
+      entity_id:
+      - light.outside_garage
+      - light.outside_entry
+    action: light.turn_on
   mode: single
 - id: '1665686584864'
   alias: "\U0001F4A1 Living Room Lamps off at Night"
@@ -1619,19 +1631,19 @@
       before: sunrise
       before_offset: -01:00:00
   action:
-  - service: light.turn_on
-    data:
-      brightness_pct: 100
+  - data:
+      brightness_pct: 80
     target:
-      entity_id: light.outside_front
+      entity_id: light.outside_entry
+    action: light.turn_on
   - delay:
       minutes: 5
-  - service: light.turn_on
-    data:
+  - data:
       transition: 180
       brightness_pct: 8
     target:
-      entity_id: light.outside_front
+      entity_id: light.outside_entry
+    action: light.turn_on
   mode: restart
 - id: '1665689270166'
   alias: "\U0001F4AC Garage Door Closed"
@@ -2782,14 +2794,14 @@
         id: 'on'
       sequence:
       - service: switch.turn_on
-        entity_id: switch.xmas_light
+        entity_id: switch.eve
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
       - service: switch.turn_off
         target:
-          entity_id: switch.xmas_light
+          entity_id: switch.eve
         data: {}
   mode: single
 - id: '1665697781484'
@@ -2836,8 +2848,8 @@
           entity_id: light.wled_mario_star_main
   mode: single
 - id: front_door_lock_state_change
-  alias: "\U0001F6A6 Front Door Light Switch Status"
-  description: Set front door light switch LED when Front Door lock state has changed
+  alias: "\U0001F6A6 Outside Entry Light Switch Status"
+  description: Set Outside Entry light switch LED when Front Door lock state has changed
   trigger:
   - platform: state
     entity_id:
@@ -2848,21 +2860,21 @@
       - condition: template
         value_template: '{{ trigger.to_state.state == ''locked'' }}'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           target:
-            entity_id: light.outside_front
+            entity_id: light.outside_entry_switch
+        action: script.inovelli_blue_led
     - conditions:
       - condition: template
         value_template: '{{ trigger.to_state.state == ''unlocked'' }}'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Red
           effect: Open/Close
           level: 40
           target:
-            entity_id: light.outside_front
+            entity_id: light.outside_entry_switch
+        action: script.inovelli_blue_led
   mode: restart
 - id: '1665699683348'
   alias: ⏯ Living Room Media State at Night
