@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3011 |
-| Sensors        | 859 |
-| Binary Sensors | 242 |
-| Lights         | 47 |
-| Switches       | 104 |
+| All Entities   | 3074 |
+| Sensors        | 901 |
+| Binary Sensors | 244 |
+| Lights         | 49 |
+| Switches       | 107 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -100,6 +100,10 @@ The glances integration allows you to monitor the system information provided by
 
 Google Cast integration
 
+### [Google Cloud Platform](https://www.home-assistant.io/integrations/google_cloud)
+
+The google_cloud platform allows you to use Google Cloud Platform API and integrate them into Home Assistant.
+
 ### [HomeKit Device](https://www.home-assistant.io/integrations/homekit_controller)
 
 The HomeKit Device integration allows you to connect accessories with the “Works with HomeKit” logo to Home Assistant.
@@ -108,13 +112,13 @@ The HomeKit Device integration allows you to connect accessories with the “Wor
 
 iBeacons are Bluetooth-enabled devices that advertise identifiers to announce their location
 
-### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
-
-The iqvia sensor platform collects and displays allergy, asthma and disease information
-
 ### [InfluxDB](https://www.home-assistant.io/integrations/influxdb)
 
 The influxdb integration makes it possible to transfer all state changes to an external InfluxDB database
+
+### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
+
+The iqvia sensor platform collects and displays allergy, asthma and disease information
 
 ### [Local Calendar](https://www.home-assistant.io/integrations/local_calendar)
 
@@ -131,10 +135,6 @@ The Mealie integration will fetch data from your Mealie instance
 ### [Meater](https://www.home-assistant.io/integrations/meater)
 
 The Meater Smart Meat Thermometer integration allows for communicating with the Meater Temperature Probe from Apption Labs
-
-### [MJPEG IP Camera](https://www.home-assistant.io/integrations/mjpeg)
-
-The MJPEG IP Camera integration allows you to integrate IP cameras which are capable to stream their video with MJPEG (Motion JPEG)
 
 ### [Mobile App](https://www.home-assistant.io/integrations/mobile_app)
 
@@ -160,7 +160,7 @@ The OpenWeatherMap weather integrations uses OpenWeatherMap as a source for curr
 
 Uses ICMP pings to check if a device is online
 
-### [Plex](https://www.home-assistant.io/integrations/plex)
+### [Plex Media Server](https://www.home-assistant.io/integrations/plex)
 
 The plex integration allows you to connect to a Plex Media Server
 
@@ -179,6 +179,10 @@ The Radio Browser integration allows you to use the directory of radio stations 
 ### [Reolink IP NVR/camera](https://www.home-assistant.io/integrations/reolink)
 
 The integration allows you to control Reolink NVRs or cameras.
+
+### [RESTful](https://www.home-assistant.io/integrations/rest)
+
+The rest sensor platform is consuming a given endpoint which is exposed by a RESTful API of a device, an application, or a web service. The sensor has support for GET and POST requests.
 
 ### [RESTful Command](https://www.home-assistant.io/integrations/rest_command)
 
@@ -236,6 +240,10 @@ The Twinkly integration allows you to control Twinkly LED string
 
 The unifi integration allows you to connects to a UniFi controller and gather device tracking data
 
+### [Universal media player](https://www.home-assistant.io/integrations/universal)
+
+A universal media player can combine multiple existing entities in Home Assistant into a single media player entity. This is used to create a single media player entity that can control an entire media center.
+
 ### [Uptime](https://www.home-assistant.io/integrations/uptime)
 
 The uptime integration provides a sensor that stores the timestamp (date and time) when Home Assistant was last started
@@ -278,13 +286,13 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>23 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.22.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.23.0]
 
 Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.21]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.22]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -306,7 +314,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.3.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.4.0]
 
 Frigate integration for Home Assistant
 
@@ -330,7 +338,7 @@ Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v1.34.0]
+### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v2.0.0]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
 
@@ -354,7 +362,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.26.1]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.26.6]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -372,7 +380,7 @@ Home Assistant integration for Nintendo Switch Parental Controls
 
 Authors: [@pantherale0](https://github.com/pantherale0).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.3.7]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.3.8]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -396,7 +404,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.6.0]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.6.1]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -436,7 +444,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.1.1]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.2.4]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -464,7 +472,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 A Lovelace card for Frigate in Home Assistant
 
-### [Ha Floorplan 🖌🎨   Your Imagination Just Become The New Limit](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.43]
+### [Ha Floorplan 🖌🎨 | Your Imagination Just Became The New Limit](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.44]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just became the new limit.
 
@@ -480,7 +488,7 @@ Sun Card successor: Visualize the position of the Sun over the horizon.
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.1.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.1.1]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -500,7 +508,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.2]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.4]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -512,7 +520,7 @@ Home Assistant card for collecting OpenSprinkler status
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.2]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.3]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -520,7 +528,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 💡 A Lovelace custom card for RGB lights
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.2.3]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.2.4]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -550,9 +558,13 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 ---
 
-</details><details><summary>2 Themes</summary>
+</details><details><summary>3 Themes</summary>
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.0]
+### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-2.3.0]
+
+LCARS theme for Home Assistant
+
+### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.2]
 
 A Material You and Google Home app influenced theme for Home Assistant
 
@@ -804,7 +816,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2024.8.0-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2024.8.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
