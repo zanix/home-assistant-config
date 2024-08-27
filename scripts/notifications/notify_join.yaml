@@ -83,58 +83,56 @@ notify_join:
       selector:
         object:
 
-  # Set local variables for reuse in this script.
-  variables:
-    notification_service: 'notify.{{ who }}'
-    image_path: >-
-      {%- if image is string -%}
-        {%- if image.startswith("http") -%}
-          {{ image }}
-        {%- else -%}
-          {{ state_attr("sensor.hass_config", "external_url") }}/{{ image }}
-        {%- endif -%}
-      {%- endif -%}
-    icon_path: >-
-      {%- if icon is string -%}
-        {%- if icon.startswith("http") -%}
-          {{ icon }}
-        {%- else -%}
-          {{ state_attr("sensor.hass_config", "external_url") }}/{{ icon }}
-        {%- endif -%}
-      {%- endif -%}
-    smallicon_path: >-
-      {%- if smallicon is string -%}
-        {%- if smallicon.startswith("http") -%}
-          {{ smallicon }}
-        {%- else -%}
-          {{ state_attr("sensor.hass_config", "external_url") }}/{{ smallicon }}
-        {%- endif -%}
-      {%- endif -%}
-    sound_path: >-
-      {%- if sound is string -%}
-        {%- if sound.startswith("http") -%}
-          {{ sound }}
-        {%- else -%}
-          {{ state_attr("sensor.hass_config", "external_url") }}/{{ sound }}
-        {%- endif -%}
-      {%- endif -%}
-    group_id: '{{ group | default("Home Assistant") }}'
-
   sequence:
-    - if:
-        - condition: template
-          value_template: '{{ message not in ["clear_notification", "remove_channel", "TTS"] }}'
-      then:
-        - service: '{{ notification_service }}'
-          data:
-            title: '{{ title }}'
-            message: '{{ message }}'
-            data:
-              icon: '{{ icon_path | default(none, true) }}'
-              smallicon: '{{ smallicon_path | default(state_attr("sensor.hass_config", "external_url") ~ "/local/icons/home-assistant.png", true) }}'
-              image: '{{ image_path | default(none, true) }}'
-              sound: '{{ sound_path | default(none, true) }}'
-              url: '{{ url | default(none, true) }}'
-              category: '{{ group_id }}'
-              notification_id: '{{ tag | default(none, true) }}'
-              actions: '{{ actions | default(none, true) }}'
+    - alias: Set local variables for reuse in this script.
+      variables:
+        notification_service: 'notify.{{ who }}'
+        image_path: >-
+          {%- if image is string -%}
+            {%- if image.startswith("http") -%}
+              {{ image }}
+            {%- else -%}
+              {{ state_attr("sensor.hass_config", "external_url") }}/{{ image }}
+            {%- endif -%}
+          {%- endif -%}
+        icon_path: >-
+          {%- if icon is string -%}
+            {%- if icon.startswith("http") -%}
+              {{ icon }}
+            {%- else -%}
+              {{ state_attr("sensor.hass_config", "external_url") }}/{{ icon }}
+            {%- endif -%}
+          {%- endif -%}
+        smallicon_path: >-
+          {%- if smallicon is string -%}
+            {%- if smallicon.startswith("http") -%}
+              {{ smallicon }}
+            {%- else -%}
+              {{ state_attr("sensor.hass_config", "external_url") }}/{{ smallicon }}
+            {%- endif -%}
+          {%- endif -%}
+        sound_path: >-
+          {%- if sound is string -%}
+            {%- if sound.startswith("http") -%}
+              {{ sound }}
+            {%- else -%}
+              {{ state_attr("sensor.hass_config", "external_url") }}/{{ sound }}
+            {%- endif -%}
+          {%- endif -%}
+        group_id: '{{ group | default("Home Assistant") }}'
+    - alias: Do not send on certain message types.
+      condition: template
+      value_template: '{{ message not in ["clear_notification", "remove_channel", "TTS"] }}'
+    - action: '{{ notification_service }}'
+      data:
+        title: '{{ title }}'
+        message: '{{ message }}'
+        data:
+          icon: '{{ icon_path | default(none, true) }}'
+          smallicon: '{{ smallicon_path | default(state_attr("sensor.hass_config", "external_url") ~ "/local/icons/home-assistant.png", true) }}'
+          image: '{{ image_path | default(none, true) }}'
+          sound: '{{ sound_path | default(none, true) }}'
+          url: '{{ url | default(none, true) }}'
+          category: '{{ group_id }}'
+          notification_id: '{{ tag | default(none, true) }}'
+          actions: '{{ actions | default(none, true) }}'

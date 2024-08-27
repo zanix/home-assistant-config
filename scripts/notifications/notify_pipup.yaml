@@ -154,114 +154,113 @@ notify_pipup:
           value: true
           label: Enabled
 
-  # Set local variables for reuse in this script.
-  variables:
-    # Set to true to create a "persistent_notification" with debugging information.
-    debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
-
-    background_color_rgba: |-
-      {%- set transparancy = iif(background_transparancy is defined, background_transparancy, 204) -%}
-      {%- if background_color is defined -%}
-        {%- if background_color is iterable -%}
-          #{{ "%02x%02x%02x%02x" | format(transparancy, background_color[0], background_color[1], background_color[2]) }}
-        {%- elif background_color is string -%}
-          {{ background_color }}
-        {%- endif -%}
-      {%- endif -%}
-    title_color_rgba: |-
-      {%- set transparancy = iif(title_transparancy is defined, title_transparancy, 255) -%}
-      {%- if title_color is defined -%}
-        {%- if title_color is iterable -%}
-          #{{ "%02x%02x%02x%02x" | format(transparancy, title_color[0], title_color[1], title_color[2]) }}
-        {%- elif title_color is string -%}
-          {{ title_color }}
-        {%- endif -%}
-      {%- endif -%}
-    message_color_rgba: |-
-      {%- set transparancy = iif(message_transparancy is defined, message_transparancy, 255) -%}
-      {%- if message_color is defined -%}
-        {%- if message_color is iterable -%}
-          #{{ "%02x%02x%02x%02x" | format(transparancy, message_color[0], message_color[1], message_color[2]) }}
-        {%- elif message_color is string -%}
-          {{ message_color }}
-        {%- endif -%}
-      {%- endif -%}
-    entity: '{{ entity | default([]) }}'
-    entity_list: >
-      {% set entities = namespace(names=[]) %}
-      {% if entity %}
-        {# Convert to a list #}
-        {% if ',' in entity %}
-          {% set entitynum = entity.split(',') | count %}
-          {% for i in range(0, entitynum) %}
-            {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
-          {% endfor %}
-        {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-          {% set entities.names = entities.names + [entity | string | trim] %}
-        {% else %}
-          {% set entities.names = entity %}
-        {% endif %}
-      {% endif %}
-      {{ entities.names | unique | list | lower }}
-
-    # Generate a random ID for the webrtc link.
-    link_id: "{% from 'util.jinja' import random_string %}{{ random_string(40) }}"
-    icon_path: >-
-      {%- if icon_url is string -%}
-        {%- if icon_url.startswith("http") -%}
-          {{ icon_url }}
-        {%- else -%}
-          {{ state_attr("sensor.hass_config", "internal_url") }}/{{ icon_url }}
-        {%- endif -%}
-      {%- endif -%}
-    image_path: >-
-      {%- if image is string -%}
-        {%- if image.startswith("http") -%}
-          {{ image }}
-        {%- else -%}
-          {{ state_attr("sensor.hass_config", "internal_url") }}/{{ image }}
-        {%- endif -%}
-      {%- endif -%}
-    media_data: >-
-      {%- if url is string -%}
-        {{ {
-            "web": {
-              "uri": url,
-              "width": width | default(640, true),
-              "height": height | default(480, true),
-            }
-          } | tojson }}
-      {%- elif icon_url is string -%}
-        {{ {
-            "image": {
-              "uri": icon_path,
-              "width": width | default(64, true),
-            }
-          } | tojson }}
-      {%- elif image is string -%}
-        {{ {
-            "image": {
-              "uri": image_path,
-              "width": width | default(640, true),
-            }
-          } | tojson }}
-      {%- elif camera is string -%}
-        {{ {
-            "web": {
-              "uri": state_attr("sensor.hass_config", "internal_url") ~ '/webrtc/embed?url=' ~ link_id ~ '&webrtc=false',
-              "width": width | default(640, true),
-              "height": height | default(360, true),
-            }
-          } | tojson }}
-      {%- endif -%}
-
   sequence:
-    # Set enable_debug = true above to provide output troubleshooting information.
-    - if:
+    - alias: Set local variables for reuse in this script.
+      variables:
+        # Set to true to create a "persistent_notification" with debugging information.
+        debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+
+        background_color_rgba: |-
+          {%- set transparancy = iif(background_transparancy is defined, background_transparancy, 204) -%}
+          {%- if background_color is defined -%}
+            {%- if background_color is iterable -%}
+              #{{ "%02x%02x%02x%02x" | format(transparancy, background_color[0], background_color[1], background_color[2]) }}
+            {%- elif background_color is string -%}
+              {{ background_color }}
+            {%- endif -%}
+          {%- endif -%}
+        title_color_rgba: |-
+          {%- set transparancy = iif(title_transparancy is defined, title_transparancy, 255) -%}
+          {%- if title_color is defined -%}
+            {%- if title_color is iterable -%}
+              #{{ "%02x%02x%02x%02x" | format(transparancy, title_color[0], title_color[1], title_color[2]) }}
+            {%- elif title_color is string -%}
+              {{ title_color }}
+            {%- endif -%}
+          {%- endif -%}
+        message_color_rgba: |-
+          {%- set transparancy = iif(message_transparancy is defined, message_transparancy, 255) -%}
+          {%- if message_color is defined -%}
+            {%- if message_color is iterable -%}
+              #{{ "%02x%02x%02x%02x" | format(transparancy, message_color[0], message_color[1], message_color[2]) }}
+            {%- elif message_color is string -%}
+              {{ message_color }}
+            {%- endif -%}
+          {%- endif -%}
+        entity: '{{ entity | default([]) }}'
+        entity_list: >
+          {% set entities = namespace(names=[]) %}
+          {% if entity %}
+            {# Convert to a list #}
+            {% if ',' in entity %}
+              {% set entitynum = entity.split(',') | count %}
+              {% for i in range(0, entitynum) %}
+                {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
+              {% endfor %}
+            {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+              {% set entities.names = entities.names + [entity | string | trim] %}
+            {% else %}
+              {% set entities.names = entity %}
+            {% endif %}
+          {% endif %}
+          {{ entities.names | unique | list | lower }}
+
+        # Generate a random ID for the webrtc link.
+        link_id: "{% from 'util.jinja' import random_string %}{{ random_string(40) }}"
+        icon_path: >-
+          {%- if icon_url is string -%}
+            {%- if icon_url.startswith("http") -%}
+              {{ icon_url }}
+            {%- else -%}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ icon_url }}
+            {%- endif -%}
+          {%- endif -%}
+        image_path: >-
+          {%- if image is string -%}
+            {%- if image.startswith("http") -%}
+              {{ image }}
+            {%- else -%}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ image }}
+            {%- endif -%}
+          {%- endif -%}
+        media_data: >-
+          {%- if url is string -%}
+            {{ {
+                "web": {
+                  "uri": url,
+                  "width": width | default(640, true),
+                  "height": height | default(480, true),
+                }
+              } | tojson }}
+          {%- elif icon_url is string -%}
+            {{ {
+                "image": {
+                  "uri": icon_path,
+                  "width": width | default(64, true),
+                }
+              } | tojson }}
+          {%- elif image is string -%}
+            {{ {
+                "image": {
+                  "uri": image_path,
+                  "width": width | default(640, true),
+                }
+              } | tojson }}
+          {%- elif camera is string -%}
+            {{ {
+                "web": {
+                  "uri": state_attr("sensor.hass_config", "internal_url") ~ '/webrtc/embed?url=' ~ link_id ~ '&webrtc=false',
+                  "width": width | default(640, true),
+                  "height": height | default(360, true),
+                }
+              } | tojson }}
+          {%- endif -%}
+    - alias: Set enable_debug = true above to provide output troubleshooting information.
+      if:
         - condition: template
           value_template: '{{ debug == true }}'
       then:
-        - service: persistent_notification.create
+        - action: persistent_notification.create
           data:
             notification_id: 'notify_pipup'
             title: 'DEBUG: script.notify_pipup'
@@ -277,39 +276,43 @@ notify_pipup:
               messageSize: {{ message_size | default(12, true) }}
               backgroundColor: {{ background_color_rgba | default("#cc0f0e0e", true) }}
               media_data: {{ media_data | default("", true) }}
-    # Create the webrtc link if a camera was chosen.
-    - if:
+    - alias: Check for empty entity list
+      condition: template
+      value_template: "{{ entity_list | count > 0 }}"
+    - alias: Create a webrtc link if a camera was chosen.
+      if:
         - condition: template
           value_template: '{{ camera is string }}'
       then:
-        - service: webrtc.create_link
+        - action: webrtc.create_link
           data:
             link_id: '{{ link_id }}'
             url: rtsp://127.0.0.1:8554/{{ camera.split(".")[1] }}
             open_limit: 0
             time_to_live: 120
-    # Loop through entity_list
-    - repeat:
+    - alias: Loop through entity_list
+      repeat:
         for_each: '{{ entity_list }}'
         sequence:
+          - alias: Only send the message if the device has a value.
+            condition: template
+            value_template: "{{ has_value(repeat.item) }}"
+          - alias: Only send the message if the device is on.
+            condition: template
+            value_template: "{{ not is_state(repeat.item, \"off\") }}"
           - variables:
               ip_address: >-
                 {{ device_attr(repeat.item, 'name') | replace("Android TV ", "") }}
-          # Only send the message if the device is on.
-          - if:
-              - condition: template
-                value_template: '{{ not is_state(repeat.item, "off") }}'
-            then:
-              - service: rest_command.pipup
-                data:
-                  ip_address: '{{ ip_address }}'
-                  duration: '{{ duration | default(8, true) }}'
-                  position: '{{ position | default(1, true) }}'
-                  title: '{{ title | default("", true) }}'
-                  titleColor: '{{ title_color_rgba | default("#50bff2", true) }}'
-                  titleSize: '{{ title_size | default(16, true) }}'
-                  message: '{{ message | default("", true) }}'
-                  messageColor: '{{ message_color_rgba | default("#fbf5f5", true) }}'
-                  messageSize: '{{ message_size | default(12, true) }}'
-                  backgroundColor: '{{ background_color_rgba | default("#cc0f0e0e", true) }}'
-                  media_data: '{{ media_data | default("", true) }}'
+          - action: rest_command.pipup
+            data:
+              ip_address: "{{ ip_address }}"
+              duration: "{{ duration | default(8, true) }}"
+              position: "{{ position | default(1, true) }}"
+              title: "{{ title | default(\"\", true) }}"
+              titleColor: "{{ title_color_rgba | default(\"#50bff2\", true) }}"
+              titleSize: "{{ title_size | default(16, true) }}"
+              message: "{{ message | default(\"\", true) }}"
+              messageColor: "{{ message_color_rgba | default(\"#fbf5f5\", true) }}"
+              messageSize: "{{ message_size | default(12, true) }}"
+              backgroundColor: "{{ background_color_rgba | default(\"#cc0f0e0e\", true) }}"
+              media_data: "{{ media_data | default(\"\", true) }}"

@@ -141,115 +141,71 @@ notify_mobile:
       selector:
         text:
 
-  # Set local variables for reuse in this script.
-  variables:
-    notification_service: 'notify.{{ who }}'
-    title: '{{ title | default("", true) }}'
-    subtitle: '{{ subtitle | default(none, true) }}'
-    message: '{{ message | default("", true) }}'
-    url: '{{ url | default("lovelace/main", true) }}'
-    group: '{{ group | default("Home Assistant") }}'
-    channel: '{{ channel | default(none, true) }}'
-    importance: '{{ importance | default(none, true) }}'
-    priority: '{{ priority | default(none, true) }}'
-    ttl: '{{ iif(priority == "high", "0", none) }}'
-    tag: '{{ tag | default(none, true) }}'
-    actions: '{{ actions | default(none, true) }}'
-    notification_icon: '{{ notification_icon | default(none, true) }}'
-    notification_color: |-
-      {%- if color is defined -%}
-        {%- if color is string -%}
-          {{ color }}
-        {%- elif color is iterable -%}
-          #{{ "%02x%02x%02x" | format(color[0], color[1], color[2]) }}
-        {%- endif -%}
-      {%- else -%}
-        {{ none }}
-      {%- endif -%}
-    vibration_pattern: '{{ vibration | default(none, true) }}'
-
   sequence:
-    - if:
-        - condition: state
-          entity_id: input_boolean.mobile_notifications
-          state: 'on'
-      then:
-        - choose:
-            # Send camera stream.
-            - conditions: '{{ camera is string }}'
-              sequence:
-                - service: '{{ notification_service }}'
-                  data:
-                    title: '{{ title }}'
-                    message: '{{ message }}'
-                    data:
-                      subject: '{{ subtitle }}'
-                      image: '/api/camera_proxy/{{ camera }}'
-                      notification_icon: '{{ notification_icon }}'
-                      clickAction: '{{ url }}'
-                      group: '{{ group }}'
-                      tag: '{{ camera | replace(".", "_") }}'
-                      channel: '{{ channel }}'
-                      importance: '{{ importance }}'
-                      priority: '{{ priority }}'
-                      ttl: '{{ ttl }}'
-                      color: '{{ notification_color }}'
-                      vibrationPattern: '{{ vibration_pattern }}'
-                      actions: '{{ actions }}'
-
-            # Send an image.
-            - conditions: '{{ image is string }}'
-              sequence:
-                - service: '{{ notification_service }}'
-                  data:
-                    title: '{{ title }}'
-                    message: '{{ message }}'
-                    data:
-                      subject: '{{ subtitle }}'
-                      image: '{{ image }}'
-                      notification_icon: '{{ notification_icon }}'
-                      clickAction: '{{ url }}'
-                      group: '{{ group }}'
-                      tag: '{{ tag }}'
-                      channel: '{{ channel }}'
-                      importance: '{{ importance }}'
-                      priority: '{{ priority }}'
-                      ttl: '{{ ttl }}'
-                      color: '{{ notification_color }}'
-                      vibrationPattern: '{{ vibration_pattern }}'
-                      actions: '{{ actions }}'
-
-            # Send an video.
-            - conditions: '{{ video is string }}'
-              sequence:
-                - service: '{{ notification_service }}'
-                  data:
-                    title: '{{ title }}'
-                    message: '{{ message }}'
-                    data:
-                      subject: '{{ subtitle }}'
-                      video: '{{ video }}'
-                      notification_icon: '{{ notification_icon }}'
-                      clickAction: '{{ url }}'
-                      group: '{{ group }}'
-                      tag: '{{ tag }}'
-                      channel: '{{ channel }}'
-                      importance: '{{ importance }}'
-                      priority: '{{ priority }}'
-                      ttl: '{{ ttl }}'
-                      color: '{{ notification_color }}'
-                      vibrationPattern: '{{ vibration_pattern }}'
-                      actions: '{{ actions }}'
-
-          # Send a basic, link, or actionable notification message.
-          default:
-            - service: '{{ notification_service }}'
+    - alias: Set local variables for reuse in this script.
+      variables:
+        notification_service: 'notify.{{ who }}'
+        title: '{{ title | default("", true) }}'
+        subtitle: '{{ subtitle | default(none, true) }}'
+        message: '{{ message | default("", true) }}'
+        url: '{{ url | default("lovelace/main", true) }}'
+        group: '{{ group | default("Home Assistant") }}'
+        channel: '{{ channel | default(none, true) }}'
+        importance: '{{ importance | default(none, true) }}'
+        priority: '{{ priority | default(none, true) }}'
+        ttl: '{{ iif(priority == "high", "0", none) }}'
+        tag: '{{ tag | default(none, true) }}'
+        sticky: '{{ sticky | default(none, true) }}'
+        actions: '{{ actions | default(none, true) }}'
+        notification_icon: '{{ notification_icon | default(none, true) }}'
+        notification_color: |-
+          {%- if color is defined -%}
+            {%- if color is string -%}
+              {{ color }}
+            {%- elif color is iterable -%}
+              #{{ "%02x%02x%02x" | format(color[0], color[1], color[2]) }}
+            {%- endif -%}
+          {%- else -%}
+            {{ none }}
+          {%- endif -%}
+        vibration_pattern: '{{ vibration | default(none, true) }}'
+    - alias: Only send the message if notifications are enabled.
+      condition: state
+      entity_id: input_boolean.mobile_notifications
+      state: 'on'
+    - choose:
+        - alias: Send camera stream.
+          conditions: '{{ camera is string }}'
+          sequence:
+            - action: '{{ notification_service }}'
               data:
                 title: '{{ title }}'
                 message: '{{ message }}'
                 data:
                   subject: '{{ subtitle }}'
-                  icon_url: '{{ icon_url | default("local/icons/home-assistant.png") }}'
+                  image: '/api/camera_proxy/{{ camera }}'
+                  notification_icon: '{{ notification_icon }}'
+                  clickAction: '{{ url }}'
+                  group: '{{ group }}'
+                  tag: '{{ camera | replace(".", "_") }}'
+                  channel: '{{ channel }}'
+                  importance: '{{ importance }}'
+                  priority: '{{ priority }}'
+                  ttl: '{{ ttl }}'
+                  sticky: '{{ sticky }}'
+                  color: '{{ notification_color }}'
+                  vibrationPattern: '{{ vibration_pattern }}'
+                  actions: '{{ actions }}'
+        - alias: Send an image.
+          conditions: '{{ image is string }}'
+          sequence:
+            - action: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  subject: '{{ subtitle }}'
+                  image: '{{ image }}'
                   notification_icon: '{{ notification_icon }}'
                   clickAction: '{{ url }}'
                   group: '{{ group }}'
@@ -258,6 +214,49 @@ notify_mobile:
                   importance: '{{ importance }}'
                   priority: '{{ priority }}'
                   ttl: '{{ ttl }}'
+                  sticky: '{{ sticky }}'
                   color: '{{ notification_color }}'
                   vibrationPattern: '{{ vibration_pattern }}'
                   actions: '{{ actions }}'
+        - alias: Send a video.
+          conditions: '{{ video is string }}'
+          sequence:
+            - action: '{{ notification_service }}'
+              data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                data:
+                  subject: '{{ subtitle }}'
+                  video: '{{ video }}'
+                  notification_icon: '{{ notification_icon }}'
+                  clickAction: '{{ url }}'
+                  group: '{{ group }}'
+                  tag: '{{ tag }}'
+                  channel: '{{ channel }}'
+                  importance: '{{ importance }}'
+                  priority: '{{ priority }}'
+                  ttl: '{{ ttl }}'
+                  sticky: '{{ sticky }}'
+                  color: '{{ notification_color }}'
+                  vibrationPattern: '{{ vibration_pattern }}'
+                  actions: '{{ actions }}'
+      default:
+        - alias: Send a basic, link, or actionable notification message.
+          action: "{{ notification_service }}"
+          data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            data:
+              subject: '{{ subtitle }}'
+              icon_url: '{{ icon_url | default("local/icons/home-assistant.png") }}'
+              notification_icon: '{{ notification_icon }}'
+              clickAction: '{{ url }}'
+              group: '{{ group }}'
+              tag: '{{ tag }}'
+              channel: '{{ channel }}'
+              importance: '{{ importance }}'
+              priority: '{{ priority }}'
+              ttl: '{{ ttl }}'
+              color: '{{ notification_color }}'
+              vibrationPattern: '{{ vibration_pattern }}'
+              actions: '{{ actions }}'

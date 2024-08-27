@@ -14,37 +14,32 @@ collection_at_curb:
         entity:
           domain: sensor
 
-  variables:
-    name: '{{ states[entity].name | replace(" Collection", "") }}'
-    object_id: '{{ states[entity].object_id }}'
-    tag: '{{ object_id }}'
-
   sequence:
-    - if:
-        - condition: template
-          value_template: '{{ states(entity) | int < 2 }}'
-        - condition: template
-          value_template: '{{ is_state("input_boolean." ~ object_id, "off") }}'
-
-      then:
-        - service: input_boolean.turn_on
-          target:
-            entity_id: 'input_boolean.{{ object_id }}'
-
-        - service: script.notify_mobile
-          data:
-            who: parents
-            title: '{{ name }} Collection'
-            message: 'The {{ name }} can is at the curb'
-            notification_icon: '{{ states[entity].attributes.icon }}'
-            color: "#4caf50"
-            icon_url: 'local/icons/{{ states[entity].attributes.icon | replace("mdi:", "") }}.png'
-            group: Collection
-            tag: '{{ tag }}'
-        - service: script.notify_hass_agent
-          data:
-            entity:
-              - media_player.erebus
-              - media_player.nasya
-            title: '{{ name }} Collection'
-            message: 'The {{ name }} can is at the curb'
+    - alias: Set local variables for reuse in this script.
+      variables:
+        name: '{{ states[entity].name | replace(" Collection", "") }}'
+        object_id: '{{ states[entity].object_id }}'
+        tag: '{{ object_id }}'
+    - alias: Check for valid state
+      condition: template
+      value_template: '{{ states(entity) | int < 2 and is_state("input_boolean." ~ object_id, "off") }}'
+    - action: input_boolean.turn_on
+      target:
+        entity_id: 'input_boolean.{{ object_id }}'
+    - action: script.notify_mobile
+      data:
+        who: parents
+        title: '{{ name }} Collection'
+        message: 'The {{ name }} can is at the curb'
+        notification_icon: '{{ states[entity].attributes.icon }}'
+        color: "#4caf50"
+        icon_url: 'local/icons/{{ states[entity].attributes.icon | replace("mdi:", "") }}.png'
+        group: Collection
+        tag: '{{ tag }}'
+    - action: script.notify_hass_agent
+      data:
+        entity:
+          - media_player.erebus
+          - media_player.nasya
+        title: '{{ name }} Collection'
+        message: 'The {{ name }} can is at the curb'

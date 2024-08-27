@@ -150,7 +150,8 @@ script:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_night') }}
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_night')
+                    and not is_state('input_text.keymaster_front_door_autolock_door_time_night', '') }}
               - condition: state
                 entity_id: schedule.front_door_auto_lock
                 state: "on"
@@ -165,7 +166,8 @@ script:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_day') }}
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_day')
+                    and not is_state('input_text.keymaster_front_door_autolock_door_time_day', '') }}
               - condition: state
                 entity_id: schedule.front_door_auto_lock
                 state: "off"
@@ -377,7 +379,8 @@ automation:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_night') }}
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_night')
+                    and not is_state('input_text.keymaster_front_door_autolock_door_time_night', '') }}
               - condition: state
                 entity_id: schedule.front_door_auto_lock
                 state: "on"
@@ -392,7 +395,8 @@ automation:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_day') }}
+                  {{ has_value('input_text.keymaster_front_door_autolock_door_time_day')
+                    and not is_state('input_text.keymaster_front_door_autolock_door_time_day', '') }}
               - condition: state
                 entity_id: schedule.front_door_auto_lock
                 state: "off"
@@ -404,6 +408,24 @@ automation:
                     {{ states('input_text.keymaster_front_door_autolock_door_time_day') }}
                 target:
                   entity_id: timer.keymaster_front_door_autolock
+
+  - alias: "🔑 Front Door Lock Schedule"
+    id: keymaster_front_door_lock_schedule
+    trigger:
+      - platform: state
+        entity_id:
+          - schedule.front_door_auto_lock
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.keymaster_front_door_autolock
+        state: "on"
+    action:
+      - service: script.turn_on
+        entity_id: script.keymaster_front_door_start_timer
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_front_door_retry
 
   - alias: "🔑 Front Door Unlocked Start Auto-lock"
     id: keymaster_front_door_unlocked_start_autolock

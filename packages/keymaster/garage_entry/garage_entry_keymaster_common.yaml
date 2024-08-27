@@ -150,7 +150,8 @@ script:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_night') }}
+                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_night')
+                    and not is_state('input_text.keymaster_garage_entry_autolock_door_time_night', '') }}
               - condition: state
                 entity_id: schedule.garage_entry_auto_lock
                 state: "on"
@@ -165,7 +166,8 @@ script:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_day') }}
+                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_day')
+                    and not is_state('input_text.keymaster_garage_entry_autolock_door_time_day', '') }}
               - condition: state
                 entity_id: schedule.garage_entry_auto_lock
                 state: "off"
@@ -378,7 +380,8 @@ automation:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_night') }}
+                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_night')
+                    and not is_state('input_text.keymaster_garage_entry_autolock_door_time_night', '') }}
               - condition: state
                 entity_id: schedule.garage_entry_auto_lock
                 state: "on"
@@ -393,7 +396,8 @@ automation:
           - conditions:
               - condition: template
                 value_template: >-
-                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_day') }}
+                  {{ has_value('input_text.keymaster_garage_entry_autolock_door_time_day')
+                    and not is_state('input_text.keymaster_garage_entry_autolock_door_time_day', '') }}
               - condition: state
                 entity_id: schedule.garage_entry_auto_lock
                 state: "off"
@@ -406,8 +410,26 @@ automation:
                 target:
                   entity_id: timer.keymaster_garage_entry_autolock
 
+  - alias: "🔑 Garage Entry Lock Schedule"
+    id: keymaster_garage_entry_lock_schedule
+    trigger:
+      - platform: state
+        entity_id:
+          - schedule.garage_entry_auto_lock
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.keymaster_garage_entry_autolock
+        state: "on"
+    action:
+      - service: script.turn_on
+        entity_id: script.keymaster_garage_entry_start_timer
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.keymaster_garage_entry_retry
+
   - alias: "🔑 Garage Entry Unlocked Start Auto-lock"
-    id: keymaster_garage_entry_unlocked_ start_autolock
+    id: keymaster_garage_entry_unlocked_start_autolock
     trigger:
       entity_id: lock.garage_entry
       platform: state

@@ -35,62 +35,59 @@ notify_speech:
             - label: Nabu Casa Cloud
               value: cloud
 
-  # Set local variables for reuse in this script.
-  variables:
-    # Use a lower volume during quiet hours.
-    volume:
-      media_player.cast_living_room_speaker: '{{ iif(is_state("schedule.quiet_hours", "on"), 30, 60) }}'
-      media_player.cast_family_room_speaker: '{{ iif(is_state("schedule.quiet_hours", "on"), 30, 70) }}'
-      media_player.cast_office_speaker: '{{ iif(is_state("schedule.quiet_hours", "on"), 15, 40) }}'
-    # Check for availability.
-    available:
-      media_player.cast_living_room_speaker: true
-      media_player.cast_family_room_speaker: true
-      media_player.cast_office_speaker: '{{ is_state("binary_sensor.erebus_mic_active", "off") }}'
-    media_player: '{{ media_player | default([]) }}'
-    media_player_list: >
-      {% set entities = namespace(names=[]) %}
-      {% if media_player %}
-        {# Convert to a list #}
-        {% if ',' in media_player %}
-          {% set entitynum = media_player.split(',') | count %}
-          {% for i in range(0, entitynum) %}
-            {% set entities.names = entities.names + [media_player.split(',')[i] | string | trim] %}
-          {% endfor %}
-        {% elif media_player[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-          {% set entities.names = entities.names + [media_player | string | trim] %}
-        {% else %}
-          {% set entities.names = media_player %}
-        {% endif %}
-      {% endif %}
-      {{ entities.names | unique | list }}
-    voice: '{{ voice | default("cloud") }}'
-
   sequence:
-    - if:
-        - condition: state
-          entity_id: input_boolean.audio_notifications
-          state: "on"
-      then:
-        - repeat:
-            for_each: '{{ media_player_list }}'
-            sequence:
-              - if:
-                  - condition: template
-                    value_template: '{{ available[repeat.item] }}'
-                then:
-                  # Use script.turn_on to play on all devices simultaneously
-                  - service: script.turn_on
-                    target:
-                      entity_id: script.media_play
-                    data:
-                      variables:
-                        media_player: '{{ repeat.item }}'
-                        message: '{{ message }}'
-                        volume: >-
-                          {% if repeat.item in volume %}
-                            {{ volume[repeat.item] }}
-                          {% else %}
-                            {{ iif(is_state("schedule.quiet_hours", "on"), 30, 60) }}
-                          {% endif %}
-                        voice: '{{ voice }}'
+    - alias: Set local variables for reuse in this script.
+      variables:
+        # Use a lower volume during quiet hours.
+        volume:
+          media_player.cast_living_room_speaker: '{{ iif(is_state("schedule.quiet_hours", "on"), 30, 60) }}'
+          media_player.cast_family_room_speaker: '{{ iif(is_state("schedule.quiet_hours", "on"), 30, 70) }}'
+          media_player.cast_office_speaker: '{{ iif(is_state("schedule.quiet_hours", "on"), 15, 40) }}'
+        # Check for availability.
+        available:
+          media_player.cast_living_room_speaker: true
+          media_player.cast_family_room_speaker: true
+          media_player.cast_office_speaker: '{{ is_state("binary_sensor.erebus_mic_active", "off") }}'
+        media_player: '{{ media_player | default([]) }}'
+        media_player_list: >
+          {% set entities = namespace(names=[]) %}
+          {% if media_player %}
+            {# Convert to a list #}
+            {% if ',' in media_player %}
+              {% set entitynum = media_player.split(',') | count %}
+              {% for i in range(0, entitynum) %}
+                {% set entities.names = entities.names + [media_player.split(',')[i] | string | trim] %}
+              {% endfor %}
+            {% elif media_player[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+              {% set entities.names = entities.names + [media_player | string | trim] %}
+            {% else %}
+              {% set entities.names = media_player %}
+            {% endif %}
+          {% endif %}
+          {{ entities.names | unique | list }}
+        voice: '{{ voice | default("cloud") }}'
+    - alias: Only send the message if notifications are enabled.
+      condition: state
+      entity_id: input_boolean.audio_notifications
+      state: 'on'
+    - repeat:
+        for_each: '{{ media_player_list }}'
+        sequence:
+          - alias: Check the entity is available.
+            condition: template
+            value_template: '{{ available[repeat.item] }}'
+          - alias: Use script.turn_on to play on all devices simultaneously
+            action: script.turn_on
+            target:
+              entity_id: script.media_play
+            data:
+              variables:
+                media_player: '{{ repeat.item }}'
+                message: '{{ message }}'
+                volume: >-
+                  {% if repeat.item in volume %}
+                    {{ volume[repeat.item] }}
+                  {% else %}
+                    {{ iif(is_state("schedule.quiet_hours", "on"), 30, 60) }}
+                  {% endif %}
+                voice: '{{ voice }}'

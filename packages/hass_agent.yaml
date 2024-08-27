@@ -20,35 +20,34 @@ script:
             multiple: true
             integration: hass_agent
 
-    # Set local variables for reuse in this script.
-    variables:
-      entity: '{{ entity | default([]) }}'
-      entity_list: >
-        {% set entities = namespace(names=[]) %}
-        {% if entity %}
-          {# Convert to a list #}
-          {% if ',' in entity %}
-            {% set entitynum = entity.split(',') | count %}
-            {% for i in range(0, entitynum) %}
-              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
-            {% endfor %}
-          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set entities.names = entities.names + [entity | string | trim] %}
-          {% else %}
-            {% set entities.names = entity %}
-          {% endif %}
-        {% endif %}
-        {{ entities.names | unique | list }}
-
     sequence:
-      # Loop through entity_list
-      - repeat:
+      - alias: Set local variables for reuse in this script.
+        variables:
+          entity: '{{ entity | default([]) }}'
+          entity_list: >
+            {% set entities = namespace(names=[]) %}
+            {% if entity %}
+              {# Convert to a list #}
+              {% if ',' in entity %}
+                {% set entitynum = entity.split(',') | count %}
+                {% for i in range(0, entitynum) %}
+                  {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
+                {% endfor %}
+              {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+                {% set entities.names = entities.names + [entity | string | trim] %}
+              {% else %}
+                {% set entities.names = entity %}
+              {% endif %}
+            {% endif %}
+            {{ entities.names | unique | list }}
+      - alias: Loop through entity_list
+        repeat:
           for_each: '{{ entity_list }}'
           sequence:
             - variables:
                 computer: >-
                   {{ device_attr(repeat.item, 'name') | lower }}
-            - service: button.press
+            - action: button.press
               target:
                 entity_id:
                   - 'button.{{ computer }}_publish_sensors'
@@ -76,35 +75,34 @@ script:
         selector:
           text:
 
-    # Set local variables for reuse in this script.
-    variables:
-      entity: '{{ entity | default([]) }}'
-      entity_list: >
-        {% set entities = namespace(names=[]) %}
-        {% if entity %}
-          {# Convert to a list #}
-          {% if ',' in entity %}
-            {% set entitynum = entity.split(',') | count %}
-            {% for i in range(0, entitynum) %}
-              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
-            {% endfor %}
-          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set entities.names = entities.names + [entity | string | trim] %}
-          {% else %}
-            {% set entities.names = entity %}
-          {% endif %}
-        {% endif %}
-        {{ entities.names | unique | list }}
-
     sequence:
-      # Loop through entity_list
-      - repeat:
+      - alias: Set local variables for reuse in this script.
+        variables:
+          entity: '{{ entity | default([]) }}'
+          entity_list: >
+            {% set entities = namespace(names=[]) %}
+            {% if entity %}
+              {# Convert to a list #}
+              {% if ',' in entity %}
+                {% set entitynum = entity.split(',') | count %}
+                {% for i in range(0, entitynum) %}
+                  {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
+                {% endfor %}
+              {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+                {% set entities.names = entities.names + [entity | string | trim] %}
+              {% else %}
+                {% set entities.names = entity %}
+              {% endif %}
+            {% endif %}
+            {{ entities.names | unique | list }}
+      - alias: Loop through entity_list
+        repeat:
           for_each: '{{ entity_list }}'
           sequence:
             - variables:
                 computer: >-
                   {{ device_attr(repeat.item, 'name') | upper }}
-            - service: mqtt.publish
+            - action: mqtt.publish
               data:
                 topic_template: "homeassistant/button/{{ computer }}/{{ computer }}_Launch/action"
                 payload_template: '{{ command }}'
@@ -131,35 +129,34 @@ script:
         selector:
           text:
 
-    # Set local variables for reuse in this script.
-    variables:
-      entity: '{{ entity | default([]) }}'
-      entity_list: >
-        {% set entities = namespace(names=[]) %}
-        {% if entity %}
-          {# Convert to a list #}
-          {% if ',' in entity %}
-            {% set entitynum = entity.split(',') | count %}
-            {% for i in range(0, entitynum) %}
-              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
-            {% endfor %}
-          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set entities.names = entities.names + [entity | string | trim] %}
-          {% else %}
-            {% set entities.names = entity %}
-          {% endif %}
-        {% endif %}
-        {{ entities.names | unique | list }}
-
     sequence:
-      # Loop through entity_list
-      - repeat:
+      - alias: Set local variables for reuse in this script.
+        variables:
+          entity: '{{ entity | default([]) }}'
+          entity_list: >
+            {% set entities = namespace(names=[]) %}
+            {% if entity %}
+              {# Convert to a list #}
+              {% if ',' in entity %}
+                {% set entitynum = entity.split(',') | count %}
+                {% for i in range(0, entitynum) %}
+                  {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
+                {% endfor %}
+              {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+                {% set entities.names = entities.names + [entity | string | trim] %}
+              {% else %}
+                {% set entities.names = entity %}
+              {% endif %}
+            {% endif %}
+            {{ entities.names | unique | list }}
+      - alias: Loop through entity_list
+        repeat:
           for_each: '{{ entity_list }}'
           sequence:
             - variables:
                 computer: >-
                   {{ device_attr(repeat.item, 'name') | upper }}
-            - service: mqtt.publish
+            - action: mqtt.publish
               data:
                 topic_template: "homeassistant/button/{{ computer }}/{{ computer }}_Launch_URL/action"
                 payload_template: '{{ url }}'
@@ -203,6 +200,28 @@ script:
         selector:
           entity:
             domain: camera
+      url:
+        name: 'URL'
+        description: 'Action when clicking the notification.'
+        example: 'lovelace/main'
+        selector:
+          text:
+      group:
+        name: 'Message group'
+        example: 'Home Assistant'
+        selector:
+          text:
+      tag:
+        name: 'Tag'
+        description: 'Unique tag for the notification.'
+        example: 'tag'
+        selector:
+          text:
+      actions:
+        name: 'Actions'
+        description: 'A list of actions for actionable notifications.'
+        selector:
+          object:
       duration:
         name: 'Duration'
         description: 'The duration in seconds for which the notification will be displayed.'
@@ -213,35 +232,52 @@ script:
             unit_of_measurement: seconds
             min: 1
             max: 36000
-      actions:
-        name: 'Actions'
-        description: 'A list of actions for actionable notifications.'
+      importance:
+        name: 'Notification Importance'
+        description: 'Set the notification importance.'
         selector:
-          object:
-
-    # Set local variables for reuse in this script.
-    variables:
-      entity: '{{ entity | default([]) }}'
-      entity_list: >
-        {% set entities = namespace(names=[]) %}
-        {% if entity %}
-          {# Convert to a list #}
-          {% if ',' in entity %}
-            {% set entitynum = entity.split(',') | count %}
-            {% for i in range(0, entitynum) %}
-              {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
-            {% endfor %}
-          {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
-            {% set entities.names = entities.names + [entity | string | trim] %}
-          {% else %}
-            {% set entities.names = entity %}
-          {% endif %}
-        {% endif %}
-        {{ entities.names | unique | list }}
+          select:
+            mode: dropdown
+            options:
+              - high
+              - default
+              - low
+              - min
+      sticky:
+        name: 'Sticky'
+        description: 'Keep the notification from being dismissed when the user selects it.'
+        selector:
+          constant:
+            value: 'true'
+            label: Sticky
 
     sequence:
-      # Loop through entity_list
-      - repeat:
+      - alias: Set local variables for reuse in this script.
+        variables:
+          entity: '{{ entity | default([]) }}'
+          entity_list: >
+            {% set entities = namespace(names=[]) %}
+            {% if entity %}
+              {# Convert to a list #}
+              {% if ',' in entity %}
+                {% set entitynum = entity.split(',') | count %}
+                {% for i in range(0, entitynum) %}
+                  {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
+                {% endfor %}
+              {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+                {% set entities.names = entities.names + [entity | string | trim] %}
+              {% else %}
+                {% set entities.names = entity %}
+              {% endif %}
+            {% endif %}
+            {{ entities.names | unique | list }}
+          url: '{{ url | default("lovelace/main", true) }}'
+          group: '{{ group | default("Home Assistant") }}'
+          tag: '{{ tag | default(none, true) }}'
+          sticky: '{{ sticky | default(none, true) }}'
+
+      - alias: Loop through entity_list
+        repeat:
           for_each: '{{ entity_list }}'
           sequence:
             - variables:
@@ -258,41 +294,57 @@ script:
                   {%- endif -%}
                 duration: '{{ duration | default(5) }}'
 
-            - if:
-                - condition: template
-                  value_template: '{{ is_state("sensor." ~ computer ~ "_user_notification", "AcceptsNotifications") }}'
-              then:
-                - choose:
-                    # Send camera image.
-                    - conditions: '{{ camera is string }}'
-                      sequence:
-                        - service: '{{ notification_service }}'
-                          data:
-                            title: '{{ title }}'
-                            message: '{{ message }}'
-                            data:
-                              image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr(camera, "entity_picture") }}'
-                              duration: '{{ duration }}'
-                              actions: '{{ actions | default([], true) }}'
+            - alias: Only send the message if the device is accepting messages.
+              condition: template
+              value_template: '{{ is_state("sensor." ~ computer ~ "_user_notification", "AcceptsNotifications") }}'
 
-                    # Send an image.
-                    - conditions: '{{ image is string }}'
-                      sequence:
-                        - service: '{{ notification_service }}'
-                          data:
-                            title: '{{ title }}'
-                            message: '{{ message }}'
-                            data:
-                              image: '{{ image_path }}'
-                              duration: '{{ duration }}'
-                              actions: '{{ actions | default([], true) }}'
-
-                  # Send a basic notification message.
-                  default:
-                    - service: '{{ notification_service }}'
+            - choose:
+                - alias: Send camera stream.
+                  conditions: '{{ camera is string }}'
+                  sequence:
+                    - action: '{{ notification_service }}'
                       data:
                         title: '{{ title }}'
                         message: '{{ message }}'
                         data:
+                          image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr(camera, "entity_picture") }}'
+                          clickAction: '{{ url }}'
+                          importance: '{{ importance | default(none, true) }}'
+                          group: '{{ group }}'
+                          tag: '{{ tag }}'
+                          sticky: '{{ sticky }}'
                           duration: '{{ duration }}'
                           actions: '{{ actions | default([], true) }}'
+
+                - alias: Send an image.
+                  conditions: '{{ image is string }}'
+                  sequence:
+                    - action: '{{ notification_service }}'
+                      data:
+                        title: '{{ title }}'
+                        message: '{{ message }}'
+                        data:
+                          image: '{{ image_path }}'
+                          clickAction: '{{ url }}'
+                          importance: '{{ importance | default(none, true) }}'
+                          group: '{{ group }}'
+                          tag: '{{ tag }}'
+                          sticky: '{{ sticky }}'
+                          duration: '{{ duration }}'
+                          actions: '{{ actions | default([], true) }}'
+
+              # Send a basic notification message.
+              default:
+                - alias: Send a basic, link, or actionable notification message.
+                  action: '{{ notification_service }}'
+                  data:
+                    title: '{{ title }}'
+                    message: '{{ message }}'
+                    data:
+                      clickAction: '{{ url }}'
+                      importance: '{{ importance | default(none, true) }}'
+                      group: '{{ group }}'
+                      tag: '{{ tag }}'
+                      sticky: '{{ sticky }}'
+                      duration: '{{ duration }}'
+                      actions: '{{ actions | default([], true) }}'
