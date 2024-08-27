@@ -2551,10 +2551,24 @@ views:
           - type: custom:mushroom-chips-card
             alignment: justify
             chips:
-              - type: weather
+              - type: template
                 entity: weather.owm_daily
-                show_conditions: true
-                show_temperature: true
+                icon: '{% if is_state(entity,"clear-day") %} mdi:weather-sunny {%
+                  elif is_state(entity,"sunny") %} mdi:weather-sunny {% elif is_state(entity,"clear")
+                  %} mdi:weather-sunny {% elif is_state(entity,"clear-night") %} mdi:weather-night
+                  {% elif is_state(entity,"rainy") %} mdi:weather-rainy {% elif is_state(entity,"pouring")
+                  %} mdi:weather-pouring {% elif is_state(entity,"snow") %} mdi:weather-snowy
+                  {% elif is_state(entity,"fog") %} mdi:weather-fog {% elif is_state(entity,"sleet")
+                  %} mdi:weather-partly-snowy-rainy {% elif is_state(entity,"wind")
+                  %} mdi:weather-windy {% elif is_state(entity,"cloudy") %} mdi:weather-cloudy
+                  {% elif is_state(entity,"partlycloudy") %} mdi:weather-partly-cloudy
+                  {% elif is_state(entity,"partly-cloudy-night") %} mdi:weather-night-partly-cloudy
+                  {% elif is_state(entity,"hail") %} mdi:weather-hail {% elif is_state(entity,"lightning")
+                  %} mdi:weather-lightning {% elif is_state(entity,"tstorm") %} mdi:weather-lightning-rainy
+                  {% endif %}'
+                content: '{{ state_translated(entity) }} / {{ states("sensor.ecowitt_outdoor_temperature")
+                  | round() }} {{ state_attr("sensor.ecowitt_outdoor_temperature",
+                  "unit_of_measurement") }}'
                 tap_action:
                   action: navigate
                   navigation_path: '#weather'
@@ -3577,7 +3591,7 @@ views:
             variables:
               - primary: Outside
               - entity: light.outside_lights
-              - temperature: sensor.owm_daily_temperature
+              - temperature: sensor.ecowitt_outdoor_temperature
               - icon: mdi:spa
               - icon_color: 139, 195, 74
               - path: outside
@@ -4171,13 +4185,10 @@ views:
               }"
             show_last_changed: false
           - type: custom:vertical-stack-in-card
-            card_mod:
-              style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                \ 0;\n}\n"
             cards:
               - card_config_version: 8
                 daily_forecast_days: 6
-                entity_apparent_temp: weather.owm_daily
+                entity_apparent_temp: sensor.ecowitt_feels_like_temperature
                 entity_extended: sensor.forecast
                 entity_forecast_icon: weather.owm_daily
                 entity_forecast_icon_1: weather.owm_daily
@@ -4185,20 +4196,21 @@ views:
                 entity_forecast_max_1: weather.owm_daily
                 entity_forecast_min: weather.owm_daily
                 entity_forecast_min_1: weather.owm_daily
-                entity_humidity: weather.owm_daily
+                entity_humidity: sensor.ecowitt_humidity
                 entity_pop: weather.owm_daily
                 entity_pop_1: weather.owm_daily
                 entity_pos: weather.owm_daily
                 entity_pos_1: weather.owm_daily
-                entity_pressure: weather.owm_daily
+                entity_pressure: sensor.ecowitt_relative_pressure
                 entity_summary: weather.owm_daily
                 entity_summary_1: weather.owm_daily
                 entity_sun: sun.sun
-                entity_temperature: weather.owm_daily
+                entity_temperature: sensor.ecowitt_outdoor_temperature
                 entity_uv_alert_summary: sensor.owm_daily_uv_index
                 entity_visibility: sensor.owm_daily_visibility
-                entity_wind_bearing: weather.owm_daily
-                entity_wind_speed: weather.owm_daily
+                entity_wind_bearing: sensor.ecowitt_wind_direction
+                entity_wind_gust: sensor.ecowitt_wind_gust
+                entity_wind_speed: sensor.ecowitt_wind_speed
                 extended_name_attr: precipitation_unit
                 extended_use_attr: false
                 forecast_type: daily
@@ -4290,8 +4302,11 @@ views:
                           \ {\n  font-size: 12px;\n  font-weight: bolder;\n}\n.axes\
                           \ {\n  margin-top: 10px !important;\n}\n"
               - type: iframe
-                url: https://embed.windy.com/embed2.html?lat=42.918&lon=-112.465&zoom=7&level=surface&overlay=wind&menu=&message=true&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=43.490&detailLon=-112.040&metricWind=mph&metricTemp=%C2%B0F&radarRange=-1
+                url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=°F&metricWind=mph&zoom=7&overlay=wind&product=ecmwf&level=surface&lat=42.926&lon=-112.462&message=true
               - type: custom:horizon-card
+            card_mod:
+              style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+                \ 0;\n}\n"
       - type: vertical-stack
         cards:
           - type: custom:bubble-card
@@ -6783,11 +6798,20 @@ views:
                 tap_action:
                   action: more-info
                 hold_action:
-                  action: none
+                  action: more-info
+              - type: template
+                entity: sensor.ecowitt_outdoor_temperature
+                icon: mdi:thermometer
+                content: '{{ states(entity) | round }} {{ state_attr(entity, "unit_of_measurement")
+                  }}'
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: more-info
               - type: entity
-                entity: sensor.owm_daily_temperature
+                entity: sensor.ecowitt_humidity
               - type: entity
-                entity: sensor.owm_daily_humidity
+                entity: sensor.ecowitt_solar_lux
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
@@ -10019,7 +10043,7 @@ views:
                     text: °F
                     rotate: 0
             series:
-              - entity: sensor.owm_daily_temperature
+              - entity: sensor.ecowitt_outdoor_temperature
                 name: Outside
                 color: rgb(0,188,212)
               - entity: sensor.cold_storage_temperature
@@ -10065,7 +10089,7 @@ views:
                     text: '%'
                     rotate: 0
             series:
-              - entity: sensor.owm_daily_humidity
+              - entity: sensor.ecowitt_humidity
                 name: Outside
                 color: rgb(0,188,212)
               - entity: sensor.cold_storage_humidity
