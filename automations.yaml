@@ -203,8 +203,8 @@
       title: Window Alerts Ignored
       message: The Window Open alerts have been ignored until all windows are closed
 - id: '1665681550417'
-  alias: ☑️ Retry Remote Start Subaru
-  description: Starts the Subaru (usually after a failure) when the action is pressed
+  alias: ☑️ Retry Remote Start Ascent
+  description: Starts the Ascent (usually after a failure) when the action is pressed
   trigger:
   - platform: event
     event_type: mobile_app_notification_action
@@ -217,18 +217,18 @@
   condition: []
   action:
   - parallel:
-    - service: button.press
-      target:
+    - target:
         entity_id: button.ascent_remote_start
       data: {}
-    - service: script.notify_mobile
-      data:
+      action: button.press
+    - data:
         who: parents
         message: clear_notification
-        tag: subaru
-    - service: persistent_notification.dismiss
-      data:
-        notification_id: subaru
+        tag: ascent
+      action: script.notify_mobile
+    - data:
+        notification_id: ascent
+      action: persistent_notification.dismiss
   mode: single
 - id: '1665681684041'
   alias: ☑️ Turn on Water Main
@@ -1183,31 +1183,32 @@
     - binary_sensor.sliding_door_contact
     - binary_sensor.garage_entry_window_door_is_open
     - binary_sensor.garage_side_door_contact
+    - binary_sensor.cold_storage_contact_contact
     from: 'on'
     to: 'off'
     for:
       seconds: 30
   condition: []
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       message: clear_notification
       tag: door-{{ trigger.to_state.object_id }}
+    action: script.notify_mobile
   - if:
     - condition: template
       value_template: '{{ expand("binary_sensor.all_doors") | selectattr("state",
         "==", "on") | map(attribute="entity_id") | list | count == 0 }}'
     then:
-    - service: input_boolean.turn_on
-      target:
+    - target:
         entity_id: input_boolean.door_open_alerts
       data: {}
-    - service: script.notify_mobile
-      data:
+      action: input_boolean.turn_on
+    - data:
         who: parents
         message: clear_notification
         tag: door-alerts-ignored
+      action: script.notify_mobile
   mode: single
 - id: '1665687917160'
   alias: "\U0001F4AC Door Left Open"
@@ -1219,6 +1220,7 @@
     - binary_sensor.sliding_door_contact
     - binary_sensor.garage_entry_window_door_is_open
     - binary_sensor.garage_side_door_contact
+    - binary_sensor.cold_storage_contact_contact
     from: 'off'
     to: 'on'
     for:
@@ -1242,8 +1244,7 @@
           message: The {{ name }} has been open for {{ trigger.to_state.last_changed
             | relative_time }}.
       - parallel:
-        - service: script.notify_mobile
-          data:
+        - data:
             who: parents
             title: '{{ name }}'
             message: '{{ message }}'
@@ -1257,8 +1258,8 @@
             actions:
             - action: ignore_door_alerts
               title: Ignore Alerts
-        - service: script.notify_hass_agent
-          data:
+          action: script.notify_mobile
+        - data:
             entity:
             - media_player.erebus
             - media_player.nasya
@@ -1267,8 +1268,8 @@
             actions:
             - action: ignore_door_alerts
               title: Ignore Alerts
-        - service: script.notify_pipup
-          data:
+          action: script.notify_hass_agent
+        - data:
             entity:
             - media_player.shield_living_room
             - media_player.shield_family_room
@@ -1276,13 +1277,14 @@
             title: '{{ name }}'
             message: '{{ message }}'
             icon_url: local/icons/door-open.png
-        - service: script.notify_speech
-          data:
+          action: script.notify_pipup
+        - data:
             media_player:
             - media_player.cast_living_room_speaker
             - media_player.cast_family_room_speaker
             - media_player.cast_office_speaker
             message: '{{ message }}'
+          action: script.notify_speech
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
@@ -1337,6 +1339,7 @@
     - binary_sensor.sliding_door_contact
     - binary_sensor.garage_entry_window_door_is_open
     - binary_sensor.garage_side_door_contact
+    - binary_sensor.cold_storage_contact_contact
     from: 'off'
     to: 'on'
   condition:
@@ -1350,8 +1353,7 @@
     entity_id: input_boolean.door_open_alerts
     state: 'on'
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       title: Door Opened
       message: The {{ trigger.to_state.attributes.friendly_name }} opened and no one
@@ -1366,6 +1368,7 @@
       actions:
       - action: ignore_door_alerts
         title: Ignore
+    action: script.notify_mobile
   mode: single
 - id: '1665688080710'
   alias: "\U0001F514 Doorbell Ring"
@@ -1491,7 +1494,7 @@
     entity_id:
     - cover.garage_door
     - light.garage
-    - timer.subaru_remote_start
+    - timer.ascent_remote_start
   condition: []
   action:
   - choose:
@@ -1500,25 +1503,25 @@
         entity_id: cover.garage_door
         state: opening
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Yellow
           effect: Fast Rising
           level: 40
           target:
             entity_id: light.garage
+        action: script.inovelli_blue_led
     - conditions:
       - condition: state
         entity_id: cover.garage_door
         state: closing
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Yellow
           effect: Fast Falling
           level: 40
           target:
             entity_id: light.garage
+        action: script.inovelli_blue_led
     - conditions:
       - condition: state
         entity_id: cover.garage_door
@@ -1530,42 +1533,42 @@
             entity_id: light.garage
             state: 'on'
           sequence:
-          - service: script.inovelli_blue_led
-            data:
+          - data:
               color: Orange
               effect: Medium Rising
               level: 40
               target:
                 entity_id: light.garage
+            action: script.inovelli_blue_led
         - conditions:
           - condition: state
             entity_id: light.garage
             state: 'off'
           sequence:
-          - service: script.inovelli_blue_led
-            data:
+          - data:
               color: Red
               effect: Medium Rising
               level: 40
               target:
                 entity_id: light.garage
+            action: script.inovelli_blue_led
     - conditions:
       - condition: state
-        entity_id: timer.subaru_remote_start
+        entity_id: timer.ascent_remote_start
         state: active
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Blue
           effect: Open/Close
           level: 60
           target:
             entity_id: light.garage
+        action: script.inovelli_blue_led
     default:
-    - service: script.inovelli_blue_led
-      data:
+    - data:
         target:
           entity_id: light.garage
+      action: script.inovelli_blue_led
   mode: restart
 - id: '1665688406559'
   alias: "\U0001F6A6 Joshua Office Light Switch Status"
@@ -1919,8 +1922,8 @@
           tag: '{{ tag }}'
   mode: parallel
 - id: '1665689633891'
-  alias: "\U0001F4AC Subaru Failed Notification"
-  description: Sends a notification when the Subaru fails to start
+  alias: "\U0001F4AC Ascent Failed Notification"
+  description: Sends a notification when the Ascent fails to start
   trigger:
   - platform: event
     event_type: subaru_command_failed
@@ -1939,33 +1942,33 @@
         recieved.\n{%- elif 'unknown' in trigger.event.data.message -%}\n  I have
         no idea why. Please try again.\n{% endif %}"
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
-        title: Subaru Remote Start
+        title: Ascent Remote Start
         message: '{{ message }}'
         notification_icon: mdi:car-connected
         color: '#0e4bef'
         icon_url: local/icons/subaru.png
-        group: Subaru
-        tag: subaru
-        url: lovelace/subaru
+        group: Ascent
+        tag: ascent
+        url: lovelace/ascent
         actions:
         - action: remote_start_again
           title: Retry
-    - service: script.notify_pipup
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Subaru Remote Start
+        title: Ascent Remote Start
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
-    - service: script.notify_speech
-      data:
+      action: script.notify_pipup
+    - data:
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
+      action: script.notify_speech
   mode: single
 - id: '1665689705099'
   alias: "\U0001F3E2 Joshua Office Day Mode"
@@ -3157,13 +3160,13 @@
     input:
       switch: sensor.emma_bedroom_action
       config_single:
-      - service: switch.toggle
+      - action: switch.toggle
         metadata: {}
         data: {}
         target:
           entity_id: switch.nebula_projector_emma_main_switch
       config_double:
-      - service: select.select_next
+      - action: select.select_next
         metadata: {}
         data:
           cycle: true
@@ -3175,7 +3178,7 @@
           entity_id: switch.nebula_projector_emma_main_switch
           state: 'on'
         then:
-        - service: light.toggle
+        - action: light.toggle
           metadata: {}
           data: {}
           target:
@@ -3212,107 +3215,107 @@
       switch: sensor.garage_action
       config_single:
       - parallel:
-        - service: cover.toggle
-          data: {}
+        - data: {}
           target:
             entity_id: cover.garage_door
+          action: cover.toggle
         - choose:
           - conditions:
             - condition: state
               entity_id: cover.garage_door
               state: closed
             sequence:
-            - service: script.inovelli_blue_led
-              data:
+            - data:
                 color: Yellow
                 effect: Fast Rising
                 level: 40
                 duration: 3 Seconds
                 target:
                   entity_id: light.garage
+              action: script.inovelli_blue_led
           default:
-          - service: script.inovelli_blue_led
-            data:
+          - data:
               color: Yellow
               effect: Fast Falling
               level: 40
               duration: 3 Seconds
               target:
                 entity_id: light.garage
+            action: script.inovelli_blue_led
       - delay:
           seconds: 3
-      - service: automation.trigger
-        data:
+      - data:
           skip_condition: true
         target:
           entity_id:
           - automation.garage_light_switch_status
+        action: automation.trigger
       up_double:
       - parallel:
-        - service: script.inovelli_blue_led
-          data:
+        - data:
             color: Yellow
             effect: Chase
             level: 40
             duration: 3 Seconds
             target:
               entity_id: light.garage
-        - service: light.turn_on
-          enabled: false
+          action: script.inovelli_blue_led
+        - enabled: false
           target:
             entity_id:
             - light.living_room
             - light.kitchen
           data:
             brightness: 255
+          action: light.turn_on
       - delay:
           seconds: 3
-      - service: automation.trigger
-        data:
+      - data:
           skip_condition: true
         target:
           entity_id: automation.garage_light_switch_status
+        action: automation.trigger
       up_triple:
       - parallel:
-        - service: script.inovelli_blue_led
-          data:
+        - data:
             color: Blue
             effect: Chase
             level: 60
             duration: 3 Seconds
             target:
               entity_id: light.garage
-        - service: script.subaru_remote_start
-          data: {}
+          action: script.inovelli_blue_led
+        - data: {}
+          action: script.ascent_remote_start
       - delay:
           seconds: 3
-      - service: automation.trigger
-        data:
+      - data:
           skip_condition: true
         target:
           entity_id: automation.garage_light_switch_status
+        action: automation.trigger
       down_triple:
       - parallel:
-        - service: script.inovelli_blue_led
-          data:
+        - data:
             color: Yellow
             effect: Chase
             level: 60
             duration: 3 Seconds
             target:
               entity_id: light.garage
-        - service: light.turn_off
-          enabled: false
+          action: script.inovelli_blue_led
+        - enabled: false
           target:
             entity_id: light.inside_lights
           data: {}
+          action: light.turn_off
       - delay:
           seconds: 3
-      - service: automation.trigger
-        data:
+      - data:
           skip_condition: true
         target:
           entity_id: automation.garage_light_switch_status
+        action: automation.trigger
 - id: '1667779560311'
   alias: "\U0001F4CB [Inovelli] Kitchen Switch"
   description: Custom button actions for the Inovelli switch
@@ -3394,11 +3397,11 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       up_single:
-      - service: script.office_lights_on
+      - action: script.joshua_office_lights_on
         data: {}
       up_double:
       - parallel:
-        - service: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led_status_start
           data:
             entity_id:
             - light.joshua_office_switch
@@ -3409,16 +3412,16 @@
             color_end: Green
             effect_end: Clear
             level_end: 40
-        - service: script.office_lights_day_mode
+        - action: script.joshua_office_lights_day_mode
           data: {}
       down_single:
-      - service: light.turn_off
+      - action: light.turn_off
         data: {}
         target:
           entity_id: light.joshua_office_lights
       down_double:
       - parallel:
-        - service: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led_status_start
           data:
             entity_id:
             - light.joshua_office_switch
@@ -3429,7 +3432,7 @@
             color_end: Green
             effect_end: Clear
             level_end: 40
-        - service: script.office_lights_night_mode
+        - action: script.joshua_office_lights_night_mode
           data: {}
       switch: sensor.joshua_office_switch_action
 - id: '1667780182339'
@@ -3438,7 +3441,45 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.amy_office_action
+      up_single:
+      - action: script.amy_office_lights_on
+        data: {}
+      up_double:
+      - parallel:
+        - action: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.amy_office_switch
+            color_start: Yellow
+            effect_start: Open/Close
+            duration: 2 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - action: script.amy_office_lights_day_mode
+          data: {}
+      down_single:
+      - action: light.turn_off
+        data: {}
+        target:
+          entity_id: light.amy_office_lights
+      down_double:
+      - parallel:
+        - action: script.inovelli_blue_led_status_start
+          data:
+            entity_id:
+            - light.amy_office_switch
+            color_start: Yellow
+            effect_start: Open/Close
+            duration: 2 Seconds
+            level_start: 60
+            color_end: Green
+            effect_end: Clear
+            level_end: 40
+        - action: script.amy_office_lights_night_mode
+          data: {}
+      switch: sensor.amy_office_switch_action
 - id: '1669666972148'
   alias: "\U0001F310 UniFi WAN Status"
   description: Sends notifications when the network status changes
@@ -3523,8 +3564,8 @@
     default: []
   mode: restart
 - id: '1673152651576'
-  alias: "\U0001F4AC Subaru Started"
-  description: Actions when the Subaru starts
+  alias: "\U0001F4AC Ascent Started"
+  description: Actions when the Ascent starts
   trigger:
   - platform: event
     event_type: subaru_command_successful
@@ -3533,27 +3574,26 @@
   condition: []
   action:
   - variables:
-      title: Subaru Remote Start
+      title: Ascent Remote Start
       message: The car started and is running.
-  - service: timer.start
-    data: {}
+  - data: {}
     target:
-      entity_id: timer.subaru_remote_start
+      entity_id: timer.ascent_remote_start
+    action: timer.start
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: '{{ title }}'
         message: '{{ message }}'
         notification_icon: mdi:car-connected
         color: '#114be6'
         icon_url: local/icons/subaru.png
-        group: Subaru
+        group: Ascent
         priority: high
-        tag: subaru
-        url: lovelace/subaru
-    - service: script.notify_pipup
-      data:
+        tag: ascent
+        url: lovelace/ascent
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -3561,10 +3601,11 @@
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
-    - service: script.notify_speech
-      data:
+      action: script.notify_pipup
+    - data:
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
+      action: script.notify_speech
   - wait_for_trigger:
     - platform: state
       entity_id:
@@ -3583,10 +3624,10 @@
       minutes: 10
       seconds: 5
     continue_on_timeout: false
-  - service: timer.cancel
-    data: {}
+  - data: {}
     target:
-      entity_id: timer.subaru_remote_start
+      entity_id: timer.ascent_remote_start
+    action: timer.cancel
   mode: single
 - id: '1677559331389'
   alias: "\U0001F5FA️ Leaving Zone"
@@ -3639,13 +3680,13 @@
         message: '{{ message }}'
   mode: single
 - id: '1678829415008'
-  alias: "\U0001F4AC Subaru Remote Start Expired Notification"
-  description: Sends a notification when the Subaru remote start expires
+  alias: "\U0001F4AC Ascent Remote Start Expired Notification"
+  description: Sends a notification when the Ascent remote start expires
   trigger:
   - platform: event
     event_type: timer.finished
     event_data:
-      entity_id: timer.subaru_remote_start
+      entity_id: timer.ascent_remote_start
   condition:
   - condition: or
     conditions:
@@ -3657,26 +3698,25 @@
       state: home
   action:
   - variables:
-      title: Subaru Remote Start
+      title: Ascent Remote Start
       message: The car shut off and is no longer running.
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: '{{ title }}'
         message: '{{ message }}'
         notification_icon: mdi:car-connected
         color: '#114be6'
         icon_url: local/icons/subaru.png
-        group: Subaru
+        group: Ascent
         priority: high
-        tag: subaru
-        url: lovelace/subaru
+        tag: ascent
+        url: lovelace/ascent
         actions:
         - action: remote_start_again
           title: Start Again
-    - service: script.notify_pipup
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -3684,10 +3724,11 @@
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/subaru.png
-    - service: script.notify_speech
-      data:
+      action: script.notify_pipup
+    - data:
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
+      action: script.notify_speech
   mode: single
 - id: '1679340622496'
   alias: "\U0001F5FA️ Arriving Home"
@@ -4311,8 +4352,8 @@
           target:
             entity_id: '{{ repeat.item[0] }}'
 - id: '1704385020720'
-  alias: "\U0001F4AC Subaru Fuel Level Low"
-  description: Sends a notification when Subaru fuel level is low
+  alias: "\U0001F4AC Ascent Fuel Level Low"
+  description: Sends a notification when the Ascent's fuel level is low
   trigger:
   - platform: numeric_state
     entity_id:
@@ -4323,26 +4364,26 @@
   condition: []
   action:
   - parallel:
-    - service: persistent_notification.create
-      data:
-        title: Subaru Fuel Low
-        message: The fuel level in the Subaru is low.
-        notification_id: subaru-fuel
-    - service: script.notify_mobile
-      data:
+    - data:
+        title: Ascent Fuel Low
+        message: The fuel level in the Ascent is low.
+        notification_id: ascent-fuel
+      action: persistent_notification.create
+    - data:
         who: parents
-        title: Subaru Fuel Low
-        message: The fuel level in the Subaru is low.
+        title: Ascent Fuel Low
+        message: The fuel level in the Ascent is low.
         notification_icon: mdi:car-connected
         color: '#0e4bef'
         icon_url: local/icons/subaru.png
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
-        title: Subaru Fuel Low
-        message: The fuel level in the Subaru is low.
+        title: Ascent Fuel Low
+        message: The fuel level in the Ascent is low.
+      action: script.notify_hass_agent
   mode: single
 - id: '1704594011311'
   alias: "\U0001F4C5 Grow Light On/Off"
@@ -4405,7 +4446,7 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: script.office_lights_on
+      - service: script.joshua_office_lights_on
         data: {}
     - conditions:
       - condition: trigger
@@ -4717,24 +4758,24 @@
         entity_id: switch.nebula_projector_emma_main_switch
         state: 'off'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           target:
             entity_id: light.emma_bedroom
           led: Led 1
+        action: script.inovelli_blue_led
     - conditions:
       - condition: state
         entity_id: switch.nebula_projector_emma_main_switch
         state: 'on'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           level: 40
           target:
             entity_id: light.emma_bedroom
           led: Led 1
           effect: Pulse
           color: Red
+        action: script.inovelli_blue_led
   mode: restart
 - id: '1711138066935'
   alias: ⚙️ Reload Addons and Integrations
@@ -4745,15 +4786,19 @@
     event: start
   condition: []
   action:
-  - service: hassio.addon_restart
-    metadata: {}
+  - metadata: {}
     data:
       addon: 45df7312_zigbee2mqtt
-  - service: homeassistant.reload_config_entry
-    metadata: {}
+    action: hassio.addon_restart
+  - metadata: {}
     data: {}
+    action: homeassistant.reload_config_entry
     target:
-      device_id: 4d8e4dbe89e0c2955f1faf921bc35550
+      device_id:
+      - 1dee4aa37e70d346348224829cd7c84f
+      - fd4ff1a9970156bb319e4d85d4450657
+      - 046ad4016aea54916dd414935e0008da
+      - 49d046eb766685131c0c5deb9f0d2250
   mode: single
 - id: '1713385133443'
   alias: ⚙️ Offline Devices
@@ -5165,4 +5210,115 @@
         title: Oven
         message: The oven timer has finished
         icon_url: local/icons/stove.png
+  mode: single
+- id: '1725260717620'
+  alias: "\U0001F6A6 Amy Office Light Switch Status"
+  description: Set Amy Office light switch LED light status
+  trigger:
+  - platform: state
+    id: 'on'
+    entity_id:
+    - light.amy_office
+    from: 'off'
+    to: 'on'
+  - platform: state
+    id: 'off'
+    entity_id:
+    - light.amy_office
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: 'off'
+      sequence:
+      - data:
+          color: Red
+          effect: Solid
+          level: 1
+          target:
+            entity_id: light.amy_office_switch
+        action: script.inovelli_blue_led
+    - conditions:
+      - condition: trigger
+        id: 'on'
+      sequence:
+      - data:
+          color: Green
+          effect: Solid
+          level: 40
+          target:
+            entity_id: light.amy_office_switch
+        action: script.inovelli_blue_led
+  mode: restart
+- id: '1725462823177'
+  alias: "\U0001F4AC Kona Fuel Level Low"
+  description: Sends a notification when the Kona's fuel level is low
+  trigger:
+  - platform: numeric_state
+    entity_id:
+    - sensor.kona_fuel_level
+    below: 11
+    for:
+      hours: 1
+  condition: []
+  action:
+  - parallel:
+    - data:
+        title: Kona Fuel Low
+        message: The fuel level in the Kona is low.
+        notification_id: kona-fuel
+      action: persistent_notification.create
+    - data:
+        who: parents
+        title: Kona Fuel Low
+        message: The fuel level in the Kona is low.
+        notification_icon: mdi:car-connected
+        color: '#0e4bef'
+        icon_url: local/icons/hyundai.png
+      action: script.notify_mobile
+    - data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Kona Fuel Low
+        message: The fuel level in the Kona is low.
+      action: script.notify_hass_agent
+  mode: single
+- id: '1725463478923'
+  alias: "\U0001F4AC Kona Battery Charge Low"
+  description: Sends a notification when the Kona's battery charge is low
+  trigger:
+  - platform: numeric_state
+    entity_id:
+    - sensor.kona_car_battery_level
+    below: 41
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - parallel:
+    - data:
+        title: Kona Battery Low
+        message: The battery charge in the Kona is low.
+        notification_id: kona-battery
+      action: persistent_notification.create
+    - data:
+        who: joshua
+        title: Kona Battery Low
+        message: The battery charge in the Kona is low.
+        notification_icon: mdi:car-connected
+        color: '#0e4bef'
+        icon_url: local/icons/hyundai.png
+      action: script.notify_mobile
+    - data:
+        entity:
+        - media_player.erebus
+        title: Kona Battery Low
+        message: The battery charge in the Kona is low.
+      action: script.notify_hass_agent
   mode: single

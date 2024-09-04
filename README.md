@@ -32,10 +32,10 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3074 |
-| Sensors        | 901 |
-| Binary Sensors | 244 |
-| Lights         | 49 |
+| All Entities   | 3210 |
+| Sensors        | 977 |
+| Binary Sensors | 256 |
+| Lights         | 56 |
 | Switches       | 107 |
 
 <details><summary>Stock Integrations</summary>
@@ -658,7 +658,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>505 Automations</summary>
+<details><summary>508 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -678,7 +678,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ☑️ Ignore Door Alerts
 - ☑️ Ignore Garage Door Alerts
 - ☑️ Ignore Window Alerts 🚫
-- ☑️ Retry Remote Start Subaru
+- ☑️ Retry Remote Start Ascent
 - ☑️ Turn on Water Main
 - ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
@@ -724,6 +724,10 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
 - 💧 Water Leak Detected 🚫
+- 💬 Ascent Failed Notification
+- 💬 Ascent Fuel Level Low
+- 💬 Ascent Remote Start Expired Notification
+- 💬 Ascent Started
 - 💬 Bambu P1S Print Completed
 - 💬 Bambu P1S Print Status
 - 💬 Bambu P1S Printer Error
@@ -736,10 +740,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💬 Garage Door Left Open and Leaving
 - 💬 Garage Door Opened and Away
 - 💬 Garbage Collection
-- 💬 Subaru Failed Notification
-- 💬 Subaru Fuel Level Low
-- 💬 Subaru Remote Start Expired Notification
-- 💬 Subaru Started
+- 💬 Kona Battery Charge Low
+- 💬 Kona Fuel Level Low
 - 💬 Window Left Open 🚫
 - 📅 Emma's Projector On/Off
 - 📅 Ethan's Projector On/Off
@@ -749,8 +751,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📅 Main Bedroom Fan On/Off 🚫
 - 📋 [Controller] Hue Dimmer Remote 🚫
 - 📋 [Controller] Ikea 5-Button Remote 🚫
-- 📋 [Inovelli] Amy Office Switch 🚫
-- 📋 [Inovelli] Emma Switch 🚫
+- 📋 [Inovelli] Amy Office Switch
+- 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
 - 📋 [Inovelli] Family Room Switch
 - 📋 [Inovelli] Garage Switch
@@ -782,7 +784,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🖨️ Out of Paper
 - 🗺️ Arriving Home 🚫
 - 🗺️ Leaving Zone
-- 🚦 Emma Light Switch Status 🚫
+- 🚦 Amy Office Light Switch Status 🚫
+- 🚦 Emma Light Switch Status
 - 🚦 Ethan Light Switch Status
 - 🚦 Garage Entry Light Switch Status
 - 🚦 Garage Light Switch Status
