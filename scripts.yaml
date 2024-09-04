@@ -11,51 +11,51 @@ inovelli_blue_led:
 remote_family_room_activate_tv:
   alias: Family Room TV
   sequence:
-  - service: remote.turn_off
-    target:
+  - target:
       entity_id: remote.harmony_family_room
     data:
       activity: Shield TV
+    action: remote.turn_off
   icon: mdi:motion-play-outline
   mode: single
 remote_family_room_activate_computer:
   alias: Gaming PC
   sequence:
-  - service: remote.turn_on
-    target:
+  - target:
       entity_id: remote.harmony_family_room
     data:
       activity: Computer
+    action: remote.turn_on
   icon: mdi:desktop-tower
   mode: single
 remote_family_room_activate_ps3:
   alias: PS3
   sequence:
-  - service: remote.turn_on
-    target:
+  - target:
       entity_id: remote.harmony_family_room
     data:
       activity: PS3
+    action: remote.turn_on
   icon: mdi:sony-playstation
   mode: single
 remote_family_room_activate_ps4:
   alias: PS4
   sequence:
-  - service: remote.turn_on
-    target:
+  - target:
       entity_id: remote.harmony_family_room
     data:
       activity: PS4
+    action: remote.turn_on
   icon: mdi:sony-playstation
   mode: single
 remote_family_room_activate_xbox:
   alias: XBox
   sequence:
-  - service: remote.turn_on
-    target:
+  - target:
       entity_id: remote.harmony_family_room
     data:
       activity: XBox
+    action: remote.turn_on
   icon: mdi:microsoft-xbox
   mode: single
 family_room_game_light_mode:
@@ -72,33 +72,33 @@ family_room_game_light_mode:
           before: sunrise
       sequence:
       - parallel:
-        - service: switch.turn_off
-          target:
+        - target:
             entity_id: light.stairway
           data: {}
-        - service: light.turn_on
-          data:
+          action: switch.turn_off
+        - data:
             transition: 1
             brightness_pct: 20
           target:
             entity_id: light.family_room
+          action: light.turn_on
     default:
     - parallel:
-      - service: switch.turn_off
-        target:
+      - target:
           entity_id: light.stairway
         data: {}
-      - service: light.turn_on
-        data:
+        action: switch.turn_off
+      - data:
           brightness_pct: 20
           transition: 1
         target:
           entity_id: light.family_room
+        action: light.turn_on
   description: Adjusts the lights in the Family Room for Games.
   icon: mdi:light-flood-up
   mode: single
-office_lights_on:
-  alias: Office Lights On
+joshua_office_lights_on:
+  alias: Joshua Office Lights On
   sequence:
   - if:
     - condition: or
@@ -109,46 +109,47 @@ office_lights_on:
         before: sunrise
         before_offset: -00:20:00
     then:
-    - service: light.turn_on
-      data: {}
+    - data: {}
       target:
         entity_id:
         - light.joshua_office
         - light.joshua_office_lamp
         - light.wled_joshua_office_desk
+      action: light.turn_on
     else:
-    - service: light.turn_on
-      target:
+    - target:
         entity_id:
         - light.joshua_office
-    - service: light.turn_on
-      target:
+      action: light.turn_on
+      data: {}
+    - target:
         entity_id:
         - light.joshua_office_lamp
         - light.wled_joshua_office_desk
       data: {}
-    - service: switch.turn_on
-      target:
+      action: light.turn_on
+    - target:
         entity_id:
         - switch.joshua_office_shelf_led
       data: {}
+      action: switch.turn_on
   description: Turns on the office lights based on time of day.
   icon: mdi:chair-rolling
   mode: single
 generate_readme:
   alias: Generate README
   sequence:
-  - service: readme.generate
-    data: {}
-  - service: browser_mod.notification
-    data:
+  - data: {}
+    action: readme.generate
+  - data:
       message: README generation process complete
       duration: 5000
+    action: browser_mod.notification
   description: Regernerates the readme file based on templates/README.js.
   icon: mdi:text
   mode: single
-subaru_remote_start:
-  alias: Subaru Remote Start
+ascent_remote_start:
+  alias: Ascent Remote Start
   sequence:
   - variables:
       door_closed: '{{ is_state("cover.garage_door", "closed") }}'
@@ -158,41 +159,41 @@ subaru_remote_start:
     - condition: template
       value_template: '{{ door_closed and car_in_garage }}'
     then:
-    - service: cover.open_cover
-      target:
+    - target:
         entity_id: cover.garage_door
       data: {}
-  - service: button.press
-    target:
+      action: cover.open_cover
+  - target:
       entity_id: button.ascent_remote_start
     data: {}
-  description: Starts the Subaru and opens the garage door.
+    action: button.press
+  description: Starts the Ascent and opens the garage door.
   icon: fapro:subaru
   mode: single
-subaru_remote_stop:
-  alias: Subaru Remote Stop
+ascent_remote_stop:
+  alias: Ascent Remote Stop
   sequence:
-  - service: button.press
-    data:
+  - data:
       entity_id: button.ascent_remote_stop
+    action: button.press
   - if:
     - condition: state
       entity_id: cover.garage_door
       state: open
     then:
-    - service: cover.close_cover
-      target:
+    - target:
         entity_id: cover.garage_door
       data: {}
-  description: Stops the Subaru and closes the garage door.
+      action: cover.close_cover
+  description: Stops the Ascent and closes the garage door.
   icon: fapro:subaru
   mode: single
 sql_purge:
   alias: Purge Home Assistant Database
   sequence:
-  - service: recorder.purge
-    data:
+  - data:
       keep_days: '{{ states("input_number.db_purge_days") | int }}'
+    action: recorder.purge
   icon: mdi:database
   mode: single
 media_player_mute:
@@ -205,11 +206,11 @@ media_player_mute:
       value_template: '{{ not states(media_player) in [''unknown'', ''unavailable'']
         }}'
     then:
-    - service: media_player.volume_mute
-      target:
+    - target:
         entity_id: '{{ media_player }}'
       data:
         is_volume_muted: '{{ not state_attr(media_player , ''is_volume_muted'') }}'
+      action: media_player.volume_mute
   max: 10
   fields:
     media_player:
@@ -224,10 +225,10 @@ feeder_start:
   icon: mdi:paw
   mode: single
   sequence:
-  - service: mqtt.publish
-    data:
+  - data:
       topic: zigbee2mqtt/{{ feeder }}/set
       payload: '{"feed": "START"}'
+    action: mqtt.publish
   fields:
     feeder:
       name: Feeder
@@ -237,12 +238,11 @@ feeder_start:
           options:
           - Cat Feeder
           - Dog Feeder
-office_lights_day_mode:
-  alias: Office Lights Day Mode
+joshua_office_lights_day_mode:
+  alias: Joshua Office Lights Day Mode
   sequence:
   - parallel:
-    - service: light.turn_on
-      target:
+    - target:
         entity_id:
         - light.joshua_office
         - light.joshua_office_lamp
@@ -250,8 +250,8 @@ office_lights_day_mode:
         color_temp: 181
         brightness: 255
         transition: '{{ transition | default(1) }}'
-    - service: light.turn_on
-      target:
+      action: light.turn_on
+    - target:
         entity_id: light.wled_joshua_office_desk
       data:
         rgb_color:
@@ -260,10 +260,11 @@ office_lights_day_mode:
         - 255
         brightness: 255
         transition: '{{ transition | default(1) }}'
-    - service: switch.turn_on
-      target:
+      action: light.turn_on
+    - target:
         entity_id: switch.joshua_office_shelf_led
       data: {}
+      action: switch.turn_on
   description: Turns on the office lights and sets them to full-bright and daylight.
   icon: mdi:lightbulb-auto
   fields:
@@ -277,35 +278,35 @@ office_lights_day_mode:
           unit_of_measurement: seconds
           min: 1
           max: 36000
-office_lights_night_mode:
-  alias: Office Lights Night Mode
+joshua_office_lights_night_mode:
+  alias: Joshua Office Lights Night Mode
   sequence:
   - parallel:
-    - service: light.turn_on
-      data:
+    - data:
         brightness: 204
         color_temp: 370
         transition: '{{ transition | default(1) }}'
       target:
         entity_id: light.joshua_office_lamp
-    - service: light.turn_on
-      data:
+      action: light.turn_on
+    - data:
         brightness: 140
         color_temp: 370
         transition: '{{ transition | default(1) }}'
       target:
         entity_id: light.joshua_office
-    - service: light.turn_on
-      data:
+      action: light.turn_on
+    - data:
         brightness: 140
         color_temp: 250
         transition: '{{ transition | default(1) }}'
       target:
         entity_id: light.wled_joshua_office_desk
-    - service: switch.turn_off
-      target:
+      action: light.turn_on
+    - target:
         entity_id: switch.joshua_office_shelf_led
       data: {}
+      action: switch.turn_off
   description: Dims and sets the office lights to soft.
   icon: mdi:lightbulb-night
   fields:
@@ -330,32 +331,107 @@ kona_remote_start:
     - condition: template
       value_template: '{{ door_closed and car_in_garage }}'
     then:
-    - service: cover.open_cover
-      target:
+    - target:
         entity_id: cover.garage_door
       data: {}
-  - service: kia_uvo.start_climate
-    data:
+      action: cover.open_cover
+  - data:
       duration: 10
       device_id: f27d2038fd3fe30bc627505de54ddea8
+    action: kia_uvo.start_climate
   description: Starts the Kona and opens the garage door.
   icon: fapro:hyundai
   mode: single
 kona_remote_stop:
   alias: Kona Remote Stop
   sequence:
-  - service: kia_uvo.stop_climate
-    data:
+  - data:
       device_id: f27d2038fd3fe30bc627505de54ddea8
+    action: kia_uvo.stop_climate
   - if:
     - condition: state
       entity_id: cover.garage_door
       state: open
     then:
-    - service: cover.close_cover
-      target:
+    - target:
         entity_id: cover.garage_door
       data: {}
+      action: cover.close_cover
   description: Stops the Kona and closes the garage door.
   icon: fapro:hyundai
+  mode: single
+amy_office_lights_day_mode:
+  alias: Amy Office Lights Day Mode
+  sequence:
+  - parallel:
+    - target:
+        entity_id:
+        - light.amy_office
+      data:
+        color_temp: 181
+        brightness: 255
+        transition: '{{ transition | default(1) }}'
+      action: light.turn_on
+  description: Turns on the office lights and sets them to full-bright and daylight.
+  icon: mdi:lightbulb-auto
+  fields:
+    transition:
+      name: Transition
+      description: Time to transition the change.
+      example: '600'
+      selector:
+        number:
+          mode: box
+          unit_of_measurement: seconds
+          min: 1
+          max: 36000
+amy_office_lights_night_mode:
+  alias: Amy Office Lights Night Mode
+  sequence:
+  - parallel:
+    - data:
+        brightness: 140
+        color_temp: 370
+        transition: '{{ transition | default(1) }}'
+      target:
+        entity_id: light.amy_office
+      action: light.turn_on
+  description: Dims and sets the office lights to soft.
+  icon: mdi:lightbulb-night
+  fields:
+    transition:
+      name: Transition
+      description: Time to transition the change.
+      example: '600'
+      selector:
+        number:
+          mode: box
+          unit_of_measurement: seconds
+          min: 1
+          max: 36000
+amy_office_lights_on:
+  alias: Amy Office Lights On
+  sequence:
+  - if:
+    - condition: or
+      conditions:
+      - condition: time
+        after: input_datetime.office_night_mode
+      - condition: sun
+        before: sunrise
+        before_offset: -00:20:00
+    then:
+    - data: {}
+      target:
+        entity_id:
+        - light.amy_office
+      action: light.turn_on
+    else:
+    - target:
+        entity_id:
+        - light.amy_office
+      action: light.turn_on
+      data: {}
+  description: Turns on the office lights based on time of day.
+  icon: mdi:chair-rolling
   mode: single

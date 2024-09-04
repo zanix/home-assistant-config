@@ -79,14 +79,14 @@ media_play:
           value_template: "{{ is_google }}"
       then:
         - alias: Mute to hide the Google bloop-bloop sound
-          service: media_player.volume_mute
+          action: media_player.volume_mute
           data:
             is_volume_muted: true
           target:
             entity_id: "{{ media_player }}"
 
         - alias: Play a 1 second silent track to mask bloop
-          service: media_player.play_media
+          action: media_player.play_media
           data:
             media_content_type: music
             media_content_id: media-source://media_source/local/sounds/1-second-of-silence.mp3
@@ -108,7 +108,7 @@ media_play:
         - condition: template
           value_template: "{{ volume is number }}"
       then:
-        - service: media_player.volume_set
+        - action: media_player.volume_set
           data:
             volume_level: "{{ volume / 100 }}"
           target:
@@ -120,7 +120,7 @@ media_play:
           value_template: "{{ is_google }}"
       then:
         - alias: Unmute after setting the volume to hide the volume change sound
-          service: media_player.volume_mute
+          action: media_player.volume_mute
           data:
             is_volume_muted: false
           target:
@@ -133,7 +133,7 @@ media_play:
               condition: template
               value_template: "{{ media_location is string }}"
           sequence:
-            - service: media_player.play_media
+            - action: media_player.play_media
               data:
                 media_content_type: "{{ media_type | default('music', true) }}"
                 media_content_id: "{{ media_location }}"
@@ -145,7 +145,7 @@ media_play:
               condition: template
               value_template: "{{ message is string }}"
           sequence:
-            - service: "{{ voice_service }}"
+            - action: "{{ voice_service }}"
               data:
                 media_player: "{{ media_player }}"
                 message: "{{ message }}"
@@ -172,14 +172,14 @@ media_play:
               value_template: "{{ is_google }}"
           then:
             - alias: Mute to hide the volume change sound
-              service: media_player.volume_mute
+              action: media_player.volume_mute
               data:
                 is_volume_muted: true
               target:
                 entity_id: "{{ media_player }}"
 
             - alias: Play a 1 second silent track to mask bloop
-              service: media_player.play_media
+              action: media_player.play_media
               data:
                 media_content_type: music
                 media_content_id: media-source://media_source/local/sounds/1-second-of-silence.mp3
@@ -189,7 +189,7 @@ media_play:
                 milliseconds: 200
 
         - alias: Restore volume
-          service: media_player.volume_set
+          action: media_player.volume_set
           data:
             volume_level: "{{ current_volume }}"
           target:
@@ -201,20 +201,20 @@ media_play:
               value_template: "{{ is_google }}"
           then:
             - alias: Unmute to allow other announcements
-              service: media_player.volume_mute
+              action: media_player.volume_mute
               data:
                 is_volume_muted: false
               target:
                 entity_id: "{{ media_player }}"
 
     - alias: Store Last Message
-      service: script.store_mqtt_sensor
+      action: script.store_mqtt_sensor
       data:
         name: last_message
         state: "{{ iif(message is string, message, media_location) }}"
 
     - alias: Store Last Speaker
-      service: script.store_mqtt_sensor
+      action: script.store_mqtt_sensor
       data:
         name: last_speaker
         state: "{{ media_player }}"
