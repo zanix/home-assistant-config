@@ -3734,7 +3734,7 @@ views:
                 fill_container: true
                 tap_action:
                   action: navigate
-                  navigation_path: subaru
+                  navigation_path: ascent
                 badge_icon: "{% if is_state(\"binary_sensor.ascent_trouble\", \"on\"\
                   ) %}\n  mdi:alert\n{% endif %}"
                 badge_color: "{% if is_state(\"binary_sensor.ascent_trouble\", \"\
@@ -3754,7 +3754,7 @@ views:
                       \ absolute;\n  top: -30px;\n  left: -10px;\n}\nmushroom-state-info\
                       \ {\n  padding-left: 50px;\n  z-index: 1;\n}\nmushroom-badge-icon\
                       \ {\n  margin-right: -55px;\n  margin-top: -20px;\n}\n"
-                    mushroom-shape-avatar$: "{% set timer = \"timer.subaru_remote_start\"\
+                    mushroom-shape-avatar$: "{% set timer = \"timer.ascent_remote_start\"\
                       \ %}\n{% if state_attr(timer, \"finishes_at\") %}\n.picture\
                       \ {\n  {% set remaining = (as_datetime(state_attr(timer, \"\
                       finishes_at\")) - now()).total_seconds() | int %}\n  {% set\
@@ -6150,6 +6150,17 @@ views:
                 service: script.feeder_start
                 data:
                   feeder: Cat Feeder
+              card_mod:
+                style:
+                  mushroom-shape-icon$: "{% set level = \"sensor.cat_feeder_food_level\"\
+                    \ %} {% from \"util.jinja\" import battery_color %} .shape {\n\
+                    \  /* Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+                    \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--{{\
+                    \ battery_color(level) }}-color) {{ states(level) }}% 0%, var(--card-background-color)\
+                    \ 0% 100%\n  );\n} .shape:after {\n  /* Add back icon shape */\n\
+                    \  content: \"\";\n  height: 100%;\n  width: 100%;\n  position:\
+                    \ absolute;\n  border-radius: var(--icon-border-radius);\n  background:\
+                    \ var(--shape-color);\n}"
             cards:
               - type: custom:mushroom-number-card
                 entity: number.cat_feeder_serving_size
@@ -6342,11 +6353,11 @@ views:
               - type: light-brightness
           - type: horizontal-stack
             cards:
-              - type: tile
-                entity: light.main_bedroom_fan
-                name: Fan Light
-                features:
+              - features:
                   - type: light-brightness
+                type: tile
+                entity: light.main_bedroom_fan_light
+                name: Fan Light
               - type: tile
                 entity: light.main_bedroom_floor_lamp
                 name: Floor Lamp
@@ -6828,7 +6839,7 @@ views:
             cards:
               - type: tile
                 entity: light.outside_entry
-                name: Entry
+                name: Front Entry
                 features:
                   - type: light-brightness
               - features:
@@ -7017,9 +7028,9 @@ views:
             extra_entities:
               - binary_sensor.opensprinkler_rain_delay_active
               - sensor.opensprinkler_rain_delay_stop_time
-  - title: Subaru
+  - title: Ascent
     theme: Backend-selected
-    path: subaru
+    path: ascent
     type: custom:masonry-layout
     layout:
       max_cols: 2
@@ -7211,7 +7222,7 @@ views:
                     ) -%}\n  Open the Garage and Start the Ascent\n{%- else -%}\n\
                     \  Start the Ascent\n{%- endif -%}"
                   icon: mdi:key-wireless
-                  entity: script.subaru_remote_start
+                  entity: script.ascent_remote_start
                   icon_color: amber
                   tap_action:
                     action: none
@@ -7219,7 +7230,7 @@ views:
                     action: call-service
                     service: script.turn_on
                     target:
-                      entity_id: script.subaru_remote_start
+                      entity_id: script.ascent_remote_start
                 - type: custom:timer-bar-card
                   filter: true
                   invert: true
@@ -7238,7 +7249,7 @@ views:
                     - remaining: 00:01:00
                       bar_foreground: var(--red-color)
                   entities:
-                    - entity: timer.subaru_remote_start
+                    - entity: timer.ascent_remote_start
                       name: Timer
             cards:
               - type: custom:mushroom-select-card
@@ -7637,9 +7648,11 @@ views:
                 \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
                 }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
                 }\n"
-            name: Fuel
             entities:
               - entity: sensor.kona_fuel_level
+                name: Fuel
+              - entity: sensor.kona_car_battery_level
+                name: Battery
             animation:
               state: 'on'
             positions:
@@ -7707,7 +7720,7 @@ views:
                     - remaining: 00:01:00
                       bar_foreground: var(--red-color)
                   entities:
-                    - entity: timer.subaru_remote_start
+                    - entity: timer.ascent_remote_start
                       name: Timer
             cards:
               - type: custom:mushroom-chips-card
@@ -9986,6 +9999,9 @@ views:
               - entity: sensor.main_bedroom_temperature
                 name: Main
                 color: rgb(103,58,183)
+              - entity: sensor.kitchen_temperature
+                name: Kitchen
+                color: rgb(205,220,57)
               - entity: sensor.ethan_bedroom_temperature
                 name: Ethan
                 color: rgb(76,175,80)
@@ -10007,6 +10023,9 @@ views:
               - entity: sensor.main_bathroom_sensor_temperature
                 name: Main Bath
                 color: rgb(103,58,183)
+              - entity: sensor.theater_room_temperature
+                name: Theater Room
+                color: rgb(255, 193, 7)
           - type: custom:apexcharts-card
             apex_config:
               chart:
@@ -10427,11 +10446,11 @@ views:
               - type: light-brightness
           - type: horizontal-stack
             cards:
-              - type: tile
-                entity: light.main_bedroom_fan
-                name: Fan Light
-                features:
+              - features:
                   - type: light-brightness
+                type: tile
+                entity: light.main_bedroom_fan_light
+                name: Fan Light
               - type: tile
                 entity: light.main_bedroom_floor_lamp
                 name: Floor Lamp
@@ -10526,7 +10545,7 @@ views:
             cards:
               - type: tile
                 entity: light.outside_entry
-                name: Entry
+                name: Front Entry
                 features:
                   - type: light-brightness
               - features:
@@ -10902,6 +10921,13 @@ views:
                     secondary_info: none
                     icon_type: none
                     show_position_control: true
+              - type: custom:decluttering-card
+                template: door_card
+                variables:
+                  - name: Cold Storage Door
+                  - entity: binary_sensor.cold_storage_contact_contact
+                  - battery_entity: sensor.cold_storage_contact_battery
+                  - icon: mdi:door
       - type: vertical-stack
         cards:
           - type: custom:decluttering-card
