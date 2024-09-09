@@ -1396,12 +1396,12 @@
       - action: URI
         title: Stream
         uri: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
-  - service: webrtc.create_link
-    data:
+  - data:
       link_id: '{{ link_id }}'
       url: rtsp://127.0.0.1:8554/{{ camera_name }}
       open_limit: 0
       time_to_live: 600
+    action: webrtc.create_link
   - parallel:
     - if:
       - condition: state
@@ -1410,20 +1410,18 @@
       then:
       - repeat:
           for_each:
-          - media_player.cast_living_room_speaker
           - media_player.cast_family_room_speaker
           - media_player.cast_office_speaker
           sequence:
-          - service: script.turn_on
-            target:
+          - target:
               entity_id: script.media_play
             data:
               variables:
                 media_player: '{{ repeat.item }}'
                 media_location: '{{ media_location }}'
                 volume: '{{ volume }}'
-    - service: script.notify_mobile
-      data:
+            action: script.turn_on
+    - data:
         who: parents
         title: Doorbell
         message: '{{ message }}'
@@ -1437,8 +1435,8 @@
         channel: Doorbell Ring
         importance: high
         actions: '{{ actions }}'
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
@@ -1447,44 +1445,45 @@
         camera: '{{ camera }}'
         duration: 20
         actions: '{{ actions }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         title: Doorbell
         message: '{{ message }}'
         duration: 20
         camera: '{{ camera }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_pipup
+    - data:
         entity:
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: Doorbell
         message: '{{ message }}'
         icon_url: local/icons/doorbell-video.png
+      action: script.notify_pipup
     - if:
       - condition: state
         entity_id: light.wled_joshua_office_desk
         state: 'on'
       then:
-      - service: number.set_value
-        data:
+      - data:
           value: '180'
         target:
           entity_id: number.wled_joshua_office_desk_speed
-      - service: light.turn_on
-        target:
+        action: number.set_value
+      - target:
           entity_id: light.wled_joshua_office_desk
         data:
           effect: Sunrise
+        action: light.turn_on
       - delay:
           seconds: 5
-      - service: light.turn_on
-        target:
+      - target:
           entity_id: light.wled_joshua_office_desk
         data:
           effect: Solid
+        action: light.turn_on
   mode: single
 - id: '1665688313389'
   alias: "\U0001F6A6 Garage Light Switch Status"
@@ -3056,14 +3055,14 @@
         target:
           entity_id: switch.joshua_office_shelf_led
 - id: '1665723372482'
-  alias: "\U0001F4CB [Controller] Ikea 5-Button Remote"
+  alias: "\U0001F4CB [Controller] Ikea Remote Main Bedroom"
   description: ''
   use_blueprint:
     path: EPMatt/ikea_e1524_e1810.yaml
     input:
       integration: Zigbee2MQTT
-      controller_entity: sensor.ikea_5_button_remote_action
-      helper_last_controller_event: input_text.ikea_5_button_remote_event
+      controller_entity: sensor.ikea_remote_main_bedroom_action
+      helper_last_controller_event: input_text.ikea_remote_main_bedroom_event
       helper_double_press_delay: 400
       button_center_double_press: true
       button_up_double_press: true
@@ -3071,56 +3070,56 @@
       button_up_long_loop: false
       button_down_long_loop: false
       action_button_left_short:
-      - service: fan.decrease_speed
-        data:
+      - data:
           percentage_step: 25
         target:
           entity_id: fan.main_bedroom_ceiling
+        action: fan.decrease_speed
       action_button_right_short:
-      - service: fan.increase_speed
-        data:
+      - data:
           percentage_step: 25
         target:
           entity_id: fan.main_bedroom_ceiling
+        action: fan.increase_speed
       action_button_up_short:
-      - service: light.turn_on
-        data:
+      - data:
           brightness_step_pct: 10
           transition: 1
         target:
           entity_id: light.main_bedroom
+        action: light.turn_on
       action_button_up_double:
-      - service: light.turn_on
-        data:
+      - data:
           brightness_pct: 100
           transition: 1
         target:
           entity_id: light.main_bedroom
+        action: light.turn_on
       action_button_down_short:
-      - service: light.turn_on
-        data:
+      - data:
           brightness_step_pct: -10
           transition: 1
         target:
           entity_id: light.main_bedroom
+        action: light.turn_on
       action_button_down_double:
-      - service: light.turn_on
-        data:
+      - data:
           brightness_pct: 2
           transition: 1
         target:
           entity_id: light.main_bedroom
+        action: light.turn_on
       action_button_center_short:
-      - service: light.toggle
-        data:
+      - data:
           transition: 1
         target:
           entity_id: light.main_bedroom
+        action: light.toggle
       action_button_center_double:
-      - service: fan.toggle
-        data: {}
+      - data: {}
         target:
           entity_id: fan.main_bedroom_ceiling
+        action: fan.toggle
 - id: '1667779119970'
   alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
@@ -4316,19 +4315,20 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: fan.turn_on
-        data:
+      - data:
           percentage: 66
         target:
           entity_id: fan.main_bedroom_ceiling
+        action: fan.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: fan.turn_off
-        data: {}
+      - action: fan.turn_on
         target:
           entity_id: fan.main_bedroom_ceiling
+        data:
+          percentage: 33
   mode: single
 - id: '1702017706466'
   alias: ⚙️ Scan Interval

@@ -10,10 +10,16 @@ sensor:
     icon: 'mdi:network{{ iif(this.state | int(default=0) == 0, "", "-off") }}'
     state: '{{ this.attributes.get("entity_id", []) | count }}'
     attributes:
+      ignore: >-
+        {{ [
+          'sensor.cold_storage_last_seen',
+          'sensor.basement_hallway_motion_last_seen'
+        ] }}
       entity_id: >-
         {% set result = namespace(sensors=[]) %}
+        {% set ignore = this.attributes.get('ignore', {}) %}
         {% for state in states.sensor | rejectattr('attributes.device_class', 'undefined') | selectattr('attributes.device_class', '==', 'timestamp') %}
-          {% if 'last_seen' in state.entity_id and (states(state.entity_id) == 'unavailable' or ((as_timestamp(now()) - as_timestamp(iif(has_value(state.entity_id), states(state.entity_id), now()))) > ((24 | int) * 60 * 60))) %}
+          {% if 'last_seen' in state.entity_id and not state.entity_id in ignore and (states(state.entity_id) == 'unavailable' or ((as_timestamp(now()) - as_timestamp(iif(has_value(state.entity_id), states(state.entity_id), now()))) > ((24 | int) * 60 * 60))) %}
             {% set result.sensors = result.sensors + [state.entity_id] %}
           {% endif %}
         {% endfor %}

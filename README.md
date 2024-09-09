@@ -758,9 +758,9 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📅 Garbage Collection Event Generator
 - 📅 Grow Light On/Off 🚫
 - 📅 Living Room Fan On/Off
-- 📅 Main Bedroom Fan On/Off 🚫
+- 📅 Main Bedroom Fan On/Off
 - 📋 [Controller] Hue Dimmer Remote 🚫
-- 📋 [Controller] Ikea 5-Button Remote 🚫
+- 📋 [Controller] Ikea Remote Main Bedroom
 - 📋 [Inovelli] Amy Office Switch
 - 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
@@ -794,7 +794,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🖨️ Out of Paper
 - 🗺️ Arriving Home 🚫
 - 🗺️ Leaving Zone
-- 🚦 Amy Office Light Switch Status 🚫
+- 🚦 Amy Office Light Switch Status
 - 🚦 Emma Light Switch Status
 - 🚦 Ethan Light Switch Status
 - 🚦 Garage Entry Light Switch Status
