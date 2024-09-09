@@ -1,13 +1,13 @@
 ---
-# Custom component for ESPHome to add support for the Emporia Vue 2 energy monitor
+# Custom component for ESPHome to add support for the Emporia Vue 3 energy monitor
 # Source: https://github.com/emporia-vue-local/esphome
 #
 # yamllint disable rule:brackets
 # yamllint disable rule:colons
 
 substitutions:
-  name: emporiavue
-  friendly_name: EmporiaVue
+  name: emporiavue_sub
+  friendly_name: EmporiaVue Sub
 
   timezone_name: "America/Boise"
 
@@ -18,8 +18,8 @@ substitutions:
   # Calibration
   # To calculate new calibration value use the formula <in-use calibration value> * <accurate voltage> / <reporting voltage>
   # 0.022 is used as the default as starting point but may need adjusted to ensure accuracy
-  phase_a_calibration: "0.0231"
-  phase_b_calibration: "0.0217"
+  phase_a_calibration: "0.01935"
+  phase_b_calibration: "0.01916"
 
   # Suffixes
   # Add a beginning space if you want a space between the circuit name and suffix.
@@ -35,40 +35,40 @@ substitutions:
   balance_name: "Balance"
 
   # Individual circuits
-  circuit_name_1: "Family room"
-  circuit_name_2: "Dishwasher, Disposal"
-  circuit_name_3: "Fridge, Kitchen outlets"
-  circuit_name_4: "Theater room"
-  circuit_name_5: "Washer"
-  circuit_name_6: "Basement bedrooms"
-  circuit_name_7: "Living room, Master bedroom"
-  circuit_name_8: "Bedrooms"
-  circuit_name_9: "Range"
-  circuit_name_10: "Dryer"
-  circuit_name_11: "Garage outlets"
-  circuit_name_12: "Utility room"
-  circuit_name_13: "Entry, Living room, Bath lights"
-  circuit_name_14: "Air conditioner"
-  circuit_name_15: "Microwave"
-  circuit_name_16: "Furnace"
+  circuit_name_1: "Eve Outlet"
+  circuit_name_2: "Bathroom Outlets"
+  circuit_name_3: "Living Room"
+  circuit_name_4: "Furnace"
+  circuit_name_5: "Hall, Bedroom Outlets/Entry, Outside Lights"
+  circuit_name_6: "Bedroom Lights"
+  circuit_name_7: "Hall, Bath Lights/Main Bed Outlets"
+  circuit_name_8: "Basement Lights/Utility Room"
+  circuit_name_9: "Basement Bath Outlet"
+  circuit_name_10: "Kitchen Island"
+  circuit_name_11: "Family Room"
+  circuit_name_12: "Theater, Family Room Outlets/Basement Lighting"
+  circuit_name_13: "Basement Bedrooms"
+  circuit_name_14: "Circuit 14"
+  circuit_name_15: "Circuit 15"
+  circuit_name_16: "Circuit 16"
 
   # Pay close attention to set the phase_id for each breaker by matching it to the phase/leg it connects to in the panel
   circuit_phase_1: phase_a
-  circuit_phase_2: phase_b
-  circuit_phase_3: phase_a
-  circuit_phase_4: phase_b
+  circuit_phase_2: phase_a
+  circuit_phase_3: phase_b
+  circuit_phase_4: phase_a
   circuit_phase_5: phase_b
-  circuit_phase_6: phase_a
-  circuit_phase_7: phase_b
-  circuit_phase_8: phase_a
+  circuit_phase_6: phase_b
+  circuit_phase_7: phase_a
+  circuit_phase_8: phase_b
   circuit_phase_9: phase_a
   circuit_phase_10: phase_a
-  circuit_phase_11: phase_a
+  circuit_phase_11: phase_b
   circuit_phase_12: phase_b
   circuit_phase_13: phase_a
   circuit_phase_14: phase_b
-  circuit_phase_15: phase_b
-  circuit_phase_16: phase_a
+  circuit_phase_15: phase_a
+  circuit_phase_16: phase_b
 
   circuit_factor_1: "1"
   circuit_factor_2: "1"
@@ -78,12 +78,12 @@ substitutions:
   circuit_factor_6: "1"
   circuit_factor_7: "1"
   circuit_factor_8: "1"
-  circuit_factor_9: "2"
-  circuit_factor_10: "2"
+  circuit_factor_9: "1"
+  circuit_factor_10: "1"
   circuit_factor_11: "1"
   circuit_factor_12: "1"
   circuit_factor_13: "1"
-  circuit_factor_14: "2"
+  circuit_factor_14: "1"
   circuit_factor_15: "1"
   circuit_factor_16: "1"
 
@@ -92,7 +92,7 @@ esphome:
   friendly_name: $friendly_name
 
 external_components:
-  - source: github://emporia-vue-local/esphome@dev
+  - source: github://emporia-vue-local/esphome@vue3
     components:
       - emporia_vue
 
@@ -132,6 +132,8 @@ wifi:
   password: !secret wifi_not_password
   fast_connect: true
 
+captive_portal:
+
 preferences:
   # The default of 1min is far too short--flash chip is rated for approx 100k writes.
   flash_write_interval: "48h"
@@ -167,10 +169,18 @@ button:
 
 light:
   - platform: status_led
-    name: "LED"
-    pin: 23
-    restore_mode: ALWAYS_ON
-    entity_category: config
+    id: wifi_led
+    name: "WiFi LED"
+    pin:
+      number: 2
+      ignore_strapping_warning: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+  - platform: status_led
+    id: ethernet_led
+    name: "Ethernet LED"
+    pin: 4
+    restore_mode: RESTORE_DEFAULT_ON
 
 text_sensor:
   - platform: version
@@ -181,10 +191,10 @@ text_sensor:
       name: "Reset Reason"
 
 i2c:
-  sda: 21
-  scl: 22
+  sda: 5
+  scl: 18
   scan: false
-  frequency: 200kHz  # recommended range is 50-200kHz
+  frequency: 150kHz  # recommended range is 50-200kHz
   id: i2c_a
 
 time:
@@ -213,29 +223,32 @@ debug:
   - &abs
     # take the absolute value of the value
     lambda: 'return abs(x);'
+  - &zero
+    # Use for disconnected circuits to return 0
+    lambda: "return 0.0f;"
 
 sensor:
   - platform: emporia_vue
     i2c_id: i2c_a
     phases:
       - id: phase_a
-        input: BLACK
+        input: RED
         calibration: $phase_a_calibration
         voltage:
           name: "${phase_a_name}${voltage_suffix_name}"
           filters: [ *throttle_avg, *pos ]
-        frequency:
-          name: "${phase_a_name}${frequency_suffix_name}"
+        phase_angle:
+          name: "${phase_b_name}${phase_angle_suffix_name}"
           filters: [ *throttle_avg, *pos ]
 
       - id: phase_b
-        input: RED
+        input: BLACK
         calibration: $phase_b_calibration
         voltage:
           name: "${phase_b_name}${voltage_suffix_name}"
           filters: [ *throttle_avg, *pos ]
-        phase_angle:
-          name: "${phase_b_name}${phase_angle_suffix_name}"
+        frequency:
+          name: "${phase_a_name}${frequency_suffix_name}"
           filters: [ *throttle_avg, *pos ]
 
     ct_clamps:
@@ -274,9 +287,9 @@ sensor:
       - { phase_id: $circuit_phase_11, input: "11", power: { id: circuit_11_power, filters: [ *pos, multiply: $circuit_factor_11 ] } }
       - { phase_id: $circuit_phase_12, input: "12", power: { id: circuit_12_power, filters: [ *pos, multiply: $circuit_factor_12 ] } }
       - { phase_id: $circuit_phase_13, input: "13", power: { id: circuit_13_power, filters: [ *pos, multiply: $circuit_factor_13 ] } }
-      - { phase_id: $circuit_phase_14, input: "14", power: { id: circuit_14_power, filters: [ *pos, multiply: $circuit_factor_14 ] } }
-      - { phase_id: $circuit_phase_15, input: "15", power: { id: circuit_15_power, filters: [ *pos, multiply: $circuit_factor_15 ] } }
-      - { phase_id: $circuit_phase_16, input: "16", power: { id: circuit_16_power, filters: [ *pos, multiply: $circuit_factor_16 ] } }
+      - { phase_id: $circuit_phase_14, input: "14", power: { id: circuit_14_power, filters: [ *zero ] } }
+      - { phase_id: $circuit_phase_15, input: "15", power: { id: circuit_15_power, filters: [ *zero ] } }
+      - { phase_id: $circuit_phase_16, input: "16", power: { id: circuit_16_power, filters: [ *zero ] } }
     on_update:
       then:
         - component.update: total_power
@@ -305,9 +318,9 @@ sensor:
   - { platform: copy, source_id: circuit_11_power, filters: *throttle_avg, name: "${circuit_name_11}${power_suffix_name}" }
   - { platform: copy, source_id: circuit_12_power, filters: *throttle_avg, name: "${circuit_name_12}${power_suffix_name}" }
   - { platform: copy, source_id: circuit_13_power, filters: *throttle_avg, name: "${circuit_name_13}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_14_power, filters: *throttle_avg, name: "${circuit_name_14}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_15_power, filters: *throttle_avg, name: "${circuit_name_15}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_16_power, filters: *throttle_avg, name: "${circuit_name_16}${power_suffix_name}" }
+  # - { platform: copy, source_id: circuit_14_power, filters: *throttle_avg, name: "${circuit_name_14}${power_suffix_name}" }
+  # - { platform: copy, source_id: circuit_15_power, filters: *throttle_avg, name: "${circuit_name_15}${power_suffix_name}" }
+  # - { platform: copy, source_id: circuit_16_power, filters: *throttle_avg, name: "${circuit_name_16}${power_suffix_name}" }
 
   # Mains Total Power
   - platform: template
@@ -344,10 +357,7 @@ sensor:
         id(circuit_10_power).state -
         id(circuit_11_power).state -
         id(circuit_12_power).state -
-        id(circuit_13_power).state -
-        id(circuit_14_power).state -
-        id(circuit_15_power).state -
-        id(circuit_16_power).state);
+        id(circuit_13_power).state);
     update_interval: never
     id: balance_power
     device_class: power
@@ -378,6 +388,6 @@ sensor:
   - { power_id: "circuit_11_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_11}${daily_suffix_name}" }
   - { power_id: "circuit_12_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_12}${daily_suffix_name}" }
   - { power_id: "circuit_13_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_13}${daily_suffix_name}" }
-  - { power_id: "circuit_14_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_14}${daily_suffix_name}" }
-  - { power_id: "circuit_15_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_15}${daily_suffix_name}" }
-  - { power_id: "circuit_16_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_16}${daily_suffix_name}" }
+  # - { power_id: "circuit_14_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_14}${daily_suffix_name}" }
+  # - { power_id: "circuit_15_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_15}${daily_suffix_name}" }
+  # - { power_id: "circuit_16_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_16}${daily_suffix_name}" }

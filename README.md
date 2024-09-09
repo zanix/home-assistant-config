@@ -612,7 +612,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [Apollo MSR-1](https://shop.apolloautomation.cloud/products/multisensor-mk1) - mmWave CO2 Multisensor
 - [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
-- [Emporia Vue 2](https://www.amazon.com/dp/B08CJGPHL9/) - Real Time Electricity Monitor/Meter
+- [Emporia Vue 3](https://www.amazon.com/gp/product/B0C79PNK84) - Real Time Electricity Monitor/Meter
   flashed for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
 - [ESPHome](https://esphome.io) - DIY devices
 - [Zooz 700 Series Z-Wave Plus 4-in-1 Sensor ZSE40](https://www.amazon.com/dp/B01AKSO80O)
@@ -801,8 +801,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🚦 Garage Light Switch Status
 - 🚦 Joshua Office Light Switch Status 🚫
 - 🚦 Outside Entry Light Switch Status
-- 🧺 Dryer Running 🚫
-- 🧺 Washer Running 🚫
+- 🧺 Dryer Running
+- 🧺 Washer Running
 
 ---
 
