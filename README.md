@@ -284,7 +284,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>23 Custom Integrations</summary>
+<details><summary>24 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.23.0]
 
@@ -301,6 +301,12 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
+
+### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v1.0.4]
+
+Home Assistant integration for Dreame robot vacuums with map support
+
+Authors: [@tasshack](https://github.com/tasshack).
 
 ### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
 
@@ -426,7 +432,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>32 Lovelace Plugins</summary>
+<details><summary>33 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -555,6 +561,10 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 ### [Vertical Stack In Card](https://github.com/ofekashery/vertical-stack-in-card) [v0.4.4]
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
+
+### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.2.4]
+
+This card provides a user-friendly way to fully control map-based vacuums in Home Assistant. Supported brands include Xiaomi (Roborock/Viomi/Dreame/Roidmi/Valetudo/Valetudo RE), Neato, Wyze, Roomba, Ecovacs (and probably more).
 
 ---
 
