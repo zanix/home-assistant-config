@@ -11,29 +11,20 @@ sensor:
     unit_of_measurement: USD
     device_class: monetary
     icon: mdi:currency-usd
-    availability: "{{ has_value('sensor.sol_ark_grid_net_monthly') }}"
+    availability: "{{ has_value('sensor.emporiavue_main_balance_monthly') }}"
     state: >-
-      {%- set tariffs = ["summer_off_peak", "summer_peak", "winter_off_peak", "winter_peak"] -%}
+      {%- set tariffs = [
+        "summer_tier_1",
+        "summer_tier_2",
+        "summer_tier_3",
+        "winter_tier_1",
+        "winter_tier_2",
+        "winter_tier_3",
+      ] -%}
       {%- set ns = namespace(cost=0) -%}
       {% for tariff in tariffs -%}
         {%- set usage = states('sensor.monthly_energy_' ~ tariff) | float(default=0) -%}
         {%- set rate = states('input_text.tariff_' ~ tariff) | float(default=0) -%}
-        {%- set ns.cost = ns.cost + (usage * rate) -%}
-      {%- endfor -%}
-      {{ ns.cost | round(2) }}
-
-  - name: Month ToU Power Cost
-    unique_id: month_tou_power_cost
-    unit_of_measurement: USD
-    device_class: monetary
-    icon: mdi:currency-usd
-    availability: "{{ has_value('sensor.sol_ark_grid_net_monthly') }}"
-    state: >-
-      {%- set tariffs = ["summer_off_peak", "summer_peak", "winter_off_peak", "winter_peak"] -%}
-      {%- set ns = namespace(cost=0) -%}
-      {% for tariff in tariffs -%}
-        {%- set usage = states('sensor.monthly_tou_energy_' ~ tariff) | float(default=0) -%}
-        {%- set rate = states('input_text.tariff_tou_' ~ tariff) | float(default=0) -%}
         {%- set ns.cost = ns.cost + (usage * rate) -%}
       {%- endfor -%}
       {{ ns.cost | round(2) }}

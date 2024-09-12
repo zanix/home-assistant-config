@@ -668,7 +668,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>508 Automations</summary>
+<details><summary>504 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -705,10 +705,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⚙️ Startup
 - ⚙️ Update Database Filesize Sensor
 - ⚙️ Updates Available
-- ⚡ Tariff Summer Off-Peak 🚫
-- ⚡ Tariff Summer Peak 🚫
-- ⚡ Tariff Winter Off-Peak 🚫
-- ⚡ Tariff Winter Peak 🚫
+- ⚡ Tariff Changes
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
