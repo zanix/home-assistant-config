@@ -673,7 +673,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 > Keymaster automations are hidden
 
 - ⏯ Ensure PiPup is Running 🚫
-- ⏯ Family Room Media Auto Off 🚫
+- ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode 🚫
 - ⏯ Living Room Media State at Night 🚫
@@ -712,7 +712,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ✴️ Joshua Office CO2 Levels
 - ✴️ Joshua Office Light On/Off Presence
 - 🌐 UniFi WAN Status 🚫
-- 🍽️ Dishwasher is Done 🚫
+- 🍽️ Dishwasher is Done
 - 🍽️ Oven is Preheated
 - 🍽️ Oven Timer Completed
 - 🎄 XMas Lights On/Off 🚫
@@ -730,7 +730,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💡 Turn Lights On when Arrive 🚫
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
-- 💧 Water Leak Detected 🚫
+- 💧 Water Leak Detected
 - 💬 Ascent Failed Notification
 - 💬 Ascent Fuel Level Low
 - 💬 Ascent Remote Start Expired Notification
@@ -766,7 +766,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📋 [Inovelli] Joshua Office Switch
 - 📋 [Inovelli] Kitchen Switch 🚫
 - 📋 [Inovelli] Living Room Switch 🚫
-- 📋 [Inovelli] Main Bedroom Switch 🚫
+- 📋 [Inovelli] Main Bedroom Switch
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Today
 - 📦 Packages Delivered
@@ -789,7 +789,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
-- 🗺️ Arriving Home 🚫
+- 🗺️ Arriving Home
 - 🗺️ Leaving Zone
 - 🚦 Amy Office Light Switch Status
 - 🚦 Emma Light Switch Status
