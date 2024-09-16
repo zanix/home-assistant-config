@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3481 |
-| Sensors        | 1077 |
-| Binary Sensors | 258 |
-| Lights         | 62 |
-| Switches       | 149 |
+| All Entities   | 3532 |
+| Sensors        | 1117 |
+| Binary Sensors | 268 |
+| Lights         | 63 |
+| Switches       | 150 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -326,7 +326,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.9]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.11]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -432,7 +432,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>33 Lovelace Plugins</summary>
+<details><summary>32 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -450,7 +450,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.2.4]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0-beta.1]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -482,7 +482,7 @@ A Lovelace card for Frigate in Home Assistant
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just became the new limit.
 
-### [History Explorer Card](https://github.com/alexarch21/history-explorer-card) [v1.0.51]
+### [History Explorer Card](https://github.com/SpangleLabs/history-explorer-card) [v1.0.54]
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
@@ -530,10 +530,6 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
-### [Rgb Light Card](https://github.com/bokub/rgb-light-card) [v1.11.0]
-
-💡 A Lovelace custom card for RGB lights
-
 ### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.2.4]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
@@ -570,7 +566,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 </details><details><summary>3 Themes</summary>
 
-### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-2.3.0]
+### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-2.3.1]
 
 LCARS theme for Home Assistant
 
