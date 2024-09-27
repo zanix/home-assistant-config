@@ -432,7 +432,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>32 Lovelace Plugins</summary>
+<details><summary>33 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -470,6 +470,10 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🧹 Declutter your lovelace configuration with the help of this card
 
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.0.1]
+
+Expander card for HomeAssistant
+
 ### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v2.2.0]
 
 🔹 A foldable row for entities card, containing other rows
@@ -501,10 +505,6 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 ### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.5]
 
 🔹 Get more control over the placement of lovelace cards.
-
-### [Lovelace Yet Another Expander Card](https://github.com/clarinetJWD/lovelace-yet-another-expander-card) [v0.0.4]
-
-Yet Another Collapsible Expandable Lovelace Card
 
 ### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.12.1]
 
@@ -549,6 +549,10 @@ a custom card for home assistant that utilizes tabs to segregate individual card
 ### [Timer Bar Card](https://github.com/rianadon/timer-bar-card) [v1.30.2]
 
 A progress bar display for Home Assistant timers
+
+### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v1.6.5]
+
+This custom card allows you to display vehicle information in your Home Assistant dashboard, including the vehicle name, image, and fuel or charge level.
 
 ### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.16.0]
 
