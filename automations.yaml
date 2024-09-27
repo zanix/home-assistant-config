@@ -1330,6 +1330,7 @@
     - cover.garage_door
     - light.garage
     - timer.ascent_remote_start
+    - timer.kona_remote_start
   condition: []
   action:
   - choose:
@@ -1394,6 +1395,18 @@
       sequence:
       - data:
           color: Blue
+          effect: Open/Close
+          level: 60
+          target:
+            entity_id: light.garage
+        action: script.inovelli_blue_led
+    - conditions:
+      - condition: state
+        entity_id: timer.kona_remote_start
+        state: active
+      sequence:
+      - data:
+          color: Cyan
           effect: Open/Close
           level: 60
           target:
@@ -1608,8 +1621,7 @@
     entity_id: input_boolean.garage_door_open_alerts
     state: 'on'
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       title: Garage Door Open
       message: The Garage Door was left open when you left! Close it!
@@ -1623,8 +1635,9 @@
       actions:
       - action: ignore_garage_door_alerts
         title: Ignore Alerts
-      - action: close_garage
+      - action: close_garage_door
         title: Close
+    action: script.notify_mobile
   mode: single
 - id: '1665689312993'
   alias: "\U0001F4AC Garage Door Opened and Away"
@@ -1644,8 +1657,7 @@
     entity_id: input_boolean.garage_door_open_alerts
     state: 'on'
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       title: Garage Door Open
       message: The Garage Door opened and no one is home.
@@ -1659,8 +1671,9 @@
       actions:
       - action: ignore_garage_door_alerts
         title: Ignore Alerts
-      - action: close_garage
+      - action: close_garage_door
         title: Close
+    action: script.notify_mobile
   mode: single
 - id: '1691033044070'
   alias: "\U0001F4AC Garbage Collection"
@@ -2964,13 +2977,13 @@
     input:
       switch: sensor.ethan_bedroom_action
       config_single:
-      - service: switch.toggle
+      - action: switch.toggle
         metadata: {}
         data: {}
         target:
           entity_id: switch.nebula_projector_ethan_main_switch
       config_double:
-      - service: select.select_next
+      - action: select.select_next
         metadata: {}
         data:
           cycle: true
@@ -2982,7 +2995,7 @@
           entity_id: switch.nebula_projector_ethan_main_switch
           state: 'on'
         then:
-        - service: light.toggle
+        - action: light.toggle
           metadata: {}
           data: {}
           target:
@@ -3050,33 +3063,18 @@
       switch: sensor.garage_action
       config_single:
       - parallel:
+        - data:
+            color: Yellow
+            effect: Chase
+            level: 40
+            duration: 3 Seconds
+            target:
+              entity_id: light.garage
+          action: script.inovelli_blue_led
         - data: {}
           target:
             entity_id: cover.garage_door
           action: cover.toggle
-        - choose:
-          - conditions:
-            - condition: state
-              entity_id: cover.garage_door
-              state: closed
-            sequence:
-            - data:
-                color: Yellow
-                effect: Fast Rising
-                level: 40
-                duration: 3 Seconds
-                target:
-                  entity_id: light.garage
-              action: script.inovelli_blue_led
-          default:
-          - data:
-              color: Yellow
-              effect: Fast Falling
-              level: 40
-              duration: 3 Seconds
-              target:
-                entity_id: light.garage
-            action: script.inovelli_blue_led
       - delay:
           seconds: 3
       - data:
@@ -3085,7 +3083,45 @@
           entity_id:
           - automation.garage_light_switch_status
         action: automation.trigger
-      up_double:
+      config_triple:
+      - parallel:
+        - data:
+            color: Blue
+            effect: Chase
+            level: 60
+            duration: 3 Seconds
+            target:
+              entity_id: light.garage
+          action: script.inovelli_blue_led
+        - data: {}
+          action: script.ascent_remote_start
+      - delay:
+          seconds: 3
+      - data:
+          skip_condition: true
+        target:
+          entity_id: automation.garage_light_switch_status
+        action: automation.trigger
+      config_quadruple:
+      - parallel:
+        - data:
+            color: Cyan
+            effect: Chase
+            level: 60
+            duration: 3 Seconds
+            target:
+              entity_id: light.garage
+          action: script.inovelli_blue_led
+        - data: {}
+          action: script.kona_remote_start
+      - delay:
+          seconds: 3
+      - data:
+          skip_condition: true
+        target:
+          entity_id: automation.garage_light_switch_status
+        action: automation.trigger
+      up_triple:
       - parallel:
         - data:
             color: Yellow
@@ -3110,25 +3146,6 @@
         target:
           entity_id: automation.garage_light_switch_status
         action: automation.trigger
-      up_triple:
-      - parallel:
-        - data:
-            color: Blue
-            effect: Chase
-            level: 60
-            duration: 3 Seconds
-            target:
-              entity_id: light.garage
-          action: script.inovelli_blue_led
-        - data: {}
-          action: script.ascent_remote_start
-      - delay:
-          seconds: 3
-      - data:
-          skip_condition: true
-        target:
-          entity_id: automation.garage_light_switch_status
-        action: automation.trigger
       down_triple:
       - parallel:
         - data:
@@ -3139,8 +3156,7 @@
             target:
               entity_id: light.garage
           action: script.inovelli_blue_led
-        - enabled: false
-          target:
+        - target:
             entity_id: light.inside_lights
           data: {}
           action: light.turn_off
@@ -5175,28 +5191,23 @@
     id: season
   condition:
   - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      and not trigger.to_state.state in ["unknown", "unavailable"] }}'
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
+      none, null] and not trigger.to_state.state in ["unknown", "unavailable", none,
+      null] }}'
   action:
   - variables:
-      season: '{% set summer = is_state("binary_sensor.tariff_summer", "on") %} {{
-        iif(summer, "summer", "winter") }}'
+      season: '{{ iif(is_state("binary_sensor.tariff_summer", "on"), "summer", "winter")
+        }}'
       map: "{{ {\n    \"summer_tier_1\": [\"under 800\", \"summer tier 1\"],\n    \"summer_tier_2\":
         [\"over 800\", \"summer tier 2\"],\n    \"summer_tier_3\": [\"over 2000\",
         \"summer tier 3\"],\n    \"winter_tier_1\": [\"under 800\", \"winter tier
         1\"],\n    \"winter_tier_2\": [\"over 800\", \"winter tier 2\"],\n    \"winter_tier_3\":
         [\"over 2000\", \"winter tier 3\"],\n} }}\n"
-  - if:
-    - condition: trigger
-      id:
-      - season
-    then:
-    - variables:
-        tariff: '{{ season }}_tier_{{ states("select.monthly_energy").split("_")[2]
-          }}'
-    else:
-    - variables:
-        tariff: '{{ season }}_{{ trigger.id }}'
+      tariff: "{% if trigger.id == \"season\" and has_value(\"select.monthly_energy\")
+        %}\n  {{ season }}_tier_{{ states(\"select.monthly_energy\").split(\"_\")[2]
+        }}\n{% else %}\n  {{ season }}_{{ trigger.id }}\"\n{% endif %}\n"
+      message: Power usage is {{ map[tariff][0] }} kWh. Now charing {{ map[tariff][1]
+        }} rates.
   - action: select.select_option
     data:
       option: '{{ tariff }}'
@@ -5206,8 +5217,7 @@
     data:
       who: parents
       title: Energy Tariff Changed
-      message: Power usage is {{ map[tariff][0] }} kWh. Now charing {{ map[tariff][1]
-        }} rates.
+      message: '{{ message }}'
       notification_icon: mdi:lightning-bolt
       color: '#ffeb3b'
       icon_url: local/icons/lightning-bolt.png
@@ -5219,6 +5229,5 @@
       entity:
       - media_player.erebus
       title: Energy Tariff Changed
-      message: Power usage is {{ map[tariff][0] }} kWh. Now charing {{ map[tariff][1]
-        }} rates.
+      message: '{{ message }}'
   mode: single
