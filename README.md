@@ -32,7 +32,7 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3559 |
+| All Entities   | 3556 |
 | Sensors        | 1123 |
 | Binary Sensors | 271 |
 | Lights         | 64 |
@@ -668,16 +668,16 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>504 Automations</summary>
+<details><summary>501 Automations</summary>
 
 > Keymaster automations are hidden
 
-- ⏯ Ensure PiPup is Running 🚫
-- ⏯ Family Room Media Auto Off
+- ⏯ Ensure PiPup is Running
+- ⏯ Family Room Media Auto Off 🚫
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode 🚫
 - ⏯ Living Room Media State at Night 🚫
-- ⏯ Living Room Sound Mode 🚫
+- ⏯ Living Room Sound Mode
 - ⏯ Main Bedroom Media Auto Off 🚫
 - ⏯ PS4 Harmony Activity 🚫
 - ⏯️ Samsung Soundbar Night Mode
@@ -717,17 +717,15 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🍽️ Oven Timer Completed
 - 🎄 XMas Lights On/Off 🚫
 - 🎄 XMas Tree On/Off 🚫
-- 🏢 Joshua Office Day Mode
-- 🏢 Joshua Office Night Mode
+- 🏢 Joshua Office Mode
 - 🐱 Cat Feeder Empty Notification
 - 🐱 Cat Feeder Error
 - 💡 All Lights off when Away
 - 💡 Dim Front Lights at Night
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
-- 💡 Living Room Lamps off at Night
-- 💡 Living Room Lamps on at Sunset
-- 💡 Turn Lights On when Arrive 🚫
+- 💡 Living Room Lamps on/off
+- 💡 Turn Lights On when Arrive
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
 - 💧 Water Leak Detected
@@ -765,7 +763,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📋 [Inovelli] Garage Switch
 - 📋 [Inovelli] Joshua Office Switch
 - 📋 [Inovelli] Kitchen Switch 🚫
-- 📋 [Inovelli] Living Room Switch 🚫
+- 📋 [Inovelli] Living Room Switch
 - 📋 [Inovelli] Main Bedroom Switch
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Today
@@ -784,7 +782,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🔔 Frigate Doorbell - Object Seen
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
-- 🖥️ [Ardena] Sleep When Harmony Off
 - 🖥️ [Quest] Charge Complete
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner

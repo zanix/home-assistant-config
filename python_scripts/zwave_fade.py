@@ -8,7 +8,7 @@ automation:
     event: sunset
     offset: "-01:00:00"
     action:
-    - service: python_script.zwave_fade
+    - action: python_script.zwave_fade
       data:
         entity_id: light.level  # Entity ID to fade
         transition: 300          # Seconds to go from current to end brightness

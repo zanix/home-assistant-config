@@ -12,12 +12,11 @@
       action: close_garage_door
   condition: []
   action:
-  - service: cover.close_cover
-    target:
+  - target:
       entity_id: cover.garage_door
     data: {}
-  - service: script.notify_mobile
-    data:
+    action: cover.close_cover
+  - data:
       who: parents
       title: Garage Door Closed
       message: The Garage Door was closed
@@ -27,6 +26,7 @@
       group: Security
       tag: garage-door
       url: lovelace/security
+    action: script.notify_mobile
   mode: single
 - id: '1665681396617'
   alias: ☑️ Garbage Collection
@@ -53,12 +53,11 @@
   - variables:
       tag: '{{ trigger.event.data.tag }}'
       type: '{{ iif(tag == ''recycle_collection'', ''Recycling'', ''Garbage'') }}'
-  - service: input_boolean.turn_on
-    target:
+  - target:
       entity_id: input_boolean.{{ tag }}
+    action: input_boolean.turn_on
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: '{{ type }} Collection'
         message: The {{ type }} can is at the curb
@@ -67,13 +66,14 @@
         icon_url: '{{ trigger.event.data.icon_url }}'
         group: '{{ trigger.event.data.group }}'
         tag: '{{ tag }}'
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: '{{ type }} Collection'
         message: The {{ type }} can is at the curb
+      action: script.notify_hass_agent
   mode: single
 - id: '1665681528781'
   alias: ☑️ Ignore Door Alerts
@@ -89,34 +89,34 @@
       action: ignore_door_alerts
   condition: []
   action:
-  - service: input_boolean.turn_off
-    target:
+  - target:
       entity_id: input_boolean.door_open_alerts
     data: {}
+    action: input_boolean.turn_off
   - if:
     - condition: template
       value_template: '{{ trigger.event.data.tag != "" }}'
     then:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         message: clear_notification
         tag: '{{ trigger.event.data.tag }}'
-  - service: script.notify_mobile
-    data:
+      action: script.notify_mobile
+  - data:
       who: parents
       title: Door Alerts Ignored
       message: The Door Open alerts have been ignored until all doors are closed
       icon_url: local/icons/door-open.png
       group: Security
       tag: door-alerts-ignored
-  - service: script.notify_hass_agent
-    data:
+    action: script.notify_mobile
+  - data:
       entity:
       - media_player.erebus
       - media_player.nasya
       title: Door Alerts Ignored
       message: The Door Open alerts have been ignored until all doors are closed
+    action: script.notify_hass_agent
   mode: single
 - id: '1665681539044'
   alias: ☑️ Ignore Garage Door Alerts
@@ -132,17 +132,16 @@
       action: ignore_garage_door_alerts
   condition: []
   action:
-  - service: input_boolean.turn_off
-    target:
+  - target:
       entity_id: input_boolean.garage_door_open_alerts
     data: {}
-  - service: script.notify_mobile
-    data:
+    action: input_boolean.turn_off
+  - data:
       who: parents
       message: clear_notification
       tag: garage-door
-  - service: script.notify_mobile
-    data:
+    action: script.notify_mobile
+  - data:
       who: parents
       title: Garage Door Alerts Ignored
       message: The Garage Door Open alerts have been ignored until the Garage Door
@@ -150,14 +149,15 @@
       icon_url: local/icons/garage-open.png
       group: Security
       tag: garage-door-alerts-ignored
-  - service: script.notify_hass_agent
-    data:
+    action: script.notify_mobile
+  - data:
       entity:
       - media_player.erebus
       - media_player.nasya
       title: Garage Door Alerts Ignored
       message: The Garage Door Open alerts have been ignored until the Garage Door
         is closed
+    action: script.notify_hass_agent
   mode: single
 - id: '1665683799664'
   alias: ☑️ Ignore Window Alerts
@@ -172,21 +172,20 @@
     event_data:
       action: ignore_window_alerts
   action:
-  - service: input_boolean.turn_off
-    target:
+  - target:
       entity_id: input_boolean.window_open_alerts
     data: {}
+    action: input_boolean.turn_off
   - if:
     - condition: template
       value_template: '{{ trigger.event.data.tag != "" }}'
     then:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         message: clear_notification
         tag: '{{ trigger.event.data.tag }}'
-  - service: script.notify_mobile
-    data:
+      action: script.notify_mobile
+  - data:
       who: parents
       title: Window Alerts Ignored
       message: The Window Open alerts have been ignored until all windows are closed
@@ -195,13 +194,14 @@
       icon_url: local/icons/window-open.png
       group: Security
       tag: window-alerts-ignored
-  - service: script.notify_hass_agent
-    data:
+    action: script.notify_mobile
+  - data:
       entity:
       - media_player.erebus
       - media_player.nasya
       title: Window Alerts Ignored
       message: The Window Open alerts have been ignored until all windows are closed
+    action: script.notify_hass_agent
 - id: '1665681550417'
   alias: ☑️ Retry Remote Start Ascent
   description: Starts the Ascent (usually after a failure) when the action is pressed
@@ -248,18 +248,18 @@
       title: Water Main
       message: The water main has been turned back on after the leak was detected.
   - parallel:
-    - service: valve.open_valve
-      target:
+    - target:
         entity_id: valve.water_main_valve
       data: {}
-    - service: script.notify_mobile
-      data:
+      action: valve.open_valve
+    - data:
         who: parents
         message: clear_notification
         tag: water-leak
-    - service: persistent_notification.dismiss
-      data:
+      action: script.notify_mobile
+    - data:
         notification_id: water-leak
+      action: persistent_notification.dismiss
   - wait_for_trigger:
     - platform: state
       entity_id:
@@ -267,8 +267,7 @@
       to: open
     timeout: 00:00:30
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: '{{ title }}'
         message: '{{ message }}'
@@ -278,15 +277,15 @@
         group: Water Leak
         priority: high
         tag: water-leak-main-on
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -294,6 +293,7 @@
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/water-alert.png
+      action: script.notify_pipup
   mode: single
 - id: '1665682232855'
   alias: "\U0001F5A5️ [Ardena] Power Actions"
@@ -309,48 +309,54 @@
         entity_id: binary_sensor.ardena_connected
         state: 'on'
       sequence:
-      - service: fan.turn_on
-        entity_id: fan.computer
+      - entity_id: fan.computer
+        action: fan.turn_on
     - conditions:
       - condition: state
         entity_id: binary_sensor.ardena_connected
         state: 'off'
       sequence:
-      - service: fan.turn_off
-        entity_id: fan.computer
+      - entity_id: fan.computer
+        action: fan.turn_off
   mode: single
 - id: '1665682307865'
   alias: "\U0001F5A5️ [Ardena] Power on Activity"
-  description: Turns on Ardena when the Family Room Harmony activity is set to Computer
+  description: Turns on/off Ardena when the Family Room Harmony activity is changed
   trigger:
   - platform: state
     entity_id: remote.harmony_family_room
     attribute: current_activity
     to: Computer
-  condition: []
-  action:
-  - service: switch.turn_on
-    entity_id: switch.ardena
-  mode: restart
-- id: '1665682318040'
-  alias: "\U0001F5A5️ [Ardena] Sleep When Harmony Off"
-  description: Puts Ardena to sleep when the Family Room Harmony activity is Off
-  trigger:
+    id: power_on
   - platform: state
     entity_id: remote.harmony_family_room
     attribute: current_activity
     from: Computer
     to: PowerOff
-  condition:
-  - condition: state
-    entity_id: binary_sensor.ardena_connected
-    state: 'on'
+    id: power_off
+  condition: []
   action:
-  - service: button.press
-    data: {}
-    target:
-      entity_id: button.ardena_sleep
-  mode: single
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - power_on
+      sequence:
+      - entity_id: switch.ardena
+        action: switch.turn_on
+    - conditions:
+      - condition: trigger
+        id:
+        - power_off
+      - condition: state
+        entity_id: binary_sensor.ardena_connected
+        state: 'on'
+      sequence:
+      - data: {}
+        target:
+          entity_id: button.ardena_sleep
+        action: button.press
+  mode: restart
 - id: '1665682398363'
   alias: "\U0001F4E6 Clear Packages Out for Delivery"
   description: Clears package delivery notification when packages are delivered
@@ -365,11 +371,11 @@
       trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
       in [\"unknown\", \"unavailable\"] }}"
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       message: clear_notification
       tag: delivery-packages-pending
+    action: script.notify_mobile
   mode: single
 - id: '1665682414590'
   alias: "\U0001F4E6 Mail Today"
@@ -387,8 +393,7 @@
   - variables:
       message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
         "1" else "items" }} will be in the mailbox today.'
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       title: Mail Today
       message: '{{ message }}'
@@ -398,16 +403,16 @@
       url: lovelace/main
       group: Delivery
       tag: delivery-mail
-  - service: script.notify_hass_agent
-    data:
+    action: script.notify_mobile
+  - data:
       entity:
       - media_player.erebus
       - media_player.nasya
       title: Mail Today
       message: '{{ message }}'
       camera: camera.mail_usps_camera
-  - service: script.notify_pipup
-    data:
+    action: script.notify_hass_agent
+  - data:
       entity:
       - media_player.shield_living_room
       - media_player.shield_family_room
@@ -416,6 +421,7 @@
       message: '{{ message }}'
       image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
       duration: 15
+    action: script.notify_pipup
   mode: single
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
@@ -434,8 +440,7 @@
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} delivered.'
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: Package Delivery
         message: '{{ message }}'
@@ -444,15 +449,15 @@
         icon_url: local/icons/package-variant.png
         group: Delivery
         tag: delivery-packages-delivered
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Package Delivery
         message: '{{ message }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -460,6 +465,7 @@
         title: Package Delivery
         message: '{{ message }}'
         icon_url: local/icons/package-variant.png
+      action: script.notify_pipup
   mode: single
 - id: '1665682458887'
   alias: "\U0001F4E6 Packages Out for Delivery"
@@ -478,8 +484,7 @@
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} out for delivery.'
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: Package Delivery
         message: '{{ message }}'
@@ -488,15 +493,15 @@
         icon_url: local/icons/package.png
         group: Delivery
         tag: delivery-packages-pending
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Package Delivery
         message: '{{ message }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -504,6 +509,7 @@
         title: Package Delivery
         icon_url: local/icons/package.png
         message: '{{ message }}'
+      action: script.notify_pipup
   mode: single
 - id: '1665685653869'
   alias: "\U0001F4E6 Update USPS Mail Camera"
@@ -515,8 +521,8 @@
     event: start
   condition: []
   action:
-  - service: mail_and_packages.update_image
-    data: {}
+  - data: {}
+    action: mail_and_packages.update_image
   mode: single
 - id: '1665685949212'
   alias: ⏯ Family Room Media Auto Off
@@ -538,8 +544,8 @@
     attribute: current_activity
     state: Shield TV
   action:
-  - service: remote.turn_off
-    entity_id: remote.harmony_family_room
+  - entity_id: remote.harmony_family_room
+    action: remote.turn_off
   mode: restart
 - id: '1665685997408'
   alias: ⏯ Main Bedroom Media Auto Off
@@ -561,8 +567,8 @@
     attribute: current_activity
     state: Shield TV
   action:
-  - service: remote.turn_off
-    entity_id: remote.harmony_main_bedroom
+  - entity_id: remote.harmony_main_bedroom
+    action: remote.turn_off
   mode: restart
 - id: '1665686040957'
   alias: "\U0001F9FA Dryer Running"
@@ -702,12 +708,11 @@
     state: 'on'
   action:
   - parallel:
-    - service: light.turn_off
-      data: {}
+    - data: {}
       target:
         entity_id: light.all_lights
-    - service: script.notify_mobile
-      data:
+      action: light.turn_off
+    - data:
         who: parents
         title: Lights Out
         message: The lights have been turned off since no one is home.
@@ -715,6 +720,7 @@
         color: '#9e9e9e'
         icon_url: local/icons/lightbulb.png
         group: Light
+      action: script.notify_mobile
   mode: single
 - id: '1665686481763'
   alias: "\U0001F4A1 Dim Front Lights at Night"
@@ -774,48 +780,54 @@
     action: light.turn_on
   mode: single
 - id: '1665686584864'
-  alias: "\U0001F4A1 Living Room Lamps off at Night"
-  description: Turns off the Living Room lamps at night
-  trigger:
-  - platform: time
-    at: input_datetime.living_room_lamps_off
-  condition: []
-  action:
-  - service: light.turn_off
-    entity_id: light.living_room_floor_lamp
-  - service: light.turn_off
-    entity_id: light.living_room_lamp
-  mode: single
-- id: '1665686606211'
-  alias: "\U0001F4A1 Living Room Lamps on at Sunset"
-  description: Turns the Living Room lamps on at sunset
+  alias: "\U0001F4A1 Living Room Lamps on/off"
+  description: Turns on/off the Living Room lamps
   trigger:
   - platform: sun
     event: sunset
     offset: -00:20:00
+    id: 'on'
+  - platform: time
+    at: input_datetime.living_room_lamps_off
+    id: 'off'
   condition: []
   action:
-  - if:
-    - condition: state
-      entity_id: light.living_room_floor_lamp
-      state: 'off'
-    then:
-    - service: light.turn_on
-      entity_id: light.living_room_floor_lamp
-      data:
-        transition: 30
-        brightness: 100
-        color_temp: 370
-  - if:
-    - condition: state
-      entity_id: light.living_room_lamp
-      state: 'off'
-    then:
-    - service: light.turn_on
-      entity_id: light.living_room_lamp
-      data:
-        transition: 30
-        brightness: 100
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - 'on'
+      sequence:
+      - if:
+        - condition: state
+          entity_id: light.living_room_floor_lamp
+          state: 'off'
+        then:
+        - entity_id: light.living_room_floor_lamp
+          data:
+            transition: 30
+            brightness: 100
+            color_temp: 370
+          action: light.turn_on
+      - if:
+        - condition: state
+          entity_id: light.living_room_lamp
+          state: 'off'
+        then:
+        - entity_id: light.living_room_lamp
+          data:
+            transition: 30
+            brightness: 100
+          action: light.turn_on
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+      sequence:
+      - entity_id: light.living_room_floor_lamp
+        action: light.turn_off
+      - entity_id: light.living_room_lamp
+        action: light.turn_off
   mode: single
 - id: '1665686715952'
   alias: "\U0001F4A1 Turn Lights On when Arrive"
@@ -836,18 +848,17 @@
     after: 00:00:00
   action:
   - parallel:
-    - service: light.turn_on
-      entity_id: light.mud_room
-    - service: light.turn_on
-      entity_id: light.living_room
+    - entity_id: light.mud_room
+      action: light.turn_on
+    - entity_id: light.living_room_fan_light
       data:
         brightness: 255
-    - service: light.turn_on
-      entity_id: light.kitchen
+      action: light.turn_on
+    - entity_id: light.kitchen
       data:
         brightness: 255
-    - service: script.notify_mobile
-      data:
+      action: light.turn_on
+    - data:
         who: parents
         title: Lights On
         message: Welcome home, some lights have been turned on for you since it's
@@ -856,10 +867,11 @@
         color: '#ffeb3b'
         icon_url: local/icons/lightbulb-on.png
         group: Light
+      action: script.notify_mobile
   - delay:
       minutes: 5
-  - service: light.turn_off
-    entity_id: light.mud_room
+  - entity_id: light.mud_room
+    action: light.turn_off
   mode: single
 - id: '1665686891355'
   alias: "\U0001F512 Door Lock Jammed"
@@ -880,8 +892,7 @@
         }}'
       message: Check the {{ lock }}, something is wrong.
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: '{{ lock }} Issue'
         message: '{{ message }}'
@@ -889,15 +900,15 @@
         color: '#03a9f4'
         icon_url: local/icons/lock-smart.png
         group: Security
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: '{{ lock }} Issue'
         message: '{{ message }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -905,10 +916,11 @@
         title: '{{ lock }} Issue'
         message: '{{ message }}'
         icon_url: local/icons/lock-smart.png
-    - service: script.notify_speech
-      data:
+      action: script.notify_pipup
+    - data:
         media_player: media_player.cast_living_room_speaker
         message: '{{ message }}'
+      action: script.notify_speech
   mode: single
 - id: '1665686913548'
   alias: "\U0001F512 Lock Doors when Away"
@@ -939,11 +951,11 @@
       entity_id: binary_sensor.front_door_window_door_is_open
       state: 'off'
     then:
-    - service: lock.lock
-      metadata: {}
+    - metadata: {}
       data: {}
       target:
         entity_id: lock.front_door
+      action: lock.lock
   - if:
     - condition: state
       entity_id: schedule.garage_entry_auto_lock
@@ -955,13 +967,12 @@
       entity_id: binary_sensor.garage_entry_window_door_is_open
       state: 'off'
     then:
-    - service: lock.lock
-      metadata: {}
+    - metadata: {}
       data: {}
       target:
         entity_id: lock.garage_entry
-  - service: script.notify_mobile
-    data:
+      action: lock.lock
+  - data:
       who: parents
       title: Door Lock
       message: The doors have been locked since no one is home.
@@ -969,6 +980,7 @@
       color: '#03a9f4'
       icon_url: local/icons/lock-smart.png
       group: Security
+    action: script.notify_mobile
   mode: single
 - id: '1665687778783'
   alias: "\U0001F37D️ Dishwasher is Done"
@@ -981,8 +993,7 @@
   condition: []
   action:
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: Dishwasher
         message: The dishwasher is done!
@@ -991,15 +1002,15 @@
         icon_url: local/icons/dishwasher.png
         tag: dishwasher
         priority: high
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Dishwasher
         message: The dishwasher is done!
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -1007,6 +1018,7 @@
         title: Dishwasher
         message: The dishwasher is done!
         icon_url: local/icons/dishwasher.png
+      action: script.notify_pipup
   mode: single
   max_exceeded: silent
 - id: '1665687879665'
@@ -1145,8 +1157,7 @@
     entity_id: input_boolean.door_open_alerts
     state: 'on'
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: parents
       title: Door Left Open
       message: "{%- from \"util.jinja\" import get_friendly_names -%} {%- set doors
@@ -1164,6 +1175,7 @@
       actions:
       - action: ignore_door_alerts
         title: Ignore
+    action: script.notify_mobile
   mode: single
 - id: '1665687990814'
   alias: "\U0001F4AC Door Opened and Away"
@@ -1441,24 +1453,24 @@
       - condition: trigger
         id: 'off'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Red
           effect: Solid
           level: 1
           target:
             entity_id: light.joshua_office_switch
+        action: script.inovelli_blue_led
     - conditions:
       - condition: trigger
         id: 'on'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Green
           effect: Solid
           level: 40
           target:
             entity_id: light.joshua_office_switch
+        action: script.inovelli_blue_led
   mode: restart
 - id: '1665688920005'
   alias: "\U0001F514 Doorbell Object or Ring"
@@ -1505,20 +1517,20 @@
     to: closed
   condition: []
   action:
-  - service: input_boolean.turn_on
-    target:
+  - target:
       entity_id: input_boolean.garage_door_open_alerts
     data: {}
-  - service: script.notify_mobile
-    data:
+    action: input_boolean.turn_on
+  - data:
       who: parents
       message: clear_notification
       tag: garage-door
-  - service: script.notify_mobile
-    data:
+    action: script.notify_mobile
+  - data:
       who: parents
       message: clear_notification
       tag: garage-door-alerts-ignored
+    action: script.notify_mobile
   mode: single
 - id: '1665689284289'
   alias: "\U0001F4AC Garage Door Left Open"
@@ -1740,8 +1752,7 @@
       - condition: template
         value_template: '{{ is_state("input_boolean." ~ object_id, "off") }}'
       sequence:
-      - service: script.notify_mobile
-        data:
+      - data:
           who: parents
           title: '{{ name }} Collection'
           message: The {{ name }} can will be picked up {{ day }} {{ description }}
@@ -1754,20 +1765,21 @@
           actions:
           - action: '{{ object_id }}'
             title: On the curb
+        action: script.notify_mobile
     - conditions:
       - condition: trigger
         id:
         - garbage-clear
         - recycle-clear
       sequence:
-      - service: input_boolean.turn_off
-        target:
+      - target:
           entity_id: input_boolean.{{ object_id }}
-      - service: script.notify_mobile
-        data:
+        action: input_boolean.turn_off
+      - data:
           who: parents
           message: clear_notification
           tag: '{{ tag }}'
+        action: script.notify_mobile
   mode: parallel
 - id: '1665689633891'
   alias: "\U0001F4AC Ascent Failed Notification"
@@ -1819,38 +1831,45 @@
       action: script.notify_speech
   mode: single
 - id: '1665689705099'
-  alias: "\U0001F3E2 Joshua Office Day Mode"
-  description: Turns on the office computer on a workday
+  alias: "\U0001F3E2 Joshua Office Mode"
+  description: Actions on day/night mode for the office
   trigger:
   - platform: time
     at: input_datetime.office_startup
-  condition:
-  - condition: state
-    entity_id: person.joshua
-    state: home
-  - condition: state
-    entity_id: binary_sensor.workday_sensor
-    state: 'on'
-  action:
-  - service: switch.turn_on
-    data:
-      entity_id: switch.erebus
-  mode: single
-- id: '1665689732088'
-  alias: "\U0001F3E2 Joshua Office Night Mode"
-  description: Turn off the non-dimmable lights in the office at night.
-  trigger:
+    id: day
   - platform: time
     at: input_datetime.office_night_mode
-  condition:
-  - condition: state
-    entity_id: light.joshua_office
-    state: 'on'
+    id: night
+  condition: []
   action:
-  - service: switch.turn_off
-    target:
-      entity_id: switch.joshua_office_shelf_led
-    data: {}
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - day
+      - condition: state
+        entity_id: person.joshua
+        state: home
+      - condition: state
+        entity_id: binary_sensor.workday_sensor
+        state: 'on'
+      sequence:
+      - data:
+          entity_id: switch.erebus
+        action: switch.turn_on
+    - conditions:
+      - condition: trigger
+        id:
+        - night
+      - condition: state
+        entity_id: light.joshua_office
+        state: 'on'
+      sequence:
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.joshua_office_shelf_led
   mode: single
 - id: '1665695892233'
   alias: "\U0001F5A8️ Low Toner"
@@ -1875,13 +1894,12 @@
   - variables:
       message: The {{ trigger.to_state.attributes.friendly_name }} is low
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: Printer Alert
         message: '{{ message }}'
         notification_id: printer-toner-low
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: joshua
         title: Printer Alert
         message: '{{ message }}'
@@ -1891,13 +1909,14 @@
         group: System
         tag: printer-toner-low
         url: dashboard-system/overview
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Printer Alert
         message: '{{ message }}'
+      action: script.notify_hass_agent
   mode: single
 - id: '1665695909455'
   alias: "\U0001F5A8️ Out of Paper"
@@ -1913,13 +1932,12 @@
   - variables:
       message: The {{ trigger.to_state.attributes.friendly_name }} is out of paper
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: Printer Alert
         message: '{{ message }}'
         notification_id: printer-paper-low
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: joshua
         title: Printer Alert
         message: '{{ message }}'
@@ -1929,13 +1947,14 @@
         group: System
         tag: printer-paper-low
         url: dashboard-system/overview
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Printer Alert
         message: '{{ message }}'
+      action: script.notify_hass_agent
   mode: single
 - id: '1665695943529'
   alias: ⏯ PS4 Harmony Activity
@@ -1950,8 +1969,8 @@
     attribute: current_activity
     state: PS4
   action:
-  - service: media_player.turn_on
-    entity_id: media_player.playstation_4
+  - entity_id: media_player.playstation_4
+    action: media_player.turn_on
   mode: single
 - id: '1665695979311'
   alias: "\U0001F5A5️ [Quest] Charge Complete"
@@ -1972,20 +1991,20 @@
     entity_id: binary_sensor.quest_interactive
     state: 'off'
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: joshua
       title: Quest is Charged
       message: The Quest is charged, you should unplug it
       notification_icon: mdi:battery-charging-high
       color: '#4caf50'
       icon_url: local/icons/battery-charging-high.png
-  - service: script.notify_hass_agent
-    data:
+    action: script.notify_mobile
+  - data:
       entity:
       - media_player.erebus
       title: Quest is Charged
       message: The Quest is charged, you should unplug it
+    action: script.notify_hass_agent
   mode: single
 - id: '1665696049425'
   alias: "\U0001F5A5️ [Quest] Interactive"
@@ -2002,12 +2021,12 @@
         state: 'on'
       sequence:
       - parallel:
-        - service: light.turn_on
-          data:
+        - data:
             transition: 1
             brightness_pct: 100
           target:
             entity_id: light.family_room
+          action: light.turn_on
     - conditions:
       - condition: state
         entity_id: binary_sensor.quest_interactive
@@ -2020,12 +2039,12 @@
           before: sunrise
       sequence:
       - parallel:
-        - service: light.turn_on
-          data:
+        - data:
             transition: 1
             brightness_pct: 25
           target:
             entity_id: light.family_room
+          action: light.turn_on
     default: []
   mode: single
 - id: '1665696328059'
@@ -2052,11 +2071,11 @@
     value_template: '{{ sound_mode != state_attr("media_player.denon_avr_s760h", "sound_mode")
       }}'
   action:
-  - service: media_player.select_sound_mode
-    target:
+  - target:
       entity_id: media_player.denon_avr_s760h
     data:
       sound_mode: '{{ sound_mode }}'
+    action: media_player.select_sound_mode
   variables:
     sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH
       STEREO\n{%- elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
@@ -2065,7 +2084,7 @@
   mode: restart
 - id: '1665696345535'
   alias: ⏯ Living Room Sound Mode
-  description: Changes the reciever sound mode based on Source
+  description: Changes the soundbar sound mode based on Source
   trigger:
   - platform: state
     entity_id: media_player.universal_living_room
@@ -2074,26 +2093,36 @@
   - condition: not
     conditions:
     - condition: state
-      entity_id: media_player.yamaha_rx_v679
+      entity_id: media_player.samsung_soundbar
       state: 'off'
     - condition: state
       entity_id: media_player.universal_living_room
       attribute: source
       state: nl.rogro82.pipup
-  - condition: template
-    value_template: '{{ sound_mode != state_attr("media_player.yamaha_rx_v679", "sound_mode")
-      }}'
   action:
-  - service: media_player.select_sound_mode
-    target:
-      entity_id: media_player.yamaha_rx_v679
-    data:
-      sound_mode: '{{ sound_mode }}'
-  variables:
-    sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  7ch_stereo\n{%-
-      elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube', 'YouTube
-      Kids', 'DisneyNow', 'PBS Kids'] -%}\n  surr_decoder\n{%- else -%}\n  straight\n{%-
-      endif -%}"
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.samsung_soundbar_voice_enhancer
+        state: 'on'
+      - condition: template
+        value_template: '{{ trigger.to_state.attributes.source == ''Spotify'' }}'
+      sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.samsung_soundbar_voice_enhancer
+        data: {}
+    - conditions:
+      - condition: state
+        entity_id: input_boolean.samsung_soundbar_voice_enhancer
+        state: 'off'
+      - condition: template
+        value_template: '{{ trigger.to_state.attributes.source != ''Spotify'' }}'
+      sequence:
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.samsung_soundbar_voice_enhancer
+        data: {}
   mode: restart
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer [Actionable Event]
@@ -2105,10 +2134,10 @@
     event_type: hass_agent_notifications
   condition: []
   action:
-  - service: persistent_notification.create
-    data:
+  - data:
       title: Actionable Event Sniffer
       message: '{{ trigger.event.data | default("") }}'
+    action: persistent_notification.create
   mode: parallel
   initial_state: false
 - id: '1665696464819'
@@ -2133,13 +2162,12 @@
         + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
         > 0, '- ', '') }}{{ result.sensors | join('\\n- ') }}\n{% endif %}"
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: Low Battery Levels
         message: '{{ sensors }}'
         notification_id: low-battery-alert
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: joshua
         title: Low Battery Levels
         message: '{{ sensors }}'
@@ -2149,12 +2177,13 @@
         group: System
         tag: low-battery-alert
         url: dashboard-system/overview
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: Low Battery Levels
         message: '{{ sensors }}'
+      action: script.notify_hass_agent
   mode: single
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
@@ -2169,8 +2198,8 @@
     before: 00:00:00
     after: 00:00:00
   action:
-  - service: tts.clear_cache
-    data: {}
+  - data: {}
+    action: tts.clear_cache
   mode: single
   initial_state: false
 - id: '1665696511584'
@@ -2183,13 +2212,12 @@
   condition: []
   action:
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: Low Disk Space
         message: Disk usage is at {{ trigger.to_state.state }}%
         notification_id: low-disk-space
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: joshua
         title: Low Disk Space
         message: Disk usage is at {{ trigger.to_state.state }}%
@@ -2199,12 +2227,13 @@
         group: System
         tag: system-disk
         url: dashboard-system/overview
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: Low Disk Space
         message: Disk usage is at {{ trigger.to_state.state }}%
+      action: script.notify_hass_agent
   mode: single
 - id: '1665696525167'
   alias: ⚙️ Failed Login
@@ -2218,20 +2247,20 @@
       many login attempts" in notification or "invalid authentication" in notification
       or "login attempt" in notification }}'
   action:
-  - service: script.notify_mobile
-    data:
+  - data:
       who: joshua
       title: '{{ trigger.notification.title }}'
       message: '{{ trigger.notification.message }}'
       notification_icon: mdi:home-assistant
       color: '#2196f3'
       icon_url: local/icons/home-assistant.png
-  - service: script.notify_hass_agent
-    data:
+    action: script.notify_mobile
+  - data:
       entity:
       - media_player.erebus
       title: '{{ trigger.notification.title }}'
       message: '{{ trigger.notification.message }}'
+    action: script.notify_hass_agent
   mode: single
 - id: '1665696538493'
   alias: ⚙️ Updates Available
@@ -2255,18 +2284,17 @@
       value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
         | int(default=0)) > 0 }}"
     then:
-    - service: persistent_notification.dismiss
-      data:
+    - data:
         notification_id: hacs-update
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.dismiss
+    - data:
         who: joshua
         message: clear_notification
         tag: hacs-update
+      action: script.notify_mobile
     else:
     - parallel:
-      - service: persistent_notification.create
-        data:
+      - data:
           title: '{{ title }}'
           message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
             -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
@@ -2276,8 +2304,8 @@
             list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
             -%} {{ list.updates | join('\\n') }}"
           notification_id: hacs-update
-      - service: script.notify_mobile
-        data:
+        action: persistent_notification.create
+      - data:
           who: joshua
           title: '{{ title }}'
           message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
@@ -2293,8 +2321,8 @@
           group: Upgrade
           tag: hacs-update
           url: config/updates
-      - service: script.notify_hass_agent
-        data:
+        action: script.notify_mobile
+      - data:
           entity:
           - media_player.erebus
           title: '{{ title }}'
@@ -2305,6 +2333,7 @@
             ~ ' -> ' ~ state_attr(repo, 'latest_version') %}\n    {%- set list.updates
             = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
             | join('\\n') }}"
+        action: script.notify_hass_agent
   mode: restart
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
@@ -2316,13 +2345,12 @@
   condition: []
   action:
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: RAM Usage High
         message: RAM usage is at {{ trigger.to_state.state }}%
         notification_id: low-ram
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: joshua
         title: RAM Usage High
         message: RAM usage is at {{ trigger.to_state.state }}%
@@ -2332,12 +2360,13 @@
         group: System
         tag: system-ram
         url: dashboard-system/overview
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: RAM Usage High
         message: RAM usage is at {{ trigger.to_state.state }}%
+      action: script.notify_hass_agent
   mode: single
 - id: '1665696596579'
   alias: ⚙️ Startup
@@ -2347,41 +2376,41 @@
     event: start
   condition: []
   action:
-  - service: browser_mod.notification
-    data:
+  - data:
       message: Startup automation starting...
+    action: browser_mod.notification
   - delay:
       seconds: 60
-  - service: homeassistant.reload_config_entry
-    data: {}
+  - data: {}
     target:
       device_id:
       - 046ad4016aea54916dd414935e0008da
       - fd4ff1a9970156bb319e4d85d4450657
       - 1dee4aa37e70d346348224829cd7c84f
-  - service: script.hass_publish_sensors
-    data:
+    action: homeassistant.reload_config_entry
+  - data:
       entity:
       - media_player.ardena
       - media_player.athos
       - media_player.erebus
       - media_player.nasya
+    action: script.hass_publish_sensors
   - parallel:
-    - service: input_boolean.turn_off
-      data: {}
+    - data: {}
       target:
         entity_id:
         - input_boolean.washer_status
         - input_boolean.dryer_status
-  - service: browser_mod.notification
-    data:
+      action: input_boolean.turn_off
+  - data:
       message: Startup automation complete...
-  - service: automation.turn_off
-    enabled: false
+    action: browser_mod.notification
+  - enabled: false
     data:
       stop_actions: false
     target:
       entity_id: automation.startup
+    action: automation.turn_off
   mode: single
 - id: '1665696688106'
   alias: ⚙️ Event Sniffer [Z-Wave JS]
@@ -2398,8 +2427,7 @@
     value_template: '{{ event_label.endswith("lock operation") == False }}'
     alias: 'Ignore events already identified: Manual deadbolt operation'
   action:
-  - service: persistent_notification.create
-    data:
+  - data:
       title: ZWaveJS Event Sniffer
       message: 'event_type: {{ event_type }}
 
@@ -2410,6 +2438,7 @@
         event_label: {{ event_label }}
 
         event_data: {{ event_data }}'
+    action: persistent_notification.create
   mode: parallel
   initial_state: false
   variables:
@@ -2429,18 +2458,18 @@
   - variables:
       device: '{{ trigger.topic.split("/")[1] }}'
       action: '{{ trigger.payload }}'
-  - service: persistent_notification.create
-    data:
+  - data:
       title: Zigbee Event Sniffer
       message: 'device: {{ device }}
 
         action: {{ action }}'
-  - service: browser_mod.notification
-    data:
+    action: persistent_notification.create
+  - data:
       duration: 10000
       message: 'device: {{ device }}
 
         action: {{ action }}'
+    action: browser_mod.notification
   mode: parallel
   initial_state: false
 - id: '1665697122708'
@@ -2548,26 +2577,26 @@
   condition: []
   action:
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: Water Softener
         message: The salt level in the water softener is low.
         notification_id: water-softener
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: parents
         title: Water Softener
         message: The salt level in the water softener is low.
         notification_icon: mdi:arrow-expand-vertical
         color: '#03a9f4'
         icon_url: local/icons/arrow-expand-vertical.png
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Water Softener
         message: The salt level in the water softener is low.
+      action: script.notify_hass_agent
   mode: single
 - id: '1665697635082'
   alias: "\U0001F4A7 Shut-Off Valve Overheated"
@@ -2583,13 +2612,12 @@
       title: Water Valve Overheated
       message: The water main shut-off valve has overheated.
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: '{{ title }}'
         message: '{{ message }}'
         notification_id: water-leak
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: parents
         title: '{{ title }}'
         message: '{{ message }}'
@@ -2599,15 +2627,15 @@
         group: Water Leak
         priority: high
         url: lovelace/utility
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -2615,13 +2643,14 @@
         title: '{{ title }}'
         message: '{{ message }}'
         icon_url: local/icons/water-alert.png
-    - service: script.notify_speech
-      data:
+      action: script.notify_pipup
+    - data:
         media_player:
         - media_player.cast_living_room_speaker
         - media_player.cast_family_room_speaker
         - media_player.cast_office_speaker
         message: '{{ message }}'
+      action: script.notify_speech
   mode: single
 - id: '1665697728164'
   alias: "\U0001F384 XMas Lights On/Off"
@@ -2644,16 +2673,16 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: switch.turn_on
-        entity_id: switch.eve
+      - entity_id: switch.eve
+        action: switch.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: switch.turn_off
-        target:
+      - target:
           entity_id: switch.eve
         data: {}
+        action: switch.turn_off
   mode: single
 - id: '1665697781484'
   alias: "\U0001F384 XMas Tree On/Off"
@@ -2677,26 +2706,26 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: light.turn_on
-        data: {}
+      - data: {}
         target:
           entity_id: light.xmas_tree
-      - service: light.turn_on
-        data: {}
+        action: light.turn_on
+      - data: {}
         target:
           entity_id: light.wled_mario_star_main
+        action: light.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: light.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: light.xmas_tree
-      - service: light.turn_off
-        data: {}
+        action: light.turn_off
+      - data: {}
         target:
           entity_id: light.wled_mario_star_main
+        action: light.turn_off
   mode: single
 - id: front_door_lock_state_change
   alias: "\U0001F6A6 Outside Entry Light Switch Status"
@@ -2748,21 +2777,21 @@
         entity_id: media_player.androidtv_living_room
         state: paused
       sequence:
-      - service: light.turn_on
-        data:
+      - data:
           transition: 5
           brightness_pct: 60
         target:
           entity_id: light.living_room
+        action: light.turn_on
     - conditions:
       - condition: state
         entity_id: media_player.androidtv_living_room
         state: playing
       sequence:
-      - service: light.turn_on
-        data:
+      - data:
           transition: 5
           brightness_pct: 20
+        action: light.turn_on
 - id: '1665700097529'
   alias: ⏯ Family Room Media State at Night
   description: Brighten/Dim the lights when Media is paused
@@ -2784,21 +2813,21 @@
         entity_id: media_player.androidtv_family_room
         state: paused
       sequence:
-      - service: light.turn_on
-        data:
+      - data:
           transition: 5
           brightness_pct: 60
         target:
           entity_id: light.family_room
+        action: light.turn_on
     - conditions:
       - condition: state
         entity_id: media_player.androidtv_family_room
         state: playing
       sequence:
-      - service: light.turn_on
-        data:
+      - data:
           transition: 5
           brightness_pct: 20
+        action: light.turn_on
   mode: single
 - id: '1665700388935'
   alias: "\U0001F4AC Window Left Open"
@@ -2829,8 +2858,7 @@
           message: The {{ name }} has been open for {{ trigger.to_state.last_changed
             | relative_time }}.
       - parallel:
-        - service: script.notify_mobile
-          data:
+        - data:
             who: parents
             title: '{{ name }}'
             message: '{{ message }}'
@@ -2844,8 +2872,8 @@
             actions:
             - action: ignore_window_alerts
               title: Ignore Alerts
-        - service: script.notify_hass_agent
-          data:
+          action: script.notify_mobile
+        - data:
             entity:
             - media_player.erebus
             - media_player.nasya
@@ -2854,8 +2882,8 @@
             actions:
             - action: ignore_window_alerts
               title: Ignore Alerts
-        - service: script.notify_pipup
-          data:
+          action: script.notify_hass_agent
+        - data:
             entity:
             - media_player.shield_living_room
             - media_player.shield_family_room
@@ -2863,13 +2891,14 @@
             title: '{{ name }}'
             message: '{{ message }}'
             icon_url: local/icons/window-open.png
-        - service: script.notify_speech
-          data:
+          action: script.notify_pipup
+        - data:
             media_player:
             - media_player.cast_living_room_speaker
             - media_player.cast_family_room_speaker
             - media_player.cast_office_speaker
             message: '{{ message }}'
+          action: script.notify_speech
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
@@ -2884,25 +2913,25 @@
       helper_last_controller_event: input_text.hue_dimmer_remote_event
       helper_double_press_delay: 400
       action_button_on_short:
-      - service: homeassistant.turn_on
-        data: {}
+      - data: {}
         target:
           entity_id: light.wled_joshua_office_desk
+        action: homeassistant.turn_on
       action_button_off_short:
-      - service: homeassistant.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: light.wled_joshua_office_desk
+        action: homeassistant.turn_off
       action_button_up_short:
-      - service: switch.turn_on
-        data: {}
+      - data: {}
         target:
           entity_id: switch.joshua_office_shelf_led
+        action: switch.turn_on
       action_button_down_short:
-      - service: switch.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: switch.joshua_office_shelf_led
+        action: switch.turn_off
 - id: '1665723372482'
   alias: "\U0001F4CB [Controller] Ikea Remote Main Bedroom"
   description: ''
@@ -3039,21 +3068,21 @@
     input:
       switch: sensor.family_room_action
       config_single:
-      - service: light.turn_on
-        data:
+      - data:
           brightness_pct: 20
         target:
           entity_id:
           - light.family_room
+        action: light.turn_on
       up_triple:
       - parallel:
-        - service: script.family_room_game_light_mode
-          data: {}
-        - service: remote.turn_on
-          data:
+        - data: {}
+          action: script.family_room_game_light_mode
+        - data:
             activity: Computer
           target:
             entity_id: remote.harmony_family_room
+          action: remote.turn_on
 - id: '1667779442976'
   alias: "\U0001F4CB [Inovelli] Garage Switch"
   description: Custom button actions for the Inovelli switch
@@ -3180,11 +3209,10 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: sensor.living_room_action
+      switch: sensor.living_room_fan_light_action
       config_single:
       - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
+        - data:
             entity_id:
             - light.living_room
             color_start: Yellow
@@ -3194,16 +3222,15 @@
             color_end: Green
             effect_end: Clear
             level_end: 40
-        - service: light.toggle
-          data: {}
+          action: script.inovelli_blue_led_status_start
+        - data: {}
           target:
             entity_id:
-            - light.living_room_lamp
             - light.living_room_floor_lamp
+          action: light.toggle
       config_double:
       - parallel:
-        - service: script.inovelli_blue_led_status_start
-          data:
+        - data:
             entity_id:
             - light.living_room
             color_start: Yellow
@@ -3213,10 +3240,11 @@
             color_end: Green
             effect_end: Clear
             level_end: 40
-        - service: light.turn_off
-          data: {}
+          action: script.inovelli_blue_led_status_start
+        - data: {}
           target:
             entity_id: light.living_room_lights
+          action: light.turn_off
 - id: '1667779709981'
   alias: "\U0001F4CB [Inovelli] Main Bedroom Switch"
   description: Custom button actions for the Inovelli switch
@@ -3350,8 +3378,7 @@
         - connected
       sequence:
       - parallel:
-        - service: script.notify_mobile
-          data:
+        - data:
             who: parents
             title: Network
             message: The Internet is back up
@@ -3359,8 +3386,8 @@
             color: '#e91e63'
             icon_url: local/icons/web.png
             tag: unifi-www
-        - service: script.notify_pipup
-          data:
+          action: script.notify_mobile
+        - data:
             entity:
             - media_player.shield_living_room
             - media_player.shield_family_room
@@ -3368,21 +3395,21 @@
             title: Network
             message: The Internet is back up
             icon_url: local/icons/web.png
-        - service: script.notify_hass_agent
-          data:
+          action: script.notify_pipup
+        - data:
             entity:
             - media_player.erebus
             - media_player.nasya
             title: Network
             message: The Internet is back up
+          action: script.notify_hass_agent
     - conditions:
       - condition: trigger
         id:
         - disconnected
       sequence:
       - parallel:
-        - service: script.notify_mobile
-          data:
+        - data:
             who: parents
             title: Network
             message: The Internet is down
@@ -3390,8 +3417,8 @@
             color: '#e91e63'
             icon_url: local/icons/web.png
             tag: unifi-www
-        - service: script.notify_pipup
-          data:
+          action: script.notify_mobile
+        - data:
             entity:
             - media_player.shield_living_room
             - media_player.shield_family_room
@@ -3399,13 +3426,14 @@
             title: Network
             message: The Internet is down
             icon_url: local/icons/web.png
-        - service: script.notify_hass_agent
-          data:
+          action: script.notify_pipup
+        - data:
             entity:
             - media_player.erebus
             - media_player.nasya
             title: Network
             message: The Internet is down
+          action: script.notify_hass_agent
     default: []
   mode: restart
 - id: '1673152651576'
@@ -3646,11 +3674,11 @@
   - repeat:
       for_each: '{{ media_players }}'
       sequence:
-      - service: androidtv.adb_command
-        data:
+      - data:
           command: am start -n nl.rogro82.pipup/nl.rogro82.pipup.MainActivity
         target:
           entity_id: '{{ repeat.item }}'
+        action: androidtv.adb_command
   mode: single
 - id: '1682570311827'
   alias: "\U0001F4C5 Garbage Collection Event Generator"
@@ -3662,22 +3690,22 @@
   - condition: template
     value_template: '{{ now().month == 12 and now().day == 1 }}'
   action:
-  - service: script.generate_collection_dates
-    data:
+  - data:
       frequency: '2'
       pickup_day: '4'
       name: Garbage
       calendar: calendar.garbage_collection
       holiday_entity: calendar.collection
       year: '{{ now().year + 1 }}'
-  - service: script.generate_collection_dates
-    data:
+    action: script.generate_collection_dates
+  - data:
       frequency: '1'
       pickup_day: '1'
       name: Recycling
       calendar: calendar.recycle_collection
       holiday_entity: calendar.collection
       year: '{{ now().year + 1 }}'
+    action: script.generate_collection_dates
   mode: single
 - id: '1692245318569'
   alias: "\U0001F514 Frigate Doorbell - Object Seen"
@@ -3731,16 +3759,16 @@
       - condition: trigger
         id: silence
       sequence:
-      - service: automation.turn_off
-        target:
+      - target:
           entity_id: '{{ this.entity_id }}'
         data:
           stop_actions: false
+        action: automation.turn_off
       - delay:
           minutes: '{{ silence_timer }}'
-      - service: automation.turn_on
-        target:
+      - target:
           entity_id: '{{ this.entity_id }}'
+        action: automation.turn_on
     - alias: Frigate Event
       conditions:
       - condition: trigger
@@ -3785,20 +3813,19 @@
           - action: silence-{{ camera }}
             title: Silence ({{ silence_timer }} min)
             destructive: true
-      - service: webrtc.create_link
-        data:
+      - data:
           link_id: '{{ link_id }}'
           url: rtsp://127.0.0.1:8554/{{ camera | lower }}
           open_limit: 0
           time_to_live: 600
+        action: webrtc.create_link
       - alias: 'Debug: set notification'
         choose:
         - conditions:
           - condition: template
             value_template: '{{ debug }}'
           sequence:
-          - service: persistent_notification.create
-            data:
+          - data:
               title: Frigate Notification
               message: "Info:\n  - FPS: {{ fps }}\n  - Frigate event Id: {{ id }}\n
                 \ - Object (Formatted): {{ object }} ({{ label }})\n\nConfig:\n  -
@@ -3825,6 +3852,7 @@
                 | int / 60 > time\n    -%}\n    {%- set state_filter.allow = state_filter.allow
                 + [state] -%}\n  {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow
                 | reject | first | default(true), 'PASS', 'FAIL') }}\n"
+            action: persistent_notification.create
       - alias: Notifications enabled for object label
         condition: template
         value_template: '{{ not labels | length or object in labels }}'
@@ -3927,8 +3955,7 @@
               - condition: template
                 value_template: '{{ debug }}'
               sequence:
-              - service: persistent_notification.create
-                data:
+              - data:
                   title: Frigate Notification Loop
                   message: "Info:\n  - Last zones: {{ last_zones }}\n  - Current zones:
                     {{ entered_zones }}\n  - Sublabel: {{ sub_label }}\n  - URL: api/frigate/notifications/{{
@@ -3945,6 +3972,7 @@
                     | reject('in', entered_zones) | list | length == 0 ) else 'FAIL'
                     }}\n  - Image: api/frigate/notifications/{{ id }}/{{ attachment
                     }}\n"
+                action: persistent_notification.create
           - alias: Notify on loitering or significant change
             choose:
             - conditions:
@@ -4002,15 +4030,14 @@
         id:
         - initial
       then:
-      - service: script.notify_speech
-        data:
+      - data:
           media_player:
           - media_player.cast_living_room_speaker
           - media_player.cast_family_room_speaker
           - media_player.cast_office_speaker
           message: A {{ label }} was detected at the front door.
-    - service: script.notify_mobile
-      data:
+        action: script.notify_speech
+    - data:
         who: parents
         title: '{{ title }}'
         message: '{{ message }}'
@@ -4025,8 +4052,8 @@
         importance: high
         url: lovelace/security
         actions: '{{ actions }}'
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
@@ -4035,8 +4062,8 @@
         image: '{{ image }}'
         duration: 10
         actions: '{{ actions }}'
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -4045,6 +4072,7 @@
         message: '{{ message }}'
         duration: 20
         image: '{{ image }}'
+      action: script.notify_pipup
     - if:
       - condition: trigger
         id:
@@ -4055,23 +4083,23 @@
           entity_id: light.wled_joshua_office_desk
           state: 'on'
         then:
-        - service: number.set_value
-          data:
+        - data:
             value: '80'
           target:
             entity_id: number.wled_joshua_office_desk_speed
-        - service: light.turn_on
-          target:
+          action: number.set_value
+        - target:
             entity_id: light.wled_joshua_office_desk
           data:
             effect: Phased
+          action: light.turn_on
         - delay:
             seconds: 5
-        - service: light.turn_on
-          target:
+        - target:
             entity_id: light.wled_joshua_office_desk
           data:
             effect: Solid
+          action: light.turn_on
   mode: parallel
 - id: '1698644135975'
   alias: ⚙️ Update Database Filesize Sensor
@@ -4083,10 +4111,10 @@
     hours: '*'
   condition: []
   action:
-  - service: homeassistant.update_entity
-    data: {}
+  - data: {}
     target:
       entity_id: sensor.home_assistant_v2_db_size
+    action: homeassistant.update_entity
   mode: single
 - id: '1698980625096'
   alias: ⚙️ Automated Backup
@@ -4098,10 +4126,10 @@
   - condition: template
     value_template: '{{ now().isoweekday() == 7 }}'
   action:
-  - service: hassio.backup_full
-    data:
+  - data:
       compressed: false
       location: Lantea
+    action: hassio.backup_full
   mode: single
 - id: '1699834374599'
   alias: "\U0001F4C5 Living Room Fan On/Off"
@@ -4122,19 +4150,19 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: fan.turn_on
-        data:
+      - data:
           percentage: 66
         target:
           entity_id: fan.living_room_ceiling
+        action: fan.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: fan.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: fan.living_room_ceiling
+        action: fan.turn_off
   mode: single
 - id: '1699834405375'
   alias: "\U0001F4C5 Main Bedroom Fan On/Off"
@@ -4188,9 +4216,9 @@
         - condition: template
           value_template: '{{ total_mins % repeat.item[1] == 0 }}'
         then:
-        - service: homeassistant.update_entity
-          target:
+        - target:
             entity_id: '{{ repeat.item[0] }}'
+          action: homeassistant.update_entity
 - id: '1704385020720'
   alias: "\U0001F4AC Ascent Fuel Level Low"
   description: Sends a notification when the Ascent's fuel level is low
@@ -4246,20 +4274,20 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: switch.turn_on
-        target:
+      - target:
           entity_id:
           - switch.grow_light
         data: {}
+        action: switch.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: switch.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id:
           - switch.grow_light
+        action: switch.turn_off
   mode: single
 - id: '1704671260235'
   alias: ✴️ Joshua Office Light On/Off Presence
@@ -4286,17 +4314,17 @@
       - condition: trigger
         id: 'on'
       sequence:
-      - service: script.joshua_office_lights_on
-        data: {}
+      - data: {}
+        action: script.joshua_office_lights_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: light.turn_off
-        target:
+      - target:
           entity_id: light.joshua_office_lights
         data:
           transition: 20
+        action: light.turn_off
   mode: restart
 - id: '1704733260383'
   alias: ✴️ Joshua Office CO2 Levels
@@ -4316,12 +4344,10 @@
         entity_id: sensor.apollo_msr_1_office_co2
         above: 1666
       sequence:
-      - service: esphome.apollo_msr_1_bcbde8_play_buzzer
-        data:
+      - data:
           song_str: Cantina:d=4,o=5,b=250:8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p
-        enabled: false
-      - service: light.turn_on
-        data:
+        action: esphome.apollo_msr_1_bcbde8_play_buzzer
+      - data:
           rgb_color:
           - 255
           - 0
@@ -4329,14 +4355,14 @@
           brightness: 255
         target:
           entity_id: light.apollo_msr_1_office_rgb_light
+        action: light.turn_on
     - conditions:
       - condition: numeric_state
         entity_id: sensor.apollo_msr_1_office_co2
         above: 1333
         below: 1666
       sequence:
-      - service: light.turn_on
-        data:
+      - data:
           rgb_color:
           - 255
           - 174
@@ -4344,14 +4370,14 @@
           brightness: 255
         target:
           entity_id: light.apollo_msr_1_office_rgb_light
+        action: light.turn_on
     - conditions:
       - condition: numeric_state
         entity_id: sensor.apollo_msr_1_office_co2
         above: 700
         below: 1333
       sequence:
-      - service: light.turn_on
-        data:
+      - data:
           rgb_color:
           - 255
           - 255
@@ -4359,15 +4385,16 @@
           brightness: 255
         target:
           entity_id: light.apollo_msr_1_office_rgb_light
+        action: light.turn_on
     - conditions:
       - condition: numeric_state
         entity_id: sensor.apollo_msr_1_office_co2
         below: 700
       sequence:
-      - service: light.turn_off
-        target:
+      - target:
           entity_id: light.apollo_msr_1_office_rgb_light
         data: {}
+        action: light.turn_off
   - delay:
       hours: 0
       minutes: 5
@@ -4386,8 +4413,7 @@
   condition: []
   action:
   - parallel:
-    - service: script.notify_mobile
-      metadata: {}
+    - metadata: {}
       data:
         who: parents
         title: Cat Feeder
@@ -4399,8 +4425,8 @@
         - action: cat_feeder_full
           title: Feeder Full
         tag: cat-feeder
-    - service: script.notify_hass_agent
-      metadata: {}
+      action: script.notify_mobile
+    - metadata: {}
       data:
         entity:
         - media_player.erebus
@@ -4410,6 +4436,7 @@
         actions:
         - action: cat_feeder_full
           title: Feeder Full
+      action: script.notify_hass_agent
   mode: single
 - id: '1708236514239'
   alias: ☑️ Cat Feeder Filled
@@ -4425,15 +4452,14 @@
       action: cat_feeder_full
   condition: []
   action:
-  - service: utility_meter.calibrate
-    metadata: {}
+  - metadata: {}
     data:
       value: '0'
     target:
       entity_id: sensor.cat_feeder_total_weight
+    action: utility_meter.calibrate
   - parallel:
-    - service: script.notify_mobile
-      metadata: {}
+    - metadata: {}
       data:
         who: parents
         title: Cat Feeder
@@ -4442,14 +4468,15 @@
         color: '#FF9800'
         icon_url: local/icons/paw.png
         tag: cat-feeder
-    - service: script.notify_hass_agent
-      metadata: {}
+      action: script.notify_mobile
+    - metadata: {}
       data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Cat Feeder
         message: The Cat feeder was refilled
+      action: script.notify_hass_agent
   mode: single
 - id: '1709917613454'
   alias: "\U0001F431 Cat Feeder Error"
@@ -4462,8 +4489,7 @@
   condition: []
   action:
   - parallel:
-    - service: script.notify_mobile
-      metadata: {}
+    - metadata: {}
       data:
         who: parents
         title: Cat Feeder Error
@@ -4472,14 +4498,15 @@
         color: '#FF0000'
         icon_url: local/icons/paw.png
         tag: cat-feeder
-    - service: script.notify_hass_agent
-      metadata: {}
+      action: script.notify_mobile
+    - metadata: {}
       data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Cat Feeder Error
         message: The Cat feeder is stuck
+      action: script.notify_hass_agent
   mode: single
 - id: '1710955585340'
   alias: "\U0001F4C5 Emma's Projector On/Off"
@@ -4503,18 +4530,18 @@
         entity_id: light.nebula_projector_emma_light
         state: 'off'
       sequence:
-      - service: switch.turn_on
-        data: {}
+      - data: {}
         target:
           entity_id: switch.nebula_projector_emma_main_switch
+        action: switch.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: switch.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: switch.nebula_projector_emma_main_switch
+        action: switch.turn_off
   mode: single
 - id: '1710955623615'
   alias: "\U0001F4C5 Ethan's Projector On/Off"
@@ -4538,18 +4565,18 @@
         entity_id: light.nebula_projector_ethan_light
         state: 'off'
       sequence:
-      - service: switch.turn_on
-        data: {}
+      - data: {}
         target:
           entity_id: switch.nebula_projector_ethan_main_switch
+        action: switch.turn_on
     - conditions:
       - condition: trigger
         id: 'off'
       sequence:
-      - service: switch.turn_off
-        data: {}
+      - data: {}
         target:
           entity_id: switch.nebula_projector_ethan_main_switch
+        action: switch.turn_off
   mode: single
 - id: '1710964633068'
   alias: "\U0001F6A6 Ethan Light Switch Status"
@@ -4565,24 +4592,24 @@
         entity_id: switch.nebula_projector_ethan_main_switch
         state: 'off'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           target:
             entity_id: light.ethan_bedroom
           led: Led 1
+        action: script.inovelli_blue_led
     - conditions:
       - condition: state
         entity_id: switch.nebula_projector_ethan_main_switch
         state: 'on'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           level: 40
           target:
             entity_id: light.ethan_bedroom
           led: Led 1
           effect: Pulse
           color: Red
+        action: script.inovelli_blue_led
   mode: restart
 - id: '1710965030799'
   alias: "\U0001F6A6 Emma Light Switch Status"
@@ -4663,13 +4690,12 @@
         = result.sensors + [name ~ time] %}\n{% endfor %} {{ iif(result.sensors |
         count > 0, \"- \", \"\") }}{{ result.sensors | join(\"\\n- \") }}"
   - parallel:
-    - service: persistent_notification.create
-      data:
+    - data:
         title: Offline Devices
         message: '{{ sensors }}'
         notification_id: offline-devices
-    - service: script.notify_mobile
-      data:
+      action: persistent_notification.create
+    - data:
         who: joshua
         title: Offline Devices
         message: '{{ sensors }}'
@@ -4679,12 +4705,13 @@
         group: System
         tag: offline-devices
         url: dashboard-system/overview
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: Offline Devices
         message: '{{ sensors }}'
+      action: script.notify_hass_agent
   mode: restart
 - id: '1713973263507'
   alias: "\U0001F4AC Bambu P1S Print Status"
@@ -4712,8 +4739,7 @@
       message: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".gcode","")
         }} is at {{ progress }}'
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: joshua
         title: '{{ title }}'
         message: '{{ message }}'
@@ -4725,13 +4751,14 @@
         tag: 3d-printer
         priority: high
         url: lovelace/bambu
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: '{{ title }}'
         message: '{{ message }}'
         camera: image.bambu_p1s_camera
+      action: script.notify_hass_agent
   mode: single
 - id: '1713983450425'
   alias: "\U0001F4AC Bambu P1S Print Completed"
@@ -4758,8 +4785,7 @@
         }}'
       message: '{{ model }} {{ trigger.id | lower }} printing at {{ time }}'
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: joshua
         title: 3D Print {{ trigger.id }}
         message: '{{ message }}'
@@ -4771,13 +4797,14 @@
         priority: high
         tag: 3d-printer
         url: lovelace/bambu
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: 3D Print {{ trigger.id }}
         message: '{{ message }}'
         camera: image.bambu_p1s_camera
+      action: script.notify_hass_agent
   - alias: Wait for bed to cool
     wait_for_trigger:
     - platform: numeric_state
@@ -4790,8 +4817,7 @@
       seconds: 0
       milliseconds: 0
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: joshua
         title: 3D Print {{ trigger.id }}
         message: Bed has cooled down. {{ message }}
@@ -4803,18 +4829,19 @@
         priority: high
         tag: 3d-printer
         url: lovelace/bambu
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: 3D Print {{ trigger.id }}
         message: Bed has cooled down, you can remove {{ model }}
         camera: image.bambu_p1s_camera
-  - service: light.turn_off
-    metadata: {}
+      action: script.notify_hass_agent
+  - metadata: {}
     data: {}
     target:
       entity_id: light.bambu_p1s_chamber_light
+    action: light.turn_off
   mode: single
 - id: '1714000511725'
   alias: "\U0001F4AC Bambu P1S Printer Error"
@@ -4830,8 +4857,7 @@
       title: P1S Issue Detected - {{ trigger.event.data.hms_code }}
       message: '{{ trigger.event.data.description }}'
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: joshua
         title: '{{ title }}'
         message: '{{ message }}'
@@ -4846,8 +4872,8 @@
         - action: URI
           title: Bambu Lab Wiki
           uri: '{{ trigger.event.data.url }}'
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         title: '{{ title }}'
@@ -4857,6 +4883,7 @@
         - action: URI
           title: Bambu Lab Wiki
           uri: '{{ trigger.event.data.url }}'
+      action: script.notify_hass_agent
   mode: single
 - id: '1722871416531'
   alias: "\U0001F6A6 Garage Entry Light Switch Status"
@@ -4872,21 +4899,21 @@
       - condition: template
         value_template: '{{ trigger.to_state.state == ''locked'' }}'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           target:
             entity_id: light.outside_garage_switch
+        action: script.inovelli_blue_led
     - conditions:
       - condition: template
         value_template: '{{ trigger.to_state.state == ''unlocked'' }}'
       sequence:
-      - service: script.inovelli_blue_led
-        data:
+      - data:
           color: Red
           effect: Open/Close
           level: 40
           target:
             entity_id: light.outside_garage_switch
+        action: script.inovelli_blue_led
   mode: restart
 - id: '1723130495380'
   alias: ⏯️ Samsung Soundbar Night Mode
@@ -4913,23 +4940,23 @@
         id:
         - 'on'
       sequence:
-      - service: samsung_soundbar.set_night_mode
-        metadata: {}
+      - metadata: {}
         data:
           enabled: true
         target:
           entity_id: media_player.samsung_soundbar
+        action: samsung_soundbar.set_night_mode
     - conditions:
       - condition: trigger
         id:
         - 'off'
       sequence:
-      - service: samsung_soundbar.set_night_mode
-        metadata: {}
+      - metadata: {}
         data:
           enabled: false
         target:
           entity_id: media_player.samsung_soundbar
+        action: samsung_soundbar.set_night_mode
   mode: single
 - id: '1723130728950'
   alias: ⏯️ Samsung Soundbar Voice Enhancer
@@ -4956,23 +4983,23 @@
         id:
         - 'on'
       sequence:
-      - service: samsung_soundbar.set_voice_enhancer
-        metadata: {}
+      - metadata: {}
         data:
           enabled: true
         target:
           entity_id: media_player.samsung_soundbar
+        action: samsung_soundbar.set_voice_enhancer
     - conditions:
       - condition: trigger
         id:
         - 'off'
       sequence:
-      - service: samsung_soundbar.set_voice_enhancer
-        metadata: {}
+      - metadata: {}
         data:
           enabled: false
         target:
           entity_id: media_player.samsung_soundbar
+        action: samsung_soundbar.set_voice_enhancer
   mode: single
 - id: '1723165470472'
   alias: "\U0001F37D️ Oven is Preheated"
@@ -4986,8 +5013,7 @@
   condition: []
   action:
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: Oven
         message: The oven is preheated!
@@ -4996,15 +5022,15 @@
         icon_url: local/icons/stove.png
         tag: oven
         priority: high
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Oven
         message: The oven is preheated!
-    - service: script.notify_pipup
-      data:
+      action: script.notify_hass_agent
+    - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
@@ -5012,6 +5038,7 @@
         title: Oven
         message: The oven is preheated!
         icon_url: local/icons/stove.png
+      action: script.notify_pipup
   mode: single
 - id: '1723166117553'
   alias: "\U0001F37D️ Oven Timer Completed"
