@@ -3496,12 +3496,12 @@
   - variables:
       zone_name: '{{ trigger.from_state.state }}'
       name: '{{ trigger.to_state.attributes.friendly_name }}'
-      message: '{%- from "message.jinja" import arriving_home -%} {%- set person =
-        {"Amy": "Mom", "Joshua": "Dad"}[name] -%} {{ arriving_home(person, zone_name)
-        }}'
+      person: '{{ {"Amy": "Mom", "Joshua": "Dad"}[name] }}'
+      title: '{{ name }} Leaving {{ zone_name }}'
+      message: '{%- from "message.jinja" import arriving_home -%} {{ arriving_home(person,
+        zone_name) }}'
   - parallel:
-    - service: script.notify_mobile
-      data:
+    - data:
         who: parents
         title: '{{ name }} Leaving {{ zone_name }}'
         message: '{{ message }}'
@@ -3509,20 +3509,21 @@
         color: '#ff5722'
         icon_url: local/icons/map-marker-account.png
         group: Presence
-    - service: script.notify_hass_agent
-      data:
+      action: script.notify_mobile
+    - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: '{{ name }} Leaving {{ zone_name }}'
         message: '{{ message }}'
-    - service: script.notify_speech
-      data:
+      action: script.notify_hass_agent
+    - data:
         media_player:
         - media_player.cast_living_room_speaker
         - media_player.cast_family_room_speaker
         - media_player.cast_office_speaker
         message: '{{ message }}'
+      action: script.notify_speech
   mode: single
 - id: '1678829415008'
   alias: "\U0001F4AC Ascent Remote Start Expired Notification"

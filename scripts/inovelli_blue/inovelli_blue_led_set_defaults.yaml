@@ -17,6 +17,7 @@ inovelli_blue_led_set_defaults:
         entity:
           domain:
             - light
+            - fan
             - switch
           integration: mqtt
           multiple: true
@@ -102,50 +103,68 @@ inovelli_blue_led_set_defaults:
           value: true
           label: Enabled
 
-  variables:
-    # Set to true to create a "persistent_notification" with debugging information.
-    debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
-    entity_list: '{{ entity_id }}'
-
-    led_value: '{{ led | default(0) | int(default=0) }}'
-
-    intensity_on_value: '{{ intensity_on | default(40) | int }}'
-    intensity_off_value: '{{ intensity_off | default(1) | int }}'
-
-    colors:
-      'Off': 0
-      'Red': 1
-      'Orange': 21
-      'Yellow': 42
-      'Green': 85
-      'Cyan': 127
-      'Teal': 145
-      'Blue': 170
-      'Purple': 195
-      'Light Pink': 220
-      'Pink': 234
-      'White': 255
-    color: '{{ color | default("Yellow") }}'
-    color_on_value: >-
-      {% if color_on | int(default=-1) == -1 %}
-        {{ colors[color_on | title] | int(default=0) }}
-      {% else %}
-        {{ color_on | int(default=0) }}
-      {% endif %}
-    color_off_value: >-
-      {% if color_off | int(default=-1) == -1 %}
-        {{ colors[color_off | title] | int(default=0) }}
-      {% else %}
-        {{ color_off | int(default=0) }}
-      {% endif %}
-
   sequence:
-    # Loop through each entity_id
-    - repeat:
+    - variables:
+        # Set to true to create a "persistent_notification" with debugging information.
+        debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+        entity_list: '{{ entity_id }}'
+
+        led_value: '{{ led | default(0) | int(default=0) }}'
+
+        intensity_on_value: >-
+          {% if intensity_on == none %}
+            {{ none }}
+          {% else %}
+            {{ intensity_on | int }}
+          {% endif %}
+        intensity_off_value: >-
+          {% if intensity_off == none %}
+            {{ none }}
+          {% else %}
+            {{ intensity_off | int }}
+          {% endif %}
+
+        colors:
+          'off': 0
+          'red': 1
+          'orange': 21
+          'yellow': 42
+          'green': 85
+          'cyan': 127
+          'teal': 145
+          'blue': 170
+          'purple': 195
+          'light pink': 220
+          'lightpink': 220
+          'pink': 234
+          'white': 255
+        color_on_value: >-
+          {% if color_on == none %}
+            {{ none }}
+          {% elif color_on|int(default=-1) == -1 %}
+            {{ colors[color_on|lower]|int(default=0) }}
+          {% else %}
+            {{ color_on|int(default=0) }}
+          {% endif %}
+        color_off_value: >-
+          {% if color_off == none %}
+            {{ none }}
+          {% elif color_off|int(default=-1) == -1 %}
+            {{ colors[color_off|lower]|int(default=0) }}
+          {% else %}
+            {{ color_off|int(default=0) }}
+          {% endif %}
+
+    - alias: Loop through each entity_id
+      repeat:
         for_each: '{{ entity_list }}'
         sequence:
-          # Set enable_debug = true above to provide output troubleshooting information.
-          - if:
+          - variables:
+              device_identifier: >-
+                {% set identifiers = device_attr(repeat.item, "identifiers") | first %}
+                {{ identifiers[1].split('_')[1] }}
+          - alias: Set enable_debug = true above to provide output troubleshooting information.
+            if:
               - condition: template
                 value_template: '{{ debug == true }}'
             then:
@@ -155,8 +174,8 @@ inovelli_blue_led_set_defaults:
                   title: 'DEBUG: script.inovelli_blue_led_set_defaults'
                   message: |-
                     entity: {{ repeat.item }}
-                    device_name: {{ device_attr(repeat.item, "name") }}
-                    topic: zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set
+                    device_name: {{ device_identifier }}
+                    topic: zigbee2mqtt/{{ device_identifier }}/set
                     led: {{ led_value }}
                     color_on: {{ color_on_value }}
                     color_off: {{ color_off_value }}
@@ -165,45 +184,93 @@ inovelli_blue_led_set_defaults:
 
           - choose:
               - conditions:
-                  - '{{ led_value == 0 }}'
+                  - condition: template
+                    value_template: "{{ led_value == 0 }}"
                 sequence:
-                  - action: mqtt.publish
-                    data:
-                      topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                      payload_template: "{\"ledColorWhenOn\": {{ color_on_value }}}"
+                  - if:
+                      - alias: Test if color_on_color_off_valuevalue is set
+                        condition: template
+                        value_template: "{{ color_off_value != null }}"
+                    then:
+                      - action: mqtt.publish
+                        data:
+                          topic: zigbee2mqtt/{{ device_identifier }}/set
+                          payload_template: |
+                            {{ { "ledColorWhenOff": color_off_value } | tojson }}
 
-                  - action: mqtt.publish
-                    data:
-                      topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                      payload_template: "{\"ledColorWhenOff\": {{ color_off_value }}}"
+                  - if:
+                      - alias: Test if color_on_value is set
+                        condition: template
+                        value_template: "{{ color_on_value != null }}"
+                    then:
+                      - action: mqtt.publish
+                        data:
+                          topic: zigbee2mqtt/{{ device_identifier }}/set
+                          payload_template: |
+                            {{ { "ledColorWhenOn": color_on_value } | tojson }}
 
-                  - action: mqtt.publish
-                    data:
-                      topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                      payload_template: "{\"ledIntensityWhenOn\": {{ intensity_on_value }}}"
+                  - if:
+                      - alias: Test if intensity_on_value is set
+                        condition: template
+                        value_template: "{{ intensity_on_value != null }}"
+                    then:
+                      - action: mqtt.publish
+                        data:
+                          topic: zigbee2mqtt/{{ device_identifier }}/set
+                          payload_template: >
+                            {{ { "ledIntensityWhenOn": intensity_on_value } | tojson }}
 
-                  - action: mqtt.publish
-                    data:
-                      topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                      payload_template: "{\"ledIntensityWhenOff\": {{ intensity_off_value }}}"
-
+                  - if:
+                      - alias: Test if intensity_off_value is set
+                        condition: template
+                        value_template: "{{ intensity_off_value != null }}"
+                    then:
+                      - action: mqtt.publish
+                        data:
+                          topic: zigbee2mqtt/{{ device_identifier }}/set
+                          payload_template: >
+                            {{ { "ledIntensityWhenOff": intensity_off_value } | tojson }}
             default:
-              - action: mqtt.publish
-                data:
-                  topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                  payload_template: "{\"defaultLed{{ led_value }}ColorWhenOn\": {{ color_on_value }}}"
+              - if:
+                  - alias: Test if color_on_value is set
+                    condition: template
+                    value_template: "{{ color_on_value != null }}"
+                then:
+                  - action: mqtt.publish
+                    data:
+                      topic: zigbee2mqtt/{{ device_identifier }}/set
+                      payload_template: >
+                        {{ { "defaultLed" ~ led_value ~ "ColorWhenOn": color_on_value } | to_json }}
 
-              - action: mqtt.publish
-                data:
-                  topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                  payload_template: "{\"defaultLed{{ led_value }}ColorWhenOff\": {{ color_off_value }}}"
+              - if:
+                  - alias: Test if color_off_value is set
+                    condition: template
+                    value_template: "{{ color_off_value != null }}"
+                then:
+                  - action: mqtt.publish
+                    data:
+                      topic: zigbee2mqtt/{{ device_identifier }}/set
+                      payload_template: >
+                        {{ { "defaultLed" ~ led_value ~ "ColorWhenOff": color_off_value } | to_json }}
 
-              - action: mqtt.publish
-                data:
-                  topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                  payload_template: "{\"defaultLed{{ led_value }}IntensityWhenOn\": {{ intensity_on_value }}}"
+              - if:
+                  - alias: Test if intensity_on_value is set
+                    condition: template
+                    value_template: "{{ intensity_on_value != null }}"
+                then:
+                  - action: mqtt.publish
+                    data:
+                      topic: zigbee2mqtt/{{ device_identifier }}/set
+                      payload_template: >
+                        {{ { "defaultLed" ~ led_value ~ "IntensityWhenOn": intensity_on_value } | to_json }}
 
-              - action: mqtt.publish
-                data:
-                  topic: 'zigbee2mqtt/{{ device_attr(repeat.item, "name") }}/set'
-                  payload_template: "{\"defaultLed{{ led_value }}IntensityWhenOff\": {{ intensity_off_value }}}"
+              - if:
+                  - alias: Test if intensity_off_value is set
+                    condition: template
+                    value_template: "{{ intensity_off_value != null }}"
+                then:
+                  - action: mqtt.publish
+                    data:
+                      topic: zigbee2mqtt/{{ device_identifier }}/set
+                      payload_template: >
+                        {{ { "defaultLed" ~ led_value ~ "IntensityWhenOff": intensity_off_value } | to_json }}
