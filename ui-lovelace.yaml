@@ -1220,6 +1220,7 @@ decluttering_templates:
           child-padding: 0.5em
           title-card-padding: 0em
           title-card-button-overlay: true
+          expander-card-background: transparent
           overlay-margin: 0
           title-card:
             type: grid
@@ -1428,10 +1429,10 @@ decluttering_templates:
             volume: true
           card_mod:
             style:
-              .: "ha-card {\n  --mmp-progress-height: 10px !important;\n  --paper-progress-container-color:\
-                \ transparent;\n  /*--paper-progress-active-color: var(--mmp-accent-color);*/\n\
-                \  --paper-progress-active-color: var(--rgb-accent-color);\n  --ha-card-border-width:\
-                \ 0;\n  height: var(--mmp-progress-height);\n}\n"
+              .: "ha-card {\n  --mmp-accent-color: rgb(var(--rgb-accent-color));\n\
+                \  --mmp-progress-height: 12px !important;\n  --paper-progress-container-color:\
+                \ transparent;\n  --ha-card-border-width: 0;\n  height: var(--mmp-progress-height);\n\
+                }\n"
       card_mod:
         style:
           .: "ha-card {\n  background: none;\n  --ha-card-border-width: 0;\n  transform:\
@@ -2726,7 +2727,7 @@ views:
                 icon: "{% if not has_value(entity) %}\n  mdi:robot-vacuum-alert\n\
                   {% else %}\n  mdi:robot-vacuum\n{% endif %}"
                 icon_color: "{% if not has_value(entity) %}\n  disabled\n{% elif(is_state(entity,\
-                  \ \"cleaning\")) %}\n  green\n{% elif(is_state(entity, \"charging\"\
+                  \ \"cleaning\")) %}\n  cyan\n{% elif(is_state(entity, \"charging\"\
                   )) %}\n  orange\n{% elif(is_state(entity, \"return\")) %}\n  purple\n\
                   {% else %}\n  disabled\n{% endif %}"
                 tap_action:
@@ -3183,7 +3184,7 @@ views:
               - temperature: sensor.theater_room_temperature
               - icon: mdi:projector
               - icon_color: 255, 193, 7
-              - path: theater-room
+              - path: theater
               - chips:
                   - type: template
                     entity: light.theater_room
@@ -3530,6 +3531,22 @@ views:
               - icon_color: 121, 85, 72
               - path: utility
               - chips:
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.water_leak_detected
+                        state_not: 'off'
+                    chip:
+                      type: template
+                      entity: binary_sensor.water_leak_detected
+                      icon_color: '{{ iif(is_state(entity, "on"), "red", "white")
+                        }}'
+                      icon: mdi:water-alert
+                      tap_action:
+                        action: none
+                      card_mod:
+                        style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n{% if\
+                          \ is_state(config.entity, \"on\") %}\n.content {\n  animation:\
+                          \ phase 1.5s ease-out infinite;\n}\n{% endif %}\n"
                   - type: template
                     entity: sensor.dustin_mopman_status
                     icon_color: "{% if not has_value(entity) %}\n  disabled\n{% elif(is_state(entity,\
@@ -3547,6 +3564,31 @@ views:
                         \ \"cleaning\") %}\n.content {\n  animation: wobbling 0.7s\
                         \ linear infinite alternate;\n}\n{% endif %}\n"
                   - type: template
+                    entity: light.utility_lights
+                    icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
+                      }}'
+                    icon_color: '{{ iif(is_state(entity, "on"), "amber", "disabled")
+                      }}'
+                    card_mod:
+                      style:
+                        .: "{% if is_state(config.entity, \"on\") %}\nha-card:after\
+                          \ {\n  content: \"{{ expand(config.entity) | selectattr('state',\
+                          \ '==', 'on') | list | count }}\";\n  position: absolute;\n\
+                          \  color: var(--amber-color);\n  font-weight: bolder;\n\
+                          \  top: -2px;\n  right: 2px;\n  font-size: 12px;\n}\n{%\
+                          \ endif %}\n"
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Utility Lights
+                          content:
+                            type: custom:decluttering-card
+                            template: light_group_popup
+                            variables:
+                              - entity: light.utility_lights
+                  - type: template
                     entity: valve.water_main_valve
                     icon_color: "{% if not has_value(entity) %}\n  disabled\n{% elif(is_state(entity,\
                       \ \"open\")) %}\n  green\n{% else %}\n  red\n{% endif %}"
@@ -3558,18 +3600,6 @@ views:
                     card_mod:
                       style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n{% if is_state(config.entity,\
                         \ \"closed\") %}\n.content {\n  animation: phase 1.5s ease-out\
-                        \ infinite;\n}\n{% endif %}\n"
-                  - type: template
-                    entity: binary_sensor.water_leak_detected
-                    icon_color: '{{ iif(is_state(entity, "on"), "red", "light-blue")
-                      }}'
-                    icon: mdi:{{ iif(is_state(entity, "on"), "water-alert", "water-check")
-                      }}
-                    tap_action:
-                      action: none
-                    card_mod:
-                      style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n{% if is_state(config.entity,\
-                        \ \"on\") %}\n.content {\n  animation: phase 1.5s ease-out\
                         \ infinite;\n}\n{% endif %}\n"
           - type: custom:decluttering-card
             layout_options:
@@ -3760,8 +3790,7 @@ views:
                   navigation_path: '#ascent'
                 badge_icon: "{% if is_state(\"binary_sensor.ascent_trouble\", \"on\"\
                   ) %}\n  mdi:alert\n{% endif %}"
-                badge_color: "{% if is_state(\"binary_sensor.ascent_trouble\", \"\
-                  on\") %}\n  red\n{% endif %}"
+                badge_color: red
                 card_mod:
                   style:
                     .: "{% set state = states(config.entity) %}\n:host {\n  transition:\
@@ -3790,22 +3819,15 @@ views:
                       \ 0% 100%);\n}\n{% endif %}\n"
               - type: custom:mushroom-chips-card
                 alignment: end
-                card_mod:
-                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
-                    \ rgba(var(--rgb-disabled), 0.1);\n  --chip-border-width: 0;\n\
-                    \  --chip-spacing: 1px;\n  margin-right: calc(var(--ha-card-border-radius,\
-                    \ 12px) / 2);\n}\n"
                 chips:
                   - type: template
-                    entity: sensor.ascent_range
+                    entity: sensor.ascent_fuel_level
                     content: "{% if has_value(entity) %}\n  {{ states(entity) | round(0)\
-                      \ }}mi\n{% endif %}"
+                      \ }}%\n{% endif %}"
                     icon: mdi:gas-station
-                    icon_color: "{% if has_value(entity) %}\n  {% set range = int(states(entity),\
-                      \ 0) %}\n  {% if range > 200 %}\n    green\n  {% elif range\
-                      \ > 70 %}\n    light-green\n  {% elif range > 50 %}\n    amber\n\
-                      \  {% elif range > 30 %}\n    orange\n  {% else %}\n    red\n\
-                      \  {% endif %}\n{% endif %}"
+                    icon_color: '{% from "util.jinja" import battery_color %}
+
+                      {{ battery_color(entity) }}'
                     tap_action:
                       action: more-info
                     hold_action:
@@ -3824,6 +3846,11 @@ views:
                       action: none
                     double_tap_action:
                       action: none
+                card_mod:
+                  style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background:\
+                    \ rgba(var(--rgb-disabled), 0.1);\n  --chip-border-width: 0;\n\
+                    \  --chip-spacing: 1px;\n  margin-right: calc(var(--ha-card-border-radius,\
+                    \ 12px) / 2);\n}\n"
             card_mod:
               style: "{% set state = states(\"device_tracker.ascent\") %}\n{% if state\
                 \ != \"home\" %}\nha-card {\n  {% if state == \"not_home\" %}\n  \
@@ -3846,8 +3873,7 @@ views:
                   navigation_path: '#kona'
                 badge_icon: "{% if is_state(\"binary_sensor.kona_problems\", \"on\"\
                   ) %}\n  mdi:alert\n{% endif %}"
-                badge_color: "{% if is_state(\"binary_sensor.kona_problems\", \"on\"\
-                  ) %}\n  red\n{% endif %}"
+                badge_color: red
                 card_mod:
                   style:
                     .: "{% set state = states(config.entity) %}\n:host {\n  transition:\
@@ -3878,15 +3904,13 @@ views:
                 alignment: end
                 chips:
                   - type: template
-                    entity: sensor.kona_fuel_driving_range
+                    entity: sensor.kona_fuel_level
                     content: "{% if has_value(entity) %}\n  {{ states(entity) | round(0)\
-                      \ }}mi\n{% endif %}"
+                      \ }}%\n{% endif %}"
                     icon: mdi:gas-station
-                    icon_color: "{% if has_value(entity) %}\n  {% set range = int(states(entity),\
-                      \ 0) %}\n  {% if range > 200 %}\n    green\n  {% elif range\
-                      \ > 70 %}\n    light-green\n  {% elif range > 50 %}\n    amber\n\
-                      \  {% elif range > 30 %}\n    orange\n  {% else %}\n    red\n\
-                      \  {% endif %}\n{% endif %}"
+                    icon_color: '{% from "util.jinja" import battery_color %}
+
+                      {{ battery_color(entity) }}'
                     tap_action:
                       action: more-info
                     hold_action:
@@ -4200,7 +4224,8 @@ views:
                 margin_top_mobile: -56px
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
-                  bubble-card::after {\n  display: none !important;\n}"
+                  bubble-card::after {\n  display: none !important;\n}\n${card.querySelector(\"\
+                  .bubble-sub-button-1\").innerText = hass.formatEntityState(hass.states['weather.owm_daily'])}"
                 show_last_changed: false
               - type: custom:vertical-stack-in-card
                 cards:
@@ -8424,6 +8449,40 @@ views:
             layout_options:
               grid_columns: full
     cards: []
+  - title: Theater Room
+    path: theater
+    icon: mdi:projector
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: custom:decluttering-card
+            template: chip_header
+            variables:
+              - primary: Theater Room
+              - icon: mdi:projector
+              - icon_color: amber
+              - chips:
+                  - type: template
+                    entity: binary_sensor.theater_room_occupancy
+                    icon: "{%- if is_state(\"binary_sensor.theater_room_motion\",\
+                      \ \"on\") -%}\n  mdi:motion-sensor\n{%- elif is_state(entity,\
+                      \ \"on\") -%}\n  mdi:walk\n{%- else -%}\n  mdi:motion-sensor-off\n\
+                      {%- endif -%}"
+                    icon_color: "{%- if is_state(\"binary_sensor.theater_room_motion\"\
+                      , \"on\") -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n\
+                      \  light-green\n{%- else -%}\n  disabled\n{%- endif -%}"
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: none
+                  - type: entity
+                    entity: sensor.theater_room_temperature
+            layout_options:
+              grid_columns: full
+        column_span: 2
+    cards: []
   - title: Josh Office
     path: office
     icon: mdi:chair-rolling
@@ -11530,6 +11589,22 @@ views:
                     color: rgb(158,158,158)
                 card_mod:
                   style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+          - type: custom:decluttering-card
+            template: title_chips
+            variables:
+              - title: Lights
+              - chips:
+                  - type: template
+                    entity: light.utility_lights
+                    content: '{{ expand(entity) | selectattr("state", "==", "on")
+                      | list | count }} / {{ expand(entity) | list | count }}'
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: toggle
+          - type: tile
+            entity: light.cold_storage
+            name: Cold Storage
     cards: []
   - title: Computer
     icon: mdi:desktop-tower
@@ -11668,7 +11743,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.erebus_mic_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -11677,7 +11752,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.erebus_webcam_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -11794,7 +11869,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.nasya_mic_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -11803,7 +11878,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.nasya_webcam_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -11936,7 +12011,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.ardena_mic_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -11945,7 +12020,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.ardena_webcam_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -12062,7 +12137,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.athos_mic_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -12071,7 +12146,7 @@ views:
                       chip:
                         type: entity
                         entity: binary_sensor.athos_webcam_active
-                        icon_color: green
+                        icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
@@ -13692,6 +13767,13 @@ views:
             variables:
               - entity: light.outside_lights
               - style: ''
+      - type: grid
+        cards:
+          - type: custom:decluttering-card
+            template: light_group_popup
+            variables:
+              - entity: light.utility_lights
+              - style: ''
     cards: []
   - icon: mdi:shield
     path: security
@@ -13884,6 +13966,9 @@ views:
                       style:
                         .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
                           \ 0;\n  background: none;\n}\n"
+                        mushroom-lock-buttons-control$:
+                          mushroom-button:nth-child(1)$: ".button {\n  --bg-color:\
+                            \ rgba(var(--rgb-disabled), 0.2);\n}\n"
           - type: custom:vertical-stack-in-card
             layout_options:
               grid_columns: 2
@@ -13976,6 +14061,9 @@ views:
                       style:
                         .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
                           \ 0;\n  background: none;\n}\n"
+                        mushroom-lock-buttons-control$:
+                          mushroom-button:nth-child(1)$: ".button {\n  --bg-color:\
+                            \ rgba(var(--rgb-disabled), 0.2);\n}\n"
           - type: custom:decluttering-card
             layout_options:
               grid_columns: 2
@@ -14021,6 +14109,15 @@ views:
                 secondary_info: none
                 icon_type: none
                 show_position_control: true
+                card_mod:
+                  style:
+                    .: "ha-card {\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
+                      \ 0;\n  background: none;\n}\n"
+                    mushroom-button$: ".button {\n  --bg-color: rgba(var(--rgb-disabled),\
+                      \ 0.2);\n}\n"
+                    mushroom-cover-buttons-control$:
+                      mushroom-button$: ".button {\n  --bg-color: rgba(var(--rgb-disabled),\
+                        \ 0.2);\n}\n"
           - type: custom:decluttering-card
             layout_options:
               grid_columns: 2
