@@ -87,16 +87,26 @@ decluttering_templates:
         - type: custom:bubble-card
           card_type: media-player
           entity: '[[media]]'
-          card_layout: large
-          show_state: true
-          show_name: false
+          show_state: false
           show_attribute: true
-          attribute: media_title
+          attribute: source
+          card_layout: large
           hide:
             volume_button: true
             previous_button: true
             power_button: true
             next_button: true
+          styles: "${card.querySelector('.bubble-name').innerText = [\n    (hass.states[entity]?.attributes.media_title\
+            \ || \"\"),\n    (hass.states[entity]?.attributes.media_artist || \"\"\
+            ),\n    (typeof(hass.states[entity]?.attributes.media_season) !== \"undefined\"\
+            \ ? \"S\" + hass.states[entity]?.attributes.media_season : \"\") +\n \
+            \   (typeof(hass.states[entity]?.attributes.media_episode) !== \"undefined\"\
+            \ ? \"E\" + hass.states[entity]?.attributes.media_episode : \"\"),\n \
+            \   (hass.states[entity]?.attributes.media_series_title || \"\")\n  ].filter(n\
+            \ => n).join(\" ⸱ \")\n} ${card.querySelector('.bubble-state').innerText\
+            \ = [\n    (hass.formatEntityState(hass.states[entity]) || \"\"),\n  \
+            \  (hass.states[entity]?.attributes.source || \"\")\n  ].filter(n => n).join(\"\
+            \ ⸱ \")\n}"
         - type: custom:tabbed-card
           styles:
             --mdc-theme-primary: var(--primary-color)
@@ -748,26 +758,6 @@ decluttering_templates:
             style: "ha-card {\n  position: absolute;\n  top: 0px;\n  right: 0px;\n\
               \  --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-border-width:\
               \ 0;\n}\n"
-  camera_card:
-    card:
-      type: picture-entity
-      entity: '[[camera]]'
-      aspect_ratio: '16:9'
-      show_state: false
-      show_name: false
-      tap_action:
-        action: fire-dom-event
-        browser_mod:
-          service: browser_mod.popup
-          data:
-            title: '[[name]]'
-            size: fullscreen
-            content:
-              type: custom:decluttering-card
-              template: camera_popup
-              variables:
-                - camera: '[[camera]]'
-                - stream: '[[stream]]'
   camera_popup:
     card:
       type: custom:frigate-card
@@ -2890,7 +2880,7 @@ views:
                         :\")[0], 0) * 60)\n    + (int(entity_duration.split(\":\"\
                         )[1], 0))\n-%} .shape {\n  /* Radial progress bar */\n  background:\n\
                         \    radial-gradient(var(--card-background-color) 60%, transparent\
-                        \ calc(60% + 1px)),\n    conic-gradient(var(--purple-color)\
+                        \ calc(60% + 1px)),\n    conic-gradient(var(--cyan-color)\
                         \ {{ ((duration - remaining) / duration * 100) | round() }}%\
                         \ 0%, var(--card-background-color) 0% 100%);\n} .shape:after\
                         \ {\n  /* Add back icon shape */\n  content: \"\";\n  height:\
@@ -2918,18 +2908,8 @@ views:
                     icon: mdi:cctv
                     icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Living Room
-                          size: fullscreen
-                          content:
-                            type: custom:decluttering-card
-                            template: camera_popup
-                            variables:
-                              - camera: camera.living_room
-                              - stream: living_room
+                      action: navigate
+                      navigation_path: '#camera-living-room'
               - chips:
                   - type: template
                     entity: media_player.universal_living_room
@@ -3076,18 +3056,8 @@ views:
                     icon: mdi:cctv
                     icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Family Room
-                          size: fullscreen
-                          content:
-                            type: custom:decluttering-card
-                            template: camera_popup
-                            variables:
-                              - camera: camera.family_room
-                              - stream: familyroom
+                      action: navigate
+                      navigation_path: '#camera-family-room'
               - chips:
                   - type: conditional
                     conditions:
@@ -3217,7 +3187,7 @@ views:
               - temperature: sensor.joshua_office_temperature
               - icon: mdi:chair-rolling
               - icon_color: 33, 150, 243
-              - path: office
+              - path: josh-office
               - chips:
                   - type: conditional
                     conditions:
@@ -3618,18 +3588,8 @@ views:
                     icon: mdi:doorbell-video
                     icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Doorbell
-                          size: fullscreen
-                          content:
-                            type: custom:decluttering-card
-                            template: camera_popup
-                            variables:
-                              - camera: camera.doorbell
-                              - stream: doorbell
+                      action: navigate
+                      navigation_path: '#camera-doorbell'
               - chips:
                   - type: template
                     entity: light.outside_lights
@@ -3707,18 +3667,8 @@ views:
                     icon: mdi:cctv
                     icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Garage
-                          size: fullscreen
-                          content:
-                            type: custom:decluttering-card
-                            template: camera_popup
-                            variables:
-                              - camera: camera.garage
-                              - stream: garage
+                      action: navigate
+                      navigation_path: '#camera-garage'
               - chips:
                   - type: conditional
                     conditions:
@@ -7637,6 +7587,74 @@ views:
                       \ button to match Chip */\n  height: var(--mush-chip-height,\
                       \ 36px) !important;\n  width: var(--mush-chip-height, 36px)\
                       \ !important;\n  --mdc-icon-size: 22px;\n}\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-living-room'
+                button_type: name
+                name: Living Room
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.living_room
+                  - stream: livingroom
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-family-room'
+                button_type: name
+                name: Family Room
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.family_room
+                  - stream: familyroom
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-garage'
+                button_type: name
+                name: Garage
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.garage
+                  - stream: garage
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-doorbell'
+                button_type: name
+                name: Doorbell
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.doorbell
+                  - stream: doorbell
     cards: []
   - title: Living Room
     path: living
@@ -7670,6 +7688,13 @@ views:
                     entity: sensor.ecobee_current_temperature
                   - type: entity
                     entity: sensor.ecobee_current_humidity
+                  - type: template
+                    entity: camera.living_room
+                    icon: mdi:cctv
+                    icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
+                    tap_action:
+                      action: navigate
+                      navigation_path: '#camera-living-room'
                   - type: template
                     icon: mdi:remote-tv
                     icon_color: orange
@@ -8013,6 +8038,23 @@ views:
                                 \ none;\n  --chip-border-width: 0;\n}\n"
             layout_options:
               grid_columns: full
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-living-room'
+                button_type: name
+                name: Living Room
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.living_room
+                  - stream: livingroom
     cards: []
   - title: Family Room
     path: family
@@ -8056,18 +8098,8 @@ views:
                     icon: mdi:cctv
                     icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Family Room
-                          size: fullscreen
-                          content:
-                            type: custom:decluttering-card
-                            template: camera_popup
-                            variables:
-                              - camera: camera.family_room
-                              - stream: familyroom
+                      action: navigate
+                      navigation_path: '#camera-family-room'
                   - type: template
                     icon: mdi:remote-tv
                     icon_color: orange
@@ -8421,6 +8453,23 @@ views:
                           - sound_mode: All Zone Stereo
             layout_options:
               grid_columns: full
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-family-room'
+                button_type: name
+                name: Family Room
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.family_room
+                  - stream: familyroom
     cards: []
   - title: Theater Room
     path: theater
@@ -8456,8 +8505,8 @@ views:
               grid_columns: full
         column_span: 2
     cards: []
-  - title: Josh Office
-    path: office
+  - title: Josh's Office
+    path: josh-office
     icon: mdi:chair-rolling
     type: sections
     max_columns: 2
@@ -9542,7 +9591,7 @@ views:
                 entity: switch.nebula_projector_emma_main_switch
                 state: 'on'
     cards: []
-  - title: Amy Office
+  - title: Amy's Office
     path: amy-office
     type: sections
     max_columns: 2
@@ -9673,25 +9722,26 @@ views:
                     icon: mdi:cctv
                     icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                     tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Garage
-                          size: fullscreen
-                          content:
-                            type: custom:decluttering-card
-                            template: camera_popup
-                            variables:
-                              - camera: camera.garage
-                              - stream: garage
+                      action: navigate
+                      navigation_path: '#camera-garage'
             layout_options:
               grid_columns: full
         column_span: 2
       - type: grid
         cards:
-          - type: custom:mushroom-title-card
-            title: Lights
+          - type: custom:decluttering-card
+            template: title_chips
+            variables:
+              - title: Lights
+              - chips:
+                  - type: template
+                    entity: light.garage_lights
+                    content: '{{ expand(entity) | selectattr("state", "==", "on")
+                      | list | count }} / {{ expand(entity) | list | count }}'
+                    tap_action:
+                      action: more-info
+                    hold_action:
+                      action: toggle
           - type: tile
             entity: light.garage
             name: Main
@@ -9727,6 +9777,25 @@ views:
               - last-changed
             layout_options:
               grid_columns: full
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-garage'
+                button_type: name
+                name: Garage
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.garage
+                  - stream: garage
     cards: []
   - title: Outside
     path: outside
@@ -12480,6 +12549,19 @@ views:
                       - computer: erebus
                   - type: conditional
                     conditions:
+                      - entity: binary_sensor.erebus_connected
+                        state_not: unavailable
+                      - entity: binary_sensor.erebus_connected
+                        state_not: unknown
+                      - entity: binary_sensor.erebus_connected
+                        state_not: 'off'
+                    card:
+                      type: custom:decluttering-card
+                      template: computer_apps
+                      variables:
+                        - computer: erebus
+                  - type: conditional
+                    conditions:
                       - entity: media_player.erebus
                         state_not: unavailable
                       - entity: media_player.erebus
@@ -12644,6 +12726,19 @@ views:
                       - computer: nasya
                   - type: conditional
                     conditions:
+                      - entity: binary_sensor.nasya_connected
+                        state_not: unavailable
+                      - entity: binary_sensor.nasya_connected
+                        state_not: unknown
+                      - entity: binary_sensor.nasya_connected
+                        state_not: 'off'
+                    card:
+                      type: custom:decluttering-card
+                      template: computer_apps
+                      variables:
+                        - computer: nasya
+                  - type: conditional
+                    conditions:
                       - entity: media_player.nasya
                         state_not: unavailable
                       - entity: media_player.nasya
@@ -12781,6 +12876,19 @@ views:
                     template: computer_power
                     variables:
                       - computer: ardena
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.ardena_connected
+                        state_not: unavailable
+                      - entity: binary_sensor.ardena_connected
+                        state_not: unknown
+                      - entity: binary_sensor.ardena_connected
+                        state_not: 'off'
+                    card:
+                      type: custom:decluttering-card
+                      template: computer_apps
+                      variables:
+                        - computer: ardena
                   - type: conditional
                     conditions:
                       - entity: binary_sensor.ardena_connected
@@ -12931,6 +13039,19 @@ views:
                   - type: conditional
                     conditions:
                       - entity: binary_sensor.athos_connected
+                        state_not: unavailable
+                      - entity: binary_sensor.athos_connected
+                        state_not: unknown
+                      - entity: binary_sensor.athos_connected
+                        state_not: 'off'
+                    card:
+                      type: custom:decluttering-card
+                      template: computer_apps
+                      variables:
+                        - computer: athos
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.athos_connected
                         state: 'on'
                     card:
                       type: custom:decluttering-card
@@ -13046,6 +13167,7 @@ views:
                           type: custom:mushroom-template-card
                           entity: button.magicmirror_shutdown
                           layout: vertical
+                          primary: Power
                           icon: mdi:power
                           icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
                             }}'
@@ -13067,6 +13189,7 @@ views:
                           type: custom:mushroom-template-card
                           entity: button.magicmirror_reboot
                           layout: vertical
+                          primary: Reboot
                           icon: mdi:refresh
                           icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
                             }}'
@@ -13088,6 +13211,7 @@ views:
                           type: custom:mushroom-template-card
                           entity: button.magicmirror_restart
                           layout: vertical
+                          primary: Restart
                           icon: mdi:table-refresh
                           icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
                             }}'
@@ -13109,6 +13233,7 @@ views:
                           type: custom:mushroom-template-card
                           entity: button.magicmirror_refresh
                           layout: vertical
+                          primary: Refresh
                           icon: mdi:web-refresh
                           icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
                             }}'
@@ -14126,18 +14251,8 @@ views:
                   top: 20px
                   transform: translate(-50%, -50%) scale(150%)
                 tap_action:
-                  action: fire-dom-event
-                  browser_mod:
-                    service: browser_mod.popup
-                    data:
-                      title: Doorbell
-                      size: fullscreen
-                      content:
-                        type: custom:decluttering-card
-                        template: camera_popup
-                        variables:
-                          - camera: camera.doorbell
-                          - stream: doorbell
+                  action: navigate
+                  navigation_path: '#camera-doorbell'
               - type: state-icon
                 entity: sensor.doorbell_person_count
                 icon: mdi:walk
@@ -14160,30 +14275,36 @@ views:
                   action: more-info
             layout_options:
               grid_columns: 2
-          - type: custom:decluttering-card
+          - type: picture-entity
+            entity: camera.garage
+            aspect_ratio: '16:9'
+            show_state: false
+            show_name: false
+            tap_action:
+              action: navigate
+              navigation_path: '#camera-garage'
             layout_options:
               grid_columns: 2
-            template: camera_card
-            variables:
-              - name: Garage
-              - camera: camera.garage
-              - stream: garage
-          - type: custom:decluttering-card
+          - type: picture-entity
+            entity: camera.family_room
+            aspect_ratio: '16:9'
+            show_state: false
+            show_name: false
+            tap_action:
+              action: navigate
+              navigation_path: '#camera-family-room'
             layout_options:
               grid_columns: 2
-            template: camera_card
-            variables:
-              - name: Family Room
-              - camera: camera.family_room
-              - stream: familyroom
-          - type: custom:decluttering-card
+          - type: picture-entity
+            entity: camera.living_room
+            aspect_ratio: '16:9'
+            show_state: false
+            show_name: false
+            tap_action:
+              action: navigate
+              navigation_path: '#camera-living-room'
             layout_options:
               grid_columns: 2
-            template: camera_card
-            variables:
-              - name: Living Room
-              - camera: camera.living_room
-              - stream: living_room
           - type: custom:mushroom-template-card
             entity: binary_sensor.doorbell_visitor
             primary: Last Ring
@@ -14265,6 +14386,76 @@ views:
                 variables:
                   - name: Garage
                   - entity: binary_sensor.garage_multisensor_motion_detection
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-living-room'
+                button_type: name
+                name: Living Room
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.living_room
+                  - stream: livingroom
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-family-room'
+                button_type: name
+                name: Family Room
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.family_room
+                  - stream: familyroom
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-garage'
+                button_type: name
+                name: Garage
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.garage
+                  - stream: garage
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#camera-doorbell'
+                button_type: name
+                name: Doorbell
+                icon: mdi:cctv
+                width_desktop: 96%
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  bubble-card::after {\n  display: none !important;\n}"
+              - type: custom:decluttering-card
+                template: camera_popup
+                variables:
+                  - camera: camera.doorbell
+                  - stream: doorbell
     cards: []
   - title: Frigate
     path: frigate
@@ -15180,27 +15371,29 @@ views:
               fossil_fuel_percentage:
                 entity: sensor.electricity_maps_grid_fossil_fuel_percentage
                 color_value: false
-                secondary_info: {}
+                secondary_info:
+                  entity: sensor.electricity_maps_grid_low_carbon_percentage
+                  unit_of_measurement: '%'
                 color_icon: true
               home:
+                color_icon: true
                 secondary_info: {}
               individual:
                 - entity: sensor.emporiavue_sub_total_power
-                  secondary_info: {}
                   name: Sub Panel
-                  color_value: false
-                  color_icon: true
-                - entity: sensor.emporiavue_main_a_c_power
                   secondary_info: {}
+                - entity: sensor.emporiavue_main_a_c_power
                   name: A/C
                   icon: mdi:air-conditioner
                   display_zero_tolerance: 1
-                - entity: sensor.emporiavue_main_range_power
                   secondary_info: {}
+                - entity: sensor.emporiavue_main_range_power
                   name: Range
                   icon: mdi:stove
-                  color_icon: true
-                  show_direction: false
+                  display_zero_tolerance: 10
+                - entity: sensor.emporiavue_sub_furnace_power
+                  name: Furnace
+                  icon: mdi:hvac
                   display_zero_tolerance: 10
             clickable_entities: true
             display_zero_lines:
@@ -15432,104 +15625,209 @@ views:
                   - color: var(--red-color)
                     from: 7680
                     to: 9600
-          - type: custom:mushroom-title-card
-            subtitle: Main
-          - type: custom:mushroom-title-card
-            subtitle: Sub
-          - type: custom:bar-card
-            card_mod:
-              style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n  text-shadow:\
-                \ 1px 1px var(--primary-background-color);\n}\n"
-            min: 0
-            max: 2400
-            decimal: 1
-            height: 30px
-            positions:
-              indicator: inside
-            severity:
-              - color: var(--green-color)
-                from: 0
-                to: 480
-              - color: var(--light-green-color)
-                from: 480
-                to: 960
-              - color: var(--amber-color)
-                from: 960
-                to: 1440
-              - color: var(--orange-color)
-                from: 1440
-                to: 1920
-              - color: var(--red-color)
-                from: 1920
-                to: 2400
-            entities:
-              - entity: sensor.emporiavue_main_balance_power
-                name: Main Balance
-                icon: mdi:home-analytics
-                max: 9600
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                subtitle: Main
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                min: 0
+                max: 2400
+                decimal: 1
+                height: 30px
+                positions:
+                  indicator: inside
                 severity:
                   - color: var(--green-color)
                     from: 0
+                    to: 480
+                  - color: var(--light-green-color)
+                    from: 480
+                    to: 960
+                  - color: var(--amber-color)
+                    from: 960
+                    to: 1440
+                  - color: var(--orange-color)
+                    from: 1440
                     to: 1920
-                  - color: var(--light-green-color)
+                  - color: var(--red-color)
                     from: 1920
-                    to: 3840
-                  - color: var(--amber-color)
-                    from: 3840
-                    to: 5760
-                  - color: var(--orange-color)
-                    from: 5760
-                    to: 7680
-                  - color: var(--red-color)
-                    from: 7680
-                    to: 9600
-              - entity: sensor.emporiavue_main_a_c_power
-                name: Air Conditioner
-                icon: mdi:air-conditioner
-                max: 7200
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 1440
-                  - color: var(--light-green-color)
-                    from: 1440
-                    to: 2880
-                  - color: var(--amber-color)
-                    from: 2880
-                    to: 4320
-                  - color: var(--orange-color)
-                    from: 4320
-                    to: 5760
-                  - color: var(--red-color)
-                    from: 5760
-                    to: 7200
-              - entity: sensor.emporiavue_main_dryer_power
-                name: Dryer
-                icon: mdi:tumble-dryer
-                max: 7200
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 1440
-                  - color: var(--light-green-color)
-                    from: 1440
-                    to: 2880
-                  - color: var(--amber-color)
-                    from: 2880
-                    to: 4320
-                  - color: var(--orange-color)
-                    from: 4320
-                    to: 5760
-                  - color: var(--red-color)
-                    from: 5760
-                    to: 7200
-              - entity: sensor.emporiavue_main_dishwasher_disposal_power
-                name: Dishwasher / Disposal
-                icon: mdi:dishwasher
-              - entity: sensor.emporiavue_main_garage_laundry_outside_lights_power
-                name: Garage, Laundry, Outside Lights
-                icon: mdi:lightbulb-group
+                    to: 2400
+                entities:
+                  - entity: sensor.emporiavue_main_balance_power
+                    name: Main Balance
+                    icon: mdi:home-analytics
+                    max: 9600
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 1920
+                      - color: var(--light-green-color)
+                        from: 1920
+                        to: 3840
+                      - color: var(--amber-color)
+                        from: 3840
+                        to: 5760
+                      - color: var(--orange-color)
+                        from: 5760
+                        to: 7680
+                      - color: var(--red-color)
+                        from: 7680
+                        to: 9600
+                  - entity: sensor.emporiavue_main_a_c_power
+                    name: Air Conditioner
+                    icon: mdi:air-conditioner
+                    max: 7200
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 1440
+                      - color: var(--light-green-color)
+                        from: 1440
+                        to: 2880
+                      - color: var(--amber-color)
+                        from: 2880
+                        to: 4320
+                      - color: var(--orange-color)
+                        from: 4320
+                        to: 5760
+                      - color: var(--red-color)
+                        from: 5760
+                        to: 7200
+                  - entity: sensor.emporiavue_main_dryer_power
+                    name: Dryer
+                    icon: mdi:tumble-dryer
+                    max: 7200
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 1440
+                      - color: var(--light-green-color)
+                        from: 1440
+                        to: 2880
+                      - color: var(--amber-color)
+                        from: 2880
+                        to: 4320
+                      - color: var(--orange-color)
+                        from: 4320
+                        to: 5760
+                      - color: var(--red-color)
+                        from: 5760
+                        to: 7200
+                  - entity: sensor.emporiavue_main_dishwasher_disposal_power
+                    name: Dishwasher / Disposal
+                    icon: mdi:dishwasher
+                  - entity: sensor.emporiavue_main_garage_laundry_outside_lights_power
+                    name: Garage, Laundry, Outside Lights
+                    icon: mdi:lightbulb-group
+                    max: 1800
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 360
+                      - color: var(--light-green-color)
+                        from: 360
+                        to: 720
+                      - color: var(--amber-color)
+                        from: 720
+                        to: 1080
+                      - color: var(--orange-color)
+                        from: 1080
+                        to: 1440
+                      - color: var(--red-color)
+                        from: 1440
+                        to: 1800
+                  - entity: sensor.emporiavue_main_garage_outlets_power
+                    name: Garage Outlets
+                    icon: mdi:power-plug
+                  - entity: sensor.emporiavue_main_kitchen_dining_lights_power
+                    name: Kitchen, Dining Lights
+                    icon: mdi:lightbulb-group
+                    max: 1800
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 360
+                      - color: var(--light-green-color)
+                        from: 360
+                        to: 720
+                      - color: var(--amber-color)
+                        from: 720
+                        to: 1080
+                      - color: var(--orange-color)
+                        from: 1080
+                        to: 1440
+                      - color: var(--red-color)
+                        from: 1440
+                        to: 1800
+                  - entity: sensor.emporiavue_main_kitchen_outlets_1_power
+                    name: Kitchen Outlets 1
+                    icon: mdi:power-plug
+                  - entity: sensor.emporiavue_main_kitchen_outlets_2_power
+                    name: Kitchen Outlets 2
+                    icon: mdi:power-plug
+                  - entity: sensor.emporiavue_main_microwave_power
+                    name: Microwave
+                    icon: mdi:microwave
+                  - entity: sensor.emporiavue_main_outside_outlet_power
+                    name: Outside Outlet
+                    icon: mdi:power-plug
+                    max: 1800
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 360
+                      - color: var(--light-green-color)
+                        from: 360
+                        to: 720
+                      - color: var(--amber-color)
+                        from: 720
+                        to: 1080
+                      - color: var(--orange-color)
+                        from: 1080
+                        to: 1440
+                      - color: var(--red-color)
+                        from: 1440
+                        to: 1800
+                  - entity: sensor.emporiavue_main_range_power
+                    name: Range
+                    icon: mdi:stove
+                    max: 9600
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 1920
+                      - color: var(--light-green-color)
+                        from: 1920
+                        to: 3840
+                      - color: var(--amber-color)
+                        from: 3840
+                        to: 5760
+                      - color: var(--orange-color)
+                        from: 5760
+                        to: 7680
+                      - color: var(--red-color)
+                        from: 7680
+                        to: 9600
+                  - entity: sensor.emporiavue_main_washer_power
+                    name: Washer
+                    icon: mdi:washing-machine
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                subtitle: Sub
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                min: 0
                 max: 1800
+                decimal: 1
+                height: 30px
+                positions:
+                  indicator: inside
                 severity:
                   - color: var(--green-color)
                     from: 0
@@ -15546,235 +15844,134 @@ views:
                   - color: var(--red-color)
                     from: 1440
                     to: 1800
-              - entity: sensor.emporiavue_main_garage_outlets_power
-                name: Garage Outlets
-                icon: mdi:power-plug
-              - entity: sensor.emporiavue_main_kitchen_dining_lights_power
-                name: Kitchen, Dining Lights
-                icon: mdi:lightbulb-group
-                max: 1800
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 360
-                  - color: var(--light-green-color)
-                    from: 360
-                    to: 720
-                  - color: var(--amber-color)
-                    from: 720
-                    to: 1080
-                  - color: var(--orange-color)
-                    from: 1080
-                    to: 1440
-                  - color: var(--red-color)
-                    from: 1440
-                    to: 1800
-              - entity: sensor.emporiavue_main_kitchen_outlets_1_power
-                name: Kitchen Outlets 1
-                icon: mdi:power-plug
-              - entity: sensor.emporiavue_main_kitchen_outlets_2_power
-                name: Kitchen Outlets 2
-                icon: mdi:power-plug
-              - entity: sensor.emporiavue_main_microwave_power
-                name: Microwave
-                icon: mdi:microwave
-              - entity: sensor.emporiavue_main_outside_outlet_power
-                name: Outside Outlet
-                icon: mdi:power-plug
-                max: 1800
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 360
-                  - color: var(--light-green-color)
-                    from: 360
-                    to: 720
-                  - color: var(--amber-color)
-                    from: 720
-                    to: 1080
-                  - color: var(--orange-color)
-                    from: 1080
-                    to: 1440
-                  - color: var(--red-color)
-                    from: 1440
-                    to: 1800
-              - entity: sensor.emporiavue_main_range_power
-                name: Range
-                icon: mdi:stove
-                max: 9600
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 1920
-                  - color: var(--light-green-color)
-                    from: 1920
-                    to: 3840
-                  - color: var(--amber-color)
-                    from: 3840
-                    to: 5760
-                  - color: var(--orange-color)
-                    from: 5760
-                    to: 7680
-                  - color: var(--red-color)
-                    from: 7680
-                    to: 9600
-              - entity: sensor.emporiavue_main_washer_power
-                name: Washer
-                icon: mdi:washing-machine
-          - type: custom:bar-card
-            card_mod:
-              style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n  text-shadow:\
-                \ 1px 1px var(--primary-background-color);\n}\n"
-            min: 0
-            max: 1800
-            decimal: 1
-            height: 30px
-            positions:
-              indicator: inside
-            severity:
-              - color: var(--green-color)
-                from: 0
-                to: 360
-              - color: var(--light-green-color)
-                from: 360
-                to: 720
-              - color: var(--amber-color)
-                from: 720
-                to: 1080
-              - color: var(--orange-color)
-                from: 1080
-                to: 1440
-              - color: var(--red-color)
-                from: 1440
-                to: 1800
-            entities:
-              - entity: sensor.emporiavue_sub_balance_power
-                name: Sub Balance
-                icon: mdi:home-analytics
-                max: 9600
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 1920
-                  - color: var(--light-green-color)
-                    from: 1920
-                    to: 3840
-                  - color: var(--amber-color)
-                    from: 3840
-                    to: 5760
-                  - color: var(--orange-color)
-                    from: 5760
-                    to: 7680
-                  - color: var(--red-color)
-                    from: 7680
-                    to: 9600
-              - entity: sensor.emporiavue_sub_basement_bath_outlet_power
-                name: Basement Bath Outlet
-                icon: mdi:hair-dryer
-                max: 2400
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 480
-                  - color: var(--light-green-color)
-                    from: 480
-                    to: 960
-                  - color: var(--amber-color)
-                    from: 960
-                    to: 1440
-                  - color: var(--orange-color)
-                    from: 1440
-                    to: 1920
-                  - color: var(--red-color)
-                    from: 1920
-                    to: 2400
-              - entity: sensor.emporiavue_sub_basement_bedrooms_power
-                name: Basement Bedrooms
-                icon: mdi:home-floor-0
-              - entity: sensor.emporiavue_sub_basement_lights_utility_room_power
-                name: Basement Lights/Utility Room
-                icon: mdi:progress-wrench
-              - entity: sensor.emporiavue_sub_bathroom_outlets_power
-                name: Bathroom Outlets
-                icon: mdi:hair-dryer
-                max: 2400
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 480
-                  - color: var(--light-green-color)
-                    from: 480
-                    to: 960
-                  - color: var(--amber-color)
-                    from: 960
-                    to: 1440
-                  - color: var(--orange-color)
-                    from: 1440
-                    to: 1920
-                  - color: var(--red-color)
-                    from: 1920
-                    to: 2400
-              - entity: sensor.emporiavue_sub_bedroom_lights_power
-                name: Bedroom Lights
-                icon: mdi:lightbulb-group
-              - entity: sensor.emporiavue_sub_eve_outlet_power
-                name: Eve Outlet
-                icon: mdi:rounded-corner
-                max: 2400
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 480
-                  - color: var(--light-green-color)
-                    from: 480
-                    to: 960
-                  - color: var(--amber-color)
-                    from: 960
-                    to: 1440
-                  - color: var(--orange-color)
-                    from: 1440
-                    to: 1920
-                  - color: var(--red-color)
-                    from: 1920
-                    to: 2400
-              - entity: sensor.emporiavue_sub_family_room_power
-                name: Family Room
-                icon: mdi:gamepad-circle
-              - entity: sensor.emporiavue_sub_furnace_power
-                name: Furnace
-                icon: mdi:hvac
-              - entity: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_power
-                name: Hall, Bath Lights/Main Bed Outlets
-                icon: mdi:home-floor-1
-              - entity: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_power
-                name: Hall, Bedroom Outlets/Entry, Outside Lights
-                icon: mdi:home-floor-1
-              - entity: sensor.emporiavue_sub_kitchen_island_power
-                name: Kitchen Island
-                icon: mdi:table-chair
-                max: 2400
-                severity:
-                  - color: var(--green-color)
-                    from: 0
-                    to: 480
-                  - color: var(--light-green-color)
-                    from: 480
-                    to: 960
-                  - color: var(--amber-color)
-                    from: 960
-                    to: 1440
-                  - color: var(--orange-color)
-                    from: 1440
-                    to: 1920
-                  - color: var(--red-color)
-                    from: 1920
-                    to: 2400
-              - entity: sensor.emporiavue_sub_living_room_power
-                name: Living Room
-                icon: mdi:sofa-single
-              - entity: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_power
-                name: Theater, Family Outlets/Basement Lighting
-                icon: mdi:theater
+                entities:
+                  - entity: sensor.emporiavue_sub_balance_power
+                    name: Sub Balance
+                    icon: mdi:home-analytics
+                    max: 9600
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 1920
+                      - color: var(--light-green-color)
+                        from: 1920
+                        to: 3840
+                      - color: var(--amber-color)
+                        from: 3840
+                        to: 5760
+                      - color: var(--orange-color)
+                        from: 5760
+                        to: 7680
+                      - color: var(--red-color)
+                        from: 7680
+                        to: 9600
+                  - entity: sensor.emporiavue_sub_basement_bath_outlet_power
+                    name: Basement Bath Outlet
+                    icon: mdi:hair-dryer
+                    max: 2400
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 480
+                      - color: var(--light-green-color)
+                        from: 480
+                        to: 960
+                      - color: var(--amber-color)
+                        from: 960
+                        to: 1440
+                      - color: var(--orange-color)
+                        from: 1440
+                        to: 1920
+                      - color: var(--red-color)
+                        from: 1920
+                        to: 2400
+                  - entity: sensor.emporiavue_sub_basement_bedrooms_power
+                    name: Basement Bedrooms
+                    icon: mdi:home-floor-0
+                  - entity: sensor.emporiavue_sub_basement_lights_utility_room_power
+                    name: Basement Lights/Utility Room
+                    icon: mdi:progress-wrench
+                  - entity: sensor.emporiavue_sub_bathroom_outlets_power
+                    name: Bathroom Outlets
+                    icon: mdi:hair-dryer
+                    max: 2400
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 480
+                      - color: var(--light-green-color)
+                        from: 480
+                        to: 960
+                      - color: var(--amber-color)
+                        from: 960
+                        to: 1440
+                      - color: var(--orange-color)
+                        from: 1440
+                        to: 1920
+                      - color: var(--red-color)
+                        from: 1920
+                        to: 2400
+                  - entity: sensor.emporiavue_sub_bedroom_lights_power
+                    name: Bedroom Lights
+                    icon: mdi:lightbulb-group
+                  - entity: sensor.emporiavue_sub_eve_outlet_power
+                    name: Eve Outlet
+                    icon: mdi:rounded-corner
+                    max: 2400
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 480
+                      - color: var(--light-green-color)
+                        from: 480
+                        to: 960
+                      - color: var(--amber-color)
+                        from: 960
+                        to: 1440
+                      - color: var(--orange-color)
+                        from: 1440
+                        to: 1920
+                      - color: var(--red-color)
+                        from: 1920
+                        to: 2400
+                  - entity: sensor.emporiavue_sub_family_room_power
+                    name: Family Room
+                    icon: mdi:gamepad-circle
+                  - entity: sensor.emporiavue_sub_furnace_power
+                    name: Furnace
+                    icon: mdi:hvac
+                  - entity: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_power
+                    name: Hall, Bath Lights/Main Bed Outlets
+                    icon: mdi:home-floor-1
+                  - entity: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_power
+                    name: Hall, Bedroom Outlets/Entry, Outside Lights
+                    icon: mdi:home-floor-1
+                  - entity: sensor.emporiavue_sub_kitchen_island_power
+                    name: Kitchen Island
+                    icon: mdi:table-chair
+                    max: 2400
+                    severity:
+                      - color: var(--green-color)
+                        from: 0
+                        to: 480
+                      - color: var(--light-green-color)
+                        from: 480
+                        to: 960
+                      - color: var(--amber-color)
+                        from: 960
+                        to: 1440
+                      - color: var(--orange-color)
+                        from: 1440
+                        to: 1920
+                      - color: var(--red-color)
+                        from: 1920
+                        to: 2400
+                  - entity: sensor.emporiavue_sub_living_room_power
+                    name: Living Room
+                    icon: mdi:sofa-single
+                  - entity: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_power
+                    name: Theater, Family Outlets/Basement Lighting
+                    icon: mdi:theater
         column_span: 2
       - type: grid
         cards:
@@ -15782,70 +15979,82 @@ views:
             title: Measurements
             layout_options:
               grid_columns: full
-          - type: custom:mushroom-title-card
-            subtitle: Main
-          - type: custom:mushroom-title-card
-            subtitle: Sub
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_main_phase_a_voltage
-            primary_info: state
-            secondary_info: name
-            name: Phase A voltage
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_main_phase_b_voltage
-            primary_info: state
-            secondary_info: name
-            name: Phase B voltage
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_sub_phase_a_voltage
-            primary_info: state
-            secondary_info: name
-            name: Phase A voltage
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_sub_phase_b_voltage
-            primary_info: state
-            secondary_info: name
-            name: Phase B voltage
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_main_phase_a_current
-            primary_info: state
-            secondary_info: name
-            name: Phase A current
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_main_phase_b_current
-            primary_info: state
-            secondary_info: name
-            name: Phase B current
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_sub_phase_a_current
-            primary_info: state
-            secondary_info: name
-            name: Phase A current
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_sub_phase_b_current
-            primary_info: state
-            secondary_info: name
-            name: Phase B current
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_main_phase_a_frequency
-            primary_info: state
-            secondary_info: name
-            name: Phase A frequency
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_main_phase_b_phase_angle
-            primary_info: state
-            secondary_info: name
-            name: Phase B phase
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_sub_phase_a_frequency
-            primary_info: state
-            secondary_info: name
-            name: Phase A frequency
-          - type: custom:mushroom-entity-card
-            entity: sensor.emporiavue_sub_phase_b_phase_angle
-            primary_info: state
-            secondary_info: name
-            name: Phase B phase
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                subtitle: Main
+              - type: grid
+                square: false
+                columns: 2
+                cards:
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_main_phase_a_voltage
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase A voltage
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_main_phase_b_voltage
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase B voltage
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_main_phase_a_current
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase A current
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_main_phase_b_current
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase B current
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_main_phase_a_frequency
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase A frequency
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_main_phase_b_phase_angle
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase B phase
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                subtitle: Sub
+              - type: grid
+                square: false
+                columns: 2
+                cards:
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_sub_phase_a_voltage
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase A voltage
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_sub_phase_b_voltage
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase B voltage
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_sub_phase_a_current
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase A current
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_sub_phase_b_current
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase B current
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_sub_phase_a_frequency
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase A frequency
+                  - type: custom:mushroom-entity-card
+                    entity: sensor.emporiavue_sub_phase_b_phase_angle
+                    primary_info: state
+                    secondary_info: name
+                    name: Phase B phase
         column_span: 2
     dense_section_placement: true
     cards: []
