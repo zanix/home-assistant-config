@@ -326,7 +326,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.12]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.14]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -386,7 +386,7 @@ Home Assistant integration for Nintendo Switch Parental Controls
 
 Authors: [@pantherale0](https://github.com/pantherale0).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.3.8]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.4.0]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -574,7 +574,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.3]
+### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.4]
 
 A Material You and Google Home app influenced theme for Home Assistant
 
@@ -671,7 +671,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 <details><summary>501 Automations</summary>
 
-> [!NOTE]
 > Keymaster automations are hidden
 
 - ⏯ Ensure PiPup is Running
