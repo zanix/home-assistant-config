@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3604 |
-| Sensors        | 1144 |
-| Binary Sensors | 283 |
-| Lights         | 64 |
-| Switches       | 158 |
+| All Entities   | 3653 |
+| Sensors        | 1170 |
+| Binary Sensors | 290 |
+| Lights         | 66 |
+| Switches       | 159 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -666,19 +666,22 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 ## Automations
 
+> [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
 <details><summary>501 Automations</summary>
 
+> [!NOTE]
 > Keymaster automations are hidden
 
 - ⏯ Ensure PiPup is Running
-- ⏯ Family Room Media Auto Off 🚫
+- ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode 🚫
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode
-- ⏯ Main Bedroom Media Auto Off 🚫
+- ⏯ Living Room Sound Night Mode
+- ⏯ Main Bedroom Media Auto Off
 - ⏯ PS4 Harmony Activity 🚫
 - ⏯️ Samsung Soundbar Night Mode
 - ⏯️ Samsung Soundbar Voice Enhancer
@@ -754,7 +757,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📅 Grow Light On/Off 🚫
 - 📅 Living Room Fan On/Off
 - 📅 Main Bedroom Fan On/Off
-- 📋 [Controller] Hue Dimmer Remote 🚫
+- 📋 [Controller] Hue Dimmer Remote
 - 📋 [Controller] Ikea Remote Main Bedroom
 - 📋 [Inovelli] Amy Office Switch
 - 📋 [Inovelli] Emma Switch
@@ -762,7 +765,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📋 [Inovelli] Family Room Switch
 - 📋 [Inovelli] Garage Switch
 - 📋 [Inovelli] Joshua Office Switch
-- 📋 [Inovelli] Kitchen Switch 🚫
 - 📋 [Inovelli] Living Room Switch
 - 📋 [Inovelli] Main Bedroom Switch
 - 📦 Clear Packages Out for Delivery
@@ -770,8 +772,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📦 Packages Delivered
 - 📦 Packages Out for Delivery
 - 📦 Update USPS Mail Camera
-- 📱 MagicMirror Brightness on Lights On/Off 🚫
-- 📱 MagicMirror Dim at Sunset 🚫
+- 📱 MagicMirror Brightness on Lights On/Off
+- 📱 MagicMirror Dim at Sunset
 - 📱 MagicMirror On/Off Presence
 - 📱 MagicMirror On/Off Schedule
 - 🔒 Door Lock Jammed

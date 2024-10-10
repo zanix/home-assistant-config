@@ -832,21 +832,21 @@
 - id: '1665686715952'
   alias: "\U0001F4A1 Turn Lights On when Arrive"
   description: Turns lights on when someone arrives home after sunset
-  trigger:
-  - platform: state
-    entity_id: group.people
+  triggers:
+  - entity_id: group.people
     from: not_home
     to: home
     for:
       minutes: 1
-  condition:
+    trigger: state
+  conditions:
   - condition: sun
     after: sunset
     after_offset: -0:30:00
   - condition: time
     before: '23:59:59'
     after: 00:00:00
-  action:
+  actions:
   - parallel:
     - entity_id: light.mud_room
       action: light.turn_on
@@ -854,10 +854,11 @@
       data:
         brightness: 255
       action: light.turn_on
-    - entity_id: light.kitchen
-      data:
+    - data:
         brightness: 255
       action: light.turn_on
+      target:
+        entity_id: light.dining_room
     - data:
         who: parents
         title: Lights On
@@ -2909,19 +2910,19 @@
     path: EPMatt/philips_324131092621.yaml
     input:
       integration: Zigbee2MQTT
-      controller_entity: sensor.hue_dimmer_remote_action
+      controller_entity: sensor.hue_remote_joshua_office_action
       helper_last_controller_event: input_text.hue_dimmer_remote_event
       helper_double_press_delay: 400
       action_button_on_short:
       - data: {}
         target:
           entity_id: light.wled_joshua_office_desk
-        action: homeassistant.turn_on
+        action: light.turn_on
       action_button_off_short:
       - data: {}
         target:
           entity_id: light.wled_joshua_office_desk
-        action: homeassistant.turn_off
+        action: light.turn_off
       action_button_up_short:
       - data: {}
         target:
@@ -3090,7 +3091,7 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: sensor.garage_action
-      config_single:
+      config_double:
       - parallel:
         - data:
             color: Yellow
@@ -3150,31 +3151,6 @@
         target:
           entity_id: automation.garage_light_switch_status
         action: automation.trigger
-      up_triple:
-      - parallel:
-        - data:
-            color: Yellow
-            effect: Chase
-            level: 40
-            duration: 3 Seconds
-            target:
-              entity_id: light.garage
-          action: script.inovelli_blue_led
-        - enabled: false
-          target:
-            entity_id:
-            - light.living_room
-            - light.kitchen
-          data:
-            brightness: 255
-          action: light.turn_on
-      - delay:
-          seconds: 3
-      - data:
-          skip_condition: true
-        target:
-          entity_id: automation.garage_light_switch_status
-        action: automation.trigger
       down_triple:
       - parallel:
         - data:
@@ -3196,13 +3172,12 @@
         target:
           entity_id: automation.garage_light_switch_status
         action: automation.trigger
-- id: '1667779560311'
-  alias: "\U0001F4CB [Inovelli] Kitchen Switch"
-  description: Custom button actions for the Inovelli switch
-  use_blueprint:
-    path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
-    input:
-      switch: sensor.kitchen_action
+      config_single:
+      - action: light.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.garage_door_light
 - id: '1667779650555'
   alias: "\U0001F4CB [Inovelli] Living Room Switch"
   description: Custom button actions for the Inovelli switch
@@ -4405,13 +4380,13 @@
 - id: '1706291631355'
   alias: "\U0001F431 Cat Feeder Empty Notification"
   description: Sends a notification when the Cat feeder is nearly empty
-  trigger:
-  - platform: numeric_state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.cat_feeder_total_weight
-    above: 1440
-  condition: []
-  action:
+    above: 1400
+    trigger: numeric_state
+  conditions: []
+  actions:
   - parallel:
     - metadata: {}
       data:
@@ -5195,34 +5170,34 @@
 - id: '1725915027719'
   alias: ⚡ Tariff Changes
   description: Sets the current tariff and sends a notification.
-  trigger:
-  - platform: numeric_state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.emporiavue_main_total_monthly
     below: 800
     id: tier_1
-  - platform: numeric_state
-    entity_id:
+    trigger: numeric_state
+  - entity_id:
     - sensor.emporiavue_main_total_monthly
     above: 800
     below: 2000
     id: tier_2
-  - platform: numeric_state
-    entity_id:
+    trigger: numeric_state
+  - entity_id:
     - sensor.emporiavue_main_total_monthly
     above: 2000
     id: tier_3
-  - platform: state
-    entity_id:
+    trigger: numeric_state
+  - entity_id:
     - binary_sensor.tariff_summer
     to:
     id: season
-  condition:
+    trigger: state
+  conditions:
   - condition: template
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
       none, null] and not trigger.to_state.state in ["unknown", "unavailable", none,
       null] }}'
-  action:
+  actions:
   - variables:
       season: '{{ iif(is_state("binary_sensor.tariff_summer", "on"), "summer", "winter")
         }}'
@@ -5233,7 +5208,7 @@
         [\"over 2000\", \"winter tier 3\"],\n} }}\n"
       tariff: "{% if trigger.id == \"season\" and has_value(\"select.monthly_energy\")
         %}\n  {{ season }}_tier_{{ states(\"select.monthly_energy\").split(\"_\")[2]
-        }}\n{% else %}\n  {{ season }}_{{ trigger.id }}\"\n{% endif %}\n"
+        }}\n{% else %}\n  {{ season }}_{{ trigger.id }}\n{% endif %}\n"
       message: Power usage is {{ map[tariff][0] }} kWh. Now charing {{ map[tariff][1]
         }} rates.
   - action: select.select_option
@@ -5259,3 +5234,41 @@
       title: Energy Tariff Changed
       message: '{{ message }}'
   mode: single
+- id: '1728402022145'
+  alias: ⏯ Living Room Sound Night Mode
+  description: Changes the soundbar night mode
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.samsung_soundbar_night_mode
+    to: 'on'
+    id: 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.samsung_soundbar_night_mode
+    to: 'off'
+    id: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - 'on'
+      sequence:
+      - action: input_boolean.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: input_boolean.samsung_soundbar_night_mode
+    - conditions:
+      - condition: trigger
+        id:
+        - 'off'
+      sequence:
+      - action: input_boolean.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: input_boolean.samsung_soundbar_night_mode
+  mode: restart
