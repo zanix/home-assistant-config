@@ -2126,21 +2126,32 @@
         data: {}
   mode: restart
 - id: '1665696446379'
-  alias: ⚙️ Event Sniffer [Actionable Event]
-  description: Listen for Actionable events
-  trigger:
-  - platform: event
-    event_type: mobile_app_notification_action
-  - platform: event
-    event_type: hass_agent_notifications
-  condition: []
-  action:
+  alias: ⚙️ Event Sniffer
+  description: Listen for events and output data
+  triggers:
+  - event_type: mobile_app_notification_action
+    trigger: event
+    enabled: false
+  - event_type: hass_agent_notifications
+    trigger: event
+    enabled: false
+  - event_type: dreame_vacuum_task_status
+    trigger: event
+  - event_type: dreame_vacuum_consumable
+    trigger: event
+  - event_type: dreame_vacuum_information
+    trigger: event
+  - event_type: dreame_vacuum_warning
+    trigger: event
+  - event_type: dreame_vacuum_error
+    trigger: event
+  conditions: []
+  actions:
   - data:
       title: Actionable Event Sniffer
-      message: '{{ trigger.event.data | default("") }}'
+      message: '{{ trigger.event.data | to_json }}'
     action: persistent_notification.create
   mode: parallel
-  initial_state: false
 - id: '1665696464819'
   alias: ⚙️ Battery Level Low
   description: Sends a notification when a device battery level is low
@@ -2372,11 +2383,11 @@
 - id: '1665696596579'
   alias: ⚙️ Startup
   description: Actions to run at startup
-  trigger:
-  - platform: homeassistant
-    event: start
-  condition: []
-  action:
+  triggers:
+  - event: start
+    trigger: homeassistant
+  conditions: []
+  actions:
   - data:
       message: Startup automation starting...
     action: browser_mod.notification
@@ -2385,9 +2396,10 @@
   - data: {}
     target:
       device_id:
-      - 046ad4016aea54916dd414935e0008da
-      - fd4ff1a9970156bb319e4d85d4450657
       - 1dee4aa37e70d346348224829cd7c84f
+      - fd4ff1a9970156bb319e4d85d4450657
+      - c72e54dada7a18b12e5d2a42cd2a94ab
+      - 49d046eb766685131c0c5deb9f0d2250
     action: homeassistant.reload_config_entry
   - data:
       entity:
@@ -2416,18 +2428,24 @@
 - id: '1665696688106'
   alias: ⚙️ Event Sniffer [Z-Wave JS]
   description: Listen for Z-Wave JS events
-  trigger:
-  - platform: event
-    event_type: zwave_js_value_notification
+  triggers:
+  - event_type: zwave_js_value_notification
     alias: When Central Scene event is fired
-  - platform: event
-    event_type: zwave_js_notification
+    trigger: event
+  - event_type: zwave_js_notification
     alias: When Notification Command Class, Entry Control Command Class is fired
-  condition:
+    trigger: event
+  conditions:
   - condition: template
     value_template: '{{ event_label.endswith("lock operation") == False }}'
     alias: 'Ignore events already identified: Manual deadbolt operation'
-  action:
+  actions:
+  - variables:
+      event_data: '{{ trigger.event.data | default("") }}'
+      event_type: '{{ trigger.event.event_type | default("") }}'
+      event_label: '{{ event_data.event_label | default("") }}'
+      notification_label: '{{ event_data.label | default("") }}'
+      node_id: '{{ event_data.node_id | default("") }}'
   - data:
       title: ZWaveJS Event Sniffer
       message: 'event_type: {{ event_type }}
@@ -2442,12 +2460,6 @@
     action: persistent_notification.create
   mode: parallel
   initial_state: false
-  variables:
-    event_data: '{{ trigger.event.data | default("") }}'
-    event_type: '{{ trigger.event.event_type | default("") }}'
-    event_label: '{{ event_data.event_label | default("") }}'
-    notification_label: '{{ event_data.label | default("") }}'
-    node_id: '{{ event_data.node_id | default("") }}'
 - id: '1665696751056'
   alias: ⚙️ Action Sniffer [Zigbee]
   description: Listen for Zigbee actions
@@ -2903,36 +2915,6 @@
       - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
-- id: '1665723292840'
-  alias: "\U0001F4CB [Controller] Hue Dimmer Remote"
-  description: ''
-  use_blueprint:
-    path: EPMatt/philips_324131092621.yaml
-    input:
-      integration: Zigbee2MQTT
-      controller_entity: sensor.hue_remote_joshua_office_action
-      helper_last_controller_event: input_text.hue_dimmer_remote_event
-      helper_double_press_delay: 400
-      action_button_on_short:
-      - data: {}
-        target:
-          entity_id: light.wled_joshua_office_desk
-        action: light.turn_on
-      action_button_off_short:
-      - data: {}
-        target:
-          entity_id: light.wled_joshua_office_desk
-        action: light.turn_off
-      action_button_up_short:
-      - data: {}
-        target:
-          entity_id: switch.joshua_office_shelf_led
-        action: switch.turn_on
-      action_button_down_short:
-      - data: {}
-        target:
-          entity_id: switch.joshua_office_shelf_led
-        action: switch.turn_off
 - id: '1665723372482'
   alias: "\U0001F4CB [Controller] Ikea Remote Main Bedroom"
   description: ''
@@ -4142,17 +4124,17 @@
 - id: '1699834405375'
   alias: "\U0001F4C5 Main Bedroom Fan On/Off"
   description: ''
-  trigger:
-  - platform: state
-    entity_id: schedule.main_bedroom_fan
+  triggers:
+  - entity_id: schedule.main_bedroom_fan
     id: 'on'
     to: 'on'
-  - platform: state
-    entity_id: schedule.main_bedroom_fan
+    trigger: state
+  - entity_id: schedule.main_bedroom_fan
     id: 'off'
     to: 'off'
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -4167,11 +4149,11 @@
       - condition: trigger
         id: 'off'
       sequence:
-      - action: fan.turn_on
+      - action: fan.turn_off
         target:
-          entity_id: fan.main_bedroom_ceiling
-        data:
-          percentage: 33
+          entity_id:
+          - fan.main_bedroom_ceiling
+        data: {}
   mode: single
 - id: '1702017706466'
   alias: ⚙️ Scan Interval
@@ -4623,11 +4605,11 @@
   alias: ⚙️ Reload Addons and Integrations
   description: Reload AddOns and Integrations since they don't work after Home Assistant
     is restarted.
-  trigger:
-  - platform: homeassistant
-    event: start
-  condition: []
-  action:
+  triggers:
+  - event: start
+    trigger: homeassistant
+  conditions: []
+  actions:
   - metadata: {}
     data:
       addon: 45df7312_zigbee2mqtt
@@ -4639,7 +4621,7 @@
       device_id:
       - 1dee4aa37e70d346348224829cd7c84f
       - fd4ff1a9970156bb319e4d85d4450657
-      - 046ad4016aea54916dd414935e0008da
+      - c72e54dada7a18b12e5d2a42cd2a94ab
       - 49d046eb766685131c0c5deb9f0d2250
   mode: single
 - id: '1713385133443'
@@ -5233,6 +5215,43 @@
       title: Energy Tariff Changed
       message: '{{ message }}'
   mode: single
+- id: '1727824341800'
+  alias: "\U0001F557 Main Bedroom Ceiling Fan Default Light Status"
+  description: Adjusts the Main Bedroom ceiling fan light status based on the time
+    of day.
+  trigger:
+  - platform: time
+    at: '20:00:00'
+    id: dim
+  - platform: time
+    at: 04:00:00
+    id: bright
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - dim
+      sequence:
+      - action: script.inovelli_blue_led_set_defaults
+        metadata: {}
+        data:
+          entity_id:
+          - fan.main_bedroom_ceiling
+          color_on: Red
+    - conditions:
+      - condition: trigger
+        id:
+        - bright
+      sequence:
+      - action: script.inovelli_blue_led_set_defaults
+        metadata: {}
+        data:
+          entity_id:
+          - fan.main_bedroom_ceiling
+          color_on: Green
+  mode: single
 - id: '1728402022145'
   alias: ⏯ Living Room Sound Night Mode
   description: Changes the soundbar night mode
@@ -5271,3 +5290,59 @@
         target:
           entity_id: input_boolean.samsung_soundbar_night_mode
   mode: restart
+- id: '1728622562146'
+  alias: "\U0001F4A1 School Departure Light Indicator"
+  description: Changes some light colors when it's time to go school.
+  triggers:
+  - at: 07:15:00
+    trigger: time
+  conditions:
+  - condition: state
+    entity_id: cover.garage_door
+    state: closed
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: 'on'
+  actions:
+  - data:
+      rgb_color:
+      - 255
+      - 255
+      - 0
+      brightness_pct: 100
+    action: light.turn_on
+    target:
+      entity_id: light.kitchen_island
+  - delay:
+      minutes: 5
+  - data:
+      rgb_color:
+      - 255
+      - 0
+      - 0
+    action: light.turn_on
+    target:
+      entity_id: light.kitchen_island
+  - wait_for_trigger:
+    - trigger: state
+      entity_id:
+      - cover.garage_door
+      from: open
+      to: closed
+    timeout:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - action: light.turn_on
+    metadata: {}
+    data:
+      kelvin: 3000
+    target:
+      entity_id: light.kitchen_island
+  - action: light.turn_on
+    metadata: {}
+    data:
+      flash: short
+    target:
+      entity_id: light.kitchen_island

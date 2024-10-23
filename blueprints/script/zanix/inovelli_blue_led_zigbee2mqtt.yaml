@@ -3,7 +3,7 @@ blueprint:
   description: |
     Set LED effects for Inovelli Blue Series Switches using Zigbee2MQTT.
 
-    ℹ️ Version: 2024.8.0
+    ℹ️ Version: 2024.10.0
 
     To update this blueprint, read [Re-importing a blueprint](https://www.home-assistant.io/docs/automation/using_blueprints/#re-importing-a-blueprint)
 
@@ -388,6 +388,27 @@ variables:
       {% endif %}
       {# Detect switches #}
       {% for label in labels.labels %}
+        {# Parse areas #}
+        {% for area in label_areas(label) %}
+            {% for ent in area_entities(area) %}
+              {% for model in models %}
+                {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+                  {% set switch.entities = switch.entities + [ent|string|trim] %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+        {% endfor %}
+        {# Parse devices #}
+        {% for device in label_devices(label) %}
+          {% for ent in device_entities(device) %}
+            {% for model in models %}
+              {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
+                {% set switch.entities = switch.entities + [ent|string|trim] %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+        {# Parse entities #}
         {% for ent in label_entities(label) %}
           {% for model in models %}
             {% if model in device_attr(ent, 'model') | default('', true) and ent.split('.')[0] in domains %}
@@ -630,7 +651,7 @@ sequence:
           service: mqtt.publish
           data:
             topic: '{{ command_path }}'
-            payload: "{{ payload }}"
+            payload: '{{ payload }}'
 
 icon: mdi:led-on
 mode: parallel

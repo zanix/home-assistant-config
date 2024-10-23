@@ -674,7 +674,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>501 Automations</summary>
+<details><summary>502 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -702,7 +702,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ⚙️ Battery Level Low
 - ⚙️ Clear TTS Cache 🚫
 - ⚙️ Disk Space Low
-- ⚙️ Event Sniffer [Actionable Event] 🚫
+- ⚙️ Event Sniffer 🚫
 - ⚙️ Event Sniffer [Z-Wave JS] 🚫
 - ⚙️ Failed Login
 - ⚙️ Offline Devices
@@ -732,6 +732,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps on/off
+- 💡 School Departure Light Indicator
 - 💡 Turn Lights On when Arrive
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
@@ -761,7 +762,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 📅 Grow Light On/Off 🚫
 - 📅 Living Room Fan On/Off
 - 📅 Main Bedroom Fan On/Off
-- 📋 [Controller] Hue Dimmer Remote
 - 📋 [Controller] Ikea Remote Main Bedroom
 - 📋 [Inovelli] Amy Office Switch
 - 📋 [Inovelli] Emma Switch
@@ -786,13 +786,14 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🔔 Doorbell Ring
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
+- 🕗 Main Bedroom Ceiling Fan Default Light Status
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Quest] Charge Complete
 - 🖥️ [Quest] Interactive
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
-- 🗺️ Arriving Home
+- 🗺️ Arriving Home 🚫
 - 🗺️ Leaving Zone
 - 🚦 Amy Office Light Switch Status
 - 🚦 Emma Light Switch Status
