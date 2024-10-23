@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3653 |
-| Sensors        | 1170 |
-| Binary Sensors | 290 |
+| All Entities   | 3975 |
+| Sensors        | 1218 |
+| Binary Sensors | 312 |
 | Lights         | 66 |
-| Switches       | 159 |
+| Switches       | 206 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -252,10 +252,6 @@ The uptime integration provides a sensor that stores the timestamp (date and tim
 
 The Utility Meter integration provides functionality to track consumptions of various utilities (e.g., energy, gas, water, heating)
 
-### [Version](https://www.home-assistant.io/integrations/version)
-
-The Version integration can display the current Home Assistant Core versions
-
 ### [Vizio SmartCast](https://www.home-assistant.io/integrations/vizio)
 
 The vizio integration allows you to control SmartCast-compatible TVs and sound bars
@@ -292,7 +288,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.22]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.23]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -326,7 +322,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.14]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.15]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -368,7 +364,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.27.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.27.2]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -392,7 +388,7 @@ OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
-### [Samsung Soundbar](https://github.com/samuelspagl/ha_samsung_soundbar) [v0.4.0]
+### [Samsung Soundbar](https://github.com/samuelspagl/ha_samsung_soundbar) [v0.4.1]
 
 YASSI (Yet another Samsung Soundbar integration) is a HomeAssistant integration for Samsung Soundbars.
 
@@ -410,7 +406,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.6.1]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.6.3]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -422,7 +418,7 @@ Home Assistant custom integration to keep track of missing entities and services
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
-### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.5.2]
+### [Webrtc Camera](https://github.com/AlexxIT/WebRTC) [v3.6.0]
 
 Home Assistant custom component for real-time viewing of almost any camera stream using WebRTC and other technologies.
 
@@ -450,7 +446,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0-beta.2]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0-beta.3]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -470,7 +466,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🧹 Declutter your lovelace configuration with the help of this card
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.2.1]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.2.2]
 
 Expander card for HomeAssistant
 
@@ -494,11 +490,11 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.2.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.4.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.2.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.3.1]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -570,7 +566,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 </details><details><summary>3 Themes</summary>
 
-### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-3.0.0]
+### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-3.0.1]
 
 LCARS theme for Home Assistant
 
@@ -602,6 +598,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [Inovelli LZW30-SN Red Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-sn-spec-sheet)
 - [Inovelli VZM31-SN Blue Series Smart 2-1 Switch](https://inovelli.com/products/blue-series-smart-2-1-switch-on-off-or-dimmer)
 - [Philips Hue White Ambiance](https://www.amazon.com/dp/B0753H5GKN)
+- [Sengled Zigbee Bulb](https://www.amazon.com/dp/B07HL5GPPF)
+- [Sengled Zigbee Smart Light Bulbs BR30](https://www.amazon.com/dp/B08R5FWMCW)
 - [Tuya Star Projector](https://solution.tuya.com/projects/CMamw6tl7mwgzm) - Light and laser projector, [hacked](https://github.com/seberm/esphome-SK20-Nebula-Light/tree/master) with [Tuya Cloudcutter](https://github.com/tuya-cloudcutter/tuya-cloudcutter)
 - [WLED](https://github.com/Aircoookie/WLED) - DIY light strip
 - [Zooz ZEN71 On-Off Switch](https://www.getzooz.com/zooz-zen71-on-off-switch/)
@@ -613,9 +611,12 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
 - [Emporia Vue 3](https://www.amazon.com/gp/product/B0C79PNK84) - Real Time Electricity Monitor/Meter
-  flashed for local data with [custom firmware](https://gist.github.com/flaviut/93a1212c7b165c7674693a45ad52c512)
+  flashed for local data with [custom firmware](https://github.com/emporia-vue-local/esphome)
 - [ESPHome](https://esphome.io) - DIY devices
-- [Zooz 700 Series Z-Wave Plus 4-in-1 Sensor ZSE40](https://www.amazon.com/dp/B01AKSO80O)
+- [THIRDREALITY Zigbee Motion Sensor](https://www.amazon.com/dp/B09MVKWBFF)
+- [THIRDREALITY Zigbee Temperature and Humidity Sensor](https://www.amazon.com/dp/B0BF9W3WMK)
+- [THIRDREALITY Zigbee Temperature and Humidity Sensor Lite](https://www.amazon.com/dp/B0D2NVJTS3)
+- [Zooz Z-Wave Long Range Q Sensor ZSE11](https://www.amazon.com/dp/B09GDL6BGY)
 
 ### Switch
 
@@ -629,6 +630,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 ### Camera
 
 - [Reolink Doorbell](https://www.amazon.com/gp/product/B0B7S3JSG7)
+- [Tapo C110 2K Camera](https://www.amazon.com/dp/B09YL5G1Y8)
 - [Tapo C210 2K Pan/Tilt Camera](https://www.amazon.com/dp/B09Y8TLP25)
 
 ### Media
@@ -637,9 +639,11 @@ A Material You and Google Home app influenced theme for Home Assistant
 - [Google Home Mini](https://store.google.com/us/product/google_nest_mini)
 - [Harmony Hub](https://www.logitech.com/en-us/products/harmony/harmony-hub.html)
 - [MagicMirror](https://magicmirror.builders)
+- [Nintendo Switch](https://www.amazon.com/dp/B0BFJWCYTL)
 - [nVidia Shield](https://www.nvidia.com/en-us/shield/) (2015, 2017, and 2019 versions)
 - [PlayStation 4 Pro](https://www.amazon.com/dp/B07K14XKZH)
 - [Plex](https://plex.tv)
+- [Samsung HW-Q990C 11.1.4ch Soundbar](https://www.amazon.com/dp/B0BZK3SRR7)
 - [Vizio P-Series Quantum](https://www.vizio.com/en/tv/p-series-quantum)
 - [Vizio P-Series Quantum X](https://www.vizio.com/en/tv/p-series-quantum-x)
 
@@ -661,6 +665,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 - [Aqara Pet Feeder C1](https://www.amazon.com/dp/B0B9XZ96PH) - Zigbee controlled pet feeder
 - [Bambu Lab P1S](https://us.store.bambulab.com/products/p1s) - 3D printer
+- [Dreame L10s Pro Ultra Heat](https://www.amazon.com/gp/product/B0CVL2TT74)
 - [OpenSprinkler](https://opensprinkler.com) - Automate and access sprinklers from anywhere
 - [Ratgdo](https://paulwieland.github.io/ratgdo/) - WiFi control board for Chamberlain or Liftmaster garage door openers
 
@@ -803,12 +808,6 @@ A Material You and Google Home app influenced theme for Home Assistant
 
 </details>
 
-## Things to Consider Buying
-
-- [433Mhz Transmitter and receiver](https://www.amazon.com/dp/B00M2CUALS) - For 433Mhz based devices
-- LED RGB [Wifi Controller](https://www.amazon.com/dp/B01JZ2SI6Q) flux_led compatible with [LED Strip kits](https://www.amazon.com/dp/B01CUILC3I) - ~100 Feet
-- [First Alert 2-in-1 Z-Wave Wireless Smoke Detector & Carbon Monoxide Alarm](https://www.amazon.com/gp/product/B00KMHXFAI)
-
 ## Todo List
 
 See the [issue queue](https://github.com/zanix/home-assistant-config/issues).
@@ -824,7 +823,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2024.10.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2024.10.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
