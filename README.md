@@ -32,8 +32,8 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3975 |
-| Sensors        | 1218 |
+| All Entities   | 3977 |
+| Sensors        | 1220 |
 | Binary Sensors | 312 |
 | Lights         | 66 |
 | Switches       | 206 |
@@ -288,7 +288,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.23]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.24]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -526,7 +526,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.4.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.5.0]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -570,7 +570,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.4]
+### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.6]
 
 A Material You and Google Home app influenced theme for Home Assistant
 
