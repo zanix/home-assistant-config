@@ -16,8 +16,6 @@ decluttering_templates:
               - webrtc
               - mse
             stream: '[[stream]]'
-      dimensions:
-        aspect_ratio_mode: dynamic
       menu:
         style: outside
         buttons:
@@ -46,13 +44,18 @@ decluttering_templates:
       live:
         draggable: false
         auto_unmute: all
+        lazy_unload: all
         preload: true
+        controls:
+          builtin: false
+      media_viewer:
+        transition_effect: slide
       timeline:
         controls:
           thumbnails:
             mode: below
-      media_viewer:
-        transition_effect: slide
+      dimensions:
+        aspect_ratio_mode: dynamic
       performance:
         profile: high
 
@@ -218,29 +221,32 @@ views:
             - name: Lights
               entities:
                 - light.living_room
+                - light.living_room_fan_light
                 - light.front_entry
                 - light.mud_room
+                - light.cold_storage
                 - light.living_room_floor_lamp
                 - light.living_room_lamp
                 - light.kitchen
                 - light.dining_room
                 - light.hallway
+                - light.basement_hallway
                 - light.family_room
                 - light.family_room_lamp
                 - light.stairway
                 - light.joshua_office_shelf_led
                 # - light.theater_room
                 - light.main_bedroom
+                - light.main_bedroom_fan_light
                 - light.main_bedroom_floor_lamp
                 - light.ethan_bedroom
                 - light.emma_bedroom
-                - light.amy_office
                 - light.garage
                 - light.eve
                 - light.outside_entry
-                - light.outside_garage
                 - light.outside_side
                 - light.outside_back
+                - light.joshua_office
               tap_action:
                 service: homeassistant.toggle
               state_action:
@@ -249,9 +255,11 @@ views:
 
             - name: Color Lights
               entities:
-                - light.joshua_office
+                - light.kitchen_island
+                - light.amy_office
                 - light.joshua_office_lamp
                 - light.wled_joshua_office_desk
+                - light.outside_garage
               tap_action:
                 service: homeassistant.toggle
               state_action:
@@ -260,6 +268,7 @@ views:
                   >
                   var elements = [
                     `${entity.entity_id}`,
+                    `${entity.entity_id} *`,
                   ];
 
                   var color = 'rgb(88, 89, 89)';
@@ -287,6 +296,7 @@ views:
                 - binary_sensor.sliding_door_contact
                 - binary_sensor.garage_entry_window_door_is_open
                 - binary_sensor.garage_side_door_contact
+                - binary_sensor.cold_storage_contact_contact
                 # - binary_sensor.entry_closet_door_is_open
                 # - binary_sensor.laundry_door_is_open
                 # - binary_sensor.main_bathroom_door_is_open
@@ -354,7 +364,7 @@ views:
                 service_data: |
                   >
                   var floorplan = element.dataset.floorplan;
-                  var state = ["Open", "Closing"].includes(entity.state) ? "open" : "closed";
+                  var state = ["Open", "Opening", "Closing"].includes(entity.state) ? "open" : "closed";
                   return `${floorplan} ${state}`;
 
             - name: Leak Sensors
@@ -458,6 +468,7 @@ views:
                 - media_player.cast_living_room_speaker
                 - media_player.cast_family_room_speaker
                 - media_player.cast_office_speaker
+                - media_player.samsung_soundbar
                 - media_player.denon_avr_s760h
                 - media_player.yamaha_rx_v679
               state_action:
@@ -485,8 +496,10 @@ views:
                 - sensor.main_bedroom_temperature
                 - sensor.emma_bedroom_temperature
                 - sensor.ethan_bedroom_temperature
+                - sensor.theater_room_temperature
                 - sensor.amy_office_temperature
                 - sensor.joshua_office_temperature
+                - sensor.cold_storage_temperature
                 - sensor.garage_multisensor_air_temperature
                 - sensor.water_main_valve_air_temperature
               state_action:
@@ -506,6 +519,23 @@ views:
                       return "temp-very-high-background";
 
             # Cameras
+            - entity: camera.livingroom
+              state_action:
+                service: floorplan.class_set
+                service_data: '${(entity.state === "recording") ? "camera-recording" : ""}'
+              tap_action:
+                action: fire-dom-event
+                browser_mod:
+                  service: browser_mod.popup
+                  data:
+                    title: Living Room
+                    size: fullscreen
+                    content:
+                      type: custom:decluttering-card
+                      template: camera_card
+                      variables:
+                        - camera: camera.livingroom
+                        - stream: livingroom
             - entity: camera.family_room
               state_action:
                 service: floorplan.class_set
