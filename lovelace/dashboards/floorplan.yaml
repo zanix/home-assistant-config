@@ -67,8 +67,8 @@ views:
       - type: custom:floorplan-card
         full_height: true
         config:
-          image: /local/floorplan/floorplan.svg?v=1.1.14
-          stylesheet: /local/floorplan/floorplan.css?v=1.1.14
+          image: /local/floorplan/floorplan.svg?v=2.0.0
+          stylesheet: /local/floorplan/floorplan.css?v=2.0.0
 
           defaults:
             hover_action: hover-info
@@ -256,6 +256,8 @@ views:
             - name: Color Lights
               entities:
                 - light.kitchen_island
+                - light.nebula_projector_ethan_light
+                - light.nebula_projector_emma_light
                 - light.amy_office
                 - light.joshua_office_lamp
                 - light.wled_joshua_office_desk
@@ -410,6 +412,7 @@ views:
                 - binary_sensor.ecobee_occupancy
                 - binary_sensor.kitchen_occupancy
                 - binary_sensor.family_room_occupancy
+                - binary_sensor.theater_room_motion
                 - binary_sensor.main_bedroom_occupancy
                 - binary_sensor.emma_bedroom_occupancy
                 - binary_sensor.ethan_bedroom_occupancy
@@ -494,6 +497,7 @@ views:
                 - sensor.kitchen_temperature
                 - sensor.family_room_temperature
                 - sensor.main_bedroom_temperature
+                - sensor.main_bathroom_sensor_temperature
                 - sensor.emma_bedroom_temperature
                 - sensor.ethan_bedroom_temperature
                 - sensor.theater_room_temperature
@@ -517,6 +521,25 @@ views:
                       return "temp-average-background";
                     else
                       return "temp-very-high-background";
+
+            - name: Robot Vac
+              entities:
+                - vacuum.r2dee2
+                - vacuum.dustin_mopman
+              state_action:
+                service: floorplan.class_set
+                service_data: |
+                  >
+                  if (entity.state == "cleaning")
+                    return "vacuum-on";
+                  else if (entity.state == "charging")
+                    return "vacuum-charging";
+                  else if (entity.state == "paused")
+                    return "vacuum-paused";
+                  else if (entity.state == "return")
+                    return "vacuum-return";
+                  else
+                    return "vacuum-off";
 
             # Cameras
             - entity: camera.livingroom
@@ -587,6 +610,23 @@ views:
                       variables:
                         - camera: camera.doorbell
                         - stream: doorbell
+            - entity: camera.litterbox
+              state_action:
+                service: floorplan.class_set
+                service_data: '${(entity.state === "recording") ? "camera-recording" : ""}'
+              tap_action:
+                action: fire-dom-event
+                browser_mod:
+                  service: browser_mod.popup
+                  data:
+                    title: Litterbox
+                    size: fullscreen
+                    content:
+                      type: custom:decluttering-card
+                      template: camera_card
+                      variables:
+                        - camera: camera.litterbox
+                        - stream: litterbox
             - entity: camera.bambu_p1s_camera
               state_action:
                 service: floorplan.class_set
@@ -595,6 +635,7 @@ views:
             - name: Cars
               entities:
                 - device_tracker.ascent
+                - device_tracker.kona_location
               hover_action: false
               state_action:
                 service: floorplan.class_set
