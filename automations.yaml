@@ -571,37 +571,59 @@
     action: remote.turn_off
   mode: restart
 - id: '1665686040957'
-  alias: "\U0001F9FA Dryer Running"
+  alias: "\U0001F9FA Dryer Notifications"
   description: Actions when the dryer is running and is done
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.emporiavue_main_dryer_power
+  triggers:
+  - entity_id: sensor.emporiavue_main_dryer_power
     for:
       minutes: 1
     above: 100
-  condition: []
-  action:
-  - target:
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - alias: Set start time and start power tracking
+    variables:
+      start_time: '{{ now().timestamp() }}'
+      start_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'')
+        | float }}'
+  - alias: Set dryer active switch on
+    target:
       entity_id: input_boolean.dryer_status
     data: {}
     action: input_boolean.turn_on
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.emporiavue_main_dryer_power
+  - alias: Wait until appliance has finished
+    wait_for_trigger:
+    - entity_id: sensor.emporiavue_main_dryer_power
       below: 100
       for:
-        hours: 0
-        minutes: 0
         seconds: 30
-  - parallel:
-    - target:
-        entity_id: input_boolean.dryer_status
-      data: {}
-      action: input_boolean.turn_off
+      trigger: numeric_state
+  - alias: Set message and stop power tracking
+    variables:
+      end_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'') |
+        float }}'
+      message: 'The dryer is done! {% set kwh = end_power_consumption | float - start_power_consumption
+        | float %} {{''\n''}}Consumption {{kwh | round(2) }}kWh {% set cost = (end_power_consumption
+        | float - start_power_consumption | float) * (states(''sensor.tariff_price'')
+        | float) %} {{''\n''}}Approx Cost ${{cost | round(2) }} {% set end_time =
+        now().timestamp() %} {% set duration = (end_time - start_time) | int %} {%
+        set hours = (duration // 3600) | int %} {% set minutes = ((duration % 3600)
+        // 60) | int %} {% set seconds = (duration % 60) | int %} {{''\n''}}Duration
+        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
+        | format(seconds) }}
+
+        '
+  - alias: Set dryer active switch off
+    target:
+      entity_id: input_boolean.dryer_status
+    data: {}
+    action: input_boolean.turn_off
+  - alias: Send a notification to each device
+    parallel:
     - data:
         who: parents
-        title: Laundry
-        message: The dryer is done!
+        title: Dryer
+        message: '{{ message }}'
         notification_icon: mdi:tumble-dryer
         color: '#ff9800'
         icon_url: local/icons/tumble-dryer.png
@@ -613,53 +635,76 @@
         entity:
         - media_player.erebus
         - media_player.nasya
-        title: Laundry
-        message: The dryer is done!
+        title: Dryer
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Laundry
+        title: Dryer
         message: The dryer is done!
         icon_url: local/icons/tumble-dryer.png
       action: script.notify_pipup
   mode: single
   max_exceeded: silent
 - id: '1665686051361'
-  alias: "\U0001F9FA Washer Running"
+  alias: "\U0001F9FA Washer Notifications"
   description: Actions when the washer is running and is done
-  trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.emporiavue_main_washer_power
+  triggers:
+  - entity_id: sensor.emporiavue_main_washer_power
     for:
       minutes: 1
     above: 40
-  condition: []
-  action:
-  - target:
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - alias: Set start time and start power tracking
+    variables:
+      start_time: '{{ now().timestamp() }}'
+      start_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'')
+        | float }}'
+  - alias: Set washer active switch on
+    target:
       entity_id: input_boolean.washer_status
     data: {}
     action: input_boolean.turn_on
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.emporiavue_main_washer_power
+  - alias: Wait until appliance has finished
+    wait_for_trigger:
+    - entity_id: sensor.emporiavue_main_washer_power
       below: 10
       for:
-        minutes: 1
-  - parallel:
-    - target:
-        entity_id: input_boolean.washer_status
-      data: {}
-      action: input_boolean.turn_off
+        seconds: 30
+      trigger: numeric_state
+  - alias: Set message and stop power tracking
+    variables:
+      end_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'') |
+        float }}'
+      message: 'The washer is done! {% set kwh = end_power_consumption | float - start_power_consumption
+        | float %} {{''\n''}}Consumption {{kwh | round(2) }}kWh {% set cost = (end_power_consumption
+        | float - start_power_consumption | float) * (states(''sensor.tariff_price'')
+        | float) %} {{''\n''}}Approx Cost ${{cost | round(2) }} {% set end_time =
+        now().timestamp() %} {% set duration = (end_time - start_time) | int %} {%
+        set hours = (duration // 3600) | int %} {% set minutes = ((duration % 3600)
+        // 60) | int %} {% set seconds = (duration % 60) | int %} {{''\n''}}Duration
+        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
+        | format(seconds) }}
+
+        '
+  - alias: Set washer active switch off
+    target:
+      entity_id: input_boolean.washer_status
+    data: {}
+    action: input_boolean.turn_off
+  - alias: Send a notification to each device
+    parallel:
     - data:
         who: parents
-        title: Laundry
-        message: The washer is done!
+        title: Washer
+        message: '{{ message }}'
         notification_icon: mdi:washing-machine
-        color: '#2196f3'
+        color: '#ff9800'
         icon_url: local/icons/washing-machine.png
         group: Laundry
         priority: high
@@ -669,15 +714,15 @@
         entity:
         - media_player.erebus
         - media_player.nasya
-        title: Laundry
-        message: The washer is done!
+        title: Washer
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         entity:
         - media_player.shield_living_room
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Laundry
+        title: Washer
         message: The washer is done!
         icon_url: local/icons/washing-machine.png
       action: script.notify_pipup
@@ -986,13 +1031,13 @@
 - id: '1665687778783'
   alias: "\U0001F37D️ Dishwasher is Done"
   description: Sends notification when the dishwasher is done
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.ge_dishwasher_operating_mode
     to: Cycle Complete
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - parallel:
     - data:
         who: parents
@@ -1020,6 +1065,7 @@
         message: The dishwasher is done!
         icon_url: local/icons/dishwasher.png
       action: script.notify_pipup
+    alias: Send a notification to each device
   mode: single
   max_exceeded: silent
 - id: '1665687879665'
@@ -4285,16 +4331,17 @@
   mode: restart
 - id: '1704733260383'
   alias: ✴️ Joshua Office CO2 Levels
-  description: Alerts when CO2 levels in Joshua's Office are high
-  trigger:
-  - platform: state
-    entity_id:
+  description: Sets MSR-1 LED color Alerts when CO2 levels in Joshua's Office are
+    high
+  triggers:
+  - entity_id:
     - sensor.apollo_msr_1_office_co2
     to:
-  - platform: homeassistant
-    event: start
-  condition: []
-  action:
+    trigger: state
+  - event: start
+    trigger: homeassistant
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: numeric_state
@@ -4322,31 +4369,31 @@
       - data:
           rgb_color:
           - 255
-          - 174
+          - 100
           - 0
-          brightness: 255
+          brightness: 128
         target:
           entity_id: light.apollo_msr_1_office_rgb_light
         action: light.turn_on
     - conditions:
       - condition: numeric_state
         entity_id: sensor.apollo_msr_1_office_co2
-        above: 700
+        above: 800
         below: 1333
       sequence:
       - data:
           rgb_color:
           - 255
-          - 255
+          - 200
           - 0
-          brightness: 255
+          brightness: 128
         target:
           entity_id: light.apollo_msr_1_office_rgb_light
         action: light.turn_on
     - conditions:
       - condition: numeric_state
         entity_id: sensor.apollo_msr_1_office_co2
-        below: 700
+        below: 800
       sequence:
       - target:
           entity_id: light.apollo_msr_1_office_rgb_light
@@ -4997,23 +5044,23 @@
       action: script.notify_pipup
   mode: single
 - id: '1723166117553'
-  alias: "\U0001F37D️ Oven Timer Completed"
-  description: Sends notification when the oven timer is finished
-  trigger:
-  - platform: state
-    entity_id:
+  alias: "\U0001F37D️ Oven Kitchen Timer Completed"
+  description: Sends notification when the oven kitchen timer is finished
+  triggers:
+  - entity_id:
     - sensor.ge_oven_kitchen_timer
     to: 'Off'
-  condition:
+    trigger: state
+  conditions:
   - condition: template
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
       none] }}'
-  action:
+  actions:
   - parallel:
     - data:
         who: parents
         title: Oven Timer
-        message: The oven timer has finished
+        message: The oven kitchen timer has finished
         notification_icon: mdi:stove
         color: '#f44336'
         icon_url: local/icons/stove.png
@@ -5025,7 +5072,7 @@
         - media_player.erebus
         - media_player.nasya
         title: Oven
-        message: The oven timer has finished
+        message: The oven kitchen timer has finished
       action: script.notify_hass_agent
     - data:
         entity:
@@ -5033,7 +5080,7 @@
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: Oven
-        message: The oven timer has finished
+        message: The oven kitchen timer has finished
         icon_url: local/icons/stove.png
       action: script.notify_pipup
   mode: single
@@ -5346,3 +5393,46 @@
       flash: short
     target:
       entity_id: light.kitchen_island
+- id: '1730497546367'
+  alias: "\U0001F37D️ Oven Bake Timer Completed"
+  description: Sends notification when the oven bake timer is finished
+  triggers:
+  - entity_id:
+    - sensor.ge_oven_cook_time_remaining
+    to: 'Off'
+    trigger: state
+  conditions:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
+      none] }}'
+    alias: Check for offline device
+  actions:
+  - parallel:
+    - data:
+        who: parents
+        title: Oven Timer
+        message: The oven bake timer has finished
+        notification_icon: mdi:stove
+        color: '#f44336'
+        icon_url: local/icons/stove.png
+        tag: oven
+        priority: high
+      action: script.notify_mobile
+    - data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Oven
+        message: The oven bake timer has finished
+      action: script.notify_hass_agent
+    - data:
+        entity:
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_main_bedroom
+        title: Oven
+        message: The oven bake timer has finished
+        icon_url: local/icons/stove.png
+      action: script.notify_pipup
+    alias: Send a notification to each device
+  mode: single

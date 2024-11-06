@@ -678,7 +678,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>502 Automations</summary>
+<details><summary>503 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -724,8 +724,9 @@ A Material You and Google Home app influenced theme for Home Assistant
 - ✴️ Joshua Office Light On/Off Presence
 - 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done
+- 🍽️ Oven Bake Timer Completed
 - 🍽️ Oven is Preheated
-- 🍽️ Oven Timer Completed
+- 🍽️ Oven Kitchen Timer Completed
 - 🎄 XMas Lights On/Off 🚫
 - 🎄 XMas Tree On/Off 🚫
 - 🏢 Joshua Office Mode
@@ -806,8 +807,8 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🚦 Garage Light Switch Status
 - 🚦 Joshua Office Light Switch Status 🚫
 - 🚦 Outside Entry Light Switch Status
-- 🧺 Dryer Running
-- 🧺 Washer Running
+- 🧺 Dryer Notifications
+- 🧺 Washer Notifications
 
 ---
 
