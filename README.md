@@ -32,10 +32,10 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 3977 |
-| Sensors        | 1220 |
-| Binary Sensors | 312 |
-| Lights         | 66 |
+| All Entities   | 4017 |
+| Sensors        | 1237 |
+| Binary Sensors | 316 |
+| Lights         | 68 |
 | Switches       | 206 |
 
 <details><summary>Stock Integrations</summary>
@@ -288,7 +288,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.24]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.29]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -364,7 +364,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.27.2]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.28.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -406,7 +406,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.6.3]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.8.0]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -428,7 +428,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>33 Lovelace Plugins</summary>
+<details><summary>34 Lovelace Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -446,7 +446,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0-beta.3]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0-beta.4]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -466,7 +466,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🧹 Declutter your lovelace configuration with the help of this card
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.2.2]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.2.6]
 
 Expander card for HomeAssistant
 
@@ -478,7 +478,7 @@ Expander card for HomeAssistant
 
 A Lovelace card for Frigate in Home Assistant
 
-### [Ha Floorplan 🖌🎨 | Your Imagination Just Became The New Limit](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.45]
+### [Ha Floorplan 🖌🎨 | Your Imagination Just Became The New Limit](https://github.com/ExperienceLovelace/ha-floorplan) [v1.0.47]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just became the new limit.
 
@@ -486,13 +486,17 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
-### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.1.0]
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.3.1]
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
 ### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.4.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
+
+### [Hui Element](https://github.com/thomasloven/lovelace-hui-element) [v1a80547]
+
+🔹 Use built-in elements in the wrong place
 
 ### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.3.1]
 
@@ -510,7 +514,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.7]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.0.8]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -546,7 +550,7 @@ a custom card for home assistant that utilizes tabs to segregate individual card
 
 A progress bar display for Home Assistant timers
 
-### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v1.6.7]
+### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v1.6.8]
 
 This custom card allows you to display vehicle information in your Home Assistant dashboard, including the vehicle name, image, and fuel or charge level.
 
@@ -570,7 +574,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.6]
+### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v2.1.8]
 
 A Material You and Google Home app influenced theme for Home Assistant
 
@@ -786,7 +790,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🔔 Doorbell Ring
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
-- 🕗 Main Bedroom Ceiling Fan Default Light Status
+- 🕗 Main Bedroom Ceiling Fan Default Light Status 🚫
 - 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Quest] Charge Complete
@@ -824,7 +828,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2024.10.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2024.10.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
