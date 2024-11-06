@@ -1,0 +1,70 @@
+---
+# Bed Presence
+# https://github.com/ElevatedSensors/sensor-configs/blob/main/bed-presence-mk1.yaml
+
+substitutions:
+  # Calibrate Trigger Percentile
+  # This controls how the trigger threshold is set during calibration. During calibration, the unoccupied and occupied
+  # pressure values are determined. This is the percentage of the difference between those values required to trigger
+  # the "occupied" state.
+  #     - 0.75  Requires 75% of the occupied pressure to trigger (Default)
+  #     - 0.50   Set trigger exactly in the middle of unoccupied and occupied pressures
+  #     - 0.25  More sensitive, likely to be triggered by partner
+  trigger_percentile: '0.75'
+
+  # Fast Sensor Delay
+  # This controls how long the "Fast" sensor must register its value before updating. Without any delay, the sensor
+  # will register frequent fall negatives as you shift in bed.
+  #     - 2s    Same response as standard sensor
+  #     - 500ms Good starting point for getting speed without too many false negatives (Default)
+  #     - 0ms   No delay, expect frequent false negatives
+  fast_delayed_off: 500ms
+
+esphome:
+  name: bed-presence-f56148
+  friendly_name: Bed Presence
+  min_version: 2024.6.0
+  name_add_mac_suffix: false
+  project:
+    name: ElevatedSensors.BedPresenceMk1
+    version: DIY
+  platformio_options:
+    board_build.flash_mode: dio # dio flash_mode fixes issue where board bootloops using esp-idf
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf # using arduino causes board to reset multiple times/day
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret encryption_key
+
+# Enable wifi
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Set up a wifi access point
+  ap: {}
+
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device via WiFi AP.
+captive_portal:
+
+# Enable esphome OTA updates
+ota:
+  platform: esphome
+  password: !secret ota_password
+
+################################################################################
+packages:
+  remote_package:
+    url: https://github.com/ElevatedSensors/sensor-configs
+    ref: main
+    files: [bed-presence-mk1/base.yaml]
+    refresh: 1s
