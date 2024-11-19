@@ -7013,6 +7013,60 @@ views:
         hold_action:
           action: navigate
           navigation_path: /config/updates
+      - type: custom:mushroom-template-badge
+        icon: mdi:timer
+        color: lime
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            service: browser_mod.popup
+            data:
+              title: Timers
+              content:
+                type: custom:auto-entities
+                show_empty: false
+                card:
+                  type: custom:timer-bar-card
+                filter:
+                  template: "{%- set results = namespace(timers = []) -%} {%- set\
+                    \ state_map = {\n  \"set\": \"active\",\n  \"ringing\": \"active\"\
+                    ,\n} -%} {%- set icon_map = {\n  \"set\": \"mdi:timer\",\n  \"\
+                    ringing\": \"mdi:timer-alert\",\n  \"paused\": \"mdi:timer-pause\"\
+                    ,\n} -%} {%- for entity_id in integration_entities('google_home')\n\
+                    \  if entity_id is contains '_timers'\n-%}\n  {%- set multiple\
+                    \ = not loop.first or not loop.last -%}\n  {%- set suffix = ''\n\
+                    \    if not multiple\n    else ' ⸱ ' + state_attr(entity_id, 'friendly_name')\n\
+                    \    | replace(' timers', '')\n  -%}\n  {%- for t in state_attr(entity_id,\
+                    \ 'timers') if as_timestamp(t.local_time_iso) > as_timestamp(now())\
+                    \ -%}\n    {%- set label = t.label if t.label else t.duration\
+                    \ | regex_replace('^0:0*', '') -%}\n    {%- set results.timers\
+                    \ = results.timers + [{\n      'entity': entity_id,\n      'icon':\
+                    \ icon_map[t.status],\n      'duration': {'fixed': t.duration},\n\
+                    \      'end_time': {'fixed': t.local_time_iso},\n      'name':\
+                    \ label + suffix,\n      'state': {'fixed': state_map[t.status]\
+                    \ | default(t.status)},\n      \"extend_paper_buttons_row\": {\n\
+                    \        \"position\": \"right\",\n        \"buttons\": [\n  \
+                    \        {\n            \"icon\": \"mdi:close\",\n           \
+                    \ \"tooltip\": \"Dismiss\",\n            \"tap_action\": {\n \
+                    \             \"action\": \"call-service\",\n              \"\
+                    service\": \"google_home.delete_timer\",\n              \"service_data\"\
+                    : {\n                \"timer_id\": t.timer_id,\n             \
+                    \   \"entity_id\": entity_id,\n                \"skip_refresh\"\
+                    : False,\n              }\n            }\n          }\n      \
+                    \  ]\n      }\n    }] -%}\n  {%- endfor -%}\n{%- endfor -%} {{\
+                    \ results.timers }}"
+        visibility:
+          - condition: or
+            conditions:
+              - condition: state
+                entity: sensor.living_room_speaker_timers
+                state_not: unavailable
+              - condition: state
+                entity: sensor.family_room_speaker_timers
+                state_not: unavailable
+              - condition: state
+                entity: sensor.office_speaker_timers
+                state_not: unavailable
     cards: []
   - title: Living Room
     path: living
