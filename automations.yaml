@@ -1831,15 +1831,15 @@
 - id: '1665689633891'
   alias: "\U0001F4AC Ascent Failed Notification"
   description: Sends a notification when the Ascent fails to start
-  trigger:
-  - platform: event
-    event_type: subaru_command_failed
+  triggers:
+  - event_type: subaru_command_failed
     event_data:
       command: remote_start
-  condition: []
-  action:
+    trigger: event
+  conditions: []
+  actions:
   - variables:
-      message: "The car didn't start.{{ \" \" }} {% if 'doorNotLocked' in trigger.event.data.message
+      message: "The Ascent didn't start.{{ \" \" }} {% if 'doorNotLocked' in trigger.event.data.message
         -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.message
         -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.message
         -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow' in
@@ -3020,13 +3020,19 @@
       - data:
           transition: 1
         target:
-          entity_id: light.main_bedroom_lights
+          entity_id: light.main_bedroom
         action: light.toggle
       action_button_center_double:
       - data: {}
         target:
           entity_id: fan.main_bedroom_ceiling
         action: fan.toggle
+      action_button_center_long:
+      - action: light.toggle
+        data:
+          transition: 1
+        target:
+          entity_id: light.main_bedroom_fan_light
 - id: '1667779119970'
   alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
@@ -3442,16 +3448,16 @@
 - id: '1673152651576'
   alias: "\U0001F4AC Ascent Started"
   description: Actions when the Ascent starts
-  trigger:
-  - platform: event
-    event_type: subaru_command_successful
+  triggers:
+  - event_type: subaru_command_successful
     event_data:
       command: remote_start
-  condition: []
-  action:
+    trigger: event
+  conditions: []
+  actions:
   - variables:
       title: Ascent Remote Start
-      message: The car started and is running.
+      message: The Ascent started and is running.
   - data: {}
     target:
       entity_id: timer.ascent_remote_start
@@ -3483,19 +3489,19 @@
         message: '{{ message }}'
       action: script.notify_speech
   - wait_for_trigger:
-    - platform: state
-      entity_id:
+    - entity_id:
       - cover.garage_door
       to: closed
-    - platform: event
-      event_type: subaru_command_successful
+      trigger: state
+    - event_type: subaru_command_successful
       event_data:
         command: remote_stop
-    - platform: state
-      entity_id:
+      trigger: event
+    - entity_id:
       - binary_sensor.pixel_8_amy_android_auto
       - binary_sensor.pixel_8_joshua_android_auto
       to: 'on'
+      trigger: state
     timeout:
       minutes: 10
       seconds: 5
@@ -3559,12 +3565,12 @@
 - id: '1678829415008'
   alias: "\U0001F4AC Ascent Remote Start Expired Notification"
   description: Sends a notification when the Ascent remote start expires
-  trigger:
-  - platform: event
-    event_type: timer.finished
+  triggers:
+  - event_type: timer.finished
     event_data:
       entity_id: timer.ascent_remote_start
-  condition:
+    trigger: event
+  conditions:
   - condition: or
     conditions:
     - condition: state
@@ -3573,10 +3579,10 @@
     - condition: state
       entity_id: device_tracker.ascent
       state: home
-  action:
+  actions:
   - variables:
       title: Ascent Remote Start
-      message: The car shut off and is no longer running.
+      message: The Ascent shut off and is no longer running.
   - parallel:
     - data:
         who: parents
@@ -4351,6 +4357,7 @@
       - data:
           song_str: Cantina:d=4,o=5,b=250:8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8p,8d6,8p
         action: esphome.apollo_msr_1_bcbde8_play_buzzer
+        enabled: false
       - data:
           rgb_color:
           - 255
