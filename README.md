@@ -434,7 +434,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>34 Dashboard Plugins</summary>
+<details><summary>35 Dashboard Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -543,6 +543,10 @@ A Home Assistant lovelace card to display a sankey chart. For example for power 
 ### [Steam Card](https://github.com/Kibibit/kb-steam-card) [v1.1.1]
 
 A Home Assistant card for Steam integrations
+
+### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.0.15]
+
+Streamline your Lovelace configuration with with a card template system.
 
 ### [Swipe Card](https://github.com/bramkragten/swipe-card) [v5.0.0]
 
