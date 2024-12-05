@@ -360,17 +360,17 @@
 - id: '1665682398363'
   alias: "\U0001F4E6 Clear Packages Out for Delivery"
   description: Clears package delivery notification when packages are delivered
-  trigger:
-  - platform: state
-    entity_id: sensor.mail_packages_in_transit
+  triggers:
+  - entity_id: sensor.mail_packages_in_transit
     to: '0'
-  condition:
+    trigger: state
+  conditions:
   - condition: template
     value_template: "{{ (trigger.from_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
       | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
-      trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
-      in [\"unknown\", \"unavailable\"] }}"
-  action:
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
+  actions:
   - data:
       who: parents
       message: clear_notification
@@ -380,16 +380,16 @@
 - id: '1665682414590'
   alias: "\U0001F4E6 Mail Today"
   description: Notifies when mail will be delivered today
-  trigger:
-  - platform: state
-    entity_id: sensor.mail_usps_mail
-  condition:
+  triggers:
+  - entity_id: sensor.mail_usps_mail
+    trigger: state
+  conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
       | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
-      trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
-      in [\"unknown\", \"unavailable\"] }}"
-  action:
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
+  actions:
   - variables:
       message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
         "1" else "items" }} will be in the mailbox today.'
@@ -426,16 +426,16 @@
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
   description: Notifies when packages have been delivered
-  trigger:
-  - platform: state
-    entity_id: sensor.mail_packages_delivered
-  condition:
+  triggers:
+  - entity_id: sensor.mail_packages_delivered
+    trigger: state
+  conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
       | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
-      trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
-      in [\"unknown\", \"unavailable\"] }}"
-  action:
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
+  actions:
   - variables:
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} delivered.'
@@ -2201,16 +2201,16 @@
 - id: '1665696464819'
   alias: ⚙️ Battery Level Low
   description: Sends a notification when a device battery level is low
-  trigger:
-  - platform: state
-    entity_id: sensor.low_battery_devices
-  condition:
+  triggers:
+  - entity_id: sensor.low_battery_devices
+    trigger: state
+  conditions:
   - condition: template
     value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
       \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
-      trigger.to_state.state | int > 0\n  and trigger.to_state.state | int != trigger.from_state.state
-      | int\n}}"
-  action:
+      not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state
+      in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
+  actions:
   - variables:
       sensors: "{% if not trigger.to_state.state in ['unknown', 'unavailable', none]
         %}\n  {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
@@ -2219,29 +2219,45 @@
         replace = '', ignorecase = true) %}\n    {% set result.sensors = result.sensors
         + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
         > 0, '- ', '') }}{{ result.sensors | join('\\n- ') }}\n{% endif %}"
-  - parallel:
+      devices: '{{ trigger.to_state.state | int(default=0) }}'
+      title: Low Battery Level{{ iif(devices > 1, 's', '') }} ({{ devices }})
+  - if:
+    - condition: template
+      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+        | int(default=0)) > 0 }}"
+    then:
     - data:
-        title: Low Battery Levels
-        message: '{{ sensors }}'
         notification_id: low-battery-alert
-      action: persistent_notification.create
+      action: persistent_notification.dismiss
     - data:
         who: joshua
-        title: Low Battery Levels
-        message: '{{ sensors }}'
-        notification_icon: mdi:battery-alert
-        color: '#f44336'
-        icon_url: local/icons/battery-alert.png
-        group: System
+        message: clear_notification
         tag: low-battery-alert
-        url: dashboard-system/overview
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.erebus
-        title: Low Battery Levels
-        message: '{{ sensors }}'
-      action: script.notify_hass_agent
+    else:
+    - parallel:
+      - data:
+          title: '{{ title }}'
+          message: '{{ sensors }}'
+          notification_id: low-battery-alert
+        action: persistent_notification.create
+      - data:
+          who: joshua
+          title: '{{ title }}'
+          message: '{{ sensors }}'
+          notification_icon: mdi:battery-alert
+          color: '#f44336'
+          icon_url: local/icons/battery-alert.png
+          group: System
+          tag: low-battery-alert
+          url: dashboard-system/overview
+        action: script.notify_mobile
+      - data:
+          entity:
+          - media_player.erebus
+          title: '{{ title }}'
+          message: '{{ sensors }}'
+        action: script.notify_hass_agent
   mode: single
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
@@ -4681,17 +4697,17 @@
 - id: '1713385133443'
   alias: ⚙️ Offline Devices
   description: Sends a notification when a device is offline
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.offline_devices
-  condition:
+    trigger: state
+  conditions:
   - condition: template
-    value_template: "{{ not trigger.to_state in [\"unknown\", \"unavailable\", none]\n
-      \ and not trigger.to_state.state in [\"unknown\", \"unavailable\", none]\n  and
-      trigger.to_state.state | int > 0\n  and trigger.to_state.state | int != trigger.from_state.state
-      | int\n}}"
-  action:
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
+      not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state
+      in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
+  actions:
   - variables:
       sensors: "{% set result = namespace(sensors=[]) %} {% for entity_id in trigger.to_state.attributes.entity_id
         %}\n  {% set state = states(entity_id) %}\n  {% set time = iif(has_value(entity_id),
@@ -4700,29 +4716,45 @@
         = \" last seen\", replace = \"\", ignorecase = true) %}\n  {% set result.sensors
         = result.sensors + [name ~ time] %}\n{% endfor %} {{ iif(result.sensors |
         count > 0, \"- \", \"\") }}{{ result.sensors | join(\"\\n- \") }}"
-  - parallel:
+      offline: '{{ trigger.to_state.state | int(default=0) }}'
+      title: Offline Device{{ iif(offline > 1, 's', '') }} ({{ offline }})
+  - if:
+    - condition: template
+      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+        | int(default=0)) > 0 }}"
+    then:
     - data:
-        title: Offline Devices
-        message: '{{ sensors }}'
         notification_id: offline-devices
-      action: persistent_notification.create
+      action: persistent_notification.dismiss
     - data:
         who: joshua
-        title: Offline Devices
-        message: '{{ sensors }}'
-        notification_icon: mdi:network-off
-        color: '#f44336'
-        icon_url: local/icons/network-off.png
-        group: System
+        message: clear_notification
         tag: offline-devices
-        url: dashboard-system/overview
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.erebus
-        title: Offline Devices
-        message: '{{ sensors }}'
-      action: script.notify_hass_agent
+    else:
+    - parallel:
+      - data:
+          title: '{{ title }}'
+          message: '{{ sensors }}'
+          notification_id: offline-devices
+        action: persistent_notification.create
+      - data:
+          who: joshua
+          title: '{{ title }}'
+          message: '{{ sensors }}'
+          notification_icon: mdi:network-off
+          color: '#f44336'
+          icon_url: local/icons/network-off.png
+          group: System
+          tag: offline-devices
+          url: dashboard-system/overview
+        action: script.notify_mobile
+      - data:
+          entity:
+          - media_player.erebus
+          title: '{{ title }}'
+          message: '{{ sensors }}'
+        action: script.notify_hass_agent
   mode: restart
 - id: '1713973263507'
   alias: "\U0001F4AC Bambu P1S Print Status"
