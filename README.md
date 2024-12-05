@@ -16,7 +16,7 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 <details><summary>8 Add-ons</summary>
 
 - Mosquitto broker
-- ESPHome
+- ESPHome Device Compiler
 - AdGuard Home
 - Advanced SSH & Web Terminal
 - Studio Code Server
@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4055 |
-| Sensors        | 1250 |
-| Binary Sensors | 329 |
-| Lights         | 68 |
-| Switches       | 214 |
+| All Entities   | 4117 |
+| Sensors        | 1286 |
+| Binary Sensors | 330 |
+| Lights         | 72 |
+| Switches       | 219 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -316,11 +316,11 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.4.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.5.1]
 
 Frigate integration for Home Assistant
 
-Authors: [@blakeblackshear](https://github.com/blakeblackshear).
+Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
 ### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.16]
 
@@ -328,7 +328,7 @@ Component to integrate with GasBuddy fuel price tracker.
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v0.6.13]
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v0.6.14]
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
@@ -370,7 +370,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.30.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.31.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -412,15 +412,15 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.8.1]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v5.8.5]
 
 Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.3]
+### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.5]
 
-Home Assistant custom integration to keep track of missing entities and services in your config files
+Home Assistant custom integration to keep track of missing entities and actions in your config files
 
 Authors: [@dummylabs](https://github.com/dummylabs).
 
@@ -434,7 +434,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>35 Dashboard Plugins</summary>
+<details><summary>36 Dashboard Plugins</summary>
 
 ### [Apexcharts Card](https://github.com/RomRider/apexcharts-card) [v2.1.2]
 
@@ -452,7 +452,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0-beta.7]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v2.3.0]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -467,10 +467,6 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 ### [Card Tools](https://github.com/thomasloven/lovelace-card-tools) [v11]
 
 🔹A collection of tools for other lovelace plugins to use
-
-### [Decluttering Card](https://github.com/custom-cards/decluttering-card) [v1.0.0]
-
-🧹 Declutter your lovelace configuration with the help of this card
 
 ### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.3.1]
 
@@ -520,13 +516,17 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.1.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.2.1]
 
 Build a beautiful Home Assistant dashboard easily
 
 ### [Opensprinkler Card](https://github.com/rianadon/opensprinkler-card) [v1.13]
 
 Home Assistant card for collecting OpenSprinkler status
+
+### [Paper Buttons Row](https://github.com/jcwillox/lovelace-paper-buttons-row) [v2.2.0]
+
+Adds highly configurable buttons that use actions and per-state styling.
 
 ### [Platinum Weather Card](https://github.com/tommyjlong/platinum-weather-card) [v1.2.0]
 
@@ -544,7 +544,7 @@ A Home Assistant lovelace card to display a sankey chart. For example for power 
 
 A Home Assistant card for Steam integrations
 
-### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.0.15]
+### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.0.19]
 
 Streamline your Lovelace configuration with with a card template system.
 
@@ -571,6 +571,10 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 ### [Vertical Stack In Card](https://github.com/ofekashery/vertical-stack-in-card) [v0.5.0]
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
+
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.11.7]
+
+Home Assistant Lovelace Windrose Card
 
 ### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.2.4]
 
@@ -738,7 +742,7 @@ A Material You and Google Home app influenced theme for Home Assistant
 - 🍽️ Oven is Preheated
 - 🍽️ Oven Kitchen Timer Completed
 - 🎄 XMas Lights On/Off 🚫
-- 🎄 XMas Tree On/Off 🚫
+- 🎄 XMas Tree On/Off
 - 🏢 Joshua Office Mode
 - 🐱 Cat Feeder Empty Notification
 - 🐱 Cat Feeder Error
@@ -839,7 +843,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2024.11.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2024.11.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
