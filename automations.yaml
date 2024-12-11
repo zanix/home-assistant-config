@@ -770,11 +770,11 @@
 - id: '1665686481763'
   alias: "\U0001F4A1 Dim Front Lights at Night"
   description: Dims the front lights at night
-  trigger:
-  - platform: time
-    at: input_datetime.lights_front_night_dim
-  condition: []
-  action:
+  triggers:
+  - at: input_datetime.lights_front_night_dim
+    trigger: time
+  conditions: []
+  actions:
   - data:
       transition: 360
       brightness_pct: 25
@@ -783,7 +783,7 @@
     action: light.turn_on
   - data:
       transition: 360
-      brightness_pct: 8
+      brightness_pct: 1
     target:
       entity_id: light.outside_entry
     action: light.turn_on
@@ -4779,8 +4779,15 @@
   - variables:
       progress: '{{ states("sensor.bambu_p1s_print_progress") }}%'
       title: 3D Print Status {{ progress }}
-      message: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".gcode","")
-        }} is at {{ progress }}'
+      message: "{% set end_time = states('sensor.bambu_p1s_end_time') | as_timestamp
+        %} {% set time_to_end = states('sensor.bambu_p1s_remaining_time') | int %}
+        {% set hours = (time_to_end / 60) | int %} {% set minutes = (time_to_end %
+        60) %} {% if end_time | timestamp_custom('%Y-%m-%d') == now().date() | string
+        %}\n  {% set time = end_time | timestamp_custom('%-I:%M %p') %}\n{% else %}\n
+        \ {% set time = end_time | timestamp_custom('%m/%d %-I:%M %p') %}\n{% endif
+        %} {{ states(\"sensor.bambu_p1s_task_name\")\n  | replace(\".3mf\", \"\")\n
+        \ | replace(\".stl\", \"\")\n  | replace(\".gcode\", \"\")\n}} will finish
+        in {{ '{:01}h {:01}m'.format(hours, minutes) }} at {{ time }}"
   - parallel:
     - data:
         who: joshua
@@ -4824,8 +4831,8 @@
   actions:
   - variables:
       time: '{{ as_timestamp(now()) | timestamp_custom("%-m/%-d/%Y %-I:%M %p") }}'
-      model: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".gcode","")
-        }}'
+      model: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".stl",
+        "") | replace(".gcode","") }}'
       message: '{{ model }} {{ trigger.id | lower }} printing at {{ time }}'
   - parallel:
     - data:
@@ -5382,56 +5389,64 @@
   triggers:
   - at: 07:15:00
     trigger: time
+    id: warn
+  - trigger: time
+    at: 07:20:00
+    id: leave
   conditions:
   - condition: state
     entity_id: cover.garage_door
     state: closed
+    enabled: false
   - condition: state
     entity_id: binary_sensor.workday_sensor
     state: 'on'
   actions:
-  - data:
-      rgb_color:
-      - 255
-      - 255
-      - 0
-      brightness_pct: 100
-    action: light.turn_on
-    target:
-      entity_id: light.kitchen_island
-  - delay:
-      minutes: 5
-  - data:
-      rgb_color:
-      - 255
-      - 0
-      - 0
-    action: light.turn_on
-    target:
-      entity_id: light.kitchen_island
-  - wait_for_trigger:
-    - trigger: state
-      entity_id:
-      - cover.garage_door
-      from: open
-      to: closed
-    timeout:
-      hours: 0
-      minutes: 10
-      seconds: 0
-      milliseconds: 0
-  - action: light.turn_on
-    metadata: {}
-    data:
-      kelvin: 3000
-    target:
-      entity_id: light.kitchen_island
-  - action: light.turn_on
-    metadata: {}
-    data:
-      flash: short
-    target:
-      entity_id: light.kitchen_island
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - warn
+      sequence:
+      - data:
+          rgb_color:
+          - 255
+          - 255
+          - 0
+          brightness_pct: 100
+        action: light.turn_on
+        target:
+          entity_id: light.kitchen_island
+    - conditions:
+      - condition: trigger
+        id:
+        - leave
+      sequence:
+      - data:
+          rgb_color:
+          - 255
+          - 0
+          - 0
+        action: light.turn_on
+        target:
+          entity_id: light.kitchen_island
+      - wait_for_trigger:
+        - trigger: state
+          entity_id:
+          - cover.garage_door
+          from: open
+          to: closed
+        timeout:
+          hours: 0
+          minutes: 10
+          seconds: 0
+          milliseconds: 0
+      - action: light.turn_on
+        metadata: {}
+        data:
+          kelvin: 3000
+        target:
+          entity_id: light.kitchen_island
 - id: '1730497546367'
   alias: "\U0001F37D️ Oven Bake Timer Completed"
   description: Sends notification when the oven bake timer is finished
