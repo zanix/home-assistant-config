@@ -1614,7 +1614,7 @@ streamline_templates:
       primary: '[[name]]'
       secondary: '{% from "util.jinja" import nominal_change_history %} {{ state_translated(entity)
         }} ⸱ {{ nominal_change_history(entity) }}'
-      icon: '[[icon]]{{ iif(is_state(entity, "on"), "-open", "") }}'
+      icon: '[[icon]]{{ "-open" if is_state(entity, "on") }}'
       icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
       tap_action:
         action: more-info
@@ -2727,6 +2727,7 @@ streamline_templates:
           card:
             type: grid
             square: false
+            columns: 5
             cards:
               - type: custom:button-card
                 template: badge
@@ -3209,6 +3210,7 @@ streamline_templates:
           card:
             type: grid
             square: false
+            columns: 5
             cards:
               - type: custom:button-card
                 template: badge
@@ -3421,6 +3423,7 @@ views:
             card:
               type: grid
               square: false
+              columns: 4
               cards:
                 - type: custom:mushroom-template-badge
                   entity: weather.owm_daily
@@ -3819,6 +3822,7 @@ views:
             card:
               type: grid
               square: false
+              columns: 4
               cards:
                 - type: custom:mushroom-template-badge
                   entity: sensor.garbage_collection
@@ -3990,6 +3994,7 @@ views:
             card:
               type: grid
               square: false
+              columns: 4
               cards:
                 - type: custom:button-card
                   template: badge
@@ -4176,6 +4181,139 @@ views:
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+          - type: custom:mod-card
+            style:
+              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
+                \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
+            card:
+              type: grid
+              square: false
+              columns: 4
+              cards:
+                - type: conditional
+                  conditions:
+                    - condition: numeric_state
+                      entity: sensor.mail_usps_mail
+                      above: 0
+                  card:
+                    type: custom:mushroom-template-badge
+                    entity: sensor.mail_usps_mail
+                    label: Mail
+                    content: '{{ states(entity) }} {{ iif(is_state(entity, "1"), "piece",
+                      "pieces") }}'
+                    icon: mdi:mail
+                    color: blue
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Mail
+                          size: fullscreen
+                          content:
+                            type: picture-entity
+                            entity: camera.mail_usps_camera
+                            camera_image: camera.mail_usps_camera
+                            show_name: false
+                            show_state: false
+                            card_mod:
+                              style: "ha-card {\n  --ha-card-background: none;\n}\n"
+                - type: conditional
+                  conditions:
+                    - condition: numeric_state
+                      entity: sensor.mail_packages_delivered
+                      above: 0
+                  card:
+                    type: custom:mushroom-template-badge
+                    entity: sensor.mail_packages_delivered
+                    label: Delivered
+                    content: '{{ states(entity) }} {{ iif(is_state(entity, "1"), "package",
+                      "packages") }}
+
+                      '
+                    icon: mdi:package-variant
+                    color: orange
+                - type: conditional
+                  conditions:
+                    - condition: numeric_state
+                      entity: sensor.mail_usps_delivering
+                      above: 0
+                    - condition: state
+                      entity: sensor.mail_usps_delivering
+                      state_not: unavailable
+                    - condition: state
+                      entity: sensor.mail_usps_delivering
+                      state_not: unknown
+                  card:
+                    type: custom:streamline-card
+                    template: package_delivery
+                    variables:
+                      - entity: sensor.mail_usps_delivering
+                      - name: USPS
+                      - icon: fab:usps
+                      - icon_color: blue
+                      - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=##TRACK_ID##
+                - type: conditional
+                  conditions:
+                    - condition: numeric_state
+                      entity: sensor.mail_ups_delivering
+                      above: 0
+                    - condition: state
+                      entity: sensor.mail_ups_delivering
+                      state_not: unavailable
+                    - condition: state
+                      entity: sensor.mail_ups_delivering
+                      state_not: unknown
+                  card:
+                    type: custom:streamline-card
+                    template: package_delivery
+                    variables:
+                      - entity: sensor.mail_ups_delivering
+                      - name: UPS
+                      - icon: fab:ups
+                      - icon_color: brown
+                      - url: https://www.ups.com/track?loc=en_US&tracknum=##TRACK_ID##
+                - type: conditional
+                  conditions:
+                    - condition: numeric_state
+                      entity: sensor.mail_fedex_delivering
+                      above: 0
+                    - condition: state
+                      entity: sensor.mail_fedex_delivering
+                      state_not: unavailable
+                    - condition: state
+                      entity: sensor.mail_fedex_delivering
+                      state_not: unknown
+                  card:
+                    type: custom:streamline-card
+                    template: package_delivery
+                    variables:
+                      - entity: sensor.mail_fedex_delivering
+                      - name: FedEx
+                      - icon: fab:fedex
+                      - icon_color: purple
+                      - url: https://www.fedex.com/fedextrack/?trknbr=##TRACK_ID##
+                - type: conditional
+                  conditions:
+                    - condition: numeric_state
+                      entity: sensor.mail_amazon_packages
+                      above: 0
+                    - condition: state
+                      entity: sensor.mail_amazon_packages
+                      state_not: unavailable
+                    - condition: state
+                      entity: sensor.mail_amazon_packages
+                      state_not: unknown
+                  card:
+                    type: custom:streamline-card
+                    template: package_delivery
+                    variables:
+                      - entity: sensor.mail_amazon_packages
+                      - name: Amazon
+                      - icon: fab:amazon
+                      - icon_color: yellow
+                      - url: https://www.amazon.com/gp/your-account/order-details?orderID=##TRACK_ID##
       - type: grid
         cards:
           - type: custom:streamline-card
@@ -5258,18 +5396,15 @@ views:
               - type: custom:bubble-card
                 card_type: pop-up
                 hash: '#weather'
-                button_type: state
-                entity: sensor.owm_daily_temperature
+                button_type: name
                 name: Weather
                 show_attribute: false
                 attribute: temperature
                 show_icon: false
-                show_state: false
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}"
-                show_last_changed: false
               - type: custom:vertical-stack-in-card
                 cards:
                   - card_config_version: 8
@@ -5389,7 +5524,7 @@ views:
                 button_type: name
                 name: Joshua
                 icon: mdi:account
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n"
@@ -5406,7 +5541,7 @@ views:
                 button_type: name
                 name: Amy
                 icon: mdi:account
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n"
@@ -5425,7 +5560,7 @@ views:
                 icon: fapro:subaru
                 show_state: false
                 width_desktop: 600px
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-1\
@@ -5909,7 +6044,7 @@ views:
                 icon: fapro:hyundai
                 show_state: false
                 width_desktop: 600px
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-1\
@@ -6322,6 +6457,7 @@ views:
                 button_type: name
                 name: Updates
                 icon: mdi:package-up
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}"
@@ -7480,117 +7616,6 @@ views:
           - condition: numeric_state
             entity: sensor.water_softener_salt_monitor_salt_level
             below: 10
-      - type: custom:mushroom-template-badge
-        entity: sensor.mail_usps_mail
-        label: Mail
-        content: '{{ states(entity) }} {{ iif(is_state(entity, "1"), "piece", "pieces")
-          }}'
-        icon: mdi:mail
-        color: blue
-        tap_action:
-          action: fire-dom-event
-          browser_mod:
-            service: browser_mod.popup
-            data:
-              title: Mail
-              size: fullscreen
-              content:
-                type: picture-entity
-                entity: camera.mail_usps_camera
-                camera_image: camera.mail_usps_camera
-                show_name: false
-                show_state: false
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n}\n"
-        visibility:
-          - condition: numeric_state
-            entity: sensor.mail_usps_mail
-            above: 0
-      - type: custom:mushroom-template-badge
-        entity: sensor.mail_packages_delivered
-        label: Delivered
-        content: '{{ states(entity) }} {{ iif(is_state(entity, "1"), "package", "packages")
-          }}
-
-          '
-        icon: mdi:package-variant
-        color: orange
-        visibility:
-          - condition: numeric_state
-            entity: sensor.mail_packages_delivered
-            above: 0
-      - type: custom:streamline-card
-        template: package_delivery
-        variables:
-          - entity: sensor.mail_usps_delivering
-          - name: USPS
-          - icon: fab:usps
-          - icon_color: blue
-          - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=##TRACK_ID##
-        visibility:
-          - condition: numeric_state
-            entity: sensor.mail_usps_delivering
-            above: 0
-          - condition: state
-            entity: sensor.mail_usps_delivering
-            state_not: unavailable
-          - condition: state
-            entity: sensor.mail_usps_delivering
-            state_not: unknown
-      - type: custom:streamline-card
-        template: package_delivery
-        variables:
-          - entity: sensor.mail_ups_delivering
-          - name: UPS
-          - icon: fab:ups
-          - icon_color: brown
-          - url: https://www.ups.com/track?loc=en_US&tracknum=##TRACK_ID##
-        visibility:
-          - condition: numeric_state
-            entity: sensor.mail_ups_delivering
-            above: 0
-          - condition: state
-            entity: sensor.mail_ups_delivering
-            state_not: unavailable
-          - condition: state
-            entity: sensor.mail_ups_delivering
-            state_not: unknown
-      - type: custom:streamline-card
-        template: package_delivery
-        variables:
-          - entity: sensor.mail_fedex_delivering
-          - name: FedEx
-          - icon: fab:fedex
-          - icon_color: purple
-          - url: https://www.fedex.com/fedextrack/?trknbr=##TRACK_ID##
-        visibility:
-          - condition: numeric_state
-            entity: sensor.mail_fedex_delivering
-            above: 0
-          - condition: state
-            entity: sensor.mail_fedex_delivering
-            state_not: unavailable
-          - condition: state
-            entity: sensor.mail_fedex_delivering
-            state_not: unknown
-      - type: custom:streamline-card
-        template: package_delivery
-        variables:
-          - entity: sensor.mail_amazon_packages
-          - name: Amazon
-          - icon: fab:amazon
-          - icon_color: yellow
-          - url: https://www.amazon.com/gp/your-account/order-details?orderID=##TRACK_ID##
-        visibility:
-          - condition: numeric_state
-            entity: sensor.mail_amazon_packages
-            above: 0
-          - condition: state
-            entity: sensor.mail_amazon_packages
-            state_not: unavailable
-          - condition: state
-            entity: sensor.mail_amazon_packages
-            state_not: unknown
       - type: custom:mushroom-template-badge
         show_name: true
         entity: sensor.low_battery_devices
@@ -9926,26 +9951,79 @@ views:
       - type: grid
         cards:
           - type: heading
+            icon: mdi:lightbulb-group
+            heading: Lights
+            heading_style: subtitle
+            badges:
+              - type: custom:mushroom-template-badge
+                entity: light.utility_lights
+                content: '{{ expand(entity) | selectattr("state", "==", "on") | list
+                  | count }}/{{ expand(entity) | list | count }}'
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: toggle
+          - type: tile
+            entity: light.mud_room
+          - type: tile
+            entity: light.cold_storage
+          - type: heading
             icon: mdi:robot-vacuum
             heading: Robovacs
             heading_style: subtitle
-          - type: custom:tabbed-card
-            attributes:
-              minWidth: true
-            styles:
-              --mdc-theme-primary: var(--state-active-color)
-              --mdc-tab-color-default: var(--secondary-text-color)
-            tabs:
-              - card:
-                  type: custom:streamline-card
-                  template: vacuum_r2dee2
-                attributes:
-                  label: R2Dee2
-              - card:
-                  type: custom:streamline-card
-                  template: vacuum_mopman
-                attributes:
-                  label: Dustin Mopman
+          - type: custom:mushroom-chips-card
+            alignment: center
+            chips:
+              - type: template
+                content: R2Dee2
+                icon: mdi:robot-vacuum
+                icon_color: blue
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      title: R2Dee2
+                      content:
+                        type: custom:vertical-stack-in-card
+                        card_mod:
+                          style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+                            \ 0;\n}\n"
+                        cards:
+                          - type: custom:streamline-card
+                            template: vacuum_r2dee2
+                card_mod:
+                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
+                    \ rgba(var(--rgb-blue), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
+                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
+                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
+                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
+                    \ rgba(var(--rgb-blue), 0.4);\n}\n"
+              - type: template
+                content: Dustin Mopman
+                icon: mdi:robot-vacuum
+                icon_color: yellow
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      title: Dustin Mopman
+                      content:
+                        type: custom:vertical-stack-in-card
+                        card_mod:
+                          style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+                            \ 0;\n}\n"
+                        cards:
+                          - type: custom:streamline-card
+                            template: vacuum_mopman
+                card_mod:
+                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
+                    \ rgba(var(--rgb-yellow), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
+                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
+                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
+                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
+                    \ rgba(var(--rgb-yellow), 0.4);\n}\n"
       - type: grid
         cards:
           - type: heading
@@ -10079,23 +10157,6 @@ views:
                     color: rgb(158,158,158)
                 card_mod:
                   style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-          - type: heading
-            icon: mdi:lightbulb-group
-            heading: Lights
-            heading_style: subtitle
-            badges:
-              - type: custom:mushroom-template-badge
-                entity: light.utility_lights
-                content: '{{ expand(entity) | selectattr("state", "==", "on") | list
-                  | count }}/{{ expand(entity) | list | count }}'
-                tap_action:
-                  action: more-info
-                hold_action:
-                  action: toggle
-          - type: tile
-            entity: light.mud_room
-          - type: tile
-            entity: light.cold_storage
       - type: grid
         column_span: 2
         visibility:
@@ -10760,7 +10821,7 @@ views:
             primary: Garage Side Door
             secondary: '{% from "util.jinja" import nominal_change_history %} {{ state_translated(entity)
               }} ⸱ {{ nominal_change_history(entity) }}'
-            icon: mdi:door{{ iif(is_state(entity, "on"), "-open", "") }}
+            icon: mdi:door{{ "-open" if is_state(entity, "on") }}
             icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
             tap_action:
               action: more-info
@@ -10787,7 +10848,7 @@ views:
             primary: Sliding Door
             secondary: '{% from "util.jinja" import nominal_change_history %} {{ state_translated(entity)
               }} ⸱ {{ nominal_change_history(entity) }}'
-            icon: mdi:door-sliding{{ iif(is_state(entity, "on"), "-open", "") }}
+            icon: mdi:door-sliding{{ "-open" if is_state(entity, "on") }}
             icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
             tap_action:
               action: more-info
@@ -10850,7 +10911,7 @@ views:
             primary: Cold Storage Door
             secondary: '{% from "util.jinja" import nominal_change_history %} {{ state_translated(entity)
               }} ⸱ {{ nominal_change_history(entity) }}'
-            icon: mdi:door{{ iif(is_state(entity, "on"), "-open", "") }}
+            icon: mdi:door{{ "-open" if is_state(entity, "on") }}
             icon_color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
             tap_action:
               action: more-info
@@ -12705,10 +12766,10 @@ views:
             custom_fields:
               stat1: "[[[\n  var entity_id = 'sensor.quest_battery_level';\n  return\
                 \ `<ha-icon icon=\"mdi:battery\" style=\"width: 24px; height: 24px;\
-                \ color: var(--green-color);\"></ha-icon>\n    <span> CPU: <span style=\"\
-                color: var(--text-color-sensor);\">${states[entity_id].state !== 'unavailable'\
-                \ ? helpers.localize(states[entity_id], undefined, 0) : '?'}</span></span>`\n\
-                ]]]"
+                \ color: var(--green-color);\"></ha-icon>\n    <span> Battery: <span\
+                \ style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
+                \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
+                \ 0) : '?'}</span></span>`\n]]]"
               stat2: "[[[\n  var entity_id = 'sensor.quest_wifi_link_speed';\n  return\
                 \ `<ha-icon icon=\"mdi:wifi\" style=\"width: 24px; height: 24px; color:\
                 \ var(--green-color);\"></ha-icon>\n    <span> WiFi: <span style=\"\
@@ -12817,7 +12878,7 @@ views:
                   data:
                     entity: media_player.erebus
                   target: {}
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-1\
@@ -12995,7 +13056,7 @@ views:
                   data:
                     entity: media_player.nasya
                   target: {}
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-1\
@@ -13159,7 +13220,7 @@ views:
                   data:
                     entity: media_player.ardena
                   target: {}
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-2\
@@ -13219,7 +13280,7 @@ views:
                   - type: custom:streamline-card
                     template: computer_power
                     variables:
-                      - computer: ardena
+                      computer: ardena
                   - type: conditional
                     conditions:
                       - entity: binary_sensor.ardena_connected
@@ -13228,15 +13289,6 @@ views:
                         state_not: unknown
                       - entity: binary_sensor.ardena_connected
                         state_not: 'off'
-                    card:
-                      type: custom:streamline-card
-                      template: computer_apps
-                      variables:
-                        - computer: ardena
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.ardena_connected
-                        state: 'on'
                     card:
                       type: custom:streamline-card
                       template: computer_apps
@@ -13334,7 +13386,7 @@ views:
                   data:
                     entity: media_player.athos
                   target: {}
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-1\
@@ -13392,7 +13444,7 @@ views:
                   - type: custom:streamline-card
                     template: computer_power
                     variables:
-                      - computer: athos
+                      computer: athos
                   - type: conditional
                     conditions:
                       - entity: binary_sensor.athos_connected
@@ -13401,15 +13453,6 @@ views:
                         state_not: unknown
                       - entity: binary_sensor.athos_connected
                         state_not: 'off'
-                    card:
-                      type: custom:streamline-card
-                      template: computer_apps
-                      variables:
-                        - computer: athos
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.athos_connected
-                        state: 'on'
                     card:
                       type: custom:streamline-card
                       template: computer_apps
@@ -13503,7 +13546,7 @@ views:
                   action: none
                 hold_action:
                   action: none
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}"
@@ -13664,7 +13707,7 @@ views:
                   action: none
                 hold_action:
                   action: none
-                margin_top_mobile: -56px
+                margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}"
@@ -13877,9 +13920,11 @@ views:
             badges:
               - type: entity
                 entity: sensor.bambu_p1s_power
+                tap_action:
+                  action: more-info
               - type: custom:mushroom-template-badge
                 entity: switch.bambu_p1s
-                icon: mdi:power{{ iif(is_state(entity, "off"), "-off", "") }}
+                icon: mdi:power{{ "-off" if is_state(entity, "off") }}
                 label: Power
                 content: '{{ state_translated(entity) }}'
                 tap_action:
@@ -13889,7 +13934,7 @@ views:
                 color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
               - type: custom:mushroom-template-badge
                 entity: binary_sensor.bambu_p1s_hms_errors
-                icon: mdi:cogs
+                icon: mdi:information
                 tap_action:
                   action: navigate
                   navigation_path: '#printer-info'
@@ -14423,11 +14468,11 @@ views:
                 \ %}\n{% set hours = (time_to_end / 60) | int %}\n{% set minutes =\
                 \ (time_to_end % 60) %}\n\n.bubble-sub-button-4::before {\n  {% if\
                 \ toggle_state == 'on' %}\n    {% if end_time | timestamp_custom('%Y-%m-%d')\
-                \ == now().date() | string %}\n      content: \"{{ end_time | timestamp_custom('%H:%M')\
-                \ }}\";\n    {% else %}\n      content: \"{{ end_time | timestamp_custom('%m/%d\
-                \ %H:%M') }}\";\n    {% endif %}\n  {% else %}\n    content: \"{{\
-                \ '{:01}h {:01}m'.format(hours, minutes) }}\";\n  {% endif %}\n  margin-left:\
-                \ 3px;\n}\n"
+                \ == now().date() | string %}\n      content: \"{{ end_time | timestamp_custom('%-I:%M\
+                \ %p') }}\";\n    {% else %}\n      content: \"{{ end_time | timestamp_custom('%m/%d\
+                \ %-I:%M %p') }}\";\n    {% endif %}\n  {% else %}\n    content: \"\
+                {{ '{:01}h {:01}m'.format(hours, minutes) }}\";\n  {% endif %}\n \
+                \ margin-left: 3px;\n}\n"
       - type: grid
         cards:
           - type: custom:layout-card
