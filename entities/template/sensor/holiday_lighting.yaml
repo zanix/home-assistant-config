@@ -1,0 +1,148 @@
+---
+# The template platform supports sensors which get their values from other
+# entities.
+#
+# source: https://github.com/Petro31/home-assistant-config
+#
+trigger:
+  - platform: time
+    at: "00:00:00"
+  - platform: homeassistant
+    event: start
+  # If you end up here to copy this, it relies on an automation in config\automation\events
+  # named "Events - Forward Reload Templates"
+  - platform: event
+    event_type: templates_reloaded
+  - platform: state
+    entity_id: input_select.holiday_override
+action:
+  - variables:
+      holidays:
+        # These holidays are meant to be used with easy_time.jinja
+        # start, end, and event are all dictionaries that contain macro and kwargs.
+        # macro is the macro used from easy_time.jina.
+        # kwargs are the arguments used by name, e.g. if the macro uses month, day as inputs
+        # kwargs will be set to month: #, day: #.
+
+        valentines:
+          event:
+            macro: month_day
+            kwargs:
+              month: 2
+              day: 14
+          before:
+            days: 14
+          after:
+            days: 1
+
+        st_patricks_day:
+          event:
+            macro: month_day
+            kwargs:
+              month: 3
+              day: 17
+          before:
+            days: 6
+          after:
+            days: 1
+
+        easter:
+          event:
+            macro: easter
+          before:
+            days: 6
+          after:
+            days: 1
+
+        memorial_day:
+          event:
+            macro: last_day_in_month
+            kwargs:
+              month: 5
+              weekday: 0
+          before:
+            days: 6
+          after:
+            days: 1
+
+        independence_day:
+          event:
+            macro: month_day
+            kwargs:
+              month: 7
+              day: 4
+          before:
+            days: 6
+          after:
+            days: 1
+
+        halloween:
+          start:
+            macro: month_day
+            kwargs:
+              month: 10
+              day: 1
+          end:
+            macro: month_day
+            kwargs:
+              month: 11
+              day: 1
+
+        veterans_day:
+          event:
+            macro: month_day
+            kwargs:
+              month: 11
+              day: 11
+          before:
+            days: 6
+          after:
+            days: 1
+
+        christmas:
+          start:
+            macro: month_week_day
+            kwargs:
+              month: 11
+              week: 4
+              weekday: 7
+          end:
+            macro: month_day
+            kwargs:
+              month: 1
+              day: 7
+      event: >
+        {%- set override = states('input_select.holiday_override') %}
+        {%- if override == 'automatic' %}
+          {%- import 'easy_time.jinja' as easy_time %}
+          {%- set dflt = {'minutes': 0 } %}
+          {%- set ns = namespace(events=[], found='no_holiday') %}
+          {%- for holiday, items in holidays.items() %}
+            {%- set event = items.get('event') %}
+            {%- set start = items.get('start') %}
+            {%- set end = items.get('end') %}
+            {%- if event %}
+              {%- set e = easy_time[event['macro']](**event.get('kwargs', {})) | as_datetime | as_local %}
+              {%- set b = timedelta(**items.get('before', dflt)) %}
+              {%- set a = timedelta(**items.get('after', dflt)) %}
+              {%- set ns.events = ns.events + [ (holiday, e - b), ('no_holiday', e + a) ] %}
+            {%- elif start and end %}
+              {%- set s = easy_time[start['macro']](**start.get('kwargs', {})) | as_datetime | as_local %}
+              {%- set e = easy_time[end['macro']](**end.get('kwargs', {})) | as_datetime | as_local %}
+              {%- set ns.events = ns.events + [ (holiday, s), ('no_holiday', e) ] %}
+            {%- endif %}
+          {%- endfor %}
+
+          {%- for event, dt in ns.events | sort(attribute='1') %}
+            {%- if dt.date() <= now().date() %}
+              {%- set ns.found = event %}
+            {%- endif %}
+          {%- endfor %}
+          {{ ns.found }}
+        {%- else %}
+          {{ override }}
+        {%- endif %}
+sensor:
+  - unique_id: holiday_lighting
+    name: Holiday Lighting
+    state: "{{ event }}"

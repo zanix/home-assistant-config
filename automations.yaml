@@ -778,12 +778,14 @@
   - data:
       transition: 360
       brightness_pct: 25
+      kelvin: 3000
     target:
       entity_id: light.outside_garage
     action: light.turn_on
   - data:
       transition: 360
       brightness_pct: 1
+      kelvin: 3000
     target:
       entity_id: light.outside_entry
     action: light.turn_on
@@ -807,22 +809,22 @@
 - id: '1665686549835'
   alias: "\U0001F4A1 Front Lights on at Sunset"
   description: Turns the front lights on at sunset
-  trigger:
-  - platform: sun
-    event: sunset
+  triggers:
+  - event: sunset
     offset: -00:20:00
-  condition:
+    trigger: sun
+  conditions:
   - condition: time
     before: input_datetime.lights_front_night_dim
     after: 00:00:00
-  action:
-  - data:
-      brightness_pct: 100
+  actions:
+  - variables:
+      scene: '{{ states(''sensor.seasonal_lights'')}}'
+  - action: scene.turn_on
+    metadata: {}
+    data: {}
     target:
-      entity_id:
-      - light.outside_garage
-      - light.outside_entry
-    action: light.turn_on
+      entity_id: '{{ scene }}'
   mode: single
 - id: '1665686584864'
   alias: "\U0001F4A1 Living Room Lamps on/off"
@@ -5490,3 +5492,13 @@
       action: script.notify_pipup
     alias: Send a notification to each device
   mode: single
+- id: '1734643266064'
+  alias: ⚙️ Forward Reload Templates
+  description: Forwards the template reloaded event so other actions can be taken
+  triggers:
+  - event_type: event_template_reloaded
+    trigger: event
+  actions:
+  - delay: 00:00:01
+  - event: templates_reloaded
+    event_data: {}
