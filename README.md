@@ -32,10 +32,10 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4134 |
-| Sensors        | 1278 |
+| All Entities   | 4150 |
+| Sensors        | 1279 |
 | Binary Sensors | 322 |
-| Lights         | 72 |
+| Lights         | 73 |
 | Switches       | 226 |
 
 <details><summary>Stock Integrations</summary>
@@ -282,13 +282,13 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>26 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.23.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.25.0]
 
 Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.38]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.39]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -370,7 +370,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.31.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.31.2]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -382,7 +382,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.6]
+### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.7]
 
 Home Assistant Neakasa Integration
 
@@ -412,7 +412,7 @@ A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
 Authors: [@frenck](https://github.com/frenck).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.15]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.16]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -482,7 +482,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v6.1.0]
+### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v6.1.2]
 
 A Lovelace card for Frigate in Home Assistant
 
@@ -498,7 +498,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.4.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.5.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -578,7 +578,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.12.3]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.12.6]
 
 Home Assistant Lovelace Windrose Card
 
@@ -594,7 +594,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material Rounded Theme   Based On Material You By Google On Android](https://github.com/Nerwyn/material-rounded-theme) [v3.0.0]
+### [Material Rounded And Material You   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.0.2]
 
 Material Design 3 Colors and Components in Home Assistant
 
