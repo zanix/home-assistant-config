@@ -707,7 +707,7 @@ Material Design 3 Colors and Components in Home Assistant
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode 🚫
 - ⏯ Living Room Media State at Night 🚫
-- ⏯ Living Room Sound Mode
+- ⏯ Living Room Sound Mode 🚫
 - ⏯ Living Room Sound Night Mode
 - ⏯ Main Bedroom Media Auto Off
 - ⏯ PS4 Harmony Activity 🚫
