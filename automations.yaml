@@ -778,14 +778,14 @@
   - data:
       transition: 360
       brightness_pct: 25
-      kelvin: 3000
+      kelvin: 2700
     target:
       entity_id: light.outside_garage
     action: light.turn_on
   - data:
       transition: 360
       brightness_pct: 1
-      kelvin: 3000
+      kelvin: 2700
     target:
       entity_id: light.outside_entry
     action: light.turn_on
@@ -1848,8 +1848,9 @@
         trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'otherCommandsOngoing'
         in trigger.event.data.message -%}\n  Another command is in-progress.\n{%-
         elif 'never received' in trigger.event.data.message -%}\n  The message wasn't
-        recieved.\n{%- elif 'unknown' in trigger.event.data.message -%}\n  I have
-        no idea why. Please try again.\n{% endif %}"
+        recieved.\n{%- elif 'ignitionIsOn' in trigger.event.data.message -%}\n  The
+        car is already running.\n{%- elif 'unknown' in trigger.event.data.message
+        -%}\n  I have no idea why. Please try again.\n{% endif %}"
   - parallel:
     - data:
         who: parents
@@ -2574,9 +2575,10 @@
   actions:
   - variables:
       title: Water Leak Detected
-      location: '{{ trigger.to_state.name | replace(" water leak", "") | replace("
-        Leak Sensor", "") | replace(" Leak", "") | replace(" Moisture", "") | trim
-        }}'
+      location: "{{ trigger.to_state.name\n  | regex_replace(find=' water', replace='',
+        ignorecase=true)\n  | regex_replace(find=' leak', replace='', ignorecase=true)\n
+        \ | regex_replace(find=' detected', replace='', ignorecase=true)\n  | regex_replace(find='
+        moisture', replace='', ignorecase=true)\n  | trim\n}}"
       message: There is a water leak in the {{ location }} and the water main has
         been shut off.
   - parallel:
@@ -3038,19 +3040,13 @@
       - data:
           transition: 1
         target:
-          entity_id: light.main_bedroom
+          entity_id: light.main_bedroom_main_lights
         action: light.toggle
       action_button_center_double:
       - data: {}
         target:
           entity_id: fan.main_bedroom_ceiling
         action: fan.toggle
-      action_button_center_long:
-      - action: light.toggle
-        data:
-          transition: 1
-        target:
-          entity_id: light.main_bedroom_fan_light
 - id: '1667779119970'
   alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
@@ -4437,7 +4433,7 @@
   triggers:
   - entity_id:
     - sensor.cat_feeder_total_weight
-    above: 1400
+    above: 1340
     trigger: numeric_state
   conditions: []
   actions:
@@ -4906,8 +4902,8 @@
   conditions: []
   actions:
   - variables:
-      title: P1S Issue Detected - {{ trigger.event.data.hms_code }}
-      message: '{{ trigger.event.data.description }}'
+      title: P1S Issue Detected - {{ trigger.event.data.code }}
+      message: '{{ trigger.event.data.error }}'
   - parallel:
     - data:
         who: joshua
@@ -5436,7 +5432,6 @@
         - trigger: state
           entity_id:
           - cover.garage_door
-          from: open
           to: closed
         timeout:
           hours: 0
@@ -5491,6 +5486,65 @@
         icon_url: local/icons/stove.png
       action: script.notify_pipup
     alias: Send a notification to each device
+  mode: single
+- id: '1734069674224'
+  alias: "\U0001F431 Cat Litterbox Full"
+  description: Sends a notification when the Litterbox is full
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.luna_box_garbage_can_full
+    to: 'on'
+  conditions: []
+  actions:
+  - parallel:
+    - metadata: {}
+      data:
+        who: parents
+        title: Litterbox
+        message: The Litterbox bin is full
+        notification_icon: mdi:paw
+        color: '#FF9800'
+        icon_url: local/icons/paw.png
+        tag: litterbox
+      action: script.notify_mobile
+    - metadata: {}
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Litterbox
+        message: The Litterbox bin is full
+      action: script.notify_hass_agent
+  mode: single
+- id: '1734069969369'
+  alias: "\U0001F431 Cat Litterbox Litter Low"
+  description: Sends a notification when the Litterbox litter is nearly empty
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.luna_box_cat_litter_state
+    to: insufficient
+  conditions: []
+  actions:
+  - parallel:
+    - metadata: {}
+      data:
+        who: parents
+        title: Litterbox
+        message: The Litterbox litter is low
+        notification_icon: mdi:paw
+        color: '#FF9800'
+        icon_url: local/icons/paw.png
+      action: script.notify_mobile
+    - metadata: {}
+      data:
+        entity:
+        - media_player.erebus
+        - media_player.nasya
+        title: Litterbox
+        message: The Litterbox litter is low
+      action: script.notify_hass_agent
   mode: single
 - id: '1734643266064'
   alias: ⚙️ Forward Reload Templates

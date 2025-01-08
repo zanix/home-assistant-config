@@ -698,7 +698,7 @@ Material Design 3 Colors and Components in Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>503 Automations</summary>
+<details><summary>506 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -707,7 +707,7 @@ Material Design 3 Colors and Components in Home Assistant
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode 🚫
 - ⏯ Living Room Media State at Night 🚫
-- ⏯ Living Room Sound Mode 🚫
+- ⏯ Living Room Sound Mode
 - ⏯ Living Room Sound Night Mode
 - ⏯ Main Bedroom Media Auto Off
 - ⏯ PS4 Harmony Activity 🚫
@@ -753,6 +753,8 @@ Material Design 3 Colors and Components in Home Assistant
 - 🏢 Joshua Office Mode
 - 🐱 Cat Feeder Empty Notification
 - 🐱 Cat Feeder Error
+- 🐱 Cat Litterbox Full
+- 🐱 Cat Litterbox Litter Low
 - 💡 All Lights off when Away
 - 💡 Dim Front Lights at Night
 - 💡 Front Lights off at Sunrise
@@ -795,7 +797,7 @@ Material Design 3 Colors and Components in Home Assistant
 - 📋 [Inovelli] Family Room Switch
 - 📋 [Inovelli] Garage Switch
 - 📋 [Inovelli] Joshua Office Switch
-- 📋 [Inovelli] Living Room Switch
+- 📋 [Inovelli] Living Room Fan Light Switch
 - 📋 [Inovelli] Main Bedroom Switch
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Today
