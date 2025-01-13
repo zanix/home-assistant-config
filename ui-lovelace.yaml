@@ -5,6 +5,8 @@ kiosk_mode:
 button_card_templates:
   badge:
     show_label: true
+    variables:
+      color: var(--grey-color)
     styles:
       grid:
         - grid-template-areas: '"i n" "i l"'
@@ -15,6 +17,7 @@ button_card_templates:
         - height: 36px
         - border-radius: var(--ha-badge-border-radius, calc(var(--ha-badge-size, 36px)
             / 2))
+        - --mdc-ripple-color: '[[[ return variables.color ]]]'
       img_cell:
         - justify-content: start
         - width: 26px
@@ -24,7 +27,7 @@ button_card_templates:
         - position: relative
         - width: 18px
         - height: 18px
-        - color: var(--grey-color)
+        - color: '[[[ return variables.color ]]]'
       name:
         - justify-self: start
         - align-self: start
@@ -2181,30 +2184,11 @@ streamline_templates:
                 \ */\n  background-color: var(--state-person);\n  box-shadow: 0 0\
                 \ 4px 2px var(--state-person);\n  margin-right: var(--mush-title-spacing,\
                 \ 12px);\n}\n"
-        - type: custom:history-explorer-card
-          cardName: historycard-person.[[person]]
-          header: hide
-          uiLayout:
-            selector: hide
-          labelsVisible: false
-          labelAreaWidth: 0
-          tooltipShowDuration: true
-          tooltipSize: slim
-          stateTextMode: auto
-          graphs:
-            - type: timeline
-              title: Timeline
-              entities:
-                - entity: person.[[person]]
-                  process: "( state == \"home\" ) ? \"Home\"\n  : ( state == \"not_home\"\
-                    \ ) ? \"Away\"\n  : state"
-          stateColors:
-            Home: rgb(0,138,23)
-            Away: rgb(57,64,70)
-          card_mod:
-            style:
-              .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-background:\
-                \ none;\n  box-shadow: none;\n}\n"
+        - type: history-graph
+          hours_to_show: 48
+          show_names: false
+          entities:
+            - entity: person.[[person]]
         - type: horizontal-stack
           cards:
             - type: custom:mushroom-template-card
@@ -3967,9 +3951,6 @@ views:
                       styles:
                         icon:
                           - animation: cleaning 10s linear infinite
-                  styles:
-                    icon:
-                      - color: '[[[ return variables.color ]]]'
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
@@ -4028,9 +4009,6 @@ views:
                       styles:
                         icon:
                           - animation: cleaning 10s linear infinite
-                  styles:
-                    icon:
-                      - color: '[[[ return variables.color ]]]'
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
@@ -4082,7 +4060,6 @@ views:
                       icon: mdi:washing-machine
                       styles:
                         icon:
-                          - color: var(--blue-color)
                           - animation: shake 400ms ease-in-out infinite, drum 2s ease
                               infinite
                           - transform-origin: 50% 110%
@@ -4107,14 +4084,13 @@ views:
                   tap_action:
                     action: more-info
                   variables:
-                    color: "[[[\n  if (entity.state === 'on') return 'var(--blue-color)';\n\
+                    color: "[[[\n  if (entity.state === 'on') return 'var(--orange-color)';\n\
                       \  else return 'var(--grey-color)';\n]]]\n"
                   state:
                     - value: 'on'
                       icon: mdi:tumble-dryer
                       styles:
                         icon:
-                          - color: var(--orange-color)
                           - animation: shake 400ms ease-in-out infinite, drum 1s infinite
                           - transform-origin: 50% 65%
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
@@ -4164,21 +4140,19 @@ views:
                           - transform-origin: 50% 75%
                   styles:
                     img_cell:
-                      - background: "[[[\n  var entity_remain = \"sensor.ge_dishwasher_time_remaining\"\
-                          ;\n  var entity_duration = \"sensor.ge_dishwasher_duration\"\
+                      - background: "[[[\n  let entity_remain = \"sensor.ge_dishwasher_time_remaining\"\
+                          ;\n  let entity_duration = \"sensor.ge_dishwasher_duration\"\
                           ;\n\n  if (entity.state !== \"Off\"\n    && states[entity_remain].state\n\
                           \    && states[entity_duration].state\n    && states[entity_duration].state\
-                          \ !== \"Off\"\n  ) {\n    var remaining = states[entity_remain].state.split(\"\
+                          \ !== \"Off\"\n  ) {\n    let remaining = states[entity_remain].state.split(\"\
                           :\");\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
-                          \    var duration = states[entity_duration].state.split(\"\
+                          \    let duration = states[entity_duration].state.split(\"\
                           :\");\n    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
                           \n    return `radial-gradient(var(--card-background-color)\
                           \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
                           \ ${Math.round(((duration - remaining) / duration * 100),\
-                          \ 0)}% 0%, var(--card-background-color) 0% 100%)`;\n  }\n\
-                          ]]]\n"
-                    icon:
-                      - color: '[[[ return variables.color ]]]'
+                          \ 0)}% 0%, var(--card-background-color) 0% 100%)`;\n  }\
+                          \ else {\n    return 'inherit';\n  }\n]]]\n"
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
@@ -4221,11 +4195,11 @@ views:
                       ]]]\n"
                   styles:
                     img_cell:
-                      - background: "[[[\n  var cook_time_remain = \"sensor.ge_oven_cook_time_remaining\"\
-                          ;\n  var cook_time_duration = \"sensor.ge_oven_cook_time_duration\"\
-                          ;\n\n  var timer_remain = \"sensor.ge_oven_kitchen_timer\"\
-                          ;\n  var timer_duration = \"sensor.ge_oven_kitchen_timer_duration\"\
-                          ;\n\n  var remaining = \"\";\n  var duration = \"\";\n \
+                      - background: "[[[\n  let cook_time_remain = \"sensor.ge_oven_cook_time_remaining\"\
+                          ;\n  let cook_time_duration = \"sensor.ge_oven_cook_time_duration\"\
+                          ;\n\n  let timer_remain = \"sensor.ge_oven_kitchen_timer\"\
+                          ;\n  let timer_duration = \"sensor.ge_oven_kitchen_timer_duration\"\
+                          ;\n\n  let remaining = \"\";\n  let duration = \"\";\n \
                           \ if (states[cook_time_remain]?.state\n    && states[cook_time_duration]?.state\
                           \ !== \"Off\"\n  ) {\n    remaining = states[cook_time_remain].state.split(\"\
                           :\");\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
@@ -4245,8 +4219,6 @@ views:
                           \ ${Math.round(((duration - remaining) / duration * 100),\
                           \ 0)}% 0%, var(--card-background-color) 0% 100%)`;\n  }\n\
                           ]]]\n"
-                    icon:
-                      - color: '[[[ return variables.color ]]]'
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
@@ -4456,11 +4428,10 @@ views:
                   card_mod:
                     style: ".content {\n  {% if is_state(config.entity, 'on') %}\n\
                       \    {% set speed = state_attr(config.entity, 'percentage')\
-                      \ %}\n    {% set duration = {\n      33: \"1s\",\n      66:\
-                      \ \"0.75s\",\n      100: \"0.66s\"\n    }[speed] %}\n    animation:\
-                      \ rotation linear infinite;\n    animation-duration: {{ duration\
-                      \ }};\n  {% endif %}\n}\n@keyframes rotation {\n  100% {\n \
-                      \   transform: rotate(360deg);\n  }\n}\n"
+                      \ %}\n    animation: {{ (2 - (speed / 100) * 1.5) | round(2)\
+                      \ }}s rotation linear infinite;\n  {% endif %}\n}\n@keyframes\
+                      \ rotation {\n  100% {\n    transform: rotate(360deg);\n  }\n\
+                      }\n"
                   tap_action:
                     action: more-info
                 - type: template
@@ -5012,11 +4983,10 @@ views:
                   card_mod:
                     style: ".content {\n  {% if is_state(config.entity, 'on') %}\n\
                       \    {% set speed = state_attr(config.entity, 'percentage')\
-                      \ %}\n    {% set duration = {\n      33: \"1s\",\n      66:\
-                      \ \"0.75s\",\n      100: \"0.66s\"\n    }[speed] %}\n    animation:\
-                      \ rotation linear infinite;\n    animation-duration: {{ duration\
-                      \ }};\n  {% endif %}\n}\n@keyframes rotation {\n  100% {\n \
-                      \   transform: rotate(360deg);\n  }\n}\n"
+                      \ %}\n    animation: {{ (2 - (speed / 100) * 1.5) | round(2)\
+                      \ }}s rotation linear infinite;\n  {% endif %}\n}\n@keyframes\
+                      \ rotation {\n  100% {\n    transform: rotate(360deg);\n  }\n\
+                      }\n"
                   tap_action:
                     action: more-info
                 - type: template
@@ -5610,7 +5580,8 @@ views:
                       style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
                   - type: custom:mushroom-chips-card
                     card_mod:
-                      style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
+                      style: "ha-card {\n  --chip-background: var(--secondary-background-color);\n\
+                        }\n.chip-container {\n  display: grid !important;\n  grid-template-columns:\
                         \ 1fr 1fr 1fr 1fr;\n}\n"
                     chips:
                       - type: entity
@@ -5735,7 +5706,8 @@ views:
                             }\n"
                   - type: custom:mushroom-chips-card
                     card_mod:
-                      style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
+                      style: "ha-card {\n  --chip-background: var(--secondary-background-color);\n\
+                        }\n.chip-container {\n  display: grid !important;\n  grid-template-columns:\
                         \ max-content max-content;\n  margin-top: 15px;\n  place-content:\
                         \ space-around !important;\n}\n"
                     chips:
@@ -5893,6 +5865,43 @@ views:
                 location_url: ''
                 mileage_url: ''
                 fuel_level_url: ''
+              - type: custom:expander-card
+                gap: 0em
+                padding: 0em
+                child-padding: 0.5em
+                title-card-padding: 0em
+                title-card-button-overlay: true
+                overlay-margin: calc(var(--ha-card-border-radius, 12px) / 2) auto
+                title-card:
+                  type: vertical-stack
+                  cards:
+                    - type: heading
+                      icon: mdi:gas-station
+                      heading: Gas Prices
+                      heading_style: title
+                    - type: markdown
+                      content: "{%- set level = states('sensor.ascent_fuel_level')\
+                        \ | float(100) -%} {%- set capacity = 19.3 -%} {%- set gal_remain\
+                        \ = (100 - level) / 100 * capacity -%} {% set stations = {\n\
+                        \  \"Costco\": states('sensor.costco_regular_gas') | float(3),\n\
+                        \  \"Maverik\": states('sensor.maverik_midgrade_gas') | float(3)\n\
+                        } %} {%- for name, price in stations.items() -%}\n  {{ name\
+                        \ }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain\
+                        \ * price) }}\n{% endfor %}"
+                cards:
+                  - type: custom:auto-entities
+                    filter:
+                      include:
+                        - integration: gasbuddy
+                          options:
+                            type: tile
+                            show_entity_picture: true
+                    sort:
+                      method: state
+                    card:
+                      type: custom:layout-card
+                      cards: []
+                      layout_type: masonry
               - type: map
                 entities:
                   - entity: device_tracker.ascent
@@ -5960,28 +5969,6 @@ views:
                 layout_options:
                   grid_columns: full
                   grid_rows: 7
-              - type: custom:expander-card
-                gap: 0em
-                padding: 0em
-                child-padding: 0.5em
-                title-card-padding: 0em
-                title-card-button-overlay: true
-                overlay-margin: calc(var(--ha-card-border-radius, 12px) / 2) auto
-                title: Gas Prices
-                cards:
-                  - type: custom:auto-entities
-                    filter:
-                      include:
-                        - integration: gasbuddy
-                          options:
-                            type: tile
-                            show_entity_picture: true
-                    sort:
-                      method: state
-                    card:
-                      type: custom:layout-card
-                      cards: []
-                      layout_type: masonry
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -6059,7 +6046,8 @@ views:
                 cards:
                   - type: custom:mushroom-chips-card
                     card_mod:
-                      style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
+                      style: "ha-card {\n  --chip-background: var(--secondary-background-color);\n\
+                        }\n.chip-container {\n  display: grid !important;\n  grid-template-columns:\
                         \ 1fr 1fr 1fr 1fr;\n}\n"
                     chips:
                       - type: entity
@@ -6132,7 +6120,8 @@ views:
                             }\n"
                   - type: custom:mushroom-chips-card
                     card_mod:
-                      style: ".chip-container {\n  display: grid !important;\n  grid-template-columns:\
+                      style: "ha-card {\n  --chip-background: var(--secondary-background-color);\n\
+                        }\n.chip-container {\n  display: grid !important;\n  grid-template-columns:\
                         \ max-content max-content;\n  margin-top: 15px;\n  place-content:\
                         \ space-around !important;\n}\n"
                     chips:
@@ -6312,6 +6301,43 @@ views:
                 engine_on_url: ''
                 location_url: ''
                 mileage_url: ''
+              - type: custom:expander-card
+                gap: 0em
+                padding: 0em
+                child-padding: 0.5em
+                title-card-padding: 0em
+                title-card-button-overlay: true
+                overlay-margin: calc(var(--ha-card-border-radius, 12px) / 2) auto
+                title-card:
+                  type: vertical-stack
+                  cards:
+                    - type: heading
+                      icon: mdi:gas-station
+                      heading: Gas Prices
+                      heading_style: title
+                    - type: markdown
+                      content: "{%- set level = states('sensor.kona_fuel_level') |\
+                        \ float(100) -%} {%- set capacity = 12.4 -%} {%- set gal_remain\
+                        \ = (100 - level) / 100 * capacity -%} {% set stations = {\n\
+                        \  \"Costco\": states('sensor.costco_regular_gas') | float(3),\n\
+                        \  \"Maverik\": states('sensor.maverik_midgrade_gas') | float(3)\n\
+                        } %} {%- for name, price in stations.items() -%}\n  {{ name\
+                        \ }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain\
+                        \ * price) }}\n{% endfor %}"
+                cards:
+                  - type: custom:auto-entities
+                    filter:
+                      include:
+                        - integration: gasbuddy
+                          options:
+                            type: tile
+                            show_entity_picture: true
+                    sort:
+                      method: state
+                    card:
+                      type: custom:layout-card
+                      cards: []
+                      layout_type: masonry
               - type: map
                 entities:
                   - entity: device_tracker.kona_location
@@ -6376,28 +6402,6 @@ views:
                       \ button to match Chip */\n  height: var(--mush-chip-height,\
                       \ 36px) !important;\n  width: var(--mush-chip-height, 36px)\
                       \ !important;\n  --mdc-icon-size: 22px;\n}\n"
-              - type: custom:expander-card
-                gap: 0em
-                padding: 0em
-                child-padding: 0.5em
-                title-card-padding: 0em
-                title-card-button-overlay: true
-                overlay-margin: calc(var(--ha-card-border-radius, 12px) / 2) auto
-                title: Gas Prices
-                cards:
-                  - type: custom:auto-entities
-                    filter:
-                      include:
-                        - integration: gasbuddy
-                          options:
-                            type: tile
-                            show_entity_picture: true
-                    sort:
-                      method: state
-                    card:
-                      type: custom:layout-card
-                      cards: []
-                      layout_type: masonry
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -6451,7 +6455,7 @@ views:
                 card_type: pop-up
                 hash: '#feeder-info'
                 show_header: false
-                margin_top_desktop: 30vh
+                margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: 10vh
               - type: custom:bubble-card
@@ -6607,7 +6611,7 @@ views:
                 card_type: pop-up
                 hash: '#litter-info'
                 show_header: false
-                margin_top_desktop: 30vh
+                margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: 10vh
               - type: custom:bubble-card
@@ -6844,8 +6848,6 @@ views:
                         card:
                           - background-color: color-mix(in srgb, var(--disabled-color)
                               12%, var(--card-background-color) 100%) !important;
-                        icon:
-                          - color: '[[[ return variables.color ]]]'
                       state:
                         - value: 'on'
                           icon: mdi:check-circle
@@ -6869,8 +6871,6 @@ views:
                         card:
                           - background-color: color-mix(in srgb, var(--disabled-color)
                               12%, var(--card-background-color) 100%) !important;
-                        icon:
-                          - color: '[[[ return variables.color ]]]'
                       state:
                         - value: 'on'
                           icon: mdi:check-circle
@@ -6894,8 +6894,6 @@ views:
                         card:
                           - background-color: color-mix(in srgb, var(--disabled-color)
                               12%, var(--card-background-color) 100%) !important;
-                        icon:
-                          - color: '[[[ return variables.color ]]]'
                       state:
                         - value: 'on'
                           icon: mdi:check-circle
@@ -6919,8 +6917,6 @@ views:
                         card:
                           - background-color: color-mix(in srgb, var(--disabled-color)
                               12%, var(--card-background-color) 100%) !important;
-                        icon:
-                          - color: '[[[ return variables.color ]]]'
                       state:
                         - value: 'on'
                           icon: mdi:check-circle
@@ -6944,8 +6940,6 @@ views:
                         card:
                           - background-color: color-mix(in srgb, var(--disabled-color)
                               12%, var(--card-background-color) 100%) !important;
-                        icon:
-                          - color: '[[[ return variables.color ]]]'
                       state:
                         - value: 'on'
                           icon: mdi:check-circle
@@ -6969,10 +6963,8 @@ views:
                           \  else return 'var(--grey-color)';\n]]]\n"
                       styles:
                         card:
-                          - background-color: color-mix(in srgb, var(--red-color)
+                          - background-color: color-mix(in srgb, var(--disabled-color)
                               12%, var(--card-background-color) 100%) !important;
-                        icon:
-                          - color: '[[[ return variables.color ]]]'
                       state:
                         - value: 'on'
                           icon: mdi:check-circle
@@ -7002,15 +6994,16 @@ views:
               - type: custom:mushroom-template-card
                 entity: water_heater.ge_oven
                 multiline_secondary: false
-                primary: "{% if is_state_attr(entity, 'operation_mode', 'Off') %}\n\
-                  \  Oven\n{% elif not is_state('sensor.ge_oven_cook_time_remaining',\
+                primary: "{% if has_value(entity) and is_state_attr(entity, 'operation_mode',\
+                  \ 'Off') %}\n  Oven\n{% elif not is_state('sensor.ge_oven_cook_time_remaining',\
                   \ 'Off') %}\n  Cook Time\n{% elif not is_state('sensor.ge_oven_kitchen_timer',\
                   \ 'Off') %}\n  Timer\n{% else %}\n  {{ state_attr(entity, 'operation_mode')\
                   \ }} ⸱ {{ float(state_attr('water_heater.ge_oven', 'temperature'),\
                   \ 0) | round(0) }}°F\n{% endif %}"
-                secondary: "{% if is_state_attr(entity,'operation_mode', 'Off') %}\n\
-                  \  Off\n{% else %}\n  {{ float(state_attr(entity, 'current_temperature'))\
-                  \ | round(0) }}°F\n{% endif %}"
+                secondary: "{% if has_value(entity) %}\n  {% if is_state_attr(entity,\
+                  \ 'operation_mode', 'Off') %}\n    Off\n  {% else %}\n    {{ float(state_attr(entity,\
+                  \ 'current_temperature')) | round(0) }}°F\n  {% endif %}\n{% endif\
+                  \ %}"
                 icon: '{% if not is_state(''sensor.ge_oven_cook_time_remaining'',
                   ''Off'') %}mdi:timer-play
 
@@ -7048,7 +7041,8 @@ views:
                       \ -%} {%- set cook_time_duration = 'sensor.ge_oven_cook_time_duration'\
                       \ -%} {%- set timer_remain = 'sensor.ge_oven_kitchen_timer'\
                       \ -%} {%- set timer_duration = 'sensor.ge_oven_kitchen_timer_duration'\
-                      \ -%}\n{%- if has_value(timer_remain)\n  and has_value(timer_duration)\n\
+                      \ -%}\n{%- set entity_remain = '00:00' -%} {%- set entity_duration\
+                      \ = '00:00' -%} {%- if has_value(timer_remain)\n  and has_value(timer_duration)\n\
                       \  and not is_state(timer_duration, 'Off')\n-%}\n  {%- set entity_remain\
                       \ = states(timer_remain) -%}\n  {%- set entity_duration = states(timer_duration)\
                       \ -%}\n{%- elif has_value(cook_time_remain)\n  and has_value(cook_time_duration)\n\
@@ -7058,15 +7052,15 @@ views:
                       \ =\n  (int(entity_remain.split(\":\")[0], 0) * 60)\n  + (int(entity_remain.split(\"\
                       :\")[1], 0)) -%}\n{%- set duration =\n  (int(entity_duration.split(\"\
                       :\")[0], 0) * 60)\n    + (int(entity_duration.split(\":\")[1],\
-                      \ 0))\n-%}\n.shape {\n  /* Radial progress bar */\n  background:\n\
-                      \    radial-gradient(var(--card-background-color) 60%, transparent\
-                      \ calc(60% + 1px)),\n    conic-gradient(var(--purple-color)\
+                      \ 0))\n-%}\n{%- if duration - remaining > 0 -%} .shape {\n \
+                      \ /* Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
+                      \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--purple-color)\
                       \ {{ ((duration - remaining) / duration * 100) | round() }}%\
                       \ 0%, var(--card-background-color) 0% 100%);\n} .shape:after\
                       \ {\n  /* Add back icon shape */\n  content: \"\";\n  height:\
                       \ 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
                       \ var(--icon-border-radius);\n  background: var(--shape-color);\n\
-                      }\n"
+                      } {%- endif -%}\n"
               - square: false
                 type: grid
                 columns: 4
@@ -10200,7 +10194,7 @@ views:
             entity: sensor.ecowitt_wh90_capacitor
             name: Capacitor
             min: 0
-            max: 5
+            max: 5.5
             severity:
               green: 4
               yellow: 3
@@ -10875,7 +10869,7 @@ views:
                   controls:
                     builtin: false
                     ptz:
-                      mode: 'off'
+                      mode: 'on'
                       orientation: vertical
                       hide_zoom: true
                   lazy_load: true
@@ -10942,7 +10936,7 @@ views:
                   controls:
                     builtin: false
                     ptz:
-                      mode: 'off'
+                      mode: 'on'
                       orientation: vertical
                       hide_zoom: true
                   lazy_load: true
@@ -11009,7 +11003,7 @@ views:
                   controls:
                     builtin: false
                     ptz:
-                      mode: 'off'
+                      mode: 'on'
                       orientation: vertical
                       hide_zoom: true
                   lazy_load: true
@@ -11141,19 +11135,12 @@ views:
         color: grey
         tap_action:
           action: more-info
-  - title: Frigate
+  - title: Frigate Timeline
     path: frigate
     subview: true
     icon: mdi:timeline
     type: sections
     sections:
-      - type: grid
-        cards:
-          - type: heading
-            icon: mdi:timeline
-            heading: Frigate Timeline
-            heading_style: title
-        column_span: 4
       - type: grid
         cards:
           - type: custom:frigate-card
@@ -11402,11 +11389,11 @@ views:
                       entity_row: true
                     - entity: sensor.joshua_office_temperature
                       height: 30px
-                      name: Josh Office
+                      name: Josh's Office
                       entity_row: true
                     - entity: sensor.amy_office_temperature
                       height: 30px
-                      name: Amy Office
+                      name: Amy's Office
                       entity_row: true
                     - entity: sensor.theater_room_temperature
                       height: 30px
@@ -14082,18 +14069,18 @@ views:
                 \ progress * 2 * 255) | round(0) %}\n{% set font_color = (r, g, 0,\
                 \ 1) %} {% set bg_color = (r, g, 0, 0.4) %}\n\n.bubble-button-background::before\
                 \ {\n  content: \"\";\n  height: 75px;\n  width: {{ progress * 100\
-                \ }}%;\n  background-color: rgba{{ bg_color }};\n}\n\n{% set toggle_state\
-                \ = states('input_boolean.bambu_p1s_end_time_switch') %}\n\n{% set\
-                \ end_time = states('sensor.bambu_p1s_end_time') | as_timestamp %}\n\
-                {% set time_to_end = states('sensor.bambu_p1s_remaining_time') | int\
-                \ %}\n{% set hours = (time_to_end / 60) | int %}\n{% set minutes =\
-                \ (time_to_end % 60) %}\n\n.bubble-sub-button-4::before {\n  {% if\
-                \ toggle_state == 'on' %}\n    {% if end_time | timestamp_custom('%Y-%m-%d')\
-                \ == now().date() | string %}\n      content: \"{{ end_time | timestamp_custom('%-I:%M\
-                \ %p') }}\";\n    {% else %}\n      content: \"{{ end_time | timestamp_custom('%m/%d\
-                \ %-I:%M %p') }}\";\n    {% endif %}\n  {% else %}\n    content: \"\
-                {{ '{:01}h {:01}m'.format(hours, minutes) }}\";\n  {% endif %}\n \
-                \ margin-left: 3px;\n}\n"
+                \ }}%;\n  background-color: rgba{{ bg_color }};\n}\n\n{% if has_value('sensor.bambu_p1s_end_time')\
+                \ %}\n  {% set toggle_state = states('input_boolean.bambu_p1s_end_time_switch')\
+                \ %}\n\n  {% set end_time = states('sensor.bambu_p1s_end_time') |\
+                \ as_timestamp %}\n  {% set time_to_end = states('sensor.bambu_p1s_remaining_time')\
+                \ | int %}\n  {% set hours = (time_to_end / 60) | int %}\n  {% set\
+                \ minutes = (time_to_end % 60) %}\n\n  .bubble-sub-button-4::before\
+                \ {\n    {% if toggle_state == 'on' %}\n      {% if end_time | timestamp_custom('%Y-%m-%d')\
+                \ == now().date() | string %}\n        content: \"{{ end_time | timestamp_custom('%-I:%M\
+                \ %p') }}\";\n      {% else %}\n        content: \"{{ end_time | timestamp_custom('%m/%d\
+                \ %-I:%M %p') }}\";\n      {% endif %}\n    {% else %}\n      content:\
+                \ \"{{ '{:01}h {:01}m'.format(hours, minutes) }}\";\n    {% endif\
+                \ %}\n    margin-left: 3px;\n  }\n{% endif %}\n"
       - type: grid
         cards:
           - type: custom:layout-card
@@ -14618,275 +14605,9 @@ views:
                     entity: sensor.bambu_p1s_nozzle_target_temperature
                     tap_action:
                       action: none
-                  - name: Decrease
-                    icon: mdi:minus
-                    show_name: false
-                    show_icon: true
-                    show_background: false
-                    tap_action:
-                      action: call-service
-                      service: number.set_value
-                      service_data:
-                        entity_id: number.bambu_p1s_set_nozzle_temp
-                        value: '[[[ return 220; ]]]'
-                      target: {}
-                  - name: Increase
-                    icon: mdi:plus
-                    show_name: false
-                    show_icon: true
-                    show_background: false
-                    tap_action:
-                      action: call-service
-                      service: script.increment_3d_printer_nozzle_temp
-                      target: {}
                 styles: ".bubble-name, .bubble-state {\n  font-weight: bold;\n}\n\
                   .bubble-icon {\n  color: var(--red-color) !important;\n}\n.bubble-range-fill\
                   \ {\n  background: rgba(200, 25, 25, .5) !important;\n}\n"
-              - type: custom:layout-card
-                layout_type: custom:grid-layout
-                layout:
-                  grid-template-columns: 1fr auto 1fr auto 1fr
-                  grid-template-rows: auto
-                  grid-template-areas: '". off . changing ."
-
-                    '
-                cards:
-                  - type: custom:button-card
-                    view_layout:
-                      grid-area: 'off'
-                    name: 'Off'
-                    show_state: false
-                    icon: mdi:printer-3d-nozzle-off
-                    tap_action:
-                      action: call-service
-                      service: number.set_value
-                      data:
-                        value: '0'
-                      target:
-                        entity_id: number.bambu_p1s_set_nozzle_temp
-                    custom_fields:
-                      temp: 0
-                    styles:
-                      card:
-                        - border-top-left-radius: 24px
-                        - border-bottom-left-radius: 24px
-                        - border-top-right-radius: 24px
-                        - border-bottom-right-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                        - color: grey
-                        - padding: 5px
-                        - width: 75px
-                      grid:
-                        - grid-template-areas: '"i n" "i temp"'
-                        - grid-template-columns: auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                      icon:
-                        - width: 20px
-                        - color: grey
-                      state:
-                        - justify-self: center
-                        - font-size: 12px
-                      custom_fields:
-                        temp:
-                          - justify-self: left
-                          - font-size: 10px
-                  - type: custom:button-card
-                    view_layout:
-                      grid-area: changing
-                    name: Changing
-                    show_state: false
-                    icon: mdi:circle-slice-6
-                    tap_action:
-                      action: call-service
-                      service: number.set_value
-                      data:
-                        value: '250'
-                      target:
-                        entity_id: number.bambu_p1s_set_nozzle_temp
-                    custom_fields:
-                      temp: 250
-                    styles:
-                      card:
-                        - border-top-left-radius: 24px
-                        - border-bottom-left-radius: 24px
-                        - border-top-right-radius: 24px
-                        - border-bottom-right-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                        - color: grey
-                        - padding: 5px
-                        - width: 100px
-                      grid:
-                        - grid-template-areas: '"i n" "i temp"'
-                        - grid-template-columns: auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                      icon:
-                        - width: 20px
-                        - color: grey
-                      custom_fields:
-                        temp:
-                          - justify-self: left
-                          - font-size: 10px
-              - type: custom:layout-card
-                layout_type: custom:grid-layout
-                layout:
-                  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr
-                  grid-template-rows: auto
-                  grid-template-areas: '". pla . tpu . abs ."
-
-                    '
-                cards:
-                  - type: custom:button-card
-                    view_layout:
-                      grid-area: pla
-                    name: PLA
-                    show_state: false
-                    icon: mdi:thermometer-low
-                    tap_action:
-                      action: call-service
-                      service: number.set_value
-                      data:
-                        value: '220'
-                      target:
-                        entity_id: number.bambu_p1s_set_nozzle_temp
-                    custom_fields:
-                      temp: 220
-                    styles:
-                      card:
-                        - border-top-left-radius: 24px
-                        - border-bottom-left-radius: 24px
-                        - border-top-right-radius: 24px
-                        - border-bottom-right-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                        - color: grey
-                        - padding: 5px
-                        - width: 100px
-                      grid:
-                        - grid-template-areas: '"i n" "i temp"'
-                        - grid-template-columns: auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                      icon:
-                        - width: 20px
-                        - color: grey
-                      state:
-                        - justify-self: center
-                        - font-size: 12px
-                      custom_fields:
-                        temp:
-                          - justify-self: left
-                          - font-size: 10px
-                  - type: custom:button-card
-                    view_layout:
-                      grid-area: tpu
-                    name: TPU/PETG
-                    show_state: false
-                    icon: mdi:thermometer
-                    tap_action:
-                      action: call-service
-                      service: number.set_value
-                      data:
-                        value: '250'
-                      target:
-                        entity_id: number.bambu_p1s_set_nozzle_temp
-                    custom_fields:
-                      temp: 250
-                    styles:
-                      card:
-                        - border-top-left-radius: 24px
-                        - border-bottom-left-radius: 24px
-                        - border-top-right-radius: 24px
-                        - border-bottom-right-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                        - color: grey
-                        - padding: 5px
-                        - width: 100px
-                      grid:
-                        - grid-template-areas: '"i n" "i temp"'
-                        - grid-template-columns: auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                      icon:
-                        - width: 20px
-                        - color: grey
-                      state:
-                        - justify-self: center
-                        - font-size: 12px
-                      custom_fields:
-                        temp:
-                          - justify-self: left
-                          - font-size: 10px
-                  - type: custom:button-card
-                    view_layout:
-                      grid-area: abs
-                    name: ABS/ASA
-                    show_state: false
-                    icon: mdi:thermometer-high
-                    tap_action:
-                      action: call-service
-                      service: number.set_value
-                      data:
-                        value: '275'
-                      target:
-                        entity_id: number.bambu_p1s_set_nozzle_temp
-                    custom_fields:
-                      temp: 275
-                    styles:
-                      card:
-                        - border-top-left-radius: 24px
-                        - border-bottom-left-radius: 24px
-                        - border-top-right-radius: 24px
-                        - border-bottom-right-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                        - color: grey
-                        - padding: 5px
-                        - width: 100px
-                      grid:
-                        - grid-template-areas: '"i n" "i temp"'
-                        - grid-template-columns: auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                      icon:
-                        - width: 20px
-                        - color: grey
-                      state:
-                        - justify-self: center
-                        - font-size: 12px
-                      custom_fields:
-                        temp:
-                          - justify-self: left
-                          - font-size: 10px
               - type: custom:mini-graph-card
                 entities:
                   - entity: sensor.bambu_p1s_nozzle_temperature
@@ -14932,22 +14653,6 @@ views:
                     entity: sensor.bambu_p1s_target_bed_temperature
                     tap_action:
                       action: none
-                  - name: Decrease
-                    icon: mdi:minus
-                    show_name: false
-                    show_icon: true
-                    show_background: false
-                    tap_action:
-                      action: call-service
-                      service: script.decrement_3d_printer_bed_temp
-                  - name: Increase
-                    icon: mdi:plus
-                    show_name: false
-                    show_icon: true
-                    show_background: false
-                    tap_action:
-                      action: call-service
-                      service: script.increment_3d_printer_bed_temp
                 styles: ".bubble-name, .bubble-state {\n  font-weight: bold;\n}\n\
                   .bubble-range-fill {\n  background: rgba(200, 25, 25, .5) !important;\n\
                   }\n.bubble-sub-button-1 {\n  display: ${hass.states['sensor.bambu_p1s_target_bed_temperature'].state\
@@ -15058,32 +14763,6 @@ views:
               - type: custom:bubble-card
                 card_type: separator
                 name: Speed
-                sub_button:
-                  - name: Decrease
-                    icon: mdi:minus
-                    entity: sensor.bambu_p1s_speed_percent
-                    show_background: false
-                    tap_action:
-                      action: call-service
-                      service: script.decrement_3d_printer_speed
-                      target: {}
-                  - name: Speed %
-                    icon: mdi:gauge
-                    entity: number.bambu_p1s_set_speed_percent
-                    show_background: false
-                    show_name: false
-                    show_state: true
-                    show_icon: false
-                    tap_action:
-                      action: none
-                  - name: Increase
-                    icon: mdi:plus
-                    entity: sensor.bambu_p1s_speed_percent
-                    show_background: false
-                    tap_action:
-                      action: call-service
-                      service: script.increment_3d_printer_speed
-                      target: {}
               - type: horizontal-stack
                 cards:
                   - type: custom:button-card
