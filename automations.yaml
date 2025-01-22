@@ -602,15 +602,16 @@
     variables:
       end_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'') |
         float }}'
-      message: 'The dryer is done! {% set kwh = end_power_consumption | float - start_power_consumption
-        | float %} {{''\n''}}Consumption {{kwh | round(2) }}kWh {% set cost = (end_power_consumption
-        | float - start_power_consumption | float) * (states(''sensor.tariff_price'')
-        | float) %} {{''\n''}}Approx Cost ${{cost | round(2) }} {% set end_time =
-        now().timestamp() %} {% set duration = (end_time - start_time) | int %} {%
-        set hours = (duration // 3600) | int %} {% set minutes = ((duration % 3600)
-        // 60) | int %} {% set seconds = (duration % 60) | int %} {{''\n''}}Duration
-        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
-        | format(seconds) }}
+      summary: The dryer is done!
+      message: '{%- set kwh = end_power_consumption | float - start_power_consumption
+        | float %} {%- set cost = (end_power_consumption | float - start_power_consumption
+        | float) * (states(''sensor.tariff_price'') | float) %} {%- set end_time =
+        now().timestamp() %} {%- set duration = (end_time - start_time) | int %} {%-
+        set hours = (duration // 3600) | int %} {%- set minutes = ((duration % 3600)
+        // 60) | int %} {%- set seconds = (duration % 60) | int -%} {{ summary }}
+        {{ ''\n'' }} Consumption {{ kwh | round(2) }}kWh {{ ''\n'' }} Approx Cost
+        {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration {{ ''%02d'' | format(hours)
+        }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d'' | format(seconds) }}
 
         '
   - alias: Set dryer active switch off
@@ -623,6 +624,7 @@
     - data:
         who: parents
         title: Dryer
+        subtitle: '{{ summary }} ⤵️'
         message: '{{ message }}'
         notification_icon: mdi:tumble-dryer
         color: '#ff9800'
@@ -644,7 +646,7 @@
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: Dryer
-        message: The dryer is done!
+        message: '{{ summary }}'
         icon_url: local/icons/tumble-dryer.png
       action: script.notify_pipup
   mode: single
@@ -681,15 +683,16 @@
     variables:
       end_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'') |
         float }}'
-      message: 'The washer is done! {% set kwh = end_power_consumption | float - start_power_consumption
-        | float %} {{''\n''}}Consumption {{kwh | round(2) }}kWh {% set cost = (end_power_consumption
-        | float - start_power_consumption | float) * (states(''sensor.tariff_price'')
-        | float) %} {{''\n''}}Approx Cost ${{cost | round(2) }} {% set end_time =
-        now().timestamp() %} {% set duration = (end_time - start_time) | int %} {%
-        set hours = (duration // 3600) | int %} {% set minutes = ((duration % 3600)
-        // 60) | int %} {% set seconds = (duration % 60) | int %} {{''\n''}}Duration
-        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
-        | format(seconds) }}
+      summary: The washer is done!
+      message: '{%- set kwh = end_power_consumption | float - start_power_consumption
+        | float %} {%- set cost = (end_power_consumption | float - start_power_consumption
+        | float) * (states(''sensor.tariff_price'') | float) %} {%- set end_time =
+        now().timestamp() %} {%- set duration = (end_time - start_time) | int %} {%-
+        set hours = (duration // 3600) | int %} {%- set minutes = ((duration % 3600)
+        // 60) | int %} {%- set seconds = (duration % 60) | int -%} {{ summary }}
+        {{ ''\n'' }} Consumption {{ kwh | round(2) }}kWh {{ ''\n'' }} Approx Cost
+        {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration {{ ''%02d'' | format(hours)
+        }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d'' | format(seconds) }}
 
         '
   - alias: Set washer active switch off
@@ -702,6 +705,7 @@
     - data:
         who: parents
         title: Washer
+        subtitle: '{{ summary }} ⤵️'
         message: '{{ message }}'
         notification_icon: mdi:washing-machine
         color: '#ff9800'
@@ -723,7 +727,7 @@
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: Washer
-        message: The washer is done!
+        message: '{{ summary }}'
         icon_url: local/icons/washing-machine.png
       action: script.notify_pipup
   mode: single
@@ -1326,7 +1330,7 @@
         color: '#e91e63'
         icon_url: local/icons/doorbell-video.png
         camera: '{{ camera }}'
-        url: lovelace/security
+        url: lovelace/security#camera-doorbell
         group: Doorbell
         priority: high
         channel: Doorbell Ring
@@ -1849,7 +1853,8 @@
         in trigger.event.data.message -%}\n  Another command is in-progress.\n{%-
         elif 'never received' in trigger.event.data.message -%}\n  The message wasn't
         recieved.\n{%- elif 'ignitionIsOn' in trigger.event.data.message -%}\n  The
-        car is already running.\n{%- elif 'unknown' in trigger.event.data.message
+        car is already running.\n{%- elif '500' in trigger.event.data.message -%}\n
+        \ The service is offline.\n{%- elif 'unknown' in trigger.event.data.message
         -%}\n  I have no idea why. Please try again.\n{% endif %}"
   - parallel:
     - data:
@@ -1861,7 +1866,7 @@
         icon_url: local/icons/subaru.png
         group: Ascent
         tag: ascent
-        url: lovelace/ascent
+        url: lovelace#ascent
         actions:
         - action: remote_start_again
           title: Retry
@@ -3487,7 +3492,7 @@
         group: Ascent
         priority: high
         tag: ascent
-        url: lovelace/ascent
+        url: lovelace#ascent
       action: script.notify_mobile
     - data:
         entity:
@@ -3528,28 +3533,28 @@
 - id: '1677559331389'
   alias: "\U0001F5FA️ Leaving Zone"
   description: Sends a notification when someone is leaving a zone.
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - person.joshua
     - person.amy
     to: not_home
     for:
       minutes: 1
-  condition:
+    trigger: state
+  conditions:
   - condition: template
     value_template: "{{\n  not trigger.from_state.state in [\"home\", \"not_home\",
       trigger.to_state.state]\n  and trigger.to_state.state != \"home\"\n}}"
   - condition: time
     after: 08:00:00
     before: '22:00:00'
-  action:
+  actions:
   - variables:
       zone_name: '{{ trigger.from_state.state }}'
       name: '{{ trigger.to_state.attributes.friendly_name }}'
       person: '{{ {"Amy": "Mom", "Joshua": "Dad"}[name] }}'
       title: '{{ name }} Leaving {{ zone_name }}'
-      message: '{%- from "message.jinja" import arriving_home -%} {{ arriving_home(person,
+      message: '{%- from "message.jinja" import leaving_zone -%} {{ leaving_zone(person,
         zone_name) }}'
   - parallel:
     - data:
@@ -3608,7 +3613,7 @@
         group: Ascent
         priority: high
         tag: ascent
-        url: lovelace/ascent
+        url: lovelace#ascent
         actions:
         - action: remote_start_again
           title: Start Again
@@ -4073,7 +4078,7 @@
         sticky: true
         channel: Doorbell Motion
         importance: high
-        url: lovelace/security
+        url: lovelace/security#camera-doorbell
         actions: '{{ actions }}'
       action: script.notify_mobile
     - data:
@@ -4245,35 +4250,46 @@
 - id: '1704385020720'
   alias: "\U0001F4AC Ascent Fuel Level Low"
   description: Sends a notification when the Ascent's fuel level is low
-  trigger:
-  - platform: numeric_state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.ascent_range
     below: 31
-    for:
-      hours: 1
-  condition: []
-  action:
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - variables:
+      summary: The fuel level in the Ascent is low (<30 miles).
+      message: "{%- set level = states('sensor.ascent_fuel_level') | float(100) -%}
+        {%- set capacity = 19.3 -%} {%- set gal_remain = (100 - level) / 100 * capacity
+        -%} {% set stations = {\n  \"Costco\": states('sensor.costco_regular_gas')
+        | float(3),\n  \"Maverik\": states('sensor.maverik_midgrade_gas') | float(3)\n}
+        %} Current gas prices. {% for name, price in stations.items() %}\n  {{ name
+        }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain * price)
+        }}\n{%- endfor %}\n"
   - parallel:
     - data:
         title: Ascent Fuel Low
-        message: The fuel level in the Ascent is low.
+        subtitle: '{{ summary }}'
+        message: '{{ message }}'
         notification_id: ascent-fuel
       action: persistent_notification.create
     - data:
         who: parents
         title: Ascent Fuel Low
-        message: The fuel level in the Ascent is low.
+        subtitle: '{{ summary }} ⤵️'
+        message: '{{ message }}'
         notification_icon: mdi:car-connected
         color: '#0e4bef'
         icon_url: local/icons/subaru.png
+        group: Ascent
+        url: lovelace#ascent
       action: script.notify_mobile
     - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Ascent Fuel Low
-        message: The fuel level in the Ascent is low.
+        message: '{{ message }}'
       action: script.notify_hass_agent
   mode: single
 - id: '1704594011311'
@@ -5173,51 +5189,62 @@
 - id: '1725462823177'
   alias: "\U0001F4AC Kona Fuel Level Low"
   description: Sends a notification when the Kona's fuel level is low
-  trigger:
-  - platform: numeric_state
-    entity_id:
-    - sensor.kona_fuel_level
-    below: 11
-    for:
-      hours: 1
-  condition: []
-  action:
+  triggers:
+  - entity_id:
+    - sensor.kona_fuel_driving_range
+    below: 31
+    trigger: numeric_state
+  conditions: []
+  actions:
+  - variables:
+      summary: The fuel level in the Kona is low (<30 miles).
+      message: "{%- set level = states('sensor.kona_fuel_level') | float(100) -%}
+        {%- set capacity = 19.3 -%} {%- set gal_remain = (100 - level) / 100 * capacity
+        -%} {% set stations = {\n  \"Costco\": states('sensor.costco_regular_gas')
+        | float(3),\n  \"Maverik\": states('sensor.maverik_midgrade_gas') | float(3)\n}
+        %} Current gas prices. {% for name, price in stations.items() %}\n  {{ name
+        }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain * price)
+        }}\n{%- endfor %}\n"
   - parallel:
     - data:
         title: Kona Fuel Low
-        message: The fuel level in the Kona is low.
+        subtitle: '{{ summary }}'
+        message: '{{ message }}'
         notification_id: kona-fuel
       action: persistent_notification.create
     - data:
         who: parents
         title: Kona Fuel Low
-        message: The fuel level in the Kona is low.
+        subtitle: '{{ summary }} ⤵️'
+        message: '{{ message }}'
         notification_icon: mdi:car-connected
         color: '#0e4bef'
         icon_url: local/icons/hyundai.png
+        group: Kona
+        url: lovelace#kona
       action: script.notify_mobile
     - data:
         entity:
         - media_player.erebus
         - media_player.nasya
         title: Kona Fuel Low
-        message: The fuel level in the Kona is low.
+        message: '{{ message }}'
       action: script.notify_hass_agent
   mode: single
 - id: '1725463478923'
   alias: "\U0001F4AC Kona Battery Charge Low"
   description: Sends a notification when the Kona's battery charge is low
-  trigger:
-  - platform: numeric_state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.kona_car_battery_level
     below: 41
     for:
       hours: 0
       minutes: 30
       seconds: 0
-  condition: []
-  action:
+    trigger: numeric_state
+  conditions: []
+  actions:
   - parallel:
     - data:
         title: Kona Battery Low
@@ -5231,6 +5258,8 @@
         notification_icon: mdi:car-connected
         color: '#0e4bef'
         icon_url: local/icons/hyundai.png
+        group: Kona
+        url: lovelace#kona
       action: script.notify_mobile
     - data:
         entity:

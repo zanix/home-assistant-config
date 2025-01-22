@@ -82,10 +82,17 @@ notify_join:
       example: ''
       selector:
         object:
+    enable_debug:
+      name: Enable debug output?
+      selector:
+        constant:
+          value: true
+          label: Enabled
 
   sequence:
     - alias: Set local variables for reuse in this script.
       variables:
+        debug: "{{ iif(enable_debug is defined, enable_debug, false) }}"
         notification_service: 'notify.{{ who }}'
         image_path: >-
           {%- if image is string -%}
@@ -120,9 +127,29 @@ notify_join:
             {%- endif -%}
           {%- endif -%}
         group_id: '{{ group | default("Home Assistant") }}'
+
+    - alias: >-
+        Set enable_debug = true above to provide output troubleshooting
+        information.
+      if:
+        - condition: template
+          value_template: "{{ debug == true }}"
+      then:
+        - action: persistent_notification.create
+          data:
+            notification_id: notify_join
+            title: "DEBUG: script.notify_join"
+            message: |-
+              send_message: {{ states("input_boolean.mobile_notifications") }}
+              notification_service: {{ notification_service }}
+              title: {{ title }}
+              message: {{ message }}
+              data: {{ notify_data }}
+
     - alias: Do not send on certain message types.
       condition: template
       value_template: '{{ message not in ["clear_notification", "remove_channel", "TTS"] }}'
+
     - action: '{{ notification_service }}'
       data:
         title: '{{ title }}'
