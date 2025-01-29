@@ -52,22 +52,22 @@ button_card_templates:
     custom_fields:
       stat1: "[[[\n  return `<ha-icon icon=\"mdi:motion-play-outline\" style=\"width:\
         \ 24px; height: 24px; color: var(--green-color);\"></ha-icon>\n    <span>\
-        \ Media: <span style=\"color: var(--text-color-sensor);\">${states[variables.media].state\
+        \ Media: <span style=\"color: var(--text-color-sensor);\">${states[variables.media]?.state\
         \ !== 'unavailable' ? helpers.localize(states[variables.media]) : '?'}</span></span>`\n\
         ]]]"
       stat2: "[[[\n  return `<ha-icon icon=\"mdi:cpu-64-bit\" style=\"width: 24px;\
         \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span> CPU: <span\
-        \ style=\"color: var(--text-color-sensor);\">${states[variables.cpu].state\
+        \ style=\"color: var(--text-color-sensor);\">${states[variables.cpu]?.state\
         \ !== 'unavailable' ? helpers.localize(states[variables.cpu], undefined, 0)\
         \ : '?'}</span></span>`\n]]]"
       stat3: "[[[\n  return `<ha-icon icon=\"mdi:memory\" style=\"width: 24px; height:\
         \ 24px; color: var(--green-color);\"></ha-icon>\n    <span> RAM: <span style=\"\
-        color: var(--text-color-sensor);\">${states[variables.ram].state !== 'unavailable'\
+        color: var(--text-color-sensor);\">${states[variables.ram]?.state !== 'unavailable'\
         \ ? helpers.localize(states[variables.ram], undefined, 0) : '?'}</span></span>`\n\
         ]]]"
       stat4: "[[[\n  return `<ha-icon icon=\"mdi:expansion-card\" style=\"width: 24px;\
         \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span> GPU: <span\
-        \ style=\"color: var(--text-color-sensor);\">${states[variables.gpu].state\
+        \ style=\"color: var(--text-color-sensor);\">${states[variables.gpu]?.state\
         \ !== 'unavailable' ? helpers.localize(states[variables.gpu], undefined, 0)\
         \ : '?'}</span></span>`\n]]]"
       info: ''
@@ -113,27 +113,27 @@ button_card_templates:
           - align-self: start
           - justify-self: start
           - font-size: 14px
-          - --text-color-sensor: '[[[ if (states[variables.media].state != ''playing'')
+          - --text-color-sensor: '[[[ if (states[variables.media]?.state != ''playing'')
               return ''var(--yellow-color)''; ]]]'
         stat2:
           - padding-bottom: 2px
           - align-self: start
           - justify-self: start
           - font-size: 14px
-          - --text-color-sensor: '[[[ if (states[variables.cpu].state > 80) return
+          - --text-color-sensor: '[[[ if (states[variables.cpu]?.state > 80) return
               ''var(--red-color)''; ]]]'
         stat3:
           - padding-bottom: 2px
           - align-self: start
           - justify-self: start
           - font-size: 14px
-          - --text-color-sensor: '[[[ if (states[variables.ram].state > 80) return
+          - --text-color-sensor: '[[[ if (states[variables.ram]?.state > 80) return
               ''var(--red-color)''; ]]]'
         stat4:
           - align-self: start
           - justify-self: start
           - font-size: 14px
-          - --text-color-sensor: '[[[ if (states[variables.gpu].state > 80) return
+          - --text-color-sensor: '[[[ if (states[variables.gpu]?.state > 80) return
               ''var(--red-color)''; ]]]'
         info:
           - align-self: end
@@ -2610,6 +2610,17 @@ streamline_templates:
       tooltip:
         animation: true
         hour24: false
+  linux_updates_list:
+    card:
+      type: markdown
+      card_mod:
+        style: "ha-card {\n  --ha-card-background: none\n}\n"
+      content: "### {{ state_attr(\"[[entity]]\", \"friendly_name\") }}: {{ states(\"\
+        [[entity]]\") }}\n{% for update in state_attr(\"[[entity]]\", \"updates\"\
+        ) %}\n  {%- set parts = update.split(\" \") -%}\n  {%- set name = parts[0]\
+        \ -%}\n  {%- set previous_version = parts[1] -%}\n  {%- set update_version\
+        \ = parts[3] -%}\n__{{ name }}__ <blockquote> {{ previous_version }} -> {{\
+        \ update_version }}</blockquote> {% endfor %}"
   windows_updates_list:
     card:
       type: markdown
@@ -4765,6 +4776,17 @@ views:
               temperature: sensor.joshua_office_temperature
               icon_color: 33, 150, 243
               chips:
+                - type: conditional
+                  conditions:
+                    - entity: binary_sensor.cartago_connected
+                      state: 'on'
+                  chip:
+                    type: template
+                    entity: binary_sensor.cartago_connected
+                    icon_color: blue
+                    icon: mdi:laptop
+                    tap_action:
+                      action: none
                 - type: conditional
                   conditions:
                     - entity: binary_sensor.erebus_connected
@@ -12177,12 +12199,17 @@ views:
             variables:
               connected: binary_sensor.erebus_connected
               media: media_player.erebus
-              cpu: sensor.erebus_cpu_load
+              cpu: sensor.erebus_cpu_usage
               ram: sensor.erebus_memory_usage
-              gpu: sensor.erebus_gpu_load
+              gpu: sensor.erebus_gpu_amd_0
+            triggers_update:
+              - media_player.erebus
+              - sensor.erebus_cpu_usage
+              - sensor.erebus_memory_usage
+              - sensor.erebus_gpu_amd_0
             custom_fields:
-              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Ryzen_5_5600X-ED1C24?style=flat-square&logo=amd&logoColor=white&logoSize=auto&labelColor=555555\"\
-                ><br>\n  <img src=\"https://img.shields.io/badge/RX_6650_XT-ED1C24?style=flat-square&logo=amd&logoColor=white&logoSize=auto&labelColor=555555\"\
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Ryzen_5_5600X-ED1C24?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTUzMCAxNTMwIgogICB3aWR0aD0iMTUzMCIKICAgaGVpZ2h0PSIxNTMwIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iQU1ELnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS40IChlN2MzZmViMTAwLCAyMDI0LTEwLTA5KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzMSIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjMDAwMDAwIgogICAgIGJvcmRlcm9wYWNpdHk9IjAuMjUiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIgogICAgIGlua3NjYXBlOmRlc2tjb2xvcj0iI2QxZDFkMSIKICAgICBpbmtzY2FwZTp6b29tPSIwLjc1ODE2OTkzIgogICAgIGlua3NjYXBlOmN4PSI3NjUiCiAgICAgaW5rc2NhcGU6Y3k9Ijc2NS42NTk0OCIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjIyMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTI4NiIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5BTURfTG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICMwMDAwMDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgY2xhc3M9InNocDAiCiAgICAgZD0iTTQzMS4zNSA0MTYuMzlMMTUuMjggMEwxNTMwIDBMMTUzMCAxNTE1LjY2TDExMTMuOTIgMTA5OS4zMkwxMTEzLjkyIDQxNi4zOUw0MzEuMzUgNDE2LjM5Wk00MzAuODcgNDk5LjgzTDIuNDkgOTI4LjQ0TDIuNDkgMTUyOC40MUw2MDIuMDQgMTUyOC40MUwxMDMwLjM5IDEwOTkuODFMNDMwLjg3IDEwOTkuODFMNDMwLjg3IDQ5OS44M1oiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MSIgLz4KPC9zdmc+Cg==&logoColor=white&logoSize=auto&labelColor=555555\"\
+                ><br>\n  <img src=\"https://img.shields.io/badge/RX_6650_XT-ED1C24?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTUzMCAxNTMwIgogICB3aWR0aD0iMTUzMCIKICAgaGVpZ2h0PSIxNTMwIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iQU1ELnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS40IChlN2MzZmViMTAwLCAyMDI0LTEwLTA5KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzMSIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjMDAwMDAwIgogICAgIGJvcmRlcm9wYWNpdHk9IjAuMjUiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIgogICAgIGlua3NjYXBlOmRlc2tjb2xvcj0iI2QxZDFkMSIKICAgICBpbmtzY2FwZTp6b29tPSIwLjc1ODE2OTkzIgogICAgIGlua3NjYXBlOmN4PSI3NjUiCiAgICAgaW5rc2NhcGU6Y3k9Ijc2NS42NTk0OCIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjIyMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTI4NiIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5BTURfTG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICMwMDAwMDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgY2xhc3M9InNocDAiCiAgICAgZD0iTTQzMS4zNSA0MTYuMzlMMTUuMjggMEwxNTMwIDBMMTUzMCAxNTE1LjY2TDExMTMuOTIgMTA5OS4zMkwxMTEzLjkyIDQxNi4zOUw0MzEuMzUgNDE2LjM5Wk00MzAuODcgNDk5LjgzTDIuNDkgOTI4LjQ0TDIuNDkgMTUyOC40MUw2MDIuMDQgMTUyOC40MUwxMDMwLjM5IDEwOTkuODFMNDMwLjg3IDEwOTkuODFMNDMwLjg3IDQ5OS44M1oiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MSIgLz4KPC9zdmc+Cg==&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
                 card:
@@ -12195,30 +12222,30 @@ views:
                   chips:
                     - type: conditional
                       conditions:
-                        - entity: binary_sensor.erebus_mic_active
+                        - entity: binary_sensor.erebus_microphone_used
                           state: 'on'
                       chip:
                         type: entity
-                        entity: binary_sensor.erebus_mic_active
+                        entity: binary_sensor.erebus_microphone_used
                         icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
-                        - entity: binary_sensor.erebus_webcam_active
+                        - entity: binary_sensor.erebus_camera_used
                           state: 'on'
                       chip:
                         type: entity
-                        entity: binary_sensor.erebus_webcam_active
+                        entity: binary_sensor.erebus_camera_used
                         icon_color: red
                         content_info: none
                     - type: conditional
                       conditions:
                         - condition: numeric_state
-                          entity: sensor.erebus_windows_updates_software_updates
+                          entity: sensor.erebus_system_updates_count
                           above: 0
                       chip:
                         type: template
-                        entity: sensor.erebus_windows_updates_software_updates
+                        entity: sensor.erebus_system_updates_count
                         icon: mdi:arrow-up-bold-circle
                         icon_color: red
                         card_mod:
@@ -12233,42 +12260,12 @@ views:
                           browser_mod:
                             service: browser_mod.popup
                             data:
-                              title: Software Updates
+                              title: System Updates
                               content:
                                 type: custom:streamline-card
-                                template: windows_updates_list
+                                template: linux_updates_list
                                 variables:
-                                  - computer: erebus
-                                  - entity: sensor.erebus_windows_updates_software_updates
-                    - type: conditional
-                      conditions:
-                        - condition: numeric_state
-                          entity: sensor.erebus_windows_updates_driver_updates
-                          above: 0
-                      chip:
-                        type: template
-                        entity: sensor.erebus_windows_updates_driver_updates
-                        icon: mdi:cog-refresh
-                        icon_color: red
-                        card_mod:
-                          style:
-                            .: "{% if int(states(config.entity), 0) > 0 %}\nha-card:after\
-                              \ {\n  content: \"{{ int(states(config.entity), 0) }}\"\
-                              ;\n  position: absolute;\n  color: var(--red-color);\n\
-                              \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n\
-                              \  font-size: 12px;\n}\n{% endif %}\n"
-                        tap_action:
-                          action: fire-dom-event
-                          browser_mod:
-                            service: browser_mod.popup
-                            data:
-                              title: Driver Updates
-                              content:
-                                type: custom:streamline-card
-                                template: windows_updates_list
-                                variables:
-                                  - computer: erebus
-                                  - entity: sensor.erebus_windows_updates_driver_updates
+                                  - entity: sensor.erebus_system_updates_count
           - type: custom:button-card
             layout_options:
               grid_columns: 2
@@ -12286,9 +12283,14 @@ views:
               cpu: sensor.nasya_cpu_load
               ram: sensor.nasya_memory_usage
               gpu: sensor.nasya_gpu_load
+            triggers_update:
+              - media_player.nasya
+              - sensor.nasya_cpu_load
+              - sensor.nasya_memory_usage
+              - sensor.nasya_gpu_load
             custom_fields:
-              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Core_i7_1260P-0071C5?style=flat-square&logo=intel&logoColor=white&logoSize=auto&labelColor=555555\"\
-                ><br>\n  <img src=\"https://img.shields.io/badge/RTX_3050_Ti-76B900?style=flat-square&logo=nvidia&logoColor=white&logoSize=auto&labelColor=555555\"\
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Core_i7_1260P-0071C5?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTYwMCA2NzUiCiAgIHdpZHRoPSIxNjAwIgogICBoZWlnaHQ9IjY3NSIKICAgaWQ9InN2ZzEiCiAgIHNvZGlwb2RpOmRvY25hbWU9IklOVEMuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIxLjQgKGU3YzNmZWIxMDAsIDIwMjQtMTAtMDkpIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIGlua3NjYXBlOnpvb209IjEuNzE4NTE4NSIKICAgICBpbmtzY2FwZTpjeD0iODAwLjEwNzc2IgogICAgIGlua3NjYXBlOmN5PSIzMzcuNSIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjUxMjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM3MSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzEiIC8+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlMSI+SW50ZWxfbG9nb18oMjAyMCxfZGFya19ibHVlKS1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICMwMDY4YjUgfSAKCQkuc2hwMSB7IGZpbGw6ICMwMDAwMDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0icmVjdDQiCiAgICAgY2xhc3M9InNocDAiCiAgICAgZD0iTTAgOS40MUwxMjUuOTQgOS40MUwxMjUuOTQgMTM1LjMxTDAgMTM1LjMxTDAgOS40MVoiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MSIgLz4KICA8cGF0aAogICAgIGlkPSJwYXRoNiIKICAgICBmaWxsLXJ1bGU9ImV2ZW5vZGQiCiAgICAgY2xhc3M9InNocDEiCiAgICAgZD0iTSAzLjU5LDY2NS4zNSBWIDIxMS45MyBIIDEyMi44IHYgNDUzLjQyIHogbSA4OTUuOTEsNC40OCBjIC0zNi4zMSwwIC02Ni43OCwtMy4xNCAtOTAuOTgsLTkuODYgLTIzLjc2LC02LjcyIC00My40OCwtMTcuNDcgLTU4LjI3LC0zMi43IC0xNC43OSwtMTUuMjQgLTI1LjU0LC0zNS40IC0zMS44MiwtNjAuMDQgLTYuMjcsLTI1LjA5IC05LjQxLC01Ni40NiAtOS40MSwtOTMuNjQgViAzNC45NSBoIDExOS42NiB2IDE3Ni45OCBoIDg2LjUgdiAxMDIuMTUgaCAtODYuNSB2IDE1OC42MSBjIDAsMTcuOTIgMC45LDMyLjcxIDIuNjksNDMuOTEgMi4yNCwxMS42NSA2LjI4LDIwLjYxIDEyLjU1LDI2Ljg4IDYuMjgsNi4yNyAxNS42OSwxMC43NSAyOC4yNCwxMi41NSAxMC43NSwxLjc5IDI1LjU0LDIuNjggNDMuMDIsMi42OCB2IDExMS4xMiB6IG0gNTgwLjg0LC00LjQ4IFYgMCBIIDE2MDAgViA2NjUuMzUgWiBNIDY0My41OSw0MDcuNzIgViA2NjQuOSBIIDUyMy4wMyBWIDQyNC4zIGMgMCwtMzcuMTkgLTguOTcsLTY2LjMxIC0yNiwtODYuOTIgLTE3LjQ4LC0yMC42MSAtNDMuOTIsLTMxLjM2IC03OC40MywtMzEuMzYgLTI5LjEzLDAgLTU0LjY4LDEwLjc1IC03NS43NCwzMi4yNiAtMTkuNzIsMjAuMTYgLTMwLjAzLDUxLjUyIC0zMS4zOCw5NC4wOCBWIDY2NS4zNSBIIDE5Mi43MiBWIDIxMS45MyBoIDExNy44NyB2IDY0Ljk2IGwgNi43MiwtOC41MSBjIDE1LjY5LC0yMC42MSAzNS44NiwtMzYuNzQgNTkuMTYsLTQ4LjM5IDIzLjc1LC0xMS42NSA0OS43NSwtMTcuNDcgNzguNDMsLTE3LjQ3IDU5LjE2LDAgMTA1Ljc3LDE3LjkyIDEzOC45NCw1My43NiAzMy4xNiwzNS44NSA1MC4xOSw4Ni45MiA0OS43NSwxNTEuNDQgeiBtIDc3NC45LDcyLjU5IGggLTM1Ni4zMSBsIDEuMzUsNC4wMyBjIDcuNjIsMjYuNDMgMjEuOTYsNDcuOTQgNDMuMDIsNjMuMTcgMjEuMDcsMTUuNjggNDguODYsMjMuMyA4Mi40NywyMy4zIDUzLjc4LDAgOTYuODEsLTI5LjEyIDExNC43MywtNTAuNjMgbCA4Ni4wNSw2NS40MiBjIC0zNy42NCw0My4wMSAtMTAwLjM5LDg5LjE2IC0yMDEuNjgsODkuMTYgLTM0Ljk1LDAgLTY3LjY3LC02LjI3IC05Ny4yNSwtMTguODIgLTI5LjU4LC0xMi4xIC01NS4xMywtMjkuMTIgLTc1Ljc0LC01MC4xOCAtMjAuNjIsLTIxLjA2IC0zNy4yLC00Ni4xNSAtNDguODYsLTc0LjgyIC0xMS42NSwtMjguNjggLTE3LjQ3LC01OS42IC0xNy40NywtOTIuMyAwLC0zMi43MSA1LjgyLC02My42MyAxOC4zNywtOTIuMyAxMi4xLC0yOC42OCAyOS4xMywtNTMuNzcgNTAuMiwtNzQuODIgMjEuMDYsLTIxLjA2IDQ2LjE2LC0zNy42NCA3NC44NCwtNTAuMTkgMjguNjksLTEyLjA5IDU5LjYxLC0xOC4zNiA5Mi4zMywtMTguMzYgMzQuNTEsMCA2Ni4zMyw1LjgyIDk1LjAxLDE3LjkyIDI4LjY5LDEyLjA5IDUzLjM0LDI4LjY3IDczLjk1LDUwLjE4IDIwLjE3LDIxLjUgMzYuMyw0Ni41OSA0Ny45Niw3NC44MiAxMS4yLDI4LjY4IDE3LjAzLDU5LjE0IDE3LjAzLDkxLjg1IHogbSAtMTE0Ljc0LC04NC42OCBjIDAsLTMzLjE2IC0zOC41NCwtOTAuOTYgLTEyMC41NiwtOTAuOTYgLTgyLjAxLDAuNDUgLTEyMC4xMSw1OC4yNSAtMTIwLjExLDkxLjQgeiIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K&logoColor=white&logoSize=auto&labelColor=555555\"\
+                ><br>\n  <img src=\"https://img.shields.io/badge/RTX_3050_Ti-76B900?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTU1OSAxMDMyIgogICB3aWR0aD0iMTU1OSIKICAgaGVpZ2h0PSIxMDMyIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iTlZEQS5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNCAoZTdjM2ZlYjEwMCwgMjAyNC0xMC0wOSkiCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczEiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6em9vbT0iMC41NjIwMTU1IgogICAgIGlua3NjYXBlOmN4PSI0NTkuMDYyMDciCiAgICAgaW5rc2NhcGU6Y3k9IjU3MC4yNjg5NyIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjI2NDIiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM1MCIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5OVklESUFfbG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICM3NmI5MDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgZmlsbC1ydWxlPSJldmVub2RkIgogICAgIGNsYXNzPSJzaHAwIgogICAgIGQ9Ik0xNTU3LjkgLTAuNUwxNTU3LjkgMTAyOS43OEw1ODEuOTkgMTAyOS43OEw1ODEuOTkgOTA4LjgxQzYwMi42MyA5MTEuMSA2MjMuMjggOTEyLjI1IDY0NS4wNiA5MTIuMjVDODcwLjk4IDkxMi4yNSAxMjY5LjQ5IDc5Ny4wMSAxNDQwLjM2IDY1My42N0MxNDE1LjEzIDYyOC40NSAxMjkyLjk5IDU3MC41NCAxMjYzLjE4IDU0Ni40NkMxMDgzLjEzIDcwMS4yNiA4OTcuMzYgODMyLjU1IDY0MC40OCA4MzIuNTVDNjIwLjk4IDgzMi41NSA2MDAuOTEgODMwLjgzIDU4MS40MiA4MjguNTRMNTgxLjQyIDc0Mi41NEM2MDQuOTMgNzQ2LjU1IDYyOC40NCA3NDguODUgNjUyLjUyIDc0OC44NUM5MjguMzIgNzQ4Ljg1IDExOTMuMjMgNDI2LjYzIDExOTMuMjMgNDI2LjYzQzExOTMuMjMgNDI2LjYzIDk2Mi4xNSAxMjQuNDkgNjA4LjM3IDEzNi41M0w1ODAuODQgMTM4LjI1TDU4MC44NCAtMC41TDE1NTcuOSAtMC41Wk02MDguMzcgMjEyLjc4Qzg2Mi45NSAyMDQuNzUgMTAyOS44MSA0MzEuNzkgMTAyOS44MSA0MzEuNzlDMTAyOS44MSA0MzEuNzkgODQ5Ljc2IDY4MS43NyA2NTYuNTMgNjgxLjc3QzYzMC43MyA2ODEuNzcgNjA1LjUgNjc3Ljc1IDU4MS40MiA2NjkuNzNMNTgxLjQyIDM4Ny42NUM2ODAuNjEgMzk5LjY5IDcwMC42OCA0NDMuMjYgNzU5Ljc0IDU0Mi40NUw4OTIuMiA0MzEuMjJDODkyLjIgNDMxLjIyIDc5NS4yOSAzMDQuNTEgNjMyLjQ1IDMwNC41MUM2MTUuMjUgMzAzLjk0IDU5OC4wNSAzMDUuMDkgNTgwLjg0IDMwNi44MUw1ODAuODQgMjEzLjk3QzI5OS42OSAyMzYgMTU5LjQgNDQzLjI2IDE1OS40IDQ0My4yNkMxNTkuNCA0NDMuMjYgMjY2LjYzIDc4OS41NSA1ODAuODQgODI4LjU0TDU4MC44NCA5MDguODFDMTUyLjUyIDg2OC42NyAwIDQyNy4yMSAwIDQyNy4yMUMwIDQyNy4yMSAyNjkuNDkgMTYzLjQ3IDU4MS40MiAxMzguMjVMNTgxLjQyIDIxMy44OUM1OTAuNCAyMTMuMzMgNTk5LjM4IDIxMi43OCA2MDguMzcgMjEyLjc4Wk01ODAuODQgNzQzLjExQzM0My40NiA3MDAuNjkgMjc3LjUyIDQ1My41OCAyNzcuNTIgNDUzLjU4QzI3Ny41MiA0NTMuNTggMzkxLjYzIDMyNy40NSA1ODAuODQgMzA2LjgxTDU4MC44NCAzODcuMDdMNTgwLjI3IDM4Ny4wN0M0ODEuMDcgMzc1LjAzIDQwMy4wOSA0NjcuOTEgNDAzLjA5IDQ2Ny45MUM0MDMuMDkgNDY3LjkxIDQ0Ny4yNCA2MjQuNDMgNTgwLjg0IDY2OS43M0w1ODAuODQgNzQzLjExWiIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
                 card:
@@ -12344,7 +12346,6 @@ views:
                                 type: custom:streamline-card
                                 template: windows_updates_list
                                 variables:
-                                  - computer: nasya
                                   - entity: sensor.nasya_windows_updates_software_updates
                     - type: conditional
                       conditions:
@@ -12373,8 +12374,73 @@ views:
                                 type: custom:streamline-card
                                 template: windows_updates_list
                                 variables:
-                                  - computer: nasya
                                   - entity: sensor.nasya_windows_updates_driver_updates
+          - type: custom:button-card
+            layout_options:
+              grid_columns: 2
+            template: computer_tile
+            name: Cartago
+            icon: mdi:laptop
+            entity: binary_sensor.cartago_connected
+            tap_action:
+              action: navigate
+              navigation_path: '#computer-cartago'
+            variables:
+              connected: binary_sensor.cartago_connected
+              media: media_player.cartago
+              cpu: sensor.cartago_cpu_usage
+              ram: sensor.cartago_memory_usage
+              gpu: sensor.cartago_gpu_amd_0
+            custom_fields:
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Ryzen_9_4900HS-ED1C24?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTUzMCAxNTMwIgogICB3aWR0aD0iMTUzMCIKICAgaGVpZ2h0PSIxNTMwIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iQU1ELnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS40IChlN2MzZmViMTAwLCAyMDI0LTEwLTA5KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzMSIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjMDAwMDAwIgogICAgIGJvcmRlcm9wYWNpdHk9IjAuMjUiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIgogICAgIGlua3NjYXBlOmRlc2tjb2xvcj0iI2QxZDFkMSIKICAgICBpbmtzY2FwZTp6b29tPSIwLjc1ODE2OTkzIgogICAgIGlua3NjYXBlOmN4PSI3NjUiCiAgICAgaW5rc2NhcGU6Y3k9Ijc2NS42NTk0OCIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjIyMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTI4NiIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5BTURfTG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICMwMDAwMDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgY2xhc3M9InNocDAiCiAgICAgZD0iTTQzMS4zNSA0MTYuMzlMMTUuMjggMEwxNTMwIDBMMTUzMCAxNTE1LjY2TDExMTMuOTIgMTA5OS4zMkwxMTEzLjkyIDQxNi4zOUw0MzEuMzUgNDE2LjM5Wk00MzAuODcgNDk5LjgzTDIuNDkgOTI4LjQ0TDIuNDkgMTUyOC40MUw2MDIuMDQgMTUyOC40MUwxMDMwLjM5IDEwOTkuODFMNDMwLjg3IDEwOTkuODFMNDMwLjg3IDQ5OS44M1oiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MSIgLz4KPC9zdmc+Cg==&logoColor=white&logoSize=auto&labelColor=555555\"\
+                ><br>\n  <img src=\"https://img.shields.io/badge/RTX_2060_Q-76B900?style=flat-square&logo=nvidia&logoColor=white&logoSize=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTU1OSAxMDMyIgogICB3aWR0aD0iMTU1OSIKICAgaGVpZ2h0PSIxMDMyIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iTlZEQS5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNCAoZTdjM2ZlYjEwMCwgMjAyNC0xMC0wOSkiCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczEiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6em9vbT0iMC41NjIwMTU1IgogICAgIGlua3NjYXBlOmN4PSI0NTkuMDYyMDciCiAgICAgaW5rc2NhcGU6Y3k9IjU3MC4yNjg5NyIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjI2NDIiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM1MCIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5OVklESUFfbG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICM3NmI5MDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgZmlsbC1ydWxlPSJldmVub2RkIgogICAgIGNsYXNzPSJzaHAwIgogICAgIGQ9Ik0xNTU3LjkgLTAuNUwxNTU3LjkgMTAyOS43OEw1ODEuOTkgMTAyOS43OEw1ODEuOTkgOTA4LjgxQzYwMi42MyA5MTEuMSA2MjMuMjggOTEyLjI1IDY0NS4wNiA5MTIuMjVDODcwLjk4IDkxMi4yNSAxMjY5LjQ5IDc5Ny4wMSAxNDQwLjM2IDY1My42N0MxNDE1LjEzIDYyOC40NSAxMjkyLjk5IDU3MC41NCAxMjYzLjE4IDU0Ni40NkMxMDgzLjEzIDcwMS4yNiA4OTcuMzYgODMyLjU1IDY0MC40OCA4MzIuNTVDNjIwLjk4IDgzMi41NSA2MDAuOTEgODMwLjgzIDU4MS40MiA4MjguNTRMNTgxLjQyIDc0Mi41NEM2MDQuOTMgNzQ2LjU1IDYyOC40NCA3NDguODUgNjUyLjUyIDc0OC44NUM5MjguMzIgNzQ4Ljg1IDExOTMuMjMgNDI2LjYzIDExOTMuMjMgNDI2LjYzQzExOTMuMjMgNDI2LjYzIDk2Mi4xNSAxMjQuNDkgNjA4LjM3IDEzNi41M0w1ODAuODQgMTM4LjI1TDU4MC44NCAtMC41TDE1NTcuOSAtMC41Wk02MDguMzcgMjEyLjc4Qzg2Mi45NSAyMDQuNzUgMTAyOS44MSA0MzEuNzkgMTAyOS44MSA0MzEuNzlDMTAyOS44MSA0MzEuNzkgODQ5Ljc2IDY4MS43NyA2NTYuNTMgNjgxLjc3QzYzMC43MyA2ODEuNzcgNjA1LjUgNjc3Ljc1IDU4MS40MiA2NjkuNzNMNTgxLjQyIDM4Ny42NUM2ODAuNjEgMzk5LjY5IDcwMC42OCA0NDMuMjYgNzU5Ljc0IDU0Mi40NUw4OTIuMiA0MzEuMjJDODkyLjIgNDMxLjIyIDc5NS4yOSAzMDQuNTEgNjMyLjQ1IDMwNC41MUM2MTUuMjUgMzAzLjk0IDU5OC4wNSAzMDUuMDkgNTgwLjg0IDMwNi44MUw1ODAuODQgMjEzLjk3QzI5OS42OSAyMzYgMTU5LjQgNDQzLjI2IDE1OS40IDQ0My4yNkMxNTkuNCA0NDMuMjYgMjY2LjYzIDc4OS41NSA1ODAuODQgODI4LjU0TDU4MC44NCA5MDguODFDMTUyLjUyIDg2OC42NyAwIDQyNy4yMSAwIDQyNy4yMUMwIDQyNy4yMSAyNjkuNDkgMTYzLjQ3IDU4MS40MiAxMzguMjVMNTgxLjQyIDIxMy44OUM1OTAuNCAyMTMuMzMgNTk5LjM4IDIxMi43OCA2MDguMzcgMjEyLjc4Wk01ODAuODQgNzQzLjExQzM0My40NiA3MDAuNjkgMjc3LjUyIDQ1My41OCAyNzcuNTIgNDUzLjU4QzI3Ny41MiA0NTMuNTggMzkxLjYzIDMyNy40NSA1ODAuODQgMzA2LjgxTDU4MC44NCAzODcuMDdMNTgwLjI3IDM4Ny4wN0M0ODEuMDcgMzc1LjAzIDQwMy4wOSA0NjcuOTEgNDAzLjA5IDQ2Ny45MUM0MDMuMDkgNDY3LjkxIDQ0Ny4yNCA2MjQuNDMgNTgwLjg0IDY2OS43M0w1ODAuODQgNzQzLjExWiIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K&labelColor=555555\"\
+                >`\n]]]"
+              chips:
+                card:
+                  type: custom:mushroom-chips-card
+                  card_mod:
+                    style: "ha-card {\n  transition: all 0s;\n  --chip-background:\
+                      \ var(--primary-background-color) !important;\n  --chip-box-shadow:\
+                      \ none;\n  --chip-border-width: 0;\n  --chip-spacing: 0.1em;\n\
+                      }\n"
+                  chips:
+                    - type: conditional
+                      conditions:
+                        - entity: binary_sensor.cartago_microphone_used
+                          state: 'on'
+                      chip:
+                        type: entity
+                        entity: binary_sensor.cartago_microphone_used
+                        icon_color: red
+                        content_info: none
+                    - type: conditional
+                      conditions:
+                        - condition: numeric_state
+                          entity: sensor.cartago_system_updates_count
+                          above: 0
+                      chip:
+                        type: template
+                        entity: sensor.cartago_system_updates_count
+                        icon: mdi:arrow-up-bold-circle
+                        icon_color: red
+                        card_mod:
+                          style:
+                            .: "{% if int(states(config.entity), 0) > 0 %}\nha-card:after\
+                              \ {\n  content: \"{{ int(states(config.entity), 0) }}\"\
+                              ;\n  position: absolute;\n  color: var(--red-color);\n\
+                              \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n\
+                              \  font-size: 12px;\n}\n{% endif %}\n"
+                        tap_action:
+                          action: fire-dom-event
+                          browser_mod:
+                            service: browser_mod.popup
+                            data:
+                              title: System Updates
+                              content:
+                                type: custom:streamline-card
+                                template: linux_updates_list
+                                variables:
+                                  - entity: sensor.cartago_system_updates_count
           - type: custom:button-card
             layout_options:
               grid_columns: 2
@@ -12392,9 +12458,14 @@ views:
               cpu: sensor.ardena_cpu_load
               ram: sensor.ardena_memory_usage
               gpu: sensor.ardena_gpu_load
+            triggers_update:
+              - media_player.ardena
+              - sensor.ardena_cpu_load
+              - sensor.ardena_memory_usage
+              - sensor.ardena_gpu_load
             custom_fields:
-              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Ryzen_5_5600X-ED1C24?style=flat-square&logo=amd&logoColor=white&logoSize=auto&labelColor=555555\"\
-                ><br>\n  <img src=\"https://img.shields.io/badge/RTX_3080-76B900?style=flat-square&logo=nvidia&logoColor=white&logoSize=auto&labelColor=555555\"\
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Ryzen_5_5600X-ED1C24?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTUzMCAxNTMwIgogICB3aWR0aD0iMTUzMCIKICAgaGVpZ2h0PSIxNTMwIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iQU1ELnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS40IChlN2MzZmViMTAwLCAyMDI0LTEwLTA5KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzMSIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjMDAwMDAwIgogICAgIGJvcmRlcm9wYWNpdHk9IjAuMjUiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIgogICAgIGlua3NjYXBlOmRlc2tjb2xvcj0iI2QxZDFkMSIKICAgICBpbmtzY2FwZTp6b29tPSIwLjc1ODE2OTkzIgogICAgIGlua3NjYXBlOmN4PSI3NjUiCiAgICAgaW5rc2NhcGU6Y3k9Ijc2NS42NTk0OCIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjIyMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTI4NiIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5BTURfTG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICMwMDAwMDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgY2xhc3M9InNocDAiCiAgICAgZD0iTTQzMS4zNSA0MTYuMzlMMTUuMjggMEwxNTMwIDBMMTUzMCAxNTE1LjY2TDExMTMuOTIgMTA5OS4zMkwxMTEzLjkyIDQxNi4zOUw0MzEuMzUgNDE2LjM5Wk00MzAuODcgNDk5LjgzTDIuNDkgOTI4LjQ0TDIuNDkgMTUyOC40MUw2MDIuMDQgMTUyOC40MUwxMDMwLjM5IDEwOTkuODFMNDMwLjg3IDEwOTkuODFMNDMwLjg3IDQ5OS44M1oiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MSIgLz4KPC9zdmc+Cg==&logoColor=white&logoSize=auto&labelColor=555555\"\
+                ><br>\n  <img src=\"https://img.shields.io/badge/RTX_3080-76B900?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTU1OSAxMDMyIgogICB3aWR0aD0iMTU1OSIKICAgaGVpZ2h0PSIxMDMyIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iTlZEQS5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNCAoZTdjM2ZlYjEwMCwgMjAyNC0xMC0wOSkiCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczEiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6em9vbT0iMC41NjIwMTU1IgogICAgIGlua3NjYXBlOmN4PSI0NTkuMDYyMDciCiAgICAgaW5rc2NhcGU6Y3k9IjU3MC4yNjg5NyIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjI2NDIiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM1MCIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5OVklESUFfbG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICM3NmI5MDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgZmlsbC1ydWxlPSJldmVub2RkIgogICAgIGNsYXNzPSJzaHAwIgogICAgIGQ9Ik0xNTU3LjkgLTAuNUwxNTU3LjkgMTAyOS43OEw1ODEuOTkgMTAyOS43OEw1ODEuOTkgOTA4LjgxQzYwMi42MyA5MTEuMSA2MjMuMjggOTEyLjI1IDY0NS4wNiA5MTIuMjVDODcwLjk4IDkxMi4yNSAxMjY5LjQ5IDc5Ny4wMSAxNDQwLjM2IDY1My42N0MxNDE1LjEzIDYyOC40NSAxMjkyLjk5IDU3MC41NCAxMjYzLjE4IDU0Ni40NkMxMDgzLjEzIDcwMS4yNiA4OTcuMzYgODMyLjU1IDY0MC40OCA4MzIuNTVDNjIwLjk4IDgzMi41NSA2MDAuOTEgODMwLjgzIDU4MS40MiA4MjguNTRMNTgxLjQyIDc0Mi41NEM2MDQuOTMgNzQ2LjU1IDYyOC40NCA3NDguODUgNjUyLjUyIDc0OC44NUM5MjguMzIgNzQ4Ljg1IDExOTMuMjMgNDI2LjYzIDExOTMuMjMgNDI2LjYzQzExOTMuMjMgNDI2LjYzIDk2Mi4xNSAxMjQuNDkgNjA4LjM3IDEzNi41M0w1ODAuODQgMTM4LjI1TDU4MC44NCAtMC41TDE1NTcuOSAtMC41Wk02MDguMzcgMjEyLjc4Qzg2Mi45NSAyMDQuNzUgMTAyOS44MSA0MzEuNzkgMTAyOS44MSA0MzEuNzlDMTAyOS44MSA0MzEuNzkgODQ5Ljc2IDY4MS43NyA2NTYuNTMgNjgxLjc3QzYzMC43MyA2ODEuNzcgNjA1LjUgNjc3Ljc1IDU4MS40MiA2NjkuNzNMNTgxLjQyIDM4Ny42NUM2ODAuNjEgMzk5LjY5IDcwMC42OCA0NDMuMjYgNzU5Ljc0IDU0Mi40NUw4OTIuMiA0MzEuMjJDODkyLjIgNDMxLjIyIDc5NS4yOSAzMDQuNTEgNjMyLjQ1IDMwNC41MUM2MTUuMjUgMzAzLjk0IDU5OC4wNSAzMDUuMDkgNTgwLjg0IDMwNi44MUw1ODAuODQgMjEzLjk3QzI5OS42OSAyMzYgMTU5LjQgNDQzLjI2IDE1OS40IDQ0My4yNkMxNTkuNCA0NDMuMjYgMjY2LjYzIDc4OS41NSA1ODAuODQgODI4LjU0TDU4MC44NCA5MDguODFDMTUyLjUyIDg2OC42NyAwIDQyNy4yMSAwIDQyNy4yMUMwIDQyNy4yMSAyNjkuNDkgMTYzLjQ3IDU4MS40MiAxMzguMjVMNTgxLjQyIDIxMy44OUM1OTAuNCAyMTMuMzMgNTk5LjM4IDIxMi43OCA2MDguMzcgMjEyLjc4Wk01ODAuODQgNzQzLjExQzM0My40NiA3MDAuNjkgMjc3LjUyIDQ1My41OCAyNzcuNTIgNDUzLjU4QzI3Ny41MiA0NTMuNTggMzkxLjYzIDMyNy40NSA1ODAuODQgMzA2LjgxTDU4MC44NCAzODcuMDdMNTgwLjI3IDM4Ny4wN0M0ODEuMDcgMzc1LjAzIDQwMy4wOSA0NjcuOTEgNDAzLjA5IDQ2Ny45MUM0MDMuMDkgNDY3LjkxIDQ0Ny4yNCA2MjQuNDMgNTgwLjg0IDY2OS43M0w1ODAuODQgNzQzLjExWiIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
                 card:
@@ -12466,7 +12537,6 @@ views:
                                 type: custom:streamline-card
                                 template: windows_updates_list
                                 variables:
-                                  - computer: ardena
                                   - entity: sensor.ardena_windows_updates_software_updates
                     - type: conditional
                       conditions:
@@ -12495,7 +12565,6 @@ views:
                                 type: custom:streamline-card
                                 template: windows_updates_list
                                 variables:
-                                  - computer: ardena
                                   - entity: sensor.ardena_windows_updates_driver_updates
           - type: custom:button-card
             layout_options:
@@ -12514,9 +12583,14 @@ views:
               cpu: sensor.athos_cpu_load
               ram: sensor.athos_memory_usage
               gpu: sensor.athos_gpu_load
+            triggers_update:
+              - media_player.athos
+              - sensor.athos_cpu_load
+              - sensor.athos_memory_usage
+              - sensor.athos_gpu_load
             custom_fields:
-              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Core_i7_11700-0071C5?style=flat-square&logo=intel&logoColor=white&logoSize=auto&labelColor=555555\"\
-                ><br>\n  <img src=\"https://img.shields.io/badge/GTX_1070-76B900?style=flat-square&logo=nvidia&logoColor=white&logoSize=auto&labelColor=555555\"\
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Core_i7_11700-0071C5?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTYwMCA2NzUiCiAgIHdpZHRoPSIxNjAwIgogICBoZWlnaHQ9IjY3NSIKICAgaWQ9InN2ZzEiCiAgIHNvZGlwb2RpOmRvY25hbWU9IklOVEMuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIxLjQgKGU3YzNmZWIxMDAsIDIwMjQtMTAtMDkpIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIGlua3NjYXBlOnpvb209IjEuNzE4NTE4NSIKICAgICBpbmtzY2FwZTpjeD0iODAwLjEwNzc2IgogICAgIGlua3NjYXBlOmN5PSIzMzcuNSIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjUxMjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM3MSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzEiIC8+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlMSI+SW50ZWxfbG9nb18oMjAyMCxfZGFya19ibHVlKS1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICMwMDY4YjUgfSAKCQkuc2hwMSB7IGZpbGw6ICMwMDAwMDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0icmVjdDQiCiAgICAgY2xhc3M9InNocDAiCiAgICAgZD0iTTAgOS40MUwxMjUuOTQgOS40MUwxMjUuOTQgMTM1LjMxTDAgMTM1LjMxTDAgOS40MVoiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MSIgLz4KICA8cGF0aAogICAgIGlkPSJwYXRoNiIKICAgICBmaWxsLXJ1bGU9ImV2ZW5vZGQiCiAgICAgY2xhc3M9InNocDEiCiAgICAgZD0iTSAzLjU5LDY2NS4zNSBWIDIxMS45MyBIIDEyMi44IHYgNDUzLjQyIHogbSA4OTUuOTEsNC40OCBjIC0zNi4zMSwwIC02Ni43OCwtMy4xNCAtOTAuOTgsLTkuODYgLTIzLjc2LC02LjcyIC00My40OCwtMTcuNDcgLTU4LjI3LC0zMi43IC0xNC43OSwtMTUuMjQgLTI1LjU0LC0zNS40IC0zMS44MiwtNjAuMDQgLTYuMjcsLTI1LjA5IC05LjQxLC01Ni40NiAtOS40MSwtOTMuNjQgViAzNC45NSBoIDExOS42NiB2IDE3Ni45OCBoIDg2LjUgdiAxMDIuMTUgaCAtODYuNSB2IDE1OC42MSBjIDAsMTcuOTIgMC45LDMyLjcxIDIuNjksNDMuOTEgMi4yNCwxMS42NSA2LjI4LDIwLjYxIDEyLjU1LDI2Ljg4IDYuMjgsNi4yNyAxNS42OSwxMC43NSAyOC4yNCwxMi41NSAxMC43NSwxLjc5IDI1LjU0LDIuNjggNDMuMDIsMi42OCB2IDExMS4xMiB6IG0gNTgwLjg0LC00LjQ4IFYgMCBIIDE2MDAgViA2NjUuMzUgWiBNIDY0My41OSw0MDcuNzIgViA2NjQuOSBIIDUyMy4wMyBWIDQyNC4zIGMgMCwtMzcuMTkgLTguOTcsLTY2LjMxIC0yNiwtODYuOTIgLTE3LjQ4LC0yMC42MSAtNDMuOTIsLTMxLjM2IC03OC40MywtMzEuMzYgLTI5LjEzLDAgLTU0LjY4LDEwLjc1IC03NS43NCwzMi4yNiAtMTkuNzIsMjAuMTYgLTMwLjAzLDUxLjUyIC0zMS4zOCw5NC4wOCBWIDY2NS4zNSBIIDE5Mi43MiBWIDIxMS45MyBoIDExNy44NyB2IDY0Ljk2IGwgNi43MiwtOC41MSBjIDE1LjY5LC0yMC42MSAzNS44NiwtMzYuNzQgNTkuMTYsLTQ4LjM5IDIzLjc1LC0xMS42NSA0OS43NSwtMTcuNDcgNzguNDMsLTE3LjQ3IDU5LjE2LDAgMTA1Ljc3LDE3LjkyIDEzOC45NCw1My43NiAzMy4xNiwzNS44NSA1MC4xOSw4Ni45MiA0OS43NSwxNTEuNDQgeiBtIDc3NC45LDcyLjU5IGggLTM1Ni4zMSBsIDEuMzUsNC4wMyBjIDcuNjIsMjYuNDMgMjEuOTYsNDcuOTQgNDMuMDIsNjMuMTcgMjEuMDcsMTUuNjggNDguODYsMjMuMyA4Mi40NywyMy4zIDUzLjc4LDAgOTYuODEsLTI5LjEyIDExNC43MywtNTAuNjMgbCA4Ni4wNSw2NS40MiBjIC0zNy42NCw0My4wMSAtMTAwLjM5LDg5LjE2IC0yMDEuNjgsODkuMTYgLTM0Ljk1LDAgLTY3LjY3LC02LjI3IC05Ny4yNSwtMTguODIgLTI5LjU4LC0xMi4xIC01NS4xMywtMjkuMTIgLTc1Ljc0LC01MC4xOCAtMjAuNjIsLTIxLjA2IC0zNy4yLC00Ni4xNSAtNDguODYsLTc0LjgyIC0xMS42NSwtMjguNjggLTE3LjQ3LC01OS42IC0xNy40NywtOTIuMyAwLC0zMi43MSA1LjgyLC02My42MyAxOC4zNywtOTIuMyAxMi4xLC0yOC42OCAyOS4xMywtNTMuNzcgNTAuMiwtNzQuODIgMjEuMDYsLTIxLjA2IDQ2LjE2LC0zNy42NCA3NC44NCwtNTAuMTkgMjguNjksLTEyLjA5IDU5LjYxLC0xOC4zNiA5Mi4zMywtMTguMzYgMzQuNTEsMCA2Ni4zMyw1LjgyIDk1LjAxLDE3LjkyIDI4LjY5LDEyLjA5IDUzLjM0LDI4LjY3IDczLjk1LDUwLjE4IDIwLjE3LDIxLjUgMzYuMyw0Ni41OSA0Ny45Niw3NC44MiAxMS4yLDI4LjY4IDE3LjAzLDU5LjE0IDE3LjAzLDkxLjg1IHogbSAtMTE0Ljc0LC04NC42OCBjIDAsLTMzLjE2IC0zOC41NCwtOTAuOTYgLTEyMC41NiwtOTAuOTYgLTgyLjAxLDAuNDUgLTEyMC4xMSw1OC4yNSAtMTIwLjExLDkxLjQgeiIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K&logoColor=white&logoSize=auto&labelColor=555555\"\
+                ><br>\n  <img src=\"https://img.shields.io/badge/GTX_1070-76B900?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgdmVyc2lvbj0iMS4yIgogICB2aWV3Qm94PSIwIDAgMTU1OSAxMDMyIgogICB3aWR0aD0iMTU1OSIKICAgaGVpZ2h0PSIxMDMyIgogICBpZD0ic3ZnMSIKICAgc29kaXBvZGk6ZG9jbmFtZT0iTlZEQS5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNCAoZTdjM2ZlYjEwMCwgMjAyNC0xMC0wOSkiCiAgIHhtbG5zOmlua3NjYXBlPSJodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy9uYW1lc3BhY2VzL2lua3NjYXBlIgogICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiCiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgeG1sbnM6c3ZnPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnMKICAgICBpZD0iZGVmczEiIC8+CiAgPHNvZGlwb2RpOm5hbWVkdmlldwogICAgIGlkPSJuYW1lZHZpZXcxIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6em9vbT0iMC41NjIwMTU1IgogICAgIGlua3NjYXBlOmN4PSI0NTkuMDYyMDciCiAgICAgaW5rc2NhcGU6Y3k9IjU3MC4yNjg5NyIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjI2NDIiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM1MCIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMjYiCiAgICAgaW5rc2NhcGU6d2luZG93LXk9IjIzIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5OVklESUFfbG9nby1zdmc8L3RpdGxlPgogIDxzdHlsZQogICAgIGlkPSJzdHlsZTEiPgoJCXRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0KCQkuc2hwMCB7IGZpbGw6ICM3NmI5MDAgfSAKCTwvc3R5bGU+CiAgPHBhdGgKICAgICBpZD0iTGF5ZXIiCiAgICAgZmlsbC1ydWxlPSJldmVub2RkIgogICAgIGNsYXNzPSJzaHAwIgogICAgIGQ9Ik0xNTU3LjkgLTAuNUwxNTU3LjkgMTAyOS43OEw1ODEuOTkgMTAyOS43OEw1ODEuOTkgOTA4LjgxQzYwMi42MyA5MTEuMSA2MjMuMjggOTEyLjI1IDY0NS4wNiA5MTIuMjVDODcwLjk4IDkxMi4yNSAxMjY5LjQ5IDc5Ny4wMSAxNDQwLjM2IDY1My42N0MxNDE1LjEzIDYyOC40NSAxMjkyLjk5IDU3MC41NCAxMjYzLjE4IDU0Ni40NkMxMDgzLjEzIDcwMS4yNiA4OTcuMzYgODMyLjU1IDY0MC40OCA4MzIuNTVDNjIwLjk4IDgzMi41NSA2MDAuOTEgODMwLjgzIDU4MS40MiA4MjguNTRMNTgxLjQyIDc0Mi41NEM2MDQuOTMgNzQ2LjU1IDYyOC40NCA3NDguODUgNjUyLjUyIDc0OC44NUM5MjguMzIgNzQ4Ljg1IDExOTMuMjMgNDI2LjYzIDExOTMuMjMgNDI2LjYzQzExOTMuMjMgNDI2LjYzIDk2Mi4xNSAxMjQuNDkgNjA4LjM3IDEzNi41M0w1ODAuODQgMTM4LjI1TDU4MC44NCAtMC41TDE1NTcuOSAtMC41Wk02MDguMzcgMjEyLjc4Qzg2Mi45NSAyMDQuNzUgMTAyOS44MSA0MzEuNzkgMTAyOS44MSA0MzEuNzlDMTAyOS44MSA0MzEuNzkgODQ5Ljc2IDY4MS43NyA2NTYuNTMgNjgxLjc3QzYzMC43MyA2ODEuNzcgNjA1LjUgNjc3Ljc1IDU4MS40MiA2NjkuNzNMNTgxLjQyIDM4Ny42NUM2ODAuNjEgMzk5LjY5IDcwMC42OCA0NDMuMjYgNzU5Ljc0IDU0Mi40NUw4OTIuMiA0MzEuMjJDODkyLjIgNDMxLjIyIDc5NS4yOSAzMDQuNTEgNjMyLjQ1IDMwNC41MUM2MTUuMjUgMzAzLjk0IDU5OC4wNSAzMDUuMDkgNTgwLjg0IDMwNi44MUw1ODAuODQgMjEzLjk3QzI5OS42OSAyMzYgMTU5LjQgNDQzLjI2IDE1OS40IDQ0My4yNkMxNTkuNCA0NDMuMjYgMjY2LjYzIDc4OS41NSA1ODAuODQgODI4LjU0TDU4MC44NCA5MDguODFDMTUyLjUyIDg2OC42NyAwIDQyNy4yMSAwIDQyNy4yMUMwIDQyNy4yMSAyNjkuNDkgMTYzLjQ3IDU4MS40MiAxMzguMjVMNTgxLjQyIDIxMy44OUM1OTAuNCAyMTMuMzMgNTk5LjM4IDIxMi43OCA2MDguMzcgMjEyLjc4Wk01ODAuODQgNzQzLjExQzM0My40NiA3MDAuNjkgMjc3LjUyIDQ1My41OCAyNzcuNTIgNDUzLjU4QzI3Ny41MiA0NTMuNTggMzkxLjYzIDMyNy40NSA1ODAuODQgMzA2LjgxTDU4MC44NCAzODcuMDdMNTgwLjI3IDM4Ny4wN0M0ODEuMDcgMzc1LjAzIDQwMy4wOSA0NjcuOTEgNDAzLjA5IDQ2Ny45MUM0MDMuMDkgNDY3LjkxIDQ0Ny4yNCA2MjQuNDMgNTgwLjg0IDY2OS43M0w1ODAuODQgNzQzLjExWiIKICAgICBzdHlsZT0iZmlsbDojZmZmZmZmO2ZpbGwtb3BhY2l0eToxIiAvPgo8L3N2Zz4K&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
                 card:
@@ -12575,7 +12649,6 @@ views:
                                 type: custom:streamline-card
                                 template: windows_updates_list
                                 variables:
-                                  - computer: athos
                                   - entity: sensor.athos_windows_updates_software_updates
                     - type: conditional
                       conditions:
@@ -12607,7 +12680,6 @@ views:
                                 type: custom:streamline-card
                                 template: windows_updates_list
                                 variables:
-                                  - computer: athos
                                   - entity: sensor.athos_windows_updates_driver_updates
           - type: custom:button-card
             layout_options:
@@ -12619,6 +12691,10 @@ views:
             tap_action:
               action: navigate
               navigation_path: '#computer-magicmirror'
+            triggers_update:
+              - sensor.magicmirror_cpu_usage
+              - sensor.magicmirror_memory_usage
+              - sensor.magicmirror_cpu_thermal_1_temperature
             custom_fields:
               stat1: "[[[\n  var entity_id = 'sensor.magicmirror_cpu_usage';\n  return\
                 \ `<ha-icon icon=\"mdi:cpu-64-bit\" style=\"width: 24px; height: 24px;\
@@ -12638,7 +12714,7 @@ views:
                 \ Temp: <span style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
                 \ 0) : '?'}</span></span>`\n]]]"
-              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Raspberry_Pi_5-C7053D?style=flat-square&logo=raspberrypi&logoColor=white&logoSize=auto&labelColor=555555\"\
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Raspberry_Pi_5-C7053D?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgcm9sZT0iaW1nIgogICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIHNvZGlwb2RpOmRvY25hbWU9InJhc3BiZXJyeXBpLnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS40IChlN2MzZmViMTAwLCAyMDI0LTEwLTA5KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzMSIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjMDAwMDAwIgogICAgIGJvcmRlcm9wYWNpdHk9IjAuMjUiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIgogICAgIGlua3NjYXBlOmRlc2tjb2xvcj0iI2QxZDFkMSIKICAgICBpbmtzY2FwZTp6b29tPSI0OC4zMzMzMzMiCiAgICAgaW5rc2NhcGU6Y3g9IjEyIgogICAgIGlua3NjYXBlOmN5PSIxMiIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjUxMjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM3MSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzEiIC8+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlMSI+UmFzcGJlcnJ5IFBpPC90aXRsZT4KICA8cGF0aAogICAgIGQ9Ik0gMTkuODk1NSwxMC44OTYxIDE5LjcyMjksMTAuNTkzMyBDIDE5LjcyOTcsOC40MTg3IDE4LjcyMDcsNy41MzIzIDE3LjU0NDEsNi44NTg1IDE3LjkwMDEsNi43NjQ3IDE4LjI2NzgsNi42ODc0IDE4LjM2ODYsNi4yNDAzIDE4Ljk4MDQsNi4wODM3IDE5LjEwODMsNS44MDA1IDE5LjE2OTcsNS41MDA1IDE5LjMyOTcsNS4zOTM5IDE5Ljg2NTIsNS4wOTQ0IDE5LjgwOTEsNC41Nzk0IDIwLjEwODksNC4zNzI1IDIwLjI3Niw0LjEwNjkgMjAuMTkxLDMuNzMwNyAyMC41MTMyLDMuMzc5MiAyMC41OTgsMy4wODg4IDIwLjQ2MTIsMi44MjExIDIwLjg0OCwyLjM0MDYgMjAuNjc2NCwyLjA5MTYgMjAuNTExMiwxLjgzOTQgMjAuODAwOSwxLjMxNCAyMC41NDUzLDAuNzUwNyAxOS43MzU0LDAuODQ1IDE5LjQxMzMsMC4zNzE3IDE4LjcxMSwwLjQ3OTEgMTguNjAyNCwwLjQ4MTMgMTguNDgwOSwwLjMyOTQgMTguMzIwNSwwLjE5OTIgMTcuODI2OSwwLjI2MjMgMTcuNTA3MiwtMC4wMjI4IDE3LjE0OTgsMC4wMjU5IDE2Ljc4MTEsMC4xNjU5IDE2LjM0MzMsLTAuMTc0NCAxNi4wNTM2LDAuMDk4NCAxNS43MjI3LDAuMjAxNSAxNS4xOTI3LDAuMDMwOSAxNS4wNzE0LDAuMjY0NiAxNC44MTEsMC4zNTk4IDE0LjIzMjksMC4yMzk1IDE0LjA1NzIsMC41MDE0IDEzLjc4MDEsMC43NzggTCAxMy40NTc3LDAuNzcxNyBDIDEyLjU4NTgsMS4yNzc4IDEyLjE1MjcsMi4zMDgzIDExLjk5OTIsMi44MzgxIDExLjg0NTYsMi4zMDgyIDExLjQxMzQsMS4yNzc3IDEwLjU0MTcsMC43NzE3IEwgMTAuMjE5NCwwLjc3OCBDIDkuOTQyLDAuNTAxNCA5Ljc2NjMsMC4yMzk0IDkuMTg4MywwLjM1OTcgOC45Mjc5LDAuMjY0NiA4LjgwNywwLjAzMDkgOC4yNzY2LDAuMjAxNSA4LjA1OTQsMC4xMzM4IDcuODU5NiwtMC4wMDY5IDcuNjI0NCwzZS00IGwgNGUtNCwyZS00IEMgNy41MDE3LDAuMDA0MSA3LjM2OSwwLjA0OSA3LjIxODUsMC4xNjYgNi44NDk3LDAuMDI1OSA2LjQ5MjMsLTAuMDIyNyA2LjE3MjYsMC4yNjI0IDUuNjc5LDAuMTk5MyA1LjUxODYsMC4zMjk1IDUuMzk3LDAuNDgxNCA1LjI4ODcsMC40NzkxIDQuNTg2MiwwLjM3MTcgNC4yNjQsMC44NDUgMy40NTQ0LDAuNzUwNyAzLjE5ODUsMS4zMTQxIDMuNDg4NCwxLjgzOTQgMy4zMjMxLDIuMDkxNSAzLjE1MTgsMi4zNDA3IDMuNTM4NCwyLjgyMTMgMy40MDE3LDMuMDg5IDMuNDg2NSwzLjM3OTQgMy44MDg3LDMuNzMwOSAzLjcyMzcsNC4xMDcyIDMuODkwOSw0LjM3MjcgNC4xOTA2LDQuNTc5NiA0LjEzNDUsNS4wOTQ2IDQuNjcwMSw1LjM5NCA0LjgzLDUuNTAwNyA0Ljg5MTQsNS44MDA4IDUuMDE5NCw2LjA4MzkgNS42MzExLDYuMjQwNSA1LjczMTksNi42ODc3IDYuMDk5Niw2Ljc2NDkgNi40NTU2LDYuODU4OCA1LjI3OSw3LjUzMjUgNC4yNyw4LjQxODggNC4yNzY4LDEwLjU5MzYgbCAtMC4xNzI0LDAuMzAyOCBjIC0xLjM0OTEsMC44MDgyIC0yLjU2MjksMy40MDU2IC0wLjY2NDgsNS41MTY3IDAuMTI0LDAuNjYwOSAwLjMzMTksMS4xMzU1IDAuNTE3MSwxLjY2MDkgMC4yNzY5LDIuMTE3IDIuMDg0MSwzLjEwODIgMi41NjA4LDMuMjI1NSAwLjY5ODQsMC41MjQgMS40NDIzLDEuMDIxMiAyLjQ0OSwxLjM2OTYgMC45NDksMC45NjQgMS45NzcsMS4zMzE0IDMuMDEwNywxLjMzMDggMC4wMTUyLDAgMC4wMzA2LDJlLTQgMC4wNDU3LDAgMS4wMzM3LDZlLTQgMi4wNjE4LC0wLjM2NjggMy4wMTA3LC0xLjMzMDggMS4wMDY3LC0wLjM0ODMgMS43NTA2LC0wLjg0NTYgMi40NDkxLC0xLjM2OTYgMC40NzY2LC0wLjExNzMgMi4yODM4LC0xLjEwODUgMi41NjA3LC0zLjIyNTUgMC4xODUxLC0wLjUyNTMgMC4zOTMxLC0xIDAuNTE3LC0xLjY2MDkgMS44OTgxLC0yLjExMTMgMC42ODQzLC00LjcwODkgLTAuNjY0OSwtNS41MTcgeiBtIC0xLjAzODYsLTAuMzcxNSBjIC0wLjA3MDQsMC44NzU5IC00LjYzNTQsLTMuMDUwNCAtMy44NDcyLC0zLjE4MDggMi4xMzkxLC0wLjM1NTggMy45MTkxLDAuODk2IDMuODQ3MiwzLjE4MDggeiBtIC0yLjAxNTUsNC4zNjQ5IGMgLTEuMTQ4MSwwLjc0MDkgLTIuODAyNSwwLjI2MjYgLTMuNjk1MywtMS4wNjgxIC0wLjg5MjgsLTEuMzMwNiAtMC42ODU4LC0zLjAxMDEgMC40NjIzLC0zLjc1MDkgMS4xNDgxLC0wLjc0MDkgMi44MDI1LC0wLjI2MjcgMy42OTUzLDEuMDY4IDAuODkyNywxLjMzMDcgMC42ODU4LDMuMDEwMSAtMC40NjIzLDMuNzUxIHogTSAxMy42NTkxLDEuMzcyMSBjIDAuMDM5NiwwLjE5NjcgMC4wODQzLDAuMzIxIDAuMTM1NCwwLjM1NzcgMC4yNTM3LC0wLjI3MiAwLjQ2MTEsLTAuNTUwNiAwLjc4NzgsLTAuODEyMyAwLjAwMTEsMC4xNTM3IC0wLjA3NzYsMC4zMjA1IDAuMTE2OSwwLjQ0MjUgMC4xNzUyLC0wLjIzNTYgMC40MTE5LC0wLjQ0NTkgMC43MjYzLC0wLjYyNDQgLTAuMTUxNCwwLjI2MTEgLTAuMDI2LDAuMzQwNCAwLjA1NTQsMC40NDg2IDAuMjQsLTAuMjA1OSAwLjQ2ODEsLTAuNDE0NCAwLjkxMDksLTAuNTc1OSAtMC4xMjEsMC4xNDc0IC0wLjI5MDIsMC4yOTE0IC0wLjExMDgsMC40NjA3IDAuMjQ3MywtMC4xNTQ0IDAuNDk2LC0wLjMwODYgMS4wODMzLC0wLjQxODMgLTAuMTMyMywwLjE0NzUgLTAuNDA1OSwwLjI5NSAtMC4yNDAxLDAuNDQyNiAwLjMxMDQsLTAuMTE4NiAwLjY1MzksLTAuMjA0NyAxLjAzNCwtMC4yNTQ2IC0wLjE4MiwwLjE0OTYgLTAuMzMzNywwLjI5NjMgLTAuMTg0NiwwLjQxMjIgMC4zMzIzLC0wLjEwMjIgMC43ODk5LC0wLjIzOTggMS4yMzcyLC0wLjEyMTIgbCAtMC4yODMyLDAuMjg0OSBjIC0wLjAzMTQsMC4wMzgyIDAuNjYyMywwLjAyOTcgMS4xMjAyLDAuMDM2NCAtMC4xNjcsMC4yMzIxIC0wLjMzNzUsMC40NTYyIC0wLjQzNywwLjg1NDggMC4wNDU0LDAuMDQ1OSAwLjI3MjMsMC4wMjA0IDAuNDg2MiwwIC0wLjIxOTQsMC40NjE4IC0wLjYwMDQsMC41NzgzIC0wLjY4OTMsMC43NzYgMC4xMzQsMC4xMDE1IDAuMzIsMC4wNzUgMC41MjMyLDAuMDA2IC0wLjE1OCwwLjMyNTQgLTAuNDg5MiwwLjU0ODQgLTAuNzUwOSwwLjgxMjMgMC4wNjYyLDAuMDQ3IDAuMTgxOCwwLjA3NSAwLjQ1NTUsMC4wNDI1IC0wLjI0MTgsMC4yNTcgLTAuNTMzOSwwLjQ5MiAtMC44ODAyLDAuNzAzMiAwLjA2MTQsMC4wNzA4IDAuMjcyMiwwLjA2ODEgMC40Njc4LDAuMDcyNyAtMC4zMTM2LDAuMzA2OSAtMC43MTczLDAuNDY2IC0xLjA5NTUsMC42NjY4IDAuMTg4NSwwLjEyODggMC4zMjM0LDAuMDk4OCAwLjQ2NzgsMC4wOTcgLTAuMjY3NiwwLjIxOTggLTAuNzIyNSwwLjMzNDIgLTEuMTQ0OCwwLjQ2NjggMC4wODAzLDAuMTI0OSAwLjE2MDcsMC4xNTg5IDAuMzMyNCwwLjE5NCAtMC40NDcsMC4yNDczIC0xLjA4NzMsMC4xMzQzIC0xLjI2NzksMC4yNjA3IDAuMDQzNSwwLjEyNDMgMC4xNjY1LDAuMjA1MyAwLjMxMzksMC4yNzI4IEMgMTYuMTA5Myw2LjcxODQgMTQuMTQxMSw2LjY1MDQgMTMuNzYzOCw1LjE2MSAxNC41MDA1LDQuMzUxNiAxNS44NDUxLDMuNDAxNyAxOC4xNTc4LDIuMjI3IDE2LjM1ODQsMi44MjkyIDE0LjczNDksMy42MzIgMTMuMzc2MSw0LjczNjYgMTEuNzc4MywzLjk5MyAxMi44Nzk2LDIuMTE2OSAxMy42NTkxLDEuMzcyMSBaIG0gLTEuNjEyNiw1LjM3MTggYyAxLjEzMjksLTAuMDEyMyAyLjUzNTYsMC44MzI1IDIuNTMsMS42Mjg2IEMgMTQuNTcxNSw5LjA3NTIgMTMuNTkxNCw5LjY0NCAxMi4wNTUyLDkuNjMzMiAxMC41NTA5LDkuNjE1NSA5LjUzOCw4LjkxODQgOS41NDE1LDguMjM3NSA5LjU0NDUsNy42NzcyIDEwLjc2OTcsNi43MTEyIDEyLjA0NjUsNi43NDM5IFogTSA2LjI4MTksNi4xNDMzIEMgNi40NTM2LDYuMTA4MiA2LjUzMzksNi4wNzQxIDYuNjE0Miw1Ljk0OTMgNi4xOTE5LDUuODE2NiA1LjczNyw1LjcwMjMgNS40Njk0LDUuNDgyNSA1LjYxMzgsNS40ODQzIDUuNzQ4Niw1LjUxNDMgNS45MzcyLDUuMzg1NSA1LjU1ODksNS4xODQ3IDUuMTU1Miw1LjAyNTYgNC44NDE2LDQuNzE4NyA1LjAzNzEsNC43MTM5IDUuMjQ4LDQuNzE2NyA1LjMwOTMsNC42NDU5IDQuOTYzMSw0LjQzNDYgNC42NzEsNC4xOTk2IDQuNDI5MiwzLjk0MjYgNC43MDMsMy45NzUxIDQuODE4NSwzLjk0NzEgNC44ODQ3LDMuOTAwMSA0LjYyMywzLjYzNjEgNC4yOTE3LDMuNDEzMSA0LjEzMzgsMy4wODc4IDQuMzM3LDMuMTU2OCA0LjUyMywzLjE4MzIgNC42NTcsMy4wODE4IDQuNTY4LDIuODg0MSA0LjE4NywyLjc2NzYgMy45Njc2LDIuMzA1OCBjIDAuMjE0LDAuMDIwNCAwLjQ0MDksMC4wNDU5IDAuNDg2MywwIEMgNC4zNTQ1LDEuOTA3MyA0LjE4NDEsMS42ODMyIDQuMDE3LDEuNDUxMSA0LjQ3NDksMS40NDQ0IDUuMTY4NiwxLjQ1MjkgNS4xMzcyLDEuNDE0NyBMIDQuODU0MSwxLjEyOTggQyA1LjMwMTMsMS4wMTEyIDUuNzU5LDEuMTQ4OCA2LjA5MTIsMS4yNTExIDYuMjQwNCwxLjEzNTIgNi4wODg2LDAuOTg4NSA1LjkwNjUsMC44Mzg4IDYuMjg2NiwwLjg4ODggNi42MzAxLDAuOTc0OSA2Ljk0MDUsMS4wOTM1IDcuMTA2NCwwLjk0NTkgNi44MzI5LDAuNzk4NCA2LjcwMDUsMC42NTA5IDcuMjg3NywwLjc2MDYgNy41MzY2LDAuOTE0OCA3Ljc4MzgsMS4wNjkyIDcuOTYzMiwwLjg5OTggNy43OTQxLDAuNzU1OSA3LjY3MywwLjYwODUgOC4xMTU4LDAuNzcgOC4zNDM5LDAuOTc4NSA4LjU4NCwxLjE4NDQgOC42NjU0LDEuMDc2MiA4Ljc5MDgsMC45OTY5IDguNjM5NCwwLjczNTggOC45NTM3LDAuOTE0MyA5LjE5MDUsMS4xMjQ2IDkuMzY1NywxLjM2MDIgOS41NjAyLDEuMjM4MiA5LjQ4MTYsMS4wNzE0IDkuNDgyNiwwLjkxNzYgOS44MDkzLDEuMTc5NCAxMC4wMTY2LDEuNDU4IDEwLjI3MDUsMS43MyAxMC4zMjE2LDEuNjkzNCAxMC4zNjY0LDEuNTY5IDEwLjQwNTksMS4zNzIzIDExLjE4NTMsMi4xMTcxIDEyLjI4NjYsMy45OTMxIDEwLjY4OSw0LjczNjkgOS4zMzAxLDMuNjMzIDcuNzA3MywyLjgzMDUgNS45MDksMi4yMjgzIDguMjIwNSwzLjQwMjMgOS41NjQ2LDQuMzUyMiAxMC4zMDEsNS4xNjExIDkuOTIzNyw2LjY1MDYgNy45NTU1LDYuNzE4NiA3LjIzNTksNi42NzY4IDcuMzgzMiw2LjYwOTIgNy41MDYyLDYuNTI4MyA3LjU0OTgsNi40MDQgNy4zNjkyLDYuMjc3NiA2LjcyODksNi4zOTA2IDYuMjgxOSw2LjE0MzMgWiBNIDkuMDk5NCw3LjI3NjcgQyA5Ljg4NzUsNy40MDcxIDUuMzIyNSwxMS4zMzM0IDUuMjUyMiwxMC40NTc2IDUuMTgwMyw4LjE3MyA2Ljk2MDEsNi45MjA5IDkuMDk5NCw3LjI3NjcgWiBtIC00Ljg0Nyw4Ljc1NjcgQyAzLjE0MywxNS4xNTQ1IDIuNzg1NiwxMi41ODA1IDQuODQyNSwxMS40MjM3IDYuMDgxOSwxMS4wOTY0IDUuMjYwOSwxNi40NzQ3IDQuMjUyNCwxNi4wMzM0IFogTSA4LjUxOCwyMC42MzIzIEMgNy44OTIzLDIxLjAwNDIgNi4zNzI4LDIwLjg1MSA1LjI5MjgsMTkuMzIyOCA0LjU2NDUsMTguMDQwNSA0LjY1ODMsMTYuNzM1NiA1LjE2OTgsMTYuMzUyMyBjIDAuNzY0OCwtMC40NTg5IDEuOTQ2NCwwLjE2MDkgMi44NTU5LDEuMjAwMyAwLjc5MjMsMC45NDA1IDEuMTUzNiwyLjU5MjcgMC40OTIzLDMuMDc5NyB6IE0gNy4yNzY1LDE1LjAyMzcgQyA2LjEyODQsMTQuMjgyOCA1LjkyMTQsMTIuNjAzNCA2LjgxNDIsMTEuMjcyNiA3LjcwNyw5Ljk0MTkgOS4zNjE0LDkuNDYzNyAxMC41MDk0LDEwLjIwNDYgYyAxLjE0ODEsMC43NDA5IDEuMzU1MSwyLjQyMDMgMC40NjIzLDMuNzUwOSAtMC44OTI2LDEuMzMwOCAtMi41NDcxLDEuODA5IC0zLjY5NTIsMS4wNjgyIHogbSA0Ljc5NDgsOC4yMjc5IEMgMTAuNjk1LDIzLjMxIDkuMzQ1NSwyMi4xNDExIDkuMzYzMiwyMS43MzU5IGMgLTAuMDIwNiwtMC41OTQgMS42NzU4LC0xLjA1NzggMi43ODIsLTEuMDMwNiAxLjExMzEsLTAuMDQ3OSAyLjYwNjgsMC4zNTMxIDIuNjA5NywwLjg4NTEgMC4wMTg0LDAuNTE2NiAtMS4zNTQ3LDEuNjgzOCAtMi42ODM2LDEuNjYxMiB6IG0gMi43NTg0LC01Ljg1NzggYyAwLjAwODEsMS4zODk5IC0xLjIyNiwyLjUyMjUgLTIuNzU2MiwyLjUyOTkgLTEuNTMwMiwwLjAwNzMgLTIuNzc3MywtMS4xMTM1IC0yLjc4NTQsLTIuNTAzMyB2IC0wLjAyNjUgYyAtMC4wMDgsLTEuMzg5OSAxLjIyNTksLTIuNTIyNiAyLjc1NjIsLTIuNTI5OSAxLjUzMDIsLTAuMDA3MyAyLjc3NzMsMS4xMTM0IDIuNzg1MywyLjUwMzMgMS44NGUtNCwwLjAwODggMi4xN2UtNCwwLjAxNzY3IDFlLTQsMC4wMjY1IHogbSAzLjg1NSwyLjAwMjkgYyAtMS4xODYsMS42MjA4IC0yLjc5MTYsMS42ODQgLTMuMzg5NiwxLjIzMjUgLTAuNjI1NSwtMC41ODExIC0wLjE0OCwtMi4zODU0IDAuNzA5NCwtMy4zNzQ3IHYgLTNlLTQgYyAwLjk4MTIsLTEuMDkxMiAyLjAzMDIsLTEuODAzNyAyLjc2MDksLTEuMjQ2OSAwLjQ5MTksMC40ODI4IDAuNzgwNSwyLjMwMDggLTAuMDgwNywzLjM4OTQgeiBtIDEuMDcyNCwtMy40MzAxIGMgLTEuMDA4NiwwLjQ0MTMgLTEuODI5OCwtNC45MzcyIC0wLjU5MDEsLTQuNjEgMi4wNTY4LDEuMTU2OSAxLjY5OTQsMy43MzEgMC41OTAxLDQuNjEgeiIKICAgICBpZD0icGF0aDEiCiAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NzY2Njc2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3NjY2NjY2NjY2NjYyIKICAgICBzdHlsZT0ic3Ryb2tlOm5vbmU7c3Ryb2tlLW9wYWNpdHk6MTtmaWxsOiNmZmZmZmY7ZmlsbC1vcGFjaXR5OjEiIC8+Cjwvc3ZnPgo=&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
                 card:
@@ -12724,6 +12800,10 @@ views:
             tap_action:
               action: navigate
               navigation_path: '#computer-quest'
+            triggers_update:
+              - sensor.quest_battery_level
+              - sensor.quest_wifi_link_speed
+              - sensor.quest_battery_temperature
             custom_fields:
               stat1: "[[[\n  var entity_id = 'sensor.quest_battery_level';\n  return\
                 \ `<ha-icon icon=\"mdi:battery\" style=\"width: 24px; height: 24px;\
@@ -12743,7 +12823,7 @@ views:
                 \ Temp: <span style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
                 \ 0) : '?'}</span></span>`\n]]]"
-              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Meta_Quest_2-0668E1?style=flat-square&logo=meta&logoColor=white&logoSize=auto&labelColor=555555\"\
+              info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Meta_Quest_2-0668E1?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgcm9sZT0iaW1nIgogICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIHNvZGlwb2RpOmRvY25hbWU9Im1ldGEuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIxLjQgKGU3YzNmZWIxMDAsIDIwMjQtMTAtMDkpIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIGlua3NjYXBlOnpvb209IjQ4LjMzMzMzMyIKICAgICBpbmtzY2FwZTpjeD0iMTIiCiAgICAgaW5rc2NhcGU6Y3k9IjEyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iNTEyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMzcxIgogICAgIGlua3NjYXBlOndpbmRvdy14PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy15PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5NZXRhPC90aXRsZT4KICA8cGF0aAogICAgIGQ9Ik02LjkxNSA0LjAzYy0xLjk2OCAwLTMuNjgzIDEuMjgtNC44NzEgMy4xMTNDLjcwNCA5LjIwOCAwIDExLjg4MyAwIDE0LjQ0OWMwIC43MDYuMDcgMS4zNjkuMjEgMS45NzNhNi42MjQgNi42MjQgMCAwIDAgLjI2NS44NiA1LjI5NyA1LjI5NyAwIDAgMCAuMzcxLjc2MWMuNjk2IDEuMTU5IDEuODE4IDEuOTI3IDMuNTkzIDEuOTI3IDEuNDk3IDAgMi42MzMtLjY3MSAzLjk2NS0yLjQ0NC43Ni0xLjAxMiAxLjE0NC0xLjYyNiAyLjY2My00LjMybC43NTYtMS4zMzkuMTg2LS4zMjVjLjA2MS4xLjEyMS4xOTYuMTgzLjNsMi4xNTIgMy41OTVjLjcyNCAxLjIxIDEuNjY1IDIuNTU2IDIuNDcgMy4zMTQgMS4wNDYuOTg3IDEuOTkyIDEuMjIgMy4wNiAxLjIyIDEuMDc1IDAgMS44NzYtLjM1NSAyLjQ1NS0uODQzYTMuNzQzIDMuNzQzIDAgMCAwIC44MS0uOTczYy41NDItLjkzOS44NjEtMi4xMjcuODYxLTMuNzQ1IDAtMi43Mi0uNjgxLTUuMzU3LTIuMDg0LTcuNDUtMS4yODItMS45MTItMi45NTctMi45My00LjcxNi0yLjkzLTEuMDQ3IDAtMi4wODguNDY3LTMuMDUzIDEuMzA4LS42NTIuNTctMS4yNTcgMS4yOS0xLjgyIDIuMDUtLjY5LS44NzUtMS4zMzUtMS41NDctMS45NTgtMi4wNTYtMS4xODItLjk2Ni0yLjMxNS0xLjMwMy0zLjQ1NC0xLjMwM3ptMTAuMTYgMi4wNTNjMS4xNDcgMCAyLjE4OC43NTggMi45OTIgMS45OTkgMS4xMzIgMS43NDggMS42NDcgNC4xOTUgMS42NDcgNi40IDAgMS41NDgtLjM2OCAyLjktMS44MzkgMi45LS41OCAwLTEuMDI3LS4yMy0xLjY2NC0xLjAwNC0uNDk2LS42MDEtMS4zNDMtMS44NzgtMi44MzItNC4zNThsLS42MTctMS4wMjhhNDQuOTA4IDQ0LjkwOCAwIDAgMC0xLjI1NS0xLjk4Yy4wNy0uMTA5LjE0MS0uMjI0LjIxMS0uMzI3IDEuMTItMS42NjcgMi4xMTgtMi42MDIgMy4zNTgtMi42MDJ6bS0xMC4yMDEuNTUzYzEuMjY1IDAgMi4wNTguNzkxIDIuNjc1IDEuNDQ2LjMwNy4zMjcuNzM3Ljg3MSAxLjIzNCAxLjU3OWwtMS4wMiAxLjU2NmMtLjc1NyAxLjE2My0xLjg4MiAzLjAxNy0yLjgzNyA0LjMzOC0xLjE5MSAxLjY0OS0xLjgxIDEuODE3LTIuNDg2IDEuODE3LS41MjQgMC0xLjAzOC0uMjM3LTEuMzgzLS43OTQtLjI2My0uNDI2LS40NjQtMS4xMy0uNDY0LTIuMDQ2IDAtMi4yMjEuNjMtNC41MzUgMS42Ni02LjA4OC40NTQtLjY4Ny45NjQtMS4yMjYgMS41MzMtMS41MzNhMi4yNjQgMi4yNjQgMCAwIDEgMS4wODgtLjI4NXoiCiAgICAgaWQ9InBhdGgxIgogICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7ZmlsbC1vcGFjaXR5OjEiIC8+Cjwvc3ZnPgo=&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
                 card:
@@ -12829,41 +12909,30 @@ views:
                 name: Erebus
                 icon: mdi:desktop-tower
                 button_type: name
-                tap_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                hold_action:
-                  action: call-service
-                  service: script.hass_publish_sensors
-                  data:
-                    entity: media_player.erebus
-                  target: {}
                 margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
-                  bubble-card::after {\n  display: none !important;\n}\n.bubble-sub-button-1\
-                  \ > ha-icon {\n  color: var(--red-color) !important;\n}\n.bubble-sub-button-2\
-                  \ > ha-icon {\n  color: var(--red-color) !important;\n}\n.bubble-sub-button-3\
-                  \ > ha-icon {\n  color: var(--red-color) !important;\n}\n.bubble-sub-button-4\
-                  \ > ha-icon {\n  color: var(--red-color) !important;\n}"
+                  .bubble-sub-button-1 > ha-icon {\n  color: var(--red-color) !important;\n\
+                  }\n.bubble-sub-button-2 > ha-icon {\n  color: var(--red-color) !important;\n\
+                  }\n.bubble-sub-button-3 > ha-icon {\n  color: var(--red-color) !important;\n\
+                  }"
                 sub_button:
-                  - entity: binary_sensor.erebus_mic_active
+                  - entity: binary_sensor.erebus_microphone_used
                     name: Mic Active
                     show_background: false
                     visibility:
                       - condition: state
-                        entity: binary_sensor.erebus_mic_active
+                        entity: binary_sensor.erebus_microphone_used
                         state: 'on'
-                  - entity: binary_sensor.erebus_webcam_active
+                  - entity: binary_sensor.erebus_camera_used
                     name: Webcam Active
                     show_background: false
                     visibility:
                       - condition: state
-                        entity: binary_sensor.erebus_webcam_active
+                        entity: binary_sensor.erebus_camera_used
                         state: 'on'
-                  - entity: sensor.erebus_windows_updates_software_updates
-                    name: Software Updates
+                  - entity: sensor.erebus_system_updates_count
+                    name: System Updates
                     show_background: false
                     show_state: true
                     icon: mdi:arrow-up-bold-circle
@@ -12872,145 +12941,107 @@ views:
                       browser_mod:
                         service: browser_mod.popup
                         data:
-                          title: Software Updates
+                          title: System Updates
                           content:
                             type: custom:streamline-card
-                            template: windows_updates_list
+                            template: linux_updates_list
                             variables:
-                              - computer: erebus
-                              - entity: sensor.erebus_windows_updates_software_updates
+                              - entity: sensor.erebus_system_updates_count
                     visibility:
                       - condition: numeric_state
-                        entity: sensor.erebus_windows_updates_software_updates
+                        entity: sensor.erebus_system_updates_count
                         above: 0
-                  - entity: sensor.erebus_windows_updates_driver_updates
-                    name: Driver Updates
+                  - entity: sensor.erebus_battery_american_power_conversion_back_ups_xs_1300g_4b1346p25103
+                    name: Battery
                     show_background: false
                     show_state: true
-                    icon: mdi:cog-refresh
-                    tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Driver Updates
-                          content:
-                            type: custom:streamline-card
-                            template: windows_updates_list
-                            variables:
-                              - computer: erebus
-                              - entity: sensor.erebus_windows_updates_driver_updates
                     visibility:
-                      - condition: numeric_state
-                        entity: sensor.erebus_windows_updates_driver_updates
-                        above: 0
-              - type: custom:vertical-stack-in-card
-                cards:
-                  - type: custom:streamline-card
-                    template: computer_power
-                    variables:
-                      - computer: erebus
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.erebus_connected
+                      - condition: state
+                        entity: sensor.erebus_battery_american_power_conversion_back_ups_xs_1300g_4b1346p25103
                         state_not: unavailable
-                      - entity: binary_sensor.erebus_connected
-                        state_not: unknown
-                      - entity: binary_sensor.erebus_connected
-                        state_not: 'off'
-                    card:
-                      type: custom:streamline-card
-                      template: computer_apps
-                      variables:
-                        - computer: erebus
-                  - type: conditional
-                    conditions:
-                      - entity: media_player.erebus
-                        state_not: unavailable
-                      - entity: media_player.erebus
-                        state_not: unknown
-                      - entity: media_player.erebus
-                        state_not: 'off'
-                    card:
-                      type: custom:bubble-card
-                      card_type: media-player
-                      card_layout: large
-                      cover_background: true
-                      entity: media_player.erebus
-                      hide:
-                        power_button: true
-                  - type: custom:streamline-card
-                    template: uptime_card
-                    variables:
-                      - entity: binary_sensor.erebus_connected
-                      - name: Erebus Up-Time
-                      - icon: mdi:connection
-                  - type: custom:streamline-card
-                    template: four_graphs
-                    variables:
-                      - graph_1_name: CPU
-                      - graph_1_icon: mdi:cpu-64-bit
-                      - graph_1_entities:
-                          - entity: sensor.erebus_cpu_load
-                            name: Usage
-                            color: var(--amber-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.erebus_cpu_clock_speed
-                            name: Speed
-                            color: var(--lime-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_2_name: GPU
-                      - graph_2_icon: mdi:expansion-card
-                      - graph_2_entities:
-                          - entity: sensor.erebus_gpu_load
-                            name: Load
-                            color: var(--green-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.erebus_gpu_temperature
-                            name: Temperature
-                            color: var(--pink-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_3_name: Storage
-                      - graph_3_icon: mdi:harddisk
-                      - graph_3_entities:
-                          - entity: sensor.erebus_storage_c
-                            attribute: UsedSpacePercentage
-                            unit: '%'
-                            name: Win11
-                            color: var(--blue-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.erebus_storage_b
-                            attribute: UsedSpacePercentage
-                            unit: '%'
-                            name: Backup
-                            color: var(--indigo-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.erebus_storage_d
-                            attribute: UsedSpacePercentage
-                            unit: '%'
-                            name: Dev Drive
-                            color: var(--lime-color)
-                            show_state: true
-                            show_points: false
-                      - graph_4_name: RAM
-                      - graph_4_icon: mdi:memory
-                      - graph_4_entities:
-                          - entity: sensor.erebus_memory_usage
-                            name: Usage
-                            color: var(--purple-color)
-                            show_state: true
-                            show_points: false
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  box-shadow: none;\n}\n"
+              - type: custom:streamline-card
+                template: computer_power
+                variables:
+                  computer: erebus
+              - type: custom:bubble-card
+                card_type: select
+                entity: select.erebus_steam_game_select
+                name: Steam
+                card_layout: normal
+                show_state: true
+                show_last_changed: true
+                show_icon: true
+                show_attribute: false
+              - type: conditional
+                conditions:
+                  - entity: media_player.erebus
+                    state_not: unavailable
+                  - entity: media_player.erebus
+                    state_not: unknown
+                  - entity: media_player.erebus
+                    state_not: 'off'
+                card:
+                  type: custom:bubble-card
+                  card_type: media-player
+                  card_layout: large
+                  cover_background: true
+                  entity: media_player.erebus
+                  hide:
+                    power_button: true
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  entity: binary_sensor.erebus_connected
+                  name: Erebus Up-Time
+                  icon: mdi:connection
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  graph_1_name: CPU
+                  graph_1_icon: mdi:cpu-64-bit
+                  graph_1_entities:
+                    - entity: sensor.erebus_cpu_usage
+                      name: Usage
+                      color: var(--amber-color)
+                      show_state: true
+                      show_points: false
+                  graph_2_name: GPU
+                  graph_2_icon: mdi:expansion-card
+                  graph_2_entities:
+                    - entity: sensor.erebus_gpu_amd_0
+                      name: Load
+                      color: var(--green-color)
+                      show_state: true
+                      show_points: false
+                    - entity: sensor.erebus_temperature_amdgpu_edge
+                      name: Temperature
+                      color: var(--pink-color)
+                      show_state: true
+                      show_points: false
+                      y_axis: secondary
+                  graph_3_name: Storage
+                  graph_3_icon: mdi:harddisk
+                  graph_3_entities:
+                    - entity: sensor.erebus_disk_dev_nvme1n1p2
+                      unit: '%'
+                      name: /
+                      color: var(--blue-color)
+                      show_state: true
+                      show_points: false
+                    - entity: sensor.erebus_disk_dev_sda1
+                      unit: '%'
+                      name: Backup
+                      color: var(--indigo-color)
+                      show_state: true
+                      show_points: false
+                  graph_4_name: RAM
+                  graph_4_icon: mdi:memory
+                  graph_4_entities:
+                    - entity: sensor.erebus_memory_usage
+                      name: Usage
+                      color: var(--purple-color)
+                      show_state: true
+                      show_points: false
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -13024,11 +13055,12 @@ views:
                 double_tap_action:
                   action: none
                 hold_action:
-                  action: call-service
-                  service: script.hass_publish_sensors
+                  action: perform-action
                   data:
-                    entity: media_player.nasya
+                    entity:
+                      - media_player.nasya
                   target: {}
+                  perform_action: script.hass_publish_sensors
                 margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
@@ -13067,7 +13099,6 @@ views:
                             type: custom:streamline-card
                             template: windows_updates_list
                             variables:
-                              - computer: nasya
                               - entity: sensor.nasya_windows_updates_software_updates
                     visibility:
                       - condition: numeric_state
@@ -13094,99 +13125,237 @@ views:
                       - condition: numeric_state
                         entity: sensor.nasya_windows_updates_driver_updates
                         above: 0
-              - type: custom:vertical-stack-in-card
-                cards:
-                  - type: custom:streamline-card
-                    template: computer_power
-                    variables:
-                      - computer: nasya
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.nasya_connected
+                  - entity: sensor.nasya_battery_charge_remaining_percentage
+                    name: Battery
+                    show_state: true
+                    show_background: false
+                    visibility:
+                      - condition: state
+                        entity: sensor.nasya_battery_charge_remaining_percentage
                         state_not: unavailable
-                      - entity: binary_sensor.nasya_connected
-                        state_not: unknown
-                      - entity: binary_sensor.nasya_connected
-                        state_not: 'off'
-                    card:
-                      type: custom:streamline-card
-                      template: computer_apps
-                      variables:
-                        - computer: nasya
-                  - type: conditional
-                    conditions:
-                      - entity: media_player.nasya
+              - type: custom:streamline-card
+                template: computer_power
+                variables:
+                  - computer: nasya
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.nasya_connected
+                    state_not: unavailable
+                  - entity: binary_sensor.nasya_connected
+                    state_not: unknown
+                  - entity: binary_sensor.nasya_connected
+                    state_not: 'off'
+                card:
+                  type: custom:streamline-card
+                  template: computer_apps
+                  variables:
+                    - computer: nasya
+              - type: conditional
+                conditions:
+                  - entity: media_player.nasya
+                    state_not: unavailable
+                  - entity: media_player.nasya
+                    state_not: unknown
+                  - entity: media_player.nasya
+                    state_not: 'off'
+                card:
+                  type: custom:bubble-card
+                  card_type: media-player
+                  card_layout: large
+                  cover_background: true
+                  entity: media_player.nasya
+                  hide:
+                    power_button: true
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  - entity: binary_sensor.nasya_connected
+                  - name: Nasya Up-Time
+                  - icon: mdi:connection
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  - graph_1_name: CPU
+                  - graph_1_icon: mdi:cpu-64-bit
+                  - graph_1_entities:
+                      - entity: sensor.nasya_cpu_load
+                        name: Usage
+                        color: var(--amber-color)
+                        show_state: true
+                        show_points: false
+                      - entity: sensor.nasya_cpu_clock_speed
+                        name: Speed
+                        color: var(--lime-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_2_name: GPU
+                  - graph_2_icon: mdi:expansion-card
+                  - graph_2_entities:
+                      - entity: sensor.nasya_gpu_load
+                        name: Load
+                        color: var(--green-color)
+                        show_state: true
+                        show_points: false
+                      - entity: sensor.nasya_gpu_temperature
+                        name: Temperature
+                        color: var(--pink-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_3_name: Storage
+                  - graph_3_icon: mdi:harddisk
+                  - graph_3_entities:
+                      - entity: sensor.nasya_storage_c
+                        attribute: UsedSpacePercentage
+                        unit: '%'
+                        name: Win11
+                        color: var(--blue-color)
+                        show_state: true
+                        show_points: false
+                  - graph_4_name: RAM
+                  - graph_4_icon: mdi:memory
+                  - graph_4_entities:
+                      - entity: sensor.nasya_memory_usage
+                        name: Usage
+                        color: var(--purple-color)
+                        show_state: true
+                        show_points: false
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#computer-cartago'
+                name: Cartago
+                icon: mdi:desktop-tower
+                button_type: name
+                margin_top_mobile: calc(0px - var(--header-height))
+                styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
+                  #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
+                  .bubble-sub-button-1 > ha-icon {\n  color: var(--red-color) !important;\n\
+                  }\n.bubble-sub-button-2 > ha-icon {\n  color: var(--red-color) !important;\n\
+                  }\n.bubble-sub-button-3 > ha-icon {\n  color: var(--red-color) !important;\n\
+                  }"
+                sub_button:
+                  - entity: binary_sensor.cartago_microphone_used
+                    name: Mic Active
+                    show_background: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.cartago_microphone_used
+                        state: 'on'
+                  - entity: binary_sensor.cartago_camera_used
+                    name: Webcam Active
+                    show_background: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.cartago_camera_used
+                        state: 'on'
+                  - entity: sensor.cartago_system_updates_count
+                    name: System Updates
+                    show_background: false
+                    show_state: true
+                    icon: mdi:arrow-up-bold-circle
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: System Updates
+                          content:
+                            type: custom:streamline-card
+                            template: linux_updates_list
+                            variables:
+                              - entity: sensor.cartago_system_updates_count
+                    visibility:
+                      - condition: numeric_state
+                        entity: sensor.cartago_system_updates_count
+                        above: 0
+                  - entity: sensor.cartago_battery_asustek_asus_battery
+                    name: Battery
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.cartago_battery_asustek_asus_battery
                         state_not: unavailable
-                      - entity: media_player.nasya
-                        state_not: unknown
-                      - entity: media_player.nasya
-                        state_not: 'off'
-                    card:
-                      type: custom:bubble-card
-                      card_type: media-player
-                      card_layout: large
-                      cover_background: true
-                      entity: media_player.nasya
-                      hide:
-                        power_button: true
-                  - type: custom:streamline-card
-                    template: uptime_card
-                    variables:
-                      - entity: binary_sensor.nasya_connected
-                      - name: Nasya Up-Time
-                      - icon: mdi:connection
-                  - type: custom:streamline-card
-                    template: four_graphs
-                    variables:
-                      - graph_1_name: CPU
-                      - graph_1_icon: mdi:cpu-64-bit
-                      - graph_1_entities:
-                          - entity: sensor.nasya_cpu_load
-                            name: Usage
-                            color: var(--amber-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.nasya_cpu_clock_speed
-                            name: Speed
-                            color: var(--lime-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_2_name: GPU
-                      - graph_2_icon: mdi:expansion-card
-                      - graph_2_entities:
-                          - entity: sensor.nasya_gpu_load
-                            name: Load
-                            color: var(--green-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.nasya_gpu_temperature
-                            name: Temperature
-                            color: var(--pink-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_3_name: Storage
-                      - graph_3_icon: mdi:harddisk
-                      - graph_3_entities:
-                          - entity: sensor.nasya_storage_c
-                            attribute: UsedSpacePercentage
-                            unit: '%'
-                            name: Win11
-                            color: var(--blue-color)
-                            show_state: true
-                            show_points: false
-                      - graph_4_name: RAM
-                      - graph_4_icon: mdi:memory
-                      - graph_4_entities:
-                          - entity: sensor.nasya_memory_usage
-                            name: Usage
-                            color: var(--purple-color)
-                            show_state: true
-                            show_points: false
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  box-shadow: none;\n}\n"
+              - type: custom:streamline-card
+                template: computer_power
+                variables:
+                  computer: cartago
+              - type: custom:bubble-card
+                card_type: select
+                entity: select.cartago_steam_game_select
+                name: Steam
+                card_layout: normal
+                show_state: true
+                show_last_changed: true
+                show_icon: true
+                show_attribute: false
+              - type: conditional
+                conditions:
+                  - entity: media_player.cartago
+                    state_not: unavailable
+                  - entity: media_player.cartago
+                    state_not: unknown
+                  - entity: media_player.cartago
+                    state_not: 'off'
+                card:
+                  type: custom:bubble-card
+                  card_type: media-player
+                  card_layout: large
+                  cover_background: true
+                  entity: media_player.cartago
+                  hide:
+                    power_button: true
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  entity: binary_sensor.cartago_connected
+                  name: Cartago Up-Time
+                  icon: mdi:connection
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  graph_1_name: CPU
+                  graph_1_icon: mdi:cpu-64-bit
+                  graph_1_entities:
+                    - entity: sensor.cartago_cpu_usage
+                      name: Usage
+                      color: var(--amber-color)
+                      show_state: true
+                      show_points: false
+                  graph_2_name: GPU
+                  graph_2_icon: mdi:expansion-card
+                  graph_2_entities:
+                    - entity: sensor.cartago_gpu_amd_0
+                      name: Load
+                      color: var(--green-color)
+                      show_state: true
+                      show_points: false
+                    - entity: sensor.cartago_temperature_amdgpu_edge
+                      name: Temperature
+                      color: var(--pink-color)
+                      show_state: true
+                      show_points: false
+                      y_axis: secondary
+                  graph_3_name: Storage
+                  graph_3_icon: mdi:harddisk
+                  graph_3_entities:
+                    - entity: sensor.cartago_disk_dev_nvme0n1p2
+                      unit: '%'
+                      name: /
+                      color: var(--blue-color)
+                      show_state: true
+                      show_points: false
+                  graph_4_name: RAM
+                  graph_4_icon: mdi:memory
+                  graph_4_entities:
+                    - entity: sensor.cartago_memory_usage
+                      name: Usage
+                      color: var(--purple-color)
+                      show_state: true
+                      show_points: false
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -13200,11 +13369,12 @@ views:
                 double_tap_action:
                   action: none
                 hold_action:
-                  action: call-service
-                  service: script.hass_publish_sensors
+                  action: perform-action
                   data:
-                    entity: media_player.ardena
+                    entity:
+                      - media_player.ardena
                   target: {}
+                  perform_action: script.hass_publish_sensors
                 margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
@@ -13245,7 +13415,6 @@ views:
                             type: custom:streamline-card
                             template: windows_updates_list
                             variables:
-                              - computer: ardena
                               - entity: sensor.ardena_windows_updates_software_updates
                     visibility:
                       - condition: numeric_state
@@ -13272,99 +13441,102 @@ views:
                       - condition: numeric_state
                         entity: sensor.ardena_windows_updates_driver_updates
                         above: 0
-              - type: custom:vertical-stack-in-card
-                cards:
-                  - type: custom:streamline-card
-                    template: computer_power
-                    variables:
-                      computer: ardena
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.ardena_connected
+                  - entity: sensor.ardena_battery_charge_remaining_percentage
+                    name: Battery
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ardena_battery_charge_remaining_percentage
                         state_not: unavailable
-                      - entity: binary_sensor.ardena_connected
-                        state_not: unknown
-                      - entity: binary_sensor.ardena_connected
-                        state_not: 'off'
-                    card:
-                      type: custom:streamline-card
-                      template: computer_apps
-                      variables:
-                        - computer: ardena
-                  - type: conditional
-                    conditions:
-                      - entity: media_player.ardena
-                        state_not: unavailable
-                      - entity: media_player.ardena
-                        state_not: unknown
-                      - entity: media_player.ardena
-                        state_not: 'off'
-                    card:
-                      type: custom:bubble-card
-                      card_type: media-player
-                      cover_background: true
-                      card_layout: large
-                      entity: media_player.ardena
-                      hide:
-                        power_button: true
-                  - type: custom:streamline-card
-                    template: uptime_card
-                    variables:
-                      - entity: binary_sensor.ardena_connected
-                      - name: Ardena Up-Time
-                      - icon: mdi:connection
-                  - type: custom:streamline-card
-                    template: four_graphs
-                    variables:
-                      - graph_1_name: CPU
-                      - graph_1_icon: mdi:cpu-64-bit
-                      - graph_1_entities:
-                          - entity: sensor.ardena_cpu_load
-                            name: Usage
-                            color: var(--amber-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.ardena_cpu_clock_speed
-                            name: Speed
-                            color: var(--lime-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_2_name: GPU
-                      - graph_2_icon: mdi:expansion-card
-                      - graph_2_entities:
-                          - entity: sensor.ardena_gpu_load
-                            name: Load
-                            color: var(--green-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.ardena_gpu_temperature
-                            name: Temperature
-                            color: var(--pink-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_3_name: Storage
-                      - graph_3_icon: mdi:harddisk
-                      - graph_3_entities:
-                          - entity: sensor.ardena_storage_c
-                            attribute: UsedSpacePercentage
-                            unit: '%'
-                            name: Win11
-                            color: var(--blue-color)
-                            show_state: true
-                            show_points: false
-                      - graph_4_name: RAM
-                      - graph_4_icon: mdi:memory
-                      - graph_4_entities:
-                          - entity: sensor.ardena_memory_usage
-                            name: Usage
-                            color: var(--purple-color)
-                            show_state: true
-                            show_points: false
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  box-shadow: none;\n}\n"
+              - type: custom:streamline-card
+                template: computer_power
+                variables:
+                  computer: ardena
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.ardena_connected
+                    state_not: unavailable
+                  - entity: binary_sensor.ardena_connected
+                    state_not: unknown
+                  - entity: binary_sensor.ardena_connected
+                    state_not: 'off'
+                card:
+                  type: custom:streamline-card
+                  template: computer_apps
+                  variables:
+                    - computer: ardena
+              - type: conditional
+                conditions:
+                  - entity: media_player.ardena
+                    state_not: unavailable
+                  - entity: media_player.ardena
+                    state_not: unknown
+                  - entity: media_player.ardena
+                    state_not: 'off'
+                card:
+                  type: custom:bubble-card
+                  card_type: media-player
+                  cover_background: true
+                  card_layout: large
+                  entity: media_player.ardena
+                  hide:
+                    power_button: true
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  - entity: binary_sensor.ardena_connected
+                  - name: Ardena Up-Time
+                  - icon: mdi:connection
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  - graph_1_name: CPU
+                  - graph_1_icon: mdi:cpu-64-bit
+                  - graph_1_entities:
+                      - entity: sensor.ardena_cpu_load
+                        name: Usage
+                        color: var(--amber-color)
+                        show_state: true
+                        show_points: false
+                      - entity: sensor.ardena_cpu_clock_speed
+                        name: Speed
+                        color: var(--lime-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_2_name: GPU
+                  - graph_2_icon: mdi:expansion-card
+                  - graph_2_entities:
+                      - entity: sensor.ardena_gpu_load
+                        name: Load
+                        color: var(--green-color)
+                        show_state: true
+                        show_points: false
+                      - entity: sensor.ardena_gpu_temperature
+                        name: Temperature
+                        color: var(--pink-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_3_name: Storage
+                  - graph_3_icon: mdi:harddisk
+                  - graph_3_entities:
+                      - entity: sensor.ardena_storage_c
+                        attribute: UsedSpacePercentage
+                        unit: '%'
+                        name: Win11
+                        color: var(--blue-color)
+                        show_state: true
+                        show_points: false
+                  - graph_4_name: RAM
+                  - graph_4_icon: mdi:memory
+                  - graph_4_entities:
+                      - entity: sensor.ardena_memory_usage
+                        name: Usage
+                        color: var(--purple-color)
+                        show_state: true
+                        show_points: false
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -13378,11 +13550,12 @@ views:
                 double_tap_action:
                   action: none
                 hold_action:
-                  action: call-service
-                  service: script.hass_publish_sensors
+                  action: perform-action
                   data:
-                    entity: media_player.athos
+                    entity:
+                      - media_player.athos
                   target: {}
+                  perform_action: script.hass_publish_sensors
                 margin_top_mobile: calc(0px - var(--header-height))
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
@@ -13421,7 +13594,6 @@ views:
                             type: custom:streamline-card
                             template: windows_updates_list
                             variables:
-                              - computer: athos
                               - entity: sensor.athos_windows_updates_software_updates
                     visibility:
                       - condition: numeric_state
@@ -13448,99 +13620,94 @@ views:
                       - condition: numeric_state
                         entity: sensor.athos_windows_updates_driver_updates
                         above: 0
-              - type: custom:vertical-stack-in-card
-                cards:
-                  - type: custom:streamline-card
-                    template: computer_power
-                    variables:
-                      computer: athos
-                  - type: conditional
-                    conditions:
-                      - entity: binary_sensor.athos_connected
-                        state_not: unavailable
-                      - entity: binary_sensor.athos_connected
-                        state_not: unknown
-                      - entity: binary_sensor.athos_connected
-                        state_not: 'off'
-                    card:
-                      type: custom:streamline-card
-                      template: computer_apps
-                      variables:
-                        - computer: athos
-                  - type: conditional
-                    conditions:
-                      - entity: media_player.athos
-                        state_not: unavailable
-                      - entity: media_player.athos
-                        state_not: unknown
-                      - entity: media_player.athos
-                        state_not: 'off'
-                    card:
-                      type: custom:bubble-card
-                      card_type: media-player
-                      cover_background: true
-                      card_layout: large
-                      entity: media_player.athos
-                      hide:
-                        power_button: true
-                  - type: custom:streamline-card
-                    template: uptime_card
-                    variables:
-                      - entity: binary_sensor.athos_connected
-                      - name: Athos Up-Time
-                      - icon: mdi:connection
-                  - type: custom:streamline-card
-                    template: four_graphs
-                    variables:
-                      - graph_1_name: CPU
-                      - graph_1_icon: mdi:cpu-64-bit
-                      - graph_1_entities:
-                          - entity: sensor.athos_cpu_load
-                            name: Usage
-                            color: var(--amber-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.athos_cpu_clock_speed
-                            name: Speed
-                            color: var(--lime-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_2_name: GPU
-                      - graph_2_icon: mdi:expansion-card
-                      - graph_2_entities:
-                          - entity: sensor.athos_gpu_load
-                            name: Load
-                            color: var(--green-color)
-                            show_state: true
-                            show_points: false
-                          - entity: sensor.athos_gpu_temperature
-                            name: Temperature
-                            color: var(--pink-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_3_name: Storage
-                      - graph_3_icon: mdi:harddisk
-                      - graph_3_entities:
-                          - entity: sensor.athos_storage_c
-                            attribute: UsedSpacePercentage
-                            unit: '%'
-                            name: Win11
-                            color: var(--blue-color)
-                            show_state: true
-                            show_points: false
-                      - graph_4_name: RAM
-                      - graph_4_icon: mdi:memory
-                      - graph_4_entities:
-                          - entity: sensor.athos_memory_usage
-                            name: Usage
-                            color: var(--purple-color)
-                            show_state: true
-                            show_points: false
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  box-shadow: none;\n}\n"
+              - type: custom:streamline-card
+                template: computer_power
+                variables:
+                  computer: athos
+              - type: conditional
+                conditions:
+                  - entity: binary_sensor.athos_connected
+                    state_not: unavailable
+                  - entity: binary_sensor.athos_connected
+                    state_not: unknown
+                  - entity: binary_sensor.athos_connected
+                    state_not: 'off'
+                card:
+                  type: custom:streamline-card
+                  template: computer_apps
+                  variables:
+                    - computer: athos
+              - type: conditional
+                conditions:
+                  - entity: media_player.athos
+                    state_not: unavailable
+                  - entity: media_player.athos
+                    state_not: unknown
+                  - entity: media_player.athos
+                    state_not: 'off'
+                card:
+                  type: custom:bubble-card
+                  card_type: media-player
+                  cover_background: true
+                  card_layout: large
+                  entity: media_player.athos
+                  hide:
+                    power_button: true
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  - entity: binary_sensor.athos_connected
+                  - name: Athos Up-Time
+                  - icon: mdi:connection
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  - graph_1_name: CPU
+                  - graph_1_icon: mdi:cpu-64-bit
+                  - graph_1_entities:
+                      - entity: sensor.athos_cpu_load
+                        name: Usage
+                        color: var(--amber-color)
+                        show_state: true
+                        show_points: false
+                      - entity: sensor.athos_cpu_clock_speed
+                        name: Speed
+                        color: var(--lime-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_2_name: GPU
+                  - graph_2_icon: mdi:expansion-card
+                  - graph_2_entities:
+                      - entity: sensor.athos_gpu_load
+                        name: Load
+                        color: var(--green-color)
+                        show_state: true
+                        show_points: false
+                      - entity: sensor.athos_gpu_temperature
+                        name: Temperature
+                        color: var(--pink-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_3_name: Storage
+                  - graph_3_icon: mdi:harddisk
+                  - graph_3_entities:
+                      - entity: sensor.athos_storage_c
+                        attribute: UsedSpacePercentage
+                        unit: '%'
+                        name: Win11
+                        color: var(--blue-color)
+                        show_state: true
+                        show_points: false
+                  - graph_4_name: RAM
+                  - graph_4_icon: mdi:memory
+                  - graph_4_entities:
+                      - entity: sensor.athos_memory_usage
+                        name: Usage
+                        color: var(--purple-color)
+                        show_state: true
+                        show_points: false
           - type: vertical-stack
             cards:
               - type: custom:bubble-card

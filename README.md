@@ -280,7 +280,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>26 Custom Integrations</summary>
+<details><summary>27 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.25.0]
 
@@ -381,6 +381,12 @@ Authors: [@fuatakgun](https://github.com/fuatakgun).
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
+
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2024.10.2]
+
+Fill out your Media Player Entity with MQTT Topics
+
+Authors: [@bkbilly](https://github.com/bkbilly).
 
 ### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.7]
 

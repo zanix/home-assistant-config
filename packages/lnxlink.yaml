@@ -1,0 +1,243 @@
+---
+# LNXlink is a Linux companion app that seamlessly integrates your system with
+# external applications like Home Assistant. It uses MQTT, a lightweight
+# messaging protocol, to enable real-time data exchange and remote control
+# capabilities.
+#
+# https://github.com/bkbilly/lnxlink
+#
+script:
+  lnklink_launch:
+    alias: '[LNXlink] Launch'
+    description: 'Opens a file or URL.'
+    icon: mdi:file
+
+    fields:
+      computer:
+        name: 'Computer'
+        description: 'The LNXlink computer.'
+        required: true
+        selector:
+          select:
+            mode: dropdown
+            multiple: true
+            custom_value: true
+            options:
+              - label: Erebus
+                value: Erebus
+              - label: Cartago
+                value: cartago
+      command:
+        name: 'Command'
+        description: 'File name or URL.'
+        example: 'Files: "myimage.jpg" or "~/myimage.jpg"<br>URL: "steam://rungameid/1151640", or "https://bkbilly.gitbook.io/lnxlink"'
+        required: true
+        selector:
+          text:
+
+    sequence:
+      - alias: Loop through computer list
+        repeat:
+          for_each: '{{ computer }}'
+          sequence:
+            - action: mqtt.publish
+              data:
+                topic: "lnxlink/{{ repeat.item | lower }}/commands/xdg_open"
+                payload: '{{ command }}'
+
+  notify_lnxlink:
+    alias: '[Notify] LNXlink'
+    description: 'Notify via LNXlink'
+    icon: mdi:cellphone-message
+    mode: parallel
+
+    fields:
+      computer:
+        name: 'Computer'
+        description: 'The LNXlink computer.'
+        required: true
+        selector:
+          select:
+            mode: dropdown
+            multiple: true
+            custom_value: true
+            options:
+              - label: Erebus
+                value: Erebus
+              - label: Cartago
+                value: cartago
+      title:
+        name: 'Title'
+        example: 'Startup: Home Assistant is Up and Running!'
+        selector:
+          text:
+      message:
+        name: 'Message'
+        example: 'Message text'
+        required: true
+        selector:
+          text:
+            multiline: true
+      icon_url:
+        name: Icon
+        example: local/icons/home-assistant.png
+        selector:
+          text:
+      image:
+        name: 'Image'
+        description: Overrides icon when used.
+        example: 'local/image.png'
+        selector:
+          text:
+      camera:
+        name: 'Camera'
+        description: 'Camera stream to attach.'
+        example: 'camera.doorbell'
+        selector:
+          entity:
+            domain: camera
+      sound:
+        name: Sound
+        description: Local or Publicly available URL for a sound to play with the notification.
+        example: local/sound.wav
+        selector:
+          text:
+      actions:
+        name: 'Actions'
+        description: 'A list of actions for actionable notifications.'
+        selector:
+          object:
+      duration:
+        name: 'Duration'
+        description: 'The duration in seconds for which the notification will be displayed.'
+        example: '5'
+        selector:
+          number:
+            mode: box
+            unit_of_measurement: seconds
+            min: 1
+            max: 36000
+      importance:
+        name: 'Notification Importance'
+        description: 'Set the notification importance.'
+        selector:
+          select:
+            mode: dropdown
+            options:
+              - normal
+              - low
+              - critical
+      enable_debug:
+        name: Enable debug output?
+        selector:
+          constant:
+            value: true
+            label: Enabled
+
+    sequence:
+      - alias: Set local variables for reuse in this script.
+        variables:
+          debug: "{{ iif(enable_debug is defined, enable_debug, false) }}"
+          payload:
+            title: "{{ title | default('', true) }}"
+            message: "{{ message | default('', true) }}"
+            urgency: '{{ importance | default("normal") }}'
+            timeout: '{{ (duration | default(5)) * 1000 }}'
+            buttons: "{{ actions | default(none, true) }}"
+            sound: |-
+              {%- if sound is string -%}
+                {%- if sound.startswith("http") -%}
+                  {{ sound }}
+                {%- else -%}
+                  {{ state_attr("sensor.hass_config", "internal_url") }}/{{ sound }}
+                {%- endif -%}
+              {%- else -%}
+                {{ none }}
+              {%- endif -%}
+          payload_data: |-
+            {%- set _ = namespace(data={}) -%}
+            {%- for k, v in payload.items() -%}
+              {%- if not v == None -%}
+                {%- set _.data = dict(_.data, **{k:v}) -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {{ _.data }}
+          icon_path: >-
+            {%- if icon_url is string -%}
+              {%- if icon_url.startswith("http") -%}
+                {{ icon_url }}
+              {%- else -%}
+                {{ state_attr("sensor.hass_config", "internal_url") }}/{{ icon_url }}
+              {%- endif -%}
+            {%- endif -%}
+          image_path: >-
+            {%- if image is string -%}
+              {%- if image.startswith("http") -%}
+                {{ image }}
+              {%- else -%}
+                {{ state_attr("sensor.hass_config", "internal_url") }}/{{ image }}
+              {%- endif -%}
+            {%- endif -%}
+
+      - alias: >-
+          Set enable_debug = true above to provide output troubleshooting
+          information.
+        if:
+          - condition: template
+            value_template: "{{ debug == true }}"
+        then:
+          - action: persistent_notification.create
+            data:
+              notification_id: notify_lnxlink
+              title: "DEBUG: script.notify_lnxlink"
+              message: |-
+                computer: {{ computer }}
+                payload: {{ payload_data }}
+                icon_path: {{ icon_path }} ({{ icon_url }})
+                image_path: {{ image_path }} ({{ image }})
+                camera: {{ camera }}
+
+      - alias: Loop through computer list
+        repeat:
+          for_each: '{{ computer }}'
+          sequence:
+            - choose:
+                - alias: Send camera stream.
+                  conditions:
+                    - condition: template
+                      value_template: "{{ camera is string }}"
+                  sequence:
+                    - action: mqtt.publish
+                      data:
+                        topic: lnxlink/{{ repeat.item | lower }}/commands/notify
+                        payload: |-
+                          {%- set data = dict(payload_data, **{
+                            "iconUrl": state_attr("sensor.hass_config", "internal_url") ~ state_attr(camera, "entity_picture"),
+                          }) -%}
+                          {{ data | tojson }}
+
+                - alias: Send an image.
+                  conditions:
+                    - condition: template
+                      value_template: "{{ image is string }}"
+                  sequence:
+                    - action: mqtt.publish
+                      data:
+                        topic: lnxlink/{{ repeat.item | lower }}/commands/notify
+                        payload: |-
+                          {%- set data = dict(payload_data, **{
+                            "iconUrl": image_path,
+                          }) -%}
+                          {{ data | tojson }}
+
+              # Send a basic notification message.
+              default:
+                - alias: Send a basic, link, or actionable notification message.
+                  action: mqtt.publish
+                  data:
+                    topic: lnxlink/{{ repeat.item | lower }}/commands/notify
+                    payload: |-
+                      {%- set data = dict(payload_data, **{
+                        "iconUrl": icon_path | default(state_attr("sensor.hass_config", "internal_url") ~ "/local/icons/home-assistant.png", true),
+                      }) -%}
+                      {{ data | tojson }}
