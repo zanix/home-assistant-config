@@ -4185,7 +4185,8 @@ views:
                     \ === 'on') return 'Clean';\n  else if (entity.state === 'N/A')\
                     \ return 'Off';\n  else return helpers.localize(entity);\n]]]\n"
                   tap_action:
-                    action: more-info
+                    action: navigate
+                    navigation_path: '#dishwasher'
                   variables:
                     color: "[[[\n  if (states['binary_sensor.ge_dishwasher_is_clean'].state\
                       \ === 'on') return 'var(--green-color)';\n  else if (entity.state\
@@ -6082,6 +6083,29 @@ views:
                   - entity: binary_sensor.kona_problems
                     name: Problems
                     show_background: false
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: Trouble Codes
+                          content:
+                            type: custom:auto-entities
+                            card:
+                              type: custom:layout-card
+                              cards: []
+                              layout_type: masonry
+                            sort:
+                              attribute: friendly_name
+                            filter:
+                              include:
+                                - group: binary_sensor.kona_problems
+                                  options:
+                                    type: tile
+                              exclude:
+                                - state: 'off'
+                                - state: unavailable
+                                - state: unknown
                     visibility:
                       - condition: state
                         entity: binary_sensor.kona_problems
@@ -7081,11 +7105,17 @@ views:
                 name: Oven
                 sub_button:
                   - entity: switch.ge_oven_light
+                    name: Light
                     show_state: true
                     tap_action:
                       action: toggle
                     hold_action:
                       action: more-info
+                  - entity: binary_sensor.ge_oven_remote_enabled
+                    name: Remote Enable
+                    icon: mdi:remote
+                    tap_action:
+                      action: none
               - type: custom:mushroom-template-card
                 entity: water_heater.ge_oven
                 multiline_secondary: false
@@ -7506,6 +7536,65 @@ views:
                           \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
                           \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
                           \ 0 0 1px 15px transparent; }\n}\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#dishwasher'
+                show_header: false
+                margin_top_desktop: 40vh
+                width_desktop: 40vw
+                margin_top_mobile: 10vh
+              - type: custom:bubble-card
+                card_type: separator
+                name: Dishwasher
+                sub_button:
+                  - entity: sensor.ge_dishwasher_cycle_name
+                    show_state: true
+                    tap_action:
+                      action: none
+                    name: Cycle Name
+                  - entity: binary_sensor.ge_dishwasher_remote_start_enable
+                    tap_action:
+                      action: none
+                    name: Remote Enable
+                    icon: mdi:remote
+              - type: custom:timer-bar-card
+                filter: true
+                invert: true
+                state_color: true
+                layout: full_row
+                text_width: 4.5em
+                bar_height: 12px
+                bar_radius: var(--ha-card-border-radius, 12px)
+                bar_direction: rtl
+                bar_foreground: var(--lime-color)
+                bar_background: var(--disabled-color)
+                compressed: true
+                modifications:
+                  - remaining: 00:03:00
+                    bar_foreground: var(--amber-color)
+                  - remaining: 00:02:00
+                    bar_foreground: var(--orange-color)
+                  - remaining: 00:01:00
+                    bar_foreground: var(--red-color)
+                entities:
+                  - entity: timer.ge_dishwasher
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.ge_dishwasher_cycle_state
+                    state_not: N/A
+                card:
+                  type: entity
+                  entity: sensor.ge_dishwasher_cycle_state
+                  name: Current Cycle
+                  state_color: true
+              - type: tile
+                entity: binary_sensor.ge_dishwasher_is_clean
+                name: Clean
+                color: green
+                hide_state: true
     badges:
       - type: custom:mushroom-template-badge
         icon: mdi:dots-horizontal-circle
@@ -13716,6 +13805,12 @@ views:
                 name: MagicMirror
                 icon: mdi:apps
                 button_type: slider
+                use_accent_color: true
+                entity: light.magicmirror_monitor
+                show_state: true
+                show_attribute: true
+                show_last_changed: false
+                attribute: brightness
                 tap_action:
                   action: toggle
                 double_tap_action:
@@ -13726,151 +13821,140 @@ views:
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}"
-                entity: light.magicmirror_monitor
-                show_state: true
-                show_attribute: true
-                show_last_changed: false
-                attribute: brightness
               - type: custom:vertical-stack-in-card
                 cards:
-                  - type: custom:vertical-stack-in-card
-                    horizontal: true
-                    card_mod:
-                      style: "ha-card {\n  box-shadow: none;\n}\n"
-                    cards:
-                      - type: conditional
-                        conditions:
-                          - entity: binary_sensor.magicmirror_connected
-                            state: 'on'
-                        card:
-                          type: custom:mushroom-template-card
-                          entity: button.magicmirror_shutdown
-                          layout: vertical
-                          primary: Power
-                          icon: mdi:power
-                          icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
-                            }}'
-                          tap_action:
-                            action: none
-                          hold_action:
-                            action: call-service
-                            service: button.press
-                            target:
-                              entity_id: button.magicmirror_shutdown
-                          card_mod:
-                            style: "ha-card {\n  margin-left: auto;\n  margin-right:\
-                              \ auto;\n}\n"
-                      - type: conditional
-                        conditions:
-                          - entity: binary_sensor.magicmirror_connected
-                            state: 'on'
-                        card:
-                          type: custom:mushroom-template-card
-                          entity: button.magicmirror_reboot
-                          layout: vertical
-                          primary: Reboot
-                          icon: mdi:refresh
-                          icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
-                            }}'
-                          tap_action:
-                            action: none
-                          hold_action:
-                            action: call-service
-                            service: button.press
-                            target:
-                              entity_id: button.magicmirror_reboot
-                          card_mod:
-                            style: "ha-card {\n  margin-left: auto;\n  margin-right:\
-                              \ auto;\n}\n"
-                      - type: conditional
-                        conditions:
-                          - entity: binary_sensor.magicmirror_connected
-                            state: 'on'
-                        card:
-                          type: custom:mushroom-template-card
-                          entity: button.magicmirror_restart
-                          layout: vertical
-                          primary: Restart
-                          icon: mdi:table-refresh
-                          icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
-                            }}'
-                          tap_action:
-                            action: none
-                          hold_action:
-                            action: call-service
-                            service: button.press
-                            target:
-                              entity_id: button.magicmirror_restart
-                          card_mod:
-                            style: "ha-card {\n  margin-left: auto;\n  margin-right:\
-                              \ auto;\n}\n"
-                      - type: conditional
-                        conditions:
-                          - entity: binary_sensor.magicmirror_connected
-                            state: 'on'
-                        card:
-                          type: custom:mushroom-template-card
-                          entity: button.magicmirror_refresh
-                          layout: vertical
-                          primary: Refresh
-                          icon: mdi:web-refresh
-                          icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
-                            }}'
-                          tap_action:
-                            action: none
-                          hold_action:
-                            action: call-service
-                            service: button.press
-                            target:
-                              entity_id: button.magicmirror_refresh
-                          card_mod:
-                            style: "ha-card {\n  margin-left: auto;\n  margin-right:\
-                              \ auto;\n}\n"
-                  - type: custom:streamline-card
-                    template: uptime_card
-                    variables:
+                  - type: conditional
+                    conditions:
                       - entity: binary_sensor.magicmirror_connected
-                      - name: MagicMirror Up-Time
-                      - icon: mdi:connection
-                  - type: custom:streamline-card
-                    template: four_graphs
-                    variables:
-                      - graph_1_name: CPU
-                      - graph_1_icon: mdi:cpu-64-bit
-                      - graph_1_entities:
-                          - entity: sensor.magicmirror_cpu_usage
-                            name: Usage
-                            color: var(--amber-color)
-                            show_state: true
-                            show_points: false
-                      - graph_2_name: CPU Temp
-                      - graph_2_icon: mdi:thermometer-lines
-                      - graph_2_entities:
-                          - entity: sensor.magicmirror_cpu_thermal_1_temperature
-                            name: Temperature
-                            color: var(--pink-color)
-                            show_state: true
-                            show_points: false
-                            y_axis: secondary
-                      - graph_3_name: Storage
-                      - graph_3_icon: mdi:sd
-                      - graph_3_entities:
-                          - entity: sensor.magicmirror_disk_usage
-                            name: Storage
-                            color: var(--blue-color)
-                            show_state: true
-                            show_points: false
-                      - graph_4_name: RAM
-                      - graph_4_icon: mdi:memory
-                      - graph_4_entities:
-                          - entity: sensor.magicmirror_memory_usage
-                            name: Usage
-                            color: var(--purple-color)
-                            show_state: true
-                            show_points: false
+                        state: 'on'
+                    card:
+                      type: custom:mushroom-template-card
+                      entity: button.magicmirror_shutdown
+                      layout: vertical
+                      primary: Power
+                      icon: mdi:power
+                      icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
+                        }}'
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: call-service
+                        service: button.press
+                        target:
+                          entity_id: button.magicmirror_shutdown
+                      card_mod:
+                        style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
+                          }\n"
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.magicmirror_connected
+                        state: 'on'
+                    card:
+                      type: custom:mushroom-template-card
+                      entity: button.magicmirror_reboot
+                      layout: vertical
+                      primary: Reboot
+                      icon: mdi:refresh
+                      icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
+                        }}'
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: call-service
+                        service: button.press
+                        target:
+                          entity_id: button.magicmirror_reboot
+                      card_mod:
+                        style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
+                          }\n"
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.magicmirror_connected
+                        state: 'on'
+                    card:
+                      type: custom:mushroom-template-card
+                      entity: button.magicmirror_restart
+                      layout: vertical
+                      primary: Restart
+                      icon: mdi:table-refresh
+                      icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
+                        }}'
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: call-service
+                        service: button.press
+                        target:
+                          entity_id: button.magicmirror_restart
+                      card_mod:
+                        style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
+                          }\n"
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.magicmirror_connected
+                        state: 'on'
+                    card:
+                      type: custom:mushroom-template-card
+                      entity: button.magicmirror_refresh
+                      layout: vertical
+                      primary: Refresh
+                      icon: mdi:web-refresh
+                      icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
+                        }}'
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: call-service
+                        service: button.press
+                        target:
+                          entity_id: button.magicmirror_refresh
+                      card_mod:
+                        style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
+                          }\n"
                 card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  box-shadow: none;\n}\n"
+                  style: "ha-card {\n  box-shadow: none;\n}\n"
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  - entity: binary_sensor.magicmirror_connected
+                  - name: MagicMirror Up-Time
+                  - icon: mdi:connection
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  - graph_1_name: CPU
+                  - graph_1_icon: mdi:cpu-64-bit
+                  - graph_1_entities:
+                      - entity: sensor.magicmirror_cpu_usage
+                        name: Usage
+                        color: var(--amber-color)
+                        show_state: true
+                        show_points: false
+                  - graph_2_name: CPU Temp
+                  - graph_2_icon: mdi:thermometer-lines
+                  - graph_2_entities:
+                      - entity: sensor.magicmirror_cpu_thermal_1_temperature
+                        name: Temperature
+                        color: var(--pink-color)
+                        show_state: true
+                        show_points: false
+                        y_axis: secondary
+                  - graph_3_name: Storage
+                  - graph_3_icon: mdi:sd
+                  - graph_3_entities:
+                      - entity: sensor.magicmirror_disk_usage
+                        name: Storage
+                        color: var(--blue-color)
+                        show_state: true
+                        show_points: false
+                  - graph_4_name: RAM
+                  - graph_4_icon: mdi:memory
+                  - graph_4_entities:
+                      - entity: sensor.magicmirror_memory_usage
+                        name: Usage
+                        color: var(--purple-color)
+                        show_state: true
+                        show_points: false
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -13879,6 +13963,8 @@ views:
                 name: Meta Quest 2
                 icon: fab:meta
                 button_type: state
+                entity: binary_sensor.quest_interactive
+                show_state: true
                 tap_action:
                   action: none
                 double_tap_action:
@@ -13889,75 +13975,67 @@ views:
                 styles: "#header-container {\n  flex-direction: row-reverse;\n}\n\
                   #header-container > div {\n  margin: 0 0 0 14px !important;\n}\n\
                   bubble-card::after {\n  display: none !important;\n}"
-                entity: binary_sensor.quest_interactive
-                show_state: true
-              - type: custom:vertical-stack-in-card
-                cards:
-                  - type: custom:bar-card
-                    card_mod:
-                      style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
-                        \  text-shadow: 1px 1px var(--primary-background-color);\n\
-                        }\n"
-                    name: Quest 2 Battery Level
-                    entities:
-                      - entity: sensor.quest_battery_level
-                    animation:
-                      state: 'on'
-                    positions:
-                      indicator: inside
-                    decimal: 0
-                    severity:
-                      - color: var(--red-color)
-                        from: 0
-                        to: 10
-                      - color: var(--orange-color)
-                        from: 10
-                        to: 30
-                      - color: var(--amber-color)
-                        from: 30
-                        to: 50
-                      - color: var(--light-green-color)
-                        from: 50
-                        to: 80
-                      - color: var(--green-color)
-                        from: 80
-                        to: 100
-                  - type: custom:streamline-card
-                    template: four_graphs
-                    variables:
-                      - graph_1_name: WiFi Speed
-                      - graph_1_icon: mdi:wifi-arrow-left-right
-                      - graph_1_entities:
-                          - entity: sensor.quest_wifi_link_speed
-                            color: var(--green-color)
-                            show_state: false
-                            show_points: false
-                      - graph_2_name: WiFi Signal
-                      - graph_2_icon: mdi:wifi
-                      - graph_2_entities:
-                          - entity: sensor.quest_wifi_signal_strength
-                            color: var(--yellow-color)
-                            show_state: false
-                            show_points: false
-                      - graph_3_name: Storage
-                      - graph_3_icon: mdi:sd
-                      - graph_3_entities:
-                          - entity: sensor.quest_internal_storage
-                            name: Storage
-                            color: var(--blue-color)
-                            show_state: true
-                            show_points: false
-                      - graph_4_name: Battery Temp
-                      - graph_4_icon: mdi:battery-alert
-                      - graph_4_entities:
-                          - entity: sensor.quest_battery_temperature
-                            name: Battery Temp
-                            color: var(--red-color)
-                            show_state: true
-                            show_points: false
+              - type: custom:bar-card
                 card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  box-shadow: none;\n}\n"
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                name: Quest 2 Battery Level
+                entities:
+                  - entity: sensor.quest_battery_level
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                decimal: 0
+                severity:
+                  - color: var(--red-color)
+                    from: 0
+                    to: 10
+                  - color: var(--orange-color)
+                    from: 10
+                    to: 30
+                  - color: var(--amber-color)
+                    from: 30
+                    to: 50
+                  - color: var(--light-green-color)
+                    from: 50
+                    to: 80
+                  - color: var(--green-color)
+                    from: 80
+                    to: 100
+              - type: custom:streamline-card
+                template: four_graphs
+                variables:
+                  - graph_1_name: WiFi Speed
+                  - graph_1_icon: mdi:wifi-arrow-left-right
+                  - graph_1_entities:
+                      - entity: sensor.quest_wifi_link_speed
+                        color: var(--green-color)
+                        show_state: false
+                        show_points: false
+                  - graph_2_name: WiFi Signal
+                  - graph_2_icon: mdi:wifi
+                  - graph_2_entities:
+                      - entity: sensor.quest_wifi_signal_strength
+                        color: var(--yellow-color)
+                        show_state: false
+                        show_points: false
+                  - graph_3_name: Storage
+                  - graph_3_icon: mdi:sd
+                  - graph_3_entities:
+                      - entity: sensor.quest_internal_storage
+                        name: Storage
+                        color: var(--blue-color)
+                        show_state: true
+                        show_points: false
+                  - graph_4_name: Battery Temp
+                  - graph_4_icon: mdi:battery-alert
+                  - graph_4_entities:
+                      - entity: sensor.quest_battery_temperature
+                        name: Battery Temp
+                        color: var(--red-color)
+                        show_state: true
+                        show_points: false
     cards: []
     badges:
       - type: custom:mushroom-template-badge
