@@ -708,7 +708,7 @@ Material Design 3 Colors and Components in Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>506 Automations</summary>
+<details><summary>508 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -755,8 +755,11 @@ Material Design 3 Colors and Components in Home Assistant
 - ✴️ Joshua Office Light On/Off Presence
 - 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done
+- 🍽️ Dishwasher Timer
 - 🍽️ Oven Bake Timer Completed
+- 🍽️ Oven Cook Timer
 - 🍽️ Oven is Preheated
+- 🍽️ Oven Kitchen Timer
 - 🍽️ Oven Kitchen Timer Completed
 - 🎄 XMas Lights On/Off 🚫
 - 🎄 XMas Tree On/Off
@@ -825,7 +828,6 @@ Material Design 3 Colors and Components in Home Assistant
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
 - 🕗 Main Bedroom Ceiling Fan Default Light Status 🚫
-- 🖥️ [Ardena] Power Actions
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Quest] Charge Complete
 - 🖥️ [Quest] Interactive

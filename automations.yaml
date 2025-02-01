@@ -5852,3 +5852,125 @@
   - delay: 00:00:01
   - event: templates_reloaded
     event_data: {}
+- id: '1737664483359'
+  alias: "\U0001F37D️ Dishwasher Timer"
+  description: Starts the timer when the dishwasher starts
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.ge_dishwasher_operating_mode
+    not_to:
+    - unavailable
+    - unknown
+    not_from:
+    - unavailable
+    - unknown
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.ge_dishwasher_operating_mode
+        state: Cycle Active
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: '{{ states(''sensor.ge_dishwasher_time_remaining'') }}:00'
+        target:
+          entity_id: timer.ge_dishwasher
+    - conditions:
+      - condition: state
+        entity_id: sensor.ge_dishwasher_operating_mode
+        state: Cycle Complete
+      sequence:
+      - action: timer.cancel
+        metadata: {}
+        data: {}
+        target:
+          entity_id: timer.ge_dishwasher
+  mode: single
+- id: '1737664900410'
+  alias: "\U0001F37D️ Oven Cook Timer"
+  description: Starts a timer when the oven cook timer starts
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.ge_oven_cook_time_remaining
+    not_to:
+    - unavailable
+    - unknown
+    not_from:
+    - unavailable
+    - unknown
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != "Off" and trigger.to_state.state
+      != "Off" }}'
+  actions:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.from_state.state == "Off" and trigger.to_state.state
+          != "Off" }}'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: '{{ trigger.to_state.state }}:00'
+        target:
+          entity_id: timer.ge_oven_cook
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.from_state.state != "Off" and trigger.to_state.state
+          != "Off" }}'
+      sequence: []
+    default:
+    - action: timer.cancel
+      metadata: {}
+      data: {}
+      target:
+        entity_id: timer.ge_oven_cook
+  mode: single
+- id: '1737665076651'
+  alias: "\U0001F37D️ Oven Kitchen Timer"
+  description: Starts a timer when the oven cook timer starts
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.ge_oven_kitchen_timer
+    not_to:
+    - unavailable
+    - unknown
+    not_from:
+    - unavailable
+    - unknown
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.from_state.state != "Off" and trigger.to_state.state
+      != "Off" }}'
+  actions:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.from_state.state == "Off" and trigger.to_state.state
+          != "Off" }}'
+      sequence:
+      - action: timer.start
+        metadata: {}
+        data:
+          duration: '{{ trigger.to_state.state }}:00'
+        target:
+          entity_id: timer.ge_oven_kitchen
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.from_state.state != "Off" and trigger.to_state.state
+          != "Off" }}'
+      sequence: []
+    default:
+    - action: timer.cancel
+      metadata: {}
+      data: {}
+      target:
+        entity_id: timer.ge_oven_kitchen
+  mode: single
