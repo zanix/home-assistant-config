@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4381 |
-| Sensors        | 1286 |
+| All Entities   | 4392 |
+| Sensors        | 1299 |
 | Binary Sensors | 333 |
 | Lights         | 73 |
-| Switches       | 292 |
+| Switches       | 291 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -322,7 +322,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.18]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.19]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -556,7 +556,7 @@ A Home Assistant lovelace card to display a sankey chart. For example for power 
 
 A Home Assistant card for Steam integrations
 
-### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.0.20]
+### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.0.21]
 
 Streamline your Lovelace configuration with with a card template system.
 
@@ -584,7 +584,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.14.1]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.15.0]
 
 Home Assistant Lovelace Windrose Card
 
