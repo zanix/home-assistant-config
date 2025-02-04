@@ -32,8 +32,8 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4392 |
-| Sensors        | 1299 |
+| All Entities   | 4394 |
+| Sensors        | 1300 |
 | Binary Sensors | 333 |
 | Lights         | 73 |
 | Switches       | 291 |
@@ -708,7 +708,7 @@ Material Design 3 Colors and Components in Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>508 Automations</summary>
+<details><summary>509 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -807,6 +807,7 @@ Material Design 3 Colors and Components in Home Assistant
 - 📋 [Inovelli] Amy Office Switch
 - 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
+- 📋 [Inovelli] Family Room Aux Switch
 - 📋 [Inovelli] Family Room Switch
 - 📋 [Inovelli] Garage Switch
 - 📋 [Inovelli] Joshua Office Switch
