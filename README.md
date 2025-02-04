@@ -288,7 +288,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.40]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.0.46]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -322,7 +322,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.19]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.20]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -370,7 +370,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.35.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.35.1]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -382,7 +382,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2024.10.2]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2025.2.0]
 
 Fill out your Media Player Entity with MQTT Topics
 
@@ -424,7 +424,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.0.9]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.0.10]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -488,7 +488,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v6.4.0]
+### [Frigate Card](https://github.com/dermotduffy/frigate-hass-card) [v6.5.1]
 
 A Lovelace card for Frigate in Home Assistant
 
@@ -584,7 +584,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.15.0]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.15.1]
 
 Home Assistant Lovelace Windrose Card
 
