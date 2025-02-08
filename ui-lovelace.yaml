@@ -57,19 +57,19 @@ button_card_templates:
         ]]]"
       stat2: "[[[\n  return `<ha-icon icon=\"mdi:cpu-64-bit\" style=\"width: 24px;\
         \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span> CPU: <span\
-        \ style=\"color: var(--text-color-sensor);\">${states[variables.cpu]?.state\
-        \ !== 'unavailable' ? helpers.localize(states[variables.cpu], undefined, 0)\
-        \ : '?'}</span></span>`\n]]]"
+        \ style=\"color: var(--text-color-sensor);\">${!['unavailable',undefined].includes(states[variables.cpu]?.state)\
+        \ ? helpers.localize(states[variables.cpu], undefined, 0) : '?'}</span></span>`\n\
+        ]]]"
       stat3: "[[[\n  return `<ha-icon icon=\"mdi:memory\" style=\"width: 24px; height:\
         \ 24px; color: var(--green-color);\"></ha-icon>\n    <span> RAM: <span style=\"\
-        color: var(--text-color-sensor);\">${states[variables.ram]?.state !== 'unavailable'\
+        color: var(--text-color-sensor);\">${!['unavailable',undefined].includes(states[variables.ram]?.state)\
         \ ? helpers.localize(states[variables.ram], undefined, 0) : '?'}</span></span>`\n\
         ]]]"
       stat4: "[[[\n  return `<ha-icon icon=\"mdi:expansion-card\" style=\"width: 24px;\
         \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span> GPU: <span\
-        \ style=\"color: var(--text-color-sensor);\">${states[variables.gpu]?.state\
-        \ !== 'unavailable' ? helpers.localize(states[variables.gpu], undefined, 0)\
-        \ : '?'}</span></span>`\n]]]"
+        \ style=\"color: var(--text-color-sensor);\">${!['unavailable',undefined].includes(states[variables.gpu]?.state)\
+        \ ? helpers.localize(states[variables.gpu], undefined, 0) : '?'}</span></span>`\n\
+        ]]]"
       info: ''
       chips: ''
     styles:
@@ -90,8 +90,8 @@ button_card_templates:
         - right: -20px
         - top: -20px
         - border-radius: 50%
-        - background: '[[[ if (states[variables.connected].state == ''off'') return
-            ''var(--red-color)''; else return ''var(--green-color)'' ]]]'
+        - background: '[[[ if (states[variables.connected].state == ''on'') return
+            ''var(--green-color)''; else return ''var(--red-color)'' ]]]'
       icon:
         - width: 60px
         - color: rgba(0, 0, 0, 0.6)
@@ -113,7 +113,7 @@ button_card_templates:
           - align-self: start
           - justify-self: start
           - font-size: 14px
-          - --text-color-sensor: '[[[ if (states[variables.media]?.state != ''playing'')
+          - --text-color-sensor: '[[[ if ([''idle'',''paused''].includes(states[variables.media]?.state))
               return ''var(--yellow-color)''; ]]]'
         stat2:
           - padding-bottom: 2px
@@ -2104,12 +2104,10 @@ streamline_templates:
       variables:
         chips_top:
           - type: template
-            entity: sensor.[[phone_base]]_[[person]]_wifi_signal_strength
+            entity: sensor.[[phone_base]]_[[person]]_network_type
             icon_color: blue
-            icon: '{% from "util.jinja" import wifi_icon %}
-
-              {{ wifi_icon(entity, "sensor.[[phone_base]]_[[person]]_wifi_connection")
-              }}'
+            icon: '{% from "util.jinja" import wifi_icon %} {{ wifi_icon("sensor.[[phone_base]]_[[person]]_wifi_signal_strength",
+              "sensor.[[phone_base]]_[[person]]_wifi_connection") }}'
             tap_action:
               action: more-info
           - type: template
@@ -2369,13 +2367,16 @@ streamline_templates:
                     \ absolute;\n  border-radius: var(--icon-border-radius);\n  background:\
                     \ var(--shape-color);\n}\n"
             - type: custom:mushroom-template-card
-              entity: sensor.[[phone_base]]_[[person]]_wifi_signal_strength
+              entity: sensor.[[phone_base]]_[[person]]_network_type
               layout: vertical
-              primary: '{{ states("sensor.[[phone_base]]_[[person]]_wifi_connection")
-                }}'
-              secondary: "{% set signal_level = int(states(entity), 0) %} {% if signal_level\
-                \ != -1 %}\n  {{ signal_level }} dBm\n{% endif %}"
-              icon: '{% from "util.jinja" import wifi_icon %} {{ wifi_icon(entity,
+              primary: "{%- if is_state(entity, \"cellular\") -%}\n  Cellular\n{%-\
+                \ elif not is_state(\"sensor.[[phone_base]]_[[person]]_wifi_connection\"\
+                , \"<not connected>\") -%}\n  {{ states(\"sensor.[[phone_base]]_[[person]]_wifi_connection\"\
+                ) | truncate(16) }}\n{%- else -%}\n  Not Connected\n{%- endif -%}"
+              secondary: "{% set signal_level = int(states(\"sensor.[[phone_base]]_[[person]]_wifi_signal_strength\"\
+                ), 0) %} {% if signal_level != -1 %}\n  {{ signal_level }} dBm\n{%\
+                \ endif %}"
+              icon: '{% from "util.jinja" import wifi_icon %} {{ wifi_icon("sensor.[[phone_base]]_[[person]]_wifi_signal_strength",
                 "sensor.[[phone_base]]_[[person]]_wifi_connection") }}'
               icon_color: cyan
               tap_action:
@@ -5354,6 +5355,24 @@ views:
               chips:
                 - type: conditional
                   conditions:
+                    - entity: binary_sensor.garage_door_obstruction
+                      state: 'on'
+                    - entity: binary_sensor.garage_door_obstruction
+                      state_not: unavailable
+                    - entity: binary_sensor.garage_door_obstruction
+                      state_not: unknown
+                  chip:
+                    type: template
+                    entity: binary_sensor.garage_door_obstruction
+                    icon: mdi:alert-circle
+                    icon_color: red
+                    tap_action:
+                      action: none
+                    card_mod:
+                      style: "@keyframes phase {\n  50% {opacity: 0;}\n}\n.content\
+                        \ {\n  animation: phase 1.5s ease-out infinite;\n}"
+                - type: conditional
+                  conditions:
                     - entity: cover.garage_door
                       state_not: closed
                     - entity: cover.garage_door
@@ -6110,6 +6129,10 @@ views:
                       - condition: state
                         entity: binary_sensor.kona_problems
                         state: 'on'
+                  - entity: sensor.kona_car_battery_level
+                    name: Battery Level
+                    show_background: false
+                    show_state: true
                   - entity: sensor.kona_lease_tracker
                     name: Lease Tracker
                     show_state: true
@@ -10341,16 +10364,26 @@ views:
             heading_style: subtitle
             badges:
               - type: custom:mushroom-template-badge
-                entity: lock.garage_door_lock_remotes
-                label: Remotes
+                entity: binary_sensor.garage_door_obstruction
+                label: Obstruction
                 content: '{{ state_translated(entity) }}'
-                icon: mdi:{{ iif(is_state(entity, "locked"), "lock", "lock-open")
+                icon: mdi:{{ iif(is_state(entity, "on"), "alert-circle", "check-circle")
                   }}
                 color: '{{ iif(is_state(entity, "locked"), "red", "green") }}'
                 tap_action:
                   action: more-info
                 hold_action:
                   action: toggle
+              - type: custom:mushroom-template-badge
+                entity: lock.garage_door_lock_remotes
+                label: Remotes
+                content: '{{ iif(is_state(entity, "locked"), "Disabled", "Enabled")
+                  }}'
+                icon: mdi:{{ iif(is_state(entity, "locked"), "lock", "lock-open")
+                  }}
+                color: '{{ iif(is_state(entity, "locked"), "red", "green") }}'
+                tap_action:
+                  action: more-info
           - type: tile
             entity: cover.garage_door
             color: green
@@ -13103,6 +13136,12 @@ views:
                       color: var(--amber-color)
                       show_state: true
                       show_points: false
+                    - entity: sensor.erebus_temperature_nct6798_cputin
+                      name: Temperature
+                      color: var(--pink-color)
+                      show_state: true
+                      show_points: false
+                      y_axis: secondary
                   graph_2_name: GPU
                   graph_2_icon: mdi:expansion-card
                   graph_2_entities:
@@ -13120,10 +13159,16 @@ views:
                   graph_3_name: Storage
                   graph_3_icon: mdi:harddisk
                   graph_3_entities:
-                    - entity: sensor.erebus_disk_dev_nvme1n1p2
+                    - entity: sensor.erebus_disk_dev_nvme0n1p2
                       unit: '%'
                       name: /
                       color: var(--blue-color)
+                      show_state: true
+                      show_points: false
+                    - entity: sensor.erebus_disk_dev_nvme1n1p1
+                      unit: '%'
+                      name: DevDrive
+                      color: var(--green-color)
                       show_state: true
                       show_points: false
                     - entity: sensor.erebus_disk_dev_sda1
@@ -13423,6 +13468,12 @@ views:
                       color: var(--amber-color)
                       show_state: true
                       show_points: false
+                    - entity: sensor.cartago_temperature_k10temp_tctl
+                      name: Temperature
+                      color: var(--pink-color)
+                      show_state: true
+                      show_points: false
+                      y_axis: secondary
                   graph_2_name: GPU
                   graph_2_icon: mdi:expansion-card
                   graph_2_entities:
