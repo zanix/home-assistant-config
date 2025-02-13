@@ -708,7 +708,7 @@ Material Design 3 Colors and Components in Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>509 Automations</summary>
+<details><summary>510 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -813,6 +813,7 @@ Material Design 3 Colors and Components in Home Assistant
 - 📋 [Inovelli] Joshua Office Switch
 - 📋 [Inovelli] Living Room Fan Light Switch
 - 📋 [Inovelli] Main Bedroom Switch
+- 📋 [Sensor Light] Basement Hallway
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Today
 - 📦 Packages Delivered
