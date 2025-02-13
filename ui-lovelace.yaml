@@ -2096,17 +2096,21 @@ streamline_templates:
             \ none;\n}\n.ripple {\n  border-radius: var(--ha-dialog-border-radius);\n\
             }\n"
   motion_card:
+    default:
+      - entity_motion: []
     card:
       type: custom:mushroom-template-card
       entity: '[[entity]]'
       primary: '[[name]]'
-      secondary: "{%- if is_state(entity, \"on\") -%}\n  Motion\n{%- elif is_state(entity,\
-        \ \"on\") -%}\n  Detected\n{%- else -%}\n  Clear\n{%- endif -%}"
-      icon: "{%- if is_state(entity, \"on\") -%}\n  mdi:motion-sensor\n{%- elif is_state(entity,\
-        \ \"on\") -%}\n  mdi:walk\n{%- else -%}\n  mdi:motion-sensor-off\n{%- endif\
-        \ -%}"
-      icon_color: "{%- if is_state(entity, \"on\") -%}\n  orange\n{%- elif is_state(entity,\
-        \ \"on\") -%}\n  light-green\n{%- else -%}\n  disabled\n{%- endif -%}"
+      secondary: "{%- if is_state(\"[[entity_motion]]\", \"on\") -%}\n  Motion\n{%-\
+        \ elif is_state(entity, \"on\") -%}\n  Detected\n{%- else -%}\n  Clear\n{%-\
+        \ endif -%}"
+      icon: "{%- if is_state(\"[[entity_motion]]\", \"on\") -%}\n  mdi:motion-sensor\n\
+        {%- elif is_state(entity, \"on\") -%}\n  mdi:walk\n{%- else -%}\n  mdi:motion-sensor-off\n\
+        {%- endif -%}"
+      icon_color: "{%- if is_state(\"[[entity_motion]]\", \"on\") -%}\n  orange\n\
+        {%- elif is_state(entity, \"on\") -%}\n  light-green\n{%- else -%}\n  disabled\n\
+        {%- endif -%}"
       tap_action:
         action: more-info
   package_delivery:
@@ -3613,7 +3617,7 @@ views:
                   label: Weather
                   icon: '{% from "util.jinja" import weather_icon %} {{ weather_icon(entity)
                     }}'
-                  content: '{{ state_translated(entity) }} / {{ states("sensor.ecowitt_outdoor_temperature")
+                  content: '{{ state_translated(entity) | truncate(16) }} / {{ states("sensor.ecowitt_outdoor_temperature")
                     | round() }} {{ state_attr("sensor.ecowitt_outdoor_temperature",
                     "unit_of_measurement") }}'
                   tap_action:
@@ -11301,70 +11305,92 @@ views:
             icon: mdi:motion-sensor
             heading: Occupancy
             heading_style: subtitle
-          - type: grid
-            square: false
-            columns: 3
-            cards:
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Home
-                  - entity: binary_sensor.ecobee_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Kitchen
-                  - entity: binary_sensor.kitchen_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Main
-                  - entity: binary_sensor.main_bedroom_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Emma
-                  - entity: binary_sensor.emma_bedroom_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Ethan
-                  - entity: binary_sensor.ethan_bedroom_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Amy Office
-                  - entity: binary_sensor.amy_office_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Family
-                  - entity: binary_sensor.family_room_occupancy
-              - type: custom:mushroom-template-card
-                entity: binary_sensor.apollo_msr_1_office_radar_target
-                primary: Josh Office
-                secondary: "{%- if is_state(\"binary_sensor.apollo_msr_1_office_radar_moving_target\"\
-                  , \"on\") -%}\n  Motion\n{%- elif is_state(entity, \"on\") -%}\n\
-                  \  Detected\n{%- else -%}\n  Clear\n{%- endif -%}"
-                icon: "{%- if is_state(\"binary_sensor.apollo_msr_1_office_radar_moving_target\"\
-                  , \"on\") -%}\n  mdi:motion-sensor\n{%- elif is_state(entity, \"\
-                  on\") -%}\n  mdi:walk\n{%- else -%}\n  mdi:motion-sensor-off\n{%-\
-                  \ endif -%}"
-                icon_color: "{%- if is_state(\"binary_sensor.apollo_msr_1_office_radar_moving_target\"\
-                  , \"on\") -%}\n  orange\n{%- elif is_state(entity, \"on\") -%}\n\
-                  \  light-green\n{%- else -%}\n  disabled\n{%- endif -%}"
-                tap_action:
-                  action: more-info
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Theater
-                  - entity: binary_sensor.theater_room_occupancy
-              - type: custom:streamline-card
-                template: motion_card
-                variables:
-                  - name: Garage
-                  - entity: binary_sensor.garage_multisensor_motion_detection
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Living Room
+              entity: binary_sensor.ecobee_occupancy
+              entity_motion: binary_sensor.ecobee_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Kitchen
+              entity: binary_sensor.kitchen_occupancy
+              entity_motion: binary_sensor.kitchen_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: M. Bed
+              entity: binary_sensor.main_bedroom_occupancy
+              entity_motion: binary_sensor.main_bedroom_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Emma
+              entity: binary_sensor.emma_bedroom_occupancy
+              entity_motion: binary_sensor.emma_bedroom_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Ethan
+              entity: binary_sensor.ethan_bedroom_occupancy
+              entity_motion: binary_sensor.ethan_bedroom_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Amy Office
+              entity: binary_sensor.amy_office_occupancy
+              entity_motion: binary_sensor.amy_office_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Family
+              entity: binary_sensor.family_room_occupancy
+              entity_motion: binary_sensor.family_room_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Theater
+              entity: binary_sensor.theater_room_occupancy
+              entity_motion: binary_sensor.theater_room_motion
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              entity: binary_sensor.basement_hallway_motion_occupancy
+              name: Bsmt Hallway
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Josh Office
+              entity: binary_sensor.apollo_msr_1_office_radar_target
+              entity_motion: binary_sensor.apollo_msr_1_office_radar_moving_target
+            grid_options:
+              columns: 4
+          - type: custom:streamline-card
+            template: motion_card
+            variables:
+              name: Garage
+              entity: binary_sensor.garage_multisensor_motion_detection
+            grid_options:
+              columns: 4
       - type: grid
         cards:
           - type: vertical-stack
