@@ -32,7 +32,7 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4390 |
+| All Entities   | 4391 |
 | Sensors        | 1302 |
 | Binary Sensors | 332 |
 | Lights         | 73 |
@@ -316,7 +316,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.7.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.8.0]
 
 Frigate integration for Home Assistant
 
@@ -604,7 +604,7 @@ Dark Grey Theme for Home Assistant
 
 LCARS theme for Home Assistant
 
-### [Material Rounded And Material You   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.0.6]
+### [Material Rounded And Material You   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.0.7]
 
 Material Design 3 Colors and Components in Home Assistant
 
