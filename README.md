@@ -708,19 +708,19 @@ Material Design 3 Colors and Components in Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>510 Automations</summary>
+<details><summary>512 Automations</summary>
 
 > Keymaster automations are hidden
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media State at Night 🚫
-- ⏯ Family Room Sound Mode 🚫
+- ⏯ Family Room Sound Mode
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode
 - ⏯ Living Room Sound Night Mode
 - ⏯ Main Bedroom Media Auto Off
-- ⏯ PS4 Harmony Activity 🚫
+- ⏯ PS4 Harmony Activity
 - ⏯️ Samsung Soundbar Night Mode
 - ⏯️ Samsung Soundbar Voice Enhancer
 - ☑️ Cat Feeder Filled
@@ -753,6 +753,7 @@ Material Design 3 Colors and Components in Home Assistant
 - ✨ DreamScreen Scene Changed
 - ✴️ Joshua Office CO2 Levels
 - ✴️ Joshua Office Light On/Off Presence
+- 🌐 IP Address Changed
 - 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done
 - 🍽️ Dishwasher Timer
@@ -762,7 +763,7 @@ Material Design 3 Colors and Components in Home Assistant
 - 🍽️ Oven Kitchen Timer
 - 🍽️ Oven Kitchen Timer Completed
 - 🎄 XMas Lights On/Off 🚫
-- 🎄 XMas Tree On/Off
+- 🎄 XMas Tree On/Off 🚫
 - 🏢 Joshua Office Mode
 - 🐱 Cat Feeder Empty Notification
 - 🐱 Cat Feeder Error
@@ -815,6 +816,7 @@ Material Design 3 Colors and Components in Home Assistant
 - 📋 [Inovelli] Main Bedroom Switch
 - 📋 [Sensor Light] Basement Hallway
 - 📦 Clear Packages Out for Delivery
+- 📦 Mail Delivered
 - 📦 Mail Today
 - 📦 Packages Delivered
 - 📦 Packages Out for Delivery

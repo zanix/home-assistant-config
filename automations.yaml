@@ -421,42 +421,43 @@
   - variables:
       message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
         "1" else "items" }} will be in the mailbox today.'
-  - data:
-      who: parents
-      title: Mail Today
-      message: '{{ message }}'
-      notification_icon: mdi:mail
-      color: '#2096f3'
-      camera: camera.mail_usps_camera
-      url: lovelace/main
-      group: Delivery
-      tag: delivery-mail
-    action: script.notify_mobile
-  - data:
-      entity:
-      - media_player.nasya
-      title: Mail Today
-      message: '{{ message }}'
-      camera: camera.mail_usps_camera
-    action: script.notify_hass_agent
-  - data:
-      computer:
-      - erebus
-      title: Mail Today
-      message: '{{ message }}'
-      icon_url: local/icons/mailbox.png
-      camera: camera.mail_usps_camera
-    action: script.notify_lnxlink
-  - data:
-      entity:
-      - media_player.shield_living_room
-      - media_player.shield_family_room
-      - media_player.shield_main_bedroom
-      title: Mail Today
-      message: '{{ message }}'
-      image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
-      duration: 15
-    action: script.notify_pipup
+  - parallel:
+    - data:
+        who: parents
+        title: Mail Today
+        message: '{{ message }}'
+        notification_icon: mdi:mail
+        color: '#2096f3'
+        camera: camera.mail_usps_camera
+        url: lovelace/main
+        group: Delivery
+        tag: delivery-mail
+      action: script.notify_mobile
+    - data:
+        entity:
+        - media_player.nasya
+        title: Mail Today
+        message: '{{ message }}'
+        camera: camera.mail_usps_camera
+      action: script.notify_hass_agent
+    - data:
+        computer:
+        - erebus
+        title: Mail Today
+        message: '{{ message }}'
+        icon_url: local/icons/mailbox.png
+        camera: camera.mail_usps_camera
+      action: script.notify_lnxlink
+    - data:
+        entity:
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_main_bedroom
+        title: Mail Today
+        message: '{{ message }}'
+        image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
+        duration: 15
+      action: script.notify_pipup
   mode: single
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
@@ -1989,15 +1990,15 @@
 - id: '1665689705099'
   alias: "\U0001F3E2 Joshua Office Mode"
   description: Actions on day/night mode for the office
-  trigger:
-  - platform: time
-    at: input_datetime.office_startup
+  triggers:
+  - at: input_datetime.office_startup
     id: day
-  - platform: time
-    at: input_datetime.office_night_mode
+    trigger: time
+  - at: input_datetime.office_night_mode
     id: night
-  condition: []
-  action:
+    trigger: time
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -2013,19 +2014,19 @@
       - data:
           entity_id: switch.erebus
         action: switch.turn_on
+        enabled: false
     - conditions:
       - condition: trigger
         id:
         - night
-      - condition: state
-        entity_id: light.joshua_office
-        state: 'on'
       sequence:
       - action: switch.turn_off
         metadata: {}
         data: {}
         target:
-          entity_id: switch.joshua_office_shelf_led
+          entity_id:
+          - switch.joshua_office_shelf_led
+          - switch.joshua_office_workbench
   mode: single
 - id: '1665695892233'
   alias: "\U0001F5A8️ Low Toner"
@@ -2127,16 +2128,14 @@
 - id: '1665695943529'
   alias: ⏯ PS4 Harmony Activity
   description: Turns on the PS4 when the activity is active
-  trigger:
-  - platform: state
-    entity_id: remote.harmony_family_room
-    to: 'on'
-  condition:
-  - condition: state
-    entity_id: remote.harmony_family_room
+  triggers:
+  - entity_id:
+    - remote.harmony_family_room
+    to: PS4
+    trigger: state
     attribute: current_activity
-    state: PS4
-  action:
+  conditions: []
+  actions:
   - entity_id: media_player.playstation_4
     action: media_player.turn_on
   mode: single
@@ -3876,11 +3875,11 @@
 - id: '1679462212869'
   alias: ⏯ Ensure PiPup is Running
   description: ''
-  trigger:
-  - platform: time
-    at: 04:30:00
-  condition: []
-  action:
+  triggers:
+  - at: 04:30:00
+    trigger: time
+  conditions: []
+  actions:
   - variables:
       media_players:
       - media_player.shield_living_room
@@ -3891,6 +3890,11 @@
       sequence:
       - data:
           command: am start -n nl.rogro82.pipup/nl.rogro82.pipup.MainActivity
+        target:
+          entity_id: '{{ repeat.item }}'
+        action: androidtv.adb_command
+      - data:
+          command: HOME
         target:
           entity_id: '{{ repeat.item }}'
         action: androidtv.adb_command
@@ -4341,17 +4345,20 @@
 - id: '1698980625096'
   alias: ⚙️ Automated Backup
   description: Creates a full backup nightly.
-  trigger:
-  - platform: time
-    at: 03:00:00
-  condition:
+  triggers:
+  - at: 03:00:00
+    trigger: time
+  conditions:
   - condition: template
     value_template: '{{ now().isoweekday() == 7 }}'
-  action:
-  - data:
+    alias: Today is Sunday
+  actions:
+  - action: hassio.backup_full
+    data:
       compressed: false
-      location: Lantea
-    action: hassio.backup_full
+      homeassistant_exclude_database: false
+      name: Weekly backup {{ state_attr("update.home_assistant_core_update", "installed_version")
+        }} {{ as_timestamp(now()) | timestamp_custom("%Y-%m-%d") }}
   mode: single
 - id: '1699834374599'
   alias: "\U0001F4C5 Living Room Fan On/Off"
@@ -6009,3 +6016,91 @@
       - use_brightness
       night_light_transition_on: 1
       night_light_transition_off: 2
+- id: '1740694410995'
+  alias: "\U0001F310 IP Address Changed"
+  description: Sends notifications when the IP address changes
+  triggers:
+  - trigger: state
+    entity_id:
+    - sensor.external_ip
+  conditions:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
+      and not trigger.to_state.state in ["unknown", "unavailable"] }}'
+  actions:
+  - parallel:
+    - data:
+        who: joshua
+        title: Network
+        message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
+          }}
+        notification_icon: mdi:web
+        color: '#e91e63'
+        icon_url: local/icons/web.png
+        tag: unifi-ip
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        - cartago
+        title: Network
+        message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
+          }}
+        icon_url: local/icons/web.png
+      action: script.notify_lnxlink
+  mode: restart
+- id: '1741307009888'
+  alias: "\U0001F4E6 Mail Delivered"
+  description: Notifies when mail has been delivered
+  triggers:
+  - entity_id:
+    - binary_sensor.usps_mail_delivered
+    trigger: state
+    to: 'on'
+  conditions:
+  - condition: template
+    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
+      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
+  actions:
+  - variables:
+      message: Mail is delivered
+  - parallel:
+    - data:
+        who: parents
+        title: Mail Delivery
+        message: '{{ message }}'
+        notification_icon: mdi:mailbox-up
+        color: '#2096f3'
+        camera: camera.mail_usps_camera
+        url: lovelace/main
+        group: Delivery
+        tag: delivery-mail
+      action: script.notify_mobile
+    - data:
+        entity:
+        - media_player.nasya
+        title: Mail Delivery
+        message: '{{ message }}'
+        camera: camera.mail_usps_camera
+      action: script.notify_hass_agent
+    - data:
+        computer:
+        - erebus
+        title: Mail Delivery
+        message: '{{ message }}'
+        icon_url: local/icons/mailbox-up.png
+        camera: camera.mail_usps_camera
+      action: script.notify_lnxlink
+    - data:
+        entity:
+        - media_player.shield_living_room
+        - media_player.shield_family_room
+        - media_player.shield_main_bedroom
+        title: Mail Delivery
+        message: '{{ message }}'
+        image: '{{ state_attr("camera.mail_usps_camera", "file_path")[1:] }}'
+        duration: 15
+      action: script.notify_pipup
+  mode: single
