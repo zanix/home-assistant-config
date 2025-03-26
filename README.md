@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4391 |
-| Sensors        | 1302 |
-| Binary Sensors | 332 |
-| Lights         | 73 |
-| Switches       | 293 |
+| All Entities   | 4429 |
+| Sensors        | 1335 |
+| Binary Sensors | 333 |
+| Lights         | 74 |
+| Switches       | 295 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -288,7 +288,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.3]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.10]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -298,7 +298,7 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v1.0.4]
+### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v1.0.5]
 
 Home Assistant integration for Dreame robot vacuums with map support
 
@@ -370,7 +370,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.35.3]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.36.3]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -388,13 +388,13 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.7]
+### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.8]
 
 Home Assistant Neakasa Integration
 
 Authors: [@timniklas](https://github.com/timniklas).
 
-### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.1.0]
+### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.3.0]
 
 Home Assistant integration for Nintendo Switch Parental Controls
 
@@ -424,7 +424,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.0.12]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.1.3]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -448,7 +448,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>36 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.1.0]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.4.0]
 
 A comprehensive camera card for Home Assistant
 
@@ -512,7 +512,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.6.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.7.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -528,7 +528,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.2.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v4.3.1]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -544,7 +544,7 @@ Adds highly configurable buttons that use actions and per-state styling.
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.4]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.5]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -584,7 +584,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.16.0]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.20.1]
 
 Home Assistant Lovelace Windrose Card
 
@@ -604,7 +604,7 @@ Dark Grey Theme for Home Assistant
 
 LCARS theme for Home Assistant
 
-### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.0.8]
+### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.1.1]
 
 Material Design 3 Colors and Components in Home Assistant
 
@@ -866,7 +866,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.2.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.3.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
