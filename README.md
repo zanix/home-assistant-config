@@ -32,9 +32,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4428 |
-| Sensors        | 1335 |
-| Binary Sensors | 333 |
+| All Entities   | 4417 |
+| Sensors        | 1322 |
+| Binary Sensors | 334 |
 | Lights         | 74 |
 | Switches       | 295 |
 
@@ -322,7 +322,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.21]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.22]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -370,7 +370,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.36.3]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.36.4]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -388,7 +388,7 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.8]
+### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.0.9]
 
 Home Assistant Neakasa Integration
 
@@ -448,7 +448,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>36 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.4.0]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.5.1]
 
 A comprehensive camera card for Home Assistant
 
@@ -588,7 +588,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.2.4]
+### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.3.0]
 
 This card provides a user-friendly way to fully control map-based vacuums in Home Assistant. Supported brands include Xiaomi (Roborock/Viomi/Dreame/Roidmi/Valetudo/Valetudo RE), Neato, Wyze, Roomba, Ecovacs (and probably more).
 
@@ -604,7 +604,7 @@ Dark Grey Theme for Home Assistant
 
 LCARS theme for Home Assistant
 
-### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.1.2]
+### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.1.4]
 
 Material Design 3 Colors and Components in Home Assistant
 
