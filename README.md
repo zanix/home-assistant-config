@@ -594,7 +594,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 ---
 
-</details><details><summary>4 Themes</summary>
+</details><details><summary>3 Themes</summary>
 
 ### [Dark Pastel](https://github.com/chaptergy/homeassistant-theme-dark-pastel) [v1.0.2]
 
@@ -604,13 +604,9 @@ Dark Grey Theme for Home Assistant
 
 LCARS theme for Home Assistant
 
-### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.1.4]
+### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.1.5]
 
 Material Design 3 Colors and Components in Home Assistant
-
-### [Metrology   Metro + Fluent + Windows Themes   By Mmak.Es](https://github.com/Madelena/Metrology-for-Hass) [v.1.9.1]
-
-🎨 Give your Home Assistant a modern and clean facelift. 🟥🟧🟩🟦🟪 24 Variations with 2 Styles + 6 Colors (Magenta Red / Orange / Green / Blue / Purple) + 🌞 Light and 🌚 Dark modes included. Based on Metro and Fluent UI Design Systems from Microsoft Windows.
 
 ---
 
