@@ -704,7 +704,7 @@ Material Design 3 Colors and Components in Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>512 Automations</summary>
+<details><summary>516 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -726,6 +726,7 @@ Material Design 3 Colors and Components in Home Assistant
 - ☑️ Ignore Garage Door Alerts
 - ☑️ Ignore Window Alerts 🚫
 - ☑️ Retry Remote Start Ascent
+- ☑️ Retry Remote Start Kona
 - ☑️ Turn on Water Main
 - ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
@@ -792,7 +793,10 @@ Material Design 3 Colors and Components in Home Assistant
 - 💬 Garage Door Opened and Away
 - 💬 Garbage Collection
 - 💬 Kona Battery Charge Low
+- 💬 Kona Failed Notification
 - 💬 Kona Fuel Level Low
+- 💬 Kona Remote Start Expired Notification
+- 💬 Kona Started
 - 💬 Window Left Open 🚫
 - 📅 Emma's Projector On/Off
 - 📅 Ethan's Projector On/Off

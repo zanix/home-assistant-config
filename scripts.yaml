@@ -345,28 +345,88 @@ kona_remote_start:
         entity_id: cover.garage_door
       data: {}
       action: cover.open_cover
-  - data:
-      duration: 10
+  - action: kia_uvo.start_climate
+    data:
       device_id: f27d2038fd3fe30bc627505de54ddea8
-      climate: true
-      temperature: 70
+      duration: 10
+      climate: '{{ is_state(''input_boolean.kona_hvac'', ''on'') }}'
+      temperature: '{{ states(''input_number.kona_temperature_set'') | int }}'
+      defrost: '{{ is_state(''input_boolean.kona_defroster'', ''on'') }}'
       heating: '0'
-      defrost: false
-      flseat: '0'
-      frseat: '0'
+      flseat: '{{ iif(is_state(''input_boolean.kona_seat_heat'', ''on''), ''1'', ''0'')
+        }}'
+      frseat: '{{ iif(is_state(''input_boolean.kona_seat_heat'', ''on''), ''1'', ''0'')
+        }}'
       rlseat: '0'
       rrseat: '0'
-    action: kia_uvo.start_climate
-  description: Starts the Kona and opens the garage door.
+  - alias: Wait for engine to turn on
+    wait_for_trigger:
+    - type: turned_on
+      device_id: f27d2038fd3fe30bc627505de54ddea8
+      entity_id: binary_sensor.kona_engine
+      domain: binary_sensor
+      trigger: device
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+    continue_on_timeout: true
+  - repeat:
+      until:
+      - condition: or
+        conditions:
+        - type: is_on
+          condition: device
+          device_id: f27d2038fd3fe30bc627505de54ddea8
+          entity_id: binary_sensor.kona_engine
+          domain: binary_sensor
+        - condition: template
+          value_template: '{{ repeat.index == 6 }}'
+      sequence:
+      - data:
+          device_id: f27d2038fd3fe30bc627505de54ddea8
+        action: kia_uvo.update
+      - wait_for_trigger:
+        - type: turned_on
+          device_id: f27d2038fd3fe30bc627505de54ddea8
+          entity_id: binary_sensor.kona_engine
+          domain: binary_sensor
+          trigger: device
+        timeout:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+    alias: Repeat until engine turns on
+  - choose:
+    - conditions:
+      - type: is_off
+        condition: device
+        device_id: f27d2038fd3fe30bc627505de54ddea8
+        entity_id: binary_sensor.kona_engine
+        domain: binary_sensor
+      sequence:
+      - alias: Fire event for other automations and scripts
+        event: hyundai_command_failed
+        event_data:
+          command: remote_start
+    default:
+    - alias: Fire event for other automations and scripts
+      event: hyundai_command_successful
+      event_data:
+        command: remote_start
+  description: Starts the Kona and opens the garage door when home.
   icon: fapro:hyundai
   mode: single
 kona_remote_stop:
   alias: Kona Remote Stop
   sequence:
-  - data:
+  - action: kia_uvo.stop_climate
+    data:
       device_id: f27d2038fd3fe30bc627505de54ddea8
-    action: kia_uvo.stop_climate
-  - if:
+  - alias: Close the garage door if open and Ascent is not running.
+    if:
     - condition: state
       entity_id: cover.garage_door
       state: open
@@ -378,6 +438,63 @@ kona_remote_stop:
         entity_id: cover.garage_door
       data: {}
       action: cover.close_cover
+  - alias: Wait for engine to turn off
+    wait_for_trigger:
+    - type: turned_off
+      device_id: f27d2038fd3fe30bc627505de54ddea8
+      entity_id: binary_sensor.kona_engine
+      domain: binary_sensor
+      trigger: device
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+    continue_on_timeout: true
+  - repeat:
+      until:
+      - condition: or
+        conditions:
+        - type: is_off
+          condition: device
+          device_id: f27d2038fd3fe30bc627505de54ddea8
+          entity_id: binary_sensor.kona_engine
+          domain: binary_sensor
+        - condition: template
+          value_template: '{{ repeat.index == 6 }}'
+      sequence:
+      - data:
+          device_id: f27d2038fd3fe30bc627505de54ddea8
+        action: kia_uvo.update
+      - wait_for_trigger:
+        - type: turned_off
+          device_id: f27d2038fd3fe30bc627505de54ddea8
+          entity_id: binary_sensor.kona_engine
+          domain: binary_sensor
+          trigger: device
+        timeout:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+    alias: Reload data until engine stops
+  - choose:
+    - conditions:
+      - type: is_on
+        condition: device
+        device_id: f27d2038fd3fe30bc627505de54ddea8
+        entity_id: binary_sensor.kona_engine
+        domain: binary_sensor
+      sequence:
+      - alias: Fire event for other automations and scripts
+        event: hyundai_command_failed
+        event_data:
+          command: remote_stop
+    default:
+    - alias: Fire event for other automations and scripts
+      event: hyundai_command_successful
+      event_data:
+        command: remote_stop
   description: Stops the Kona and closes the garage door.
   icon: fapro:hyundai
   mode: single
