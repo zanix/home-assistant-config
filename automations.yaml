@@ -897,16 +897,16 @@
 - id: '1665686584864'
   alias: "\U0001F4A1 Living Room Lamps on/off"
   description: Turns on/off the Living Room lamps
-  trigger:
-  - platform: sun
-    event: sunset
+  triggers:
+  - event: sunset
     offset: -00:20:00
     id: 'on'
-  - platform: time
-    at: input_datetime.living_room_lamps_off
+    trigger: sun
+  - at: input_datetime.living_room_lamps_off
     id: 'off'
-  condition: []
-  action:
+    trigger: time
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -924,24 +924,12 @@
             brightness: 100
             color_temp: 370
           action: light.turn_on
-      - if:
-        - condition: state
-          entity_id: light.living_room_lamp
-          state: 'off'
-        then:
-        - entity_id: light.living_room_lamp
-          data:
-            transition: 30
-            brightness: 100
-          action: light.turn_on
     - conditions:
       - condition: trigger
         id:
         - 'off'
       sequence:
       - entity_id: light.living_room_floor_lamp
-        action: light.turn_off
-      - entity_id: light.living_room_lamp
         action: light.turn_off
   mode: single
 - id: '1665686715952'
@@ -1493,6 +1481,30 @@
   - choose:
     - conditions:
       - condition: state
+        entity_id: timer.ascent_remote_start
+        state: active
+      sequence:
+      - data:
+          color: Blue
+          effect: Fast Siren
+          level: 60
+          target:
+            entity_id: light.garage
+        action: script.inovelli_blue_led
+    - conditions:
+      - condition: state
+        entity_id: timer.kona_remote_start
+        state: active
+      sequence:
+      - data:
+          color: Cyan
+          effect: Fast Siren
+          level: 60
+          target:
+            entity_id: light.garage
+        action: script.inovelli_blue_led
+    - conditions:
+      - condition: state
         entity_id: cover.garage_door
         state: opening
       sequence:
@@ -1545,30 +1557,6 @@
               target:
                 entity_id: light.garage
             action: script.inovelli_blue_led
-    - conditions:
-      - condition: state
-        entity_id: timer.ascent_remote_start
-        state: active
-      sequence:
-      - data:
-          color: Blue
-          effect: Fast Siren
-          level: 60
-          target:
-            entity_id: light.garage
-        action: script.inovelli_blue_led
-    - conditions:
-      - condition: state
-        entity_id: timer.kona_remote_start
-        state: active
-      sequence:
-      - data:
-          color: Cyan
-          effect: Fast Siren
-          level: 60
-          target:
-            entity_id: light.garage
-        action: script.inovelli_blue_led
     default:
     - data:
         target:
@@ -3269,17 +3257,32 @@
     input:
       switch: event.family_room_action
       config_single:
-      - action: light.toggle
-        target:
-          entity_id:
-          - light.family_room_lamp
-        data: {}
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.family_room
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: light.toggle
+          target:
+            entity_id:
+            - light.family_room_lamp
+          data: {}
       up_triple:
-      - action: script.family_room_play_mode
-        metadata: {}
-        data:
-          activity: Computer
-      config_triple: []
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.family_room
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: script.family_room_play_mode
+          metadata: {}
+          data:
+            activity: Computer
 - id: '1738556679313'
   alias: "\U0001F4CB [Inovelli] Family Room Aux Switch"
   description: Custom button actions for the Inovelli switch
@@ -3288,17 +3291,32 @@
     input:
       switch: event.family_room_aux_action
       config_single:
-      - action: light.toggle
-        target:
-          entity_id:
-          - light.family_room_lamp
-        data: {}
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.family_room_aux
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: light.toggle
+          target:
+            entity_id:
+            - light.family_room_lamp
+          data: {}
       up_triple:
-      - action: script.family_room_play_mode
-        metadata: {}
-        data:
-          activity: Computer
-      config_triple: []
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.family_room_aux
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: script.family_room_play_mode
+          metadata: {}
+          data:
+            activity: Computer
 - id: '1667779442976'
   alias: "\U0001F4CB [Inovelli] Garage Switch"
   description: Custom button actions for the Inovelli switch
@@ -3306,16 +3324,29 @@
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
       switch: event.garage_action
-      config_double:
+      config_single:
       - parallel:
-        - data:
-            color: Yellow
-            effect: Chase
-            level: 40
-            duration: 3 Seconds
+        - action: script.inovelli_blue_led
+          data:
             target:
               entity_id: light.garage
-          action: script.inovelli_blue_led
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: light.toggle
+          metadata: {}
+          data: {}
+          target:
+            entity_id: light.garage_door_light
+      config_double:
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.garage
+            color: Pink
+            effect: Chase
+            duration: 3 Seconds
         - data: {}
           target:
             entity_id: cover.garage_door
@@ -3330,14 +3361,13 @@
         action: automation.trigger
       config_triple:
       - parallel:
-        - data:
-            color: Blue
-            effect: Chase
-            level: 60
-            duration: 3 Seconds
+        - action: script.inovelli_blue_led
+          data:
             target:
               entity_id: light.garage
-          action: script.inovelli_blue_led
+            color: Blue
+            effect: Chase
+            duration: 3 Seconds
         - data: {}
           action: script.ascent_remote_start
       - delay:
@@ -3349,14 +3379,13 @@
         action: automation.trigger
       config_quadruple:
       - parallel:
-        - data:
-            color: Cyan
-            effect: Chase
-            level: 60
-            duration: 3 Seconds
+        - action: script.inovelli_blue_led
+          data:
             target:
               entity_id: light.garage
-          action: script.inovelli_blue_led
+            color: Cyan
+            effect: Chase
+            duration: 3 Seconds
         - data: {}
           action: script.kona_remote_start
       - delay:
@@ -3368,14 +3397,13 @@
         action: automation.trigger
       down_triple:
       - parallel:
-        - data:
-            color: Yellow
-            effect: Chase
-            level: 60
-            duration: 3 Seconds
+        - action: script.inovelli_blue_led
+          data:
             target:
               entity_id: light.garage
-          action: script.inovelli_blue_led
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
         - target:
             entity_id: light.inside_lights
           data: {}
@@ -3387,12 +3415,6 @@
         target:
           entity_id: automation.garage_light_switch_status
         action: automation.trigger
-      config_single:
-      - action: light.toggle
-        metadata: {}
-        data: {}
-        target:
-          entity_id: light.garage_door_light
 - id: '1667779650555'
   alias: "\U0001F4CB [Inovelli] Living Room Fan Light Switch"
   description: Custom button actions for the Inovelli switch
@@ -3402,17 +3424,13 @@
       switch: event.living_room_fan_light_action
       config_single:
       - parallel:
-        - data:
-            entity_id:
-            - light.living_room
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-          action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
+          data:
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+            target:
+              entity_id: light.living_room_fan_light
         - data: {}
           target:
             entity_id:
@@ -3420,17 +3438,13 @@
           action: light.toggle
       config_double:
       - parallel:
-        - data:
-            entity_id:
-            - light.living_room
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-          action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
+          data:
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+            target:
+              entity_id: light.living_room_fan_light
         - data: {}
           target:
             entity_id: light.living_room_lights
@@ -3444,17 +3458,13 @@
       switch: event.main_bedroom_action
       config_single:
       - parallel:
-        - data:
-            entity_id:
-            - light.main_bedroom
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
-          action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.main_bedroom
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
         - data: {}
           target:
             entity_id: light.main_bedroom_floor_lamp
@@ -3470,17 +3480,13 @@
         data: {}
       up_double:
       - parallel:
-        - action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
           data:
-            entity_id:
-            - light.joshua_office_switch
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
+            target:
+              entity_id: light.joshua_office_switch
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
         - action: script.joshua_office_lights_day_mode
           data: {}
       down_single:
@@ -3490,17 +3496,13 @@
           entity_id: light.joshua_office_lights
       down_double:
       - parallel:
-        - action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
           data:
-            entity_id:
-            - light.joshua_office_switch
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
+            target:
+              entity_id: light.joshua_office_switch
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
         - action: script.joshua_office_lights_night_mode
           data: {}
       switch: event.joshua_office_switch_action
@@ -3513,33 +3515,25 @@
       up_single: []
       up_double:
       - parallel:
-        - action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
           data:
-            entity_id:
-            - light.amy_office_switch
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
+            target:
+              entity_id: light.amy_office_switch
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
         - action: script.amy_office_lights_day_mode
           data: {}
       down_single: []
       down_double:
       - parallel:
-        - action: script.inovelli_blue_led_status_start
+        - action: script.inovelli_blue_led
           data:
-            entity_id:
-            - light.amy_office_switch
-            color_start: Yellow
-            effect_start: Open/Close
-            duration: 2 Seconds
-            level_start: 60
-            color_end: Green
-            effect_end: Clear
-            level_end: 40
+            target:
+              entity_id: light.amy_office_switch
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
         - action: script.amy_office_lights_night_mode
           data: {}
       switch: event.amy_office_switch_action
@@ -6277,10 +6271,9 @@
   conditions: []
   actions:
   - parallel:
-    - target:
-        entity_id: button.kona_remote_start
+    - action: script.kona_remote_start
+      metadata: {}
       data: {}
-      action: button.press
     - data:
         who: parents
         message: clear_notification
