@@ -30,7 +30,7 @@ default:
   name: Default
   description: Default styles to apply them to all cards.
   code: |
-    /* CSS or JS templates (see examples below) */
+    /* Reverse direction of header elements (close on left) */
     #header-container {
       flex-direction: row-reverse;
     }
@@ -161,37 +161,55 @@ home-assistant-default:
       opacity: 0.24;
     }
 
-icon_container_color:
-  name: "Example: Customize the icon container color"
-  version: "v1.1"
-  creator: "Clooos"
-  link: "https://github.com/Clooos/Bubble-Card/discussions/1231"
+location_icon_color:
+  name: Location Icon Background Color
+  version: "v1.0"
+  creator: "zanix"
 
   unsupported:
     - horizontal-buttons-stack
     - separator
-
+  
   description: |
-    A list of predefined colors to customize the icon container color.
-    Configure this module via the editor or in YAML, for example:
-    <br><br>
-    <code-block><pre>
-    icon_container_color:
-        color: light-blue
-    </pre></code-block>
+    Colorizes the icon background for an entity with a location, such as a person or device tracker.
 
   code: |
+    ${(() => {
+      const config = this.config.location_icon_color || [];
+      const element = card.querySelector('.bubble-icon-container');
+
+      if (!config || !this.config.entity) {
+        return;
+      }
+
+      const entity = hass.states[this.config.entity];
+      if (!entity) {
+        return;
+      }
+
+      const color = 'var(--state-location-unknown)';
+      let colorVariable;
+      if (['home', 'not_home', 'unknown'].includes(entity.state)) {
+        colorVariable = `var(--state-location-${entity.state.replace('_', '-')})`;
+      } else if (!['unknown', 'unavailable'].includes(entity.state)) {
+        colorVariable = 'var(--state-location-zone)';
+      }
+
+      if (element) {
+        element.style.background = `${colorVariable}`;
+      }
+    })()}
+    #root {
+      /* Define State colors. Can be added to theme */
+      --state-location-home: var(--green-color);
+      --state-location-not-home: var(--red-color);
+      --state-location-zone: var(--blue-color);
+      --state-location-unknown: var(--grey-color);
+      --bubble-icon-color: var(--white-color);
+    }
     .bubble-icon-container {
       opacity: 1 !important;
-      background: var(--${this.config.icon_container_color?.color}-color) !important;
     }
-
-  editor:
-    - name: color
-      label: "Color"
-      selector:
-        ui_color:
-          include_none: true
 
 more_info_popup:
   name: "Pop-Up Box"
