@@ -74,6 +74,7 @@ button_card_templates:
         - background-color: transparent
         - font-size: 1rem
         - border: none
+        - box-shadow: none
       grid:
         - grid-template-areas: '"type type"
 
@@ -557,6 +558,16 @@ streamline_templates:
             previous_button: true
             power_button: true
             next_button: true
+          sub_button:
+            - entity: '[[media]]'
+              show_attribute: true
+              attribute: volume_level
+              icon: mdi:volume-high
+              show_background: false
+              visibility:
+                - condition: state
+                  entity: '[[media]]'
+                  state_not: 'off'
           styles: "${card.querySelector('.bubble-name').innerText = [\n    (hass.states[entity]?.attributes.media_title\
             \ || \"\"),\n    (hass.states[entity]?.attributes.media_artist || \"\"\
             ),\n    (typeof(hass.states[entity]?.attributes.media_season) !== \"undefined\"\
@@ -1747,9 +1758,9 @@ streamline_templates:
                       .: "ha-tile-icon {\n  {% if is_state(config.entity, 'on') %}\n\
                         \    {% set speed = state_attr(config.entity, 'percentage')\
                         \ %}\n    {% set color = {\n      33: \"green\",\n      66:\
-                        \ \"yellow\",\n      100: \"orange\"\n    }[speed] %}\n  {%\
-                        \ else %}\n    {% set color = \"disabled\" %}\n  {% endif\
-                        \ %}\n  --tile-color: var(--{{ color }}-color);\n}\nha-state-icon\
+                        \ \"orange\",\n      100: \"red\"\n    }[speed] %}\n  {% else\
+                        \ %}\n    {% set color = \"disabled\" %}\n  {% endif %}\n\
+                        \  --tile-color: var(--{{ color }}-color);\n}\nha-state-icon\
                         \ {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
                         \ speed = state_attr(config.entity, 'percentage') %}\n   \
                         \ animation: {{ (2 - (speed / 100)) | round(2) }}s rotation\
@@ -1788,9 +1799,10 @@ streamline_templates:
               \ rgba(var(--rgb-state-light), 0.2);\n  {% endif %}\n}\n"
         - type: custom:auto-entities
           card:
-            type: custom:layout-card
-            cards: []
-            layout_type: masonry
+            type: grid
+            columns: 1
+            square: false
+          card_param: cards
           sort:
             attribute: friendly_name
           filter:
@@ -2554,8 +2566,8 @@ streamline_templates:
       title_adaptive_color: true
       color:
         ok: var(--green-color)
-        ko: var(--disabled-color)
-        half: var(--blue-grey-color)
+        ko: var(--dark-grey-color)
+        half: var(--light-green-color)
         none: var(--black-color)
       bar:
         spacing: 1
@@ -2660,210 +2672,8 @@ views:
                     \ >= 50 %}\n    yellow\n  {% elif level >= 0 %}\n    green\n \
                     \ {% endif %}\n{% else %}\n  grey\n{% endif %}"
                   tap_action:
-                    action: fire-dom-event
-                    browser_mod:
-                      service: browser_mod.popup
-                      data:
-                        title: Air Quality
-                        content:
-                          type: custom:vertical-stack-in-card
-                          card_mod:
-                            style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                              \ 0;\n}\n"
-                          cards:
-                            - type: vertical-stack
-                              cards:
-                                - type: custom:mushroom-title-card
-                                  title: Inside
-                                - type: custom:bar-card
-                                  card_mod:
-                                    style: "bar-card-name,\nbar-card-value {\n  font-weight:\
-                                      \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                                      }\n"
-                                  animation:
-                                    state: 'on'
-                                  positions:
-                                    indicator: inside
-                                  entities:
-                                    - entity: sensor.airgradient_kitchen_pm_2_5_aqi
-                                      name: AQI
-                                      min: 0
-                                      max: 400
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '50'
-                                        - color: var(--yellow-color)
-                                          from: '50'
-                                          to: '100'
-                                        - color: var(--orange-color)
-                                          from: '100'
-                                          to: '150'
-                                        - color: var(--red-color)
-                                          from: '150'
-                                          to: '200'
-                                        - color: var(--purple-color)
-                                          from: '200'
-                                          to: '300'
-                                        - color: var(--pink-color)
-                                          from: '300'
-                                          to: '400'
-                                    - entity: sensor.airgradient_kitchen_pm_2_5
-                                      name: PM 2.5
-                                      min: 0
-                                      max: 100
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '12'
-                                        - color: var(--yellow-color)
-                                          from: '12'
-                                          to: '35'
-                                        - color: var(--orange-color)
-                                          from: '35'
-                                          to: '50'
-                                        - color: var(--red-color)
-                                          from: '50'
-                                          to: '100'
-                                    - entity: sensor.airgradient_kitchen_pm_10_0
-                                      name: PM 10
-                                      min: 0
-                                      max: 100
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '12'
-                                        - color: var(--yellow-color)
-                                          from: '12'
-                                          to: '35'
-                                        - color: var(--orange-color)
-                                          from: '35'
-                                          to: '50'
-                                        - color: var(--red-color)
-                                          from: '50'
-                                          to: '100'
-                                    - entity: sensor.airgradient_kitchen_voc_index
-                                      name: VOC
-                                      min: 0
-                                      max: 500
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '150'
-                                        - color: var(--yellow-color)
-                                          from: '150'
-                                          to: '250'
-                                        - color: var(--orange-color)
-                                          from: '250'
-                                          to: '400'
-                                        - color: var(--red-color)
-                                          from: '400'
-                                          to: '500'
-                                    - entity: sensor.airgradient_kitchen_nox_index
-                                      name: NOx
-                                      min: 0
-                                      max: 500
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '30'
-                                        - color: var(--yellow-color)
-                                          from: '30'
-                                          to: '150'
-                                        - color: var(--orange-color)
-                                          from: '150'
-                                          to: '300'
-                                        - color: var(--red-color)
-                                          from: '300'
-                                          to: '500'
-                            - type: vertical-stack
-                              cards:
-                                - type: custom:mushroom-title-card
-                                  title: Outside
-                                - type: custom:mushroom-template-card
-                                  entity: sensor.airnow_air_quality_index
-                                  primary: 'AQI: {{ state_attr(entity, "description")
-                                    }}'
-                                  multiline_secondary: true
-                                  fill_container: false
-                                  tap_action:
-                                    action: none
-                                  hold_action:
-                                    action: none
-                                  double_tap_action:
-                                    action: none
-                                - type: custom:bar-card
-                                  card_mod:
-                                    style: "bar-card-name,\nbar-card-value {\n  font-weight:\
-                                      \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                                      }\n"
-                                  animation:
-                                    state: 'on'
-                                  positions:
-                                    indicator: inside
-                                  entities:
-                                    - entity: sensor.airnow_air_quality_index
-                                      name: AQI
-                                      min: 0
-                                      max: 400
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '50'
-                                        - color: var(--yellow-color)
-                                          from: '50'
-                                          to: '100'
-                                        - color: var(--orange-color)
-                                          from: '100'
-                                          to: '150'
-                                        - color: var(--red-color)
-                                          from: '150'
-                                          to: '200'
-                                        - color: var(--purple-color)
-                                          from: '200'
-                                          to: '300'
-                                        - color: var(--pink-color)
-                                          from: '300'
-                                          to: '400'
-                                    - entity: sensor.airnow_pm2_5
-                                      name: PM 2.5
-                                      min: 0
-                                      max: 100
-                                      severity:
-                                        - color: var(--green-color)
-                                          from: '0'
-                                          to: '12'
-                                        - color: var(--yellow-color)
-                                          from: '12'
-                                          to: '35'
-                                        - color: var(--orange-color)
-                                          from: '35'
-                                          to: '50'
-                                        - color: var(--red-color)
-                                          from: '50'
-                                          to: '100'
-                            - type: custom:mini-graph-card
-                              name: CO2 Levels
-                              icon: mdi:molecule-co2
-                              show:
-                                labels: false
-                              entities:
-                                - entity: sensor.airgradient_kitchen_co2
-                                  name: Kitchen
-                                  color: var(--amber-color)
-                                  show_state: true
-                                  show_points: false
-                                - entity: sensor.apollo_msr_1_office_co2
-                                  name: Office
-                                  color: var(--blue-color)
-                                  show_state: true
-                                  show_points: false
-                              line_width: 3
-                              font_size: 75
-                              hours_to_show: 30
-                              points_per_hour: 12
-                              update_interval: 300
-                              animate: true
+                    action: navigate
+                    navigation_path: '#air-quality'
                 - type: custom:mushroom-template-badge
                   entity: sensor.allergy_index_today
                   label: Allergy
@@ -2874,143 +2684,8 @@ views:
                     {% elif level >= 4.9 %}\n  yellow\n{% elif level >= 2.5 %}\n \
                     \ lime\n{% else %}\n  green\n{% endif %}"
                   tap_action:
-                    action: fire-dom-event
-                    browser_mod:
-                      service: browser_mod.popup
-                      data:
-                        title: Allergy
-                        content:
-                          type: custom:vertical-stack-in-card
-                          card_mod:
-                            style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                              \ 0;\n}\n"
-                          cards:
-                            - type: custom:mushroom-title-card
-                              title: Allergens
-                            - type: custom:mushroom-template-card
-                              entity: sensor.allergy_index_today
-                              secondary: "{%- set ns = namespace(allergens=[]) -%}\
-                                \ {%- for id in range(1, 4) -%}\n  {%- set attr =\
-                                \ \"allergen_name_\" ~ id -%}\n  {%- if not state_attr(entity,\
-                                \ attr) in [\"unknown\", \"unavailable\", None] -%}\n\
-                                \    {%- set ns.allergens = ns.allergens + [ state_attr(entity,\
-                                \ attr) ] -%}\n  {%- endif -%}\n{%- endfor -%} {{\
-                                \ ns.allergens | join(\", \") }}\n{{ state_attr(\"\
-                                sensor.allergy_index_forecasted_average\", \"outlook\"\
-                                ) | default(\"\", true) }}"
-                              multiline_secondary: true
-                              tap_action:
-                                action: none
-                              hold_action:
-                                action: none
-                              double_tap_action:
-                                action: none
-                              card_mod:
-                                style: "ha-card {\n  /* Make card non-responsive to\
-                                  \ select and pointer */\n  user-select: none;\n\
-                                  \  pointer-events: none;\n}\n"
-                            - type: custom:mushroom-title-card
-                              title: Forecast
-                              subtitle: Allergy
-                            - type: custom:bar-card
-                              card_mod:
-                                style: "bar-card-name,\nbar-card-value {\n  font-weight:\
-                                  \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                                  }\n"
-                              entities:
-                                - entity: sensor.allergy_index_today
-                                - entity: sensor.allergy_index_tomorrow
-                                - entity: sensor.allergy_index_forecasted_average
-                              min: 0
-                              max: 12
-                              decimal: 1
-                              animation:
-                                state: 'on'
-                              positions:
-                                indicator: inside
-                              severity:
-                                - color: var(--green-color)
-                                  from: '0'
-                                  to: '2.5'
-                                - color: var(--light-green-color)
-                                  from: '2.5'
-                                  to: '4.9'
-                                - color: var(--amber-color)
-                                  from: '4.9'
-                                  to: '7.3'
-                                - color: var(--orange-color)
-                                  from: '7.3'
-                                  to: '9.7'
-                                - color: var(--red-color)
-                                  from: '9.7'
-                                  to: '12'
-                            - type: custom:mushroom-title-card
-                              subtitle: Asthma
-                            - type: custom:bar-card
-                              card_mod:
-                                style: "bar-card-name,\nbar-card-value {\n  font-weight:\
-                                  \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                                  }\n"
-                              entities:
-                                - entity: sensor.asthma_index_today
-                                - entity: sensor.asthma_index_tomorrow
-                                - entity: sensor.asthma_index_forecasted_average
-                              min: 0
-                              max: 12
-                              decimal: 1
-                              animation:
-                                state: 'on'
-                              positions:
-                                indicator: inside
-                              severity:
-                                - color: var(--green-color)
-                                  from: '0'
-                                  to: '2.5'
-                                - color: var(--light-green-color)
-                                  from: '2.5'
-                                  to: '4.9'
-                                - color: var(--amber-color)
-                                  from: '4.9'
-                                  to: '7.3'
-                                - color: var(--orange-color)
-                                  from: '7.3'
-                                  to: '9.7'
-                                - color: var(--red-color)
-                                  from: '9.7'
-                                  to: '12'
-                            - type: custom:mushroom-title-card
-                              subtitle: Cold
-                            - type: custom:bar-card
-                              card_mod:
-                                style: "bar-card-name,\nbar-card-value {\n  font-weight:\
-                                  \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                                  }\n"
-                              entities:
-                                - entity: sensor.cold_flu_index_today
-                                - entity: sensor.cold_flu_forecasted_average
-                              min: 0
-                              max: 12
-                              decimal: 1
-                              animation:
-                                state: 'on'
-                              positions:
-                                indicator: inside
-                              severity:
-                                - color: var(--green-color)
-                                  from: '0'
-                                  to: '2.5'
-                                - color: var(--light-green-color)
-                                  from: '2.5'
-                                  to: '4.9'
-                                - color: var(--amber-color)
-                                  from: '4.9'
-                                  to: '7.3'
-                                - color: var(--orange-color)
-                                  from: '7.3'
-                                  to: '9.7'
-                                - color: var(--red-color)
-                                  from: '9.7'
-                                  to: '12'
+                    action: navigate
+                    navigation_path: '#allergy'
                 - type: custom:mushroom-template-badge
                   entity: sensor.garbage_collection
                   label: Garbage
@@ -3553,9 +3228,9 @@ views:
                   entity: fan.living_room_ceiling
                   icon: mdi:fan
                   icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
-                    \ 'percentage') %}\n  {{ {\n    33: \"green\",\n    66: \"yellow\"\
-                    ,\n    100: \"orange\"\n  }[speed] }}\n{% else %}\n  disabled\n\
-                    {% endif %}"
+                    \ 'percentage') %}\n  {{ {\n    33: \"green\",\n    66: \"orange\"\
+                    ,\n    100: \"red\"\n  }[speed] }}\n{% else %}\n  disabled\n{%\
+                    \ endif %}"
                   card_mod:
                     style: ".content {\n  {% if is_state(config.entity, 'on') %}\n\
                       \    {% set speed = state_attr(config.entity, 'percentage')\
@@ -4139,9 +3814,9 @@ views:
                   entity: fan.main_bedroom_ceiling
                   icon: mdi:fan
                   icon_color: "{% if is_state(entity, 'on') %}\n  {% set speed = state_attr(entity,\
-                    \ 'percentage') %}\n  {{ {\n    33: \"green\",\n    66: \"yellow\"\
-                    ,\n    100: \"orange\"\n  }[speed] }}\n{% else %}\n  disabled\n\
-                    {% endif %}"
+                    \ 'percentage') %}\n  {{ {\n    33: \"green\",\n    66: \"orange\"\
+                    ,\n    100: \"red\"\n  }[speed] }}\n{% else %}\n  disabled\n{%\
+                    \ endif %}"
                   card_mod:
                     style: ".content {\n  {% if is_state(config.entity, 'on') %}\n\
                       \    {% set speed = state_attr(config.entity, 'percentage')\
@@ -4691,7 +4366,8 @@ views:
                         target:
                           entity_id: script.ascent_remote_start
                       card_mod:
-                        style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                        style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                          \ none;\n}\n"
                     - type: custom:timer-bar-card
                       filter: true
                       invert: true
@@ -4885,129 +4561,183 @@ views:
                     secondary_info: none
                     icon_color: pink
                     card_mod:
-                      style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-              - title: ''
-                image_url: /local/logos/ascent.png
-                charging_image_url: ''
-                image_url_type: image
-                charging_image_url_type: none
-                vehicle_type: Fuel
-                unit_type: mi
-                level_entity: ''
-                range_entity: ''
-                charging_status_entity: ''
-                location_entity: device_tracker.ascent
-                mileage_entity: sensor.ascent_odometer
-                show_level: true
-                show_range: true
+                      style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                        \ none;\n}\n"
+              - vehicle_image_type: url
+                status_image_type: none
+                layout_type: single
+                formatted_entities: true
                 show_location: true
                 show_mileage: true
                 show_car_state: false
-                show_charge_limit: true
-                icon_grid_entities:
-                  - row-separator
-                  - binary_sensor.ascent_trouble
-                  - binary_sensor.ascent_doors
-                  - binary_sensor.ascent_windows
-                custom_icons:
-                  binary_sensor.ascent_trouble:
-                    active: mdi:alert
-                    inactive: no-icon
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--red-color)
-                  binary_sensor.ascent_doors:
-                    active: mdi:car-door
-                    inactive: mdi:car-door
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--red-color)
-                  binary_sensor.ascent_windows:
-                    active: mdi:window-open
-                    inactive: mdi:window-closed
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--red-color)
-                  device_tracker.ascent:
-                    active: mdi:map
-                    inactive: mdi:map
-                icon_interactions:
-                  binary_sensor.ascent_trouble:
-                    type: more-info
-                  binary_sensor.ascent_doors:
-                    type: more-info
-                  binary_sensor.ascent_windows:
-                    type: more-info
-                icon_styles: {}
-                icon_labels:
-                  sensor.ascent_avg_fuel_consumption: right
-                hybrid_display_order: fuel_first
-                car_state_entity: ''
-                charge_limit_entity: ''
-                icon_size: 24
-                icon_gap: 12
-                showEntityInformation: true
-                carStateTextColor: var(--primary-text-color)
-                rangeTextColor: var(--primary-text-color)
-                percentageTextColor: var(--primary-text-color)
-                icon_sizes: {}
-                engine_on_entity: binary_sensor.ascent_ignition
-                row_separator_color: Default
-                row_separator_height: 1
-                row_separators:
-                  '0':
-                    color: transparent
-                    height: 1
-                    icon_gap: 20
-                    horizontalAlignment: center
-                    verticalAlignment: middle
-                  '6':
-                    color: transparent
-                    height: 1
-                    icon_gap: 20
-                    horizontalAlignment: center
-                    verticalAlignment: middle
-                iconActiveColor: var(--primary-color)
-                iconInactiveColor: var(--primary-text-color)
-                useFormattedEntities: true
-                mainImageHeight: 400px
-                chargingImageHeight: 140px
-                showTitle: false
-                layoutType: single
-                useBarGradient: true
-                barGradientStops:
-                  - percentage: 0
-                    color: '#ff0000'
-                  - percentage: 100
-                    color: '#00ff00'
-                cardTitleColor: var(--title-color)
-                cardBackgroundColor: var(--ha-card-background,var(--card-background-color,#fff))
-                barBackgroundColor: var(--primary-background-color)
-                barBorderColor: var(--primary-background-color)
-                barFillColor: var(--accent-color)
-                limitIndicatorColor: var(--primary-text-color)
-                infoTextColor: var(--secondary-text-color)
-                show_engine_animation: false
-                show_charging_animation: false
-                show_charging_status: true
-                show_engine_on: true
-                engine_on_image_url_type: none
+                sections_order:
+                  - title
+                  - info
+                  - image
+                  - icon_row_yl7u49j
+                  - bar_0
+                bars:
+                  - left_title: Fuel
+                    left_entity: sensor.ascent_fuel_level
+                    right_title: Range
+                    right_entity: sensor.ascent_range
+                    bar_color: 'var(--primary-color, #3498db)'
+                    background_color: 'var(--primary-background-color, #121212)'
+                    border_color: 'var(--primary-background-color, #555555)'
+                    left_title_color: 'var(--secondary-text-color, #999999)'
+                    left_text_color: 'var(--primary-text-color, #ffffff)'
+                    right_title_color: 'var(--secondary-text-color, #999999)'
+                    right_text_color: 'var(--primary-text-color, #ffffff)'
+                    limit_indicator_color: 'var(--error-color, #ff0000)'
+                    left_title_size: 14
+                    left_text_size: 14
+                    right_title_size: 14
+                    right_text_size: 14
+                    bar_size: thick
+                    bar_radius: rounded-square
+                    show_left: true
+                    show_right: true
+                    alignment: space-between
+                    width: '100'
+                    use_gradient: true
+                    gradient_display_mode: value_based
+                    gradient_stops:
+                      - id: '1'
+                        position: 0
+                        color: '#ff0000'
+                      - id: '2'
+                        position: 100
+                        color: '#00ff00'
+                    animation_entity: binary_sensor.ascent_ignition
+                    animation_state: 'on'
+                    animation_type: charging-lines
+                    action_animation_entity: ''
+                    action_animation_state: ''
+                    action_animation: none
+                    entity: sensor.ascent_fuel_level
+                icon_rows:
+                  - id: yl7u49j
+                    width: '100'
+                    alignment: center
+                    spacing: small
+                    icons:
+                      - entity: binary_sensor.ascent_trouble
+                        icon_inactive: mdi:alert
+                        icon_active: mdi:alert
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--red-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: false
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.ascent_doors
+                        icon_inactive: mdi:car-door
+                        icon_active: mdi:car-door
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--red-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.ascent_windows
+                        icon_inactive: mdi:window-closed
+                        icon_active: mdi:window-open
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--red-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
                 type: custom:ultra-vehicle-card
-                battery_level_entity: ''
-                battery_range_entity: ''
-                fuel_level_entity: sensor.ascent_fuel_level
-                fuel_range_entity: sensor.ascent_range
-                show_battery: true
-                show_battery_range: true
-                show_fuel: true
-                show_fuel_range: true
-                engine_on_image_url: ''
-                engine_on_image_entity: ''
-                fuel_range_url: ''
-                engine_on_url: ''
-                location_url: ''
-                mileage_url: ''
-                fuel_level_url: ''
+                title_alignment: center
+                title_size: 24
+                vehicle_image_width: 100
+                action_image_width: 100
+                show_units: true
+                action_image_type: none
+                location_entity: device_tracker.ascent
+                mileage_entity: sensor.ascent_odometer
+                vehicle_image: /local/logos/ascent.png
+                vehicle_image_crop:
+                  top: -100
+                  right: 0
+                  bottom: -100
+                  left: 0
               - type: custom:expander-card
                 gap: 0em
                 padding: 0em
@@ -5023,6 +4753,9 @@ views:
                       heading: Gas Prices
                       heading_style: title
                     - type: markdown
+                      card_mod:
+                        style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                          \ none;\n}\n"
                       content: "{%- set level = states('sensor.ascent_fuel_level')\
                         \ | float(100) -%} {%- set capacity = 19.3 -%} {%- set gal_remain\
                         \ = (100 - level) / 100 * capacity -%} {% set stations = {\n\
@@ -5181,7 +4914,8 @@ views:
                         target:
                           entity_id: script.kona_remote_start
                       card_mod:
-                        style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                        style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                          \ none;\n}\n"
                     - type: custom:timer-bar-card
                       filter: true
                       invert: true
@@ -5329,6 +5063,9 @@ views:
                     features:
                       - type: toggle
                     hide_state: true
+                    card_mod:
+                      style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                        \ none;\n}\n"
                   - type: tile
                     entity: input_number.kona_temperature_set
                     name: Temperature
@@ -5337,6 +5074,9 @@ views:
                       - style: buttons
                         type: numeric-input
                     hide_state: true
+                    card_mod:
+                      style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                        \ none;\n}\n"
                   - type: grid
                     columns: 2
                     square: false
@@ -5346,156 +5086,295 @@ views:
                         name: Defroster
                         features:
                           - type: toggle
+                        card_mod:
+                          style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                            \ none;\n}\n"
                       - type: tile
                         entity: input_boolean.kona_seat_heat
                         name: Heated Seats
                         color: deep-orange
                         features:
                           - type: toggle
-              - title: ''
-                image_url: /local/logos/kona.png
-                charging_image_url: ''
-                image_url_type: image
-                charging_image_url_type: none
-                vehicle_type: Fuel
-                unit_type: mi
-                level_entity: ''
-                range_entity: ''
-                charging_status_entity: ''
-                location_entity: device_tracker.kona_location
-                mileage_entity: sensor.kona_odometer
-                show_level: true
-                show_range: true
+                        card_mod:
+                          style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                            \ none;\n}\n"
+              - vehicle_image_type: url
+                status_image_type: none
+                layout_type: single
+                formatted_entities: true
                 show_location: true
                 show_mileage: true
                 show_car_state: false
-                show_charge_limit: true
-                icon_grid_entities:
-                  - row-separator
-                  - binary_sensor.kona_doors
-                  - binary_sensor.kona_windows
-                  - binary_sensor.kona_defrost
-                  - binary_sensor.kona_back_window_heater
-                  - binary_sensor.kona_air_conditioner
-                custom_icons:
-                  binary_sensor.kona_doors:
-                    active: mdi:car-door
-                    inactive: mdi:car-door
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--red-color)
-                  binary_sensor.kona_problems:
-                    active: mdi:alert
-                    inactive: no-icon
-                  binary_sensor.kona_windows:
-                    active: mdi:window-open
-                    inactive: mdi:window-closed
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--red-color)
-                  device_tracker.kona_location:
-                    active: mdi:map
-                    inactive: mdi:map
-                    inactiveColor: '#e4e4e7'
-                  binary_sensor.kona_defrost:
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--orange-color)
-                  binary_sensor.kona_back_window_heater:
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--orange-color)
-                  binary_sensor.kona_air_conditioner:
-                    inactiveState: default
-                    activeState: default
-                    activeColor: var(--light-blue-color)
-                icon_interactions:
-                  binary_sensor.kona_doors:
-                    type: more-info
-                  sensor.kona_car_battery_level:
-                    type: more-info
-                  binary_sensor.kona_windows:
-                    type: more-info
-                icon_styles:
-                  binary_sensor.kona_windows: icon
-                icon_labels:
-                  sensor.kona_car_battery_level: right
-                hybrid_display_order: fuel_first
-                car_state_entity: ''
-                charge_limit_entity: ''
-                icon_size: 24
-                icon_gap: 12
-                showEntityInformation: true
-                carStateTextColor: var(--primary-text-color)
-                rangeTextColor: var(--primary-text-color)
-                percentageTextColor: var(--primary-text-color)
-                icon_sizes: {}
-                engine_on_entity: binary_sensor.kona_engine
-                row_separator_color: Default
-                row_separator_height: 1
-                row_separators:
-                  '0':
-                    color: transparent
-                    height: 1
-                    icon_gap: 20
-                    horizontalAlignment: center
-                    verticalAlignment: middle
-                  '7':
-                    color: transparent
-                  '8':
-                    color: transparent
-                    height: 1
-                    icon_gap: 20
-                    horizontalAlignment: center
-                    verticalAlignment: middle
-                  '9':
-                    color: transparent
-                    height: 1
-                    icon_gap: 20
-                    horizontalAlignment: center
-                    verticalAlignment: middle
-                iconActiveColor: var(--primary-color)
-                iconInactiveColor: var(--primary-text-color)
-                useFormattedEntities: true
-                mainImageHeight: 400px
-                chargingImageHeight: 140px
-                showTitle: false
-                layoutType: single
-                useBarGradient: true
-                barGradientStops:
-                  - percentage: 0
-                    color: '#ff0000'
-                  - percentage: 100
-                    color: '#00ff00'
-                cardTitleColor: var(--title-color)
-                cardBackgroundColor: var(--ha-card-background,var(--card-background-color,#fff))
-                barBackgroundColor: var(--primary-background-color)
-                barBorderColor: var(--primary-background-color)
-                barFillColor: var(--accent-color)
-                limitIndicatorColor: var(--primary-text-color)
-                infoTextColor: var(--secondary-text-color)
-                show_engine_animation: false
-                show_charging_animation: false
-                show_charging_status: true
-                show_engine_on: true
-                engine_on_image_url_type: none
+                sections_order:
+                  - title
+                  - info
+                  - image
+                  - icon_row_b3tqh8a
+                  - bar_0
+                bars:
+                  - left_title: Fuel
+                    left_entity: sensor.kona_fuel_level
+                    right_title: Range
+                    right_entity: sensor.kona_total_driving_range
+                    bar_color: 'var(--primary-color, #3498db)'
+                    background_color: 'var(--primary-background-color, #121212)'
+                    border_color: 'var(--primary-background-color, #555555)'
+                    left_title_color: 'var(--secondary-text-color, #999999)'
+                    left_text_color: 'var(--primary-text-color, #ffffff)'
+                    right_title_color: 'var(--secondary-text-color, #999999)'
+                    right_text_color: 'var(--primary-text-color, #ffffff)'
+                    limit_indicator_color: 'var(--error-color, #ff0000)'
+                    left_title_size: 14
+                    left_text_size: 14
+                    right_title_size: 14
+                    right_text_size: 14
+                    bar_size: thick
+                    bar_radius: rounded-square
+                    show_left: true
+                    show_right: true
+                    alignment: space-between
+                    width: '100'
+                    use_gradient: true
+                    gradient_display_mode: value_based
+                    gradient_stops:
+                      - id: '1'
+                        position: 0
+                        color: '#ff0000'
+                      - id: '2'
+                        position: 100
+                        color: '#00ff00'
+                    animation_entity: binary_sensor.kona_engine
+                    animation_state: 'on'
+                    animation_type: charging-lines
+                    action_animation_entity: ''
+                    action_animation_state: ''
+                    action_animation: none
+                    entity: sensor.kona_fuel_level
+                icon_rows:
+                  - id: b3tqh8a
+                    width: '100'
+                    alignment: center
+                    spacing: small
+                    icons:
+                      - entity: binary_sensor.kona_problems
+                        icon_inactive: mdi:alert
+                        icon_active: mdi:alert
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--red-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: false
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.kona_doors
+                        icon_inactive: mdi:car-door
+                        icon_active: mdi:car-door
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.kona_windows
+                        icon_inactive: mdi:window-closed
+                        icon_active: mdi:window-open
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.kona_defrost
+                        icon_inactive: mdi:car-defrost-front
+                        icon_active: mdi:car-defrost-front
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.kona_back_window_heater
+                        icon_inactive: mdi:car-defrost-rear
+                        icon_active: mdi:car-defrost-rear
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
+                      - entity: binary_sensor.kona_air_conditioner
+                        icon_inactive: mdi:air-conditioner
+                        icon_active: mdi:air-conditioner
+                        color_inactive: var(--secondary-text-color)
+                        color_active: var(--primary-color)
+                        name_color_inactive: var(--primary-text-color)
+                        name_color_active: var(--primary-text-color)
+                        state_color_inactive: var(--secondary-text-color)
+                        state_color_active: var(--primary-text-color)
+                        inactive_state: 'off'
+                        active_state: 'on'
+                        inactive_template_mode: false
+                        active_template_mode: false
+                        inactive_template: ''
+                        active_template: ''
+                        active_state_text: ''
+                        inactive_state_text: ''
+                        show_state: false
+                        show_name: false
+                        show_units: true
+                        show_icon_active: true
+                        show_icon_inactive: true
+                        name: ''
+                        on_click_action: more-info
+                        text_position: bottom
+                        vertical_alignment: center
+                        text_alignment: center
+                        icon_size: 24
+                        text_size: 14
+                        icon_background: none
+                        icon_background_color: var(--secondary-background-color)
+                        container_background: none
+                        container_background_color: var(--secondary-background-color)
+                        draggable: true
                 type: custom:ultra-vehicle-card
-                battery_level_entity: ''
-                battery_range_entity: ''
-                fuel_level_entity: sensor.kona_fuel_level
-                fuel_range_entity: sensor.kona_fuel_driving_range
-                show_battery: true
-                show_battery_range: true
-                show_fuel: true
-                show_fuel_range: true
-                engine_on_image_url: ''
-                engine_on_image_entity: ''
-                image_entity: ''
-                fuel_level_url: ''
-                fuel_range_url: ''
-                engine_on_url: ''
-                location_url: ''
-                mileage_url: ''
+                title_alignment: center
+                title_size: 24
+                vehicle_image_width: 100
+                action_image_width: 100
+                show_units: true
+                action_image_type: none
+                location_entity: device_tracker.kona_location
+                mileage_entity: sensor.kona_odometer
+                vehicle_image_crop:
+                  top: -100
+                  right: 0
+                  bottom: -100
+                  left: 0
+                vehicle_image: /local/logos/kona.png
               - type: custom:expander-card
                 gap: 0em
                 padding: 0em
@@ -5511,6 +5390,9 @@ views:
                       heading: Gas Prices
                       heading_style: title
                     - type: markdown
+                      card_mod:
+                        style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                          \ none;\n}\n"
                       content: "{%- set level = states('sensor.kona_fuel_level') |\
                         \ float(100) -%} {%- set capacity = 13.2 -%} {%- set gal_remain\
                         \ = (100 - level) / 100 * capacity -%} {% set stations = {\n\
@@ -5584,145 +5466,315 @@ views:
                       \ #e0e0e0)) !important;\n}\n.leaflet-control-zoom {\n  /* Remove\
                       \ extra margin */\n  margin: 0px !important;\n\n  /* Remove\
                       \ zoom control border */\n  border: none !important;\n}\n"
+      - type: grid
+        cards:
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
                 card_type: pop-up
-                hash: '#updates'
-                button_type: name
-                name: Updates
-                icon: mdi:package-up
-                margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
-                  - more_info_popup
-                more_info_popup:
-                  height: 70vh
-              - type: custom:auto-entities
-                filter:
-                  include:
-                    - group: sensor.updates
-                      options:
-                        type: tile
-                        state_content:
-                          - install_status
-                          - installed_version
-                          - latest_version
-                        features:
-                          - type: update-actions
-                            backup: 'yes'
-                  exclude: []
-                card:
-                  type: custom:layout-card
-                  cards: []
-                  layout_type: masonry
-                sort:
-                  method: friendly_name
-              - type: custom:mushroom-chips-card
-                alignment: center
-                chips:
-                  - type: template
-                    content: Updates Page
-                    tap_action:
-                      action: navigate
-                      navigation_path: /config/updates
-                card_mod:
-                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
-                    \ rgba(var(--rgb-dark-grey), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
-                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
-                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
-                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
-                    \ rgba(var(--rgb-disabled), 0.2);\n}\n"
-          - type: vertical-stack
-            cards:
-              - type: custom:bubble-card
-                card_type: pop-up
-                hash: '#feeder-info'
+                hash: '#announce'
                 show_header: false
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
               - type: custom:bubble-card
                 card_type: separator
-                name: Cat Feeder
-              - type: custom:mushroom-chips-card
-                alignment: center
-                chips:
-                  - type: template
-                    content: Dispense Food
-                    icon: mdi:food-drumstick
-                    icon_color: green
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: perform-action
-                      perform_action: script.feeder_start
-                      target: {}
+                name: Announce
+                modules:
+                  - default
+              - type: heading
+                icon: mdi:gamepad-circle
+                heading: Family Room
+                heading_style: title
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: School
+                    icon: mdi:chair-school
+                    icon_tap_action:
+                      action: call-service
                       data:
-                        feeder: Cat Feeder
-                    card_mod:
-                      style: "ha-card {\n  /* Style Chip like Mushroom button */\n\
-                        \  --chip-background: rgba(var(--rgb-green), 0.2);\n  --chip-border-radius:\
-                        \ var(--mush-control-border-radius, 12px);\n  --chip-height:\
-                        \ var(--mush-control-height, 42px);\n  --chip-box-shadow:\
-                        \ none;\n  user-select: none;\n}\nha-card:active {\n  /* Add\
-                        \ effect to give feedback on button press */\n  --chip-background:\
-                        \ rgba(var(--rgb-green), 0.4);\n}\n"
-              - type: custom:mushroom-number-card
-                entity: number.cat_feeder_serving_size
-                name: Servings
-                icon: mdi:location-enter
-                secondary_info: none
-                layout: horizontal
-                display_mode: buttons
-                card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-              - type: markdown
-                title: Schedule
-                content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n{%-\
-                  \ set feedings = states(\"sensor.cat_feeder_schedule\") | replace(\"\
-                  '\", '\"') | from_json -%}\n{%- for feeding in feedings -%}\n  {{\
-                  \ feeding.size }} portions at {{ as_timestamp(today_at(feeding.hour\
-                  \ ~ \":\" ~ feeding.minute)) | timestamp_custom(\"%-I:%M %p\", True)\
-                  \ }}\n{% endfor -%}\n{%- endif -%}"
-                card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-              - type: custom:bar-card
-                card_mod:
-                  style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n\
-                    #states {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value\
-                    \ {\n  font-weight: 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
-                    }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
-                    }\n"
-                name: Food Level
-                entities:
-                  - entity: sensor.cat_feeder_food_level
-                animation:
-                  state: 'on'
-                positions:
-                  indicator: inside
-                  icon: inside
-                height: 24px
-                min: 0
-                max: 100
-                decimal: 1
-                severity:
-                  - color: var(--red-color)
-                    from: 0
-                    to: 10
-                  - color: var(--orange-color)
-                    from: 10
-                    to: 20
-                  - color: var(--amber-color)
-                    from: 20
-                    to: 40
-                  - color: var(--light-green-color)
-                    from: 40
-                    to: 70
-                  - color: var(--green-color)
-                    from: 70
-                    to: 100
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: Time to go to School!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Snack
+                    icon: mdi:apple
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: It's snack time!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Lunch
+                    icon: mdi:food-fork-drink
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: Hey, come get some lunch.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Dinner
+                    icon: mdi:food
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: Head up-stairs, it's time for dinner. Don't forget
+                          to wash your hands!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Breakfast
+                    icon: mdi:egg-fried
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: It's time for breakfast. Wash your hands!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Bed Time
+                    icon: mdi:cookie-edit
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: It's time for bed.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Ethan up-stairs
+                    icon: mdi:robot
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: Hey Ethan, come up-stairs please.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Emma up-stairs
+                    icon: mdi:unicorn-variant
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: Hey Emma, come up-stairs please.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Kids up-stairs
+                    icon: mdi:cookie-edit
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_family_room_speaker
+                        volume: 80
+                        message: Hey kids, come up-stairs please.
+                      target: {}
+                      service: script.media_play
+              - type: heading
+                icon: mdi:sofa-single
+                heading: Living Room
+                heading_style: title
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: School
+                    icon: mdi:chair-school
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: Time to go to School!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Snack
+                    icon: mdi:apple
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: It's snack time!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Lunch
+                    icon: mdi:food-fork-drink
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: Hey, come get some lunch.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Dinner
+                    icon: mdi:food
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: It's time for dinner. Don't forget to wash your hands!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Breakfast
+                    icon: mdi:egg-fried
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: It's time for breakfast. Wash your hands!
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Bed Time
+                    icon: mdi:cookie-edit
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: It's time for bed.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Ethan down-stairs
+                    icon: mdi:robot
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: Hey Ethan, come down-stairs please.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Emma down-stairs
+                    icon: mdi:unicorn-variant
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: Hey Emma, come down-stairs please.
+                      target: {}
+                      service: script.media_play
+                  - type: tile
+                    entity: script.media_play
+                    hide_state: true
+                    name: Kids down-stairs
+                    icon: mdi:cookie-edit
+                    icon_tap_action:
+                      action: call-service
+                      data:
+                        media_player: media_player.cast_living_room_speaker
+                        volume: 90
+                        message: Hey kids, come down-stairs please.
+                      target: {}
+                      service: script.media_play
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                modules:
+                  - default
+                hash: '#meater'
+                show_header: false
+                margin_top_desktop: 25vh
+                width_desktop: 40vw
+                margin_top_mobile: calc(0px - var(--header-height))
+              - type: custom:bubble-card
+                card_type: separator
+                name: Meater
+                modules:
+                  - default
+              - type: entity
+                entity: sensor.meater_probe_cook_name
+                name: Cooking
+                icon: mdi:food-steak
+              - square: false
+                columns: 2
+                type: grid
+                cards:
+                  - type: entity
+                    entity: sensor.meater_probe_cook_time_elapsed
+                    name: Elapsed Time
+                  - type: entity
+                    entity: sensor.meater_probe_cook_time_remaining
+                    name: Remaining Time
+              - type: custom:mushroom-title-card
+                subtitle: Temperature
               - type: custom:apexcharts-card
+                card_mod:
+                  style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow:\
+                    \ none;\n  margin-bottom: -15px;\n}\n.apexcharts-tooltip-series-group\
+                    \ {\n  padding-top: 0px !important;\n  padding-bottom: 0px !important;\n\
+                    \  margin-top: 0px !important;\n  margin-bottom: 0px !important;\n\
+                    \  display: none;\n  text-align: left;\n  justify-content: left;\n\
+                    \  align-items: center;\n}\n"
                 apex_config:
                   chart:
                     foreColor: '#7B7B7B'
@@ -5733,62 +5785,45 @@ views:
                   xaxis:
                     tooltip:
                       enabled: false
-                experimental:
-                  color_threshold: true
                 header:
-                  show: false
+                  show: true
+                  show_states: true
+                  colorize_states: true
+                experimental:
+                  brush: true
                 all_series_config:
                   extend_to: now
-                  stroke_width: 2
-                  type: line
-                  group_by:
-                    func: min
-                    duration: 1hour
-                  color_threshold:
-                    - value: 0
-                      color: '#f44336'
-                    - value: 10
-                      color: '#ff9800'
-                    - value: 20
-                      color: '#ffc107'
-                    - value: 40
-                      color: '#8bc34a'
-                    - value: 70
-                      color: '#4caf50'
-                span:
-                  end: minute
-                graph_span: 10d
-                yaxis:
-                  - decimals: 0
-                    min: ~0
-                    max: ~100
-                    apex_config:
-                      tickAmount: 4
-                      title:
-                        text: '%'
+                  float_precision: 2
+                  curve: stepline
+                brush:
+                  selection_span: 1h
+                  apex_config:
+                    chart:
+                      foreColor: '#7B7B7B'
+                      toolbar:
+                        show: false
+                    grid:
+                      borderColor: '#7B7B7B'
+                    xaxis:
+                      tooltip:
+                        enabled: false
                 series:
-                  - entity: sensor.cat_feeder_food_level
-                    name: Food Level
-                    color: rgb(158,158,158)
-                card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-              - type: custom:mushroom-template-card
-                entity: sensor.cat_feeder_total_weight
-                secondary: Press and hold to reset
-                primary: Reset Food Level
-                icon: mdi:progress-upload
-                icon_color: green
-                tap_action:
-                  action: none
-                hold_action:
-                  action: call-service
-                  service: utility_meter.calibrate
-                  target:
-                    entity_id: sensor.cat_feeder_total_weight
-                  data:
-                    value: '0'
-                card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                  - entity: sensor.meater_probe_internal
+                    name: Internal
+                    stroke_width: 4
+                    color: rgb(33,150,243)
+                    show:
+                      in_brush: true
+                  - entity: sensor.meater_probe_ambient
+                    name: Ambient
+                    stroke_width: 4
+                    color: rgb(139,195,74)
+                  - entity: sensor.meater_probe_cook_target_temp
+                    name: Target
+                    type: area
+                    opacity: 0.2
+                    stroke_width: 1
+                    color: rgb(233,30,99)
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -6156,6 +6191,653 @@ views:
                         \    ha-card:hover {\n      background: color-mix(in srgb,\
                         \ ${variables.color} 4%, var(--card-background-color) 100%)\
                         \ !important;\n    }\n  }\n  `\n  ]]]\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#feeder-info'
+                show_header: false
+                margin_top_desktop: 25vh
+                width_desktop: 40vw
+                margin_top_mobile: calc(0px - var(--header-height))
+              - type: custom:bubble-card
+                card_type: separator
+                name: Cat Feeder
+              - type: custom:mushroom-chips-card
+                alignment: center
+                chips:
+                  - type: template
+                    content: Dispense Food
+                    icon: mdi:food-drumstick
+                    icon_color: green
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: perform-action
+                      perform_action: script.feeder_start
+                      target: {}
+                      data:
+                        feeder: Cat Feeder
+                    card_mod:
+                      style: "ha-card {\n  /* Style Chip like Mushroom button */\n\
+                        \  --chip-background: rgba(var(--rgb-green), 0.2);\n  --chip-border-radius:\
+                        \ var(--mush-control-border-radius, 12px);\n  --chip-height:\
+                        \ var(--mush-control-height, 42px);\n  --chip-box-shadow:\
+                        \ none;\n  user-select: none;\n}\nha-card:active {\n  /* Add\
+                        \ effect to give feedback on button press */\n  --chip-background:\
+                        \ rgba(var(--rgb-green), 0.4);\n}\n"
+              - type: custom:mushroom-number-card
+                entity: number.cat_feeder_serving_size
+                name: Servings
+                icon: mdi:location-enter
+                secondary_info: none
+                layout: horizontal
+                display_mode: buttons
+                card_mod:
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+              - type: markdown
+                title: Schedule
+                content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n{%-\
+                  \ set feedings = states(\"sensor.cat_feeder_schedule\") | replace(\"\
+                  '\", '\"') | from_json -%}\n{%- for feeding in feedings -%}\n  {{\
+                  \ feeding.size }} portions at {{ as_timestamp(today_at(feeding.hour\
+                  \ ~ \":\" ~ feeding.minute)) | timestamp_custom(\"%-I:%M %p\", True)\
+                  \ }}\n{% endfor -%}\n{%- endif -%}"
+                card_mod:
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+              - type: custom:bar-card
+                card_mod:
+                  style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n\
+                    #states {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value\
+                    \ {\n  font-weight: 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                    }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
+                    }\n"
+                name: Food Level
+                entities:
+                  - entity: sensor.cat_feeder_food_level
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                  icon: inside
+                height: 24px
+                min: 0
+                max: 100
+                decimal: 1
+                severity:
+                  - color: var(--red-color)
+                    from: 0
+                    to: 10
+                  - color: var(--orange-color)
+                    from: 10
+                    to: 20
+                  - color: var(--amber-color)
+                    from: 20
+                    to: 40
+                  - color: var(--light-green-color)
+                    from: 40
+                    to: 70
+                  - color: var(--green-color)
+                    from: 70
+                    to: 100
+              - type: custom:apexcharts-card
+                apex_config:
+                  chart:
+                    foreColor: '#7B7B7B'
+                    toolbar:
+                      show: false
+                  grid:
+                    borderColor: '#7B7B7B'
+                  xaxis:
+                    tooltip:
+                      enabled: false
+                experimental:
+                  color_threshold: true
+                header:
+                  show: false
+                all_series_config:
+                  extend_to: now
+                  stroke_width: 2
+                  type: line
+                  group_by:
+                    func: min
+                    duration: 1hour
+                  color_threshold:
+                    - value: 0
+                      color: '#f44336'
+                    - value: 10
+                      color: '#ff9800'
+                    - value: 20
+                      color: '#ffc107'
+                    - value: 40
+                      color: '#8bc34a'
+                    - value: 70
+                      color: '#4caf50'
+                span:
+                  end: minute
+                graph_span: 10d
+                yaxis:
+                  - decimals: 0
+                    min: ~0
+                    max: ~100
+                    apex_config:
+                      tickAmount: 4
+                      title:
+                        text: '%'
+                series:
+                  - entity: sensor.cat_feeder_food_level
+                    name: Food Level
+                    color: rgb(158,158,158)
+                card_mod:
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+              - type: custom:mushroom-template-card
+                entity: sensor.cat_feeder_total_weight
+                secondary: Press and hold to reset
+                primary: Reset Food Level
+                icon: mdi:progress-upload
+                icon_color: green
+                tap_action:
+                  action: none
+                hold_action:
+                  action: call-service
+                  service: utility_meter.calibrate
+                  target:
+                    entity_id: sensor.cat_feeder_total_weight
+                  data:
+                    value: '0'
+                card_mod:
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#updates'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
+              - type: custom:bubble-card
+                card_type: separator
+                name: Updates
+                modules:
+                  - default
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - group: sensor.updates
+                      options:
+                        type: tile
+                        state_content:
+                          - install_status
+                          - installed_version
+                          - latest_version
+                        features:
+                          - type: update-actions
+                            backup: 'yes'
+                  exclude: []
+                card:
+                  type: custom:layout-card
+                  cards: []
+                  layout_type: masonry
+                sort:
+                  method: friendly_name
+              - type: custom:mushroom-chips-card
+                alignment: center
+                chips:
+                  - type: template
+                    content: Updates Page
+                    tap_action:
+                      action: navigate
+                      navigation_path: /config/updates
+                card_mod:
+                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
+                    \ rgba(var(--rgb-dark-grey), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
+                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
+                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
+                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
+                    \ rgba(var(--rgb-disabled), 0.2);\n}\n"
+      - type: grid
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                modules:
+                  - default
+                hash: '#air-quality'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
+              - type: custom:bubble-card
+                card_type: separator
+                name: Air Quality
+                modules:
+                  - default
+              - type: custom:mushroom-title-card
+                title: Inside
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                entities:
+                  - entity: sensor.airgradient_kitchen_pm_2_5_aqi
+                    name: AQI
+                    min: 0
+                    max: 400
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '50'
+                      - color: var(--yellow-color)
+                        from: '50'
+                        to: '100'
+                      - color: var(--orange-color)
+                        from: '100'
+                        to: '150'
+                      - color: var(--red-color)
+                        from: '150'
+                        to: '200'
+                      - color: var(--purple-color)
+                        from: '200'
+                        to: '300'
+                      - color: var(--pink-color)
+                        from: '300'
+                        to: '400'
+                  - entity: sensor.airgradient_kitchen_pm_2_5
+                    name: PM 2.5
+                    min: 0
+                    max: 100
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '12'
+                      - color: var(--yellow-color)
+                        from: '12'
+                        to: '35'
+                      - color: var(--orange-color)
+                        from: '35'
+                        to: '50'
+                      - color: var(--red-color)
+                        from: '50'
+                        to: '100'
+                  - entity: sensor.airgradient_kitchen_pm_10_0
+                    name: PM 10
+                    min: 0
+                    max: 100
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '12'
+                      - color: var(--yellow-color)
+                        from: '12'
+                        to: '35'
+                      - color: var(--orange-color)
+                        from: '35'
+                        to: '50'
+                      - color: var(--red-color)
+                        from: '50'
+                        to: '100'
+                  - entity: sensor.airgradient_kitchen_voc_index
+                    name: VOC
+                    min: 0
+                    max: 500
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '150'
+                      - color: var(--yellow-color)
+                        from: '150'
+                        to: '250'
+                      - color: var(--orange-color)
+                        from: '250'
+                        to: '400'
+                      - color: var(--red-color)
+                        from: '400'
+                        to: '500'
+                  - entity: sensor.airgradient_kitchen_nox_index
+                    name: NOx
+                    min: 0
+                    max: 500
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '30'
+                      - color: var(--yellow-color)
+                        from: '30'
+                        to: '150'
+                      - color: var(--orange-color)
+                        from: '150'
+                        to: '300'
+                      - color: var(--red-color)
+                        from: '300'
+                        to: '500'
+              - type: custom:mushroom-title-card
+                title: Outside
+              - type: custom:mushroom-template-card
+                entity: sensor.airnow_air_quality_index
+                primary: 'AQI: {{ state_attr(entity, "description") }}'
+                multiline_secondary: true
+                fill_container: false
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                icon: mdi:air-filter
+                icon_color: "{% if has_value(entity) %}\n  {% set level = states(entity)\
+                  \ | float(default=0) %}\n  {% if level >= 300 %}\n    red\n  {%\
+                  \ elif level >= 200 %}\n    purple\n  {% elif level >= 150 %}\n\
+                  \    pink\n  {% elif level >= 100 %}\n    orange\n  {% elif level\
+                  \ >= 50 %}\n    yellow\n  {% elif level >= 0 %}\n    green\n  {%\
+                  \ endif %}\n{% else %}\n  grey\n{% endif %}"
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                entities:
+                  - entity: sensor.airnow_air_quality_index
+                    name: AQI
+                    min: 0
+                    max: 400
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '50'
+                      - color: var(--yellow-color)
+                        from: '50'
+                        to: '100'
+                      - color: var(--orange-color)
+                        from: '100'
+                        to: '150'
+                      - color: var(--red-color)
+                        from: '150'
+                        to: '200'
+                      - color: var(--purple-color)
+                        from: '200'
+                        to: '300'
+                      - color: var(--pink-color)
+                        from: '300'
+                        to: '400'
+                  - entity: sensor.airnow_pm2_5
+                    name: PM 2.5
+                    min: 0
+                    max: 100
+                    severity:
+                      - color: var(--green-color)
+                        from: '0'
+                        to: '12'
+                      - color: var(--yellow-color)
+                        from: '12'
+                        to: '35'
+                      - color: var(--orange-color)
+                        from: '35'
+                        to: '50'
+                      - color: var(--red-color)
+                        from: '50'
+                        to: '100'
+              - type: custom:mini-graph-card
+                name: CO2 Levels
+                icon: mdi:molecule-co2
+                show:
+                  labels: false
+                entities:
+                  - entity: sensor.airgradient_kitchen_co2
+                    name: Kitchen
+                    color: var(--amber-color)
+                    show_state: true
+                    show_points: false
+                  - entity: sensor.apollo_msr_1_office_co2
+                    name: Office
+                    color: var(--blue-color)
+                    show_state: true
+                    show_points: false
+                line_width: 3
+                font_size: 75
+                hours_to_show: 30
+                points_per_hour: 12
+                update_interval: 300
+                animate: true
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                modules:
+                  - default
+                hash: '#allergy'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
+              - type: custom:bubble-card
+                card_type: separator
+                name: Allergy
+                modules:
+                  - default
+              - type: custom:mushroom-title-card
+                title: Allergens
+              - type: custom:mushroom-template-card
+                entity: sensor.allergy_index_today
+                secondary: "{%- set ns = namespace(allergens=[]) -%} {%- for id in\
+                  \ range(1, 4) -%}\n  {%- set attr = \"allergen_name_\" ~ id -%}\n\
+                  \  {%- if not state_attr(entity, attr) in [\"unknown\", \"unavailable\"\
+                  , None] -%}\n    {%- set ns.allergens = ns.allergens + [ state_attr(entity,\
+                  \ attr) ] -%}\n  {%- endif -%}\n{%- endfor -%} {{ ns.allergens |\
+                  \ join(\", \") }}\n{{ state_attr(\"sensor.allergy_index_forecasted_average\"\
+                  , \"outlook\") | default(\"\", true) }}"
+                multiline_secondary: true
+                tap_action:
+                  action: none
+                hold_action:
+                  action: none
+                double_tap_action:
+                  action: none
+                card_mod:
+                  style: "ha-card {\n  /* Make card non-responsive to select and pointer\
+                    \ */\n  user-select: none;\n  pointer-events: none;\n  --ha-card-border-width:\
+                    \ 0;\n  --ha-card-box-shadow: none;\n}\n"
+              - type: custom:mushroom-title-card
+                title: Forecast
+                subtitle: Allergy
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                entities:
+                  - entity: sensor.allergy_index_today
+                  - entity: sensor.allergy_index_tomorrow
+                  - entity: sensor.allergy_index_forecasted_average
+                min: 0
+                max: 12
+                decimal: 1
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                severity:
+                  - color: var(--green-color)
+                    from: '0'
+                    to: '2.5'
+                  - color: var(--light-green-color)
+                    from: '2.5'
+                    to: '4.9'
+                  - color: var(--amber-color)
+                    from: '4.9'
+                    to: '7.3'
+                  - color: var(--orange-color)
+                    from: '7.3'
+                    to: '9.7'
+                  - color: var(--red-color)
+                    from: '9.7'
+                    to: '12'
+              - type: custom:mushroom-title-card
+                subtitle: Asthma
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                entities:
+                  - entity: sensor.asthma_index_today
+                  - entity: sensor.asthma_index_tomorrow
+                  - entity: sensor.asthma_index_forecasted_average
+                min: 0
+                max: 12
+                decimal: 1
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                severity:
+                  - color: var(--green-color)
+                    from: '0'
+                    to: '2.5'
+                  - color: var(--light-green-color)
+                    from: '2.5'
+                    to: '4.9'
+                  - color: var(--amber-color)
+                    from: '4.9'
+                    to: '7.3'
+                  - color: var(--orange-color)
+                    from: '7.3'
+                    to: '9.7'
+                  - color: var(--red-color)
+                    from: '9.7'
+                    to: '12'
+              - type: custom:mushroom-title-card
+                subtitle: Cold
+              - type: custom:bar-card
+                card_mod:
+                  style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
+                    \  text-shadow: 1px 1px var(--primary-background-color);\n}\n"
+                entities:
+                  - entity: sensor.cold_flu_index_today
+                  - entity: sensor.cold_flu_forecasted_average
+                min: 0
+                max: 12
+                decimal: 1
+                animation:
+                  state: 'on'
+                positions:
+                  indicator: inside
+                severity:
+                  - color: var(--green-color)
+                    from: '0'
+                    to: '2.5'
+                  - color: var(--light-green-color)
+                    from: '2.5'
+                    to: '4.9'
+                  - color: var(--amber-color)
+                    from: '4.9'
+                    to: '7.3'
+                  - color: var(--orange-color)
+                    from: '7.3'
+                    to: '9.7'
+                  - color: var(--red-color)
+                    from: '9.7'
+                    to: '12'
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#dishwasher'
+                show_header: false
+                margin_top_desktop: 30vh
+                width_desktop: 40vw
+                margin_top_mobile: 30vh
+                modules:
+                  - default
+              - type: custom:bubble-card
+                card_type: separator
+                name: Dishwasher
+                sub_button:
+                  - entity: sensor.ge_dishwasher_cycle_name
+                    show_state: true
+                    tap_action:
+                      action: none
+                    name: Cycle Name
+                  - entity: binary_sensor.ge_dishwasher_remote_start_enable
+                    tap_action:
+                      action: none
+                    name: Remote Enable
+                    icon: mdi:remote
+                modules:
+                  - default
+              - type: custom:timer-bar-card
+                filter: true
+                invert: true
+                state_color: true
+                layout: full_row
+                text_width: 4.5em
+                bar_height: 12px
+                bar_radius: var(--ha-card-border-radius, 12px)
+                bar_direction: rtl
+                bar_foreground: var(--lime-color)
+                bar_background: var(--disabled-color)
+                compressed: true
+                modifications:
+                  - remaining: 00:03:00
+                    bar_foreground: var(--amber-color)
+                  - remaining: 00:02:00
+                    bar_foreground: var(--orange-color)
+                  - remaining: 00:01:00
+                    bar_foreground: var(--red-color)
+                entities:
+                  - entity: timer.ge_dishwasher
+              - type: tile
+                entity: binary_sensor.ge_dishwasher_is_clean
+                name: Clean
+                color: green
+                hide_state: true
+                features_position: bottom
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.ge_dishwasher_cycle_state
+                    state_not: N/A
+                card:
+                  type: entity
+                  entity: sensor.ge_dishwasher_cycle_state
+                  name: Current Cycle
+                  state_color: true
+              - type: grid
+                square: false
+                columns: 2
+                cards:
+                  - type: entity
+                    entity: sensor.ge_dishwasher_user_setting_cycle_mode
+                    name: Cycle Mode
+                    state_color: true
+                  - type: entity
+                    entity: sensor.ge_dishwasher_user_setting_presoak
+                    name: Presoak
+                    state_color: true
+                  - type: entity
+                    entity: sensor.ge_dishwasher_user_setting_bottle_jet
+                    name: Bottle Jets
+                    state_color: true
+                  - type: entity
+                    entity: sensor.ge_dishwasher_user_setting_wash_temp
+                    name: Wash Temp
+                    state_color: true
+                  - type: entity
+                    entity: sensor.ge_dishwasher_user_setting_rinse_aid
+                    name: Rinse Aid
+                    state_color: true
+                  - type: entity
+                    entity: sensor.ge_dishwasher_user_setting_dry_option
+                    name: Dry Mode
+                    state_color: true
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -6625,429 +7307,6 @@ views:
                           \ {% endif %}\n}\n@keyframes ping {\n  0% { box-shadow:\
                           \ 0 0 1px 15px rgba(255,254,249, 0.25); }\n  100% { box-shadow:\
                           \ 0 0 1px 15px transparent; }\n}\n"
-          - type: vertical-stack
-            cards:
-              - type: custom:bubble-card
-                card_type: pop-up
-                hash: '#dishwasher'
-                show_header: false
-                margin_top_desktop: 50vh
-                width_desktop: 40vw
-                margin_top_mobile: 30vh
-                modules:
-                  - default
-              - type: custom:bubble-card
-                card_type: separator
-                name: Dishwasher
-                sub_button:
-                  - entity: sensor.ge_dishwasher_cycle_name
-                    show_state: true
-                    tap_action:
-                      action: none
-                    name: Cycle Name
-                  - entity: binary_sensor.ge_dishwasher_remote_start_enable
-                    tap_action:
-                      action: none
-                    name: Remote Enable
-                    icon: mdi:remote
-              - type: custom:timer-bar-card
-                filter: true
-                invert: true
-                state_color: true
-                layout: full_row
-                text_width: 4.5em
-                bar_height: 12px
-                bar_radius: var(--ha-card-border-radius, 12px)
-                bar_direction: rtl
-                bar_foreground: var(--lime-color)
-                bar_background: var(--disabled-color)
-                compressed: true
-                modifications:
-                  - remaining: 00:03:00
-                    bar_foreground: var(--amber-color)
-                  - remaining: 00:02:00
-                    bar_foreground: var(--orange-color)
-                  - remaining: 00:01:00
-                    bar_foreground: var(--red-color)
-                entities:
-                  - entity: timer.ge_dishwasher
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.ge_dishwasher_cycle_state
-                    state_not: N/A
-                card:
-                  type: entity
-                  entity: sensor.ge_dishwasher_cycle_state
-                  name: Current Cycle
-                  state_color: true
-              - type: tile
-                entity: binary_sensor.ge_dishwasher_is_clean
-                name: Clean
-                color: green
-                hide_state: true
-          - type: vertical-stack
-            cards:
-              - type: custom:bubble-card
-                card_type: pop-up
-                modules:
-                  - default
-                hash: '#meater'
-                show_header: false
-                margin_top_desktop: 25vh
-                width_desktop: 40vw
-                margin_top_mobile: calc(0px - var(--header-height))
-              - type: custom:bubble-card
-                card_type: separator
-                name: Meater
-                modules:
-                  - default
-              - type: custom:mushroom-entity-card
-                entity: sensor.meater_probe_cook_name
-                name: Cooking
-                primary_info: state
-                secondary_info: name
-                icon: mdi:food-steak
-              - square: false
-                columns: 2
-                type: grid
-                cards:
-                  - type: custom:mushroom-entity-card
-                    entity: sensor.meater_probe_cook_time_elapsed
-                    name: Elapsed Time
-                    primary_info: state
-                    secondary_info: name
-                  - type: custom:mushroom-entity-card
-                    entity: sensor.meater_probe_cook_time_remaining
-                    name: Remaining Time
-                    primary_info: state
-                    secondary_info: name
-              - type: custom:mushroom-title-card
-                subtitle: Temperature
-              - type: custom:apexcharts-card
-                card_mod:
-                  style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow:\
-                    \ none;\n  margin-bottom: -15px;\n}\n.apexcharts-tooltip-series-group\
-                    \ {\n  padding-top: 0px !important;\n  padding-bottom: 0px !important;\n\
-                    \  margin-top: 0px !important;\n  margin-bottom: 0px !important;\n\
-                    \  display: none;\n  text-align: left;\n  justify-content: left;\n\
-                    \  align-items: center;\n}\n"
-                apex_config:
-                  chart:
-                    foreColor: '#7B7B7B'
-                    toolbar:
-                      show: false
-                  grid:
-                    borderColor: '#7B7B7B'
-                  xaxis:
-                    tooltip:
-                      enabled: false
-                header:
-                  show: true
-                  show_states: true
-                  colorize_states: true
-                experimental:
-                  brush: true
-                all_series_config:
-                  extend_to: now
-                  float_precision: 2
-                  curve: stepline
-                brush:
-                  selection_span: 1h
-                  apex_config:
-                    chart:
-                      foreColor: '#7B7B7B'
-                      toolbar:
-                        show: false
-                    grid:
-                      borderColor: '#7B7B7B'
-                    xaxis:
-                      tooltip:
-                        enabled: false
-                series:
-                  - entity: sensor.meater_probe_internal
-                    name: Internal
-                    stroke_width: 4
-                    color: rgb(33,150,243)
-                    show:
-                      in_brush: true
-                  - entity: sensor.meater_probe_ambient
-                    name: Ambient
-                    stroke_width: 4
-                    color: rgb(139,195,74)
-                  - entity: sensor.meater_probe_cook_target_temp
-                    name: Target
-                    type: area
-                    opacity: 0.2
-                    stroke_width: 1
-                    color: rgb(233,30,99)
-          - type: vertical-stack
-            cards:
-              - type: custom:bubble-card
-                card_type: pop-up
-                modules:
-                  - default
-                hash: '#announce'
-                show_header: false
-                margin_top_desktop: 25vh
-                width_desktop: 40vw
-                margin_top_mobile: calc(0px - var(--header-height))
-              - type: custom:bubble-card
-                card_type: separator
-                name: Announce
-                modules:
-                  - default
-              - type: heading
-                icon: mdi:gamepad-circle
-                heading: Family Room
-                heading_style: title
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: School
-                    icon: mdi:chair-school
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: Time to go to School!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Snack
-                    icon: mdi:apple
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: It's snack time!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Lunch
-                    icon: mdi:food-fork-drink
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: Hey, come get some lunch.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Dinner
-                    icon: mdi:food
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: Head up-stairs, it's time for dinner. Don't forget
-                          to wash your hands!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Breakfast
-                    icon: mdi:egg-fried
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: It's time for breakfast. Wash your hands!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Bed Time
-                    icon: mdi:cookie-edit
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: It's time for bed.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Ethan up-stairs
-                    icon: mdi:robot
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: Hey Ethan, come up-stairs please.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Emma up-stairs
-                    icon: mdi:unicorn-variant
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: Hey Emma, come up-stairs please.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Kids up-stairs
-                    icon: mdi:cookie-edit
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_family_room_speaker
-                        volume: 80
-                        message: Hey kids, come up-stairs please.
-                      target: {}
-                      service: script.media_play
-              - type: heading
-                icon: mdi:sofa-single
-                heading: Living Room
-                heading_style: title
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: School
-                    icon: mdi:chair-school
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: Time to go to School!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Snack
-                    icon: mdi:apple
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: It's snack time!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Lunch
-                    icon: mdi:food-fork-drink
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: Hey, come get some lunch.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Dinner
-                    icon: mdi:food
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: It's time for dinner. Don't forget to wash your hands!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Breakfast
-                    icon: mdi:egg-fried
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: It's time for breakfast. Wash your hands!
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Bed Time
-                    icon: mdi:cookie-edit
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: It's time for bed.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Ethan down-stairs
-                    icon: mdi:robot
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: Hey Ethan, come down-stairs please.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Emma down-stairs
-                    icon: mdi:unicorn-variant
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: Hey Emma, come down-stairs please.
-                      target: {}
-                      service: script.media_play
-                  - type: tile
-                    entity: script.media_play
-                    hide_state: true
-                    name: Kids down-stairs
-                    icon: mdi:cookie-edit
-                    icon_tap_action:
-                      action: call-service
-                      data:
-                        media_player: media_player.cast_living_room_speaker
-                        volume: 90
-                        message: Hey kids, come down-stairs please.
-                      target: {}
-                      service: script.media_play
     badges:
       - type: custom:mushroom-template-badge
         content: Announce
@@ -7124,6 +7383,7 @@ views:
             state: 'on'
       - type: custom:mushroom-template-badge
         entity: light.all_lights
+        label: Lights
         content: '{{ expand(entity) | selectattr(''state'', ''=='', ''on'') | list
           | count }}'
         icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-group", "mdi:lightbulb-group-off")
@@ -7303,7 +7563,7 @@ views:
                 type: custom:vertical-stack-in-card
                 card_mod:
                   style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n}\n"
+                    \ 0;\n  --ha-card-box-shadow: none;\n}\n"
                 cards:
                   - type: custom:auto-entities
                     filter:
@@ -7484,9 +7744,9 @@ views:
               style:
                 .: "ha-tile-icon {\n  {% if is_state(config.entity, 'on') %}\n   \
                   \ {% set speed = state_attr(config.entity, 'percentage') %}\n  \
-                  \  {% set color = {\n      33: \"green\",\n      66: \"yellow\"\
-                  ,\n      100: \"orange\"\n    }[speed] %}\n  {% else %}\n    {%\
-                  \ set color = \"disabled\" %}\n  {% endif %}\n  --tile-color: var(--{{\
+                  \  {% set color = {\n      33: \"green\",\n      66: \"orange\"\
+                  ,\n      100: \"red\"\n    }[speed] %}\n  {% else %}\n    {% set\
+                  \ color = \"disabled\" %}\n  {% endif %}\n  --tile-color: var(--{{\
                   \ color }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
                   \ 'on') %}\n    {% set speed = state_attr(config.entity, 'percentage')\
                   \ %}\n    animation: {{ (2 - (speed / 100)) | round(2) }}s rotation\
@@ -8738,9 +8998,9 @@ views:
               style:
                 .: "ha-tile-icon {\n  {% if is_state(config.entity, 'on') %}\n   \
                   \ {% set speed = state_attr(config.entity, 'percentage') %}\n  \
-                  \  {% set color = {\n      33: \"green\",\n      66: \"yellow\"\
-                  ,\n      100: \"orange\"\n    }[speed] %}\n  {% else %}\n    {%\
-                  \ set color = \"disabled\" %}\n  {% endif %}\n  --tile-color: var(--{{\
+                  \  {% set color = {\n      33: \"green\",\n      66: \"orange\"\
+                  ,\n      100: \"red\"\n    }[speed] %}\n  {% else %}\n    {% set\
+                  \ color = \"disabled\" %}\n  {% endif %}\n  --tile-color: var(--{{\
                   \ color }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
                   \ 'on') %}\n    {% set speed = state_attr(config.entity, 'percentage')\
                   \ %}\n    animation: {{ (2 - (speed / 100)) | round(2) }}s rotation\
@@ -9769,7 +10029,7 @@ views:
             entities:
               - entity: sensor.ecowitt_solar_radiation
                 name: Solar
-                color: yellow
+                color: var(--amber-color)
                 show_state: true
                 state_adaptive_color: true
             show:
@@ -9880,7 +10140,7 @@ views:
                   {% else %}\n  mdi:help-circle\n{% endif %}"
                 icon_color: "{% if is_state(entity, \"on\") %}\n  red\n{% elif is_state(\"\
                   lock.front_door\", \"unlocked\") and is_state(entity, \"off\") %}\n\
-                  \  yellow\n{% elif is_state(\"lock.front_door\", \"locked\") and\
+                  \  amber\n{% elif is_state(\"lock.front_door\", \"locked\") and\
                   \ is_state(entity, \"off\") %}\n  green\n{% endif %}"
                 tap_action:
                   action: more-info
@@ -9976,7 +10236,7 @@ views:
                   {% else %}\n  mdi:help-circle\n{% endif %}"
                 icon_color: "{% if is_state(entity, \"on\") %}\n  red\n{% elif is_state(\"\
                   lock.garage_entry\", \"unlocked\") and is_state(entity, \"off\"\
-                  ) %}\n  yellow\n{% elif is_state(\"lock.garage_entry\", \"locked\"\
+                  ) %}\n  amber\n{% elif is_state(\"lock.garage_entry\", \"locked\"\
                   ) and is_state(entity, \"off\") %}\n  green\n{% endif %}"
                 tap_action:
                   action: more-info
@@ -10054,7 +10314,7 @@ views:
                             \ rgba(var(--rgb-disabled), 0.2);\n}\n"
             grid_options:
               columns: 6
-              rows: auto
+              rows: 1
           - type: custom:mushroom-template-card
             entity: binary_sensor.garage_side_door_contact
             primary: Garage Side Door
@@ -11949,6 +12209,8 @@ views:
                 show_last_changed: true
                 show_icon: true
                 show_attribute: false
+                modules:
+                  - default
               - type: conditional
                 conditions:
                   - entity: media_player.erebus
@@ -11965,6 +12227,8 @@ views:
                   entity: media_player.erebus
                   hide:
                     power_button: true
+                  modules:
+                    - default
               - type: custom:streamline-card
                 template: uptime_card
                 variables:
@@ -13388,7 +13652,7 @@ views:
                     type: custom:mushroom-template-card
                     entity: sensor.bambu_p1s_print_status
                     icon: mdi:pause
-                    icon_color: yellow
+                    icon_color: amber
                     layout: vertical
                     tap_action:
                       action: call-service
@@ -13409,7 +13673,7 @@ views:
                           \ none;\n  --ha-card-border-width: 0;\n  --icon-size: 48px;\n\
                           \  margin-top: 10px;\n}\n"
                         mushroom-shape-icon$: ".shape {\n  box-shadow: 0 0 1px 15px\
-                          \ rgba(var(--rgb-yellow), 0.1) !important;\n}\n"
+                          \ rgba(var(--rgb-amber), 0.1) !important;\n}\n"
                 - type: conditional
                   conditions:
                     - condition: state
@@ -14502,6 +14766,8 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 50vh
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: External Filament
@@ -14509,6 +14775,7 @@ views:
                   - entity: sensor.bambu_p1s_external_spool_external_spool
                     name: Type
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: type
                     show_icon: false
@@ -14519,6 +14786,7 @@ views:
                   - entity: sensor.bambu_p1s_external_spool_external_spool
                     name: Name
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: name
                     show_icon: false
@@ -14529,10 +14797,13 @@ views:
                   - entity: sensor.bambu_p1s_external_spool_external_spool
                     name: Color
                     show_state: false
+                    show_background: false
                     icon: mdi:circle
                     show_icon: true
                 styles: ".bubble-sub-button-3 {\n  color: ${hass.states['sensor.bambu_p1s_external_spool_external_spool'].attributes.color}\
                   \ !important;\n}\n"
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: state
@@ -14674,6 +14945,8 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 50vh
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 1
@@ -14747,12 +15020,8 @@ views:
                 card_type: button
                 button_type: name
                 name: Serial
-                entity: sensor.bambu_p1s_ams_tray_1
                 icon: phu:3d-filament
                 show_icon: false
-                show_state: false
-                show_attribute: true
-                attribute: tray_uuid
                 sub_button:
                   - entity: sensor.bambu_p1s_ams_tray_1
                     show_state: false
@@ -14760,6 +15029,12 @@ views:
                     attribute: tray_uuid
                     show_icon: false
                     show_background: false
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_1
+                        state_not: unknown
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -14851,6 +15126,8 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 50vh
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 2
@@ -14858,6 +15135,7 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_2
                     name: Type
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: type
                     show_icon: false
@@ -14868,6 +15146,7 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_2
                     name: Name
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: name
                     show_icon: false
@@ -14878,10 +15157,17 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_2
                     name: Color
                     show_state: false
+                    show_background: false
                     icon: mdi:circle
                     show_icon: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_2
+                        state_not: unknown
                 styles: ".bubble-sub-button-3 {\n  color: ${hass.states['sensor.bambu_p1s_ams_tray_2'].attributes.color}\
                   \ !important;\n}\n"
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -14936,9 +15222,6 @@ views:
                 name: Serial
                 icon: phu:3d-filament
                 show_icon: false
-                show_state: false
-                show_attribute: true
-                attribute: tray_uuid
                 sub_button:
                   - entity: sensor.bambu_p1s_ams_tray_2
                     show_state: false
@@ -14946,6 +15229,12 @@ views:
                     attribute: tray_uuid
                     show_icon: false
                     show_background: false
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_2
+                        state_not: unknown
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -15037,6 +15326,8 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 50vh
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 3
@@ -15044,6 +15335,7 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_3
                     name: Type
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: type
                     show_icon: false
@@ -15054,6 +15346,7 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_3
                     name: Name
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: name
                     show_icon: false
@@ -15064,10 +15357,17 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_3
                     name: Color
                     show_state: false
+                    show_background: false
                     icon: mdi:circle
                     show_icon: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_3
+                        state_not: unknown
                 styles: ".bubble-sub-button-3 {\n  color: ${hass.states['sensor.bambu_p1s_ams_tray_3'].attributes.color}\
                   \ !important;\n}\n"
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15122,9 +15422,6 @@ views:
                 name: Serial
                 icon: phu:3d-filament
                 show_icon: false
-                show_state: false
-                show_attribute: true
-                attribute: tray_uuid
                 sub_button:
                   - entity: sensor.bambu_p1s_ams_tray_3
                     show_state: false
@@ -15132,6 +15429,12 @@ views:
                     attribute: tray_uuid
                     show_icon: false
                     show_background: false
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_3
+                        state_not: unknown
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -15223,6 +15526,8 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 50vh
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 4
@@ -15230,6 +15535,7 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_4
                     name: Type
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: type
                     show_icon: false
@@ -15240,6 +15546,7 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_4
                     name: Name
                     show_state: false
+                    show_background: false
                     show_attribute: true
                     attribute: name
                     show_icon: false
@@ -15250,10 +15557,17 @@ views:
                   - entity: sensor.bambu_p1s_ams_tray_4
                     name: Color
                     show_state: false
+                    show_background: false
                     icon: mdi:circle
                     show_icon: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_4
+                        state_not: unknown
                 styles: ".bubble-sub-button-3 {\n  color: ${hass.states['sensor.bambu_p1s_ams_tray_4'].attributes.color}\
                   \ !important;\n}\n"
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15308,9 +15622,6 @@ views:
                 name: Serial
                 icon: phu:3d-filament
                 show_icon: false
-                show_state: false
-                show_attribute: true
-                attribute: tray_uuid
                 sub_button:
                   - entity: sensor.bambu_p1s_ams_tray_4
                     show_state: false
@@ -15318,6 +15629,12 @@ views:
                     attribute: tray_uuid
                     show_icon: false
                     show_background: false
+                    visibility:
+                      - condition: state
+                        entity: sensor.bambu_p1s_ams_tray_4
+                        state_not: unknown
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -15732,7 +16049,7 @@ views:
                     from: 1920
                     to: 2400
                 entities:
-                  - entity: sensor.emporiavue_main_balance_power
+                  - entity: sensor.emporiavue_main_actual_balance_power
                     name: Main Balance
                     icon: mdi:home-analytics
                     max: 9600
