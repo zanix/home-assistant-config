@@ -454,7 +454,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>37 Dashboard Plugins</summary>
+<details><summary>38 Dashboard Plugins</summary>
 
 ### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.6.3]
 
@@ -531,6 +531,10 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 ### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.5]
 
 🔹 Get more control over the placement of lovelace cards.
+
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/ha-material-you-utilities) [v1.0.6]
+
+Material You Utilities - Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
 ### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.12.1]
 
@@ -616,7 +620,7 @@ Dark Grey Theme for Home Assistant
 
 LCARS theme for Home Assistant
 
-### [Material You And Material Rounded   Material Design 3 Themes](https://github.com/Nerwyn/material-rounded-theme) [v3.1.5]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v4.0.2]
 
 Material Design 3 Colors and Components in Home Assistant
 
