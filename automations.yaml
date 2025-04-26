@@ -575,15 +575,13 @@
 - id: '1665685949212'
   alias: ⏯ Family Room Media Auto Off
   description: Automatically turn off the Media Center in the Family Room
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - remote.androidtv_family_room
     to: 'off'
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      }}'
+    trigger: state
+    from: 'on'
+  conditions:
   - condition: state
     entity_id: remote.harmony_family_room
     state: 'on'
@@ -591,7 +589,12 @@
     entity_id: remote.harmony_family_room
     attribute: current_activity
     state: Shield TV
-  action:
+  actions:
+  - action: media_player.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.cast_family_room
   - entity_id: remote.harmony_family_room
     action: remote.turn_off
   mode: restart
@@ -4351,8 +4354,9 @@
     data:
       compressed: false
       homeassistant_exclude_database: false
-      name: Weekly backup {{ state_attr("update.home_assistant_core_update", "installed_version")
-        }} {{ as_timestamp(now()) | timestamp_custom("%Y-%m-%d") }}
+      location: Lantea
+      name: Weekly backup {{ state_attr("update.home_assistant_core_update",     "installed_version")
+        }} {{ as_timestamp(now()) |     timestamp_custom("%Y-%m-%d") }}
   mode: single
 - id: '1699834374599'
   alias: "\U0001F4C5 Living Room Fan On/Off"
@@ -6282,4 +6286,78 @@
     - data:
         notification_id: kona
       action: persistent_notification.dismiss
+  mode: single
+- id: '1745441734623'
+  alias: "\U0001F5A5️ [Erebus] Microphone/Camera Active"
+  description: Changes basement hallway light animation when microphone or webcam
+    is in use
+  triggers:
+  - entity_id:
+    - binary_sensor.erebus_microphone_used
+    trigger: state
+    to:
+  - entity_id:
+    - binary_sensor.erebus_camera_used
+    to:
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.erebus_microphone_used
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.erebus_camera_used
+          state: 'on'
+      sequence:
+      - action: script.inovelli_blue_led
+        metadata: {}
+        data:
+          led: All
+          color: Red
+          level: 100
+          effect: Aurora
+          duration: 4 Hours
+          target:
+            entity_id: light.basement_hallway
+      alias: When microphone or webcam are active
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.erebus_microphone_used
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.erebus_camera_used
+          state: 'off'
+      sequence:
+      - action: script.inovelli_blue_led
+        metadata: {}
+        data:
+          target:
+            entity_id: light.basement_hallway
+      alias: When microphone and webcam are inactive
+  mode: restart
+- id: '1745528112692'
+  alias: ⏯ Living Room Media Off
+  description: Ensure the Living Room media is turned off
+  triggers:
+  - trigger: state
+    entity_id:
+    - remote.androidtv_living_room
+    from: 'on'
+    to: 'off'
+  conditions:
+  - condition: state
+    entity_id: media_player.cast_living_room
+    state: 'on'
+  actions:
+  - action: media_player.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: media_player.cast_living_room
   mode: single
