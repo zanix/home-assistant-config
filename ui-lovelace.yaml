@@ -47,6 +47,57 @@ button_card_templates:
         - font-weight: 500
         - letter-spacing: 0.1px;
         - color: var(--primary-text-color)
+  button:
+    variables:
+      color: var(--grey-color)
+    styles:
+      grid:
+        - grid-template-areas: '"i n"'
+        - grid-template-columns: min-content min-content
+      card:
+        - padding: 5px 8px
+        - height: 42px
+        - border-radius: 12px
+        - --mdc-ripple-color: '[[[ return variables.color ]]]'
+        - width: auto
+        - margin: auto 0
+      img_cell:
+        - justify-content: start
+        - width: 26px
+        - height: 26px
+        - border-radius: 100%
+      icon:
+        - position: relative
+        - width: 18px
+        - height: 18px
+        - color: '[[[ return variables.color ]]]'
+      name:
+        - justify-self: start
+        - margin-left: 4px
+        - padding-right: 4px
+        - font-size: 16px
+        - font-weight: 500
+        - letter-spacing: 0.1px;
+        - color: var(--primary-text-color)
+  button_label:
+    template: button
+    show_label: true
+    styles:
+      grid:
+        - grid-template-areas: '"i n" "i l"'
+        - grid-template-columns: min-content min-content
+        - grid-template-rows: min-content
+      card:
+        - padding: 5px 8px
+      label:
+        - justify-self: start
+        - align-self: start
+        - margin-left: 4px
+        - padding-right: 4px
+        - font-size: 10px
+        - font-weight: 500
+        - letter-spacing: 0.1px;
+        - color: var(--secondary-text-color)
   bambu_spool:
     show_icon: false
     show_name: false
@@ -114,22 +165,22 @@ button_card_templates:
       stat1: "[[[\n  return `<ha-icon icon=\"mdi:motion-play-outline\" style=\"width:\
         \ 24px; height: 24px; color: var(--green-color);\"></ha-icon>\n    <span>\
         \ Media: <span style=\"color: var(--text-color-sensor);\">${states[variables.media]?.state\
-        \ !== 'unavailable' ? helpers.localize(states[variables.media]) : '?'}</span></span>`\n\
+        \ !== 'unavailable' ? helpers.localize(states[variables.media]) : '-'}</span></span>`\n\
         ]]]"
       stat2: "[[[\n  return `<ha-icon icon=\"mdi:cpu-64-bit\" style=\"width: 24px;\
         \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span> CPU: <span\
         \ style=\"color: var(--text-color-sensor);\">${!['unavailable',undefined].includes(states[variables.cpu]?.state)\
-        \ ? helpers.localize(states[variables.cpu], undefined, 0) : '?'}</span></span>`\n\
+        \ ? helpers.localize(states[variables.cpu], undefined, 0) : '-'}</span></span>`\n\
         ]]]"
       stat3: "[[[\n  return `<ha-icon icon=\"mdi:memory\" style=\"width: 24px; height:\
         \ 24px; color: var(--green-color);\"></ha-icon>\n    <span> RAM: <span style=\"\
         color: var(--text-color-sensor);\">${!['unavailable',undefined].includes(states[variables.ram]?.state)\
-        \ ? helpers.localize(states[variables.ram], undefined, 0) : '?'}</span></span>`\n\
+        \ ? helpers.localize(states[variables.ram], undefined, 0) : '-'}</span></span>`\n\
         ]]]"
       stat4: "[[[\n  return `<ha-icon icon=\"mdi:expansion-card\" style=\"width: 24px;\
         \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span> GPU: <span\
         \ style=\"color: var(--text-color-sensor);\">${!['unavailable',undefined].includes(states[variables.gpu]?.state)\
-        \ ? helpers.localize(states[variables.gpu], undefined, 0) : '?'}</span></span>`\n\
+        \ ? helpers.localize(states[variables.gpu], undefined, 0) : '-'}</span></span>`\n\
         ]]]"
       info: ''
       chips: ''
@@ -568,6 +619,8 @@ streamline_templates:
                 - condition: state
                   entity: '[[media]]'
                   state_not: 'off'
+          modules:
+            - default
           styles: "${card.querySelector('.bubble-name').innerText = [\n    (hass.states[entity]?.attributes.media_title\
             \ || \"\"),\n    (hass.states[entity]?.attributes.media_artist || \"\"\
             ),\n    (typeof(hass.states[entity]?.attributes.media_season) !== \"undefined\"\
@@ -1737,7 +1790,6 @@ streamline_templates:
             style: "ha-card {\n  {% if is_state(config.entity, \"on\") %}\n  background:\
               \ rgba(var(--rgb-state-fan), 0.2);\n  {% endif %}\n}\n"
         - type: custom:auto-entities
-          show_empty: false
           card:
             type: custom:layout-card
             cards: []
@@ -1755,18 +1807,18 @@ streamline_templates:
                     - type: fan-speed
                   card_mod:
                     style:
-                      .: "ha-tile-icon {\n  {% if is_state(config.entity, 'on') %}\n\
-                        \    {% set speed = state_attr(config.entity, 'percentage')\
+                      .: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                        \ none;\n}\nha-tile-icon {\n  {% if is_state(config.entity,\
+                        \ 'on') %}\n    {% set speed = state_attr(config.entity, 'percentage')\
                         \ %}\n    {% set color = {\n      33: \"green\",\n      66:\
                         \ \"orange\",\n      100: \"red\"\n    }[speed] %}\n  {% else\
-                        \ %}\n    {% set color = \"disabled\" %}\n  {% endif %}\n\
-                        \  --tile-color: var(--{{ color }}-color);\n}\nha-state-icon\
-                        \ {\n  {% if is_state(config.entity, 'on') %}\n    {% set\
-                        \ speed = state_attr(config.entity, 'percentage') %}\n   \
-                        \ animation: {{ (2 - (speed / 100)) | round(2) }}s rotation\
-                        \ linear infinite;\n  {% endif %}\n}\n@keyframes rotation\
-                        \ {\n  0% {transform: rotate(0deg);}\n  100% {transform: rotate(360deg);}\n\
-                        }\n"
+                        \ %}\n    {% set color = \"grey\" %}\n  {% endif %}\n  --tile-color:\
+                        \ var(--{{ color }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
+                        \ 'on') %}\n    {% set speed = state_attr(config.entity, 'percentage')\
+                        \ %}\n    animation: {{ (2 - (speed / 100)) | round(2) }}s\
+                        \ rotation linear infinite;\n  {% endif %}\n}\n@keyframes\
+                        \ rotation {\n  0% {transform: rotate(0deg);}\n  100% {transform:\
+                        \ rotate(360deg);}\n}\n"
   mini_graph:
     card:
       type: custom:mini-graph-card
@@ -1816,7 +1868,8 @@ streamline_templates:
                   layout: horizontal
                   card_mod:
                     style: "ha-card {\n  transition: all 0s;\n  padding: 4px 12px\
-                      \ !important;\n  border-width: 0;\n  box-shadow: none;\n}\n"
+                      \ !important;\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ none;\n}\n"
   media_card:
     default:
       - expanded: false
@@ -2441,42 +2494,49 @@ streamline_templates:
                   \ none;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width:\
                   \ 0;\n\n  /* Center card on row */\n  width: fit-content;\n  margin:\
                   \ auto;\n}\n"
-        - type: custom:mushroom-chips-card
-          alignment: center
-          chips:
-            - type: template
-              content: Find Phone
-              icon: mdi:target
-              icon_color: red
-              tap_action:
-                action: call-service
-                service: script.notify_mobile
-                confirmation:
-                  text: Are you sure you want to ring this device?
-                data:
-                  who: '{{ "[[person]]" }}'
-                  title: Find Phone
-                  message: Ringing phone...
-                  channel: alarm_stream
-                  tag: find-phone
-                  importance: high
-                target: {}
-              hold_action:
-                action: call-service
-                service: script.notify_mobile
-                confirmation:
-                  text: Cancel find phone?
-                data:
-                  who: '{{ "[[person]]" }}'
-                  message: clear_notification
-                  tag: find-phone
-          card_mod:
-            style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
-              \ rgba(var(--rgb-red), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
-              \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n  --chip-box-shadow:\
-              \ none;\n  user-select: none;\n}\nha-card:active {\n  /* Add effect\
-              \ to give feedback on button press */\n  --chip-background: rgba(var(--rgb-red),\
-              \ 0.4);\n}\n"
+        - type: custom:mod-card
+          style:
+            hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+              \  justify-content: space-around;\n}\n"
+          card:
+            type: grid
+            square: false
+            cards:
+              - type: custom:button-card
+                variables:
+                  color: var(--red-color)
+                template: button
+                name: Find Phone
+                icon: mdi:target
+                tap_action:
+                  action: call-service
+                  service: script.notify_mobile
+                  confirmation:
+                    text: Are you sure you want to ring this device?
+                  data:
+                    who: '{{ ''[[person]]'' }}'
+                    title: Find Phone
+                    message: Ringing phone...
+                    channel: alarm_stream
+                    tag: find-phone
+                    importance: high
+                  target: {}
+                hold_action:
+                  action: call-service
+                  service: script.notify_mobile
+                  confirmation:
+                    text: Cancel find phone?
+                  data:
+                    who: '{{ ''[[person]]'' }}'
+                    message: clear_notification
+                    tag: find-phone
+                styles:
+                  card:
+                    - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                        \ transparent 85%)`;\n]]]\n"
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color}, transparent\
+                  \ 80%) !important;\n    }\n  }\n  `\n]]]\n"
         - type: custom:mushroom-entity-card
           entity: sensor.[[phone_base]]_[[person]]_geocoded_location
           name: Location
@@ -4251,12 +4311,12 @@ views:
                 button_type: state
                 entity: person.joshua
                 show_last_changed: true
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
-                  - location_icon_color
-                width_desktop: 40vw
-                margin_top_desktop: 20vh
+                  - location_icon_background_color
               - type: custom:streamline-card
                 template: person_popup
                 variables:
@@ -4275,7 +4335,7 @@ views:
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
-                  - location_icon_color
+                  - location_icon_background_color
               - type: custom:streamline-card
                 template: person_popup
                 variables:
@@ -4287,6 +4347,8 @@ views:
                 card_type: pop-up
                 hash: '#ascent'
                 button_type: state
+                entity: device_tracker.ascent
+                force_icon: true
                 icon: fapro:subaru
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
@@ -4337,9 +4399,7 @@ views:
                     show_background: false
                 modules:
                   - default
-                  - location_icon_color
-                entity: device_tracker.ascent
-                force_icon: true
+                  - location_icon_background_color
               - type: custom:expander-card
                 gap: 0em
                 padding: 0em
@@ -4353,8 +4413,8 @@ views:
                     - type: custom:mushroom-template-card
                       primary: Remote Start
                       secondary: "{%- if is_state(\"device_tracker.ascent\", \"home\"\
-                        ) -%}\n  Open the Garage and Start the Ascent\n{%- else -%}\n\
-                        \  Start the Ascent\n{%- endif -%}"
+                        ) -%}\n  Press and Hold to Open the Garage and Start\n{%-\
+                        \ else -%}\n  Press and Hold to Start\n{%- endif -%}"
                       icon: mdi:key-wireless
                       entity: script.ascent_remote_start
                       icon_color: amber
@@ -4554,12 +4614,14 @@ views:
                           style: "ha-card {\n  justify-content: center;\n}\nha-card:hover\
                             \ {\n  --chip-background: rgb(var(--rgb-disabled));\n\
                             }\n"
-                  - type: custom:mushroom-select-card
+                  - type: tile
                     entity: select.ascent_climate_preset
-                    layout: horizontal
+                    features_position: inline
                     name: Climate Preset
-                    secondary_info: none
-                    icon_color: pink
+                    color: pink
+                    hide_state: true
+                    features:
+                      - type: select-options
                     card_mod:
                       style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
                         \ none;\n}\n"
@@ -4841,6 +4903,7 @@ views:
                 entity: device_tracker.kona_location
                 force_icon: true
                 icon: fapro:hyundai
+                name: Kona
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
                 styles: ".bubble-sub-button-1 > ha-icon {\n  color: var(--red-color)\
@@ -4886,8 +4949,7 @@ views:
                     show_background: false
                 modules:
                   - default
-                  - location_icon_color
-                name: Kona
+                  - location_icon_background_color
               - type: custom:expander-card
                 gap: 0em
                 padding: 0em
@@ -4901,8 +4963,8 @@ views:
                     - type: custom:mushroom-template-card
                       primary: Remote Start
                       secondary: "{%- if is_state(\"device_tracker.kona_location\"\
-                        , \"home\") -%}\n  Open the Garage and Start the Kona\n{%-\
-                        \ else -%}\n  Start the Kona\n{%- endif -%}"
+                        , \"home\") -%}\n  Press and Hold to Open the Garage and Start\n\
+                        {%- else -%}\n  Press and Hold to Start\n{%- endif -%}"
                       icon: mdi:key-wireless
                       entity: script.kona_remote_start
                       icon_color: amber
@@ -4963,9 +5025,9 @@ views:
                           defrost: '{{ is_state(''input_boolean.kona_defroster'',
                             ''on'') }}'
                           flseat: '{{ iif(is_state(''input_boolean.kona_seat_heat'',
-                            ''on''), 1, 0) }}'
+                            ''on''), 8, 0) }}'
                           frseat: '{{ iif(is_state(''input_boolean.kona_seat_heat'',
-                            ''on''), 1, 0) }}'
+                            ''on''), 8, 0) }}'
                           rlseat: '0'
                           rrseat: '0'
                         card_mod:
@@ -5472,13 +5534,13 @@ views:
             cards:
               - type: custom:bubble-card
                 card_type: pop-up
-                modules:
-                  - default
                 hash: '#announce'
                 show_header: false
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Announce
@@ -5739,13 +5801,49 @@ views:
             cards:
               - type: custom:bubble-card
                 card_type: pop-up
+                hash: '#doors'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
+                  - more_info_popup
+                button_type: name
+              - type: custom:bubble-card
+                card_type: separator
+                name: Doors
+                modules:
+                  - default
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - group: binary_sensor.all_doors
+                      options:
+                        type: custom:mushroom-entity-card
+                        layout: horizontal
+                        secondary_info: last-changed
+                        tap_action:
+                          action: none
+                        hold_action:
+                          action: none
+                card:
+                  type: custom:layout-card
+                  cards: []
+                  layout_type: masonry
+                sort:
+                  method: friendly_name
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
                 hash: '#meater'
                 show_header: false
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Meater
@@ -5833,50 +5931,65 @@ views:
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Neakasa M1
-              - type: custom:mushroom-chips-card
-                alignment: center
-                chips:
-                  - type: template
-                    content: Clean
-                    icon: mdi:wiper-wash
-                    icon_color: blue
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: perform-action
-                      perform_action: button.press
-                      target:
-                        entity_id: button.luna_box_clean
-                    card_mod:
-                      style: "ha-card {\n  /* Style Chip like Mushroom button */\n\
-                        \  --chip-background: rgba(var(--rgb-blue), 0.2);\n  --chip-border-radius:\
-                        \ var(--mush-control-border-radius, 12px);\n  --chip-height:\
-                        \ var(--mush-control-height, 42px);\n  --chip-box-shadow:\
-                        \ none;\n  user-select: none;\n}\nha-card:active {\n  /* Add\
-                        \ effect to give feedback on button press */\n  --chip-background:\
-                        \ rgba(var(--rgb-blue), 0.4);\n}\n"
-                  - type: template
-                    content: Level
-                    icon: mdi:spirit-level
-                    icon_color: yellow
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: perform-action
-                      perform_action: button.press
-                      target:
-                        entity_id: button.luna_box_level
-                    card_mod:
-                      style: "ha-card {\n  /* Style Chip like Mushroom button */\n\
-                        \  --chip-background: rgba(var(--rgb-yellow), 0.2);\n  --chip-border-radius:\
-                        \ var(--mush-control-border-radius, 12px);\n  --chip-height:\
-                        \ var(--mush-control-height, 42px);\n  --chip-box-shadow:\
-                        \ none;\n  user-select: none;\n}\nha-card:active {\n  /* Add\
-                        \ effect to give feedback on button press */\n  --chip-background:\
-                        \ rgba(var(--rgb-yellow), 0.4);\n}\n"
+                modules:
+                  - default
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-around;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button_label
+                      name: Clean
+                      label: Press and Hold to Clean
+                      icon: mdi:wiper-wash
+                      variables:
+                        color: var(--blue-color)
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: perform-action
+                        perform_action: button.press
+                        target:
+                          entity_id: button.luna_box_clean
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button_label
+                      name: Level
+                      label: Press and Hold to Level
+                      icon: mdi:spirit-level
+                      variables:
+                        color: var(--lime-color)
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: perform-action
+                        perform_action: button.press
+                        target:
+                          entity_id: button.luna_box_level
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
               - type: custom:button-card
                 show_state: false
                 show_label: false
@@ -5885,7 +5998,7 @@ views:
                 variables:
                   value_font_color: grey
                 custom_fields:
-                  printer_image: "[[[\n  return `\n    <div style=\"display: flex;\
+                  neakasa_image: "[[[\n  return `\n    <div style=\"display: flex;\
                     \ justify-content: flex-end;\">\n      <img\n        src=\"/local/logos/neakasa-m1.png\"\
                     \n        style=\"width: 100px;\"\n      />\n    </div>\n  `;\n\
                     ]]]\n"
@@ -5919,6 +6032,12 @@ views:
                     \      <span style=\"display: block; color: ${variables.value_font_color}\"\
                     >${state === 'unavailable' ? 'Unknown' : helpers.localize(states['sensor.luna_box_last_stay_time'])}</span>\n\
                     \    </div>\n  `;\n]]]\n"
+                  cat_weight: "[[[\n  let state = states['sensor.luna_box_cat_luna_weight']?.state;\n\
+                    \  return `\n    <div style=\"text-align: center; font-size: 12px;\
+                    \ justify-self: center;\">\n      <div>Weight</div>\n      <span\
+                    \ style=\"display: block; color: ${variables.value_font_color}\"\
+                    >${state === 'unavailable' ? 'Unknown' : helpers.localize(states['sensor.luna_box_cat_luna_weight'])}</span>\n\
+                    \    </div>\n  `;\n]]]\n"
                   last_usage: "[[[\n  let state = states['sensor.luna_box_last_usage']?.state;\n\
                     \  return `\n    <div style=\"text-align: center; font-size: 12px;\
                     \ justify-self: center;\">\n      <div>Last Usage</div>\n    \
@@ -5938,28 +6057,29 @@ views:
                     - padding-left: 10px
                     - padding-right: 10px
                   grid:
-                    - grid-template-areas: '"bin_state . litter_state . printer_image"
+                    - grid-template-areas: '"bin_state . litter_state . neakasa_image"
 
-                        "device_status . can_full . printer_image"
+                        "device_status . can_full . neakasa_image"
 
-                        "last_stay_time . last_usage . printer_image"
+                        "last_stay_time . cat_weight . neakasa_image"
 
-                        "wifi_signal . . . printer_image"
+                        "wifi_signal . last_usage . neakasa_image"
 
                         '
                     - grid-template-columns: auto 1fr auto 1fr 100px
                     - grid-template-rows: auto
                     - text-align: start
                   custom_fields:
-                    printer_image:
+                    neakasa_image:
                       - justify-self: right
                       - width: 150px
                       - height: 150px
               - type: custom:bar-card
                 card_mod:
-                  style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n\
-                    #states {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value\
-                    \ {\n  font-weight: 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                  style: "ha-card {\n  background: none;\n  --ha-card-border-width:\
+                    \ 0;\n  --ha-card-box-shadow: none;\n}\n#states {\n  padding:\
+                    \ 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n  font-weight:\
+                    \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
                     }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
                     }\n"
                 name: Litter Level
@@ -6200,32 +6320,68 @@ views:
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Cat Feeder
-              - type: custom:mushroom-chips-card
-                alignment: center
-                chips:
-                  - type: template
-                    content: Dispense Food
-                    icon: mdi:food-drumstick
-                    icon_color: green
-                    tap_action:
-                      action: none
-                    hold_action:
-                      action: perform-action
-                      perform_action: script.feeder_start
-                      target: {}
-                      data:
-                        feeder: Cat Feeder
-                    card_mod:
-                      style: "ha-card {\n  /* Style Chip like Mushroom button */\n\
-                        \  --chip-background: rgba(var(--rgb-green), 0.2);\n  --chip-border-radius:\
-                        \ var(--mush-control-border-radius, 12px);\n  --chip-height:\
-                        \ var(--mush-control-height, 42px);\n  --chip-box-shadow:\
-                        \ none;\n  user-select: none;\n}\nha-card:active {\n  /* Add\
-                        \ effect to give feedback on button press */\n  --chip-background:\
-                        \ rgba(var(--rgb-green), 0.4);\n}\n"
+                modules:
+                  - default
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-around;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button_label
+                      name: Dispense Food
+                      label: Press and Hold to Dispense
+                      icon: mdi:food-drumstick
+                      variables:
+                        color: var(--green-color)
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: perform-action
+                        perform_action: script.feeder_start
+                        target: {}
+                        data:
+                          feeder: Cat Feeder
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button_label
+                      name: Reset Food Level
+                      label: Press and Hold to Reset
+                      icon: mdi:progress-upload
+                      variables:
+                        color: var(--yellow-color)
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: call-service
+                        service: utility_meter.calibrate
+                        target:
+                          entity_id: sensor.cat_feeder_total_weight
+                        data:
+                          value: '0'
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
               - type: custom:mushroom-number-card
                 entity: number.cat_feeder_serving_size
                 name: Servings
@@ -6234,7 +6390,8 @@ views:
                 layout: horizontal
                 display_mode: buttons
                 card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                    \ none;\n}\n"
               - type: markdown
                 title: Schedule
                 content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n{%-\
@@ -6244,12 +6401,14 @@ views:
                   \ ~ \":\" ~ feeding.minute)) | timestamp_custom(\"%-I:%M %p\", True)\
                   \ }}\n{% endfor -%}\n{%- endif -%}"
                 card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                  style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                    \ none;\n}\n"
               - type: custom:bar-card
                 card_mod:
-                  style: "ha-card {\n  background: none;\n  border-width: 0;\n}\n\
-                    #states {\n  padding: 8px 2px;\n}\nbar-card-name,\nbar-card-value\
-                    \ {\n  font-weight: 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
+                  style: "ha-card {\n  background: none;\n  --ha-card-border-width:\
+                    \ 0;\n  --ha-card-box-shadow: none;\n}\n#states {\n  padding:\
+                    \ 8px 2px;\n}\nbar-card-name,\nbar-card-value {\n  font-weight:\
+                    \ 500;\n  text-shadow: 1px 1px var(--primary-background-color);\n\
                     }\nbar-card-backgroundbar {\n  background-color: var(--primary-background-color);\n\
                     }\n"
                 name: Food Level
@@ -6330,23 +6489,94 @@ views:
                     color: rgb(158,158,158)
                 card_mod:
                   style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-              - type: custom:mushroom-template-card
-                entity: sensor.cat_feeder_total_weight
-                secondary: Press and hold to reset
-                primary: Reset Food Level
-                icon: mdi:progress-upload
-                icon_color: green
-                tap_action:
-                  action: none
-                hold_action:
-                  action: call-service
-                  service: utility_meter.calibrate
-                  target:
-                    entity_id: sensor.cat_feeder_total_weight
-                  data:
-                    value: '0'
-                card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#low-battery'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
+                  - more_info_popup
+                button_type: name
+              - type: custom:bubble-card
+                card_type: separator
+                name: Low Battery
+                modules:
+                  - default
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - group: sensor.low_battery_devices
+                      options:
+                        type: custom:mushroom-template-card
+                        primary: "{{ state_attr(entity, \"friendly_name\")\n  | regex_replace(find=\"\
+                          \ battery level\", replace=\"\", ignorecase=true)\n  | regex_replace(find=\"\
+                          \ battery\", replace=\"\", ignorecase=true)\n}}"
+                        secondary: '{{ states(entity, with_unit=true) }}'
+                        icon: '{% from "util.jinja" import battery_icon %} {{ battery_icon(entity)
+                          }}
+
+                          '
+                        icon_color: '{% from "util.jinja" import battery_color %}
+                          {{ battery_color(entity) }}'
+                        badge_color: red
+                        badge_icon: "{% if int(states(entity), 0) <= 15 %}\n  mdi:exclamation-thick\n\
+                          {% endif %}"
+                        layout: horizontal
+                        tap_action:
+                          action: more-info
+                  exclude: []
+                card:
+                  type: custom:layout-card
+                  cards: []
+                  layout_type: masonry
+                sort:
+                  method: friendly_name
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#offline-devices'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
+                  - more_info_popup
+                button_type: name
+              - type: custom:bubble-card
+                card_type: separator
+                name: Offline Devices
+                modules:
+                  - default
+              - type: custom:auto-entities
+                filter:
+                  include:
+                    - group: sensor.offline_devices
+                      options:
+                        type: custom:mushroom-template-card
+                        primary: '{{ state_attr(entity, "friendly_name") | regex_replace(find="
+                          last seen", replace="", ignorecase=true) }}'
+                        secondary: "{%- if has_value(entity) -%}\n  {{ as_datetime(states(entity)).strftime(\"\
+                          %Y-%m-%d %-I:%M %p\") }}\n{%- else -%}\n  Unknown\n{%- endif\
+                          \ -%}"
+                        icon: mdi:network-off
+                        icon_color: blue-grey
+                        layout: horizontal
+                        tap_action:
+                          action: more-info
+                  exclude: []
+                card:
+                  type: custom:layout-card
+                  cards: []
+                  layout_type: masonry
+                sort:
+                  method: friendly_name
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -6358,6 +6588,8 @@ views:
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
+                  - more_info_popup
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: Updates
@@ -6373,9 +6605,6 @@ views:
                           - install_status
                           - installed_version
                           - latest_version
-                        features:
-                          - type: update-actions
-                            backup: 'yes'
                   exclude: []
                 card:
                   type: custom:layout-card
@@ -6383,41 +6612,100 @@ views:
                   layout_type: masonry
                 sort:
                   method: friendly_name
-              - type: custom:mushroom-chips-card
-                alignment: center
-                chips:
-                  - type: template
-                    content: Updates Page
-                    tap_action:
-                      action: navigate
-                      navigation_path: /config/updates
-                card_mod:
-                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
-                    \ rgba(var(--rgb-dark-grey), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
-                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
-                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
-                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
-                    \ rgba(var(--rgb-disabled), 0.2);\n}\n"
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-around;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button
+                      name: Updates Page
+                      icon: mdi:update
+                      tap_action:
+                        action: navigate
+                        navigation_path: /config/updates
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
+                hash: '#timers'
+                show_header: false
+                width_desktop: 40vw
+                margin_top_desktop: 20vh
+                margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
+                  - more_info_popup
+                button_type: name
+              - type: custom:bubble-card
+                card_type: separator
+                name: Timers
+                modules:
+                  - default
+              - type: custom:auto-entities
+                card:
+                  type: custom:timer-bar-card
+                filter:
+                  template: "{%- set results = namespace(timers = []) -%} {%- set\
+                    \ state_map = {\n  \"set\": \"active\",\n  \"ringing\": \"active\"\
+                    ,\n} -%} {%- set icon_map = {\n  \"set\": \"mdi:timer\",\n  \"\
+                    ringing\": \"mdi:timer-alert\",\n  \"paused\": \"mdi:timer-pause\"\
+                    ,\n} -%} {%- for entity_id in integration_entities('google_home')\n\
+                    \  if entity_id is contains '_timers'\n-%}\n  {%- set multiple\
+                    \ = not loop.first or not loop.last -%}\n  {%- set suffix = ''\n\
+                    \    if not multiple\n    else ' ⸱ ' + state_attr(entity_id, 'friendly_name')\
+                    \ | replace(' timers', '')\n  -%}\n  {%- for t in state_attr(entity_id,\
+                    \ 'timers') if as_timestamp(t.local_time_iso) > as_timestamp(now())\
+                    \ -%}\n    {%- set label = t.label if t.label else t.duration\
+                    \ | regex_replace('^0:0*', '') -%}\n    {%- set results.timers\
+                    \ = results.timers + [{\n      'entity': entity_id,\n      'icon':\
+                    \ icon_map[t.status],\n      'duration': {'fixed': t.duration},\n\
+                    \      'end_time': {'fixed': t.local_time_iso},\n      'name':\
+                    \ label + suffix,\n      'state': {'fixed': state_map[t.status]\
+                    \ | default(t.status)},\n      'bar_width': 'calc(70% - 10em)',\n\
+                    \      \"extend_paper_buttons_row\": {\n        \"position\":\
+                    \ \"right\",\n        \"buttons\": [\n          {\n          \
+                    \  \"icon\": \"mdi:close\",\n            \"tooltip\": \"Dismiss\"\
+                    ,\n            \"tap_action\": {\n              \"action\": \"\
+                    call-service\",\n              \"service\": \"google_home.delete_timer\"\
+                    ,\n              \"service_data\": {\n                \"timer_id\"\
+                    : t.timer_id,\n                \"entity_id\": entity_id,\n   \
+                    \             \"skip_refresh\": False,\n              }\n    \
+                    \        }\n          }\n        ]\n      }\n    }] -%}\n  {%-\
+                    \ endfor -%}\n{%- endfor -%} {{ results.timers }}"
       - type: grid
         cards:
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
                 card_type: pop-up
-                modules:
-                  - default
                 hash: '#air-quality'
                 show_header: false
                 width_desktop: 40vw
                 margin_top_desktop: 20vh
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Air Quality
                 modules:
                   - default
-              - type: custom:mushroom-title-card
-                title: Inside
+              - type: heading
+                icon: mdi:home
+                heading: Inside
+                heading_style: title
               - type: custom:bar-card
                 card_mod:
                   style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
@@ -6518,8 +6806,10 @@ views:
                       - color: var(--red-color)
                         from: '300'
                         to: '500'
-              - type: custom:mushroom-title-card
-                title: Outside
+              - type: heading
+                icon: mdi:spa
+                heading: Outside
+                heading_style: title
               - type: custom:mushroom-template-card
                 entity: sensor.airnow_air_quality_index
                 primary: 'AQI: {{ state_attr(entity, "description") }}'
@@ -6613,43 +6903,40 @@ views:
             cards:
               - type: custom:bubble-card
                 card_type: pop-up
-                modules:
-                  - default
                 hash: '#allergy'
                 show_header: false
                 width_desktop: 40vw
                 margin_top_desktop: 20vh
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Allergy
                 modules:
                   - default
-              - type: custom:mushroom-title-card
-                title: Allergens
-              - type: custom:mushroom-template-card
-                entity: sensor.allergy_index_today
-                secondary: "{%- set ns = namespace(allergens=[]) -%} {%- for id in\
+              - type: heading
+                icon: mdi:flower-pollen
+                heading: Allergens
+                heading_style: title
+              - type: markdown
+                content: "{%- set ns = namespace(allergens=[]) -%}\n{%- for id in\
                   \ range(1, 4) -%}\n  {%- set attr = \"allergen_name_\" ~ id -%}\n\
-                  \  {%- if not state_attr(entity, attr) in [\"unknown\", \"unavailable\"\
-                  , None] -%}\n    {%- set ns.allergens = ns.allergens + [ state_attr(entity,\
+                  \  {%- if not state_attr(\"sensor.allergy_index_today\", attr) in\
+                  \ [\"unknown\", \"unavailable\", None] -%}\n    {%- set ns.allergens\
+                  \ = ns.allergens + [ state_attr(\"sensor.allergy_index_today\",\
                   \ attr) ] -%}\n  {%- endif -%}\n{%- endfor -%} {{ ns.allergens |\
                   \ join(\", \") }}\n{{ state_attr(\"sensor.allergy_index_forecasted_average\"\
                   , \"outlook\") | default(\"\", true) }}"
-                multiline_secondary: true
-                tap_action:
-                  action: none
-                hold_action:
-                  action: none
-                double_tap_action:
-                  action: none
-                card_mod:
-                  style: "ha-card {\n  /* Make card non-responsive to select and pointer\
-                    \ */\n  user-select: none;\n  pointer-events: none;\n  --ha-card-border-width:\
-                    \ 0;\n  --ha-card-box-shadow: none;\n}\n"
-              - type: custom:mushroom-title-card
-                title: Forecast
-                subtitle: Allergy
+                text_only: true
+              - type: heading
+                icon: mdi:flower-pollen-outline
+                heading: Forecast
+                heading_style: title
+              - type: heading
+                icon: ''
+                heading: Allergy
+                heading_style: subtitle
               - type: custom:bar-card
                 card_mod:
                   style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
@@ -6681,8 +6968,10 @@ views:
                   - color: var(--red-color)
                     from: '9.7'
                     to: '12'
-              - type: custom:mushroom-title-card
-                subtitle: Asthma
+              - type: heading
+                icon: ''
+                heading: Asthma
+                heading_style: subtitle
               - type: custom:bar-card
                 card_mod:
                   style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
@@ -6714,8 +7003,10 @@ views:
                   - color: var(--red-color)
                     from: '9.7'
                     to: '12'
-              - type: custom:mushroom-title-card
-                subtitle: Cold
+              - type: heading
+                icon: ''
+                heading: Cold
+                heading_style: subtitle
               - type: custom:bar-card
                 card_mod:
                   style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
@@ -6754,7 +7045,7 @@ views:
                 show_header: false
                 margin_top_desktop: 30vh
                 width_desktop: 40vw
-                margin_top_mobile: 30vh
+                margin_top_mobile: 10vw
                 modules:
                   - default
               - type: custom:bubble-card
@@ -6865,6 +7156,8 @@ views:
                     icon: mdi:remote
                     tap_action:
                       action: none
+                modules:
+                  - default
               - type: custom:mushroom-template-card
                 entity: water_heater.ge_oven
                 multiline_secondary: false
@@ -6908,33 +7201,6 @@ views:
                   {% endif %}'
                 tap_action:
                   action: more-info
-                card_mod:
-                  style:
-                    .: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
-                    mushroom-shape-icon$: "{%- set cook_time_remain = 'sensor.ge_oven_cook_time_remaining'\
-                      \ -%} {%- set cook_time_duration = 'sensor.ge_oven_cook_time_duration'\
-                      \ -%} {%- set timer_remain = 'sensor.ge_oven_kitchen_timer'\
-                      \ -%} {%- set timer_duration = 'sensor.ge_oven_kitchen_timer_duration'\
-                      \ -%}\n{%- set entity_remain = '00:00' -%} {%- set entity_duration\
-                      \ = '00:00' -%} {%- if has_value(timer_remain)\n  and has_value(timer_duration)\n\
-                      \  and not is_state(timer_duration, 'Off')\n-%}\n  {%- set entity_remain\
-                      \ = states(timer_remain) -%}\n  {%- set entity_duration = states(timer_duration)\
-                      \ -%}\n{%- elif has_value(cook_time_remain)\n  and has_value(cook_time_duration)\n\
-                      \  and not is_state(cook_time_duration, 'Off')\n-%}\n  {%- set\
-                      \ entity_remain = states(cook_time_remain) -%}\n  {%- set entity_duration\
-                      \ = states(cook_time_duration) -%}\n{%- endif -%}\n{%- set remaining\
-                      \ =\n  (int(entity_remain.split(\":\")[0], 0) * 60)\n  + (int(entity_remain.split(\"\
-                      :\")[1], 0)) -%}\n{%- set duration =\n  (int(entity_duration.split(\"\
-                      :\")[0], 0) * 60)\n    + (int(entity_duration.split(\":\")[1],\
-                      \ 0))\n-%}\n{%- if duration - remaining > 0 -%} .shape {\n \
-                      \ /* Radial progress bar */\n  background:\n    radial-gradient(var(--card-background-color)\
-                      \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--purple-color)\
-                      \ {{ ((duration - remaining) / duration * 100) | round() }}%\
-                      \ 0%, var(--card-background-color) 0% 100%);\n} .shape:after\
-                      \ {\n  /* Add back icon shape */\n  content: \"\";\n  height:\
-                      \ 100%;\n  width: 100%;\n  position: absolute;\n  border-radius:\
-                      \ var(--icon-border-radius);\n  background: var(--shape-color);\n\
-                      } {%- endif -%}\n"
               - type: custom:timer-bar-card
                 filter: true
                 invert: true
@@ -6957,209 +7223,223 @@ views:
                     name: Cook
                   - entity: timer.ge_oven_kitchen
                     name: Kitchen
-              - type: grid
-                square: false
-                columns: 4
-                cards:
-                  - type: custom:mushroom-template-card
-                    icon: mdi:power
-                    icon_color: "{% if is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') %}\n  grey\n{% else %}\n  red\n{% endif %}\n"
-                    layout: vertical
-                    primary: 'Off'
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_operation_mode
-                      service_data:
-                        entity_id: water_heater.ge_oven
-                        operation_mode: 'Off'
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 300) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 300°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 300
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 350) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 350°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 350
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 375) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 375°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 375
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 400) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 400°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 400
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 425) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 425°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 425
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 450) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 450°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 450
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-                  - type: custom:mushroom-template-card
-                    icon: mdi:thermometer
-                    icon_color: "{% if not is_state_attr('water_heater.ge_oven', 'operation_mode',\
-                      \ 'Off') and is_state_attr('water_heater.ge_oven', 'temperature',\
-                      \ 475) %}\n  red\n{% else %}\n  grey\n{% endif %}\n"
-                    layout: vertical
-                    primary: 475°F
-                    tap_action:
-                      action: call-service
-                      service: water_heater.set_temperature
-                      data:
-                        temperature: 475
-                        operation_mode: Bake
-                      target:
-                        entity_id: water_heater.ge_oven
-                    card_mod:
-                      style:
-                        mushroom-state-info$: ".primary {\n  position: relative;\n\
-                          \  bottom: 5px !important;\n}\n.container {\n --card-primary-font-size:\
-                          \ 12px;\n}\n"
-                        .: "ha-card {\n  --ha-card-border-width: 0;\n  padding-right:\
-                          \ 0px !important;\n  padding-left: 0px !important;\n  padding-bottom:\
-                          \ 3px !important;\n  padding-top: 3px !important;\n}\nha-state-icon\
-                          \ {\n  --icon-symbol-size: 18px;\n}\n"
-              - type: custom:mushroom-select-card
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-around;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 300°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '300'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 300
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 350°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '350'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 350
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 375°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '375'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 375
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 400°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '400'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 400
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 425°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '425'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 425
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 450°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '450'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 450
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 475°F
+                      icon: mdi:thermometer
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    && entity.attributes.operation_mode === '475'\n\
+                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_temperature
+                        service_data:
+                          temperature: 475
+                          operation_mode: Bake
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-around;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 'Off'
+                      icon: mdi:power
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_operation_mode
+                        service_data:
+                          entity_id: water_heater.ge_oven
+                          operation_mode: 'Off'
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+              - features:
+                  - type: select-options
+                type: tile
                 entity: select.ge_oven_operation
+                features_position: inline
                 name: Mode
                 icon: mdi:heating-coil
-                secondary_info: none
-                layout: horizontal
-                tap_action:
-                  action: more-info
-                card_mod:
-                  style: "ha-card {\n  --ha-card-border-width: 0;\n}\n"
+                color: blue
+                hide_state: true
+                vertical: false
               - type: custom:bubble-card
                 card_type: separator
                 name: Burners
@@ -7339,44 +7619,8 @@ views:
         icon: '{{ iif(is_state(entity, "on"), "mdi:door-open", "mdi:door") }}'
         color: '{{ iif(is_state(entity, "on"), "cyan", "grey") }}'
         tap_action:
-          action: fire-dom-event
-          browser_mod:
-            service: browser_mod.popup
-            data:
-              title: All Doors
-              content:
-                type: custom:vertical-stack-in-card
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n}\n"
-                cards:
-                  - type: heading
-                    icon: mdi:door
-                    heading: All Doors
-                    heading_style: title
-                    badges:
-                      - type: entity
-                        entity: binary_sensor.all_doors
-                        color: red
-                  - type: custom:auto-entities
-                    show_empty: false
-                    card:
-                      type: custom:layout-card
-                      cards: []
-                      layout_type: masonry
-                    sort:
-                      method: friendly_name
-                    filter:
-                      include:
-                        - group: binary_sensor.all_doors
-                          options:
-                            type: custom:mushroom-entity-card
-                            layout: horizontal
-                            secondary_info: last-changed
-                            tap_action:
-                              action: none
-                            hold_action:
-                              action: none
+          action: navigate
+          navigation_path: '#doors'
         visibility:
           - condition: state
             entity: binary_sensor.all_doors
@@ -7427,7 +7671,7 @@ views:
         label: Bambu
         content: "{% if is_state(entity, \"running\") and\nhas_value(\"sensor.bambu_p1s_current_layer\"\
           ) %}\n  {{ states('sensor.bambu_p1s_current_layer') }} / {{\n  states('sensor.bambu_p1s_total_layer_count')\
-          \ }}\n{% endif %}"
+          \ }}\n{% else %}\n  3D\n{% endif %}"
         icon: mdi:printer-3d
         color: "{% if is_state(\"sensor.bambu_p1s_current_stage\", \"idle\") %}\n\
           \  grey\n{% elif is_state(entity, \"running\") %}\n  green\n{% elif is_state(entity,\
@@ -7495,99 +7739,27 @@ views:
             entity: sensor.water_softener_salt_monitor_salt_level
             below: 10
       - type: custom:mushroom-template-badge
-        show_name: true
         entity: sensor.low_battery_devices
         label: Battery
         content: '{{ states(entity) }}'
         icon: mdi:battery-alert
         color: red
         tap_action:
-          action: fire-dom-event
-          browser_mod:
-            service: browser_mod.popup
-            data:
-              title: Low Battery Devices
-              content:
-                type: custom:vertical-stack-in-card
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n}\n"
-                cards:
-                  - type: custom:auto-entities
-                    filter:
-                      include:
-                        - group: sensor.low_battery_devices
-                          options:
-                            type: custom:mushroom-template-card
-                            primary: '{{ states(entity, with_unit=true) }}'
-                            secondary: "{{ state_attr(entity, \"friendly_name\")\n\
-                              \  | regex_replace(find=\" battery level\", replace=\"\
-                              \", ignorecase=true) }}"
-                            icon: '{% from "util.jinja" import battery_icon %} {{
-                              battery_icon(entity) }}
-
-                              '
-                            icon_color: '{% from "util.jinja" import battery_color
-                              %} {{ battery_color(entity) }}'
-                            badge_color: red
-                            badge_icon: "{% if int(states(entity), 0) <= 15 %}\n \
-                              \ mdi:exclamation-thick\n{% endif %}"
-                            layout: horizontal
-                            tap_action:
-                              action: more-info
-                      exclude: []
-                    card:
-                      type: custom:layout-card
-                      cards: []
-                      layout_type: masonry
-                    sort:
-                      method: friendly_name
+          action: navigate
+          navigation_path: '#low-battery'
         visibility:
           - condition: numeric_state
             entity: sensor.low_battery_devices
             above: 0
       - type: custom:mushroom-template-badge
-        show_name: true
         entity: sensor.offline_devices
         label: Offline
         content: '{{ states(entity) }}'
         icon: mdi:network-off
         color: blue-grey
         tap_action:
-          action: fire-dom-event
-          browser_mod:
-            service: browser_mod.popup
-            data:
-              title: Offline Devices
-              content:
-                type: custom:vertical-stack-in-card
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n  --ha-card-box-shadow: none;\n}\n"
-                cards:
-                  - type: custom:auto-entities
-                    filter:
-                      include:
-                        - group: sensor.offline_devices
-                          options:
-                            type: custom:mushroom-template-card
-                            primary: '{{ state_attr(entity, "friendly_name") | regex_replace(find="
-                              last seen", replace="", ignorecase=true) }}'
-                            secondary: "{%- if has_value(entity) -%}\n  {{ as_datetime(states(entity)).strftime(\"\
-                              %Y-%m-%d %-I:%M %p\") }}\n{%- else -%}\n  Unknown\n\
-                              {%- endif -%}"
-                            icon: mdi:network-off
-                            icon_color: yellow
-                            layout: horizontal
-                            tap_action:
-                              action: more-info
-                      exclude: []
-                    card:
-                      type: custom:layout-card
-                      cards: []
-                      layout_type: masonry
-                    sort:
-                      method: friendly_name
+          action: navigate
+          navigation_path: '#offline-devices'
         visibility:
           - condition: numeric_state
             entity: sensor.offline_devices
@@ -7618,49 +7790,8 @@ views:
         icon: mdi:timer
         color: lime
         tap_action:
-          action: fire-dom-event
-          browser_mod:
-            service: browser_mod.popup
-            data:
-              title: Timers
-              content:
-                type: custom:vertical-stack-in-card
-                card_mod:
-                  style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                    \ 0;\n}\n"
-                cards:
-                  - type: custom:auto-entities
-                    show_empty: false
-                    card:
-                      type: custom:timer-bar-card
-                    filter:
-                      template: "{%- set results = namespace(timers = []) -%} {%-\
-                        \ set state_map = {\n  \"set\": \"active\",\n  \"ringing\"\
-                        : \"active\",\n} -%} {%- set icon_map = {\n  \"set\": \"mdi:timer\"\
-                        ,\n  \"ringing\": \"mdi:timer-alert\",\n  \"paused\": \"mdi:timer-pause\"\
-                        ,\n} -%} {%- for entity_id in integration_entities('google_home')\n\
-                        \  if entity_id is contains '_timers'\n-%}\n  {%- set multiple\
-                        \ = not loop.first or not loop.last -%}\n  {%- set suffix\
-                        \ = ''\n    if not multiple\n    else ' ⸱ ' + state_attr(entity_id,\
-                        \ 'friendly_name')\n    | replace(' timers', '')\n  -%}\n\
-                        \  {%- for t in state_attr(entity_id, 'timers') if as_timestamp(t.local_time_iso)\
-                        \ > as_timestamp(now()) -%}\n    {%- set label = t.label if\
-                        \ t.label else t.duration | regex_replace('^0:0*', '') -%}\n\
-                        \    {%- set results.timers = results.timers + [{\n      'entity':\
-                        \ entity_id,\n      'icon': icon_map[t.status],\n      'duration':\
-                        \ {'fixed': t.duration},\n      'end_time': {'fixed': t.local_time_iso},\n\
-                        \      'name': label + suffix,\n      'state': {'fixed': state_map[t.status]\
-                        \ | default(t.status)},\n      \"extend_paper_buttons_row\"\
-                        : {\n        \"position\": \"right\",\n        \"buttons\"\
-                        : [\n          {\n            \"icon\": \"mdi:close\",\n \
-                        \           \"tooltip\": \"Dismiss\",\n            \"tap_action\"\
-                        : {\n              \"action\": \"call-service\",\n       \
-                        \       \"service\": \"google_home.delete_timer\",\n     \
-                        \         \"service_data\": {\n                \"timer_id\"\
-                        : t.timer_id,\n                \"entity_id\": entity_id,\n\
-                        \                \"skip_refresh\": False,\n              }\n\
-                        \            }\n          }\n        ]\n      }\n    }] -%}\n\
-                        \  {%- endfor -%}\n{%- endfor -%} {{ results.timers }}"
+          action: navigate
+          navigation_path: '#timers'
         visibility:
           - condition: or
             conditions:
@@ -7673,7 +7804,12 @@ views:
               - condition: state
                 entity: sensor.office_speaker_timers
                 state_not: unavailable
-        content: Timers
+        label: Timer
+        content: "{%- from 'easy_time.jinja' import easy_time -%}\n{%- set _ = namespace(found=false)\
+          \ -%}\n{%- for entity_id in integration_entities('google_home') if entity_id\
+          \ is contains '_timers' -%}\n  {%- if has_value(entity_id) and not _.found\
+          \ -%}\n    {%- set _.found = true -%}\n    {{ easy_time(entity_id, short=true)\
+          \ }}\n  {%- endif -%}\n{%- endfor -%}"
     cards: []
   - title: Living Room
     path: living
@@ -7707,6 +7843,8 @@ views:
             attribute: brightness
             tap_action:
               action: toggle
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -7724,12 +7862,10 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n  ]\n    .filter(n => n && ![\"\
-              Unknown\",\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n\
-              }"
+            styles: ''
+            modules:
+              - default
+              - light_color_state
           - features:
               - type: fan-speed
             type: tile
@@ -7746,8 +7882,8 @@ views:
                   \ {% set speed = state_attr(config.entity, 'percentage') %}\n  \
                   \  {% set color = {\n      33: \"green\",\n      66: \"orange\"\
                   ,\n      100: \"red\"\n    }[speed] %}\n  {% else %}\n    {% set\
-                  \ color = \"disabled\" %}\n  {% endif %}\n  --tile-color: var(--{{\
-                  \ color }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
+                  \ color = \"grey\" %}\n  {% endif %}\n  --tile-color: var(--{{ color\
+                  \ }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
                   \ 'on') %}\n    {% set speed = state_attr(config.entity, 'percentage')\
                   \ %}\n    animation: {{ (2 - (speed / 100)) | round(2) }}s rotation\
                   \ linear infinite;\n  {% endif %}\n}\n@keyframes rotation {\n  0%\
@@ -7926,6 +8062,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -7943,15 +8081,13 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"rgb_color\") || \"\"),\n  ]\n    .filter(n => n && ![\"Unknown\"\
-              ,\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n}"
+            styles: ''
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
+              - light_color_state
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -7968,6 +8104,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
     cards: []
     badges:
       - type: custom:mushroom-template-badge
@@ -8046,6 +8184,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -8059,6 +8199,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -8075,6 +8217,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -8089,6 +8233,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
       - type: grid
         cards:
           - type: heading
@@ -8188,12 +8334,15 @@ views:
               - entity: sensor.dreamscreen_family_room_mode
                 state: Ambient
             card:
-              type: custom:mushroom-select-card
+              features:
+                - type: select-options
+              type: tile
               entity: input_select.dreamscreen_family_room_scene
               name: Ambient Scene
-              layout: horizontal
-              secondary_info: none
-              icon_color: amber
+              features_position: inline
+              vertical: false
+              color: amber
+              hide_state: true
     badges:
       - type: custom:mushroom-template-badge
         entity: binary_sensor.family_room_occupancy
@@ -8402,6 +8551,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -8419,14 +8570,13 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"rgb_color\") || \"\"),\n  ]\n    .filter(n => n && ![\"Unknown\"\
-              ,\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n}"
+            styles: ''
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
+              - light_color_state
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -8444,15 +8594,13 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n  ]\n    .filter(n => n && ![\"\
-              Unknown\",\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n\
-              }"
+            styles: ''
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
+              - light_color_state
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -8467,6 +8615,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -8481,6 +8631,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:mini-media-player
             entity: media_player.cast_office_speaker
             name: Google Home
@@ -8582,12 +8734,10 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n  ]\n    .filter(n => n && ![\"\
-              Unknown\",\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n\
-              }"
+            styles: ''
+            modules:
+              - default
+              - light_color_state
     icon: mdi:skull
     cards: []
     badges:
@@ -8647,6 +8797,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
       - type: grid
         cards:
           - type: heading
@@ -8666,17 +8818,14 @@ views:
                   action: more-info
           - type: vertical-stack
             cards:
-              - type: custom:bubble-card
-                card_type: select
+              - features:
+                  - type: select-options
+                type: tile
                 entity: select.nebula_projector_ethan_scene
-                icon: mdi:crystal-ball
-                show_state: true
+                features_position: inline
+                hide_state: true
                 name: Scene
-                card_layout: large
-                double_tap_action:
-                  action: more-info
-                hold_action:
-                  action: more-info
+                icon: mdi:crystal-ball
               - type: custom:bubble-card
                 card_type: button
                 button_type: slider
@@ -8694,13 +8843,10 @@ views:
                     name: More Info
                     icon: mdi:palette
                     state_background: false
-                styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-                  off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n\
-                  \    (hass.formatEntityAttributeValue(hass.states[entity], \"brightness\"\
-                  ) || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-                  \ \"color_temp_kelvin\") || \"\"),\n  ]\n    .filter(n => n && ![\"\
-                  Unknown\",\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  :\
-                  \ ''\n}"
+                styles: ''
+                modules:
+                  - default
+                  - light_color_state
               - square: false
                 type: grid
                 columns: 2
@@ -8718,6 +8864,8 @@ views:
                       action: toggle
                     hold_action:
                       action: more-info
+                    modules:
+                      - default
                   - type: custom:bubble-card
                     card_type: button
                     button_type: slider
@@ -8731,6 +8879,8 @@ views:
                       action: toggle
                     hold_action:
                       action: more-info
+                    modules:
+                      - default
             visibility:
               - condition: state
                 entity: switch.nebula_projector_ethan_main_switch
@@ -8795,6 +8945,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
       - type: grid
         cards:
           - type: heading
@@ -8814,17 +8966,15 @@ views:
                   action: more-info
           - type: vertical-stack
             cards:
-              - type: custom:bubble-card
-                card_type: select
+              - features:
+                  - type: select-options
+                type: tile
                 entity: select.nebula_projector_emma_scene
-                icon: mdi:crystal-ball
-                show_state: true
+                features_position: inline
+                vertical: false
+                hide_state: true
                 name: Scene
-                card_layout: large
-                double_tap_action:
-                  action: more-info
-                hold_action:
-                  action: more-info
+                icon: mdi:crystal-ball
               - type: custom:bubble-card
                 card_type: button
                 button_type: slider
@@ -8842,13 +8992,10 @@ views:
                     name: More Info
                     icon: mdi:palette
                     state_background: false
-                styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-                  off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n\
-                  \    (hass.formatEntityAttributeValue(hass.states[entity], \"brightness\"\
-                  ) || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-                  \ \"color_temp_kelvin\") || \"\"),\n  ]\n    .filter(n => n && ![\"\
-                  Unknown\",\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  :\
-                  \ ''\n}"
+                styles: ''
+                modules:
+                  - default
+                  - light_color_state
               - square: false
                 type: grid
                 columns: 2
@@ -8866,6 +9013,8 @@ views:
                       action: toggle
                     hold_action:
                       action: more-info
+                    modules:
+                      - default
                   - type: custom:bubble-card
                     card_type: button
                     button_type: slider
@@ -8879,6 +9028,8 @@ views:
                       action: toggle
                     hold_action:
                       action: more-info
+                    modules:
+                      - default
             visibility:
               - condition: state
                 entity: switch.nebula_projector_emma_main_switch
@@ -8942,6 +9093,8 @@ views:
               action: toggle
             hold_action:
               action: more-info
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -8958,6 +9111,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -8975,15 +9130,13 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n  ]\n    .filter(n => n && ![\"\
-              Unknown\",\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n\
-              }"
+            styles: ''
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
+              - light_color_state
           - features:
               - type: fan-speed
             type: tile
@@ -9000,8 +9153,8 @@ views:
                   \ {% set speed = state_attr(config.entity, 'percentage') %}\n  \
                   \  {% set color = {\n      33: \"green\",\n      66: \"orange\"\
                   ,\n      100: \"red\"\n    }[speed] %}\n  {% else %}\n    {% set\
-                  \ color = \"disabled\" %}\n  {% endif %}\n  --tile-color: var(--{{\
-                  \ color }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
+                  \ color = \"grey\" %}\n  {% endif %}\n  --tile-color: var(--{{ color\
+                  \ }}-color);\n}\nha-state-icon {\n  {% if is_state(config.entity,\
                   \ 'on') %}\n    {% set speed = state_attr(config.entity, 'percentage')\
                   \ %}\n    animation: {{ (2 - (speed / 100)) | round(2) }}s rotation\
                   \ linear infinite;\n  {% endif %}\n}\n@keyframes rotation {\n  0%\
@@ -9046,7 +9199,7 @@ views:
             name: Right
           - type: custom:mushroom-template-card
             primary: '{% set energy = states(''sensor.bed_presence_f56148_left_pressure'')
-              | int(-1) %} {{ ''?'' if energy < 0 else energy }}/{{ states(''number.bed_presence_f56148_left_trigger_pressure'')
+              | int(-1) %} {{ ''-'' if energy < 0 else energy }}/{{ states(''number.bed_presence_f56148_left_trigger_pressure'')
               | int(0) }}'
             entity: number.bed_presence_f56148_left_trigger_pressure
             tap_action:
@@ -9059,7 +9212,7 @@ views:
                 \ energy }}%, transparent {{energy}}%);\n  {% endif %}\n}\n"
           - type: custom:mushroom-template-card
             primary: '{% set energy = states(''sensor.bed_presence_f56148_right_pressure'')
-              | int(-1) %} {{ ''?'' if energy < 0 else energy }}/{{ states(''number.bed_presence_f56148_right_trigger_pressure'')
+              | int(-1) %} {{ ''-'' if energy < 0 else energy }}/{{ states(''number.bed_presence_f56148_right_trigger_pressure'')
               | int(0) }}'
             entity: number.bed_presence_f56148_right_trigger_pressure
             tap_action:
@@ -9213,6 +9366,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -9229,6 +9384,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
       - type: grid
         cards:
           - type: heading
@@ -9255,24 +9412,44 @@ views:
               - condition: state
                 entity: binary_sensor.water_leak_detected
                 state: 'on'
-          - type: custom:mushroom-template-card
-            primary: Water Main Valve
-            secondary: "{%- if is_state(entity, \"open\") -%}\n  Press and hold to\
-              \ close\n{%- elif is_state(entity, \"closed\") -%}\n  Press and hold\
-              \ to open\n{%- endif -%}"
-            entity: valve.water_main_valve
-            icon: "{%- if is_state(entity, \"open\") -%}\n  mdi:valve-open\n{%- elif\
-              \ is_state(entity, \"closed\") -%}\n  mdi:valve-closed\n{%- else -%}\n\
-              \  mdi:valve\n{%- endif -%}"
-            icon_color: "{%- if is_state(entity, \"open\") -%}\n  green\n{%- elif\
-              \ is_state(entity, \"closed\") -%}\n  red\n{%- else -%}\n  grey\n{%-\
-              \ endif -%}"
-            tap_action:
-              action: more-info
-            hold_action:
-              action: toggle
-            layout_options:
-              grid_columns: full
+          - type: custom:mod-card
+            style:
+              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                \ wrap;\n  justify-content: space-around;\n}\n"
+            card:
+              type: grid
+              square: false
+              cards:
+                - type: custom:button-card
+                  template: button_label
+                  entity: valve.water_main_valve
+                  name: Water Main Valve
+                  label: "[[[\n  if (entity.state == \"open\") {\n    return \"Press\
+                    \ and Hold to Close\";\n  } else if (entity.state == \"closed\"\
+                    ) {\n    return \"Press and Hold to Open\";\n  }\n]]]\n"
+                  icon: "[[[\n  if (entity.state == \"open\") {\n    return \"mdi:valve-open\"\
+                    ;\n  } else if (entity.state == \"closed\") {\n    return \"mdi:valve-closed\"\
+                    ;\n  } else {\n    return \"mdi:valve\";\n  }\n]]]\n"
+                  variables:
+                    color: "[[[\n  if (entity.state == \"open\") {\n    return \"\
+                      var(--green-color)\";\n  } else if (entity.state == \"closed\"\
+                      ) {\n    return \"var(--red-color)\";\n  } else {\n    return\
+                      \ \"var(--grey-color)\";\n  }\n]]]\n"
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: call-service
+                    service: script.turn_on
+                    service_data: {}
+                    target:
+                      entity_id: script.sql_purge
+                  styles:
+                    card:
+                      - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                          \ transparent 85%)`;\n]]]\n"
+                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                    \ {\n      background: color-mix(in srgb, ${variables.color},\
+                    \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
           - type: custom:expander-card
             gap: 0em
             padding: 0em
@@ -9436,15 +9613,13 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"rgb_color\") || \"\"),\n  ]\n    .filter(n => n && ![\"Unknown\"\
-              ,\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n}"
+            styles: ''
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
+              - light_color_state
           - type: custom:bubble-card
             card_type: button
             button_type: slider
@@ -9462,15 +9637,13 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: "${card.querySelector(\".bubble-state\").innerText = \n  ![\"\
-              off\",\"unknown\"].includes(hass.states[entity].state)\n  ? [\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"brightness\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"color_temp_kelvin\") || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
-              \ \"rgb_color\") || \"\"),\n  ]\n    .filter(n => n && ![\"Unknown\"\
-              ,\"Unavailable\"].includes(n))\n    .join(\" ⸱ \")\n  : ''\n}"
+            styles: ''
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
+              - light_color_state
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -9487,6 +9660,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -9503,6 +9678,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
       - type: grid
         cards:
           - type: heading
@@ -9626,6 +9803,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
           - type: custom:bubble-card
             card_type: button
             button_type: switch
@@ -9642,6 +9821,8 @@ views:
             grid_options:
               columns: 6
               rows: 1
+            modules:
+              - default
       - type: grid
         cards:
           - type: heading
@@ -9944,9 +10125,9 @@ views:
                 show_state: true
                 state_adaptive_color: true
           - type: custom:windrose-card
-            title: Wind Direction - 48 hrs
+            title: Wind Direction - 24 hrs
             data_period:
-              hours_to_show: 48
+              hours_to_show: 24
             max_width: 400
             refresh_interval: 30
             windspeed_bar_location: right
@@ -10681,6 +10862,8 @@ views:
                 show_icon: false
                 width_desktop: calc(100% - var(--mdc-drawer-width))
                 margin_top_mobile: calc(0px - var(--header-height))
+                modules:
+                  - default
               - type: custom:advanced-camera-card
                 cameras:
                   - camera_entity: camera.doorbell
@@ -11083,6 +11266,7 @@ views:
                       }\n"
                 attributes:
                   label: Current
+                  icon: mdi:home-thermometer
               - card:
                   type: custom:apexcharts-card
                   apex_config:
@@ -11150,6 +11334,7 @@ views:
                       color: rgb(255, 193, 7)
                 attributes:
                   label: History
+                  icon: mdi:history
               - card:
                   type: custom:apexcharts-card
                   apex_config:
@@ -11192,6 +11377,7 @@ views:
                       color: rgb(121,85,72)
                 attributes:
                   label: Other
+                  icon: mdi:pool-thermometer
       - type: grid
         cards:
           - type: heading
@@ -11935,20 +12121,20 @@ views:
                 \ `<ha-icon icon=\"mdi:cpu-64-bit\" style=\"width: 24px; height: 24px;\
                 \ color: var(--green-color);\"></ha-icon>\n    <span> CPU: <span style=\"\
                 color: var(--text-color-sensor);\">${states[entity_id].state !== 'unavailable'\
-                \ ? helpers.localize(states[entity_id], undefined, 0) : '?'}</span></span>`\n\
+                \ ? helpers.localize(states[entity_id], undefined, 0) : '-'}</span></span>`\n\
                 ]]]"
               stat2: "[[[\n  var entity_id = 'sensor.magicmirror_memory_usage';\n\
                 \  return `<ha-icon icon=\"mdi:memory\" style=\"width: 24px; height:\
                 \ 24px; color: var(--green-color);\"></ha-icon>\n    <span> RAM: <span\
                 \ style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
-                \ 0) : '?'}</span></span>`\n]]]"
+                \ 0) : '-'}</span></span>`\n]]]"
               stat3: "[[[\n  var entity_id = 'sensor.magicmirror_cpu_thermal_1_temperature';\n\
                 \  return `<ha-icon icon=\"mdi:thermometer\" style=\"width: 24px;\
                 \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span>\
                 \ Temp: <span style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
-                \ 0) : '?'}</span></span>`\n]]]"
+                \ 0) : '-'}</span></span>`\n]]]"
               info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Raspberry_Pi_5-C7053D?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgcm9sZT0iaW1nIgogICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIHNvZGlwb2RpOmRvY25hbWU9InJhc3BiZXJyeXBpLnN2ZyIKICAgaW5rc2NhcGU6dmVyc2lvbj0iMS40IChlN2MzZmViMTAwLCAyMDI0LTEwLTA5KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcwogICAgIGlkPSJkZWZzMSIgLz4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEiCiAgICAgcGFnZWNvbG9yPSIjZmZmZmZmIgogICAgIGJvcmRlcmNvbG9yPSIjMDAwMDAwIgogICAgIGJvcmRlcm9wYWNpdHk9IjAuMjUiCiAgICAgaW5rc2NhcGU6c2hvd3BhZ2VzaGFkb3c9IjIiCiAgICAgaW5rc2NhcGU6cGFnZW9wYWNpdHk9IjAuMCIKICAgICBpbmtzY2FwZTpwYWdlY2hlY2tlcmJvYXJkPSIwIgogICAgIGlua3NjYXBlOmRlc2tjb2xvcj0iI2QxZDFkMSIKICAgICBpbmtzY2FwZTp6b29tPSI0OC4zMzMzMzMiCiAgICAgaW5rc2NhcGU6Y3g9IjEyIgogICAgIGlua3NjYXBlOmN5PSIxMiIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjUxMjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTM3MSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzEiIC8+CiAgPHRpdGxlCiAgICAgaWQ9InRpdGxlMSI+UmFzcGJlcnJ5IFBpPC90aXRsZT4KICA8cGF0aAogICAgIGQ9Ik0gMTkuODk1NSwxMC44OTYxIDE5LjcyMjksMTAuNTkzMyBDIDE5LjcyOTcsOC40MTg3IDE4LjcyMDcsNy41MzIzIDE3LjU0NDEsNi44NTg1IDE3LjkwMDEsNi43NjQ3IDE4LjI2NzgsNi42ODc0IDE4LjM2ODYsNi4yNDAzIDE4Ljk4MDQsNi4wODM3IDE5LjEwODMsNS44MDA1IDE5LjE2OTcsNS41MDA1IDE5LjMyOTcsNS4zOTM5IDE5Ljg2NTIsNS4wOTQ0IDE5LjgwOTEsNC41Nzk0IDIwLjEwODksNC4zNzI1IDIwLjI3Niw0LjEwNjkgMjAuMTkxLDMuNzMwNyAyMC41MTMyLDMuMzc5MiAyMC41OTgsMy4wODg4IDIwLjQ2MTIsMi44MjExIDIwLjg0OCwyLjM0MDYgMjAuNjc2NCwyLjA5MTYgMjAuNTExMiwxLjgzOTQgMjAuODAwOSwxLjMxNCAyMC41NDUzLDAuNzUwNyAxOS43MzU0LDAuODQ1IDE5LjQxMzMsMC4zNzE3IDE4LjcxMSwwLjQ3OTEgMTguNjAyNCwwLjQ4MTMgMTguNDgwOSwwLjMyOTQgMTguMzIwNSwwLjE5OTIgMTcuODI2OSwwLjI2MjMgMTcuNTA3MiwtMC4wMjI4IDE3LjE0OTgsMC4wMjU5IDE2Ljc4MTEsMC4xNjU5IDE2LjM0MzMsLTAuMTc0NCAxNi4wNTM2LDAuMDk4NCAxNS43MjI3LDAuMjAxNSAxNS4xOTI3LDAuMDMwOSAxNS4wNzE0LDAuMjY0NiAxNC44MTEsMC4zNTk4IDE0LjIzMjksMC4yMzk1IDE0LjA1NzIsMC41MDE0IDEzLjc4MDEsMC43NzggTCAxMy40NTc3LDAuNzcxNyBDIDEyLjU4NTgsMS4yNzc4IDEyLjE1MjcsMi4zMDgzIDExLjk5OTIsMi44MzgxIDExLjg0NTYsMi4zMDgyIDExLjQxMzQsMS4yNzc3IDEwLjU0MTcsMC43NzE3IEwgMTAuMjE5NCwwLjc3OCBDIDkuOTQyLDAuNTAxNCA5Ljc2NjMsMC4yMzk0IDkuMTg4MywwLjM1OTcgOC45Mjc5LDAuMjY0NiA4LjgwNywwLjAzMDkgOC4yNzY2LDAuMjAxNSA4LjA1OTQsMC4xMzM4IDcuODU5NiwtMC4wMDY5IDcuNjI0NCwzZS00IGwgNGUtNCwyZS00IEMgNy41MDE3LDAuMDA0MSA3LjM2OSwwLjA0OSA3LjIxODUsMC4xNjYgNi44NDk3LDAuMDI1OSA2LjQ5MjMsLTAuMDIyNyA2LjE3MjYsMC4yNjI0IDUuNjc5LDAuMTk5MyA1LjUxODYsMC4zMjk1IDUuMzk3LDAuNDgxNCA1LjI4ODcsMC40NzkxIDQuNTg2MiwwLjM3MTcgNC4yNjQsMC44NDUgMy40NTQ0LDAuNzUwNyAzLjE5ODUsMS4zMTQxIDMuNDg4NCwxLjgzOTQgMy4zMjMxLDIuMDkxNSAzLjE1MTgsMi4zNDA3IDMuNTM4NCwyLjgyMTMgMy40MDE3LDMuMDg5IDMuNDg2NSwzLjM3OTQgMy44MDg3LDMuNzMwOSAzLjcyMzcsNC4xMDcyIDMuODkwOSw0LjM3MjcgNC4xOTA2LDQuNTc5NiA0LjEzNDUsNS4wOTQ2IDQuNjcwMSw1LjM5NCA0LjgzLDUuNTAwNyA0Ljg5MTQsNS44MDA4IDUuMDE5NCw2LjA4MzkgNS42MzExLDYuMjQwNSA1LjczMTksNi42ODc3IDYuMDk5Niw2Ljc2NDkgNi40NTU2LDYuODU4OCA1LjI3OSw3LjUzMjUgNC4yNyw4LjQxODggNC4yNzY4LDEwLjU5MzYgbCAtMC4xNzI0LDAuMzAyOCBjIC0xLjM0OTEsMC44MDgyIC0yLjU2MjksMy40MDU2IC0wLjY2NDgsNS41MTY3IDAuMTI0LDAuNjYwOSAwLjMzMTksMS4xMzU1IDAuNTE3MSwxLjY2MDkgMC4yNzY5LDIuMTE3IDIuMDg0MSwzLjEwODIgMi41NjA4LDMuMjI1NSAwLjY5ODQsMC41MjQgMS40NDIzLDEuMDIxMiAyLjQ0OSwxLjM2OTYgMC45NDksMC45NjQgMS45NzcsMS4zMzE0IDMuMDEwNywxLjMzMDggMC4wMTUyLDAgMC4wMzA2LDJlLTQgMC4wNDU3LDAgMS4wMzM3LDZlLTQgMi4wNjE4LC0wLjM2NjggMy4wMTA3LC0xLjMzMDggMS4wMDY3LC0wLjM0ODMgMS43NTA2LC0wLjg0NTYgMi40NDkxLC0xLjM2OTYgMC40NzY2LC0wLjExNzMgMi4yODM4LC0xLjEwODUgMi41NjA3LC0zLjIyNTUgMC4xODUxLC0wLjUyNTMgMC4zOTMxLC0xIDAuNTE3LC0xLjY2MDkgMS44OTgxLC0yLjExMTMgMC42ODQzLC00LjcwODkgLTAuNjY0OSwtNS41MTcgeiBtIC0xLjAzODYsLTAuMzcxNSBjIC0wLjA3MDQsMC44NzU5IC00LjYzNTQsLTMuMDUwNCAtMy44NDcyLC0zLjE4MDggMi4xMzkxLC0wLjM1NTggMy45MTkxLDAuODk2IDMuODQ3MiwzLjE4MDggeiBtIC0yLjAxNTUsNC4zNjQ5IGMgLTEuMTQ4MSwwLjc0MDkgLTIuODAyNSwwLjI2MjYgLTMuNjk1MywtMS4wNjgxIC0wLjg5MjgsLTEuMzMwNiAtMC42ODU4LC0zLjAxMDEgMC40NjIzLC0zLjc1MDkgMS4xNDgxLC0wLjc0MDkgMi44MDI1LC0wLjI2MjcgMy42OTUzLDEuMDY4IDAuODkyNywxLjMzMDcgMC42ODU4LDMuMDEwMSAtMC40NjIzLDMuNzUxIHogTSAxMy42NTkxLDEuMzcyMSBjIDAuMDM5NiwwLjE5NjcgMC4wODQzLDAuMzIxIDAuMTM1NCwwLjM1NzcgMC4yNTM3LC0wLjI3MiAwLjQ2MTEsLTAuNTUwNiAwLjc4NzgsLTAuODEyMyAwLjAwMTEsMC4xNTM3IC0wLjA3NzYsMC4zMjA1IDAuMTE2OSwwLjQ0MjUgMC4xNzUyLC0wLjIzNTYgMC40MTE5LC0wLjQ0NTkgMC43MjYzLC0wLjYyNDQgLTAuMTUxNCwwLjI2MTEgLTAuMDI2LDAuMzQwNCAwLjA1NTQsMC40NDg2IDAuMjQsLTAuMjA1OSAwLjQ2ODEsLTAuNDE0NCAwLjkxMDksLTAuNTc1OSAtMC4xMjEsMC4xNDc0IC0wLjI5MDIsMC4yOTE0IC0wLjExMDgsMC40NjA3IDAuMjQ3MywtMC4xNTQ0IDAuNDk2LC0wLjMwODYgMS4wODMzLC0wLjQxODMgLTAuMTMyMywwLjE0NzUgLTAuNDA1OSwwLjI5NSAtMC4yNDAxLDAuNDQyNiAwLjMxMDQsLTAuMTE4NiAwLjY1MzksLTAuMjA0NyAxLjAzNCwtMC4yNTQ2IC0wLjE4MiwwLjE0OTYgLTAuMzMzNywwLjI5NjMgLTAuMTg0NiwwLjQxMjIgMC4zMzIzLC0wLjEwMjIgMC43ODk5LC0wLjIzOTggMS4yMzcyLC0wLjEyMTIgbCAtMC4yODMyLDAuMjg0OSBjIC0wLjAzMTQsMC4wMzgyIDAuNjYyMywwLjAyOTcgMS4xMjAyLDAuMDM2NCAtMC4xNjcsMC4yMzIxIC0wLjMzNzUsMC40NTYyIC0wLjQzNywwLjg1NDggMC4wNDU0LDAuMDQ1OSAwLjI3MjMsMC4wMjA0IDAuNDg2MiwwIC0wLjIxOTQsMC40NjE4IC0wLjYwMDQsMC41NzgzIC0wLjY4OTMsMC43NzYgMC4xMzQsMC4xMDE1IDAuMzIsMC4wNzUgMC41MjMyLDAuMDA2IC0wLjE1OCwwLjMyNTQgLTAuNDg5MiwwLjU0ODQgLTAuNzUwOSwwLjgxMjMgMC4wNjYyLDAuMDQ3IDAuMTgxOCwwLjA3NSAwLjQ1NTUsMC4wNDI1IC0wLjI0MTgsMC4yNTcgLTAuNTMzOSwwLjQ5MiAtMC44ODAyLDAuNzAzMiAwLjA2MTQsMC4wNzA4IDAuMjcyMiwwLjA2ODEgMC40Njc4LDAuMDcyNyAtMC4zMTM2LDAuMzA2OSAtMC43MTczLDAuNDY2IC0xLjA5NTUsMC42NjY4IDAuMTg4NSwwLjEyODggMC4zMjM0LDAuMDk4OCAwLjQ2NzgsMC4wOTcgLTAuMjY3NiwwLjIxOTggLTAuNzIyNSwwLjMzNDIgLTEuMTQ0OCwwLjQ2NjggMC4wODAzLDAuMTI0OSAwLjE2MDcsMC4xNTg5IDAuMzMyNCwwLjE5NCAtMC40NDcsMC4yNDczIC0xLjA4NzMsMC4xMzQzIC0xLjI2NzksMC4yNjA3IDAuMDQzNSwwLjEyNDMgMC4xNjY1LDAuMjA1MyAwLjMxMzksMC4yNzI4IEMgMTYuMTA5Myw2LjcxODQgMTQuMTQxMSw2LjY1MDQgMTMuNzYzOCw1LjE2MSAxNC41MDA1LDQuMzUxNiAxNS44NDUxLDMuNDAxNyAxOC4xNTc4LDIuMjI3IDE2LjM1ODQsMi44MjkyIDE0LjczNDksMy42MzIgMTMuMzc2MSw0LjczNjYgMTEuNzc4MywzLjk5MyAxMi44Nzk2LDIuMTE2OSAxMy42NTkxLDEuMzcyMSBaIG0gLTEuNjEyNiw1LjM3MTggYyAxLjEzMjksLTAuMDEyMyAyLjUzNTYsMC44MzI1IDIuNTMsMS42Mjg2IEMgMTQuNTcxNSw5LjA3NTIgMTMuNTkxNCw5LjY0NCAxMi4wNTUyLDkuNjMzMiAxMC41NTA5LDkuNjE1NSA5LjUzOCw4LjkxODQgOS41NDE1LDguMjM3NSA5LjU0NDUsNy42NzcyIDEwLjc2OTcsNi43MTEyIDEyLjA0NjUsNi43NDM5IFogTSA2LjI4MTksNi4xNDMzIEMgNi40NTM2LDYuMTA4MiA2LjUzMzksNi4wNzQxIDYuNjE0Miw1Ljk0OTMgNi4xOTE5LDUuODE2NiA1LjczNyw1LjcwMjMgNS40Njk0LDUuNDgyNSA1LjYxMzgsNS40ODQzIDUuNzQ4Niw1LjUxNDMgNS45MzcyLDUuMzg1NSA1LjU1ODksNS4xODQ3IDUuMTU1Miw1LjAyNTYgNC44NDE2LDQuNzE4NyA1LjAzNzEsNC43MTM5IDUuMjQ4LDQuNzE2NyA1LjMwOTMsNC42NDU5IDQuOTYzMSw0LjQzNDYgNC42NzEsNC4xOTk2IDQuNDI5MiwzLjk0MjYgNC43MDMsMy45NzUxIDQuODE4NSwzLjk0NzEgNC44ODQ3LDMuOTAwMSA0LjYyMywzLjYzNjEgNC4yOTE3LDMuNDEzMSA0LjEzMzgsMy4wODc4IDQuMzM3LDMuMTU2OCA0LjUyMywzLjE4MzIgNC42NTcsMy4wODE4IDQuNTY4LDIuODg0MSA0LjE4NywyLjc2NzYgMy45Njc2LDIuMzA1OCBjIDAuMjE0LDAuMDIwNCAwLjQ0MDksMC4wNDU5IDAuNDg2MywwIEMgNC4zNTQ1LDEuOTA3MyA0LjE4NDEsMS42ODMyIDQuMDE3LDEuNDUxMSA0LjQ3NDksMS40NDQ0IDUuMTY4NiwxLjQ1MjkgNS4xMzcyLDEuNDE0NyBMIDQuODU0MSwxLjEyOTggQyA1LjMwMTMsMS4wMTEyIDUuNzU5LDEuMTQ4OCA2LjA5MTIsMS4yNTExIDYuMjQwNCwxLjEzNTIgNi4wODg2LDAuOTg4NSA1LjkwNjUsMC44Mzg4IDYuMjg2NiwwLjg4ODggNi42MzAxLDAuOTc0OSA2Ljk0MDUsMS4wOTM1IDcuMTA2NCwwLjk0NTkgNi44MzI5LDAuNzk4NCA2LjcwMDUsMC42NTA5IDcuMjg3NywwLjc2MDYgNy41MzY2LDAuOTE0OCA3Ljc4MzgsMS4wNjkyIDcuOTYzMiwwLjg5OTggNy43OTQxLDAuNzU1OSA3LjY3MywwLjYwODUgOC4xMTU4LDAuNzcgOC4zNDM5LDAuOTc4NSA4LjU4NCwxLjE4NDQgOC42NjU0LDEuMDc2MiA4Ljc5MDgsMC45OTY5IDguNjM5NCwwLjczNTggOC45NTM3LDAuOTE0MyA5LjE5MDUsMS4xMjQ2IDkuMzY1NywxLjM2MDIgOS41NjAyLDEuMjM4MiA5LjQ4MTYsMS4wNzE0IDkuNDgyNiwwLjkxNzYgOS44MDkzLDEuMTc5NCAxMC4wMTY2LDEuNDU4IDEwLjI3MDUsMS43MyAxMC4zMjE2LDEuNjkzNCAxMC4zNjY0LDEuNTY5IDEwLjQwNTksMS4zNzIzIDExLjE4NTMsMi4xMTcxIDEyLjI4NjYsMy45OTMxIDEwLjY4OSw0LjczNjkgOS4zMzAxLDMuNjMzIDcuNzA3MywyLjgzMDUgNS45MDksMi4yMjgzIDguMjIwNSwzLjQwMjMgOS41NjQ2LDQuMzUyMiAxMC4zMDEsNS4xNjExIDkuOTIzNyw2LjY1MDYgNy45NTU1LDYuNzE4NiA3LjIzNTksNi42NzY4IDcuMzgzMiw2LjYwOTIgNy41MDYyLDYuNTI4MyA3LjU0OTgsNi40MDQgNy4zNjkyLDYuMjc3NiA2LjcyODksNi4zOTA2IDYuMjgxOSw2LjE0MzMgWiBNIDkuMDk5NCw3LjI3NjcgQyA5Ljg4NzUsNy40MDcxIDUuMzIyNSwxMS4zMzM0IDUuMjUyMiwxMC40NTc2IDUuMTgwMyw4LjE3MyA2Ljk2MDEsNi45MjA5IDkuMDk5NCw3LjI3NjcgWiBtIC00Ljg0Nyw4Ljc1NjcgQyAzLjE0MywxNS4xNTQ1IDIuNzg1NiwxMi41ODA1IDQuODQyNSwxMS40MjM3IDYuMDgxOSwxMS4wOTY0IDUuMjYwOSwxNi40NzQ3IDQuMjUyNCwxNi4wMzM0IFogTSA4LjUxOCwyMC42MzIzIEMgNy44OTIzLDIxLjAwNDIgNi4zNzI4LDIwLjg1MSA1LjI5MjgsMTkuMzIyOCA0LjU2NDUsMTguMDQwNSA0LjY1ODMsMTYuNzM1NiA1LjE2OTgsMTYuMzUyMyBjIDAuNzY0OCwtMC40NTg5IDEuOTQ2NCwwLjE2MDkgMi44NTU5LDEuMjAwMyAwLjc5MjMsMC45NDA1IDEuMTUzNiwyLjU5MjcgMC40OTIzLDMuMDc5NyB6IE0gNy4yNzY1LDE1LjAyMzcgQyA2LjEyODQsMTQuMjgyOCA1LjkyMTQsMTIuNjAzNCA2LjgxNDIsMTEuMjcyNiA3LjcwNyw5Ljk0MTkgOS4zNjE0LDkuNDYzNyAxMC41MDk0LDEwLjIwNDYgYyAxLjE0ODEsMC43NDA5IDEuMzU1MSwyLjQyMDMgMC40NjIzLDMuNzUwOSAtMC44OTI2LDEuMzMwOCAtMi41NDcxLDEuODA5IC0zLjY5NTIsMS4wNjgyIHogbSA0Ljc5NDgsOC4yMjc5IEMgMTAuNjk1LDIzLjMxIDkuMzQ1NSwyMi4xNDExIDkuMzYzMiwyMS43MzU5IGMgLTAuMDIwNiwtMC41OTQgMS42NzU4LC0xLjA1NzggMi43ODIsLTEuMDMwNiAxLjExMzEsLTAuMDQ3OSAyLjYwNjgsMC4zNTMxIDIuNjA5NywwLjg4NTEgMC4wMTg0LDAuNTE2NiAtMS4zNTQ3LDEuNjgzOCAtMi42ODM2LDEuNjYxMiB6IG0gMi43NTg0LC01Ljg1NzggYyAwLjAwODEsMS4zODk5IC0xLjIyNiwyLjUyMjUgLTIuNzU2MiwyLjUyOTkgLTEuNTMwMiwwLjAwNzMgLTIuNzc3MywtMS4xMTM1IC0yLjc4NTQsLTIuNTAzMyB2IC0wLjAyNjUgYyAtMC4wMDgsLTEuMzg5OSAxLjIyNTksLTIuNTIyNiAyLjc1NjIsLTIuNTI5OSAxLjUzMDIsLTAuMDA3MyAyLjc3NzMsMS4xMTM0IDIuNzg1MywyLjUwMzMgMS44NGUtNCwwLjAwODggMi4xN2UtNCwwLjAxNzY3IDFlLTQsMC4wMjY1IHogbSAzLjg1NSwyLjAwMjkgYyAtMS4xODYsMS42MjA4IC0yLjc5MTYsMS42ODQgLTMuMzg5NiwxLjIzMjUgLTAuNjI1NSwtMC41ODExIC0wLjE0OCwtMi4zODU0IDAuNzA5NCwtMy4zNzQ3IHYgLTNlLTQgYyAwLjk4MTIsLTEuMDkxMiAyLjAzMDIsLTEuODAzNyAyLjc2MDksLTEuMjQ2OSAwLjQ5MTksMC40ODI4IDAuNzgwNSwyLjMwMDggLTAuMDgwNywzLjM4OTQgeiBtIDEuMDcyNCwtMy40MzAxIGMgLTEuMDA4NiwwLjQ0MTMgLTEuODI5OCwtNC45MzcyIC0wLjU5MDEsLTQuNjEgMi4wNTY4LDEuMTU2OSAxLjY5OTQsMy43MzEgMC41OTAxLDQuNjEgeiIKICAgICBpZD0icGF0aDEiCiAgICAgc29kaXBvZGk6bm9kZXR5cGVzPSJjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NzY2Njc2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY3NjY2NjY2NjY2NjYyIKICAgICBzdHlsZT0ic3Ryb2tlOm5vbmU7c3Ryb2tlLW9wYWNpdHk6MTtmaWxsOiNmZmZmZmY7ZmlsbC1vcGFjaXR5OjEiIC8+Cjwvc3ZnPgo=&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
@@ -12045,19 +12231,19 @@ views:
                 \ color: var(--green-color);\"></ha-icon>\n    <span> Battery: <span\
                 \ style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
-                \ 0) : '?'}</span></span>`\n]]]"
+                \ 0) : '-'}</span></span>`\n]]]"
               stat2: "[[[\n  var entity_id = 'sensor.quest_wifi_link_speed';\n  return\
                 \ `<ha-icon icon=\"mdi:wifi\" style=\"width: 24px; height: 24px; color:\
                 \ var(--green-color);\"></ha-icon>\n    <span> WiFi: <span style=\"\
                 color: var(--text-color-sensor);\">${states[entity_id].state !== 'unavailable'\
-                \ ? helpers.localize(states[entity_id], undefined, 0) : '?'}</span></span>`\n\
+                \ ? helpers.localize(states[entity_id], undefined, 0) : '-'}</span></span>`\n\
                 ]]]"
               stat3: "[[[\n  var entity_id = 'sensor.quest_battery_temperature';\n\
                 \  return `<ha-icon icon=\"mdi:thermometer\" style=\"width: 24px;\
                 \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span>\
                 \ Temp: <span style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
-                \ 0) : '?'}</span></span>`\n]]]"
+                \ 0) : '-'}</span></span>`\n]]]"
               info: "[[[\n  return `<img src=\"https://img.shields.io/badge/Meta_Quest_2-0668E1?style=flat-square&logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgcm9sZT0iaW1nIgogICB2aWV3Qm94PSIwIDAgMjQgMjQiCiAgIHZlcnNpb249IjEuMSIKICAgaWQ9InN2ZzEiCiAgIHNvZGlwb2RpOmRvY25hbWU9Im1ldGEuc3ZnIgogICBpbmtzY2FwZTp2ZXJzaW9uPSIxLjQgKGU3YzNmZWIxMDAsIDIwMjQtMTAtMDkpIgogICB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIKICAgeG1sbnM6c29kaXBvZGk9Imh0dHA6Ly9zb2RpcG9kaS5zb3VyY2Vmb3JnZS5uZXQvRFREL3NvZGlwb2RpLTAuZHRkIgogICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgIHhtbG5zOnN2Zz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzCiAgICAgaWQ9ImRlZnMxIiAvPgogIDxzb2RpcG9kaTpuYW1lZHZpZXcKICAgICBpZD0ibmFtZWR2aWV3MSIKICAgICBwYWdlY29sb3I9IiNmZmZmZmYiCiAgICAgYm9yZGVyY29sb3I9IiMwMDAwMDAiCiAgICAgYm9yZGVyb3BhY2l0eT0iMC4yNSIKICAgICBpbmtzY2FwZTpzaG93cGFnZXNoYWRvdz0iMiIKICAgICBpbmtzY2FwZTpwYWdlb3BhY2l0eT0iMC4wIgogICAgIGlua3NjYXBlOnBhZ2VjaGVja2VyYm9hcmQ9IjAiCiAgICAgaW5rc2NhcGU6ZGVza2NvbG9yPSIjZDFkMWQxIgogICAgIGlua3NjYXBlOnpvb209IjQ4LjMzMzMzMyIKICAgICBpbmtzY2FwZTpjeD0iMTIiCiAgICAgaW5rc2NhcGU6Y3k9IjEyIgogICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iNTEyMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctaGVpZ2h0PSIxMzcxIgogICAgIGlua3NjYXBlOndpbmRvdy14PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy15PSIwIgogICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjEiCiAgICAgaW5rc2NhcGU6Y3VycmVudC1sYXllcj0ic3ZnMSIgLz4KICA8dGl0bGUKICAgICBpZD0idGl0bGUxIj5NZXRhPC90aXRsZT4KICA8cGF0aAogICAgIGQ9Ik02LjkxNSA0LjAzYy0xLjk2OCAwLTMuNjgzIDEuMjgtNC44NzEgMy4xMTNDLjcwNCA5LjIwOCAwIDExLjg4MyAwIDE0LjQ0OWMwIC43MDYuMDcgMS4zNjkuMjEgMS45NzNhNi42MjQgNi42MjQgMCAwIDAgLjI2NS44NiA1LjI5NyA1LjI5NyAwIDAgMCAuMzcxLjc2MWMuNjk2IDEuMTU5IDEuODE4IDEuOTI3IDMuNTkzIDEuOTI3IDEuNDk3IDAgMi42MzMtLjY3MSAzLjk2NS0yLjQ0NC43Ni0xLjAxMiAxLjE0NC0xLjYyNiAyLjY2My00LjMybC43NTYtMS4zMzkuMTg2LS4zMjVjLjA2MS4xLjEyMS4xOTYuMTgzLjNsMi4xNTIgMy41OTVjLjcyNCAxLjIxIDEuNjY1IDIuNTU2IDIuNDcgMy4zMTQgMS4wNDYuOTg3IDEuOTkyIDEuMjIgMy4wNiAxLjIyIDEuMDc1IDAgMS44NzYtLjM1NSAyLjQ1NS0uODQzYTMuNzQzIDMuNzQzIDAgMCAwIC44MS0uOTczYy41NDItLjkzOS44NjEtMi4xMjcuODYxLTMuNzQ1IDAtMi43Mi0uNjgxLTUuMzU3LTIuMDg0LTcuNDUtMS4yODItMS45MTItMi45NTctMi45My00LjcxNi0yLjkzLTEuMDQ3IDAtMi4wODguNDY3LTMuMDUzIDEuMzA4LS42NTIuNTctMS4yNTcgMS4yOS0xLjgyIDIuMDUtLjY5LS44NzUtMS4zMzUtMS41NDctMS45NTgtMi4wNTYtMS4xODItLjk2Ni0yLjMxNS0xLjMwMy0zLjQ1NC0xLjMwM3ptMTAuMTYgMi4wNTNjMS4xNDcgMCAyLjE4OC43NTggMi45OTIgMS45OTkgMS4xMzIgMS43NDggMS42NDcgNC4xOTUgMS42NDcgNi40IDAgMS41NDgtLjM2OCAyLjktMS44MzkgMi45LS41OCAwLTEuMDI3LS4yMy0xLjY2NC0xLjAwNC0uNDk2LS42MDEtMS4zNDMtMS44NzgtMi44MzItNC4zNThsLS42MTctMS4wMjhhNDQuOTA4IDQ0LjkwOCAwIDAgMC0xLjI1NS0xLjk4Yy4wNy0uMTA5LjE0MS0uMjI0LjIxMS0uMzI3IDEuMTItMS42NjcgMi4xMTgtMi42MDIgMy4zNTgtMi42MDJ6bS0xMC4yMDEuNTUzYzEuMjY1IDAgMi4wNTguNzkxIDIuNjc1IDEuNDQ2LjMwNy4zMjcuNzM3Ljg3MSAxLjIzNCAxLjU3OWwtMS4wMiAxLjU2NmMtLjc1NyAxLjE2My0xLjg4MiAzLjAxNy0yLjgzNyA0LjMzOC0xLjE5MSAxLjY0OS0xLjgxIDEuODE3LTIuNDg2IDEuODE3LS41MjQgMC0xLjAzOC0uMjM3LTEuMzgzLS43OTQtLjI2My0uNDI2LS40NjQtMS4xMy0uNDY0LTIuMDQ2IDAtMi4yMjEuNjMtNC41MzUgMS42Ni02LjA4OC40NTQtLjY4Ny45NjQtMS4yMjYgMS41MzMtMS41MzNhMi4yNjQgMi4yNjQgMCAwIDEgMS4wODgtLjI4NXoiCiAgICAgaWQ9InBhdGgxIgogICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7ZmlsbC1vcGFjaXR5OjEiIC8+Cjwvc3ZnPgo=&logoColor=white&logoSize=auto&labelColor=555555\"\
                 >`\n]]]"
               chips:
@@ -12399,6 +12585,8 @@ views:
                       - condition: state
                         entity: sensor.nasya_battery_charge_remaining_percentage
                         state_not: unavailable
+                modules:
+                  - default
               - type: custom:streamline-card
                 template: computer_power
                 variables:
@@ -12558,6 +12746,8 @@ views:
                       - condition: state
                         entity: sensor.cartago_battery_asustek_asus_battery
                         state_not: unavailable
+                modules:
+                  - default
               - type: custom:streamline-card
                 template: computer_power
                 variables:
@@ -12745,6 +12935,8 @@ views:
                       - condition: state
                         entity: sensor.ardena_battery_charge_remaining_percentage
                         state_not: unavailable
+                modules:
+                  - default
               - type: custom:streamline-card
                 template: computer_power
                 variables:
@@ -12929,6 +13121,8 @@ views:
                       - condition: numeric_state
                         entity: sensor.athos_windows_updates_driver_updates
                         above: 0
+                modules:
+                  - default
               - type: custom:streamline-card
                 template: computer_power
                 variables:
@@ -13058,6 +13252,8 @@ views:
                   action: none
                 hold_action:
                   action: more-info
+                modules:
+                  - default
               - type: horizontal-stack
                 cards:
                   - type: conditional
@@ -13222,6 +13418,8 @@ views:
                   action: none
                 hold_action:
                   action: none
+                modules:
+                  - default
               - type: custom:bar-card
                 card_mod:
                   style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
@@ -13955,6 +14153,8 @@ views:
               \ !== 'offline'\n  ? hass.states['sensor.bambu_p1s_current_layer']?.state\
               \ + \" / \"\n  + hass.states['sensor.bambu_p1s_total_layer_count']?.state\
               \ :\n  'Off'}\n"
+            modules:
+              - default
             card_mod:
               style: "{% set progress = states('sensor.bambu_p1s_print_progress')\
                 \ | float / 100 %}\n\n{% set pct_diff = 1.0 - progress %} {% set r\
@@ -14200,9 +14400,14 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 30vh
+                button_type: name
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Nozzle Temperature
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: slider
@@ -14251,6 +14456,8 @@ views:
                 styles: ".bubble-name, .bubble-state {\n  font-weight: bold;\n}\n\
                   .bubble-icon {\n  color: var(--red-color) !important;\n}\n.bubble-range-fill\
                   \ {\n  background: rgba(200, 25, 25, .5) !important;\n}\n"
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -14511,9 +14718,14 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 40vh
+                button_type: name
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Temperatures
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: slider
@@ -14565,6 +14777,8 @@ views:
                   }\n.bubble-sub-button-1 {\n  display: ${hass.states['sensor.bambu_p1s_target_bed_temperature'].state\
                   \ !== hass.states['sensor.bambu_p1s_bed_temperature'].state ? ''\
                   \ : 'none'} !important;\n}\n"
+                modules:
+                  - default
               - type: custom:mini-graph-card
                 entities:
                   - entity: sensor.bambu_p1s_bed_temperature
@@ -14592,171 +14806,114 @@ views:
                 margin_top_desktop: 50vh
                 width_desktop: 50vw
                 margin_top_mobile: 70vh
+                button_type: name
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: separator
                 name: Speed
-              - type: horizontal-stack
-                cards:
-                  - type: custom:button-card
-                    entity: sensor.bambu_p1s_speed_profile
-                    name: Silent
-                    show_state: false
-                    icon: mdi:gauge-empty
-                    tap_action:
-                      action: perform-action
-                      perform_action: select.select_option
-                      target:
-                        entity_id: select.bambu_p1s_printing_speed
-                      data:
-                        option: silent
-                    state:
-                      - value: silent
-                        styles:
-                          card:
-                            - background-color: var(--state-active-color)
-                          name:
-                            - color: var(--black-color)
-                          icon:
-                            - color: var(--black-color)
-                    styles:
-                      card:
-                        - border-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                      grid:
-                        - grid-template-areas: '"i n"'
-                        - grid-template-columns: auto auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                        - color: var(--grey-color)
-                      icon:
-                        - width: 24px
-                        - color: var(--grey-color)
-                  - type: custom:button-card
-                    entity: sensor.bambu_p1s_speed_profile
-                    name: Standard
-                    show_state: false
-                    icon: mdi:gauge-low
-                    tap_action:
-                      action: perform-action
-                      perform_action: select.select_option
-                      target:
-                        entity_id: select.bambu_p1s_printing_speed
-                      data:
-                        option: standard
-                    state:
-                      - value: standard
-                        styles:
-                          card:
-                            - background-color: var(--state-active-color)
-                          name:
-                            - color: var(--black-color)
-                          icon:
-                            - color: var(--black-color)
-                    styles:
-                      card:
-                        - border-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                      grid:
-                        - grid-template-areas: '"i n"'
-                        - grid-template-columns: auto auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                        - color: var(--grey-color)
-                      icon:
-                        - width: 24px
-                        - color: var(--grey-color)
-                  - type: custom:button-card
-                    entity: sensor.bambu_p1s_speed_profile
-                    name: Sport
-                    show_state: false
-                    icon: mdi:gauge
-                    tap_action:
-                      action: perform-action
-                      perform_action: select.select_option
-                      target:
-                        entity_id: select.bambu_p1s_printing_speed
-                      data:
-                        option: sport
-                    state:
-                      - value: sport
-                        styles:
-                          card:
-                            - background-color: var(--state-active-color)
-                          name:
-                            - color: var(--black-color)
-                          icon:
-                            - color: var(--black-color)
-                    styles:
-                      card:
-                        - border-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                      grid:
-                        - grid-template-areas: '"i n"'
-                        - grid-template-columns: auto auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                        - color: var(--grey-color)
-                      icon:
-                        - width: 24px
-                        - color: var(--grey-color)
-                  - type: custom:button-card
-                    entity: sensor.bambu_p1s_speed_profile
-                    name: Ludicrous
-                    show_state: false
-                    icon: mdi:gauge-full
-                    tap_action:
-                      action: perform-action
-                      perform_action: select.select_option
-                      target:
-                        entity_id: select.bambu_p1s_printing_speed
-                      data:
-                        option: ludicrous
-                    state:
-                      - value: ludicrous
-                        styles:
-                          card:
-                            - background-color: var(--state-active-color)
-                          name:
-                            - color: var(--black-color)
-                          icon:
-                            - color: var(--black-color)
-                    styles:
-                      card:
-                        - border-radius: 24px
-                        - background-color: color-mix(in srgb, var(--disabled-color)
-                            12%, var(--card-background-color) 100%)
-                      grid:
-                        - grid-template-areas: '"i n"'
-                        - grid-template-columns: auto auto
-                        - grid-template-rows: auto
-                      img_cell:
-                        - align-self: center
-                        - text-align: start
-                      name:
-                        - justify-self: left
-                        - font-size: 12px
-                        - color: var(--grey-color)
-                      icon:
-                        - width: 24px
-                        - color: var(--grey-color)
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-around;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button
+                      entity: sensor.bambu_p1s_speed_profile
+                      name: Silent
+                      icon: mdi:gauge-empty
+                      tap_action:
+                        action: perform-action
+                        perform_action: select.select_option
+                        target:
+                          entity_id: select.bambu_p1s_printing_speed
+                        data:
+                          option: silent
+                      variables:
+                        color: "[[[\n  return entity.state === 'silent'\n    ? 'var(--state-active-color)'\n\
+                          \    : 'var(--grey-color)';\n]]]\n"
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: sensor.bambu_p1s_speed_profile
+                      name: Standard
+                      show_state: false
+                      icon: mdi:gauge-low
+                      tap_action:
+                        action: perform-action
+                        perform_action: select.select_option
+                        target:
+                          entity_id: select.bambu_p1s_printing_speed
+                        data:
+                          option: standard
+                      variables:
+                        color: "[[[\n  return entity.state === 'standard'\n    ? 'var(--state-active-color)'\n\
+                          \    : 'var(--grey-color)';\n]]]\n"
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: sensor.bambu_p1s_speed_profile
+                      name: Sport
+                      icon: mdi:gauge
+                      tap_action:
+                        action: perform-action
+                        perform_action: select.select_option
+                        target:
+                          entity_id: select.bambu_p1s_printing_speed
+                        data:
+                          option: sport
+                      variables:
+                        color: "[[[\n  return entity.state === 'sport'\n    ? 'var(--state-active-color)'\n\
+                          \    : 'var(--grey-color)';\n]]]\n"
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                    - type: custom:button-card
+                      template: button
+                      entity: sensor.bambu_p1s_speed_profile
+                      name: Ludicrous
+                      icon: mdi:gauge-full
+                      tap_action:
+                        action: perform-action
+                        perform_action: select.select_option
+                        target:
+                          entity_id: select.bambu_p1s_printing_speed
+                        data:
+                          option: ludicrous
+                      variables:
+                        color: "[[[\n  return entity.state === 'ludicrous'\n    ?\
+                          \ 'var(--state-active-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      styles:
+                        card:
+                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                              \ transparent 85%)`;\n]]]\n"
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -14768,6 +14925,7 @@ views:
                 margin_top_mobile: 50vh
                 modules:
                   - default
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: External Filament
@@ -14829,6 +14987,8 @@ views:
                     attribute: nozzle_temp_max
                     icon: mdi:thermometer-high
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: state
@@ -14854,6 +15014,8 @@ views:
                     attribute: drying_time
                     icon: mdi:clock
                     show_background: false
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -14947,6 +15109,7 @@ views:
                 margin_top_mobile: 50vh
                 modules:
                   - default
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 1
@@ -14970,6 +15133,8 @@ views:
                     name: Color
                 styles: ".bubble-sub-button-3 {\n  color: ${hass.states['sensor.bambu_p1s_ams_tray_1'].attributes.color}\
                   \ !important;\n}\n"
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -14994,6 +15159,8 @@ views:
                     attribute: nozzle_temp_max
                     icon: mdi:thermometer-high
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15016,23 +15183,30 @@ views:
                     show_attribute: true
                     icon: mdi:clock
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
-                name: Serial
-                icon: phu:3d-filament
+                name: Drying
+                icon: mdi:printer-3d-nozzle-heat
+                show_attribute: false
+                show_state: false
                 show_icon: false
+                button_action:
+                  tap_action:
+                    action: none
                 sub_button:
                   - entity: sensor.bambu_p1s_ams_tray_1
                     show_state: false
                     show_attribute: true
-                    attribute: tray_uuid
-                    show_icon: false
+                    icon: mdi:thermometer
                     show_background: false
-                    visibility:
-                      - condition: state
-                        entity: sensor.bambu_p1s_ams_tray_1
-                        state_not: unknown
+                  - entity: sensor.bambu_p1s_ams_tray_1
+                    show_state: false
+                    show_attribute: true
+                    icon: mdi:clock
+                    show_background: false
                 modules:
                   - default
               - type: custom:layout-card
@@ -15128,6 +15302,7 @@ views:
                 margin_top_mobile: 50vh
                 modules:
                   - default
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 2
@@ -15192,6 +15367,8 @@ views:
                     attribute: nozzle_temp_max
                     icon: mdi:thermometer-high
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15216,6 +15393,8 @@ views:
                     attribute: drying_time
                     icon: mdi:clock
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15328,6 +15507,7 @@ views:
                 margin_top_mobile: 50vh
                 modules:
                   - default
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 3
@@ -15392,6 +15572,8 @@ views:
                     attribute: nozzle_temp_max
                     icon: mdi:thermometer-high
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15416,6 +15598,8 @@ views:
                     attribute: drying_time
                     icon: mdi:clock
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15528,6 +15712,7 @@ views:
                 margin_top_mobile: 50vh
                 modules:
                   - default
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: AMS Slot 4
@@ -15592,6 +15777,8 @@ views:
                     attribute: nozzle_temp_max
                     icon: mdi:thermometer-high
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -15616,6 +15803,8 @@ views:
                     attribute: drying_time
                     icon: mdi:clock
                     show_background: false
+                modules:
+                  - default
               - type: custom:bubble-card
                 card_type: button
                 button_type: name
@@ -18162,19 +18351,15 @@ views:
                     buttons:
                       card:
                         type: custom:button-card
-                        name: '[[[ return (!this.__c || this.__c(this.__o()) ? ''Cancel
-                          Ignore'' : ''Ignore Obstacle''); ]]]
-
-                          '
-                        icon: '[[[ return (!this.__c || this.__c(this.__o()) ? ''mdi:eye''
-                          : ''mdi:eye-off''); ]]]
-
-                          '
+                        template: button
+                        name: "[[[ return (!this.__c || this.__c(this.__o())\n  ?\
+                          \ 'Cancel Ignore'\n  : 'Ignore Obstacle');\n]]]\n"
+                        icon: "[[[ return (!this.__c || this.__c(this.__o())\n  ?\
+                          \ 'mdi:eye'\n  : 'mdi:eye-off');\n]]]\n"
                         confirmation: '[[[ return this.__c && !this.__c(this.__o());
                           ]]]
 
                           '
-                        size: 24px
                         tap_action:
                           action: call-service
                           service: dreame_vacuum.vacuum_set_obstacle_ignore
@@ -18187,37 +18372,27 @@ views:
 
                             '
                         styles:
-                          grid:
-                            - display: contents
-                          img_cell:
-                            - display: contents
-                          name:
-                            - color: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''var(--state-icon-unavailable-color)'' : ''var(--primary-text-color)'');
-                                ]]]
-
-                                '
-                          icon:
-                            - color: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''var(--state-icon-unavailable-color)'' : ''var(--primary-text-color)'');
-                                ]]]
-
-                                '
-                            - margin: 0 6px 0 0
                           card:
-                            - background-color: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''var(--grey-color)'' : ''color-mix(in srgb, var(--yellow-color)
-                                40%, var(--card-background-color) 100%)''); ]]]
-
-                                '
-                            - pointer-events: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''none'' : ''auto''); ]]]
-
-                                '
-                            - border-radius: 100px
-                            - max-width: 250px
-                            - max-height: 48px
-                            - padding: 8px 24px
+                            - background-color: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'color-mix(in srgb, var(--grey-color), transparent\
+                                \ 85%)'\n  : 'color-mix(in srgb, var(--yellow-color),\
+                                \ transparent 85%)');\n]]]\n"
+                            - pointer-events: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'none'\n  : 'auto');\n]]]\n"
+                          name:
+                            - color: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'var(--state-icon-unavailable-color)'\n  : 'var(--primary-text-color)');\n\
+                                ]]]\n"
+                          icon:
+                            - color: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'var(--state-icon-unavailable-color)'\n  : 'var(--primary-text-color)');\n\
+                                ]]]\n"
+                        extra_styles: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                          \  ? \"@media (hover: hover) { ha-card:hover { background:\
+                          \ color-mix(in srgb, var(--grey-color), transparent 80%)\
+                          \ !important; } }\"\n  : \"@media (hover: hover) { ha-card:hover\
+                          \ { background: color-mix(in srgb, var(--yellow-color),\
+                          \ transparent 80%) !important; } }\");\n]]]\n"
                   styles:
                     custom_fields:
                       buttons:
@@ -18527,35 +18702,42 @@ views:
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-          - type: custom:mushroom-chips-card
-            alignment: center
-            chips:
-              - type: template
-                content: Clean Washboard
-                icon: mdi:wiper-wash
-                icon_color: red
-                tap_action:
-                  action: none
-                hold_action:
-                  action: perform-action
-                  perform_action: vacuum.send_command
-                  target:
-                    entity_id: vacuum.r2dee2
-                  data:
-                    command: action
-                    params:
-                      siid: 4
-                      aiid: 4
-                      in:
-                        - value: 5,1
-                          piid: 10
-                card_mod:
-                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
-                    \ rgba(var(--rgb-red), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
-                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
-                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
-                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
-                    \ rgba(var(--rgb-red), 0.4);\n}\n"
+          - type: custom:mod-card
+            style:
+              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                \ wrap;\n  justify-content: space-around;\n}\n"
+            card:
+              type: grid
+              square: false
+              cards:
+                - type: custom:button-card
+                  template: button
+                  name: Clean Washboard
+                  icon: mdi:wiper-wash
+                  variables:
+                    color: var(--red-color)
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: perform-action
+                    perform_action: vacuum.send_command
+                    target:
+                      entity_id: vacuum.r2dee2
+                    data:
+                      command: action
+                      params:
+                        siid: 4
+                        aiid: 4
+                        in:
+                          - value: 5,1
+                            piid: 10
+                  styles:
+                    card:
+                      - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                          \ transparent 85%)`;\n]]]\n"
+                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                    \ {\n      background: color-mix(in srgb, ${variables.color},\
+                    \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
     header:
       card:
         type: markdown
@@ -18933,19 +19115,15 @@ views:
                     buttons:
                       card:
                         type: custom:button-card
-                        name: '[[[ return (!this.__c || this.__c(this.__o()) ? ''Cancel
-                          Ignore'' : ''Ignore Obstacle''); ]]]
-
-                          '
-                        icon: '[[[ return (!this.__c || this.__c(this.__o()) ? ''mdi:eye''
-                          : ''mdi:eye-off''); ]]]
-
-                          '
+                        template: button
+                        name: "[[[ return (!this.__c || this.__c(this.__o())\n  ?\
+                          \ 'Cancel Ignore'\n  : 'Ignore Obstacle');\n]]]\n"
+                        icon: "[[[ return (!this.__c || this.__c(this.__o())\n  ?\
+                          \ 'mdi:eye'\n  : 'mdi:eye-off');\n]]]\n"
                         confirmation: '[[[ return this.__c && !this.__c(this.__o());
                           ]]]
 
                           '
-                        size: 24px
                         tap_action:
                           action: call-service
                           service: dreame_vacuum.vacuum_set_obstacle_ignore
@@ -18958,37 +19136,27 @@ views:
 
                             '
                         styles:
-                          grid:
-                            - display: contents
-                          img_cell:
-                            - display: contents
-                          name:
-                            - color: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''var(--state-icon-unavailable-color)'' : ''var(--primary-text-color)'');
-                                ]]]
-
-                                '
-                          icon:
-                            - color: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''var(--state-icon-unavailable-color)'' : ''var(--primary-text-color)'');
-                                ]]]
-
-                                '
-                            - margin: 0 6px 0 0
                           card:
-                            - background-color: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''var(--grey-color)'' : ''color-mix(in srgb, var(--yellow-color)
-                                40%, var(--card-background-color) 100%)''); ]]]
-
-                                '
-                            - pointer-events: '[[[ return (!this.__d || this.__d(this.__o())
-                                ? ''none'' : ''auto''); ]]]
-
-                                '
-                            - border-radius: 100px
-                            - max-width: 250px
-                            - max-height: 48px
-                            - padding: 8px 24px
+                            - background-color: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'color-mix(in srgb, var(--grey-color), transparent\
+                                \ 85%)'\n  : 'color-mix(in srgb, var(--yellow-color),\
+                                \ transparent 85%)');\n]]]\n"
+                            - pointer-events: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'none'\n  : 'auto');\n]]]\n"
+                          name:
+                            - color: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'var(--state-icon-unavailable-color)'\n  : 'var(--primary-text-color)');\n\
+                                ]]]\n"
+                          icon:
+                            - color: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                                \  ? 'var(--state-icon-unavailable-color)'\n  : 'var(--primary-text-color)');\n\
+                                ]]]\n"
+                        extra_styles: "[[[ return (!this.__d || this.__d(this.__o())\n\
+                          \  ? \"@media (hover: hover) { ha-card:hover { background:\
+                          \ color-mix(in srgb, var(--grey-color), transparent 80%)\
+                          \ !important; } }\"\n  : \"@media (hover: hover) { ha-card:hover\
+                          \ { background: color-mix(in srgb, var(--yellow-color),\
+                          \ transparent 80%) !important; } }\");\n]]]\n"
                   styles:
                     custom_fields:
                       buttons:
@@ -19297,35 +19465,42 @@ views:
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-          - type: custom:mushroom-chips-card
-            alignment: center
-            chips:
-              - type: template
-                content: Clean Washboard
-                icon: mdi:wiper-wash
-                icon_color: red
-                tap_action:
-                  action: none
-                hold_action:
-                  action: perform-action
-                  perform_action: vacuum.send_command
-                  target:
-                    entity_id: vacuum.dustin_mopman
-                  data:
-                    command: action
-                    params:
-                      siid: 4
-                      aiid: 4
-                      in:
-                        - value: 5,1
-                          piid: 10
-                card_mod:
-                  style: "ha-card {\n  /* Style Chip like Mushroom button */\n  --chip-background:\
-                    \ rgba(var(--rgb-red), 0.2);\n  --chip-border-radius: var(--mush-control-border-radius,\
-                    \ 12px);\n  --chip-height: var(--mush-control-height, 42px);\n\
-                    \  --chip-box-shadow: none;\n  user-select: none;\n}\nha-card:active\
-                    \ {\n  /* Add effect to give feedback on button press */\n  --chip-background:\
-                    \ rgba(var(--rgb-red), 0.4);\n}\n"
+          - type: custom:mod-card
+            style:
+              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                \ wrap;\n  justify-content: center;\n}\n"
+            card:
+              type: grid
+              square: false
+              cards:
+                - type: custom:button-card
+                  template: button
+                  name: Clean Washboard
+                  icon: mdi:wiper-wash
+                  variables:
+                    color: var(--red-color)
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: perform-action
+                    perform_action: vacuum.send_command
+                    target:
+                      entity_id: vacuum.dustin_mopman
+                    data:
+                      command: action
+                      params:
+                        siid: 4
+                        aiid: 4
+                        in:
+                          - value: 5,1
+                            piid: 10
+                  styles:
+                    card:
+                      - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                          \ transparent 85%)`;\n]]]\n"
+                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                    \ {\n      background: color-mix(in srgb, ${variables.color},\
+                    \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
     header:
       card:
         type: markdown
