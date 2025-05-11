@@ -1519,7 +1519,7 @@ streamline_templates:
       performance:
         features:
           media_chunk_size: 20
-          max_simultaneous_engine_requests: 50
+          max_simultaneous_engine_requests: 20
       view: {}
   computer_apps:
     card:
@@ -2248,6 +2248,17 @@ streamline_templates:
                 action: none
               double_tap_action:
                 action: none
+              card_mod:
+                style:
+                  .: "{% if int(states(\"sensor.home_[[person]]_distance\"), 0) >=\
+                    \ 400 %}\n  {% set color = \"grey\" %}\n  {% if is_state(config.entity,\
+                    \ \"towards\") %}\n    {% set color = \"green\" %}\n  {% elif\
+                    \ is_state(config.entity, \"away_from\") %}\n    {% set color\
+                    \ = \"orange\" %}\n  {% endif %}\nha-card:after {\n  content:\
+                    \ \"{{ ((states(\"sensor.home_[[person]]_distance\") | float)\
+                    \ / 5280) | round(1) }}\";\n  position: absolute;\n  color: var(--{{\
+                    \ color }}-color);\n  font-weight: bolder;\n  top: -2px;\n  right:\
+                    \ 2px;\n  font-size: 12px;\n}\n{% endif %}\n"
           - type: conditional
             conditions:
               - entity: media_player.spotify_[[person]]
@@ -4021,6 +4032,25 @@ views:
                             - stream: doorbell
               chips:
                 - type: template
+                  entity: binary_sensor.sprinkler_zones
+                  icon_color: "{% set zones = expand(entity)\n  | selectattr(\"state\"\
+                    , \"==\", \"on\")\n  | map(attribute=\"entity_id\")\n  | list\n\
+                    \  | count\n%} {% if is_state(\"binary_sensor.opensprinkler_paused\"\
+                    , \"on\") %}\n  yellow\n{% elif zones > 0 %}\n  light-blue\n{%\
+                    \ else %}\n  disabled\n{% endif %}"
+                  icon: mdi:sprinkler
+                  tap_action:
+                    action: none
+                  card_mod:
+                    style:
+                      .: "{%- set zones = expand(config.entity)\n  | selectattr(\"\
+                        state\", \"==\", \"on\")\n  | map(attribute=\"entity_id\"\
+                        )\n  | list\n-%}\n{%- if zones[0] is defined -%}\nha-card:after\
+                        \ {\n  content: \"{{ int(state_attr(zones[0], 'index')) +\
+                        \ 1 }}\";\n  position: absolute;\n  color: var(--light-blue-color);\n\
+                        \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
+                        \ 12px;\n}\n{%- endif -%}\n"
+                - type: template
                   entity: light.outside_lights
                   icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
                     }}'
@@ -4057,25 +4087,6 @@ views:
                     action: none
                   hold_action:
                     action: none
-                - type: template
-                  entity: binary_sensor.sprinkler_zones
-                  icon_color: "{% set zones = expand(entity)\n  | selectattr(\"state\"\
-                    , \"==\", \"on\")\n  | map(attribute=\"entity_id\")\n  | list\n\
-                    \  | count\n%} {% if is_state(\"binary_sensor.opensprinkler_paused\"\
-                    , \"on\") %}\n  yellow\n{% elif zones > 0 %}\n  light-blue\n{%\
-                    \ else %}\n  disabled\n{% endif %}"
-                  icon: mdi:sprinkler
-                  tap_action:
-                    action: none
-                  card_mod:
-                    style:
-                      .: "{%- set zones = expand(config.entity)\n  | selectattr(\"\
-                        state\", \"==\", \"on\")\n  | map(attribute=\"entity_id\"\
-                        )\n  | list\n-%}\n{%- if zones[0] is defined -%}\nha-card:after\
-                        \ {\n  content: \"{{ int(state_attr(zones[0], 'index')) +\
-                        \ 1 }}\";\n  position: absolute;\n  color: var(--light-blue-color);\n\
-                        \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n  font-size:\
-                        \ 12px;\n}\n{%- endif -%}\n"
           - type: custom:button-card
             layout_options:
               grid_columns: 2
@@ -4822,10 +4833,10 @@ views:
                         \ | float(100) -%} {%- set capacity = 19.3 -%} {%- set gal_remain\
                         \ = (100 - level) / 100 * capacity -%} {% set stations = {\n\
                         \  \"Costco\": states('sensor.costco_regular_gas') | float(3),\n\
-                        \  \"Maverik\": states('sensor.maverik_midgrade_gas') | float(3)\n\
-                        } %} {%- for name, price in stations.items() -%}\n  {{ name\
-                        \ }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain\
-                        \ * price) }}\n{% endfor %}"
+                        \  \"Maverik\": (states('sensor.maverik_regular_gas') | float(3))\
+                        \ - 0.1\n} %} {%- for name, price in stations.items() -%}\n\
+                        \  {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\"\
+                        .format(gal_remain * price) }}\n{% endfor %}"
                 cards:
                   - type: custom:auto-entities
                     filter:
@@ -4835,6 +4846,7 @@ views:
                             type: entity
                       exclude:
                         - name: '* Updated'
+                        - entity_id: '*mid*'
                         - state: unavailable
                         - state: unknown
                     sort:
@@ -5459,10 +5471,10 @@ views:
                         \ float(100) -%} {%- set capacity = 13.2 -%} {%- set gal_remain\
                         \ = (100 - level) / 100 * capacity -%} {% set stations = {\n\
                         \  \"Costco\": states('sensor.costco_regular_gas') | float(3),\n\
-                        \  \"Maverik\": states('sensor.maverik_midgrade_gas') | float(3)\n\
-                        } %} {%- for name, price in stations.items() -%}\n  {{ name\
-                        \ }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain\
-                        \ * price) }}\n{% endfor %}"
+                        \  \"Maverik\": (states('sensor.maverik_midgrade_gas') | float(3))\
+                        \ - 0.1\n} %} {%- for name, price in stations.items() -%}\n\
+                        \  {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\"\
+                        .format(gal_remain * price) }}\n{% endfor %}"
                 cards:
                   - type: custom:auto-entities
                     filter:
@@ -5472,6 +5484,7 @@ views:
                             type: entity
                       exclude:
                         - name: '* Updated'
+                        - entity_id: '*maverik_regular*'
                         - state: unavailable
                         - state: unknown
                     sort:
@@ -7140,6 +7153,7 @@ views:
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
+                button_type: name
               - type: custom:bubble-card
                 card_type: separator
                 name: Oven
@@ -7168,9 +7182,9 @@ views:
                   \ }} ⸱ {{ float(state_attr('water_heater.ge_oven', 'temperature'),\
                   \ 0) | round(0) }}°F\n{% endif %}"
                 secondary: "{% if has_value(entity) %}\n  {% if is_state_attr(entity,\
-                  \ 'operation_mode', 'Off') %}\n    Off\n  {% else %}\n    {{ float(state_attr(entity,\
-                  \ 'current_temperature')) | round(0) }}°F\n  {% endif %}\n{% endif\
-                  \ %}"
+                  \ 'operation_mode', 'Off') %}\n    Off\n  {% else %}\n    Current:\
+                  \ {{ float(state_attr(entity, 'current_temperature')) | round(0)\
+                  \ }}°F\n  {% endif %}\n{% endif %}"
                 icon: '{% if not is_state(''sensor.ge_oven_cook_time_remaining'',
                   ''Off'') %}mdi:timer-play
 
@@ -7238,8 +7252,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '300'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === 300\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7262,8 +7276,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '350'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === 350\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7286,8 +7300,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '375'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === 375\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7310,8 +7324,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '400'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === 400\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7334,8 +7348,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '425'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === 425\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7358,8 +7372,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '450'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === 450\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7382,8 +7396,8 @@ views:
                       icon: mdi:thermometer
                       variables:
                         color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.operation_mode === '475'\n\
-                          \    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          \ 'Off'\n    && entity.attributes.temperature === '475'\n\
+                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
                           ]]]\n"
                       tap_action:
                         action: call-service
@@ -7399,37 +7413,49 @@ views:
                         \    ha-card:hover {\n      background: color-mix(in srgb,\
                         \ ${variables.color}, transparent 80%) !important;\n    }\n\
                         \  }\n  `\n]]]\n"
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-around;\n}\n"
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: water_heater.ge_oven
+                    state_not: 'Off'
+                  - condition: state
+                    entity: water_heater.ge_oven
+                    state_not: unavailable
+                  - condition: state
+                    entity: water_heater.ge_oven
+                    state_not: unknown
                 card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 'Off'
-                      icon: mdi:power
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_operation_mode
-                        service_data:
-                          entity_id: water_heater.ge_oven
-                          operation_mode: 'Off'
-                      styles:
-                        card:
-                          - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
-                              \ transparent 85%)`;\n]]]\n"
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
+                  type: custom:mod-card
+                  style:
+                    hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                      \ wrap;\n  justify-content: space-around;\n}\n"
+                  card:
+                    type: grid
+                    square: false
+                    cards:
+                      - type: custom:button-card
+                        template: button
+                        entity: water_heater.ge_oven
+                        name: 'Off'
+                        icon: mdi:power
+                        variables:
+                          color: "[[[\n  return entity.attributes.operation_mode !==\
+                            \ 'Off'\n    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                            ]]]\n"
+                        tap_action:
+                          action: call-service
+                          service: water_heater.set_operation_mode
+                          service_data:
+                            entity_id: water_heater.ge_oven
+                            operation_mode: 'Off'
+                        styles:
+                          card:
+                            - background: "[[[\n  return `color-mix(in srgb, ${variables.color},\
+                                \ transparent 85%)`;\n]]]\n"
+                        extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                          \    ha-card:hover {\n      background: color-mix(in srgb,\
+                          \ ${variables.color}, transparent 80%) !important;\n   \
+                          \ }\n  }\n  `\n]]]\n"
               - features:
                   - type: select-options
                 type: tile
@@ -7666,6 +7692,7 @@ views:
         tap_action:
           action: navigate
           navigation_path: computer
+        label: PC
       - type: custom:mushroom-template-badge
         entity: sensor.bambu_p1s_print_status
         label: Bambu
@@ -7862,7 +7889,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: ''
             modules:
               - default
               - light_color_state
@@ -8081,7 +8107,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: ''
             grid_options:
               columns: 6
               rows: 1
@@ -8570,7 +8595,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: ''
             grid_options:
               columns: 6
               rows: 1
@@ -8594,7 +8618,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: ''
             grid_options:
               columns: 6
               rows: 1
@@ -8734,7 +8757,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: ''
             modules:
               - default
               - light_color_state
@@ -8843,7 +8865,6 @@ views:
                     name: More Info
                     icon: mdi:palette
                     state_background: false
-                styles: ''
                 modules:
                   - default
                   - light_color_state
@@ -8992,7 +9013,6 @@ views:
                     name: More Info
                     icon: mdi:palette
                     state_background: false
-                styles: ''
                 modules:
                   - default
                   - light_color_state
@@ -9130,7 +9150,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 state_background: false
-            styles: ''
             grid_options:
               columns: 6
               rows: 1
@@ -9613,7 +9632,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: ''
             grid_options:
               columns: 6
               rows: 1
@@ -9637,7 +9655,6 @@ views:
                 name: More Info
                 icon: mdi:palette
                 light_background: true
-            styles: ''
             grid_options:
               columns: 6
               rows: 1
@@ -9687,6 +9704,22 @@ views:
             heading: Sprinklers
             heading_style: subtitle
             badges:
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.opensprinkler_water_level
+                visibility:
+                  - condition: numeric_state
+                    entity: sensor.opensprinkler_water_level
+                    above: 0
+              - type: entity
+                show_state: true
+                show_icon: true
+                entity: sensor.opensprinkler_current_draw
+                visibility:
+                  - condition: numeric_state
+                    entity: sensor.opensprinkler_current_draw
+                    above: 0
               - type: custom:mushroom-template-badge
                 entity: opensprinkler.stop
                 icon: mdi:stop
@@ -12372,6 +12405,54 @@ views:
                       - condition: numeric_state
                         entity: sensor.erebus_system_updates_count
                         above: 0
+                  - entity: sensor.erebus_battery_pixel_buds_pro_7474461e2c1f
+                    name: Pixel Buds Battery
+                    icon: mdi:earbuds
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.erebus_battery_pixel_buds_pro_7474461e2c1f
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.erebus_battery_pixel_buds_pro_7474461e2c1f
+                        state_not: unknown
+                  - entity: sensor.erebus_battery_surface_headphones_f01dbcf96a24
+                    name: Surface Headphones Battery
+                    icon: mdi:headphones
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.erebus_battery_surface_headphones_f01dbcf96a24
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.erebus_battery_surface_headphones_f01dbcf96a24
+                        state_not: unknown
+                  - entity: sensor.erebus_battery_stadia8qzk_3fe5_cee2d5b33fe5
+                    name: Stadia Controller Battery
+                    icon: mdi:controller
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.erebus_battery_stadia8qzk_3fe5_cee2d5b33fe5
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.erebus_battery_stadia8qzk_3fe5_cee2d5b33fe5
+                        state_not: unknown
+                  - entity: sensor.erebus_battery_logitech_mx_master_3_fe_60_d4_68
+                    name: Logitech MX Master Battery
+                    icon: mdi:mouse-scroll-wheel
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.erebus_battery_logitech_mx_master_3_fe_60_d4_68
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.erebus_battery_logitech_mx_master_3_fe_60_d4_68
+                        state_not: unknown
                   - entity: sensor.erebus_battery_american_power_conversion_back_ups_xs_1300g_4b1346p25103
                     name: Battery
                     show_background: false
@@ -12380,6 +12461,9 @@ views:
                       - condition: state
                         entity: sensor.erebus_battery_american_power_conversion_back_ups_xs_1300g_4b1346p25103
                         state_not: unavailable
+                      - condition: state
+                        entity: sensor.erebus_battery_american_power_conversion_back_ups_xs_1300g_4b1346p25103
+                        state_not: unknown
                 modules:
                   - default
               - type: custom:streamline-card
@@ -12465,13 +12549,13 @@ views:
                       name: Storage
                       icon: mdi:harddisk
                       entities:
-                        - entity: sensor.erebus_disk_dev_nvme0n1p2
+                        - entity: sensor.erebus_disk_dev_nvme1n1p2
                           unit: '%'
                           name: /
                           color: var(--blue-color)
                           show_state: true
                           show_points: false
-                        - entity: sensor.erebus_disk_dev_nvme1n1p1
+                        - entity: sensor.erebus_disk_dev_nvme0n1p1
                           unit: '%'
                           name: DevDrive
                           color: var(--green-color)
@@ -12585,6 +12669,9 @@ views:
                       - condition: state
                         entity: sensor.nasya_battery_charge_remaining_percentage
                         state_not: unavailable
+                      - condition: state
+                        entity: sensor.nasya_battery_charge_remaining_percentage
+                        state_not: unknown
                 modules:
                   - default
               - type: custom:streamline-card
@@ -12738,6 +12825,30 @@ views:
                       - condition: numeric_state
                         entity: sensor.cartago_system_updates_count
                         above: 0
+                  - entity: sensor.cartago_battery_pixel_buds_pro_7474461e2c1f
+                    name: Pixel Buds Battery
+                    icon: mdi:earbuds
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.cartago_battery_pixel_buds_pro_7474461e2c1f
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.cartago_battery_pixel_buds_pro_7474461e2c1f
+                        state_not: unknown
+                  - entity: sensor.cartago_battery_mx_anywhere_2_e7da93535ebb
+                    name: Logitech MX Master Battery
+                    icon: mdi:mouse-scroll-wheel
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.cartago_battery_mx_anywhere_2_e7da93535ebb
+                        state_not: unavailable
+                      - condition: state
+                        entity: sensor.cartago_battery_mx_anywhere_2_e7da93535ebb
+                        state_not: unknown
                   - entity: sensor.cartago_battery_asustek_asus_battery
                     name: Battery
                     show_background: false
@@ -12746,6 +12857,9 @@ views:
                       - condition: state
                         entity: sensor.cartago_battery_asustek_asus_battery
                         state_not: unavailable
+                      - condition: state
+                        entity: sensor.cartago_battery_asustek_asus_battery
+                        state_not: unknown
                 modules:
                   - default
               - type: custom:streamline-card
@@ -14254,8 +14368,27 @@ views:
                     tap_action:
                       action: navigate
                       navigation_path: '#filament-ams-1-slot-4'
+          - type: custom:ha-bambulab-print_status-card
+            printer: b9e70ce89bcabdccae4b86eeae1918f2
+            custom_power: switch.bambu_p1s
+            style: simple
           - type: custom:ha-bambulab-skipobject-card
             printer: b9e70ce89bcabdccae4b86eeae1918f2
+          - type: custom:ha-bambulab-ams-card
+            entity: ''
+            header: ''
+            subtitle: ''
+            style: vector
+            ams: a69fffc6d83c88acd22a55db7d38b0bf
+            spool_anim_reflection: true
+            show_type: true
+            show_info_bar: true
+          - type: custom:ha-bambulab-spool-card
+            header: Header Text
+            subtitle: Subtitle Text
+            show_header: true
+            spool: acfff36117be50317b4acb8d566767e9
+            show_type: true
       - type: grid
         cards:
           - type: vertical-stack
@@ -19468,7 +19601,7 @@ views:
           - type: custom:mod-card
             style:
               hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: center;\n}\n"
+                \ wrap;\n  justify-content: space-around;\n}\n"
             card:
               type: grid
               square: false
