@@ -32,9 +32,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4517 |
-| Sensors        | 1399 |
-| Binary Sensors | 336 |
+| All Entities   | 4530 |
+| Sensors        | 1411 |
+| Binary Sensors | 335 |
 | Lights         | 74 |
 | Switches       | 294 |
 
@@ -296,7 +296,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.13]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.15]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -324,7 +324,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.8.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.9.2]
 
 Frigate integration for Home Assistant
 
@@ -378,7 +378,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.39.1]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.41.2]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -402,7 +402,7 @@ Home Assistant Neakasa Integration
 
 Authors: [@timniklas](https://github.com/timniklas).
 
-### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.3.0]
+### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.5.0]
 
 Home Assistant integration for Nintendo Switch Parental Controls
 
@@ -464,7 +464,7 @@ A comprehensive camera card for Home Assistant
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
-### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.13.0]
+### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.14.8]
 
 🔹Automatically populate the entities-list of lovelace cards
 
@@ -476,7 +476,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.0-beta.4]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.0-beta.6]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -492,7 +492,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.3.9]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.3.11]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, selectors, sliders, spinboxes, and toggles.
 
@@ -524,7 +524,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v6.7.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v7.0.1]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -532,9 +532,9 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.8]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.16]
 
-Material You Utilities - Material Design 3 Color Theme Generation and Component Modification for Home Assistant
+Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
 ### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.12.1]
 
@@ -564,7 +564,7 @@ This is a fully customisable weather card for Home Assistant with a graphical co
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.7.0]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.8.1]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -580,7 +580,7 @@ Streamline your Lovelace configuration with with a card template system.
 
 Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
-### [Tabbed Card](https://github.com/kinghat/tabbed-card) [v0.4.0-alpha.2]
+### [Tabbed Card](https://github.com/kinghat/tabbed-card) [v0.3.3]
 
 a custom card for home assistant that utilizes tabs to segregate individual cards.
 
@@ -588,7 +588,7 @@ a custom card for home assistant that utilizes tabs to segregate individual card
 
 A progress bar display for Home Assistant timers
 
-### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.6.1]
+### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.7.0]
 
 This custom card allows you to display vehicle information in your Home Assistant dashboard, including the vehicle name, image, and fuel or charge level.
 
@@ -612,13 +612,13 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 </details><details><summary>2 Themes</summary>
 
-### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-3.1.0]
+### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-3.2.0]
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v4.0.2]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v4.0.6]
 
-Material Design 3 Colors and Components in Home Assistant
+Material Design 3 Theme for Home Assistant
 
 ---
 
@@ -882,7 +882,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.4.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.5.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
