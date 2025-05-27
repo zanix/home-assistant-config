@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4530 |
-| Sensors        | 1411 |
-| Binary Sensors | 335 |
+| All Entities   | 4720 |
+| Sensors        | 1516 |
+| Binary Sensors | 333 |
 | Lights         | 74 |
-| Switches       | 294 |
+| Switches       | 296 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -302,7 +302,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.3]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.8]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -330,13 +330,13 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.0.23]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.0]
 
 Component to integrate with GasBuddy fuel price tracker.
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2025.2.1]
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2025.5.0]
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
@@ -432,7 +432,7 @@ A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
 Authors: [@frenck](https://github.com/frenck).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.16]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.17]
 
 Subaru STARLINK custom component for Home Assistant.
 
@@ -462,7 +462,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>38 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.6.5]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.8.0]
 
 A comprehensive camera card for Home Assistant
 
@@ -470,7 +470,7 @@ A comprehensive camera card for Home Assistant
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
-### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.14.8]
+### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.15.2]
 
 🔹Automatically populate the entities-list of lovelace cards
 
@@ -482,7 +482,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.0-beta.6]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.0-beta.9]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -498,7 +498,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.3.11]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.4.1]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, selectors, sliders, spinboxes, and toggles.
 
@@ -534,11 +534,11 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🙈 Hides the Home Assistant header and/or sidebar
 
-### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.5]
+### [Layout Card](https://github.com/thomasloven/lovelace-layout-card) [v2.4.6]
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.16]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.18]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -594,7 +594,7 @@ a custom card for home assistant that utilizes tabs to segregate individual card
 
 A progress bar display for Home Assistant timers
 
-### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.7.0]
+### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.8.3]
 
 This custom card allows you to display vehicle information in your Home Assistant dashboard, including the vehicle name, image, and fuel or charge level.
 
@@ -606,7 +606,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.23.4]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.24.1]
 
 Home Assistant Lovelace Windrose Card
 
@@ -889,7 +889,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.5.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.5.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
