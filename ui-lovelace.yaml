@@ -107,13 +107,12 @@ button_card_templates:
         \    return parseInt(tray);\n  }\n]]]\n"
     custom_fields:
       type: "[[[\n  return entity.attributes.type || '&nbsp;'\n]]]\n"
-      sub_type: "[[[\n  return entity.attributes.name !== 'unknown'\n    ? entity.attributes.name\n\
-        \    : '&nbsp;';\n]]]\n"
+      sub_type: "[[[\n  return entity.attributes.name || '&nbsp;';\n]]]\n"
       bar: "[[[\n  let color = entity.attributes.type\n    ? entity.attributes.color\n\
-        \    : '';\n  let remain = entity.attributes.remain;\n  return `\n    <div\
-        \ style=\"position: relative; background-color: ${color}; width: 100%; height:\
-        \ 100%; top: ${100 - remain}%; border-top: 2px solid black;\"></div>\n  `;\n\
-        ]]]\n"
+        \    : 'none';\n  let remain = entity.attributes.remain;\n  return `\n   \
+        \ <div style=\"position: relative; background-color: ${color}; width: 100%;\
+        \ height: 100%; top: ${99 - remain}%; border-top: 2px solid black;\"></div>\n\
+        \  `;\n]]]\n"
       value: "[[[\n  if (entity.attributes.remain) {\n    return entity.attributes.remain\
         \ + ' %';\n  } else {\n    return '&nbsp;';\n  }\n]]]\n"
       slotnum: "[[[\n  if (variables.slotnum) {\n    return `<ha-icon icon=\"mdi:numeric-${variables.slotnum}-box\"\
@@ -150,6 +149,10 @@ button_card_templates:
           - background-color: var(--secondary-background-color)
           - overflow: hidden
           - border-radius: 24px
+        type:
+          - font-size: 14px
+        sub_type:
+          - font-size: 12px
         value:
           - color: var(--primary-text-color)
         slotnum:
@@ -1545,6 +1548,9 @@ streamline_templates:
     card:
       type: custom:vertical-stack-in-card
       horizontal: true
+      card_mod:
+        style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow: none;\n\
+          }\n"
       cards:
         - type: conditional
           conditions:
@@ -1665,11 +1671,14 @@ streamline_templates:
     card:
       type: custom:vertical-stack-in-card
       horizontal: true
+      card_mod:
+        style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow: none;\n\
+          }\n"
       cards:
         - type: custom:mushroom-template-card
           entity: switch.[[computer]]
-          primary: "{% if is_state(\"binary_sensor.[[computer]]_connected\", \"off\"\
-            ) %}\n  Power\n{% endif %}"
+          primary: "{% if not is_state(\"binary_sensor.[[computer]]_connected\", \"\
+            on\") %}\n  Power\n{% endif %}"
           icon: "{% if is_state(\"binary_sensor.[[computer]]_connected\", \"on\")\
             \ %}\n  mdi:power\n{% else %}\n  mdi:power-off\n{% endif %}"
           icon_color: "{% if is_state(\"binary_sensor.[[computer]]_connected\", \"\
@@ -2174,8 +2183,8 @@ streamline_templates:
             content:
               type: custom:vertical-stack-in-card
               card_mod:
-                style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
-                  \ 0;\n}\n"
+                style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-box-shadow:\
+                  \ none;\n  --ha-card-border-width: 0;\n}\n"
               cards:
                 - type: custom:mushroom-template-card
                   entity: '[[entity]]'
@@ -3963,6 +3972,7 @@ views:
               action: navigate
               navigation_path: utility
             variables:
+              temperature: sensor.ecowitt_indoor_temperature
               icon_color: 121, 85, 72
               chips:
                 - type: conditional
@@ -4663,6 +4673,7 @@ views:
                 show_location: true
                 show_mileage: true
                 show_car_state: false
+                show_info_icons: true
                 sections_order:
                   - title
                   - info
@@ -4827,9 +4838,9 @@ views:
                 mileage_entity: sensor.ascent_odometer
                 vehicle_image: /local/logos/ascent.png
                 vehicle_image_crop:
-                  top: -100
+                  top: -80
                   right: 0
-                  bottom: -100
+                  bottom: -80
                   left: 0
               - type: custom:expander-card
                 gap: 0em
@@ -5199,6 +5210,7 @@ views:
                 show_location: true
                 show_mileage: true
                 show_car_state: false
+                show_info_icons: true
                 sections_order:
                   - title
                   - info
@@ -5464,9 +5476,9 @@ views:
                 location_entity: device_tracker.kona_location
                 mileage_entity: sensor.kona_odometer
                 vehicle_image_crop:
-                  top: -100
+                  top: -80
                   right: 0
-                  bottom: -100
+                  bottom: -80
                   left: 0
                 vehicle_image: /local/logos/kona.png
               - type: custom:expander-card
@@ -7488,7 +7500,9 @@ views:
                 vertical: false
               - type: custom:bubble-card
                 card_type: separator
-                name: Burners
+                name: Cooktop
+                modules:
+                  - default
               - type: custom:layout-card
                 layout_type: custom:grid-layout
                 layout:
@@ -9577,7 +9591,7 @@ views:
     cards: []
     badges:
       - type: custom:mushroom-template-badge
-        entity: sensor.water_main_valve_air_temperature
+        entity: sensor.ecowitt_indoor_temperature
         content: '{{ states(entity) | round(0) }}{{ state_attr(entity, "unit_of_measurement")
           }}'
         icon: mdi:thermometer
@@ -10222,7 +10236,6 @@ views:
             entities:
               - entity: sensor.ecowitt_rain_rate_piezo
                 name: Rain
-                show_state: false
                 state_adaptive_color: true
               - entity: sensor.ecowitt_daily_rain_rate_piezo
                 name: Daily Rain
@@ -10248,6 +10261,7 @@ views:
               labels: true
               icon: true
               state: true
+              extrema: true
               points: false
           - type: custom:mini-graph-card
             name: Solar
@@ -13728,6 +13742,32 @@ views:
                 hold_action:
                   action: toggle
                 color: '{{ iif(is_state(entity, "on"), "green", "red") }}'
+              - type: custom:button-card
+                view_layout:
+                  grid-area: light
+                template: badge
+                entity: light.bambu_p1s_chamber_light
+                name: Light
+                icon: mdi:led-strip-variant-off
+                label: "[[[\n  return entity.state === 'unavailable' ? 'Off' : helpers.localize(entity);\n\
+                  ]]]\n"
+                tap_action:
+                  action: call-service
+                  service: light.toggle
+                  target:
+                    entity_id: light.bambu_p1s_chamber_light
+                variables:
+                  color: "[[[\n  if (entity.state === 'on') return 'var(--amber-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 'on'
+                    icon: mdi:led-strip-variant
+                    styles:
+                      icon:
+                        - color: var(--amber-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
               - type: custom:mushroom-template-badge
                 entity: binary_sensor.bambu_p1s_hms_errors
                 icon: mdi:information
@@ -14071,9 +14111,9 @@ views:
           - type: custom:layout-card
             layout_type: custom:grid-layout
             layout:
-              grid-template-columns: 1fr 1fr 1fr . 1fr . 1fr
+              grid-template-columns: 1fr 1fr 1fr . 1fr
               grid-template-rows: auto
-              grid-template-areas: '"part aux cham . speed . light"
+              grid-template-areas: '"part aux cham . speed"
 
                 '
             cards:
@@ -14202,32 +14242,6 @@ views:
                         - color: var(--red-color)
                   - value: unavailable
                     icon: mdi:gauge-empty
-                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-              - type: custom:button-card
-                view_layout:
-                  grid-area: light
-                template: badge
-                entity: light.bambu_p1s_chamber_light
-                name: Light
-                icon: mdi:led-strip-variant-off
-                label: "[[[\n  return entity.state === 'unavailable' ? 'Off' : helpers.localize(entity);\n\
-                  ]]]\n"
-                tap_action:
-                  action: call-service
-                  service: light.toggle
-                  target:
-                    entity_id: light.bambu_p1s_chamber_light
-                variables:
-                  color: "[[[\n  if (entity.state === 'on') return 'var(--amber-color)';\n\
-                    \  else return 'var(--grey-color)';\n]]]\n"
-                state:
-                  - value: 'on'
-                    icon: mdi:led-strip-variant
-                    styles:
-                      icon:
-                        - color: var(--amber-color)
                 extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                   \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                   \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
@@ -14383,11 +14397,16 @@ views:
                     tap_action:
                       action: navigate
                       navigation_path: '#filament-ams-1-slot-4'
+      - type: grid
+        cards:
+          - type: heading
+            heading: Default Cards
+            heading_style: title
           - type: custom:ha-bambulab-print_status-card
             printer: b9e70ce89bcabdccae4b86eeae1918f2
             custom_power: switch.bambu_p1s
             style: simple
-          - type: custom:ha-bambulab-skipobject-card
+          - type: custom:ha-bambulab-print_control-card
             printer: b9e70ce89bcabdccae4b86eeae1918f2
           - type: custom:ha-bambulab-ams-card
             entity: ''
@@ -14398,12 +14417,6 @@ views:
             spool_anim_reflection: true
             show_type: true
             show_info_bar: true
-          - type: custom:ha-bambulab-spool-card
-            header: Header Text
-            subtitle: Subtitle Text
-            show_header: true
-            spool: acfff36117be50317b4acb8d566767e9
-            show_type: true
       - type: grid
         cards:
           - type: vertical-stack
@@ -17361,7 +17374,6 @@ views:
                                                 text: kWh
                                         series:
                                           - entity: sensor.emporiavue_main_total_weekly
-                                            type: area
                                             opacity: 0.2
                                             name: Home
                                             color: var(--grey-color)
@@ -17587,7 +17599,6 @@ views:
                                                 text: kWh
                                         series:
                                           - entity: sensor.emporiavue_main_total_monthly
-                                            type: area
                                             opacity: 0.2
                                             name: Home
                                             color: var(--grey-color)
@@ -17813,7 +17824,6 @@ views:
                                                 text: kWh
                                         series:
                                           - entity: sensor.emporiavue_main_total_yearly
-                                            type: area
                                             opacity: 0.2
                                             name: Home
                                             color: var(--grey-color)
