@@ -288,7 +288,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>27 Custom Integrations</summary>
+<details><summary>28 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.25.0]
 
@@ -383,6 +383,12 @@ Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://git
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
 Authors: [@fuatakgun](https://github.com/fuatakgun).
+
+### [Kidschores](https://github.com/ad-ha/kidschores-ha) [v0.3.1]
+
+KidsChores Custom Integration for Home Assistant
+
+Authors: [@ad-ha](https://github.com/ad-ha).
 
 ### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.2]
 
@@ -716,7 +722,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>518 Automations</summary>
+<details><summary>519 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -817,6 +823,7 @@ Material Design 3 Theme for Home Assistant
 - 📅 Grow Light On/Off 🚫
 - 📅 Living Room Fan On/Off
 - 📅 Main Bedroom Fan On/Off
+- 📅 Update KidsChore UI Helpers
 - 📋 [Controller] Ikea Remote Main Bedroom
 - 📋 [Inovelli] Amy Office Switch
 - 📋 [Inovelli] Emma Switch
