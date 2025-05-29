@@ -1,0 +1,222 @@
+---
+notify_tvoverlay:
+  alias: '[Notify] TVOverlay'
+  description: 'Notify TVOverlay devices.'
+  icon: mdi:picture-in-picture-top-right
+  mode: parallel
+
+  fields:
+    entity:
+      name: 'Entity'
+      description: 'Which Android TV entity to send to.'
+      required: true
+      selector:
+        entity:
+          multiple: true
+          filter:
+            - integration: androidtv
+              domain: media_player
+    app_title:
+      name: 'App Title'
+      example: 'Home Assistant'
+      selector:
+        text:
+    title:
+      name: 'Title'
+      example: 'Startup: Home Assistant is Up and Running!'
+      selector:
+        text:
+    message:
+      name: 'Message'
+      example: 'Message text'
+      selector:
+        text:
+          multiline: true
+    large_icon:
+      name: 'Large Icon'
+      description: 'Sets main icon. Accepts mdi icons, image urls, and bitmap encoded to base64'
+      example: 'mdi:icon_name, local/image.png, or http://url.to.image'
+      selector:
+        text:
+    small_icon:
+      name: 'Small Icon'
+      description: 'Sets small icon. Accepts mdi icons, image urls, and bitmap encoded to base64'
+      example: 'mdi:icon_name, local/image.png, or http://url.to.image'
+      selector:
+        text:
+    icon_color:
+      name: 'Small Icon color'
+      description: 'Color in HEX format "#[AA]RRGGBB"'
+      example: '#cc0f0e0e'
+      selector:
+        text:
+    image:
+      name: 'Image'
+      description: 'Accepts mdi icons, image urls and bitmap encoded to base64'
+      example: 'mdi:icon_name, local/image.png, or http://url.to.image'
+      selector:
+        text:
+    video:
+      name: 'Video'
+      description: 'Supports rtps, hls, dash, smoothstreaming, etc. Overrides image.'
+      example: 'rtsp://localhost:5555/live'
+      selector:
+        text:
+    camera:
+      name: 'Camera'
+      description: 'Camera stream to attach. Overrides image and video.'
+      example: 'camera.doorbell'
+      selector:
+        entity:
+          domain: camera
+    position:
+      name: 'Position'
+      description: 'Location of the notification.'
+      selector:
+        select:
+          options:
+            - label: Top Right
+              value: 'top_start'
+            - label: Top Left
+              value: 'top_end'
+            - label: Bottom Right
+              value: 'bottom_end'
+            - label: Bottom Left
+              value: 'bottom_start'
+    duration:
+      name: 'Duration'
+      description: 'The duration in seconds for which the notification will be displayed.'
+      example: '8'
+      selector:
+        number:
+          mode: box
+          unit_of_measurement: seconds
+          min: 1
+          max: 60
+    enable_debug:
+      name: Enable debug output?
+      selector:
+        constant:
+          value: true
+          label: Enabled
+  sequence:
+    - alias: Set local variables for reuse in this script.
+      variables:
+        debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+        icon_color_rgba: |-
+          {%- if icon_color is defined -%}
+            {%- if icon_color is string -%}
+              {{ icon_color }}
+            {%- elif icon_color is iterable -%}
+              #{{ "%02x%02x%02x" | format(icon_color[0], icon_color[1], icon_color[2]) }}
+            {%- endif -%}
+          {%- else -%}
+            {{ none }}
+          {%- endif -%}
+        entity: '{{ entity | default([]) }}'
+        entity_list: >
+          {% set entities = namespace(names=[]) %}
+          {% if entity %}
+            {# Convert to a list #}
+            {% if ',' in entity %}
+              {% set entitynum = entity.split(',') | count %}
+              {% for i in range(0, entitynum) %}
+                {% set entities.names = entities.names + [entity.split(',')[i] | string | trim ] %}
+              {% endfor %}
+            {% elif entity[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+              {% set entities.names = entities.names + [entity | string | trim] %}
+            {% else %}
+              {% set entities.names = entity %}
+            {% endif %}
+          {% endif %}
+          {{ entities.names | unique | list | lower }}
+        large_icon_path: >-
+          {%- if large_icon is string -%}
+            {%- if large_icon.startswith("http") -%}
+              {{ large_icon }}
+            {%- elif not large_icon.startswith("mdi") -%}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ large_icon }}
+            {%- else -%}
+              {{ large_icon }}
+            {%- endif -%}
+          {%- endif -%}
+        small_icon_path: >-
+          {%- if small_icon is string -%}
+            {%- if small_icon.startswith("http") -%}
+              {{ small_icon }}
+            {%- elif not small_icon.startswith("mdi") -%}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ small_icon }}
+            {%- else -%}
+              {{ small_icon }}
+            {%- endif -%}
+          {%- endif -%}
+        image_path: >-
+          {%- if image is string and not camera is string -%}
+            {%- if image.startswith("http") -%}
+              {{ image }}
+            {%- elif not image.startswith("mdi") -%}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ image }}
+            {%- else -%}
+              {{ image }}
+            {%- endif -%}
+          {%- endif -%}
+        video_path: >-
+          {%- if camera is string -%}
+            {%- if video.startswith("rtsp") -%}
+              {{ video }}
+            {%- elif video.startswith("http") -%}
+              {{ video }}
+            {%- else -%}
+              rtsp://10.10.10.10:8554/{{ camera }}
+            {%- endif -%}
+          {%- endif -%}
+    - alias: Set enable_debug = true above to provide output troubleshooting information.
+      if:
+        - condition: template
+          value_template: '{{ debug == true }}'
+      then:
+        - action: persistent_notification.create
+          data:
+            notification_id: 'notify_tvoverlay'
+            title: 'DEBUG: script.notify_tvoverlay'
+            message: |-
+              entity_list: {{ entity_list }}
+              appTitle: {{ app_title | default(none, true) }}
+              title: {{ title | default(none, true) }}
+              message: {{ message | default(none, true) }}
+              image: {{ image_path | default(none, true) }}
+              video: {{ video_path | default(none, true) }}
+              largeIcon: {{ large_icon_path | default(none, true) }}
+              smallIcon: {{ small_icon_path | default(none, true) }}
+              smallIconColor: {{ icon_color_rgba | default(none, true) }}
+              position: {{ position | default(none, true) }}
+              duration: {{ duration | default(none, true) }}
+    - alias: Check for empty entity list
+      condition: template
+      value_template: "{{ entity_list | count > 0 }}"
+    - alias: Loop through entity_list
+      repeat:
+        for_each: '{{ entity_list }}'
+        sequence:
+          - alias: Only send the message if the device has a value.
+            condition: template
+            value_template: "{{ has_value(repeat.item) }}"
+          - alias: Only send the message if the device is on.
+            condition: template
+            value_template: "{{ not is_state(repeat.item, \"off\") }}"
+          - variables:
+              ip_address: >-
+                {{ device_attr(repeat.item, 'name') | replace("Android TV ", "") }}
+          - action: rest_command.tvoverlay
+            data:
+              ip_address: "{{ ip_address }}"
+              app_title: "{{ app_title | default(\"\", true) }}"
+              title: "{{ title | default(\"\", true) }}"
+              message: "{{ message | default(\"\", true) }}"
+              image: "{%- if video is string -%}{{ none }}{%- else -%}{{ image_path | default(none, true) }}{% endif -%}"
+              video: "{{ video_path | default(none, true) }}"
+              large_icon: "{{ large_icon_path | default(none, true) }}"
+              small_icon: "{{ small_icon_path | default(none, true) }}"
+              icon_color: "{{ icon_color_rgba | default(none, true) }}"
+              position: "{{ position | default(none) }}"
+              duration: "{{ duration | default(none) }}"
