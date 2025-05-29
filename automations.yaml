@@ -3954,24 +3954,24 @@
 - id: '1692245318569'
   alias: "\U0001F514 Frigate Doorbell - Object Seen"
   description: Sends a notification when an object is detected on a camera
-  trigger:
-  - platform: mqtt
-    topic: frigate/events
+  triggers:
+  - topic: frigate/events
     id: frigate-event
     payload: Doorbell/new
     value_template: '{{ value_json[''after''][''camera''] }}/{{ value_json[''type'']
       }}'
-  - platform: event
-    event_type: mobile_app_notification_action
+    trigger: mqtt
+  - event_type: mobile_app_notification_action
     event_data:
       action: silence-doorbell
     id: silence
-  - platform: event
-    event_type: hass_agent_notifications
+    trigger: event
+  - event_type: hass_agent_notifications
     event_data:
       action: silence-doorbell
     id: silence
-  action:
+    trigger: event
+  actions:
   - variables:
       camera: doorbell
       camera_name: '{{ camera | title }}'
@@ -4003,6 +4003,46 @@
       - condition: trigger
         id: silence
       sequence:
+      - parallel:
+        - variables:
+            title: Doorbell Motion Silenced
+            message: Motion notifications have been silenced for {{ silence_timer
+              }} minutes.
+        - data:
+            who: parents
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_icon: mdi:doorbell-video
+            color: '#e91e63'
+            group: '{{ camera_name }} Notification'
+            priority: high
+            channel: Doorbell Motion
+            importance: high
+            url: lovelace/security#camera-doorbell
+          action: script.notify_mobile
+        - data:
+            entity:
+            - media_player.nasya
+            title: '{{ title }}'
+            message: '{{ message }}'
+          action: script.notify_hass_agent
+        - data:
+            computer:
+            - erebus
+            title: '{{ title }}'
+            message: '{{ message }}'
+            importance: critical
+          action: script.notify_lnxlink
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: '{{ title }}'
+            message: '{{ message }}'
+            large_icon: local/icons/doorbell-video.png
+            icon_color: '#e91e63'
+          action: script.notify_tvoverlay
       - target:
           entity_id: '{{ this.entity_id }}'
         data:
@@ -4132,10 +4172,10 @@
       - repeat:
           sequence:
           - wait_for_trigger:
-            - platform: mqtt
-              topic: frigate/events
+            - topic: frigate/events
               payload: '{{ id }}'
               value_template: '{{ value_json[''after''][''id''] }}'
+              trigger: mqtt
             timeout:
               minutes: 2
             continue_on_timeout: false
