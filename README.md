@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4720 |
-| Sensors        | 1516 |
-| Binary Sensors | 333 |
+| All Entities   | 4831 |
+| Sensors        | 1580 |
+| Binary Sensors | 335 |
 | Lights         | 74 |
-| Switches       | 296 |
+| Switches       | 298 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -348,7 +348,7 @@ Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.12.1]
+### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.13.0]
 
 Home Assistant Google Home custom component
 
@@ -402,13 +402,13 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.1.1]
+### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.2]
 
 Home Assistant Neakasa Integration
 
 Authors: [@timniklas](https://github.com/timniklas).
 
-### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.5.0]
+### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.6.0]
 
 Home Assistant integration for Nintendo Switch Parental Controls
 
@@ -438,7 +438,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.1.4]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.1.5]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -462,7 +462,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>38 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.8.0]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.11.1]
 
 A comprehensive camera card for Home Assistant
 
@@ -470,7 +470,7 @@ A comprehensive camera card for Home Assistant
 
 📈 A Lovelace card to display advanced graphs and charts based on ApexChartsJS for Home Assistant
 
-### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.15.2]
+### [Auto Entities](https://github.com/thomasloven/lovelace-auto-entities) [v1.16.1]
 
 🔹Automatically populate the entities-list of lovelace cards
 
@@ -498,11 +498,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.4.1]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.4.2]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.3.2]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.4.0]
 
 Expander card for HomeAssistant
 
@@ -510,7 +510,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Ha Floorplan 🖌🎨 | Your Imagination (Almost) Defines The Limits](https://github.com/ExperienceLovelace/ha-floorplan) [v1.1.2]
+### [Ha Floorplan 🖌🎨 | Your Imagination (Almost) Defines The Limits](https://github.com/ExperienceLovelace/ha-floorplan) [v1.1.3]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just became the new limit.
 
@@ -538,11 +538,11 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.18]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.20]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
-### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.12.1]
+### [Mini Graph Card](https://github.com/kalkih/mini-graph-card) [v0.13.0]
 
 Minimalistic graph card for Home Assistant Lovelace UI
 
@@ -594,7 +594,7 @@ a custom card for home assistant that utilizes tabs to segregate individual card
 
 A progress bar display for Home Assistant timers
 
-### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.8.3]
+### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.9.0]
 
 This custom card allows you to display vehicle information in your Home Assistant dashboard, including the vehicle name, image, and fuel or charge level.
 
