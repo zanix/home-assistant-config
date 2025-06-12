@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4831 |
-| Sensors        | 1580 |
-| Binary Sensors | 335 |
+| All Entities   | 4858 |
+| Sensors        | 1582 |
+| Binary Sensors | 337 |
 | Lights         | 74 |
-| Switches       | 298 |
+| Switches       | 319 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -296,13 +296,13 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.15]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.18]
 
 A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.3.8]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.4.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -330,7 +330,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.0]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.1]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -408,7 +408,7 @@ Home Assistant Neakasa Integration
 
 Authors: [@timniklas](https://github.com/timniklas).
 
-### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.6.0]
+### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.6.1]
 
 Home Assistant integration for Nintendo Switch Parental Controls
 
@@ -438,7 +438,7 @@ Subaru STARLINK custom component for Home Assistant.
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.1.5]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v6.1.9]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -462,7 +462,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>38 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.11.1]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.14.1]
 
 A comprehensive camera card for Home Assistant
 
@@ -498,11 +498,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.4.2]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.4.3]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.4.0]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.4.1]
 
 Expander card for HomeAssistant
 
@@ -538,7 +538,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.20]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.21]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -594,7 +594,7 @@ a custom card for home assistant that utilizes tabs to segregate individual card
 
 A progress bar display for Home Assistant timers
 
-### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.9.0]
+### [Ultra Vehicle Card](https://github.com/WJDDesigns/Ultra-Vehicle-Card) [v2.9.1]
 
 This custom card allows you to display vehicle information in your Home Assistant dashboard, including the vehicle name, image, and fuel or charge level.
 
@@ -606,7 +606,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.24.1]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v1.25.1]
 
 Home Assistant Lovelace Windrose Card
 
@@ -890,7 +890,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.5.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.6.0-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
