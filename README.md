@@ -722,12 +722,13 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>519 Automations</summary>
+<details><summary>520 Automations</summary>
 
 > Keymaster automations are hidden
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
+- ⏯ Family Room Media Off
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode
 - ⏯ Living Room Media Off
