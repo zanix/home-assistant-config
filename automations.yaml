@@ -2256,30 +2256,31 @@
     data:
       sound_mode: '{{ sound_mode }}'
     action: media_player.select_sound_mode
+  mode: restart
   variables:
     sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH
       STEREO\n{%- elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
       'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  DOLBY DIGITAL\n{%-
       else -%}\n  DIRECT\n{%- endif -%}"
-  mode: restart
 - id: '1665696345535'
   alias: ⏯ Living Room Sound Mode
   description: Changes the soundbar sound mode based on Source
-  trigger:
-  - platform: state
-    entity_id: media_player.universal_living_room
+  triggers:
+  - entity_id: media_player.universal_living_room
     attribute: source
-  condition:
+    trigger: state
+  conditions:
   - condition: not
     conditions:
     - condition: state
       entity_id: media_player.samsung_soundbar
       state: 'off'
-    - condition: state
-      entity_id: media_player.universal_living_room
-      attribute: source
-      state: nl.rogro82.pipup
-  action:
+  actions:
+  - action: select.select_option
+    target:
+      entity_id: select.samsung_soundbar_sound_mode
+    data:
+      option: '{{ sound_mode }}'
   - choose:
     - conditions:
       - condition: state
@@ -2304,6 +2305,10 @@
           entity_id: input_boolean.samsung_soundbar_voice_enhancer
         data: {}
   mode: restart
+  variables:
+    sound_mode: "{%- if trigger.to_state.attributes.source in ['Spotify', 'SmartTube',
+      'YouTube', 'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n
+      \ adaptive sound\n{%- else -%}\n  standard\n{%- endif -%}"
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer
   description: Listen for events and output data
