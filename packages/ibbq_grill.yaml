@@ -1,0 +1,990 @@
+---
+# Inkbird BBQ Grill Temperature Monitoring Package
+# This package provides a comprehensive setup for monitoring and alerting on BBQ grill and food probe temperatures using iBBQ devices.
+
+# Booleans for Enabling Features
+input_boolean:
+  ibbq_grill_enabled:
+    name: Enable iBBQ Grill Monitoring
+    icon: mdi:grill
+  ibbq_grill_alert:
+    name: Enable iBBQ Grill Temperature Notifications
+    icon: mdi:bell
+  ibbq_probe_1_alert:
+    name: Enable iBBQ Probe 1 Notifications
+    icon: mdi:bell
+  ibbq_probe_2_alert:
+    name: Enable iBBQ Probe 2 Notifications
+    icon: mdi:bell
+  ibbq_probe_3_alert:
+    name: Enable iBBQ Probe 3 Notifications
+    icon: mdi:bell
+  ibbq_probe_4_alert:
+    name: Enable iBBQ Probe 4 Notifications
+    icon: mdi:bell
+  ibbq_probe_5_alert:
+    name: Enable iBBQ Probe 5 Notifications
+    icon: mdi:bell
+  ibbq_grill_preheated:
+    name: iBBQ Grill Pre-Heated
+    initial: off
+    icon: mdi:heat-wave
+
+# Temperature Limits
+input_number:
+  # Grill Temperature Limits
+  ibbq_grill_high_temp:
+    name: iBBQ Grill High Temp
+    min: 100
+    max: 500
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:thermometer-high
+
+  ibbq_grill_low_temp:
+    name: iBBQ Grill Low Temp
+    min: 100
+    max: 500
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:thermometer-low
+
+  ibbq_grill_target_temp:
+    name: iBBQ Grill Target Temp
+    min: 100
+    max: 500
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:target
+
+  # Target Temperatures for Food Probes
+  ibbq_probe_1_target_temp:
+    name: iBBQ Probe 1 Target Temp
+    min: 60
+    max: 250
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:target
+
+  ibbq_probe_2_target_temp:
+    name: iBBQ Probe 2 Target Temp
+    min: 60
+    max: 250
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:target
+
+  ibbq_probe_3_target_temp:
+    name: iBBQ Probe 3 Target Temp
+    min: 60
+    max: 250
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:target
+
+  ibbq_probe_4_target_temp:
+    name: iBBQ Probe 4 Target Temp
+    min: 60
+    max: 250
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:target
+
+  ibbq_probe_5_target_temp:
+    name: iBBQ Probe 5 Target Temp
+    min: 60
+    max: 250
+    step: 5
+    mode: box
+    unit_of_measurement: "°F"
+    icon: mdi:target
+
+# Input Text for Probe Names
+input_text:
+  ibbq_probe_1_name:
+    name: "Probe 1 Name"
+    icon: mdi:hamburger
+  ibbq_probe_2_name:
+    name: "Probe 2 Name"
+    icon: mdi:hamburger
+  ibbq_probe_3_name:
+    name: "Probe 3 Name"
+    icon: mdi:hamburger
+  ibbq_probe_4_name:
+    name: "Probe 4 Name"
+    icon: mdi:hamburger
+  ibbq_probe_5_name:
+    name: "Probe 5 Name"
+    icon: mdi:hamburger
+
+# Derivative Sensors for Temperature Probes
+sensor:
+  - platform: derivative
+    source: sensor.ibbq_temperature_probe_1
+    name: iBBQ Temperature Probe 1 Temp Rate
+    round: 1
+    unit_time: min
+    time_window: "00:10:00"
+
+  - platform: derivative
+    source: sensor.ibbq_temperature_probe_2
+    name: iBBQ Temperature Probe 2 Temp Rate
+    round: 1
+    unit_time: min
+    time_window: "00:10:00"
+
+  - platform: derivative
+    source: sensor.ibbq_temperature_probe_3
+    name: iBBQ Temperature Probe 3 Temp Rate
+    round: 1
+    unit_time: min
+    time_window: "00:10:00"
+
+  - platform: derivative
+    source: sensor.ibbq_temperature_probe_4
+    name: iBBQ Temperature Probe 4 Temp Rate
+    round: 1
+    unit_time: min
+    time_window: "00:10:00"
+
+  - platform: derivative
+    source: sensor.ibbq_temperature_probe_5
+    name: iBBQ Temperature Probe 5 Temp Rate
+    round: 1
+    unit_time: min
+    time_window: "00:10:00"
+
+  - platform: derivative
+    source: sensor.ibbq_temperature_probe_6
+    name: iBBQ Grill Temperature Temp Rate
+    round: 1
+    unit_time: min
+    time_window: "00:10:00"
+
+# Binary Sensors for Alerts and Sensors for Time to Target
+template:
+  - binary_sensor:
+      - name: iBBQ Grill Temp Alert
+        unique_id: ibbq_grill_temp_alert
+        device_class: problem
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_6") and ((states("sensor.ibbq_temperature_probe_6") | int) < (states("input_number.ibbq_grill_low_temp") | int) or (states("sensor.ibbq_temperature_probe_6") | int) > (states("input_number.ibbq_grill_high_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+      - name: iBBQ Grill Target Alert
+        unique_id: ibbq_grill_target_alert
+        device_class: heat
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_6") and ((states("sensor.ibbq_temperature_probe_6") | int) >= (states("input_number.ibbq_grill_target_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+      - name: iBBQ Probe 1 Target Alert
+        unique_id: ibbq_probe_1_target_alert
+        device_class: heat
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_1") and ((states("sensor.ibbq_temperature_probe_1") | int) >= (states("input_number.ibbq_probe_1_target_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+      - name: iBBQ Probe 2 Target Alert
+        unique_id: ibbq_probe_2_target_alert
+        device_class: heat
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_2") and ((states("sensor.ibbq_temperature_probe_2") | int) >= (states("input_number.ibbq_probe_2_target_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+      - name: iBBQ Probe 3 Target Alert
+        unique_id: ibbq_probe_3_target_alert
+        device_class: heat
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_3") and ((states("sensor.ibbq_temperature_probe_3") | int) >= (states("input_number.ibbq_probe_3_target_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+      - name: iBBQ Probe 4 Target Alert
+        unique_id: ibbq_probe_4_target_alert
+        device_class: heat
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_4") and ((states("sensor.ibbq_temperature_probe_4") | int) >= (states("input_number.ibbq_probe_4_target_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+      - name: iBBQ Probe 5 Target Alert
+        unique_id: ibbq_probe_5_target_alert
+        device_class: heat
+        state: >
+          {% if has_value("sensor.ibbq_temperature_probe_5") and ((states("sensor.ibbq_temperature_probe_5") | int) >= (states("input_number.ibbq_probe_5_target_temp") | int)) %}
+            {{ true }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+  - sensor:
+      - name: iBBQ Grill Time to Target
+        unique_id: ibbq_grill_time_to_target
+        device_class: duration
+        unit_of_measurement: s
+        icon: mdi:clock-outline
+        state: >
+          {% set current_temp = states('sensor.ibbq_temperature_probe_6') | float(0) %}
+          {% set target_temp = states('input_number.ibbq_grill_target_temp') | float(0) %}
+          {% set temp_rate = states('sensor.ibbq_grill_temperature_temp_rate') | float(0) %}
+
+          {% if current_temp >= target_temp %}
+            0
+          {% elif current_temp == 0 or target_temp == 0 %}
+            {{ none }}
+          {% elif temp_rate <= 0.1 %}
+            {{ none }}
+          {% else %}
+            {% set remaining_temp = target_temp - current_temp %}
+            {% set minutes_remaining = remaining_temp / temp_rate %}
+
+            {% if minutes_remaining < 0 %}
+              0
+            {% elif minutes_remaining > 1440 %}
+              86400
+            {% else %}
+              {{ (minutes_remaining * 60) | round(0) }}
+            {% endif %}
+          {% endif %}
+
+      - name: iBBQ Probe 1 Time to Target
+        unique_id: ibbq_probe_1_time_to_target
+        device_class: duration
+        unit_of_measurement: s
+        icon: mdi:clock-outline
+        state: >
+          {% set current_temp = states('sensor.ibbq_temperature_probe_1') | float(0) %}
+          {% set target_temp = states('input_number.ibbq_probe_1_target_temp') | float(0) %}
+          {% set temp_rate = states('sensor.ibbq_temperature_probe_1_temp_rate') | float(0) %}
+
+          {% if current_temp >= target_temp %}
+            0
+          {% elif current_temp == 0 or target_temp == 0 %}
+            {{ none }}
+          {% elif temp_rate <= 0.1 %}
+            {{ none }}
+          {% else %}
+            {% set remaining_temp = target_temp - current_temp %}
+            {% set minutes_remaining = remaining_temp / temp_rate %}
+
+            {% if minutes_remaining < 0 %}
+              0
+            {% elif minutes_remaining > 1440 %}
+              86400
+            {% else %}
+              {{ (minutes_remaining * 60) | round(0) }}
+            {% endif %}
+          {% endif %}
+
+      - name: iBBQ Probe 2 Time to Target
+        unique_id: ibbq_probe_2_time_to_target
+        device_class: duration
+        unit_of_measurement: s
+        icon: mdi:clock-outline
+        state: >
+          {% set current_temp = states('sensor.ibbq_temperature_probe_2') | float(0) %}
+          {% set target_temp = states('input_number.ibbq_probe_2_target_temp') | float(0) %}
+          {% set temp_rate = states('sensor.ibbq_temperature_probe_2_temp_rate') | float(0) %}
+
+          {% if current_temp >= target_temp %}
+            0
+          {% elif current_temp == 0 or target_temp == 0 %}
+            {{ none }}
+          {% elif temp_rate <= 0.1 %}
+            {{ none }}
+          {% else %}
+            {% set remaining_temp = target_temp - current_temp %}
+            {% set minutes_remaining = remaining_temp / temp_rate %}
+
+            {% if minutes_remaining < 0 %}
+              0
+            {% elif minutes_remaining > 1440 %}
+              86400
+            {% else %}
+              {{ (minutes_remaining * 60) | round(0) }}
+            {% endif %}
+          {% endif %}
+
+      - name: iBBQ Probe 3 Time to Target
+        unique_id: ibbq_probe_3_time_to_target
+        device_class: duration
+        unit_of_measurement: s
+        icon: mdi:clock-outline
+        state: >
+          {% set current_temp = states('sensor.ibbq_temperature_probe_3') | float(0) %}
+          {% set target_temp = states('input_number.ibbq_probe_3_target_temp') | float(0) %}
+          {% set temp_rate = states('sensor.ibbq_temperature_probe_3_temp_rate') | float(0) %}
+
+          {% if current_temp >= target_temp %}
+            0
+          {% elif current_temp == 0 or target_temp == 0 %}
+            {{ none }}
+          {% elif temp_rate <= 0.1 %}
+            {{ none }}
+          {% else %}
+            {% set remaining_temp = target_temp - current_temp %}
+            {% set minutes_remaining = remaining_temp / temp_rate %}
+
+            {% if minutes_remaining < 0 %}
+              0
+            {% elif minutes_remaining > 1440 %}
+              86400
+            {% else %}
+              {{ (minutes_remaining * 60) | round(0) }}
+            {% endif %}
+          {% endif %}
+
+      - name: iBBQ Probe 4 Time to Target
+        unique_id: ibbq_probe_4_time_to_target
+        device_class: duration
+        unit_of_measurement: s
+        icon: mdi:clock-outline
+        state: >
+          {% set current_temp = states('sensor.ibbq_temperature_probe_4') | float(0) %}
+          {% set target_temp = states('input_number.ibbq_probe_4_target_temp') | float(0) %}
+          {% set temp_rate = states('sensor.ibbq_temperature_probe_4_temp_rate') | float(0) %}
+
+          {% if current_temp >= target_temp %}
+            0
+          {% elif current_temp == 0 or target_temp == 0 %}
+            {{ none }}
+          {% elif temp_rate <= 0.1 %}
+            {{ none }}
+          {% else %}
+            {% set remaining_temp = target_temp - current_temp %}
+            {% set minutes_remaining = remaining_temp / temp_rate %}
+
+            {% if minutes_remaining < 0 %}
+              0
+            {% elif minutes_remaining > 1440 %}
+              86400
+            {% else %}
+              {{ (minutes_remaining * 60) | round(0) }}
+            {% endif %}
+          {% endif %}
+
+      - name: iBBQ Probe 5 Time to Target
+        unique_id: ibbq_probe_5_time_to_target
+        device_class: duration
+        unit_of_measurement: s
+        icon: mdi:clock-outline
+        state: >
+          {% set current_temp = states('sensor.ibbq_temperature_probe_5') | float(0) %}
+          {% set target_temp = states('input_number.ibbq_probe_5_target_temp') | float(0) %}
+          {% set temp_rate = states('sensor.ibbq_temperature_probe_5_temp_rate') | float(0) %}
+
+          {% if current_temp >= target_temp %}
+            0
+          {% elif current_temp == 0 or target_temp == 0 %}
+            {{ none }}
+          {% elif temp_rate <= 0.1 %}
+            {{ none }}
+          {% else %}
+            {% set remaining_temp = target_temp - current_temp %}
+            {% set minutes_remaining = remaining_temp / temp_rate %}
+
+            {% if minutes_remaining < 0 %}
+              0
+            {% elif minutes_remaining > 1440 %}
+              86400
+            {% else %}
+              {{ (minutes_remaining * 60) | round(0) }}
+            {% endif %}
+          {% endif %}
+
+# Automation for BBQ Grill Alerts
+automation:
+  - id: ibbq_grill_alerts
+    alias: ♨️ iBBQ Grill Alerts
+    description: Send notifications when BBQ probe temperatures trigger alerts
+    mode: parallel
+    max: 10
+    triggers:
+      - trigger: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: snooze_bbq_alert
+        id: snooze_alert
+      - trigger: event
+        event_type: hass_agent_notifications
+        event_data:
+          action: snooze_bbq_alert
+        id: snooze_alert
+      - trigger: mqtt
+        topic: lnxlink/+/monitor_controls/notify/button_press
+        payload: Snooze BBQ 5 min
+        value_template: "{{ value_json.button }}"
+      - trigger: numeric_state
+        entity_id:
+          - sensor.ibbq_temperature_probe_6
+        above: input_number.ibbq_grill_low_temp
+        for: "00:01:00"
+        id: grill_heated_up
+      - trigger: numeric_state
+        entity_id:
+          - sensor.ibbq_temperature_probe_6
+        above: input_number.ibbq_grill_high_temp
+        for: "00:01:00"
+        id: grill_too_hot
+      - trigger: numeric_state
+        entity_id:
+          - sensor.ibbq_temperature_probe_6
+        below: input_number.ibbq_grill_low_temp
+        for: "00:01:00"
+        id: grill_too_cold
+      - trigger: state
+        entity_id: binary_sensor.ibbq_grill_target_alert
+        from: "off"
+        to: "on"
+        id: grill_alert
+      - trigger: state
+        entity_id: binary_sensor.ibbq_probe_1_target_alert
+        from: "off"
+        to: "on"
+        id: probe_1_alert
+      - trigger: state
+        entity_id: binary_sensor.ibbq_probe_2_target_alert
+        from: "off"
+        to: "on"
+        id: probe_2_alert
+      - trigger: state
+        entity_id: binary_sensor.ibbq_probe_3_target_alert
+        from: "off"
+        to: "on"
+        id: probe_3_alert
+      - trigger: state
+        entity_id: binary_sensor.ibbq_probe_4_target_alert
+        from: "off"
+        to: "on"
+        id: probe_4_alert
+      - trigger: state
+        entity_id: binary_sensor.ibbq_probe_5_target_alert
+        from: "off"
+        to: "on"
+        id: probe_5_alert
+    conditions:
+      - condition: state
+        entity_id: input_boolean.ibbq_grill_enabled
+        state: "on"
+    actions:
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: grill_heated_up
+            sequence:
+              - action: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.ibbq_grill_preheated
+            alias: Mark Grill as Having Been Hot
+          - conditions:
+              - condition: trigger
+                id: snooze_alert
+            sequence:
+              - variables:
+                  title: BBQ Alert Snoozed
+                  message: BBQ alerts snoozed for 5 minutes
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_snooze_confirmation
+                      channel: BBQ Alerts
+                      importance: high
+                      url: lovelace#bbq
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+              - target:
+                  entity_id: "{{ this.entity_id }}"
+                data:
+                  stop_actions: false
+                action: automation.turn_off
+              - delay:
+                  minutes: 5
+              - target:
+                  entity_id: "{{ this.entity_id }}"
+                action: automation.turn_on
+            alias: Snooze Alert Actions
+          - conditions:
+              - condition: trigger
+                id: grill_too_hot
+              - condition: state
+                entity_id: input_boolean.ibbq_grill_alert
+                state: "on"
+            sequence:
+              - variables:
+                  title: Grill Temperature HIGH
+                  message: >
+                    Grill temperature is {{ states('sensor.ibbq_temperature_probe_6') | float(0) }}°F
+                    (Limit: {{ states('input_number.ibbq_grill_high_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_snooze_confirmation
+                      channel: BBQ Alerts
+                      importance: high
+                      url: lovelace#bbq
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Grill Hot Alert Actions
+          - conditions:
+              - condition: trigger
+                id: grill_too_cold
+              - condition: state
+                entity_id: input_boolean.ibbq_grill_alert
+                state: "on"
+              - condition: state
+                entity_id: input_boolean.ibbq_grill_preheated
+                state: "on"
+            sequence:
+              - variables:
+                  title: Grill Temperature LOW
+                  message: >
+                    Grill temperature is {{ states('sensor.ibbq_temperature_probe_6') | float(0) }}°F
+                    (Limit: {{ states('input_number.ibbq_grill_low_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - action: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.ibbq_grill_preheated
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_snooze_confirmation
+                      channel: BBQ Alerts
+                      importance: high
+                      url: lovelace#bbq
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Grill Cold Alert Actions
+          - conditions:
+              - condition: trigger
+                id: grill_alert
+              - condition: state
+                entity_id: input_boolean.ibbq_grill_alert
+                state: "on"
+            sequence:
+              - variables:
+                  title: BBQ Alert - Grill
+                  message: >
+                    Grill has reached {{ states('sensor.ibbq_temperature_probe_6') | float(0) }}°F
+                    (Target: {{ states('input_number.ibbq_grill_target_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_snooze_confirmation
+                      channel: BBQ Alerts
+                      importance: high
+                      url: lovelace#bbq
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Grill Alert Actions
+          - conditions:
+              - condition: trigger
+                id: probe_1_alert
+              - condition: state
+                entity_id: input_boolean.ibbq_probe_1_alert
+                state: "on"
+            sequence:
+              - variables:
+                  probe_name: "{{ states('input_text.ibbq_probe_1_name') | default('Probe 1') }}"
+                  title: BBQ Alert - {{ probe_name }}
+                  message: >-
+                    {{ probe_name }} has reached {{ states('sensor.ibbq_temperature_probe_1') | float(0) }}°F
+                    (Target: {{ states('input_number.ibbq_probe_1_target_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      url: lovelace#bbq
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_probe_1
+                      channel: BBQ Alerts
+                      importance: high
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Probe 1 Alert Actions
+          - conditions:
+              - condition: trigger
+                id: probe_2_alert
+              - condition: state
+                entity_id: input_boolean.ibbq_probe_2_alert
+                state: "on"
+            sequence:
+              - variables:
+                  probe_name: "{{ states('input_text.ibbq_probe_2_name') | default('Probe 2') }}"
+                  title: BBQ Alert - {{ probe_name }}
+                  message: >-
+                    {{ probe_name }} has reached {{ states('sensor.ibbq_temperature_probe_2') | float(0) }}°F
+                    (Target: {{ states('input_number.ibbq_probe_2_target_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      url: lovelace#bbq
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_probe_2
+                      channel: BBQ Alerts
+                      importance: high
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Probe 2 Alert Actions
+          - conditions:
+              - condition: trigger
+                id: probe_3_alert
+              - condition: state
+                entity_id: input_boolean.ibbq_probe_3_alert
+                state: "on"
+            sequence:
+              - variables:
+                  probe_name: "{{ states('input_text.ibbq_probe_3_name') | default('Probe 3') }}"
+                  title: BBQ Alert - {{ probe_name }}
+                  message: >-
+                    {{ probe_name }} has reached {{ states('sensor.ibbq_temperature_probe_3') | float(0) }}°F
+                    (Target: {{ states('input_number.ibbq_probe_3_target_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      url: lovelace#bbq
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_probe_3
+                      channel: BBQ Alerts
+                      importance: high
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Probe 3 Alert Actions
+          - conditions:
+              - condition: trigger
+                id: probe_4_alert
+              - condition: state
+                entity_id: input_boolean.ibbq_probe_4_alert
+                state: "on"
+            sequence:
+              - variables:
+                  probe_name: "{{ states('input_text.ibbq_probe_4_name') | default('Probe 4') }}"
+                  title: BBQ Alert - {{ probe_name }}
+                  message: >-
+                    {{ probe_name }} has reached {{ states('sensor.ibbq_temperature_probe_4') | float(0) }}°F
+                    (Target: {{ states('input_number.ibbq_probe_4_target_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      url: lovelace#bbq
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_probe_4
+                      channel: BBQ Alerts
+                      importance: high
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Probe 4 Alert Actions
+          - conditions:
+              - condition: trigger
+                id: probe_5_alert
+              - condition: state
+                entity_id: input_boolean.ibbq_probe_5_alert
+                state: "on"
+            sequence:
+              - variables:
+                  probe_name: "{{ states('input_text.ibbq_probe_5_name') | default('Probe 5') }}"
+                  title: BBQ Alert - {{ probe_name }}
+                  message: >-
+                    {{ probe_name }} has reached {{ states('sensor.ibbq_temperature_probe_5') | float(0) }}°F
+                    (Target: {{ states('input_number.ibbq_probe_5_target_temp') | float(0) }}°F)
+                  icon: local/icons/gas-burner.png
+              - parallel:
+                  - action: script.notify_mobile
+                    data:
+                      send_to: parents
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      notification_icon: mdi:gas-burner
+                      color: "#f44336"
+                      icon: "{{ icon }}"
+                      url: lovelace#bbq
+                      group: BBQ Alerts
+                      interruption_level: critical
+                      tag: bbq_probe_5
+                      channel: BBQ Alerts
+                      importance: high
+                      actions:
+                        - action: snooze_bbq_alert
+                          title: Snooze 5 min
+                  - action: script.notify_lnxlink
+                    data:
+                      computer:
+                        - erebus
+                        - cartago
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      icon: "{{ icon }}"
+                      importance: critical
+                      actions:
+                        - Snooze BBQ 5 min
+                  - action: script.notify_tvoverlay
+                    data:
+                      entity:
+                        - media_player.living_room_googletv
+                        - media_player.shield_family_room
+                        - media_player.shield_main_bedroom
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      large_icon: "{{ icon }}"
+                      icon_color: "#f44336"
+            alias: Probe 5 Alert Actions

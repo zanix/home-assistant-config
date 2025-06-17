@@ -6007,16 +6007,870 @@ views:
             cards:
               - type: custom:bubble-card
                 card_type: pop-up
+                hash: '#bbq'
+                button_type: name
+                name: iBBQ
+                show_icon: false
+                margin_top_desktop: 13vh
+                width_desktop: 40vw
+                margin_top_mobile: calc(0px - var(--header-height))
+                styles: '${subButtonIcon[4].setAttribute("icon", hass.states[''input_boolean.ibbq_grill_enabled'']?.state
+                  === ''on'' ? ''mdi:bell'' : ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                sub_button:
+                  - entity: binary_sensor.ibbq_grill_temp_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_grill_temp_alert
+                        state: 'on'
+                  - entity: input_number.ibbq_grill_low_temp
+                    name: Low Temp
+                    show_background: false
+                    show_state: true
+                  - entity: input_number.ibbq_grill_high_temp
+                    name: High Temp
+                    show_background: false
+                    show_state: true
+                  - entity: automation.ibbq_grill_alerts
+                    name: Alerts Snoozed
+                    icon: mdi:sleep
+                    state_background: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                    visibility:
+                      - condition: state
+                        entity: automation.ibbq_grill_alerts
+                        state: 'off'
+                  - entity: input_boolean.ibbq_grill_enabled
+                    name: Alert
+                    state_background: false
+                    show_background: false
+                    show_state: false
+                    show_name: false
+                    tap_action:
+                      action: toggle
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_grill_temp_alert
+                        state: 'on'
+                  subbutton4:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: automation.ibbq_grill_alerts
+                        state: 'off'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_grill_enabled
+                        state: 'off'
+              - type: custom:bubble-card
+                card_type: button
+                button_type: name
+                name: Grill
+                show_icon: false
+                button_action:
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Grill Settings
+                        content:
+                          type: custom:vertical-stack-in-card
+                          cards:
+                            - type: tile
+                              name: Target
+                              entity: input_number.ibbq_grill_target_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                            - type: tile
+                              name: Low
+                              entity: input_number.ibbq_grill_low_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                            - type: tile
+                              name: High
+                              entity: input_number.ibbq_grill_high_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                sub_button:
+                  - entity: binary_sensor.ibbq_grill_target_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_grill_target_alert
+                        state: 'on'
+                  - entity: sensor.ibbq_temperature_probe_6
+                    name: Temperature
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ibbq_temperature_probe_6
+                        state_not: unavailable
+                      - condition: numeric_state
+                        entity: sensor.ibbq_temperature_probe_6
+                        above: 35
+                  - entity: input_number.ibbq_grill_target_temp
+                    name: Target
+                    show_background: false
+                    show_state: true
+                  - entity: sensor.ibbq_grill_time_to_target
+                    name: Estimated Time
+                    icon: mdi:clock-end
+                    show_state: false
+                    show_background: false
+                  - entity: input_boolean.ibbq_grill_alert
+                    name: Notifications
+                    show_state: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                styles: '${subButtonIcon[4].setAttribute("icon",
+
+                  hass.states[''input_boolean.ibbq_grill_alert'']?.state === ''on''
+                  ? ''mdi:bell'' :
+
+                  ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_grill_target_alert
+                        state: 'on'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_grill_alert
+                        state: 'off'
+                card_mod:
+                  style: "{% set temp = states('sensor.ibbq_temperature_probe_6')\
+                    \ | float(32) %}\n{% set target = states('input_number.ibbq_grill_target_temp')\
+                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
+                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
+                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
+                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
+                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
+                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
+                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
+                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
+                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
+                    \  .bubble-button-background::before {\n    content: \"\";\n \
+                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
+                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_grill_time_to_target')\
+                    \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
+                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_grill_time_to_target',\
+                    \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
+                    \ %}\n{% endif %}"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                name: iBBQ Probe 1
+                entity: input_text.ibbq_probe_1_name
+                show_icon: false
+                show_state: false
+                button_action:
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Probe 1 Settings
+                        content:
+                          type: custom:vertical-stack-in-card
+                          cards:
+                            - type: entities
+                              show_header_toggle: false
+                              entities:
+                                - entity: input_text.ibbq_probe_1_name
+                                  name: Name
+                            - type: tile
+                              name: Target
+                              entity: input_number.ibbq_probe_1_target_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                              vertical: false
+                sub_button:
+                  - entity: binary_sensor.ibbq_probe_1_target_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_probe_1_target_alert
+                        state: 'on'
+                  - entity: sensor.ibbq_temperature_probe_1
+                    name: Temperature
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ibbq_temperature_probe_1
+                        state_not: unavailable
+                      - condition: numeric_state
+                        entity: sensor.ibbq_temperature_probe_1
+                        above: 35
+                  - entity: input_number.ibbq_probe_1_target_temp
+                    name: Target
+                    show_background: false
+                    show_state: true
+                  - entity: sensor.ibbq_probe_1_time_to_target
+                    name: Estimated Time
+                    icon: mdi:clock-end
+                    show_state: false
+                    show_background: false
+                  - entity: input_boolean.ibbq_probe_1_alert
+                    name: Notifications
+                    show_state: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                styles: '${card.querySelector(''.bubble-name'').innerText =
+
+                  hass.states[''input_text.ibbq_probe_1_name'']?.state}
+
+
+                  ${subButtonIcon[4].setAttribute("icon",
+
+                  hass.states[''input_boolean.ibbq_probe_1_alert'']?.state === ''on''
+                  ? ''mdi:bell'' :
+
+                  ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_probe_1_target_alert
+                        state: 'on'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_probe_1_alert
+                        state: 'off'
+                card_mod:
+                  style: "{% set temp = states('sensor.ibbq_temperature_probe_1')\
+                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_1_target_temp')\
+                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
+                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
+                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
+                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
+                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
+                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
+                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
+                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
+                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
+                    \  .bubble-button-background::before {\n    content: \"\";\n \
+                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
+                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_1_time_to_target')\
+                    \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
+                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_1_time_to_target',\
+                    \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
+                    \ %}\n{% endif %}"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                name: iBBQ Probe 2
+                entity: input_text.ibbq_probe_2_name
+                show_icon: false
+                show_state: false
+                button_action:
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Probe 2 Settings
+                        content:
+                          type: custom:vertical-stack-in-card
+                          cards:
+                            - type: entities
+                              show_header_toggle: false
+                              entities:
+                                - entity: input_text.ibbq_probe_2_name
+                                  name: Name
+                            - type: tile
+                              name: Target
+                              entity: input_number.ibbq_probe_2_target_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                              vertical: false
+                sub_button:
+                  - entity: binary_sensor.ibbq_probe_2_target_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_probe_2_target_alert
+                        state: 'on'
+                  - entity: sensor.ibbq_temperature_probe_2
+                    name: Temperature
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ibbq_temperature_probe_2
+                        state_not: unavailable
+                      - condition: numeric_state
+                        entity: sensor.ibbq_temperature_probe_2
+                        above: 35
+                  - entity: input_number.ibbq_probe_2_target_temp
+                    name: Target
+                    show_background: false
+                    show_state: true
+                  - entity: sensor.ibbq_probe_2_time_to_target
+                    name: Estimated Time
+                    icon: mdi:clock-end
+                    show_state: false
+                    show_background: false
+                  - entity: input_boolean.ibbq_probe_2_alert
+                    name: Notifications
+                    show_state: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                styles: '${card.querySelector(''.bubble-name'').innerText =
+
+                  hass.states[''input_text.ibbq_probe_2_name'']?.state}
+
+
+                  ${subButtonIcon[4].setAttribute("icon",
+
+                  hass.states[''input_boolean.ibbq_probe_2_alert'']?.state === ''on''
+                  ? ''mdi:bell'' :
+
+                  ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_probe_2_target_alert
+                        state: 'on'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_probe_2_alert
+                        state: 'off'
+                card_mod:
+                  style: "{% set temp = states('sensor.ibbq_temperature_probe_2')\
+                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_2_target_temp')\
+                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
+                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
+                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
+                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
+                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
+                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
+                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
+                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
+                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
+                    \  .bubble-button-background::before {\n    content: \"\";\n \
+                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
+                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_2_time_to_target')\
+                    \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
+                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_2_time_to_target',\
+                    \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
+                    \ %}\n{% endif %}"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                name: iBBQ Probe 3
+                entity: input_text.ibbq_probe_3_name
+                show_icon: false
+                show_state: false
+                button_action:
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Probe 3 Settings
+                        content:
+                          type: custom:vertical-stack-in-card
+                          cards:
+                            - type: entities
+                              show_header_toggle: false
+                              entities:
+                                - entity: input_text.ibbq_probe_3_name
+                                  name: Name
+                            - type: tile
+                              name: Target
+                              entity: input_number.ibbq_probe_3_target_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                              vertical: false
+                sub_button:
+                  - entity: binary_sensor.ibbq_probe_3_target_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_probe_3_target_alert
+                        state: 'on'
+                  - entity: sensor.ibbq_temperature_probe_3
+                    name: Temperature
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ibbq_temperature_probe_3
+                        state_not: unavailable
+                      - condition: numeric_state
+                        entity: sensor.ibbq_temperature_probe_3
+                        above: 35
+                  - entity: input_number.ibbq_probe_3_target_temp
+                    name: Target
+                    show_background: false
+                    show_state: true
+                  - entity: sensor.ibbq_probe_3_time_to_target
+                    name: Estimated Time
+                    icon: mdi:clock-end
+                    show_state: false
+                    show_background: false
+                  - entity: input_boolean.ibbq_probe_3_alert
+                    name: Notifications
+                    show_state: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                styles: '${card.querySelector(''.bubble-name'').innerText =
+
+                  hass.states[''input_text.ibbq_probe_3_name'']?.state}
+
+
+                  ${subButtonIcon[4].setAttribute("icon",
+
+                  hass.states[''input_boolean.ibbq_probe_3_alert'']?.state === ''on''
+                  ? ''mdi:bell'' :
+
+                  ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_probe_3_target_alert
+                        state: 'on'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_probe_3_alert
+                        state: 'off'
+                card_mod:
+                  style: "{% set temp = states('sensor.ibbq_temperature_probe_3')\
+                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_3_target_temp')\
+                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
+                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
+                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
+                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
+                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
+                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
+                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
+                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
+                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
+                    \  .bubble-button-background::before {\n    content: \"\";\n \
+                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
+                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_3_time_to_target')\
+                    \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
+                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_3_time_to_target',\
+                    \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
+                    \ %}\n{% endif %}"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                name: iBBQ Probe 4
+                entity: input_text.ibbq_probe_4_name
+                show_icon: false
+                show_state: false
+                button_action:
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Probe 4 Settings
+                        content:
+                          type: custom:vertical-stack-in-card
+                          cards:
+                            - type: entities
+                              show_header_toggle: false
+                              entities:
+                                - entity: input_text.ibbq_probe_4_name
+                                  name: Name
+                            - type: tile
+                              name: Target
+                              entity: input_number.ibbq_probe_4_target_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                              vertical: false
+                sub_button:
+                  - entity: binary_sensor.ibbq_probe_4_target_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_probe_4_target_alert
+                        state: 'on'
+                  - entity: sensor.ibbq_temperature_probe_4
+                    name: Temperature
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ibbq_temperature_probe_4
+                        state_not: unavailable
+                      - condition: numeric_state
+                        entity: sensor.ibbq_temperature_probe_4
+                        above: 35
+                  - entity: input_number.ibbq_probe_4_target_temp
+                    name: Target
+                    show_background: false
+                    show_state: true
+                  - entity: sensor.ibbq_probe_4_time_to_target
+                    name: Estimated Time
+                    icon: mdi:clock-end
+                    show_state: false
+                    show_background: false
+                  - entity: input_boolean.ibbq_probe_4_alert
+                    name: Notifications
+                    show_state: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                styles: '${card.querySelector(''.bubble-name'').innerText =
+
+                  hass.states[''input_text.ibbq_probe_4_name'']?.state}
+
+
+                  ${subButtonIcon[4].setAttribute("icon",
+
+                  hass.states[''input_boolean.ibbq_probe_4_alert'']?.state === ''on''
+                  ? ''mdi:bell'' :
+
+                  ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_probe_4_target_alert
+                        state: 'on'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_probe_4_alert
+                        state: 'off'
+                card_mod:
+                  style: "{% set temp = states('sensor.ibbq_temperature_probe_4')\
+                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_4_target_temp')\
+                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
+                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
+                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
+                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
+                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
+                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
+                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
+                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
+                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
+                    \  .bubble-button-background::before {\n    content: \"\";\n \
+                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
+                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_4_time_to_target')\
+                    \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
+                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_4_time_to_target',\
+                    \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
+                    \ %}\n{% endif %}"
+              - type: custom:bubble-card
+                card_type: button
+                button_type: state
+                name: iBBQ Probe 5
+                entity: input_text.ibbq_probe_5_name
+                show_icon: false
+                show_state: false
+                button_action:
+                  tap_action:
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Probe 5 Settings
+                        content:
+                          type: custom:vertical-stack-in-card
+                          cards:
+                            - type: entities
+                              show_header_toggle: false
+                              entities:
+                                - entity: input_text.ibbq_probe_5_name
+                                  name: Name
+                            - type: tile
+                              name: Target
+                              entity: input_number.ibbq_probe_5_target_temp
+                              features:
+                                - type: numeric-input
+                                  style: buttons
+                              features_position: inline
+                              hide_state: true
+                              vertical: false
+                sub_button:
+                  - entity: binary_sensor.ibbq_probe_5_target_alert
+                    name: Target Alert
+                    show_background: false
+                    show_state: false
+                    visibility:
+                      - condition: state
+                        entity: binary_sensor.ibbq_probe_5_target_alert
+                        state: 'on'
+                  - entity: sensor.ibbq_temperature_probe_5
+                    name: Temperature
+                    show_background: false
+                    show_state: true
+                    visibility:
+                      - condition: state
+                        entity: sensor.ibbq_temperature_probe_5
+                        state_not: unavailable
+                      - condition: numeric_state
+                        entity: sensor.ibbq_temperature_probe_5
+                        above: 35
+                  - entity: input_number.ibbq_probe_5_target_temp
+                    name: Target
+                    show_background: false
+                    show_state: true
+                  - entity: sensor.ibbq_probe_5_time_to_target
+                    name: Estimated Time
+                    icon: mdi:clock-end
+                    show_state: false
+                    show_background: false
+                  - entity: input_boolean.ibbq_probe_5_alert
+                    name: Notifications
+                    show_state: false
+                    show_background: false
+                    tap_action:
+                      action: toggle
+                styles: '${card.querySelector(''.bubble-name'').innerText =
+
+                  hass.states[''input_text.ibbq_probe_5_name'']?.state}
+
+
+                  ${subButtonIcon[4].setAttribute("icon",
+
+                  hass.states[''input_boolean.ibbq_probe_5_alert'']?.state === ''on''
+                  ? ''mdi:bell'' :
+
+                  ''mdi:bell-off'')}'
+                modules:
+                  - default
+                  - subbutton_colors
+                subbutton_colors:
+                  subbutton1:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: binary_sensor.ibbq_probe_5_target_alert
+                        state: 'on'
+                  subbutton5:
+                    color: red
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.ibbq_probe_5_alert
+                        state: 'off'
+                card_mod:
+                  style: "{% set temp = states('sensor.ibbq_temperature_probe_5')\
+                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_5_target_temp')\
+                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
+                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
+                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
+                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
+                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
+                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
+                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
+                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
+                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
+                    \  .bubble-button-background::before {\n    content: \"\";\n \
+                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
+                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_5_time_to_target')\
+                    \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
+                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_5_time_to_target',\
+                    \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
+                    \ %}\n{% endif %}"
+              - type: custom:mushroom-title-card
+                subtitle: History
+              - type: custom:apexcharts-card
+                card_mod:
+                  style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow:\
+                    \ none;\n  margin-bottom: -15px;\n}\n.apexcharts-tooltip-series-group\
+                    \ {\n  padding-top: 0px !important;\n  padding-bottom: 0px !important;\n\
+                    \  margin-top: 0px !important;\n  margin-bottom: 0px !important;\n\
+                    \  display: none;\n  text-align: left;\n  justify-content: left;\n\
+                    \  align-items: center;\n}\n"
+                apex_config:
+                  chart:
+                    foreColor: '#7B7B7B'
+                    toolbar:
+                      show: false
+                  grid:
+                    borderColor: '#7B7B7B'
+                  xaxis:
+                    tooltip:
+                      enabled: false
+                header:
+                  show: true
+                  show_states: false
+                  colorize_states: true
+                experimental:
+                  brush: true
+                all_series_config:
+                  extend_to: now
+                  float_precision: 2
+                  curve: stepline
+                brush:
+                  selection_span: 1h
+                  apex_config:
+                    chart:
+                      foreColor: '#7B7B7B'
+                      toolbar:
+                        show: false
+                    grid:
+                      borderColor: '#7B7B7B'
+                    xaxis:
+                      tooltip:
+                        enabled: false
+                series:
+                  - entity: sensor.ibbq_temperature_probe_6
+                    name: Grill
+                    stroke_width: 3
+                    color: var(--amber-color)
+                    show:
+                      in_brush: true
+                  - entity: sensor.ibbq_temperature_probe_1
+                    name: Probe 1
+                    stroke_width: 3
+                    color: var(--lime-color)
+                    show:
+                      in_brush: true
+                  - entity: sensor.ibbq_temperature_probe_2
+                    name: Probe 2
+                    stroke_width: 3
+                    color: var(--purple-color)
+                    show:
+                      in_brush: true
+                  - entity: sensor.ibbq_temperature_probe_3
+                    name: Probe 3
+                    stroke_width: 3
+                    color: var(--cyan-color)
+                    show:
+                      in_brush: true
+                  - entity: sensor.ibbq_temperature_probe_4
+                    name: Probe 4
+                    stroke_width: 3
+                    color: var(--brown-color)
+                    show:
+                      in_brush: true
+                  - entity: sensor.ibbq_temperature_probe_5
+                    name: Probe 5
+                    stroke_width: 3
+                    color: var(--light-grey-color)
+                    show:
+                      in_brush: true
+                  - entity: input_number.ibbq_grill_high_temp
+                    name: High
+                    stroke_width: 1
+                    color: var(--pink-color)
+                  - entity: input_number.ibbq_grill_low_temp
+                    name: Low
+                    stroke_width: 1
+                    color: var(--indigo-color)
+                  - entity: input_number.ibbq_grill_target_temp
+                    name: Grill Target
+                    stroke_width: 1
+                    color: var(--orange-color)
+                  - entity: input_number.ibbq_probe_1_target_temp
+                    name: Target 1
+                    stroke_width: 1
+                    color: var(--green-color)
+                  - entity: input_number.ibbq_probe_2_target_temp
+                    name: Target 2
+                    stroke_width: 1
+                    color: var(--deep-purple-color)
+                  - entity: input_number.ibbq_probe_3_target_temp
+                    name: Target 3
+                    stroke_width: 1
+                    color: var(--blue-color)
+                  - entity: input_number.ibbq_probe_4_target_temp
+                    name: Target 4
+                    stroke_width: 1
+                    color: var(--deep-orange-color)
+                  - entity: input_number.ibbq_probe_5_target_temp
+                    name: Target 5
+                    stroke_width: 1
+                    color: var(--dark-grey-color)
+          - type: vertical-stack
+            cards:
+              - type: custom:bubble-card
+                card_type: pop-up
                 hash: '#litter-info'
-                show_header: false
+                button_type: name
+                name: Neakasa M1
+                show_icon: false
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
-                modules:
-                  - default
-              - type: custom:bubble-card
-                card_type: separator
-                name: Neakasa M1
                 modules:
                   - default
               - type: custom:mod-card
@@ -6389,15 +7243,12 @@ views:
               - type: custom:bubble-card
                 card_type: pop-up
                 hash: '#feeder-info'
-                show_header: false
+                button_type: name
+                name: Cat Feeder
+                show_icon: false
                 margin_top_desktop: 25vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
-                modules:
-                  - default
-              - type: custom:bubble-card
-                card_type: separator
-                name: Cat Feeder
                 modules:
                   - default
               - type: custom:mod-card
@@ -7741,6 +8592,22 @@ views:
         tap_action:
           action: navigate
           navigation_path: '#meater'
+      - type: custom:mushroom-template-badge
+        entity: sensor.ibbq_temperature_probe_6
+        label: iBBQ
+        content: "{%- from 'easy_time.jinja' import easy_time -%}\n{% if has_value(\"\
+          sensor.ibbq_temperature_probe_1\") %}\n  {{ states(\"sensor.ibbq_temperature_probe_1\"\
+          ) }} °F\n  {% if has_value(\"sensor.ibbq_probe_1_time_to_target\")  %}\n\
+          \    {{ big_time(\"sensor.ibbq_probe_1_time_to_target\", short=true) }}\n\
+          \  {% endif %}\n{% elif has_value(\"sensor.ibbq_temperature_probe_6\") %}\n\
+          \  {{ states(\"sensor.ibbq_temperature_probe_6\") }} °F\n  {% if has_value(\"\
+          sensor.ibbq_grill_time_to_target\")  %}\n    {{ big_time(\"sensor.ibbq_grill_time_to_target\"\
+          , short=true) }}\n  {% endif %}\n{% endif %}"
+        icon: mdi:grill
+        color: '{{ has_value(entity) | iif("red", "grey") }}'
+        tap_action:
+          action: navigate
+          navigation_path: '#bbq'
       - type: custom:mushroom-template-badge
         entity: sensor.luna_box_cat_litter_level
         label: Litterbox

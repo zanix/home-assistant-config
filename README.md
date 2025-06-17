@@ -32,9 +32,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4858 |
-| Sensors        | 1582 |
-| Binary Sensors | 337 |
+| All Entities   | 4909 |
+| Sensors        | 1605 |
+| Binary Sensors | 345 |
 | Lights         | 74 |
 | Switches       | 319 |
 
@@ -119,6 +119,10 @@ iBeacons are Bluetooth-enabled devices that advertise identifiers to announce th
 ### [InfluxDB](https://www.home-assistant.io/integrations/influxdb)
 
 The influxdb integration makes it possible to transfer all state changes to an external InfluxDB database
+
+### [INKBIRD](https://www.home-assistant.io/integrations/inkbird)
+
+Integrates INKBIRD devices into Home Assistant.
 
 ### [IQVIA](https://www.home-assistant.io/integrations/iqvia)
 
@@ -714,6 +718,7 @@ Material Design 3 Theme for Home Assistant
 - [Aqara Pet Feeder C1](https://www.amazon.com/dp/B0B9XZ96PH) - Zigbee controlled pet feeder
 - [Bambu Lab P1S](https://us.store.bambulab.com/products/p1s) - 3D printer
 - [Dreame L10s Pro Ultra Heat](https://www.amazon.com/gp/product/B0CVL2TT74)
+- [INKBIRD BBQ Thermometer IBT-6XS](https://inkbird.com/products/bluetooth-bbq-thermometer-ibt-6xs) - Bluetooth BBQ thermometer
 - [OpenSprinkler](https://opensprinkler.com) - Automate and access sprinklers from anywhere
 - [Ratgdo](https://paulwieland.github.io/ratgdo/) - WiFi control board for Chamberlain or Liftmaster garage door openers
 
@@ -722,7 +727,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>520 Automations</summary>
+<details><summary>521 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -748,6 +753,7 @@ Material Design 3 Theme for Home Assistant
 - ☑️ Retry Remote Start Ascent
 - ☑️ Retry Remote Start Kona
 - ☑️ Turn on Water Main
+- ♨️ iBBQ Grill Alerts
 - ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
 - ⚙️ Battery Level Low
