@@ -10,20 +10,27 @@ tvoverlay:
   verify_ssl: false
   method: 'post'
   timeout: 5
-  payload: >
-    {
-      "id": "{{ id | default('null', true) }}",
-      "appTitle": "{{ app_title  | default('Home Assistant', true) }}",
-      "title": "{{ title | default('null', true) }}",
-      "message": "{{ message | default('null', true) }}",
-      "image": "{{ image | default('null', true) }}",
-      "video": "{{ video | default('null', true) }}",
-      "largeIcon": "{{ large_icon | default('null', true) }}",
-      "smallIcon": "{{ small_icon | default('null', true) }}",
-      "smallIconColor": "{{ icon_color | default('#049cdb', true) }}",
-      "corner": "{{ position | default('null', true) }}",
-      "duration": "{{ duration | default('null', true) }}"
-    }
+  payload: |-
+    {%- set data = {
+      "id": id | default(none, true),
+      "appTitle": app_title | default(none, true),
+      "title": title | default(none, true),
+      "message": message | default(none, true),
+      "image": image | default(none, true),
+      "video": video | default(none, true),
+      "largeIcon": large_icon | default(none, true),
+      "smallIcon": small_icon | default(none, true),
+      "smallIconColor": icon_color | default(none, true),
+      "corner": position | default(none, true),
+      "duration": duration | default(none, true)
+    } -%}
+    {%- set _ = namespace(data={}) -%}
+    {%- for k, v in data.items() -%}
+      {%- if not v == None -%}
+        {%- set _.data = dict(_.data, **{k:v}) -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {{ _.data | tojson }}
 
 tvoverlay_fixed:
   url: http://{{ ip_address }}:{{ port | default('5001') }}/notify_fixed
@@ -31,16 +38,30 @@ tvoverlay_fixed:
   verify_ssl: false
   method: 'post'
   timeout: 5
-  payload: >
-    {
-      "id": "{{ id | default('null', true) }}",
-      "visible": {{ visible | default(true, true) }},
-      "icon": "{{ icon | default('null', true) }}",
-      "message": "{{ message | default('null', true) }}",
-      "messageColor": "{{ message_color | default('#ffffff', true) }}",
-      "iconColor": "{{ icon_color | default('#ffffff', true) }}",
-      "borderColor": "{{ border_color | default('#ffffff', true) }}",
-      "backgroundColor": "{{ background_color | default('#66000000', true) }}",
-      "shape": "{{ shape | default('rounded', true) }}",
-      "expiration": "{{ expiration | default('null', true) }}"
-    }
+  payload: |-
+    {%- set data = {
+      "id": id | default(none, true),
+      "visible": visible | default(true, true),
+      "icon": icon | default(none, true),
+      "message": message | default(none, true),
+      "messageColor": message_color | default('#ffffff', true),
+      "iconColor": icon_color | default(none, true),
+      "borderColor": border_color | default('#ffffff', true),
+      "backgroundColor": background_color | default('#66000000', true),
+      "shape": shape | default('rounded', true),
+      "expiration": expiration | default(none, true)
+    } -%}
+    {%- set _ = namespace(data={}) -%}
+    {%- for k, v in data.items() -%}
+      {%- if not v == None -%}
+        {%- set _.data = dict(_.data, **{k:v}) -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {{ _.data | tojson }}
+
+tvoverlay_restart:
+  url: http://{{ ip_address }}:{{ port | default('5001') }}/set/restart_service
+  content_type: 'application/json'
+  verify_ssl: false
+  method: 'post'
+  timeout: 5
