@@ -455,16 +455,18 @@ button_card_templates:
           type: custom:mushroom-chips-card
           alignment: end
           card_mod:
-            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: rgba(var(--rgb-disabled),\
-              \ 0.1);\n  --chip-border-width: 0;\n  --chip-spacing: 1px;\n}\n"
+            style: "ha-card {\n  --chip-icon-size: 0.6em;\n  --chip-border-width:\
+              \ 0;\n  --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-border:\
+              \ none;\n  --chip-spacing: none;\n}\n"
           chips: '[[[ return variables.chips_top ]]]'
       chips:
         card:
           type: custom:mushroom-chips-card
           alignment: end
           card_mod:
-            style: "ha-card {\n  --chip-box-shadow: none;\n  --chip-background: rgba(var(--rgb-disabled),\
-              \ 0.1);\n  --chip-border-width: 0;\n  --chip-spacing: 1px;\n}\n"
+            style: "ha-card {\n  --chip-icon-size: 0.6em;\n  --chip-border-width:\
+              \ 0;\n  --chip-box-shadow: none;\n  --chip-background: none;\n  --chip-border:\
+              \ none;\n  --chip-spacing: none;\n}\n"
           chips: '[[[ return variables.chips ]]]'
     state:
       - value: 'on'
@@ -514,9 +516,6 @@ button_card_templates:
           - position: absolute
           - top: 2px
           - right: calc(var(--ha-card-border-radius, 12px) / 2)
-          - --chip-box-shadow: none
-          - --chip-border-width: 0
-          - --chip-spacing: 1px
           - z-index: 1
         chips:
           - background: color-mix(in srgb, var(--ha-card-background), transparent
@@ -530,9 +529,6 @@ button_card_templates:
           - padding-right: calc(var(--ha-card-border-radius, 12px) / 2)
           - padding-top: 1px
           - padding-bottom: 1px
-          - --chip-box-shadow: none
-          - --chip-border-width: 0
-          - --chip-spacing: 1px
   vehicle:
     template: room
     show_entity_picture: true
@@ -2731,19 +2727,25 @@ streamline_templates:
     card:
       type: markdown
       card_mod:
-        style: "ha-card {\n  --ha-card-background: none\n}\n"
+        style:
+          .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+            \ 0;\n  --ha-card-box-shadow: none;\n}\n"
+          ha-markdown $: "td {\n  overflow-wrap: break-word;\n  word-break: break-all;\n\
+            }\n"
       content: "### {{ state_attr(\"[[entity]]\", \"friendly_name\") }}: {{ states(\"\
-        [[entity]]\") }}\n{% for update in state_attr(\"[[entity]]\", \"updates\"\
-        ) %}\n  {%- set parts = update.split(\" \") -%}\n  {%- set name = parts[0]\
-        \ -%}\n  {%- set previous_version = parts[1] -%}\n  {%- set update_version\
-        \ = parts[3] -%}\n__{{ name }}__ <blockquote> {{ previous_version }} -> {{\
-        \ update_version }}</blockquote> {% endfor %}"
+        [[entity]]\") }}\n<table markdown=\"1\"> {% for update in state_attr(\"[[entity]]\"\
+        , \"updates\") %}\n  {%- set parts = update.split(\" \") -%}\n  {%- set name\
+        \ = parts[0] -%}\n  {%- set previous_version = parts[1] -%}\n  {%- set update_version\
+        \ = parts[3] -%}\n<tr><td><strong><a href=\"https://archlinux.org/packages/?q={{\
+        \ name }}\">{{ name }}</a></strong></td><td>{{ previous_version }} -> {{ update_version\
+        \ }}</td></tr> {% endfor %} </table>"
   windows_updates_list:
     card:
       type: markdown
       card_mod:
-        style: "ha-card {\n  --ha-card-background: none\n}\n"
-      content: '### {{ state_attr("[[entity]]", "friendly_name") }}: {{ states("[[entity]]")
+        style: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+          \ 0;\n  --ha-card-box-shadow: none;\n}\n"
+      content: '### {{ state_attr("[[entity]]", "friendly_name") }}: {{states("[[entity]]")
         }}
 
         {% for item in state_attr("[[entity]]", "WindowsUpdates") %} __{{ item.Title
@@ -3150,20 +3152,26 @@ views:
                       \ 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
                 - type: conditional
                   conditions:
-                    - condition: numeric_state
-                      entity: sensor.mail_usps_mail
-                      above: 0
-                    - condition: state
-                      entity: binary_sensor.usps_mail_delivered
-                      state: 'off'
+                    - condition: or
+                      conditions:
+                        - condition: numeric_state
+                          entity: sensor.mail_usps_mail
+                          above: 0
+                        - condition: state
+                          entity: binary_sensor.usps_mail_delivered
+                          state: 'on'
                   card:
                     type: custom:mushroom-template-badge
                     entity: sensor.mail_usps_mail
                     label: Mail
-                    content: '{{ states(entity) }} {{ iif(is_state(entity, "1"), "piece",
-                      "pieces") }}'
-                    icon: mdi:mail
-                    color: blue
+                    content: "{% if is_state(\"binary_sensor.usps_mail_delivered\"\
+                      , \"on\") %}\n  Delivered\n{% else %}\n  {{ states(entity) }}\
+                      \ {{ iif(is_state(entity, \"1\"), \"piece\", \"pieces\") }}\n\
+                      {% endif %}"
+                    icon: '{{ iif(is_state("binary_sensor.usps_mail_delivered", "on"),
+                      "mdi:mailbox-up", "mdi:mail") }}'
+                    color: '{{ iif(is_state("binary_sensor.usps_mail_delivered", "on"),
+                      "cyan", "blue") }}'
                     tap_action:
                       action: fire-dom-event
                       browser_mod:
@@ -3178,19 +3186,7 @@ views:
                             show_name: false
                             show_state: false
                             card_mod:
-                              style: "ha-card {\n  --ha-card-background: none;\n}\n"
-                - type: conditional
-                  conditions:
-                    - condition: state
-                      entity: binary_sensor.usps_mail_delivered
-                      state: 'on'
-                  card:
-                    type: custom:mushroom-template-badge
-                    entity: binary_sensor.usps_mail_delivered
-                    label: Mail
-                    content: Delivered
-                    icon: mdi:mailbox-up
-                    color: cyan
+                              style: "ha-card {\n  --ha-card-background: none;\n"
                 - type: conditional
                   conditions:
                     - condition: numeric_state
@@ -4712,10 +4708,12 @@ views:
                 show_mileage: true
                 show_car_state: false
                 show_info_icons: true
+                help_highlight: true
                 sections_order:
                   - title
-                  - info
+                  - info_row_jt0o77g
                   - image
+                  - info
                   - icon_row_yl7u49j
                   - bar_0
                 bars:
@@ -4757,6 +4755,10 @@ views:
                     action_animation_state: ''
                     action_animation: none
                     entity: sensor.ascent_fuel_level
+                    right_condition:
+                      type: none
+                      entity: ''
+                      state: ''
                 icon_rows:
                   - id: yl7u49j
                     width: '100'
@@ -4880,6 +4882,28 @@ views:
                   right: 0
                   bottom: -80
                   left: 0
+                info_rows:
+                  - id: jt0o77g
+                    info_entities:
+                      - id: h9w7cos
+                        entity: device_tracker.ascent
+                        name: ''
+                        show_icon: true
+                        icon: mdi:map-marker-outline
+                        text_color: ''
+                        show_name: false
+                      - id: 8dcswf7
+                        entity: sensor.ascent_odometer
+                        name: ''
+                        show_icon: true
+                        icon: mdi:counter
+                        text_color: ''
+                        show_name: false
+                    alignment: center
+                    spacing: medium
+                    row_name: ''
+                    vertical_alignment: center
+                    allow_wrap: false
               - type: custom:expander-card
                 gap: 0em
                 padding: 0em
@@ -5249,10 +5273,12 @@ views:
                 show_mileage: true
                 show_car_state: false
                 show_info_icons: true
+                help_highlight: true
                 sections_order:
                   - title
-                  - info
+                  - info_row_curam50
                   - image
+                  - info
                   - icon_row_b3tqh8a
                   - bar_0
                 bars:
@@ -5519,6 +5545,28 @@ views:
                   bottom: -80
                   left: 0
                 vehicle_image: /local/logos/kona.png
+                info_rows:
+                  - id: curam50
+                    info_entities:
+                      - id: azzwys4
+                        entity: device_tracker.kona_location
+                        name: ''
+                        show_icon: true
+                        icon: mdi:map-marker-outline
+                        text_color: ''
+                        show_name: false
+                      - id: watgfuc
+                        entity: sensor.kona_odometer
+                        name: ''
+                        show_icon: true
+                        icon: mdi:counter
+                        text_color: ''
+                        show_name: false
+                    alignment: center
+                    spacing: medium
+                    row_name: ''
+                    vertical_alignment: center
+                    allow_wrap: false
               - type: custom:expander-card
                 gap: 0em
                 padding: 0em
@@ -5930,12 +5978,36 @@ views:
                 columns: 2
                 type: grid
                 cards:
-                  - type: entity
+                  - type: custom:mushroom-template-card
                     entity: sensor.meater_probe_cook_time_elapsed
-                    name: Elapsed Time
-                  - type: entity
+                    primary: '{%- from ''easy_time.jinja'' import big_time -%}
+
+                      {{ big_time(entity, short=true) }}'
+                    secondary: Elapsed Time
+                    icon: mdi:clock-start
+                    icon_color: grey
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        mushroom-state-info$: ".container {\n  --card-primary-line-height:\
+                          \ 1em;\n  --card-primary-font-size: 20px;\n}\n.primary {\n\
+                          \  font-weight: 100 !important;\n}\n"
+                  - type: custom:mushroom-template-card
                     entity: sensor.meater_probe_cook_time_remaining
-                    name: Remaining Time
+                    primary: '{%- from ''easy_time.jinja'' import big_time -%}
+
+                      {{ big_time(entity, short=true) }}'
+                    secondary: Remaining Time
+                    icon: mdi:clock-end
+                    icon_color: grey
+                    tap_action:
+                      action: more-info
+                    card_mod:
+                      style:
+                        mushroom-state-info$: ".container {\n  --card-primary-line-height:\
+                          \ 1em;\n  --card-primary-font-size: 20px;\n}\n.primary {\n\
+                          \  font-weight: 100 !important;\n}\n"
               - type: custom:mushroom-title-card
                 subtitle: Temperature
               - type: custom:apexcharts-card
@@ -6006,8 +6078,11 @@ views:
                 margin_top_desktop: 13vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
-                styles: '${subButtonIcon[4].setAttribute("icon", hass.states[''input_boolean.ibbq_grill_enabled'']?.state
-                  === ''on'' ? ''mdi:bell'' : ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button {\n  font-size: 16px !important\n} .bubble-sub-button-2\
+                  \ > ha-icon {\n  color: var(--blue-color) !important;\n} .bubble-sub-button-3\
+                  \ > ha-icon {\n  color: var(--red-color) !important;\n} ${subButtonIcon[4].setAttribute(\"\
+                  icon\", hass.states[\"input_boolean.ibbq_grill_enabled\"]?.state\
+                  \ === \"on\" ? \"mdi:bell\" : \"mdi:bell-off\")}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6077,7 +6152,7 @@ views:
                     browser_mod:
                       service: browser_mod.popup
                       data:
-                        title: Grill Settings
+                        title: Grill Details
                         content:
                           type: custom:vertical-stack-in-card
                           cards:
@@ -6105,6 +6180,74 @@ views:
                                   style: buttons
                               features_position: inline
                               hide_state: true
+                            - type: custom:apexcharts-card
+                              card_mod:
+                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
+                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
+                                  }\n"
+                              apex_config:
+                                chart:
+                                  height: 350px
+                                  foreColor: '#7B7B7B'
+                                  toolbar:
+                                    show: false
+                                grid:
+                                  borderColor: '#7B7B7B'
+                                xaxis:
+                                  tooltip:
+                                    enabled: false
+                              header:
+                                show: true
+                                show_states: false
+                                colorize_states: true
+                              experimental:
+                                brush: true
+                                hidden_by_default: true
+                              all_series_config:
+                                extend_to: now
+                                float_precision: 2
+                                stroke_width: 3
+                                curve: stepline
+                              brush:
+                                selection_span: 1h
+                                apex_config:
+                                  chart:
+                                    foreColor: '#7B7B7B'
+                                    toolbar:
+                                      show: false
+                                  grid:
+                                    borderColor: '#7B7B7B'
+                                  xaxis:
+                                    tooltip:
+                                      enabled: false
+                              yaxis:
+                                - min: ~100
+                                  max: ~300
+                              series:
+                                - entity: sensor.ibbq_temperature_probe_6
+                                  name: Grill
+                                  color: var(--amber-color)
+                                  transform: 'return x <= 32 ? null : x;'
+                                  show:
+                                    in_brush: true
+                                - entity: input_number.ibbq_grill_high_temp
+                                  name: High
+                                  stroke_width: 1
+                                  color: var(--pink-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_6''].state
+                                    <= 32 ? null : x;'
+                                - entity: input_number.ibbq_grill_low_temp
+                                  name: Low
+                                  stroke_width: 1
+                                  color: var(--indigo-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_6''].state
+                                    <= 32 ? null : x;'
+                                - entity: input_number.ibbq_grill_target_temp
+                                  name: Grill Target
+                                  stroke_width: 1
+                                  color: var(--orange-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_6''].state
+                                    <= 32 ? null : x;'
                 sub_button:
                   - entity: binary_sensor.ibbq_grill_target_alert
                     name: Target Alert
@@ -6140,12 +6283,9 @@ views:
                     show_background: false
                     tap_action:
                       action: toggle
-                styles: '${subButtonIcon[4].setAttribute("icon",
-
-                  hass.states[''input_boolean.ibbq_grill_alert'']?.state === ''on''
-                  ? ''mdi:bell'' :
-
-                  ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button-2 {\n  font-size: 20px !important\n}\n\
+                  ${subButtonIcon[4].setAttribute(\"icon\", hass.states[\"input_boolean.ibbq_grill_alert\"\
+                  ]?.state === \"on\" ? \"mdi:bell\" : \"mdi:bell-off\")}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6164,37 +6304,33 @@ views:
                         state: 'off'
                 card_mod:
                   style: "{% set temp = states('sensor.ibbq_temperature_probe_6')\
-                    \ | float(32) %}\n{% set target = states('input_number.ibbq_grill_target_temp')\
-                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
-                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
-                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
-                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
-                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
-                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
-                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
-                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
-                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
-                    \  .bubble-button-background::before {\n    content: \"\";\n \
-                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
-                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_grill_time_to_target')\
+                    \ | float(32) %} {% set target = states('input_number.ibbq_grill_target_temp')\
+                    \ | float(200) %} {% if temp > 32 and target > 32 %}\n  {% set\
+                    \ progress_pct = ((temp / target) * 100) if target > 0 else 0\
+                    \ %}\n  {% set progress_clamped = max(0, min(100, progress_pct))\
+                    \ | round(0) %}\n  {% set color_progress = max(0, min(1, progress_pct\
+                    \ / 100)) %}\n  {% set r = (255 * (1 - color_progress)) | round(0)\
+                    \ %}\n  {% set g = (255 * color_progress) | round(0) %}\n  {%\
+                    \ set bg_color = (r, g, 0, 0.4) %}\n  .bubble-button-background::before\
+                    \ {\n    content: \"\";\n    height: 100%;\n    width: {{ progress_clamped\
+                    \ }}%;\n    background-color: rgba{{ bg_color }};\n    transition:\
+                    \ width 0.3s ease, background-color 0.3s ease;\n  }\n  {% if has_value('sensor.ibbq_grill_time_to_target')\
                     \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
-                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_grill_time_to_target',\
+                    \   .bubble-sub-button-4::before {\n      content: \"{{ big_time('sensor.ibbq_grill_time_to_target',\
                     \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
                     \ %}\n{% endif %}"
               - type: custom:bubble-card
                 card_type: button
-                button_type: state
+                button_type: name
                 name: iBBQ Probe 1
-                entity: input_text.ibbq_probe_1_name
                 show_icon: false
-                show_state: false
                 button_action:
                   tap_action:
                     action: fire-dom-event
                     browser_mod:
                       service: browser_mod.popup
                       data:
-                        title: Probe 1 Settings
+                        title: Probe 1 Details
                         content:
                           type: custom:vertical-stack-in-card
                           cards:
@@ -6212,6 +6348,62 @@ views:
                               features_position: inline
                               hide_state: true
                               vertical: false
+                            - type: custom:apexcharts-card
+                              card_mod:
+                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
+                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
+                                  }\n"
+                              apex_config:
+                                chart:
+                                  height: 350px
+                                  foreColor: '#7B7B7B'
+                                  toolbar:
+                                    show: false
+                                grid:
+                                  borderColor: '#7B7B7B'
+                                xaxis:
+                                  tooltip:
+                                    enabled: false
+                              header:
+                                show: true
+                                show_states: false
+                                colorize_states: true
+                              experimental:
+                                brush: true
+                                hidden_by_default: true
+                              all_series_config:
+                                extend_to: now
+                                float_precision: 2
+                                stroke_width: 3
+                                curve: stepline
+                              brush:
+                                selection_span: 1h
+                                apex_config:
+                                  chart:
+                                    foreColor: '#7B7B7B'
+                                    toolbar:
+                                      show: false
+                                  grid:
+                                    borderColor: '#7B7B7B'
+                                  xaxis:
+                                    tooltip:
+                                      enabled: false
+                              yaxis:
+                                - min: ~100
+                                  max: 250
+                              series:
+                                - entity: sensor.ibbq_temperature_probe_1
+                                  name: Probe 1
+                                  color: var(--lime-color)
+                                  transform: 'return x <= 32 ? null : x;'
+                                  show:
+                                    in_brush: true
+                                - entity: input_number.ibbq_probe_1_target_temp
+                                  name: Target 1
+                                  stroke_width: 1
+                                  color: var(--green-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_1''].state
+                                    <= 32 ? null : x;'
                 sub_button:
                   - entity: binary_sensor.ibbq_probe_1_target_alert
                     name: Target Alert
@@ -6247,17 +6439,11 @@ views:
                     show_background: false
                     tap_action:
                       action: toggle
-                styles: '${card.querySelector(''.bubble-name'').innerText =
-
-                  hass.states[''input_text.ibbq_probe_1_name'']?.state}
-
-
-                  ${subButtonIcon[4].setAttribute("icon",
-
-                  hass.states[''input_boolean.ibbq_probe_1_alert'']?.state === ''on''
-                  ? ''mdi:bell'' :
-
-                  ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button-2 {\n  font-size: 20px !important\n}\n\
+                  ${card.querySelector('.bubble-name').innerText = hass.states[\"\
+                  input_text.ibbq_probe_1_name\"]?.state}\n${subButtonIcon[4].setAttribute(\"\
+                  icon\", hass.states[\"input_boolean.ibbq_probe_1_alert\"]?.state\
+                  \ === \"on\" ? \"mdi:bell\" : \"mdi:bell-off\")}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6276,37 +6462,33 @@ views:
                         state: 'off'
                 card_mod:
                   style: "{% set temp = states('sensor.ibbq_temperature_probe_1')\
-                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_1_target_temp')\
-                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
-                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
-                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
-                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
-                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
-                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
-                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
-                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
-                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
-                    \  .bubble-button-background::before {\n    content: \"\";\n \
-                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
-                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_1_time_to_target')\
+                    \ | float(32) %} {% set target = states('input_number.ibbq_probe_1_target_temp')\
+                    \ | float(200) %} {% if temp > 32 and target > 32 %}\n  {% set\
+                    \ progress_pct = ((temp / target) * 100) if target > 0 else 0\
+                    \ %}\n  {% set progress_clamped = max(0, min(100, progress_pct))\
+                    \ | round(0) %}\n  {% set color_progress = max(0, min(1, progress_pct\
+                    \ / 100)) %}\n  {% set r = (255 * (1 - color_progress)) | round(0)\
+                    \ %}\n  {% set g = (255 * color_progress) | round(0) %}\n  {%\
+                    \ set bg_color = (r, g, 0, 0.4) %}\n  .bubble-button-background::before\
+                    \ {\n    content: \"\";\n    height: 100%;\n    width: {{ progress_clamped\
+                    \ }}%;\n    background-color: rgba{{ bg_color }};\n    transition:\
+                    \ width 0.3s ease, background-color 0.3s ease;\n  }\n  {% if has_value('sensor.ibbq_probe_1_time_to_target')\
                     \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
-                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_1_time_to_target',\
+                    \   .bubble-sub-button-4::before {\n      content: \"{{ big_time('sensor.ibbq_probe_1_time_to_target',\
                     \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
                     \ %}\n{% endif %}"
               - type: custom:bubble-card
                 card_type: button
-                button_type: state
+                button_type: name
                 name: iBBQ Probe 2
-                entity: input_text.ibbq_probe_2_name
                 show_icon: false
-                show_state: false
                 button_action:
                   tap_action:
                     action: fire-dom-event
                     browser_mod:
                       service: browser_mod.popup
                       data:
-                        title: Probe 2 Settings
+                        title: Probe 2 Details
                         content:
                           type: custom:vertical-stack-in-card
                           cards:
@@ -6324,6 +6506,62 @@ views:
                               features_position: inline
                               hide_state: true
                               vertical: false
+                            - type: custom:apexcharts-card
+                              card_mod:
+                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
+                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
+                                  }\n"
+                              apex_config:
+                                chart:
+                                  height: 350px
+                                  foreColor: '#7B7B7B'
+                                  toolbar:
+                                    show: false
+                                grid:
+                                  borderColor: '#7B7B7B'
+                                xaxis:
+                                  tooltip:
+                                    enabled: false
+                              header:
+                                show: true
+                                show_states: false
+                                colorize_states: true
+                              experimental:
+                                brush: true
+                                hidden_by_default: true
+                              all_series_config:
+                                extend_to: now
+                                float_precision: 2
+                                stroke_width: 3
+                                curve: stepline
+                              brush:
+                                selection_span: 1h
+                                apex_config:
+                                  chart:
+                                    foreColor: '#7B7B7B'
+                                    toolbar:
+                                      show: false
+                                  grid:
+                                    borderColor: '#7B7B7B'
+                                  xaxis:
+                                    tooltip:
+                                      enabled: false
+                              yaxis:
+                                - min: ~100
+                                  max: 250
+                              series:
+                                - entity: sensor.ibbq_temperature_probe_2
+                                  name: Probe 2
+                                  color: var(--purple-color)
+                                  transform: 'return x <= 32 ? null : x;'
+                                  show:
+                                    in_brush: true
+                                - entity: input_number.ibbq_probe_2_target_temp
+                                  name: Target 2
+                                  stroke_width: 1
+                                  color: var(--deep-purple-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_2''].state
+                                    <= 32 ? null : x;'
                 sub_button:
                   - entity: binary_sensor.ibbq_probe_2_target_alert
                     name: Target Alert
@@ -6359,17 +6597,11 @@ views:
                     show_background: false
                     tap_action:
                       action: toggle
-                styles: '${card.querySelector(''.bubble-name'').innerText =
-
-                  hass.states[''input_text.ibbq_probe_2_name'']?.state}
-
-
-                  ${subButtonIcon[4].setAttribute("icon",
-
-                  hass.states[''input_boolean.ibbq_probe_2_alert'']?.state === ''on''
-                  ? ''mdi:bell'' :
-
-                  ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button-2 {\n  font-size: 20px !important\n}\n\
+                  ${card.querySelector('.bubble-name').innerText = hass.states[\"\
+                  input_text.ibbq_probe_2_name\"]?.state}\n${subButtonIcon[4].setAttribute(\"\
+                  icon\", hass.states[\"input_boolean.ibbq_probe_2_alert\"]?.state\
+                  \ === \"on\" ? \"mdi:bell\" : \"mdi:bell-off\")}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6388,37 +6620,33 @@ views:
                         state: 'off'
                 card_mod:
                   style: "{% set temp = states('sensor.ibbq_temperature_probe_2')\
-                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_2_target_temp')\
-                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
-                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
-                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
-                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
-                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
-                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
-                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
-                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
-                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
-                    \  .bubble-button-background::before {\n    content: \"\";\n \
-                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
-                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_2_time_to_target')\
+                    \ | float(32) %} {% set target = states('input_number.ibbq_probe_2_target_temp')\
+                    \ | float(200) %} {% if temp > 32 and target > 32 %}\n  {% set\
+                    \ progress_pct = ((temp / target) * 100) if target > 0 else 0\
+                    \ %}\n  {% set progress_clamped = max(0, min(100, progress_pct))\
+                    \ | round(0) %}\n  {% set color_progress = max(0, min(1, progress_pct\
+                    \ / 100)) %}\n  {% set r = (255 * (1 - color_progress)) | round(0)\
+                    \ %}\n  {% set g = (255 * color_progress) | round(0) %}\n  {%\
+                    \ set bg_color = (r, g, 0, 0.4) %}\n  .bubble-button-background::before\
+                    \ {\n    content: \"\";\n    height: 100%;\n    width: {{ progress_clamped\
+                    \ }}%;\n    background-color: rgba{{ bg_color }};\n    transition:\
+                    \ width 0.3s ease, background-color 0.3s ease;\n  }\n  {% if has_value('sensor.ibbq_probe_2_time_to_target')\
                     \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
-                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_2_time_to_target',\
+                    \   .bubble-sub-button-4::before {\n      content: \"{{ big_time('sensor.ibbq_probe_2_time_to_target',\
                     \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
                     \ %}\n{% endif %}"
               - type: custom:bubble-card
                 card_type: button
-                button_type: state
+                button_type: name
                 name: iBBQ Probe 3
-                entity: input_text.ibbq_probe_3_name
                 show_icon: false
-                show_state: false
                 button_action:
                   tap_action:
                     action: fire-dom-event
                     browser_mod:
                       service: browser_mod.popup
                       data:
-                        title: Probe 3 Settings
+                        title: Probe 3 Details
                         content:
                           type: custom:vertical-stack-in-card
                           cards:
@@ -6436,6 +6664,62 @@ views:
                               features_position: inline
                               hide_state: true
                               vertical: false
+                            - type: custom:apexcharts-card
+                              card_mod:
+                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
+                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
+                                  }\n"
+                              apex_config:
+                                chart:
+                                  height: 350px
+                                  foreColor: '#7B7B7B'
+                                  toolbar:
+                                    show: false
+                                grid:
+                                  borderColor: '#7B7B7B'
+                                xaxis:
+                                  tooltip:
+                                    enabled: false
+                              header:
+                                show: true
+                                show_states: false
+                                colorize_states: true
+                              experimental:
+                                brush: true
+                                hidden_by_default: true
+                              all_series_config:
+                                extend_to: now
+                                float_precision: 2
+                                stroke_width: 3
+                                curve: stepline
+                              brush:
+                                selection_span: 1h
+                                apex_config:
+                                  chart:
+                                    foreColor: '#7B7B7B'
+                                    toolbar:
+                                      show: false
+                                  grid:
+                                    borderColor: '#7B7B7B'
+                                  xaxis:
+                                    tooltip:
+                                      enabled: false
+                              yaxis:
+                                - min: ~100
+                                  max: 250
+                              series:
+                                - entity: sensor.ibbq_temperature_probe_3
+                                  name: Probe 3
+                                  color: var(--cyan-color)
+                                  transform: 'return x <= 32 ? null : x;'
+                                  show:
+                                    in_brush: true
+                                - entity: input_number.ibbq_probe_3_target_temp
+                                  name: Target 3
+                                  stroke_width: 1
+                                  color: var(--blue-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_3''].state
+                                    <= 32 ? null : x;'
                 sub_button:
                   - entity: binary_sensor.ibbq_probe_3_target_alert
                     name: Target Alert
@@ -6471,17 +6755,11 @@ views:
                     show_background: false
                     tap_action:
                       action: toggle
-                styles: '${card.querySelector(''.bubble-name'').innerText =
-
-                  hass.states[''input_text.ibbq_probe_3_name'']?.state}
-
-
-                  ${subButtonIcon[4].setAttribute("icon",
-
-                  hass.states[''input_boolean.ibbq_probe_3_alert'']?.state === ''on''
-                  ? ''mdi:bell'' :
-
-                  ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button-2 {\n  font-size: 20px !important\n}\n\
+                  ${card.querySelector('.bubble-name').innerText = hass.states[\"\
+                  input_text.ibbq_probe_3_name\"]?.state}\n${subButtonIcon[4].setAttribute(\"\
+                  icon\", hass.states[\"input_boolean.ibbq_probe_3_alert\"]?.state\
+                  \ === \"on\" ? \"mdi:bell\" : \"mdi:bell-off\")}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6500,37 +6778,33 @@ views:
                         state: 'off'
                 card_mod:
                   style: "{% set temp = states('sensor.ibbq_temperature_probe_3')\
-                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_3_target_temp')\
-                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
-                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
-                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
-                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
-                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
-                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
-                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
-                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
-                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
-                    \  .bubble-button-background::before {\n    content: \"\";\n \
-                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
-                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_3_time_to_target')\
+                    \ | float(32) %} {% set target = states('input_number.ibbq_probe_3_target_temp')\
+                    \ | float(200) %} {% if temp > 32 and target > 32 %}\n  {% set\
+                    \ progress_pct = ((temp / target) * 100) if target > 0 else 0\
+                    \ %}\n  {% set progress_clamped = max(0, min(100, progress_pct))\
+                    \ | round(0) %}\n  {% set color_progress = max(0, min(1, progress_pct\
+                    \ / 100)) %}\n  {% set r = (255 * (1 - color_progress)) | round(0)\
+                    \ %}\n  {% set g = (255 * color_progress) | round(0) %}\n  {%\
+                    \ set bg_color = (r, g, 0, 0.4) %}\n  .bubble-button-background::before\
+                    \ {\n    content: \"\";\n    height: 100%;\n    width: {{ progress_clamped\
+                    \ }}%;\n    background-color: rgba{{ bg_color }};\n    transition:\
+                    \ width 0.3s ease, background-color 0.3s ease;\n  }\n  {% if has_value('sensor.ibbq_probe_3_time_to_target')\
                     \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
-                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_3_time_to_target',\
+                    \   .bubble-sub-button-4::before {\n      content: \"{{ big_time('sensor.ibbq_probe_3_time_to_target',\
                     \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
                     \ %}\n{% endif %}"
               - type: custom:bubble-card
                 card_type: button
-                button_type: state
+                button_type: name
                 name: iBBQ Probe 4
-                entity: input_text.ibbq_probe_4_name
                 show_icon: false
-                show_state: false
                 button_action:
                   tap_action:
                     action: fire-dom-event
                     browser_mod:
                       service: browser_mod.popup
                       data:
-                        title: Probe 4 Settings
+                        title: Probe 4 Details
                         content:
                           type: custom:vertical-stack-in-card
                           cards:
@@ -6548,6 +6822,62 @@ views:
                               features_position: inline
                               hide_state: true
                               vertical: false
+                            - type: custom:apexcharts-card
+                              card_mod:
+                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
+                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
+                                  }\n"
+                              apex_config:
+                                chart:
+                                  height: 350px
+                                  foreColor: '#7B7B7B'
+                                  toolbar:
+                                    show: false
+                                grid:
+                                  borderColor: '#7B7B7B'
+                                xaxis:
+                                  tooltip:
+                                    enabled: false
+                              header:
+                                show: true
+                                show_states: false
+                                colorize_states: true
+                              experimental:
+                                brush: true
+                                hidden_by_default: true
+                              all_series_config:
+                                extend_to: now
+                                float_precision: 2
+                                stroke_width: 3
+                                curve: stepline
+                              brush:
+                                selection_span: 1h
+                                apex_config:
+                                  chart:
+                                    foreColor: '#7B7B7B'
+                                    toolbar:
+                                      show: false
+                                  grid:
+                                    borderColor: '#7B7B7B'
+                                  xaxis:
+                                    tooltip:
+                                      enabled: false
+                              yaxis:
+                                - min: ~100
+                                  max: 250
+                              series:
+                                - entity: sensor.ibbq_temperature_probe_4
+                                  name: Probe 4
+                                  color: var(--brown-color)
+                                  transform: 'return x <= 32 ? null : x;'
+                                  show:
+                                    in_brush: true
+                                - entity: input_number.ibbq_probe_4_target_temp
+                                  name: Target 4
+                                  stroke_width: 1
+                                  color: var(--deep-orange-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_4''].state
+                                    <= 32 ? null : x;'
                 sub_button:
                   - entity: binary_sensor.ibbq_probe_4_target_alert
                     name: Target Alert
@@ -6583,17 +6913,11 @@ views:
                     show_background: false
                     tap_action:
                       action: toggle
-                styles: '${card.querySelector(''.bubble-name'').innerText =
-
-                  hass.states[''input_text.ibbq_probe_4_name'']?.state}
-
-
-                  ${subButtonIcon[4].setAttribute("icon",
-
-                  hass.states[''input_boolean.ibbq_probe_4_alert'']?.state === ''on''
-                  ? ''mdi:bell'' :
-
-                  ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button-2 {\n  font-size: 20px !important\n}\n\
+                  ${card.querySelector('.bubble-name').innerText = hass.states[\"\
+                  input_text.ibbq_probe_4_name\"]?.state}\n${subButtonIcon[4].setAttribute(\"\
+                  icon\", hass.states[\"input_boolean.ibbq_probe_4_alert\"]?.state\
+                  \ === \"on\" ? \"mdi:bell\" : \"mdi:bell-off\")}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6612,37 +6936,33 @@ views:
                         state: 'off'
                 card_mod:
                   style: "{% set temp = states('sensor.ibbq_temperature_probe_4')\
-                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_4_target_temp')\
-                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
-                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
-                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
-                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
-                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
-                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
-                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
-                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
-                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
-                    \  .bubble-button-background::before {\n    content: \"\";\n \
-                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
-                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_4_time_to_target')\
+                    \ | float(32) %} {% set target = states('input_number.ibbq_probe_4_target_temp')\
+                    \ | float(200) %} {% if temp > 32 and target > 32 %}\n  {% set\
+                    \ progress_pct = ((temp / target) * 100) if target > 0 else 0\
+                    \ %}\n  {% set progress_clamped = max(0, min(100, progress_pct))\
+                    \ | round(0) %}\n  {% set color_progress = max(0, min(1, progress_pct\
+                    \ / 100)) %}\n  {% set r = (255 * (1 - color_progress)) | round(0)\
+                    \ %}\n  {% set g = (255 * color_progress) | round(0) %}\n  {%\
+                    \ set bg_color = (r, g, 0, 0.4) %}\n  .bubble-button-background::before\
+                    \ {\n    content: \"\";\n    height: 100%;\n    width: {{ progress_clamped\
+                    \ }}%;\n    background-color: rgba{{ bg_color }};\n    transition:\
+                    \ width 0.3s ease, background-color 0.3s ease;\n  }\n  {% if has_value('sensor.ibbq_probe_4_time_to_target')\
                     \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
-                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_4_time_to_target',\
+                    \   .bubble-sub-button-4::before {\n      content: \"{{ big_time('sensor.ibbq_probe_4_time_to_target',\
                     \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
                     \ %}\n{% endif %}"
               - type: custom:bubble-card
                 card_type: button
-                button_type: state
+                button_type: name
                 name: iBBQ Probe 5
-                entity: input_text.ibbq_probe_5_name
                 show_icon: false
-                show_state: false
                 button_action:
                   tap_action:
                     action: fire-dom-event
                     browser_mod:
                       service: browser_mod.popup
                       data:
-                        title: Probe 5 Settings
+                        title: Probe 5 Details
                         content:
                           type: custom:vertical-stack-in-card
                           cards:
@@ -6660,6 +6980,62 @@ views:
                               features_position: inline
                               hide_state: true
                               vertical: false
+                            - type: custom:apexcharts-card
+                              card_mod:
+                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
+                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
+                                  }\n"
+                              apex_config:
+                                chart:
+                                  height: 350px
+                                  foreColor: '#7B7B7B'
+                                  toolbar:
+                                    show: false
+                                grid:
+                                  borderColor: '#7B7B7B'
+                                xaxis:
+                                  tooltip:
+                                    enabled: false
+                              header:
+                                show: true
+                                show_states: false
+                                colorize_states: true
+                              experimental:
+                                brush: true
+                                hidden_by_default: true
+                              all_series_config:
+                                extend_to: now
+                                float_precision: 2
+                                stroke_width: 3
+                                curve: stepline
+                              brush:
+                                selection_span: 1h
+                                apex_config:
+                                  chart:
+                                    foreColor: '#7B7B7B'
+                                    toolbar:
+                                      show: false
+                                  grid:
+                                    borderColor: '#7B7B7B'
+                                  xaxis:
+                                    tooltip:
+                                      enabled: false
+                              yaxis:
+                                - min: ~100
+                                  max: 250
+                              series:
+                                - entity: sensor.ibbq_temperature_probe_5
+                                  name: Probe 5
+                                  color: var(--light-grey-color)
+                                  transform: 'return x <= 32 ? null : x;'
+                                  show:
+                                    in_brush: true
+                                - entity: input_number.ibbq_probe_5_target_temp
+                                  name: Target 5
+                                  stroke_width: 1
+                                  color: var(--dark-grey-color)
+                                  transform: 'return hass.states[''sensor.ibbq_temperature_probe_5''].state
+                                    <= 32 ? null : x;'
                 sub_button:
                   - entity: binary_sensor.ibbq_probe_5_target_alert
                     name: Target Alert
@@ -6695,17 +7071,11 @@ views:
                     show_background: false
                     tap_action:
                       action: toggle
-                styles: '${card.querySelector(''.bubble-name'').innerText =
-
-                  hass.states[''input_text.ibbq_probe_5_name'']?.state}
-
-
-                  ${subButtonIcon[4].setAttribute("icon",
-
-                  hass.states[''input_boolean.ibbq_probe_5_alert'']?.state === ''on''
-                  ? ''mdi:bell'' :
-
-                  ''mdi:bell-off'')}'
+                styles: ".bubble-sub-button-2 {\n  font-size: 20px !important\n}\n\
+                  ${card.querySelector('.bubble-name').innerText = hass.states[\"\
+                  input_text.ibbq_probe_5_name\"]?.state}\n${subButtonIcon[4].setAttribute(\"\
+                  icon\", hass.states[\"input_boolean.ibbq_probe_5_alert\"]?.state\
+                  \ === 'on' ? 'mdi:bell' :  'mdi:bell-off')}"
                 modules:
                   - default
                   - subbutton_colors
@@ -6724,21 +7094,19 @@ views:
                         state: 'off'
                 card_mod:
                   style: "{% set temp = states('sensor.ibbq_temperature_probe_5')\
-                    \ | float(32) %}\n{% set target = states('input_number.ibbq_probe_5_target_temp')\
-                    \ | float(60) %}\n{% if temp > 32 %}\n  {% set temp_adjusted =\
-                    \ max(0, temp - 32) %}\n  {% set target_adjusted = max(0, target\
-                    \ - 32) %}\n  {% set pct_diff = ((temp_adjusted / target_adjusted)\
-                    \ * 100) if target_adjusted > 0 else 0 %}\n  {% set pct_clamped\
-                    \ = max(0, min(100, pct_diff)) | round(0) %}\n  {% set temp_ratio\
-                    \ = (temp_adjusted / 268) if temp_adjusted > 0 else 0 %}\n  {%\
-                    \ set temp_clamped = max(0, min(1, temp_ratio)) %}\n  {% set r\
-                    \ = (pct_clamped / 100 * 255) | round(0) %}\n  {% set g = (temp_clamped\
-                    \ * 255) | round(0) %}\n  {% set bg_color = (r, g, 0, 0.4) %}\n\
-                    \  .bubble-button-background::before {\n    content: \"\";\n \
-                    \   height: 100%;\n    width: {{ pct_clamped }}%;\n    background-color:\
-                    \ rgba{{ bg_color }};\n  }\n  {% if has_value('sensor.ibbq_probe_5_time_to_target')\
+                    \ | float(32) %} {% set target = states('input_number.ibbq_probe_5_target_temp')\
+                    \ | float(200) %} {% if temp > 32 and target > 32 %}\n  {% set\
+                    \ progress_pct = ((temp / target) * 100) if target > 0 else 0\
+                    \ %}\n  {% set progress_clamped = max(0, min(100, progress_pct))\
+                    \ | round(0) %}\n  {% set color_progress = max(0, min(1, progress_pct\
+                    \ / 100)) %}\n  {% set r = (255 * (1 - color_progress)) | round(0)\
+                    \ %}\n  {% set g = (255 * color_progress) | round(0) %}\n  {%\
+                    \ set bg_color = (r, g, 0, 0.4) %}\n  .bubble-button-background::before\
+                    \ {\n    content: \"\";\n    height: 100%;\n    width: {{ progress_clamped\
+                    \ }}%;\n    background-color: rgba{{ bg_color }};\n    transition:\
+                    \ width 0.3s ease, background-color 0.3s ease;\n  }\n  {% if has_value('sensor.ibbq_probe_5_time_to_target')\
                     \ %}\n    {%- from 'easy_time.jinja' import big_time -%}\n   \
-                    \ .bubble-sub-button-3::before {\n      content: \"{{ big_time('sensor.ibbq_probe_5_time_to_target',\
+                    \   .bubble-sub-button-4::before {\n      content: \"{{ big_time('sensor.ibbq_probe_5_time_to_target',\
                     \ short=true) }}\";\n      margin-left: 3px;\n    }\n  {% endif\
                     \ %}\n{% endif %}"
               - type: custom:mushroom-title-card
@@ -6746,13 +7114,10 @@ views:
               - type: custom:apexcharts-card
                 card_mod:
                   style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow:\
-                    \ none;\n  margin-bottom: -15px;\n}\n.apexcharts-tooltip-series-group\
-                    \ {\n  padding-top: 0px !important;\n  padding-bottom: 0px !important;\n\
-                    \  margin-top: 0px !important;\n  margin-bottom: 0px !important;\n\
-                    \  display: none;\n  text-align: left;\n  justify-content: left;\n\
-                    \  align-items: center;\n}\n"
+                    \ none;\n  margin-bottom: -15px;\n}\n"
                 apex_config:
                   chart:
+                    height: 550px
                     foreColor: '#7B7B7B'
                     toolbar:
                       show: false
@@ -6767,9 +7132,11 @@ views:
                   colorize_states: true
                 experimental:
                   brush: true
+                  hidden_by_default: true
                 all_series_config:
                   extend_to: now
                   float_precision: 2
+                  stroke_width: 3
                   curve: stepline
                 brush:
                   selection_span: 1h
@@ -6783,75 +7150,94 @@ views:
                     xaxis:
                       tooltip:
                         enabled: false
+                yaxis:
+                  - min: ~100
+                    max: ~300
                 series:
                   - entity: sensor.ibbq_temperature_probe_6
                     name: Grill
-                    stroke_width: 3
                     color: var(--amber-color)
+                    transform: 'return x <= 32 ? null : x;'
                     show:
                       in_brush: true
                   - entity: sensor.ibbq_temperature_probe_1
                     name: Probe 1
-                    stroke_width: 3
                     color: var(--lime-color)
+                    transform: 'return x <= 32 ? null : x;'
                     show:
                       in_brush: true
                   - entity: sensor.ibbq_temperature_probe_2
                     name: Probe 2
-                    stroke_width: 3
                     color: var(--purple-color)
+                    transform: 'return x <= 32 ? null : x;'
                     show:
                       in_brush: true
                   - entity: sensor.ibbq_temperature_probe_3
                     name: Probe 3
-                    stroke_width: 3
                     color: var(--cyan-color)
+                    transform: 'return x <= 32 ? null : x;'
                     show:
                       in_brush: true
                   - entity: sensor.ibbq_temperature_probe_4
                     name: Probe 4
-                    stroke_width: 3
                     color: var(--brown-color)
+                    transform: 'return x <= 32 ? null : x;'
                     show:
                       in_brush: true
                   - entity: sensor.ibbq_temperature_probe_5
                     name: Probe 5
-                    stroke_width: 3
                     color: var(--light-grey-color)
+                    transform: 'return x <= 32 ? null : x;'
                     show:
                       in_brush: true
                   - entity: input_number.ibbq_grill_high_temp
                     name: High
                     stroke_width: 1
                     color: var(--pink-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_6''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_grill_low_temp
                     name: Low
                     stroke_width: 1
                     color: var(--indigo-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_6''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_grill_target_temp
                     name: Grill Target
                     stroke_width: 1
                     color: var(--orange-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_6''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_probe_1_target_temp
                     name: Target 1
                     stroke_width: 1
                     color: var(--green-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_1''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_probe_2_target_temp
                     name: Target 2
                     stroke_width: 1
                     color: var(--deep-purple-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_2''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_probe_3_target_temp
                     name: Target 3
                     stroke_width: 1
                     color: var(--blue-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_3''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_probe_4_target_temp
                     name: Target 4
                     stroke_width: 1
                     color: var(--deep-orange-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_4''].state
+                      <= 32 ? null : x;'
                   - entity: input_number.ibbq_probe_5_target_temp
                     name: Target 5
                     stroke_width: 1
                     color: var(--dark-grey-color)
+                    transform: 'return hass.states[''sensor.ibbq_temperature_probe_5''].state
+                      <= 32 ? null : x;'
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -6865,6 +7251,12 @@ views:
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
+                sub_button:
+                  - entity: sensor.luna_box_cat_litter_level
+                    show_state: true
+                    icon: mdi:waves-arrow-up
+                    show_background: false
+                    name: Litter Level
               - type: custom:mod-card
                 style:
                   hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
@@ -7243,6 +7635,11 @@ views:
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules:
                   - default
+                sub_button:
+                  - name: Food Level
+                    entity: sensor.cat_feeder_food_level
+                    show_background: false
+                    show_state: true
               - type: custom:mod-card
                 style:
                   hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
@@ -7411,6 +7808,11 @@ views:
                 modules:
                   - default
                   - more_info_popup
+                sub_button:
+                  - entity: sensor.low_battery_devices
+                    show_state: true
+                    show_background: false
+                    name: Devices
               - type: custom:auto-entities
                 filter:
                   include:
@@ -7454,6 +7856,11 @@ views:
                 modules:
                   - default
                   - more_info_popup
+                sub_button:
+                  - entity: sensor.offline_devices
+                    name: Devices
+                    show_background: false
+                    show_state: true
               - type: custom:auto-entities
                 filter:
                   include:
@@ -7491,6 +7898,11 @@ views:
                 modules:
                   - default
                   - more_info_popup
+                sub_button:
+                  - entity: sensor.updates
+                    name: Updates
+                    show_background: false
+                    show_state: true
               - type: custom:auto-entities
                 filter:
                   include:
@@ -8545,11 +8957,10 @@ views:
         entity: sensor.meater_probe_cook_state
         label: Meater
         content: "{% if has_value(entity) %}\n  {{ states(\"sensor.meater_probe_internal\"\
-          ) }} °F\n  {% if has_value(\"sensor.meater_probe_cook_time_remaining\")\
-          \  %}\n    {% set t = (states(\"sensor.meater_probe_cook_time_remaining\"\
-          ) | as_datetime - now()).total_seconds() %}\n    | {{ t | timestamp_custom('%-H\
-          \ hr %-M min' if t > 3600 else '%-M min', false) }}\n  {% endif %}\n{% endif\
-          \ %}"
+          , rounded=true, with_unit=true) }}\n  {% if has_value(\"sensor.meater_probe_cook_time_remaining\"\
+          )  %}\n    {%- from 'easy_time.jinja' import easy_time -%}\n    | {{ easy_time(\"\
+          sensor.meater_probe_cook_time_remaining\", short=true) }}\n  {% endif %}\n\
+          {% endif %}"
         icon: mdi:food-drumstick
         color: '{{ has_value(entity) | iif("brown", "grey") }}'
         tap_action:
@@ -8559,13 +8970,15 @@ views:
         entity: sensor.ibbq_temperature_probe_6
         label: iBBQ
         content: "{%- from 'easy_time.jinja' import easy_time -%}\n{% if has_value(\"\
-          sensor.ibbq_temperature_probe_1\") %}\n  {{ states(\"sensor.ibbq_temperature_probe_1\"\
-          ) }} °F\n  {% if has_value(\"sensor.ibbq_probe_1_time_to_target\")  %}\n\
-          \    {{ big_time(\"sensor.ibbq_probe_1_time_to_target\", short=true) }}\n\
-          \  {% endif %}\n{% elif has_value(\"sensor.ibbq_temperature_probe_6\") %}\n\
-          \  {{ states(\"sensor.ibbq_temperature_probe_6\") }} °F\n  {% if has_value(\"\
-          sensor.ibbq_grill_time_to_target\")  %}\n    {{ big_time(\"sensor.ibbq_grill_time_to_target\"\
-          , short=true) }}\n  {% endif %}\n{% endif %}"
+          sensor.ibbq_temperature_probe_1\") and (states(\"sensor.ibbq_temperature_probe_1\"\
+          ) | int) > 32 %}\n  {{ states(\"sensor.ibbq_temperature_probe_1\", rounded=true,\
+          \ with_unit=true) }}\n  {% if has_value(\"sensor.ibbq_probe_1_time_to_target\"\
+          )  %}\n    | {{ easy_time(\"sensor.ibbq_probe_1_time_to_target\", short=true)\
+          \ }}\n  {% endif %}\n{% elif has_value(\"sensor.ibbq_temperature_probe_6\"\
+          ) %}\n  {{ states(\"sensor.ibbq_temperature_probe_6\", rounded=true, with_unit=true)\
+          \ }}\n  {% if has_value(\"sensor.ibbq_grill_time_to_target\")  %}\n    |\
+          \ {{ easy_time(\"sensor.ibbq_grill_time_to_target\", short=true) }}\n  {%\
+          \ endif %}\n{% endif %}"
         icon: mdi:grill
         color: '{{ has_value(entity) | iif("red", "grey") }}'
         tap_action:
@@ -8724,17 +9137,13 @@ views:
                   tap_action:
                     action: more-info
               chips:
-                - type: conditional
-                  conditions:
-                    - entity: switch.nebula_projector_ethan_main_switch
-                      state: 'on'
-                  chip:
-                    type: template
-                    entity: switch.nebula_projector_ethan_main_switch
-                    icon_color: pink
-                    icon: mdi:crystal-ball
-                    tap_action:
-                      action: more-info
+                - type: template
+                  entity: switch.nebula_projector_ethan_main_switch
+                  icon_color: '{{ iif(is_state(entity, "on"), "pink", "disabled")
+                    }}'
+                  icon: mdi:crystal-ball
+                  tap_action:
+                    action: more-info
                 - type: template
                   entity: light.ethan_bedroom_lights
                   icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
@@ -8797,17 +9206,13 @@ views:
                   tap_action:
                     action: more-info
               chips:
-                - type: conditional
-                  conditions:
-                    - entity: switch.nebula_projector_emma_main_switch
-                      state: 'on'
-                  chip:
-                    type: template
-                    entity: switch.nebula_projector_emma_main_switch
-                    icon_color: pink
-                    icon: mdi:crystal-ball
-                    tap_action:
-                      action: more-info
+                - type: template
+                  entity: switch.nebula_projector_emma_main_switch
+                  icon_color: '{{ iif(is_state(entity, "on"), "pink", "disabled")
+                    }}'
+                  icon: mdi:crystal-ball
+                  tap_action:
+                    action: more-info
                 - type: template
                   entity: light.emma_bedroom_lights
                   icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
@@ -16298,6 +16703,48 @@ views:
               - type: timeline
                 entities:
                   - entity: sensor.ecobee_mode
+          - type: custom:mushroom-template-card
+            primary: '{%- from ''easy_time.jinja'' import big_time -%}
+
+              {{ big_time(entity, short=true) }}'
+            secondary: Heating Time
+            icon: mdi:heating-coil
+            tap_action:
+              action: more-info
+            entity: sensor.ecobee_heating_today
+            visibility:
+              - condition: numeric_state
+                entity: sensor.ecobee_heating_today
+                above: 0
+            icon_color: red
+          - type: custom:mushroom-template-card
+            primary: '{%- from ''easy_time.jinja'' import big_time -%}
+
+              {{ big_time(entity, short=true) }}'
+            secondary: Cooling Time
+            icon: mdi:air-conditioner
+            tap_action:
+              action: more-info
+            icon_color: blue
+            entity: sensor.ecobee_cooling_today
+            visibility:
+              - condition: numeric_state
+                entity: sensor.ecobee_cooling_today
+                above: 0
+          - type: custom:mushroom-template-card
+            primary: '{%- from ''easy_time.jinja'' import big_time -%}
+
+              {{ big_time(entity, short=true) }}'
+            secondary: Fan Time
+            icon: mdi:fan
+            tap_action:
+              action: more-info
+            entity: sensor.ecobee_fan_today
+            visibility:
+              - condition: numeric_state
+                entity: sensor.ecobee_fan_today
+                above: 0
+            icon_color: amber
           - type: heading
             icon: mdi:chart-line
             heading: Thermostat
@@ -19423,7 +19870,6 @@ views:
             name: Bambu P1S
             entity: sensor.bambu_p1s_task_name
             show_icon: false
-            show_attribute: true
             show_state: true
             button_action:
               tap_action:
@@ -20329,7 +20775,7 @@ views:
                       target:
                         device_id: b9e70ce89bcabdccae4b86eeae1918f2
                       data:
-                        external_spool: true
+                        external_spool: 1
                   - type: custom:button-card
                     template: button
                     view_layout:
@@ -20342,8 +20788,6 @@ views:
                       service: bambu_lab.unload_filament
                       target:
                         device_id: b9e70ce89bcabdccae4b86eeae1918f2
-                      data:
-                        external_spool: true
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -20486,8 +20930,6 @@ views:
                       service: bambu_lab.unload_filament
                       target:
                         device_id: b9e70ce89bcabdccae4b86eeae1918f2
-                      data:
-                        tray: 1
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -20642,8 +21084,6 @@ views:
                       service: bambu_lab.unload_filament
                       target:
                         device_id: b9e70ce89bcabdccae4b86eeae1918f2
-                      data:
-                        tray: 2
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -20798,8 +21238,6 @@ views:
                       service: bambu_lab.unload_filament
                       target:
                         device_id: b9e70ce89bcabdccae4b86eeae1918f2
-                      data:
-                        tray: 3
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -20954,8 +21392,6 @@ views:
                       service: bambu_lab.unload_filament
                       target:
                         device_id: b9e70ce89bcabdccae4b86eeae1918f2
-                      data:
-                        tray: 4
     cards: []
     badges:
       - type: custom:mushroom-template-badge
@@ -21451,6 +21887,63 @@ views:
                   - entity: sensor.emporiavue_main_washer_power
                     name: Washer
                     icon: mdi:washing-machine
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
+                    \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_main_phase_a_voltage
+                      label: Phase A voltage
+                      icon: mdi:sine-wave
+                      color: blue
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_main_phase_a_current
+                      label: Phase A current
+                      icon: mdi:current-ac
+                      color: green
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_main_phase_a_frequency
+                      label: Phase A frequency
+                      icon: mdi:waveform
+                      color: amber
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_main_phase_b_voltage
+                      label: Phase B voltage
+                      icon: mdi:sine-wave
+                      color: blue
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_main_phase_b_current
+                      label: Phase B current
+                      icon: mdi:current-ac
+                      color: green
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_main_phase_b_phase_angle
+                      label: Phase B phase
+                      icon: mdi:cosine-wave
+                      color: amber
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
           - type: vertical-stack
             cards:
               - type: heading
@@ -21610,120 +22103,63 @@ views:
                   - entity: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_power
                     name: Theater, Family Outlets/Basement Lighting
                     icon: mdi:theater
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-            card:
-              type: grid
-              square: false
-              cards:
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_main_phase_a_voltage
-                  label: Phase A voltage
-                  icon: mdi:sine-wave
-                  color: blue
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_main_phase_a_current
-                  label: Phase A current
-                  icon: mdi:current-ac
-                  color: green
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_main_phase_a_frequency
-                  label: Phase A frequency
-                  icon: mdi:cosine-wave
-                  color: amber
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_main_phase_b_voltage
-                  label: Phase B voltage
-                  icon: mdi:sine-wave
-                  color: blue
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_main_phase_b_current
-                  label: Phase B current
-                  icon: mdi:current-ac
-                  color: green
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_main_phase_b_phase_angle
-                  label: Phase B phase
-                  icon: mdi:waveform
-                  color: amber
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-            card:
-              type: grid
-              square: false
-              cards:
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_sub_phase_a_voltage
-                  label: Phase A voltage
-                  icon: mdi:sine-wave
-                  color: blue
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_sub_phase_a_current
-                  label: Phase A current
-                  icon: mdi:current-ac
-                  color: green
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_sub_phase_a_frequency
-                  label: Phase A frequency
-                  icon: mdi:cosine-wave
-                  color: amber
-                  tap_action:
-                    action: more-info
-                  content: '{{ states(entity, with_unit=true) }}'
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_sub_phase_b_voltage
-                  label: Phase B voltage
-                  icon: mdi:sine-wave
-                  color: blue
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_sub_phase_b_current
-                  label: Phase B current
-                  icon: mdi:current-ac
-                  color: green
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
-                - type: custom:mushroom-template-badge
-                  entity: sensor.emporiavue_sub_phase_b_phase_angle
-                  label: Phase B phase
-                  icon: mdi:waveform
-                  color: amber
-                  content: '{{ states(entity, with_unit=true) }}'
-                  tap_action:
-                    action: more-info
+              - type: custom:mod-card
+                style:
+                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
+                    \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
+                    \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
+                card:
+                  type: grid
+                  square: false
+                  cards:
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_sub_phase_a_voltage
+                      label: Phase A voltage
+                      icon: mdi:sine-wave
+                      color: blue
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_sub_phase_a_current
+                      label: Phase A current
+                      icon: mdi:current-ac
+                      color: green
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_sub_phase_a_frequency
+                      label: Phase A frequency
+                      icon: mdi:waveform
+                      color: amber
+                      tap_action:
+                        action: more-info
+                      content: '{{ states(entity, with_unit=true) }}'
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_sub_phase_b_voltage
+                      label: Phase B voltage
+                      icon: mdi:sine-wave
+                      color: blue
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_sub_phase_b_current
+                      label: Phase B current
+                      icon: mdi:current-ac
+                      color: green
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
+                    - type: custom:mushroom-template-badge
+                      entity: sensor.emporiavue_sub_phase_b_phase_angle
+                      label: Phase B phase
+                      icon: mdi:cosine-wave
+                      color: amber
+                      content: '{{ states(entity, with_unit=true) }}'
+                      tap_action:
+                        action: more-info
         column_span: 2
     dense_section_placement: true
     cards: []
