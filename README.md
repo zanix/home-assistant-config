@@ -805,7 +805,7 @@ Material Design 3 Theme for Home Assistant
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps on/off
-- 💡 School Departure Light Indicator
+- 💡 School Departure Light Indicator 🚫
 - 💡 Turn Lights On when Arrive
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low

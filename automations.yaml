@@ -1911,12 +1911,12 @@
   actions:
   - variables:
       name: '{{ trigger.calendar_event.summary }}'
-      type: '{{ trigger.id.split("-")[0] }}'
-      day: '{{ trigger.id.split("-")[1] }}'
-      object_id: '{{ type ~ "_collection" }}'
+      type: '{{ trigger.id.split(''-'')[0] }}'
+      day: '{{ trigger.id.split(''-'')[1] }}'
+      object_id: '{{ type ~ ''_collection'' }}'
       tag: '{{ object_id }}'
-      icon: '{{ state_attr("calendar." ~ object_id, "icon") | replace("mdi:", "")
-        }}'
+      icon: '{{ state_attr(''calendar.'' ~ object_id, ''icon'') }}'
+      icon_image: '{{ icon | replace(''mdi:'', '''') }}'
       icon_color: '#{{ iif(type == ''recycle'', ''4caf50'', ''745246'') }}'
       description: "{% if trigger.calendar_event.description != \"\" %}\n  {{ \" \"
         }}({{ trigger.calendar_event.description }})\n{%- endif -%}"
@@ -1937,7 +1937,7 @@
           message: The {{ name }} can will be picked up {{ day }} {{ description }}
           notification_icon: '{{ icon }}'
           color: '{{ icon_color }}'
-          icon: local/icons/{{ icon }}.png
+          icon: local/icons/{{ icon_image }}.png
           group: Collection
           tag: '{{ tag }}'
           url: lovelace/main
@@ -2322,7 +2322,7 @@
   variables:
     sound_mode: "{%- if trigger.to_state.attributes.source in ['Spotify', 'SmartTube',
       'YouTube', 'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n
-      \ adaptive sound\n{%- else -%}\n  standard\n{%- endif -%}"
+      \ Adaptive Sound\n{%- else -%}\n  Standard\n{%- endif -%}"
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer
   description: Listen for events and output data
@@ -2364,15 +2364,15 @@
       in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
   actions:
   - variables:
+      devices: '{{ trigger.to_state.state | int(default=0) }}'
+      title: Low Battery Level{{ iif(devices > 1, 's', '') }} ({{ devices }})
       sensors: "{% if not trigger.to_state.state in ['unknown', 'unavailable', none]
         %}\n  {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
         %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set
         name = device.name | replace(':', '') | regex_replace(find = ' battery level',
         replace = '', ignorecase = true) %}\n    {% set result.sensors = result.sensors
-        + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n  {{ iif(result.sensors|count
-        > 0, '- ', '') }}{{ result.sensors | join('\\n- ') }}\n{% endif %}"
-      devices: '{{ trigger.to_state.state | int(default=0) }}'
-      title: Low Battery Level{{ iif(devices > 1, 's', '') }} ({{ devices }})
+        + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n{% endif
+        %}\n{{ result.sensors }}"
   - if:
     - condition: template
       value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
@@ -2381,36 +2381,12 @@
     - data:
         notification_id: low-battery-alert
       action: persistent_notification.dismiss
-    - data:
-        send_to: joshua
-        notification_type: clear_notification
-        tag: low-battery-alert
-      action: script.notify_mobile
     else:
-    - parallel:
-      - data:
-          title: '{{ title }}'
-          message: '{{ sensors }}'
-          notification_id: low-battery-alert
-        action: persistent_notification.create
-      - data:
-          send_to: joshua
-          title: '{{ title }}'
-          message: '{{ sensors }}'
-          notification_icon: mdi:battery-alert
-          color: '#f44336'
-          icon: local/icons/battery-alert.png
-          group: System
-          tag: low-battery-alert
-          url: dashboard-system/overview
-        action: script.notify_mobile
-      - data:
-          computer:
-          - erebus
-          title: '{{ title }}'
-          message: '{{ sensors }}'
-          icon: local/icons/battery-alert.png
-        action: script.notify_lnxlink
+    - data:
+        title: '{{ title }}'
+        message: '{{ sensors }}'
+        notification_id: low-battery-alert
+      action: persistent_notification.create
   mode: single
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
@@ -5091,38 +5067,13 @@
     - data:
         notification_id: offline-devices
       action: persistent_notification.dismiss
-    - data:
-        send_to: joshua
-        notification_type: clear_notification
-        tag: offline-devices
-      action: script.notify_mobile
     else:
-    - parallel:
-      - data:
-          title: '{{ title }}'
-          message: '{{ iif(sensors | count > 0, ''- '', '''') }}{{ sensors | join(''\n-
-            '') }}'
-          notification_id: offline-devices
-        action: persistent_notification.create
-      - data:
-          send_to: joshua
-          title: '{{ title }}'
-          message: '{{ iif(sensors | count > 0, ''- '', '''') }}{{ sensors | join(''\n-
-            '') }}'
-          notification_icon: mdi:network-off
-          color: '#f44336'
-          icon: local/icons/network-off.png
-          group: System
-          tag: offline-devices
-          url: dashboard-system/overview
-        action: script.notify_mobile
-      - data:
-          computer:
-          - erebus
-          title: '{{ title }}'
-          message: '{{ sensors | join('' | '') }}'
-          icon: local/icons/network-off.png
-        action: script.notify_lnxlink
+    - data:
+        title: '{{ title }}'
+        message: '{{ iif(sensors | count > 0, ''- '', '''') }}{{ sensors | join(''\n-
+          '') }}'
+        notification_id: offline-devices
+      action: persistent_notification.create
   mode: restart
 - id: '1713973263507'
   alias: "\U0001F4AC Bambu P1S Print Status"
@@ -6159,17 +6110,16 @@
     to: 'on'
   conditions:
   - condition: template
-    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
-      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
-      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
-      in ['unknown', 'unavailable'] }}"
+    value_template: "{{ not trigger.from_state.state in ['unknown', 'unavailable']\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable'] }}"
   actions:
   - variables:
+      title: Mail Delivery
       message: Mail is delivered
   - parallel:
     - data:
         send_to: parents
-        title: Mail Delivery
+        title: '{{ title }}'
         message: '{{ message }}'
         notification_icon: mdi:mailbox-up
         color: '#2096f3'
@@ -6181,14 +6131,14 @@
     - data:
         entity:
         - media_player.nasya
-        title: Mail Delivery
+        title: '{{ title }}'
         message: '{{ message }}'
         camera: camera.mail_usps_camera
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Mail Delivery
+        title: '{{ title }}'
         message: '{{ message }}'
         icon: local/icons/mailbox-up.png
         camera: camera.mail_usps_camera
@@ -6198,7 +6148,7 @@
         - media_player.living_room_googletv
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Mail Delivery
+        title: '{{ title }}'
         message: '{{ message }}'
         tag: delivery-mail
         image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr("camera.mail_usps_camera",
