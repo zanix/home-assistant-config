@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4909 |
-| Sensors        | 1605 |
+| All Entities   | 4907 |
+| Sensors        | 1606 |
 | Binary Sensors | 345 |
 | Lights         | 74 |
-| Switches       | 319 |
+| Switches       | 323 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -308,7 +308,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.19]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.1.20]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -336,7 +336,7 @@ Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.9.2]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.9.3]
 
 Frigate integration for Home Assistant
 
@@ -420,13 +420,13 @@ Home Assistant Neakasa Integration
 
 Authors: [@timniklas](https://github.com/timniklas).
 
-### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.6.1]
+### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.6.2]
 
 Home Assistant integration for Nintendo Switch Parental Controls
 
 Authors: [@pantherale0](https://github.com/pantherale0).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.5.0]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.5.1]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -514,11 +514,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.4.1]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.4.3]
 
 Expander card for HomeAssistant
 
-### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v2.3.0]
+### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v.2.3.2]
 
 🔹 A foldable row for entities card, containing other rows
 
@@ -550,7 +550,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.21]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v1.0.23]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -634,7 +634,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v4.0.6]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v4.0.8]
 
 Material Design 3 Theme for Home Assistant
 
