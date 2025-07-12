@@ -735,7 +735,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>521 Automations</summary>
+<details><summary>522 Automations</summary>
 
 > Keymaster automations are hidden
 
@@ -871,6 +871,7 @@ Material Design 3 Theme for Home Assistant
 - 🖥️ [Erebus] Microphone/Camera Active
 - 🖥️ [Quest] Charge Complete
 - 🖥️ [Quest] Interactive
+- 🖥️ [Work Josh] Microphone/Camera Active
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
 - 🗺️ Arriving Home 🚫

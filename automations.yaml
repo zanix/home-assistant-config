@@ -6455,3 +6455,72 @@
     target:
       entity_id: media_player.family_room_cast
   mode: single
+- id: '1751496724109'
+  alias: "\U0001F5A5️ [Work Josh] Microphone/Camera Active"
+  description: Changes basement hallway light animation when microphone or webcam
+    is in use
+  triggers:
+  - entity_id:
+    - binary_sensor.workjosh_mic_active
+    trigger: state
+    to:
+  - entity_id:
+    - binary_sensor.workjosh_webcam_active
+    to:
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.workjosh_mic_active
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.workjosh_webcam_active
+          state: 'on'
+      sequence:
+      - action: script.inovelli_blue_led
+        metadata: {}
+        data:
+          led: All
+          color: Red
+          level: 100
+          effect: Small to Big
+          duration: 4 Hours
+          target:
+            entity_id: light.basement_hallway
+      - action: media_player.media_pause
+        metadata: {}
+        data: {}
+        target:
+          entity_id: media_player.erebus
+      - action: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.erebus_bash_mute
+      alias: When microphone or webcam are active
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.workjosh_mic_active
+          state: 'off'
+        - condition: state
+          entity_id: binary_sensor.workjosh_webcam_active
+          state: 'off'
+      sequence:
+      - action: script.inovelli_blue_led
+        metadata: {}
+        data:
+          target:
+            entity_id: light.basement_hallway
+      - action: switch.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.erebus_bash_mute
+      alias: When microphone and webcam are inactive
+  mode: restart
