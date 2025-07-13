@@ -1463,20 +1463,15 @@
         - media_player.shield_family_room
         title: Doorbell
         message: '{{ message }}'
-        tag: doorbell-ring
-        video: '{{ states("input_text.rtsp_doorbell") }}'
-        large_icon: local/icons/doorbell-video.png
-        icon_color: '#e91e63'
-      action: script.notify_tvoverlay
+        video: '{{ camera }}'
+      action: script.notify_pipup
     - data:
         entity:
         - media_player.shield_main_bedroom
         title: Doorbell
         message: '{{ message }}'
-        tag: doorbell-ring
-        large_icon: local/icons/doorbell-video.png
-        icon_color: '#e91e63'
-      action: script.notify_tvoverlay
+        video: '{{ camera }}'
+      action: script.notify_pipup
     - if:
       - condition: state
         entity_id: light.wled_joshua_office_desk
@@ -1997,21 +1992,29 @@
         - action: ascent_remote_start_again
           title: Retry
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.living_room_googletv
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: Ascent Remote Start
-        message: '{{ message }}'
-        tag: ascent
-        large_icon: local/icons/subaru.png
-        icon_color: '#0e4bef'
-      action: script.notify_tvoverlay
-    - data:
-        media_player: media_player.living_room_speaker
-        message: '{{ message }}'
-      action: script.notify_speech
+    - alias: Check the car is in the garage
+      if:
+      - condition: state
+        entity_id: device_tracker.ascent
+        state: home
+      then:
+      - parallel:
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: Ascent Remote Start
+            message: '{{ message }}'
+            tag: ascent
+            large_icon: local/icons/subaru.png
+            icon_color: '#0e4bef'
+          action: script.notify_tvoverlay
+        - data:
+            media_player:
+            - media_player.living_room_speaker
+            message: '{{ message }}'
+          action: script.notify_speech
   mode: single
 - id: '1665689705099'
   alias: "\U0001F3E2 Joshua Office Mode"
@@ -2040,7 +2043,6 @@
       - data:
           entity_id: switch.erebus
         action: switch.turn_on
-        enabled: false
     - conditions:
       - condition: trigger
         id:
@@ -2378,15 +2380,34 @@
       value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
         | int(default=0)) > 0 }}"
     then:
-    - data:
-        notification_id: low-battery-alert
-      action: persistent_notification.dismiss
+    - parallel:
+      - data:
+          notification_id: low-battery-alert
+        action: persistent_notification.dismiss
+      - data:
+          send_to: joshua
+          notification_type: clear_notification
+          tag: low-battery-alert
+        action: script.notify_mobile
     else:
-    - data:
-        title: '{{ title }}'
-        message: '{{ sensors }}'
-        notification_id: low-battery-alert
-      action: persistent_notification.create
+    - parallel:
+      - data:
+          title: '{{ title }}'
+          message: '{{ iif(sensors | count > 0, ''- '', '''') }}{{ sensors | join(''\n-
+            '') }}'
+          notification_id: low-battery-alert
+        action: persistent_notification.create
+      - data:
+          send_to: joshua
+          title: '{{ title }}'
+          message: '{{ sensors | join(''<br>'') }}'
+          notification_icon: mdi:battery-alert
+          color: '#f44336'
+          icon: local/icons/battery-alert.png
+          group: System
+          tag: low-battery-alert
+          url: dashboard-system/overview
+        action: script.notify_mobile
   mode: single
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
@@ -3502,9 +3523,16 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
+      switch: event.joshua_office_switch_action
       up_single:
       - action: script.joshua_office_lights_on
         data: {}
+      - action: adaptive_lighting.set_manual_control
+        metadata: {}
+        data:
+          manual_control: true
+          lights:
+          - light.joshua_office
       up_double:
       - parallel:
         - action: script.inovelli_blue_led
@@ -3516,6 +3544,12 @@
             duration: 3 Seconds
         - action: script.joshua_office_lights_day_mode
           data: {}
+        - action: adaptive_lighting.set_manual_control
+          metadata: {}
+          data:
+            manual_control: true
+            lights:
+            - light.joshua_office
       down_single:
       - action: light.turn_off
         data: {}
@@ -3532,7 +3566,34 @@
             duration: 3 Seconds
         - action: script.joshua_office_lights_night_mode
           data: {}
-      switch: event.joshua_office_switch_action
+      config_single:
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.joshua_office_switch
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: light.toggle
+          metadata: {}
+          data: {}
+          target:
+            entity_id: light.joshua_office_workbench
+      config_double:
+      - parallel:
+        - action: script.inovelli_blue_led
+          data:
+            target:
+              entity_id: light.joshua_office_switch
+            color: Yellow
+            effect: Chase
+            duration: 3 Seconds
+        - action: light.toggle
+          metadata: {}
+          data: {}
+          target:
+            entity_id: light.joshua_office_shelf_led
 - id: '1667780182339'
   alias: "\U0001F4CB [Inovelli] Amy Office Switch"
   description: Custom button actions for the Inovelli switch
@@ -3693,21 +3754,29 @@
         tag: ascent
         url: lovelace#ascent
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.living_room_googletv
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: '{{ title }}'
-        message: '{{ message }}'
-        tag: ascent
-        large_icon: local/icons/subaru.png
-        icon_color: '#114be6'
-      action: script.notify_tvoverlay
-    - data:
-        media_player: media_player.living_room_speaker
-        message: '{{ message }}'
-      action: script.notify_speech
+    - alias: Check the car is in the garage
+      if:
+      - condition: state
+        entity_id: device_tracker.ascent
+        state: home
+      then:
+      - parallel:
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: '{{ title }}'
+            message: '{{ message }}'
+            tag: ascent
+            large_icon: local/icons/subaru.png
+            icon_color: '#114be6'
+          action: script.notify_tvoverlay
+        - data:
+            media_player:
+            - media_player.living_room_speaker
+            message: '{{ message }}'
+          action: script.notify_speech
   - wait_for_trigger:
     - entity_id:
       - cover.garage_door
@@ -3825,21 +3894,29 @@
         - action: ascent_remote_start_again
           title: Start Again
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.living_room_googletv
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: '{{ title }}'
-        message: '{{ message }}'
-        tag: ascent
-        large_icon: local/icons/subaru.png
-        icon_color: '#114be6'
-      action: script.notify_tvoverlay
-    - data:
-        media_player: media_player.living_room_speaker
-        message: '{{ message }}'
-      action: script.notify_speech
+    - alias: Check the car is in the garage
+      if:
+      - condition: state
+        entity_id: device_tracker.ascent
+        state: home
+      then:
+      - parallel:
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: '{{ title }}'
+            message: '{{ message }}'
+            tag: ascent
+            large_icon: local/icons/subaru.png
+            icon_color: '#114be6'
+          action: script.notify_tvoverlay
+        - data:
+            media_player:
+            - media_player.living_room_speaker
+            message: '{{ message }}'
+          action: script.notify_speech
   mode: single
 - id: '1679340622496'
   alias: "\U0001F5FA️ Arriving Home"
@@ -6188,20 +6265,28 @@
         tag: kona
         url: lovelace#kona
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.living_room_googletv
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: '{{ title }}'
-        message: '{{ message }}'
-        tag: kona
-        large_icon: local/icons/hyundai.png
-      action: script.notify_tvoverlay
-    - data:
-        media_player: media_player.living_room_speaker
-        message: '{{ message }}'
-      action: script.notify_speech
+    - alias: Check the car is in the garage
+      if:
+      - condition: state
+        entity_id: device_tracker.kona_location
+        state: home
+      then:
+      - parallel:
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: '{{ title }}'
+            message: '{{ message }}'
+            tag: kona
+            large_icon: local/icons/hyundai.png
+          action: script.notify_tvoverlay
+        - data:
+            media_player:
+            - media_player.living_room_speaker
+            message: '{{ message }}'
+          action: script.notify_speech
   - wait_for_trigger:
     - entity_id:
       - cover.garage_door
@@ -6252,20 +6337,28 @@
         - action: kona_remote_start_again
           title: Retry
       action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.living_room_googletv
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: Kona Remote Start
-        message: '{{ message }}'
-        tag: kona
-        large_icon: local/icons/hyundai.png
-      action: script.notify_tvoverlay
-    - data:
-        media_player: media_player.living_room_speaker
-        message: '{{ message }}'
-      action: script.notify_speech
+    - alias: Check the car is in the garage
+      if:
+      - condition: state
+        entity_id: device_tracker.kona_location
+        state: home
+      then:
+      - parallel:
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: Kona Remote Start
+            message: '{{ message }}'
+            tag: kona
+            large_icon: local/icons/hyundai.png
+          action: script.notify_tvoverlay
+        - data:
+            media_player:
+            - media_player.living_room_speaker
+            message: '{{ message }}'
+          action: script.notify_speech
   mode: single
 - id: '1743734754522'
   alias: "\U0001F4AC Kona Remote Start Expired Notification"
@@ -6378,8 +6471,8 @@
           led: All
           color: Red
           level: 100
-          effect: Aurora
-          duration: Indefinitely
+          effect: Small to Big
+          duration: 4 Hours
           target:
             entity_id: light.basement_hallway
       alias: When microphone or webcam are active
