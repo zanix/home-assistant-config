@@ -2292,11 +2292,11 @@
       entity_id: media_player.samsung_soundbar
       state: 'off'
   actions:
-  - action: select.select_option
-    target:
-      entity_id: select.samsung_soundbar_sound_mode
-    data:
-      option: '{{ sound_mode }}'
+  - variables:
+      sound_mode: "{%- if trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
+        'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  Adaptive
+        Sound\n{%- elif trigger.to_state.attributes.source in ['Spotify'] -%}\n  Surround\n{%-
+        else -%}\n  Standard\n{%- endif -%}"
   - choose:
     - conditions:
       - condition: state
@@ -2320,11 +2320,12 @@
         target:
           entity_id: input_boolean.samsung_soundbar_voice_enhancer
         data: {}
+  - action: select.select_option
+    target:
+      entity_id: select.samsung_soundbar_sound_mode
+    data:
+      option: '{{ sound_mode }}'
   mode: restart
-  variables:
-    sound_mode: "{%- if trigger.to_state.attributes.source in ['Spotify', 'SmartTube',
-      'YouTube', 'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n
-      \ Adaptive Sound\n{%- else -%}\n  Standard\n{%- endif -%}"
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer
   description: Listen for events and output data
@@ -4602,6 +4603,13 @@
           entity_id:
           - fan.main_bedroom_ceiling
         data: {}
+        enabled: false
+      - action: fan.turn_on
+        metadata: {}
+        data:
+          percentage: 33
+        target:
+          entity_id: fan.main_bedroom_ceiling
   mode: single
 - id: '1702017706466'
   alias: ⚙️ Scan Interval
@@ -6574,26 +6582,32 @@
           entity_id: binary_sensor.workjosh_webcam_active
           state: 'on'
       sequence:
-      - action: script.inovelli_blue_led
-        metadata: {}
-        data:
-          led: All
-          color: Red
-          level: 100
-          effect: Small to Big
-          duration: 4 Hours
+      - parallel:
+        - action: script.inovelli_blue_led
+          metadata: {}
+          data:
+            led: All
+            color: Red
+            level: 100
+            effect: Small to Big
+            duration: 4 Hours
+            target:
+              entity_id: light.basement_hallway
+        - action: media_player.media_pause
+          metadata: {}
+          data: {}
           target:
-            entity_id: light.basement_hallway
-      - action: media_player.media_pause
-        metadata: {}
-        data: {}
-        target:
-          entity_id: media_player.erebus
-      - action: switch.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.erebus_bash_mute
+            entity_id: media_player.erebus
+        - action: switch.turn_on
+          metadata: {}
+          data: {}
+          target:
+            entity_id: switch.erebus_bash_mute
+        - action: notify.mobile_app_pixel_8_joshua
+          data:
+            message: command_dnd
+            data:
+              command: priority_only
       alias: When microphone or webcam are active
     - conditions:
       - condition: and
@@ -6605,15 +6619,21 @@
           entity_id: binary_sensor.workjosh_webcam_active
           state: 'off'
       sequence:
-      - action: script.inovelli_blue_led
-        metadata: {}
-        data:
+      - parallel:
+        - action: script.inovelli_blue_led
+          metadata: {}
+          data:
+            target:
+              entity_id: light.basement_hallway
+        - action: switch.turn_off
+          metadata: {}
+          data: {}
           target:
-            entity_id: light.basement_hallway
-      - action: switch.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: switch.erebus_bash_mute
+            entity_id: switch.erebus_bash_mute
+        - action: notify.mobile_app_pixel_8_joshua
+          data:
+            message: command_dnd
+            data:
+              command: 'off'
       alias: When microphone and webcam are inactive
   mode: restart
