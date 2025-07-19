@@ -870,7 +870,7 @@ Material Design 3 Theme for Home Assistant
 - 🔔 Doorbell Ring
 - 🔔 Frigate Doorbell - Event Handler
 - 🔔 Frigate Doorbell - Object Seen
-- 🕗 Main Bedroom Ceiling Fan Default Light Status 🚫
+- 🕗 Main Bedroom Ceiling Fan Default Light Status
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Erebus] Microphone/Camera Active
 - 🖥️ [Quest] Charge Complete
