@@ -927,6 +927,15 @@
   - at: input_datetime.living_room_lamps_off
     id: 'off'
     trigger: time
+  - trigger: state
+    entity_id:
+    - binary_sensor.bed_presence_f56148_bed_occupied_both
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+    id: 'off'
   conditions: []
   actions:
   - choose:
@@ -1389,6 +1398,7 @@
         }}'
       volume: '{{ iif(is_state(''schedule.quiet_hours'', ''on''), 40, 90) }}'
       media_location: media-source://media_source/local/sounds/ds9_doorchime.mp3
+      title: Doorbell
       message: Ring Ring!
       actions:
       - action: URI
@@ -1424,7 +1434,7 @@
             action: script.turn_on
     - data:
         send_to: parents
-        title: Doorbell
+        title: '{{ title }}'
         message: '{{ message }}'
         notification_icon: mdi:doorbell-video
         color: '#e91e63'
@@ -1441,7 +1451,7 @@
     - data:
         entity:
         - media_player.nasya
-        title: Doorbell
+        title: '{{ title }}'
         message: '{{ message }}'
         tag: doorbell-ring
         camera: '{{ camera }}'
@@ -1452,7 +1462,7 @@
         computer:
         - erebus
         - cartago
-        title: Doorbell
+        title: '{{ title }}'
         message: '{{ message }}'
         icon: local/icons/doorbell-video.png
         importance: critical
@@ -1460,15 +1470,18 @@
     - data:
         entity:
         - media_player.living_room_googletv
-        - media_player.shield_family_room
-        title: Doorbell
+        title: '{{ title }}'
         message: '{{ message }}'
-        video: '{{ camera }}'
-      action: script.notify_pipup
+        large_icon: local/icons/doorbell-video.png
+        video: '{{ states("input_text.rtsp_doorbell") }}'
+        tag: doorbell-ring
+        duration: 30
+      action: script.notify_tvoverlay
     - data:
         entity:
+        - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Doorbell
+        title: '{{ title }}'
         message: '{{ message }}'
         video: '{{ camera }}'
       action: script.notify_pipup
@@ -2291,6 +2304,7 @@
     - condition: state
       entity_id: media_player.samsung_soundbar
       state: 'off'
+      enabled: false
   actions:
   - variables:
       sound_mode: "{%- if trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
@@ -3987,24 +4001,20 @@
     trigger: time
   conditions: []
   actions:
-  - variables:
-      media_players:
-      - media_player.living_room_googletv
+  - data:
+      command: am start -n nl.rogro82.pipup/nl.rogro82.pipup.MainActivity
+    target:
+      entity_id:
       - media_player.shield_family_room
       - media_player.shield_main_bedroom
-  - repeat:
-      for_each: '{{ media_players }}'
-      sequence:
-      - data:
-          command: am start -n nl.rogro82.pipup/nl.rogro82.pipup.MainActivity
-        target:
-          entity_id: '{{ repeat.item }}'
-        action: androidtv.adb_command
-      - data:
-          command: HOME
-        target:
-          entity_id: '{{ repeat.item }}'
-        action: androidtv.adb_command
+    action: androidtv.adb_command
+  - data:
+      command: HOME
+    target:
+      entity_id:
+      - media_player.shield_family_room
+      - media_player.shield_main_bedroom
+    action: androidtv.adb_command
   mode: single
 - id: '1682570311827'
   alias: "\U0001F4C5 Garbage Collection Event Generator"
@@ -5750,16 +5760,59 @@
   alias: "\U0001F557 Main Bedroom Ceiling Fan Default Light Status"
   description: Adjusts the Main Bedroom ceiling fan light status based on the time
     of day.
-  trigger:
-  - platform: time
-    at: '20:00:00'
-    id: dim
-  - platform: time
-    at: 04:00:00
+  triggers:
+  - trigger: state
+    entity_id:
+    - schedule.main_bedroom_fan
+    to: 'on'
     id: bright
-  condition: []
-  action:
+  - trigger: state
+    entity_id:
+    - schedule.main_bedroom_fan
+    to: 'off'
+    id: dim
+  conditions: []
+  actions:
   - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - bright
+      - condition: state
+        entity_id: binary_sensor.bed_presence_f56148_bed_occupied_either
+        state: 'off'
+      sequence:
+      - action: script.inovelli_blue_led_set_defaults
+        metadata: {}
+        data:
+          entity_id:
+          - fan.main_bedroom_ceiling
+          color_on: Green
+    - conditions:
+      - condition: trigger
+        id:
+        - bright
+      sequence:
+      - wait_for_trigger:
+        - trigger: state
+          entity_id:
+          - binary_sensor.bed_presence_f56148_bed_occupied_either
+          to: 'off'
+          for:
+            hours: 0
+            minutes: 2
+            seconds: 0
+        continue_on_timeout: true
+        timeout:
+          hours: 1
+          minutes: 0
+          seconds: 0
+      - action: script.inovelli_blue_led_set_defaults
+        metadata: {}
+        data:
+          entity_id:
+          - fan.main_bedroom_ceiling
+          color_on: Green
     - conditions:
       - condition: trigger
         id:
@@ -5771,17 +5824,6 @@
           entity_id:
           - fan.main_bedroom_ceiling
           color_on: Red
-    - conditions:
-      - condition: trigger
-        id:
-        - bright
-      sequence:
-      - action: script.inovelli_blue_led_set_defaults
-        metadata: {}
-        data:
-          entity_id:
-          - fan.main_bedroom_ceiling
-          color_on: Green
   mode: single
 - id: '1728402022145'
   alias: ⏯ Living Room Sound Night Mode
@@ -6485,14 +6527,14 @@
             entity_id: light.basement_hallway
       alias: When microphone or webcam are active
     - conditions:
-      - condition: and
+      - condition: not
         conditions:
         - condition: state
           entity_id: binary_sensor.erebus_microphone_used
-          state: 'off'
+          state: 'on'
         - condition: state
           entity_id: binary_sensor.erebus_camera_used
-          state: 'off'
+          state: 'on'
       sequence:
       - action: script.inovelli_blue_led
         metadata: {}
@@ -6510,16 +6552,15 @@
     - remote.androidtv_living_room
     from: 'on'
     to: 'off'
-  conditions:
-  - condition: state
-    entity_id: media_player.living_room_cast
-    state: 'on'
+  conditions: []
   actions:
   - action: media_player.turn_off
     metadata: {}
     data: {}
     target:
-      entity_id: media_player.living_room_cast
+      entity_id:
+      - media_player.living_room_cast
+      - media_player.androidtv_living_room
   mode: single
 - id: '1748056193923'
   alias: "\U0001F4C5 Update KidsChore UI Helpers"
@@ -6545,16 +6586,16 @@
     - remote.androidtv_family_room
     from: 'on'
     to: 'off'
-  conditions:
-  - condition: state
-    entity_id: media_player.family_room_cast
-    state: 'on'
+  conditions: []
   actions:
   - action: media_player.turn_off
     metadata: {}
     data: {}
     target:
-      entity_id: media_player.family_room_cast
+      entity_id:
+      - media_player.family_room_cast
+      - media_player.shield_family_room
+      - media_player.androidtv_family_room
   mode: single
 - id: '1751496724109'
   alias: "\U0001F5A5️ [Work Josh] Microphone/Camera Active"
@@ -6610,14 +6651,14 @@
               command: priority_only
       alias: When microphone or webcam are active
     - conditions:
-      - condition: and
+      - condition: not
         conditions:
         - condition: state
           entity_id: binary_sensor.workjosh_mic_active
-          state: 'off'
+          state: 'on'
         - condition: state
           entity_id: binary_sensor.workjosh_webcam_active
-          state: 'off'
+          state: 'on'
       sequence:
       - parallel:
         - action: script.inovelli_blue_led
