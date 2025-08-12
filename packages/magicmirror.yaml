@@ -54,18 +54,37 @@ mqtt:
 
 automation:
   - id: magicmirror_on_off_schedule
-    alias: "📱 MagicMirror On/Off Schedule"
-    trigger:
-      - platform: state
-        entity_id: schedule.magicmirror
+    alias: 📱 MagicMirror On/Off Schedule
+    mode: single
+    triggers:
+      - entity_id: schedule.magicmirror
         id: "on"
         to: "on"
-      - platform: state
-        entity_id: schedule.magicmirror
+        trigger: state
+      - entity_id: schedule.magicmirror
         id: "off"
         to: "off"
-    condition: []
-    action:
+        trigger: state
+      - trigger: state
+        entity_id:
+          - binary_sensor.bed_presence_f56148_bed_occupied_both
+        to: "on"
+        id: "off"
+        for:
+          hours: 0
+          minutes: 5
+          seconds: 0
+      - trigger: state
+        entity_id:
+          - binary_sensor.bed_presence_f56148_bed_occupied_both
+        to: "off"
+        id: "on"
+        for:
+          hours: 0
+          minutes: 5
+          seconds: 0
+    conditions: []
+    actions:
       - choose:
           - conditions:
               - condition: trigger
@@ -86,24 +105,25 @@ automation:
               - action: light.turn_off
                 target:
                   entity_id: light.magicmirror_monitor
+                data: {}
 
   - id: magicmirror_brightness_on_lights_on_off
-    alias: "📱 MagicMirror Brightness on Lights On/Off"
+    alias: 📱 MagicMirror Brightness on Lights On/Off
     mode: restart
-    trigger:
-      - platform: state
-        entity_id: light.kitchen
-      - platform: state
-        entity_id: light.dining_room
-      - platform: numeric_state
-        entity_id: light.dining_room
+    triggers:
+      - entity_id: light.kitchen
+        trigger: state
+      - entity_id: light.dining_room
+        trigger: state
+      - entity_id: light.dining_room
         attribute: brightness
         above: 45
-      - platform: numeric_state
-        entity_id: light.dining_room
+        trigger: numeric_state
+      - entity_id: light.dining_room
         attribute: brightness
         below: 45
-    condition:
+        trigger: numeric_state
+    conditions:
       - condition: state
         entity_id: group.people
         state: home
@@ -112,7 +132,7 @@ automation:
         state: "on"
       - condition: sun
         after: sunset
-    action:
+    actions:
       - choose:
           - conditions:
               - condition: or
@@ -153,11 +173,12 @@ automation:
                   entity_id: light.magicmirror_monitor
 
   - id: magicmirror_dim_at_sunset
-    alias: "📱 MagicMirror Dim at Sunset"
-    trigger:
-      platform: sun
-      event: sunset
-    condition:
+    alias: 📱 MagicMirror Dim at Sunset
+    mode: single
+    triggers:
+      - event: sunset
+        trigger: sun
+    conditions:
       - condition: state
         entity_id: group.people
         state: home
@@ -175,7 +196,7 @@ automation:
       - condition: state
         entity_id: schedule.magicmirror
         state: "on"
-    action:
+    actions:
       - action: light.turn_on
         target:
           entity_id: light.magicmirror_monitor
@@ -183,10 +204,10 @@ automation:
           brightness_pct: 20
 
   - id: magicmirror_on_off_presence
-    alias: "📱 MagicMirror On/Off Presence"
-    trigger:
-      - platform: state
-        entity_id: group.people
+    alias: 📱 MagicMirror On/Off Presence
+    mode: single
+    triggers:
+      - entity_id: group.people
         id: away
         to: not_home
         from: home
@@ -194,16 +215,17 @@ automation:
           hours: 0
           minutes: 5
           seconds: 0
-      - platform: state
-        entity_id: group.people
+        trigger: state
+      - entity_id: group.people
         id: home
         from: not_home
         to: home
-    condition:
+        trigger: state
+    conditions:
       - condition: state
         entity_id: schedule.magicmirror
         state: "on"
-    action:
+    actions:
       - choose:
           - conditions:
               - condition: trigger
@@ -212,6 +234,7 @@ automation:
               - action: light.turn_on
                 target:
                   entity_id: light.magicmirror_monitor
+                data: {}
           - conditions:
               - condition: trigger
                 id: away
@@ -219,3 +242,4 @@ automation:
               - action: light.turn_off
                 target:
                   entity_id: light.magicmirror_monitor
+                data: {}
