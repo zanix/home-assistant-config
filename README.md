@@ -739,9 +739,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>522 Automations</summary>
-
-> Keymaster automations are hidden
+<details><summary>146 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -809,7 +807,7 @@ Material Design 3 Theme for Home Assistant
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps on/off
-- 💡 School Departure Light Indicator 🚫
+- 💡 School Departure Light Indicator
 - 💡 Turn Lights On when Arrive
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
