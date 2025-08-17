@@ -1686,6 +1686,8 @@ streamline_templates:
           conditions:
             - entity: binary_sensor.[[computer]]_connected
               state: 'on'
+            - entity: button.[[computer]]_lock
+              state_not: unavailable
           card:
             type: custom:mushroom-template-card
             entity: button.[[computer]]_lock
@@ -1708,6 +1710,8 @@ streamline_templates:
           conditions:
             - entity: binary_sensor.[[computer]]_connected
               state: 'on'
+            - entity: button.[[computer]]_logoff
+              state_not: unavailable
           card:
             type: custom:mushroom-template-card
             entity: button.[[computer]]_logoff
@@ -1727,6 +1731,8 @@ streamline_templates:
           conditions:
             - entity: binary_sensor.[[computer]]_connected
               state: 'on'
+            - entity: button.[[computer]]_sleep
+              state_not: unavailable
           card:
             type: custom:mushroom-template-card
             entity: button.[[computer]]_sleep
@@ -1746,6 +1752,29 @@ streamline_templates:
           conditions:
             - entity: binary_sensor.[[computer]]_connected
               state: 'on'
+            - entity: button.[[computer]]_suspend
+              state_not: unavailable
+          card:
+            type: custom:mushroom-template-card
+            entity: button.[[computer]]_suspend
+            layout: vertical
+            icon: mdi:sleep
+            icon_color: '{{ is_state(entity, "on") | iif("green", "grey") }}'
+            tap_action:
+              action: none
+            hold_action:
+              action: call-service
+              service: button.press
+              target:
+                entity_id: button.[[computer]]_suspend
+            card_mod:
+              style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n}\n"
+        - type: conditional
+          conditions:
+            - entity: binary_sensor.[[computer]]_connected
+              state: 'on'
+            - entity: button.[[computer]]_restart
+              state_not: unavailable
           card:
             type: custom:mushroom-template-card
             entity: button.[[computer]]_restart
@@ -2723,7 +2752,7 @@ streamline_templates:
       tooltip:
         animation: true
         hour24: false
-  linux_updates_list:
+  arch_updates_list:
     card:
       type: markdown
       card_mod:
@@ -2739,6 +2768,21 @@ streamline_templates:
         \ = parts[3] -%}\n<tr><td><strong><a href=\"https://archlinux.org/packages/?q={{\
         \ name }}\">{{ name }}</a></strong></td><td>{{ previous_version }} -> {{ update_version\
         \ }}</td></tr> {% endfor %} </table>"
+  debian_updates_list:
+    card:
+      type: markdown
+      card_mod:
+        style:
+          .: "ha-card {\n  --ha-card-background: none;\n  --ha-card-border-width:\
+            \ 0;\n  --ha-card-box-shadow: none;\n}\n"
+          ha-markdown $: "td {\n  overflow-wrap: break-word;\n  word-break: break-all;\n\
+            }\n"
+      content: '### {{ state_attr("[[entity]]", "friendly_name") }}: {{ states("[[entity]]")
+        }}
+
+        <ul markdown="1"> {% for update in state_attr("[[entity]]", "updates") %}
+        <li><a href="https://packages.debian.org/search?keywords={{ update }}&searchon=names&suite=stable&section=all">{{
+        update }}</a></li> {% endfor %} </ul>'
   windows_updates_list:
     card:
       type: markdown
@@ -17403,7 +17447,7 @@ views:
                               title: System Updates
                               content:
                                 type: custom:streamline-card
-                                template: linux_updates_list
+                                template: arch_updates_list
                                 variables:
                                   - entity: sensor.erebus_system_updates_count
           - type: custom:button-card
@@ -17578,7 +17622,7 @@ views:
                               title: System Updates
                               content:
                                 type: custom:streamline-card
-                                template: linux_updates_list
+                                template: arch_updates_list
                                 variables:
                                   - entity: sensor.cartago_system_updates_count
           - type: custom:button-card
@@ -17927,7 +17971,7 @@ views:
             triggers_update:
               - sensor.magicmirror_cpu_usage
               - sensor.magicmirror_memory_usage
-              - sensor.magicmirror_cpu_thermal_1_temperature
+              - sensor.magicmirror_temperature_cpu_thermal
             custom_fields:
               stat1: "[[[\n  var entity_id = 'sensor.magicmirror_cpu_usage';\n  return\
                 \ `<ha-icon icon=\"mdi:cpu-64-bit\" style=\"width: 24px; height: 24px;\
@@ -17941,7 +17985,7 @@ views:
                 \ style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
                 \ !== 'unavailable' ? helpers.localize(states[entity_id], undefined,\
                 \ 0) : '-'}</span></span>`\n]]]"
-              stat3: "[[[\n  var entity_id = 'sensor.magicmirror_cpu_thermal_1_temperature';\n\
+              stat3: "[[[\n  var entity_id = 'sensor.magicmirror_temperature_cpu_thermal';\n\
                 \  return `<ha-icon icon=\"mdi:thermometer\" style=\"width: 24px;\
                 \ height: 24px; color: var(--green-color);\"></ha-icon>\n    <span>\
                 \ Temp: <span style=\"color: var(--text-color-sensor);\">${states[entity_id].state\
@@ -17957,7 +18001,35 @@ views:
                       \ var(--primary-background-color) !important;\n  --chip-box-shadow:\
                       \ none;\n  --chip-border-width: 0;\n  --chip-spacing: 0.1em;\n\
                       }\n"
-                  chips: []
+                  chips:
+                    - type: conditional
+                      conditions:
+                        - condition: numeric_state
+                          entity: sensor.magicmirror_system_updates_count
+                          above: 0
+                      chip:
+                        type: template
+                        entity: sensor.magicmirror_system_updates_count
+                        icon: mdi:arrow-up-bold-circle
+                        icon_color: red
+                        card_mod:
+                          style:
+                            .: "{% if int(states(config.entity), 0) > 0 %}\nha-card:after\
+                              \ {\n  content: \"{{ int(states(config.entity), 0) }}\"\
+                              ;\n  position: absolute;\n  color: var(--red-color);\n\
+                              \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n\
+                              \  font-size: 12px;\n}\n{% endif %}\n"
+                        tap_action:
+                          action: fire-dom-event
+                          browser_mod:
+                            service: browser_mod.popup
+                            data:
+                              title: System Updates
+                              content:
+                                type: custom:streamline-card
+                                template: debian_updates_list
+                                variables:
+                                  - entity: sensor.magicmirror_system_updates_count
             styles:
               grid:
                 - grid-template-columns: 1fr min-content
@@ -17977,7 +18049,7 @@ views:
                 - top: -20px
                 - border-radius: 50%
                 - background: '[[[ if (states["binary_sensor.magicmirror_connected"].state
-                    == "off") return "var(--red-color)"; else return "var(--green-color)"
+                    == "on") return "var(--green-color)"; else return "var(--red-color)"
                     ]]]'
               icon:
                 - width: 60px
@@ -18013,16 +18085,15 @@ views:
                   - align-self: start
                   - justify-self: start
                   - font-size: 14px
-                  - --text-color-sensor: '[[[ if (states[''sensor.magicmirror_cpu_thermal_1_temperature''].state
+                  - --text-color-sensor: '[[[ if (states[''sensor.magicmirror_temperature_cpu_thermal''].state
                       > 80) return "var(--red-color)"; ]]]'
                 info:
                   - align-self: end
                   - justify-self: start
                   - text-align: left
                 chips:
-                  - margin-top: 15px
                   - justify-content: end
-                  - align-self: start
+                  - align-self: end
           - type: custom:button-card
             layout_options:
               grid_columns: 2
@@ -18129,9 +18200,8 @@ views:
                   - justify-self: start
                   - text-align: left
                 chips:
-                  - margin-top: 15px
                   - justify-content: end
-                  - align-self: start
+                  - align-self: end
       - type: grid
         cards:
           - type: vertical-stack
@@ -18177,7 +18247,7 @@ views:
                           title: System Updates
                           content:
                             type: custom:streamline-card
-                            template: linux_updates_list
+                            template: arch_updates_list
                             variables:
                               - entity: sensor.erebus_system_updates_count
                     visibility:
@@ -18597,7 +18667,7 @@ views:
                           title: System Updates
                           content:
                             type: custom:streamline-card
-                            template: linux_updates_list
+                            template: arch_updates_list
                             variables:
                               - entity: sensor.cartago_system_updates_count
                     visibility:
@@ -19309,14 +19379,36 @@ views:
                 show_attribute: true
                 show_last_changed: false
                 attribute: brightness
-                margin_top_desktop: 30vh
+                margin_top_desktop: 20vh
                 width_desktop: 40vw
                 margin_top_mobile: calc(0px - var(--header-height))
+                styles: ".bubble-sub-button-2 > ha-icon {\n  color: var(--red-color)\
+                  \ !important;\n}"
                 sub_button:
                   - entity: light.magicmirror_monitor
                     name: More Info
                     icon: mdi:palette
                     state_background: false
+                  - entity: sensor.magicmirror_system_updates_count
+                    name: System Updates
+                    show_background: false
+                    show_state: true
+                    icon: mdi:arrow-up-bold-circle
+                    tap_action:
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          title: System Updates
+                          content:
+                            type: custom:streamline-card
+                            template: debian_updates_list
+                            variables:
+                              - entity: sensor.magicmirror_system_updates_count
+                    visibility:
+                      - condition: numeric_state
+                        entity: sensor.magicmirror_system_updates_count
+                        above: 0
                 tap_action:
                   action: toggle
                 double_tap_action:
@@ -19325,6 +19417,10 @@ views:
                   action: more-info
                 modules:
                   - default
+              - type: heading
+                icon: mdi:debian
+                heading: System
+                heading_style: title
               - type: horizontal-stack
                 cards:
                   - type: conditional
@@ -19355,7 +19451,7 @@ views:
                         state: 'on'
                     card:
                       type: custom:mushroom-template-card
-                      entity: button.magicmirror_reboot
+                      entity: button.magicmirror_restart
                       layout: vertical
                       primary: Reboot
                       icon: mdi:refresh
@@ -19367,7 +19463,7 @@ views:
                         action: call-service
                         service: button.press
                         target:
-                          entity_id: button.magicmirror_reboot
+                          entity_id: button.magicmirror_restart
                       card_mod:
                         style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
                           }\n"
@@ -19377,9 +19473,37 @@ views:
                         state: 'on'
                     card:
                       type: custom:mushroom-template-card
+                      entity: button.magicmirror_suspend
+                      layout: vertical
+                      primary: Suspend
+                      icon: mdi:sleep
+                      icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
+                        }}'
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: call-service
+                        service: button.press
+                        target:
+                          entity_id: button.magicmirror_suspend
+                      card_mod:
+                        style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
+                          }\n"
+              - type: heading
+                icon: mdi:mirror-rectangle
+                heading: MagicMirror
+                heading_style: title
+              - type: horizontal-stack
+                cards:
+                  - type: conditional
+                    conditions:
+                      - entity: binary_sensor.magicmirror_connected
+                        state: 'on'
+                    card:
+                      type: custom:mushroom-template-card
                       entity: button.magicmirror_refresh
                       layout: vertical
-                      primary: Refresh
+                      primary: Refresh Browser
                       icon: mdi:web-refresh
                       icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
                         }}'
@@ -19399,10 +19523,10 @@ views:
                         state: 'on'
                     card:
                       type: custom:mushroom-template-card
-                      entity: button.magicmirror_restart
+                      entity: button.magicmirror_bash_reload_docker
                       layout: vertical
-                      primary: Restart
-                      icon: mdi:table-refresh
+                      primary: Restart Docker
+                      icon: mdi:docker
                       icon_color: '{{ is_state(entity, "on") | iif("green", "grey")
                         }}'
                       tap_action:
@@ -19411,7 +19535,7 @@ views:
                         action: call-service
                         service: button.press
                         target:
-                          entity_id: button.magicmirror_restart
+                          entity_id: button.magicmirror_bash_reload_docker
                       card_mod:
                         style: "ha-card {\n  margin-left: auto;\n  margin-right: auto;\n\
                           }\n"
@@ -19419,8 +19543,14 @@ views:
                 template: uptime_card
                 variables:
                   - entity: binary_sensor.magicmirror_connected
-                  - name: MagicMirror Up-Time
+                  - name: System Up-Time
                   - icon: mdi:connection
+              - type: custom:streamline-card
+                template: uptime_card
+                variables:
+                  - entity: light.magicmirror_monitor
+                  - name: Monitor
+                  - icon: mdi:mirror-rectangle
               - type: grid
                 square: false
                 columns: 2
@@ -19442,7 +19572,7 @@ views:
                       name: CPU Temp
                       icon: mdi:thermometer-lines
                       entities:
-                        - entity: sensor.magicmirror_cpu_thermal_1_temperature
+                        - entity: sensor.magicmirror_temperature_cpu_thermal
                           name: Temperature
                           color: var(--pink-color)
                           show_state: true
@@ -19454,7 +19584,7 @@ views:
                       name: Storage
                       icon: mdi:sd
                       entities:
-                        - entity: sensor.magicmirror_disk_usage
+                        - entity: sensor.magicmirror_disk_dev_mmcblk0p1
                           name: Storage
                           color: var(--blue-color)
                           show_state: true

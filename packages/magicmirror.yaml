@@ -11,45 +11,46 @@
 #
 mqtt:
   binary_sensor:
-    name: MagicMirror Connected
-    state_topic: "magicmirror/diningroom/availability"
-    payload_on: "online"
-    payload_off: "offline"
+    - name: MagicMirror Connected
+      unique_id: magicmirror_connected
+      state_topic: 'lnxlink/magicmirror/lwt'
+      value_template: '{{ value }}'
+      payload_on: 'ON'
+      payload_off: 'OFF'
+      device_class: connectivity
+      qos: 0
 
   light:
-    name: MagicMirror Monitor
-    optimistic: false
-    availability_topic: "magicmirror/diningroom/availability"
-    state_topic: "magicmirror/diningroom/monitor/state"
-    payload_on: "ON"
-    payload_off: "OFF"
-    command_topic: "magicmirror/diningroom/monitor/set"
-    on_command_type: first
-    brightness_state_topic: "magicmirror/diningroom/monitor/brightness"
-    brightness_command_topic: "magicmirror/diningroom/monitor/brightness/set"
-    brightness_command_template: '{ "action": "BRIGHTNESS", "value": "{{ value }}" }'
-    brightness_scale: 200
-    color_mode_value_template: "color_temp"
-    color_temp_state_topic: "magicmirror/diningroom/monitor/temp"
-    color_temp_command_topic: "magicmirror/diningroom/monitor/temp/set"
-    color_temp_command_template: '{ "action": "TEMP", "value": "{{ value }}" }'
+    - name: MagicMirror Monitor
+      unique_id: magicmirror_monitor
+      icon: mdi:monitor
+      optimistic: false
+      availability_topic: "lnxlink/magicmirror/lwt"
+      payload_available: "ON"
+      payload_not_available: "OFF"
+
+      state_topic: "lnxlink/magicmirror/monitor_controls/bash/bash_monitor"
+      state_value_template: "{{ iif(value == 'ON', 'docker exec labwc wlr-randr --output HDMI-A-1 --on', 'docker exec labwc wlr-randr --output HDMI-A-1 --off') }}"
+      payload_on: "docker exec labwc wlr-randr --output HDMI-A-1 --on"
+      payload_off: "docker exec labwc wlr-randr --output HDMI-A-1 --off"
+      command_topic: "lnxlink/magicmirror/commands/bash/bash_monitor"
+
+      brightness_state_topic: "magicmirror/server/monitor/brightness"
+      brightness_command_topic: "magicmirror/server/monitor/brightness/set"
+      brightness_command_template: '{ "action": "BRIGHTNESS", "value": "{{ value }}" }'
+      brightness_scale: 200
+
+      color_mode_value_template: "color_temp"
+      color_temp_state_topic: "magicmirror/server/monitor/temp"
+      color_temp_command_topic: "magicmirror/server/monitor/temp/set"
+      color_temp_command_template: '{ "action": "TEMP", "value": "{{ value }}" }'
 
   button:
-    - name: MagicMirror Shutdown
-      availability_topic: "magicmirror/diningroom/availability"
-      command_topic: "magicmirror/diningroom/system"
-      payload_press: "SHUTDOWN"
-    - name: MagicMirror Reboot
-      availability_topic: "magicmirror/diningroom/availability"
-      command_topic: "magicmirror/diningroom/system"
-      payload_press: "REBOOT"
-    - name: MagicMirror Restart
-      availability_topic: "magicmirror/diningroom/availability"
-      command_topic: "magicmirror/diningroom/system"
-      payload_press: "RESTART"
     - name: MagicMirror Refresh
-      availability_topic: "magicmirror/diningroom/availability"
-      command_topic: "magicmirror/diningroom/system"
+      availability_topic: "lnxlink/magicmirror/lwt"
+      payload_available: "ON"
+      payload_not_available: "OFF"
+      command_topic: "magicmirror/server/system"
       payload_press: "REFRESH"
 
 automation:
