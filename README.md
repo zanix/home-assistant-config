@@ -739,7 +739,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>146 Automations</summary>
+<details><summary>149 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -757,6 +757,7 @@ Material Design 3 Theme for Home Assistant
 - ☑️ Cat Feeder Filled
 - ☑️ Close Garage Door
 - ☑️ Garbage Collection
+- ☑️ Guest Mode Check Handler
 - ☑️ Ignore Door Alerts
 - ☑️ Ignore Garage Door Alerts
 - ☑️ Ignore Window Alerts 🚫
@@ -775,7 +776,6 @@ Material Design 3 Theme for Home Assistant
 - ⚙️ Forward Reload Templates
 - ⚙️ Offline Devices
 - ⚙️ RAM Usage High
-- ⚙️ Reload Addons and Integrations
 - ⚙️ Scan Interval 🚫
 - ⚙️ Startup
 - ⚙️ Update Database Filesize Sensor
@@ -790,6 +790,7 @@ Material Design 3 Theme for Home Assistant
 - 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done
 - 🍽️ Dishwasher Timer
+- 🍽️ Microwave Finished 🚫
 - 🍽️ Oven Bake Timer Completed
 - 🍽️ Oven Cook Timer
 - 🍽️ Oven is Preheated
@@ -828,7 +829,8 @@ Material Design 3 Theme for Home Assistant
 - 💬 Garage Door Left Open and Leaving
 - 💬 Garage Door Opened and Away
 - 💬 Garbage Collection
-- 💬 Kona Battery Charge Low
+- 💬 Guest Mode Check Reminder
+- 💬 Kona Battery Low
 - 💬 Kona Failed Notification
 - 💬 Kona Fuel Level Low
 - 💬 Kona Remote Start Expired Notification
@@ -885,6 +887,7 @@ Material Design 3 Theme for Home Assistant
 - 🚦 Garage Light Switch Status
 - 🚦 Joshua Office Light Switch Status 🚫
 - 🚦 Outside Entry Light Switch Status
+- 🤖 Robot Vacuum Error
 - 🧺 Dryer Notifications
 - 🧺 Washer Notifications
 

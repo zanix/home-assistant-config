@@ -411,8 +411,8 @@
   alias: "\U0001F4E6 Mail Today"
   description: Notifies when mail will be delivered today
   triggers:
-  - entity_id: sensor.mail_usps_mail
-    trigger: state
+  - trigger: state
+    entity_id: sensor.mail_usps_mail
   conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
@@ -424,32 +424,40 @@
       title: Mail Today
       message: '{{ trigger.to_state.state }} {{ "item" if trigger.to_state.state ==
         "1" else "items" }} will be in the mailbox today.'
+      icon: local/icons/mailbox.png
+      icon_mdi: mdi:mail
+      color: '#2096f3'
+      group: Delivery
+      tag: delivery-mail
+      camera: camera.mail_usps_camera
+      image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr("camera.mail_usps_camera",
+        "entity_picture") }}'
   - parallel:
     - data:
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:mail
-        color: '#2096f3'
-        camera: camera.mail_usps_camera
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        camera: '{{ camera }}'
         url: lovelace/main
-        group: Delivery
-        tag: delivery-mail
+        group: '{{ group }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
-        camera: camera.mail_usps_camera
+        camera: '{{ camera }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/mailbox.png
-        camera: camera.mail_usps_camera
+        icon: '{{ icon }}'
+        camera: '{{ camera }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -458,11 +466,10 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: delivery-mail
-        image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr("camera.mail_usps_camera",
-          "entity_picture") }}'
-        large_icon: local/icons/mailbox.png
-        icon_color: '#2096f3'
+        tag: '{{ tag }}'
+        image: '{{ image }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
         duration: 15
       action: script.notify_tvoverlay
   mode: single
@@ -470,8 +477,8 @@
   alias: "\U0001F4E6 Packages Delivered"
   description: Notifies when packages have been delivered
   triggers:
-  - entity_id: sensor.mail_packages_delivered
-    trigger: state
+  - trigger: state
+    entity_id: sensor.mail_packages_delivered
   conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
@@ -483,16 +490,21 @@
       title: Package Delivery
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} delivered.'
+      icon: local/icons/package-variant.png
+      icon_mdi: mdi:package-variant
+      color: '#795548'
+      group: Delivery
+      tag: delivery-packages-delivered
   - parallel:
     - data:
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:package-variant
-        color: '#795548'
-        icon: local/icons/package-variant.png
-        group: Delivery
-        tag: delivery-packages-delivered
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
@@ -505,7 +517,7 @@
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/package-variant.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -514,38 +526,43 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: delivery-packages-delivered
-        large_icon: local/icons/package-variant.png
-        icon_color: '#795548'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
   mode: single
 - id: '1665682458887'
   alias: "\U0001F4E6 Packages Out for Delivery"
   description: Notifies when packages are out for delivery
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id: sensor.mail_packages_in_transit
-  condition:
+  conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
       | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
       trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
       in [\"unknown\", \"unavailable\"] }}"
-  action:
+  actions:
   - variables:
       title: Package Delivery
       message: '{{ trigger.to_state.state }} {{ "package is" if trigger.to_state.state
         == "1" else "packages are" }} out for delivery.'
+      icon: local/icons/package.png
+      icon_mdi: mdi:package
+      color: '#795548'
+      group: Delivery
+      tag: delivery-packages-pending
   - parallel:
     - data:
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:package
-        color: '#795548'
-        icon: local/icons/package.png
-        group: Delivery
-        tag: delivery-packages-pending
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
@@ -558,7 +575,7 @@
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/package.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -567,9 +584,9 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: delivery-packages-pending
-        large_icon: local/icons/package.png
-        icon_color: '#795548'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
   mode: single
 - id: '1665685653869'
@@ -669,18 +686,25 @@
   - alias: Set message and stop power tracking
     variables:
       title: Dryer
+      icon: local/icons/tumble-dryer.png
+      icon_mdi: mdi:tumble-dryer
+      color: '#ff9800'
+      tag: laundry-dryer
+      group: Laundry
       end_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'') |
         float }}'
       summary: The dryer is done!
-      message: '{%- set kwh = end_power_consumption | float - start_power_consumption
-        | float %} {%- set cost = (end_power_consumption | float - start_power_consumption
-        | float) * (states(''sensor.tariff_price'') | float) %} {%- set end_time =
-        now().timestamp() %} {%- set duration = (end_time - start_time) | int %} {%-
-        set hours = (duration // 3600) | int %} {%- set minutes = ((duration % 3600)
-        // 60) | int %} {%- set seconds = (duration % 60) | int -%} {{ summary }}
-        {{ ''\n'' }} Consumption: {{ kwh | round(2) }}kWh {{ ''\n'' }} Approx Cost:
-        {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration: {{ ''%02d'' | format(hours)
-        }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d'' | format(seconds) }}
+      kwh: '{{ end_power_consumption | float - start_power_consumption | float }}'
+      cost: '{{ kwh * (states(''sensor.tariff_price'') | float) }}'
+      end_time: '{{ now().timestamp() }}'
+      duration: '{{ (end_time - start_time) | int }}'
+      hours: '{{ (duration // 3600) | int }}'
+      minutes: '{{ ((duration % 3600) // 60) | int }}'
+      seconds: '{{ (duration % 60) | int }}'
+      message: '{{ summary }} {{ ''\n'' }} Consumption: {{ kwh | round(2) }}kWh {{
+        ''\n'' }} Approx Cost: {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration:
+        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
+        | format(seconds) }}
 
         '
   - alias: Set dryer active switch off
@@ -695,12 +719,12 @@
         title: '{{ title }}'
         subtitle: '{{ summary }} ⤵️'
         message: '{{ message }}'
-        notification_icon: mdi:tumble-dryer
-        color: '#ff9800'
-        icon: local/icons/tumble-dryer.png
-        group: Laundry
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: laundry-dryer
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
@@ -713,7 +737,7 @@
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/tumble-dryer.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -722,9 +746,9 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ summary }}'
-        tag: laundry-dryer
-        large_icon: local/icons/tumble-dryer.png
-        icon_color: '#ff9800'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
   mode: single
   max_exceeded: silent
@@ -756,21 +780,32 @@
       for:
         seconds: 30
       trigger: numeric_state
+    timeout:
+      hours: 2
+      minutes: 0
+      seconds: 0
   - alias: Set message and stop power tracking
     variables:
       title: Washer
+      icon: local/icons/washing-machine.png
+      icon_mdi: mdi:washing-machine
+      color: '#ff9800'
+      tag: laundry-washer
+      group: Laundry
       end_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'') |
         float }}'
       summary: The washer is done!
-      message: '{%- set kwh = end_power_consumption | float - start_power_consumption
-        | float %} {%- set cost = (end_power_consumption | float - start_power_consumption
-        | float) * (states(''sensor.tariff_price'') | float) %} {%- set end_time =
-        now().timestamp() %} {%- set duration = (end_time - start_time) | int %} {%-
-        set hours = (duration // 3600) | int %} {%- set minutes = ((duration % 3600)
-        // 60) | int %} {%- set seconds = (duration % 60) | int -%} {{ summary }}
-        {{ ''\n'' }} Consumption: {{ kwh | round(2) }}kWh {{ ''\n'' }} Approx Cost:
-        {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration: {{ ''%02d'' | format(hours)
-        }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d'' | format(seconds) }}
+      kwh: '{{ end_power_consumption | float - start_power_consumption | float }}'
+      cost: '{{ kwh * (states(''sensor.tariff_price'') | float) }}'
+      end_time: '{{ now().timestamp() }}'
+      duration: '{{ (end_time - start_time) | int }}'
+      hours: '{{ (duration // 3600) | int }}'
+      minutes: '{{ ((duration % 3600) // 60) | int }}'
+      seconds: '{{ (duration % 60) | int }}'
+      message: '{{ summary }} {{ ''\n'' }} Consumption: {{ kwh | round(2) }}kWh {{
+        ''\n'' }} Approx Cost: {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration:
+        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
+        | format(seconds) }}
 
         '
   - alias: Set washer active switch off
@@ -785,12 +820,12 @@
         title: '{{ title }}'
         subtitle: '{{ summary }} ⤵️'
         message: '{{ message }}'
-        notification_icon: mdi:washing-machine
-        color: '#ff9800'
-        icon: local/icons/washing-machine.png
-        group: Laundry
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: laundry-washer
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
@@ -803,7 +838,7 @@
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/washing-machine.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -812,9 +847,9 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ summary }}'
-        tag: laundry-washer
-        large_icon: local/icons/washing-machine.png
-        icon_color: '#ff9800'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
   mode: single
   max_exceeded: silent
@@ -1011,77 +1046,83 @@
 - id: '1665686891355'
   alias: "\U0001F512 Door Lock Jammed"
   description: ''
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id:
     - binary_sensor.front_door_lock_jammed
     to: 'on'
-  - platform: state
+  - trigger: state
     entity_id:
     - binary_sensor.garage_entry_lock_jammed
     to: 'on'
-  condition: []
-  action:
+  conditions: []
+  actions:
   - variables:
       lock: '{{ trigger.to_state.attributes.friendly_name | replace('' jammed'', '''')
         }}'
+      title: '{{ lock }} Issue'
       message: Check the {{ lock }}, something is wrong.
+      icon: local/icons/lock-smart.png
+      icon_mdi: mdi:lock-smart
+      color: '#03a9f4'
+      group: Security
   - parallel:
     - data:
         send_to: parents
-        title: '{{ lock }} Issue'
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:lock-smart
-        color: '#03a9f4'
-        icon: local/icons/lock-smart.png
-        group: Security
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: '{{ lock }} Issue'
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: '{{ lock }} Issue'
+        title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/lock-smart.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
         - media_player.living_room_googletv
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: '{{ lock }} Issue'
+        title: '{{ title }}'
         message: '{{ message }}'
-        large_icon: local/icons/lock-smart.png
-        icon_color: '#03a9f4'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
     - data:
-        media_player: media_player.living_room_speaker
+        media_player:
+        - media_player.living_room_speaker
         message: '{{ message }}'
       action: script.notify_speech
   mode: single
 - id: '1665686913548'
   alias: "\U0001F512 Lock Doors when Away"
   description: ''
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id: group.people
     from: home
     to: not_home
     for:
       minutes: 5
-  condition:
+  conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
   - condition: state
     entity_id: lock.all_locks
     state: unlocked
-  action:
+  actions:
   - if:
     - condition: state
       entity_id: schedule.front_door_auto_lock
@@ -1114,14 +1155,21 @@
       target:
         entity_id: lock.garage_entry
       action: lock.lock
-  - data:
-      send_to: parents
+  - variables:
       title: Door Lock
       message: The doors have been locked since no one is home.
-      notification_icon: mdi:lock
-      color: '#03a9f4'
       icon: local/icons/lock-smart.png
+      icon_mdi: mdi:lock
+      color: '#03a9f4'
       group: Security
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
     action: script.notify_mobile
   mode: single
 - id: '1665687778783'
@@ -1134,40 +1182,47 @@
     trigger: state
   conditions: []
   actions:
+  - variables:
+      title: Dishwasher
+      message: The dishwasher is done!
+      icon: local/icons/dishwasher.png
+      mdi_icon: mdi:dishwasher
+      color: '#2196f3'
+      tag: dishwasher
   - parallel:
     - data:
         send_to: parents
-        title: Dishwasher
-        message: The dishwasher is done!
-        notification_icon: mdi:dishwasher
-        color: '#2196f3'
-        icon: local/icons/dishwasher.png
-        tag: dishwasher
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ mdi_icon }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
         interruption_level: critical
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Dishwasher
-        message: The dishwasher is done!
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Dishwasher
-        message: The dishwasher is done!
-        icon: local/icons/dishwasher.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
         - media_player.living_room_googletv
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Dishwasher
-        message: The dishwasher is done!
-        tag: dishwasher
-        large_icon: local/icons/dishwasher.png
-        icon_color: '#2196f3'
+        title: '{{ title }}'
+        message: '{{ message }}'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
     alias: Send a notification to each device
   mode: single
@@ -1175,9 +1230,8 @@
 - id: '1665687879665'
   alias: "\U0001F4AC Door Closed"
   description: Clears notification when doors are closed
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.front_door_contact
     - binary_sensor.sliding_door_contact
     - binary_sensor.garage_entry_contact
@@ -1187,8 +1241,9 @@
     to: 'off'
     for:
       seconds: 30
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - data:
       send_to: parents
       notification_type: clear_notification
@@ -1208,13 +1263,12 @@
         notification_type: clear_notification
         tag: door-alerts-ignored
       action: script.notify_mobile
-  mode: single
+  mode: parallel
 - id: '1665687917160'
   alias: "\U0001F4AC Door Left Open"
   description: Sends notification when a door is left open
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.front_door_contact
     - binary_sensor.sliding_door_contact
     - binary_sensor.garage_entry_contact
@@ -1224,11 +1278,12 @@
     to: 'on'
     for:
       minutes: 5
-  condition:
+    trigger: state
+  conditions:
   - condition: state
     entity_id: input_boolean.door_open_alerts
     state: 'on'
-  action:
+  actions:
   - repeat:
       until:
       - or:
@@ -1236,24 +1291,30 @@
           entity_id: input_boolean.door_open_alerts
           state: 'off'
         - condition: template
-          value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+          value_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
       sequence:
       - variables:
-          name: '{{ trigger.to_state.name }}'
-          message: The {{ name }} has been open for {{ trigger.to_state.last_changed
-            | relative_time }}.
+          title: '{{ trigger.to_state.name }}'
+          message: The {{ title }} has been open for {{ trigger.to_state.last_changed  |
+            relative_time }}.
+          icon: local/icons/door-open.png
+          icon_mdi: mdi:door-open
+          color: '#00bcd4'
+          tag: door-{{ trigger.to_state.object_id }}
+          group: Security
+          url: lovelace/security
       - parallel:
         - data:
             send_to: parents
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            notification_icon: mdi:door-open
-            color: '#00bcd4'
-            icon: local/icons/door-open.png
-            group: Security
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            group: '{{ group }}'
             interruption_level: critical
-            tag: door-{{ trigger.to_state.object_id }}
-            url: lovelace/security
+            tag: '{{ tag }}'
+            url: '{{ url }}'
             actions:
             - action: ignore_door_alerts
               title: Ignore Alerts
@@ -1261,7 +1322,7 @@
         - data:
             entity:
             - media_player.nasya
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
             actions:
             - action: ignore_door_alerts
@@ -1270,9 +1331,9 @@
         - data:
             computer:
             - erebus
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            icon: local/icons/door-open.png
+            icon: '{{ icon }}'
             importance: critical
             actions:
             - Ignore Door Alerts
@@ -1282,11 +1343,11 @@
             - media_player.living_room_googletv
             - media_player.shield_family_room
             - media_player.shield_main_bedroom
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            tag: door-{{ trigger.to_state.object_id }}
-            large_icon: local/icons/door-open.png
-            icon_color: '#00bcd4'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -1295,20 +1356,20 @@
             - media_player.office_speaker
             message: '{{ message }}'
           action: script.notify_speech
-      - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+      - wait_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
         timeout: 00:05:00
   mode: parallel
 - id: '1665687973181'
   alias: "\U0001F4AC Door Left Open and Leaving"
   description: Sends notification if a door is open and everybody leaves
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id: group.people
     from: home
     to: not_home
     for:
       minutes: 1
-  condition:
+  conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
@@ -1318,22 +1379,30 @@
   - condition: state
     entity_id: input_boolean.door_open_alerts
     state: 'on'
-  action:
-  - data:
-      send_to: parents
+  actions:
+  - variables:
       title: Door Left Open
+      icon: local/icons/door-open.png
+      icon_mdi: mdi:door-open
+      color: '#00bcd4'
+      group: Security
+      url: lovelace/security
       message: "{%- from \"util.jinja\" import get_friendly_names -%} {%- set doors
         = expand(\"binary_sensor.all_doors\") | selectattr(\"state\", \"==\", \"on\")
         | map(attribute=\"entity_id\") | list -%} {%- if doors | length == 1 -%}\n
         \ The {{ get_friendly_names(doors) }} was open when you left!\n{%- else -%}\n
         \ The {{ get_friendly_names(doors) }} were open when you left!\n{%- endif
         -%}"
-      notification_icon: mdi:door-open
-      color: '#00bcd4'
-      icon: local/icons/door-open.png
-      group: Security
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
       interruption_level: critical
-      url: lovelace/security
+      url: '{{ url }}'
       actions:
       - action: ignore_door_alerts
         title: Ignore
@@ -1342,8 +1411,8 @@
 - id: '1665687990814'
   alias: "\U0001F4AC Door Opened and Away"
   description: Sends notification if a door is open when people are away
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id:
     - binary_sensor.front_door_contact
     - binary_sensor.sliding_door_contact
@@ -1352,7 +1421,7 @@
     - binary_sensor.cold_storage_contact_contact
     from: 'off'
     to: 'on'
-  condition:
+  conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
@@ -1362,19 +1431,28 @@
   - condition: state
     entity_id: input_boolean.door_open_alerts
     state: 'on'
-  action:
-  - data:
-      send_to: parents
+  actions:
+  - variables:
       title: Door Opened
       message: The {{ trigger.to_state.attributes.friendly_name }} opened and no one
         is home.
-      notification_icon: mdi:door-open
-      color: '#00bcd4'
       icon: local/icons/door-open.png
-      group: Security
-      interruption_level: critical
+      icon_mdi: mdi:door-open
+      color: '#00bcd4'
       tag: door-{{ trigger.to_state.object_id }}
+      group: Security
       url: lovelace/security
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      interruption_level: critical
+      tag: '{{ tag }}'
+      url: '{{ url }}'
       actions:
       - action: ignore_door_alerts
         title: Ignore
@@ -1701,21 +1779,21 @@
 - id: '1665689284289'
   alias: "\U0001F4AC Garage Door Left Open"
   description: Sends notification if the garage door is left open
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id:
     - cover.garage_door
     to: open
     for:
       minutes: 30
-  condition:
+  conditions:
   - condition: state
     entity_id: binary_sensor.garage_multisensor_motion_detection
     state: 'off'
   - condition: state
     entity_id: input_boolean.garage_door_open_alerts
     state: 'on'
-  action:
+  actions:
   - repeat:
       until:
       - or:
@@ -1723,47 +1801,50 @@
           entity_id: input_boolean.garage_door_open_alerts
           state: 'off'
         - condition: template
-          value_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
+          value_template: '{{ is_state(trigger.to_state.entity_id, ''closed'') }}'
       sequence:
       - variables:
-          name: '{{ trigger.to_state.name }}'
-          message: The {{ name }} has been open for {{ trigger.to_state.last_changed
+          title: '{{ trigger.to_state.name }}'
+          message: The {{ title }} has been open for {{ trigger.to_state.last_changed
             | relative_time }}.
+          icon: local/icons/garage-open.png
+          icon_mdi: mdi:garage-open
+          color: '#ff9800'
+          tag: garage-door
+          group: Security
+          url: lovelace/security
+          notification_actions:
+          - action: ignore_garage_door_alerts
+            title: Ignore Alerts
+          - action: close_garage_door
+            title: Close Door
       - parallel:
         - data:
             send_to: parents
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            notification_icon: mdi:garage-open
-            color: '#ff9800'
-            icon: local/icons/garage-open.png
-            group: Security
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            group: '{{ group }}'
             interruption_level: critical
-            tag: garage-door
-            url: lovelace/security
-            actions:
-            - action: ignore_garage_door_alerts
-              title: Ignore Alerts
-            - action: close_garage_door
-              title: Close Door
+            tag: '{{ tag }}'
+            url: '{{ url }}'
+            actions: '{{ notification_actions }}'
           action: script.notify_mobile
         - data:
             entity:
             - media_player.nasya
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            actions:
-            - action: ignore_garage_door_alerts
-              title: Ignore Alerts
-            - action: close_garage_door
-              title: Close Door
+            actions: '{{ notification_actions }}'
           action: script.notify_hass_agent
         - data:
             computer:
             - erebus
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            icon: local/icons/garage-open.png
+            icon: '{{ icon }}'
             importance: critical
             actions:
             - Ignore Alerts
@@ -1774,11 +1855,11 @@
             - media_player.living_room_googletv
             - media_player.shield_family_room
             - media_player.shield_main_bedroom
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            tag: garage-door
-            large_icon: local/icons/garage-open.png
-            icon_color: '#ff9800'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -1787,20 +1868,20 @@
             - media_player.office_speaker
             message: '{{ message }}'
           action: script.notify_speech
-      - wait_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
+      - wait_template: '{{ is_state(trigger.to_state.entity_id, ''closed'') }}'
         timeout: 00:30:00
   mode: single
 - id: '1665689297011'
   alias: "\U0001F4AC Garage Door Left Open and Leaving"
   description: Sends notification if a door is open and everybody leaves
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id: group.people
     from: home
     to: not_home
     for:
       minutes: 1
-  condition:
+  conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
@@ -1810,33 +1891,43 @@
   - condition: state
     entity_id: input_boolean.garage_door_open_alerts
     state: 'on'
-  action:
-  - data:
-      send_to: parents
+  actions:
+  - variables:
       title: Garage Door Open
       message: The Garage Door was left open when you left! Close it!
-      notification_icon: mdi:garage-open
-      color: '#ff9800'
       icon: local/icons/garage-open.png
-      group: Security
-      interruption_level: critical
+      icon_mdi: mdi:garage-open
+      color: '#ff9800'
       tag: garage-door
+      group: Security
       url: lovelace/security
-      actions:
+      notification_actions:
       - action: ignore_garage_door_alerts
         title: Ignore Alerts
       - action: close_garage_door
         title: Close
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      interruption_level: critical
+      tag: '{{ tag }}'
+      url: '{{ url }}'
+      actions: '{{ notification_actions }}'
     action: script.notify_mobile
   mode: single
 - id: '1665689312993'
   alias: "\U0001F4AC Garage Door Opened and Away"
-  description: Sends notification if the garage door is open people are away
-  trigger:
-  - platform: state
+  description: Sends notification if the garage door opens while people are away
+  triggers:
+  - trigger: state
     entity_id: cover.garage_door
     to: open
-  condition:
+  conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
@@ -1846,23 +1937,33 @@
   - condition: state
     entity_id: input_boolean.garage_door_open_alerts
     state: 'on'
-  action:
-  - data:
-      send_to: parents
+  actions:
+  - variables:
       title: Garage Door Open
       message: The Garage Door opened and no one is home.
-      notification_icon: mdi:garage-open
-      color: '#ff9800'
       icon: local/icons/garage-open.png
-      group: Security
-      interruption_level: critical
+      icon_mdi: mdi:garage-open
+      color: '#ff9800'
       tag: garage-door
+      group: Security
       url: lovelace/security
-      actions:
+      notification_actions:
       - action: ignore_garage_door_alerts
         title: Ignore Alerts
       - action: close_garage_door
         title: Close
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      interruption_level: critical
+      tag: '{{ tag }}'
+      url: '{{ url }}'
+      actions: '{{ notification_actions }}'
     action: script.notify_mobile
   mode: single
 - id: '1691033044070'
@@ -1970,7 +2071,14 @@
   conditions: []
   actions:
   - variables:
-      message: "The Ascent didn't start.{{ \" \" }} {% if 'doorNotLocked' in trigger.event.data.message
+      title: Ascent Remote Start
+      icon: local/icons/subaru.png
+      icon_mdi: mdi:car-connected
+      color: '#0e4bef'
+      tag: ascent
+      group: Ascent
+      url: lovelace#ascent
+      message: "The Ascent didn't start.{{ \" \" }} {%- if 'doorNotLocked' in trigger.event.data.message
         -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.message
         -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.message
         -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow' in
@@ -1984,14 +2092,14 @@
   - parallel:
     - data:
         send_to: parents
-        title: Ascent Remote Start
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#0e4bef'
-        icon: local/icons/subaru.png
-        group: Ascent
-        tag: ascent
-        url: lovelace#ascent
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
+        url: '{{ url }}'
         actions:
         - action: ascent_remote_start_again
           title: Retry
@@ -2008,11 +2116,11 @@
             - media_player.living_room_googletv
             - media_player.shield_family_room
             - media_player.shield_main_bedroom
-            title: Ascent Remote Start
+            title: '{{ title }}'
             message: '{{ message }}'
-            tag: ascent
-            large_icon: local/icons/subaru.png
-            icon_color: '#0e4bef'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -2063,98 +2171,114 @@
 - id: '1665695892233'
   alias: "\U0001F5A8️ Low Toner"
   description: Sends a notification when the printer toner is low
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.canon_mf743c_black_toner
+  triggers:
+  - entity_id: sensor.canon_mf743c_black_toner
     below: 7
-  - platform: numeric_state
-    entity_id: sensor.canon_mf743c_cyan_toner
+    trigger: numeric_state
+  - entity_id: sensor.canon_mf743c_cyan_toner
     below: 7
-  - platform: numeric_state
-    entity_id: sensor.canon_mf743c_magenta_toner
+    trigger: numeric_state
+  - entity_id: sensor.canon_mf743c_magenta_toner
     below: 7
-  - platform: numeric_state
-    entity_id: sensor.canon_mf743c_yellow_toner
+    trigger: numeric_state
+  - entity_id: sensor.canon_mf743c_yellow_toner
     below: 7
-  condition:
+    trigger: numeric_state
+  conditions:
   - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] }}'
-  action:
+    value_template: '{{ not trigger.to_state.state in [''unknown'', ''unavailable'']
+      }}'
+  actions:
   - variables:
+      title: Printer Alert
       message: The {{ trigger.to_state.attributes.friendly_name }} is low
+      icon: local/icons/printer-alert.png
+      icon_mdi: mdi:printer-alert
+      color: '#ff5722'
+      tag: printer-toner-low
+      group: System
+      url: dashboard-system/overview
   - parallel:
     - data:
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_id: printer-toner-low
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         send_to: joshua
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:printer-alert
-        color: '#ff5722'
-        icon: local/icons/printer-alert.png
-        group: System
-        tag: printer-toner-low
-        url: dashboard-system/overview
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/printer-alert.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1665695909455'
   alias: "\U0001F5A8️ Out of Paper"
   description: Sends a notification when the printer runs out of paper
-  trigger:
-  - platform: state
-    entity_id: sensor.canon_mf743c_paper_tray
+  triggers:
+  - entity_id: sensor.canon_mf743c_paper_tray
     to: empty
-  condition:
+    trigger: state
+  conditions:
   - condition: template
-    value_template: '{{ not trigger.to_state.state in ["unknown", "unavailable"] }}'
-  action:
+    value_template: '{{ not trigger.to_state.state in [''unknown'', ''unavailable'']
+      }}'
+  actions:
   - variables:
+      title: Printer Alert
       message: The {{ trigger.to_state.attributes.friendly_name }} is out of paper
+      icon: local/icons/printer-alert.png
+      icon_mdi: mdi:printer-alert
+      color: '#ff5722'
+      tag: printer-paper-low
+      group: System
+      url: dashboard-system/overview
   - parallel:
     - data:
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_id: printer-paper-low
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         send_to: joshua
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:printer-alert
-        color: '#ff5722'
-        icon: local/icons/printer-alert.png
-        group: System
-        tag: printer-paper-low
-        url: dashboard-system/overview
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Printer Alert
+        title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/printer-alert.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1665695943529'
@@ -2190,21 +2314,31 @@
     entity_id: binary_sensor.quest_in_use
     state: 'off'
   actions:
-  - data:
-      send_to: joshua
+  - variables:
       title: Quest is Charged
       message: The Quest is charged, you should unplug it
-      notification_icon: mdi:battery-charging-high
+      icon: local/icons/battery-charging-high.png
+      icon_mdi: mdi:battery-charging-high
       color: '#4caf50'
-      icon: local/icons/battery-charging-high.png
-    action: script.notify_mobile
-  - data:
-      computer:
-      - erebus
-      title: Quest is Charged
-      message: The Quest is charged, you should unplug it
-      icon: local/icons/battery-charging-high.png
-    action: script.notify_lnxlink
+      tag: quest
+      group: Quest
+  - parallel:
+    - data:
+        send_to: joshua
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
+      action: script.notify_lnxlink
   mode: single
 - id: '1665696049425'
   alias: "\U0001F5A5️ [Quest] Interactive"
@@ -2615,6 +2749,17 @@
     action: browser_mod.notification
   - delay:
       seconds: 60
+  - parallel:
+    - metadata: {}
+      data:
+        addon: 45df7312_zigbee2mqtt
+      action: hassio.addon_restart
+    - data: {}
+      target:
+        entity_id:
+        - input_boolean.washer_status
+        - input_boolean.dryer_status
+      action: input_boolean.turn_off
   - data: {}
     target:
       device_id:
@@ -2622,19 +2767,14 @@
       - fd4ff1a9970156bb319e4d85d4450657
       - 49d046eb766685131c0c5deb9f0d2250
     action: homeassistant.reload_config_entry
+  - delay:
+      seconds: 30
   - data:
       entity:
       - media_player.ardena
       - media_player.athos
       - media_player.nasya
     action: script.hass_publish_sensors
-  - parallel:
-    - data: {}
-      target:
-        entity_id:
-        - input_boolean.washer_status
-        - input_boolean.dryer_status
-      action: input_boolean.turn_off
   - data:
       message: Startup automation complete...
     action: browser_mod.notification
@@ -2710,7 +2850,8 @@
   description: Shuts off the water main and sends a notification when a water leak
     is detected
   triggers:
-  - entity_id:
+  - trigger: state
+    entity_id:
     - binary_sensor.basement_bathroom_sink_leak_water_leak
     - binary_sensor.basement_bathroom_toilet_water_leak_detected
     - binary_sensor.bathroom_sink_leak_water_leak
@@ -2725,7 +2866,6 @@
     - binary_sensor.water_heater_leak_water_leak_detected
     - binary_sensor.water_main_valve_water_leak_detected
     to: 'on'
-    trigger: state
   conditions: []
   actions:
   - variables:
@@ -2736,6 +2876,14 @@
         moisture', replace='', ignorecase=true)\n  | trim\n}}"
       message: There is a water leak in the {{ location }} and the water main has
         been shut off.
+      icon: local/icons/water-alert.png
+      icon_mdi: mdi:water-alert
+      color: '#009688'
+      group: Water Leak
+      tag: water-leak
+      actions_water:
+      - action: turn_on_water
+        title: Turn Water Main On
   - parallel:
     - target:
         entity_id: valve.water_main_valve
@@ -2744,7 +2892,7 @@
     - data:
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_id: water-leak
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         entity:
@@ -2753,9 +2901,9 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: water-leak
-        large_icon: local/icons/water-alert.png
-        icon_color: '#009688'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
     - data:
         media_player:
@@ -2765,44 +2913,40 @@
         message: '{{ message }}'
       action: script.notify_speech
   - wait_for_trigger:
-    - entity_id:
+    - trigger: state
+      entity_id:
       - valve.water_main_valve
       to: closed
-      trigger: state
     timeout: 00:00:30
   - data:
       send_to: parents
       title: '{{ title }}'
       message: '{{ message }}'
-      notification_icon: mdi:water-alert
-      color: '#009688'
-      icon: local/icons/water-alert.png
-      group: Water Leak
-      tag: water-leak
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      tag: '{{ tag }}'
       interruption_level: critical
       channel: Water Leak
       importance: high
       url: lovelace/utility
-      actions:
-      - action: turn_on_water
-        title: Turn Water Main On
+      actions: '{{ actions_water }}'
     action: script.notify_mobile
   - data:
       entity:
       - media_player.nasya
       title: '{{ title }}'
       message: '{{ message }}'
-      actions:
-      - action: turn_on_water
-        title: Turn Water Main On
+      actions: '{{ actions_water }}'
     action: script.notify_hass_agent
   - data:
       computer:
       - erebus
       title: '{{ title }}'
       message: '{{ message }}'
-      tag: water-leak
-      icon: local/icons/water-alert.png
+      tag: '{{ tag }}'
+      icon: '{{ icon }}'
       importance: critical
       actions:
       - Turn Water Main On
@@ -2813,56 +2957,69 @@
 - id: '1665697614552'
   alias: "\U0001F4A7 Softener Salt Level Low"
   description: Sends a notification when the water softener salt level is low
-  trigger:
-  - platform: numeric_state
+  triggers:
+  - trigger: numeric_state
     entity_id:
     - sensor.water_softener_salt_monitor_salt_level
     below: 15
     for:
       hours: 24
-  condition: []
-  action:
+  conditions: []
+  actions:
+  - variables:
+      title: Water Softener
+      message: The salt level in the water softener is low.
+      icon: local/icons/arrow-expand-vertical.png
+      icon_mdi: mdi:arrow-expand-vertical
+      color: '#03a9f4'
+      tag: water-softener
   - parallel:
     - data:
-        title: Water Softener
-        message: The salt level in the water softener is low.
-        notification_id: water-softener
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         send_to: parents
-        title: Water Softener
-        message: The salt level in the water softener is low.
-        notification_icon: mdi:arrow-expand-vertical
-        color: '#03a9f4'
-        icon: local/icons/arrow-expand-vertical.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Water Softener
-        message: The salt level in the water softener is low.
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Water Softener
-        message: The salt level in the water softener is low.
-        icon: local/icons/arrow-expand-vertical.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1665697635082'
   alias: "\U0001F4A7 Shut-Off Valve Overheated"
   description: Sends a notification if the water shut-off valve overheats
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id:
     - binary_sensor.water_main_valve_overheat_detected
     to: 'on'
-  condition: []
-  action:
+  conditions: []
+  actions:
   - variables:
       title: Water Valve Overheated
       message: The water main shut-off valve has overheated.
+      icon: local/icons/water-alert.png
+      icon_mdi: mdi:water-alert
+      color: '#009688'
+      group: Water Leak
+      tag: water-valve-overheat
   - parallel:
     - data:
         title: '{{ title }}'
@@ -2873,12 +3030,12 @@
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:water-alert
-        color: '#009688'
-        icon: local/icons/water-alert.png
-        group: Water Leak
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: water-valve-overheat
+        tag: '{{ tag }}'
         url: lovelace/utility
       action: script.notify_mobile
     - data:
@@ -2892,7 +3049,7 @@
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/water-alert.png
+        icon: '{{ icon }}'
         importance: critical
       action: script.notify_lnxlink
     - data:
@@ -2902,9 +3059,9 @@
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: water-valve-overheat
-        large_icon: local/icons/water-alert.png
-        icon_color: '#009688'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
     - data:
         media_player:
@@ -3094,18 +3251,18 @@
 - id: '1665700388935'
   alias: "\U0001F4AC Window Left Open"
   description: Sends notification if a window is left open
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
     entity_id: binary_sensor.front_door_contact
     from: 'off'
     to: 'on'
     for:
       minutes: 30
-  condition:
+  conditions:
   - condition: state
     entity_id: input_boolean.window_open_alerts
     state: 'on'
-  action:
+  actions:
   - repeat:
       until:
       - or:
@@ -3113,43 +3270,48 @@
           entity_id: input_boolean.window_open_alerts
           state: 'off'
         - condition: template
-          value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+          value_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
       sequence:
       - variables:
-          name: '{{ trigger.to_state.name }}'
-          message: The {{ name }} has been open for {{ trigger.to_state.last_changed
+          title: '{{ trigger.to_state.name }}'
+          message: The {{ title }} has been open for {{ trigger.to_state.last_changed
             | relative_time }}.
+          icon: local/icons/window-open.png
+          icon_mdi: mdi:window-open
+          color: '#9c27b0'
+          tag: window-{{ trigger.to_state.object_id }}
+          group: Security
+          url: lovelace/security
+          notification_actions:
+          - action: ignore_window_alerts
+            title: Ignore Alerts
       - parallel:
         - data:
             send_to: parents
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            notification_icon: mdi:window-open
-            color: '#9c27b0'
-            icon: local/icons/window-open.png
-            group: Security
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            group: '{{ group }}'
             interruption_level: critical
-            tag: window-{{ trigger.to_state.object_id }}
-            url: lovelace/security
-            actions:
-            - action: ignore_window_alerts
-              title: Ignore Alerts
+            tag: '{{ tag }}'
+            url: '{{ url }}'
+            actions: '{{ notification_actions }}'
           action: script.notify_mobile
         - data:
             entity:
             - media_player.nasya
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            actions:
-            - action: ignore_window_alerts
-              title: Ignore Alerts
+            actions: '{{ notification_actions }}'
           action: script.notify_hass_agent
         - data:
             computer:
             - erebus
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            icon: local/icons/window-open.png
+            icon: '{{ icon }}'
             importance: critical
             actions:
             - Ignore Window Alerts
@@ -3159,11 +3321,11 @@
             - media_player.living_room_googletv
             - media_player.shield_family_room
             - media_player.shield_main_bedroom
-            title: '{{ name }}'
+            title: '{{ title }}'
             message: '{{ message }}'
-            tag: window-{{ trigger.to_state.object_id }}
-            large_icon: local/icons/window-open.png
-            icon_color: '#9c27b0'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -3172,7 +3334,7 @@
             - media_player.office_speaker
             message: '{{ message }}'
           action: script.notify_speech
-      - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+      - wait_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
         timeout: 00:05:00
   mode: parallel
 - id: '1665723372482'
@@ -3634,99 +3796,108 @@
 - id: '1669666972148'
   alias: "\U0001F310 UniFi WAN Status"
   description: Sends notifications when the network status changes
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - sensor.ucg_ultra_state
     to: Connected
     from: Disconnected
     id: connected
-  - platform: state
-    entity_id:
+    trigger: state
+  - entity_id:
     - sensor.ucg_ultra_state
     to: Disconnected
     from:
     id: disconnected
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
+  - variables:
+      title: Network
+      icon: local/icons/web.png
+      icon_mdi: mdi:web
+      color: '#e91e63'
+      tag: unifi-www
+      group: Network
+      tv_entities:
+      - media_player.living_room_googletv
+      - media_player.shield_family_room
+      - media_player.shield_main_bedroom
   - choose:
     - conditions:
       - condition: trigger
         id:
         - connected
       sequence:
+      - variables:
+          message: The Internet is back up
       - parallel:
         - data:
             send_to: parents
-            title: Network
-            message: The Internet is back up
-            notification_icon: mdi:web
-            color: '#e91e63'
-            icon: local/icons/web.png
-            tag: unifi-www
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            tag: '{{ tag }}'
           action: script.notify_mobile
         - data:
-            entity:
-            - media_player.living_room_googletv
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
-            title: Network
-            message: The Internet is back up
-            tag: unifi-www
-            large_icon: local/icons/web.png
-            icon_color: '#e91e63'
+            entity: '{{ tv_entities }}'
+            title: '{{ title }}'
+            message: '{{ message }}'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             entity:
             - media_player.nasya
-            title: Network
-            message: The Internet is back up
+            title: '{{ title }}'
+            message: '{{ message }}'
           action: script.notify_hass_agent
         - data:
             computer:
             - erebus
-            title: Network
-            message: The Internet is back up
-            icon: local/icons/web.png
+            title: '{{ title }}'
+            message: '{{ message }}'
+            icon: '{{ icon }}'
           action: script.notify_lnxlink
     - conditions:
       - condition: trigger
         id:
         - disconnected
       sequence:
+      - variables:
+          message: The Internet is down
       - parallel:
         - data:
             send_to: parents
-            title: Network
-            message: The Internet is down
-            notification_icon: mdi:web
-            color: '#e91e63'
-            icon: local/icons/web.png
-            tag: unifi-www
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            tag: '{{ tag }}'
           action: script.notify_mobile
         - data:
-            entity:
-            - media_player.living_room_googletv
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
-            title: Network
-            message: The Internet is down
-            tag: unifi-www
-            large_icon: local/icons/web.png
-            icon_color: '#e91e63'
+            entity: '{{ tv_entities }}'
+            title: '{{ title }}'
+            message: '{{ message }}'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             entity:
             - media_player.nasya
-            title: Network
-            message: The Internet is down
+            title: '{{ title }}'
+            message: '{{ message }}'
           action: script.notify_hass_agent
         - data:
             computer:
             - erebus
-            title: Network
-            message: The Internet is down
-            icon: local/icons/web.png
+            title: '{{ title }}'
+            message: '{{ message }}'
+            icon: '{{ icon }}'
           action: script.notify_lnxlink
     default: []
   mode: restart
@@ -3743,6 +3914,12 @@
   - variables:
       title: Ascent Remote Start
       message: The Ascent started and is running.
+      icon: local/icons/subaru.png
+      icon_mdi: mdi:car-connected
+      color: '#114be6'
+      tag: ascent
+      group: Ascent
+      url: lovelace#ascent
   - data: {}
     target:
       entity_id: timer.ascent_remote_start
@@ -3752,13 +3929,13 @@
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#114be6'
-        icon: local/icons/subaru.png
-        group: Ascent
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: ascent
-        url: lovelace#ascent
+        tag: '{{ tag }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -3774,9 +3951,9 @@
             - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: ascent
-            large_icon: local/icons/subaru.png
-            icon_color: '#114be6'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -3810,13 +3987,13 @@
   alias: "\U0001F5FA️ Leaving Zone"
   description: Sends a notification when someone is leaving a zone.
   triggers:
-  - entity_id:
+  - trigger: state
+    entity_id:
     - person.joshua
     - person.amy
     to: not_home
     for:
       minutes: 1
-    trigger: state
   conditions:
   - condition: template
     value_template: "{{\n  not trigger.from_state.state in [\"home\", \"not_home\",
@@ -3828,32 +4005,36 @@
   - variables:
       zone_name: '{{ trigger.from_state.state }}'
       name: '{{ trigger.to_state.attributes.friendly_name }}'
-      person: '{{ {"Amy": "Mom", "Joshua": "Dad"}[name] }}'
+      person: '{{ {''Amy'': ''Mom'', ''Joshua'': ''Dad''}[name] }}'
       title: '{{ name }} Leaving {{ zone_name }}'
       message: '{%- from "message.jinja" import leaving_zone -%} {{ leaving_zone(person,
         zone_name) }}'
+      icon: local/icons/map-marker-account.png
+      icon_mdi: mdi:map-marker-account
+      color: '#ff5722'
+      group: Presence
   - parallel:
     - data:
         send_to: parents
-        title: '{{ name }} Leaving {{ zone_name }}'
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:map-marker-account
-        color: '#ff5722'
-        icon: local/icons/map-marker-account.png
-        group: Presence
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: '{{ name }} Leaving {{ zone_name }}'
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: '{{ name }} Leaving {{ zone_name }}'
+        title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/map-marker-account.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         media_player:
@@ -3884,18 +4065,24 @@
   - variables:
       title: Ascent Remote Start
       message: The Ascent shut off and is no longer running.
+      icon: local/icons/subaru.png
+      icon_mdi: mdi:car-connected
+      color: '#114be6'
+      tag: ascent
+      group: Ascent
+      url: lovelace#ascent
   - parallel:
     - data:
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#114be6'
-        icon: local/icons/subaru.png
-        group: Ascent
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: ascent
-        url: lovelace#ascent
+        tag: '{{ tag }}'
+        url: '{{ url }}'
         actions:
         - action: ascent_remote_start_again
           title: Start Again
@@ -3914,9 +4101,9 @@
             - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: ascent
-            large_icon: local/icons/subaru.png
-            icon_color: '#114be6'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -4061,6 +4248,11 @@
       action: silence-doorbell
     id: silence
     trigger: event
+  - topic: lnxlink/+/monitor_controls/notify/button_press
+    payload: Silence Doorbell
+    value_template: '{{ value_json.button }}'
+    trigger: mqtt
+    id: silence
   actions:
   - variables:
       camera: doorbell
@@ -4379,12 +4571,12 @@
   alias: "\U0001F514 Frigate Doorbell - Event Handler"
   description: Sends notifications when an object is detected on the Doorbell camera
   triggers:
-  -     event_type: custom_frigate_doorbell_object
+  - event_type: custom_frigate_doorbell_object
     id: initial
-  trigger: event
--     event_type: custom_frigate_doorbell_object_update
+    trigger: event
+  - event_type: custom_frigate_doorbell_object_update
     id: update
-trigger: event
+    trigger: event
   conditions: []
   actions:
   - variables:
@@ -4444,6 +4636,8 @@ trigger: event
         message: '{{ message }}'
         image: '{{ image }}?format=android'
         importance: critical
+        actions:
+        - Silence Doorbell
       action: script.notify_lnxlink
     - data:
         entity:
@@ -4652,43 +4846,53 @@ trigger: event
   conditions: []
   actions:
   - variables:
+      title: Ascent Fuel Low
+      icon: local/icons/subaru.png
+      icon_mdi: mdi:car-connected
+      color: '#0e4bef'
+      group: Ascent
+      url: lovelace#ascent
+      tag: ascent-fuel
       summary: The fuel level in the Ascent is low (<30 miles).
-      message: "{%- set level = states('sensor.ascent_fuel_level') | float(100) -%}
-        {%- set capacity = 19.3 -%} {%- set gal_remain = (100 - level) / 100 * capacity
-        -%} {% set stations = {\n  \"Costco\": states('sensor.costco_regular_gas')
-        | float(3),\n  \"Maverik\": (states('sensor.maverik_regular_gas') | float(3))
-        - 0.1\n} %} Current gas prices. {% for name, price in stations.items() %}\n
-        \ {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain
+      fuel_level: '{{ states(''sensor.ascent_fuel_level'') | float(100) }}'
+      tank_capacity: 19.3
+      gallons_remaining: '{{ (100 - fuel_level) / 100 * tank_capacity }}'
+      stations:
+        Costco: '{{ states(''sensor.costco_regular_gas'') | float(3) }}'
+        Maverik: '{{ (states(''sensor.maverik_regular_gas'') | float(3)) - 0.1 }}'
+      message: "Current gas prices. {%- for name, price in stations.items() %}\n  {{
+        name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gallons_remaining
         * price) }}\n{%- endfor %}\n"
   - parallel:
     - data:
-        title: Ascent Fuel Low
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_id: ascent-fuel
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         send_to: parents
-        title: Ascent Fuel Low
+        title: '{{ title }}'
         subtitle: '{{ summary }} ⤵️'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#0e4bef'
-        icon: local/icons/subaru.png
-        group: Ascent
-        url: lovelace#ascent
+        notification_icon: '{{ icon_mdi }}'
+        tag: '{{ tag }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Ascent Fuel Low
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Ascent Fuel Low
+        title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/subaru.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1704594011311'
@@ -4852,26 +5056,34 @@ trigger: event
     trigger: numeric_state
   conditions: []
   actions:
+  - variables:
+      title: Cat Feeder
+      message: The Cat feeder is nearly empty
+      icon: local/icons/paw.png
+      icon_mdi: mdi:paw
+      color: '#ff9800'
+      tag: cat-feeder
+      group: Cat Feeder
   - parallel:
     - metadata: {}
       data:
         send_to: parents
-        title: Cat Feeder
-        message: The Cat feeder is nearly empty
-        notification_icon: mdi:paw
-        color: '#FF9800'
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
         actions:
         - action: cat_feeder_full
           title: Feeder Full
-        tag: cat-feeder
       action: script.notify_mobile
     - metadata: {}
       data:
         entity:
         - media_player.nasya
-        title: Cat Feeder
-        message: The Cat feeder is nearly empty
+        title: '{{ title }}'
+        message: '{{ message }}'
         actions:
         - action: cat_feeder_full
           title: Feeder Full
@@ -4879,9 +5091,9 @@ trigger: event
     - data:
         computer:
         - erebus
-        title: Cat Feeder
-        message: The Cat feeder is nearly empty
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
         actions:
         - Feeder Full
       action: script.notify_lnxlink
@@ -4939,37 +5151,45 @@ trigger: event
 - id: '1709917613454'
   alias: "\U0001F431 Cat Feeder Error"
   description: Sends a notification when the Cat feeder has an error
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.cat_feeder_error
     to: 'on'
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
+  - variables:
+      title: Cat Feeder Error
+      message: The Cat feeder is stuck
+      icon: local/icons/paw.png
+      icon_mdi: mdi:paw
+      color: '#ff0000'
+      tag: cat-feeder
+      group: Cat Feeder
   - parallel:
     - metadata: {}
       data:
         send_to: parents
-        title: Cat Feeder Error
-        message: The Cat feeder is stuck
-        notification_icon: mdi:paw
-        color: '#FF0000'
-        icon: local/icons/paw.png
-        tag: cat-feeder
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - metadata: {}
       data:
         entity:
         - media_player.nasya
-        title: Cat Feeder Error
-        message: The Cat feeder is stuck
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Cat Feeder Error
-        message: The Cat feeder is stuck
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1710955585340'
@@ -5108,28 +5328,6 @@ trigger: event
           color: Red
         action: script.inovelli_blue_led
   mode: restart
-- id: '1711138066935'
-  alias: ⚙️ Reload Addons and Integrations
-  description: Reload AddOns and Integrations since they don't work after Home Assistant
-    is restarted.
-  triggers:
-  - event: start
-    trigger: homeassistant
-  conditions: []
-  actions:
-  - metadata: {}
-    data:
-      addon: 45df7312_zigbee2mqtt
-    action: hassio.addon_restart
-  - metadata: {}
-    data: {}
-    action: homeassistant.reload_config_entry
-    target:
-      device_id:
-      - 1dee4aa37e70d346348224829cd7c84f
-      - fd4ff1a9970156bb319e4d85d4450657
-      - 49d046eb766685131c0c5deb9f0d2250
-  mode: single
 - id: '1713385133443'
   alias: ⚙️ Offline Devices
   description: Sends a notification when a device is offline
@@ -5192,35 +5390,44 @@ trigger: event
   - variables:
       progress: '{{ states("sensor.bambu_p1s_print_progress") }}%'
       title: 3D Print Status {{ progress }}
-      message: "{% set end_time = states('sensor.bambu_p1s_end_time') | as_timestamp
-        %} {% set time_to_end = states('sensor.bambu_p1s_remaining_time') | int %}
-        {% set hours = (time_to_end / 60) | int %} {% set minutes = (time_to_end %
-        60) %} {% if end_time | timestamp_custom('%Y-%m-%d') == now().date() | string
-        %}\n  {% set time = end_time | timestamp_custom('%-I:%M %p') %}\n{% else %}\n
-        \ {% set time = end_time | timestamp_custom('%m/%d %-I:%M %p') %}\n{% endif
-        %} {{ states(\"sensor.bambu_p1s_task_name\")\n  | replace(\".3mf\", \"\")\n
-        \ | replace(\".stl\", \"\")\n  | replace(\".gcode\", \"\")\n}} will finish
-        in {{ '{:01}h {:01}m'.format(hours, minutes) }} at {{ time }}"
+      icon: local/icons/bambu-lab.png
+      icon_mdi: mdi:printer-3d
+      color: '#16c344'
+      tag: 3d-printer
+      group: 3D Printer
+      url: lovelace/bambu
+      camera: camera.bambu_p1s_camera
+      model: "{{ states(\"sensor.bambu_p1s_task_name\")\n  | replace(\".3mf\", \"\")\n
+        \ | replace(\".stl\", \"\")\n  | replace(\".gcode\", \"\")\n}}"
+      end_time: '{{ states(''sensor.bambu_p1s_end_time'') | as_timestamp }}'
+      time_remaining: '{% set time_to_end = states(''sensor.bambu_p1s_remaining_time'')
+        | int %} {% set hours = (time_to_end / 60) | int %} {% set minutes = time_to_end
+        % 60 %} {{ ''{:01}h {:01}m''.format(hours, minutes) }}'
+      finish_time: "{% if end_time | timestamp_custom('%Y-%m-%d') == now().date()
+        | string %}\n  {{ end_time | timestamp_custom('%-I:%M %p') }}\n{% else %}\n
+        \ {{ end_time | timestamp_custom('%m/%d %-I:%M %p') }}\n{% endif %}"
+      message: '{{ model }} will finish in {{ time_remaining }} at {{ finish_time
+        }}'
   - parallel:
     - data:
         send_to: joshua
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:printer-3d
-        color: '#16c344'
-        icon: local/icons/bambu-lab.png
-        camera: camera.bambu_p1s_camera
-        group: 3d-printer
-        tag: 3d-printer
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        camera: '{{ camera }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
         interruption_level: critical
-        url: lovelace/bambu
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         computer:
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/bambu-lab.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1713983450425'
@@ -5243,30 +5450,40 @@ trigger: event
       "offline"] }}'
   actions:
   - variables:
+      title: 3D Print {{ trigger.id }}
+      icon: local/icons/bambu-lab.png
+      icon_mdi: mdi:printer-3d
+      color: '#16c344'
+      tag: 3d-printer
+      group: 3D Printer
+      url: lovelace/bambu
+      camera: camera.bambu_p1s_camera
       time: '{{ as_timestamp(now()) | timestamp_custom("%-m/%-d/%Y %-I:%M %p") }}'
       model: '{{ states("sensor.bambu_p1s_task_name") | replace(".3mf","") | replace(".stl",
         "") | replace(".gcode","") }}'
       message: '{{ model }} {{ trigger.id | lower }} printing at {{ time }}'
+      cooled_message: Bed has cooled down. {{ message }}
+      cooled_message_short: Bed has cooled down, you can remove {{ model }}
   - parallel:
     - data:
         send_to: joshua
-        title: 3D Print {{ trigger.id }}
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:printer-3d
-        color: '#16c344'
-        icon: local/icons/bambu-lab.png
-        camera: camera.bambu_p1s_camera
-        group: 3d-printer
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        camera: '{{ camera }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: 3d-printer
-        url: lovelace/bambu
+        tag: '{{ tag }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         computer:
         - erebus
-        title: 3D Print {{ trigger.id }}
+        title: '{{ title }}'
         message: '{{ message }}'
-        camera: camera.bambu_p1s_camera
+        camera: '{{ camera }}'
       action: script.notify_lnxlink
   - alias: Wait for bed to cool
     wait_for_trigger:
@@ -5282,23 +5499,23 @@ trigger: event
   - parallel:
     - data:
         send_to: joshua
-        title: 3D Print {{ trigger.id }}
-        message: Bed has cooled down. {{ message }}
-        notification_icon: mdi:printer-3d
-        color: '#16c344'
-        icon: local/icons/bambu-lab.png
-        camera: camera.bambu_p1s_camera
-        group: 3d-printer
+        title: '{{ title }}'
+        message: '{{ cooled_message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        camera: '{{ camera }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: 3d-printer
-        url: lovelace/bambu
+        tag: '{{ tag }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         computer:
         - erebus
-        title: 3D Print {{ trigger.id }}
-        message: Bed has cooled down, you can remove {{ model }}
-        icon: local/icons/bambu-lab.png
+        title: '{{ title }}'
+        message: '{{ cooled_message_short }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   - metadata: {}
     data: {}
@@ -5319,29 +5536,35 @@ trigger: event
   - variables:
       title: P1S Issue Detected - {{ trigger.event.data.code }}
       message: '{{ trigger.event.data.error }}'
+      icon: local/icons/bambu-lab.png
+      icon_mdi: mdi:printer-3d
+      color: '#16c344'
+      group: 3D Printer Error
+      url: lovelace/bambu
+      wiki_url: '{{ trigger.event.data.url }}'
   - parallel:
     - data:
         send_to: joshua
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:printer-3d
-        color: '#16c344'
-        icon: local/icons/bambu-lab.png
-        group: 3d-printer-error
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
         sticky: true
-        url: lovelace/bambu
+        url: '{{ url }}'
         actions:
         - action: URI
           title: Bambu Lab Wiki
-          uri: '{{ trigger.event.data.url }}'
+          uri: '{{ wiki_url }}'
       action: script.notify_mobile
     - data:
         computer:
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/bambu-lab.png
+        icon: '{{ icon }}'
         importance: critical
       action: script.notify_lnxlink
   mode: single
@@ -5472,40 +5695,47 @@ trigger: event
     trigger: state
   conditions: []
   actions:
+  - variables:
+      title: Oven
+      message: The oven is preheated!
+      icon: local/icons/stove.png
+      color: '#f44336'
+      tag: oven
+      icon_mdi: mdi:stove
   - parallel:
     - data:
         send_to: parents
-        title: Oven
-        message: The oven is preheated!
-        notification_icon: mdi:stove
-        color: '#f44336'
-        icon: local/icons/stove.png
-        tag: oven
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
         interruption_level: critical
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Oven
-        message: The oven is preheated!
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Oven
-        message: The oven is preheated!
-        icon: local/icons/stove.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
         - media_player.living_room_googletv
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Oven
-        message: The oven is preheated!
-        tag: oven
-        large_icon: local/icons/stove.png
-        icon_color: '#f44336'
+        title: '{{ title }}'
+        message: '{{ message }}'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
       action: script.notify_tvoverlay
   mode: single
 - id: '1723166117553'
@@ -5521,41 +5751,48 @@ trigger: event
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
       none] }}'
   actions:
+  - variables:
+      title: Oven Timer
+      message: The oven kitchen timer has finished
+      icon: local/icons/stove.png
+      color: '#f44336'
+      tag: oven
+      icon_mdi: mdi:stove
   - parallel:
-    - data:
+    - action: script.notify_mobile
+      data:
         send_to: parents
-        title: Oven Timer
-        message: The oven kitchen timer has finished
-        notification_icon: mdi:stove
-        color: '#f44336'
-        icon: local/icons/stove.png
-        tag: oven
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
         interruption_level: critical
-      action: script.notify_mobile
-    - data:
+    - action: script.notify_hass_agent
+      data:
         entity:
         - media_player.nasya
-        title: Oven
-        message: The oven kitchen timer has finished
-      action: script.notify_hass_agent
-    - data:
+        title: '{{ title }}'
+        message: '{{ message }}'
+    - action: script.notify_lnxlink
+      data:
         computer:
         - erebus
-        title: Oven
-        message: The oven kitchen timer has finished
-        icon: local/icons/stove.png
-      action: script.notify_lnxlink
-    - data:
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
+    - action: script.notify_tvoverlay
+      data:
         entity:
         - media_player.living_room_googletv
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
-        title: Oven
-        message: The oven kitchen timer has finished
-        tag: oven
-        large_icon: local/icons/stove.png
-        icon_color: '#f44336'
-      action: script.notify_tvoverlay
+        title: '{{ title }}'
+        message: '{{ message }}'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
   mode: single
 - id: '1725260717620'
   alias: "\U0001F6A6 Amy Office Light Switch Status"
@@ -5603,88 +5840,108 @@ trigger: event
   alias: "\U0001F4AC Kona Fuel Level Low"
   description: Sends a notification when the Kona's fuel level is low
   triggers:
-  - entity_id:
+  - trigger: numeric_state
+    entity_id:
     - sensor.kona_fuel_driving_range
     below: 31
-    trigger: numeric_state
   conditions: []
   actions:
   - variables:
+      title: Kona Fuel Low
+      icon: local/icons/hyundai.png
+      icon_mdi: mdi:car-connected
+      color: '#0e4bef'
+      group: Kona
+      url: lovelace#kona
+      tag: kona-fuel
       summary: The fuel level in the Kona is low (<30 miles).
-      message: "{%- set level = states('sensor.kona_fuel_level') | float(100) -%}
-        {%- set capacity = 13.2 -%} {%- set gal_remain = (100 - level) / 100 * capacity
-        -%} {% set stations = {\n  \"Costco\": states('sensor.costco_regular_gas')
-        | float(3),\n  \"Maverik\": (states('sensor.maverik_midgrade_gas') | float(3))
-        - 0.1\n} %} Current gas prices. {% for name, price in stations.items() %}\n
-        \ {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gal_remain
+      fuel_level: '{{ states(''sensor.kona_fuel_level'') | float(100) }}'
+      tank_capacity: 13.2
+      gallons_remaining: '{{ (100 - fuel_level) / 100 * tank_capacity }}'
+      stations:
+        Costco: '{{ states(''sensor.costco_regular_gas'') | float(3) }}'
+        Maverik: '{{ (states(''sensor.maverik_midgrade_gas'') | float(3)) - 0.1 }}'
+      message: "Current gas prices. {%- for name, price in stations.items() %}\n  {{
+        name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gallons_remaining
         * price) }}\n{%- endfor %}\n"
   - parallel:
     - data:
-        title: Kona Fuel Low
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_id: kona-fuel
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         send_to: parents
-        title: Kona Fuel Low
+        title: '{{ title }}'
         subtitle: '{{ summary }} ⤵️'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#0e4bef'
-        icon: local/icons/hyundai.png
-        group: Kona
-        url: lovelace#kona
+        notification_icon: '{{ icon_mdi }}'
+        tag: '{{ tag }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
-        title: Kona Fuel Low
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Kona Fuel Low
+        title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/hyundai.png
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1725463478923'
-  alias: "\U0001F4AC Kona Battery Charge Low"
+  alias: "\U0001F4AC Kona Battery Low"
   description: Sends a notification when the Kona's battery charge is low
   triggers:
-  - entity_id:
+  - trigger: numeric_state
+    entity_id:
     - sensor.kona_car_battery_level
     below: 41
     for:
       hours: 0
       minutes: 30
       seconds: 0
-    trigger: numeric_state
   conditions: []
   actions:
+  - variables:
+      title: Kona Battery Low
+      message: The battery charge in the Kona is low.
+      icon: local/icons/hyundai.png
+      icon_mdi: mdi:car-connected
+      color: '#0e4bef'
+      group: Kona
+      url: lovelace#kona
+      tag: kona-battery
   - parallel:
     - data:
-        title: Kona Battery Low
-        message: The battery charge in the Kona is low.
-        notification_id: kona-battery
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_id: '{{ tag }}'
       action: persistent_notification.create
     - data:
         send_to: joshua
-        title: Kona Battery Low
-        message: The battery charge in the Kona is low.
-        notification_icon: mdi:car-connected
-        color: '#0e4bef'
-        icon: local/icons/hyundai.png
-        group: Kona
-        url: lovelace#kona
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        tag: '{{ tag }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - data:
         computer:
         - erebus
-        title: Kona Battery Low
-        message: The battery charge in the Kona is low.
-        icon: local/icons/hyundai.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1725915027719'
@@ -5714,21 +5971,21 @@ trigger: event
     trigger: state
   conditions:
   - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
-      none, null] and not trigger.to_state.state in ["unknown", "unavailable", none,
-      null] }}'
+    value_template: '{{ not trigger.from_state.state in [''unknown'', ''unavailable'',
+      none, null] and not trigger.to_state.state in [''unknown'', ''unavailable'',
+      none, null] }}'
   actions:
   - variables:
-      season: '{{ iif(is_state("binary_sensor.tariff_summer", "on"), "summer", "winter")
-        }}'
-      map: "{{ {\n    \"summer_tier_1\": [\"under 800\", \"summer tier 1\"],\n    \"summer_tier_2\":
-        [\"over 800\", \"summer tier 2\"],\n    \"summer_tier_3\": [\"over 2000\",
-        \"summer tier 3\"],\n    \"winter_tier_1\": [\"under 800\", \"winter tier
-        1\"],\n    \"winter_tier_2\": [\"over 800\", \"winter tier 2\"],\n    \"winter_tier_3\":
-        [\"over 2000\", \"winter tier 3\"],\n} }}\n"
-      tariff: "{% if trigger.id == \"season\" and has_value(\"select.monthly_energy\")
-        %}\n  {{ season }}_tier_{{ states(\"select.monthly_energy\").split(\"_\")[2]
-        }}\n{% else %}\n  {{ season }}_{{ trigger.id }}\n{% endif %}\n"
+      season: '{{ iif(is_state(''binary_sensor.tariff_summer'', ''on''), ''summer'',
+        ''winter'') }}'
+      map: "{{ {\n    'summer_tier_1': ['under 800', 'summer tier 1'],\n    'summer_tier_2':
+        ['over 800', 'summer tier 2'],\n    'summer_tier_3': ['over 2000', 'summer
+        tier 3'],\n    'winter_tier_1': ['under 800', 'winter tier 1'],\n    'winter_tier_2':
+        ['over 800', 'winter tier 2'],\n    'winter_tier_3': ['over 2000', 'winter
+        tier 3'],\n} }}\n"
+      tariff: "{% if trigger.id == 'season' and has_value('select.monthly_energy')
+        %}\n  {{ season }}_tier_{{ states('select.monthly_energy').split('_')[2] }}\n{%
+        else %}\n  {{ season }}_{{ trigger.id }}\n{% endif %}\n"
       message: Power usage is {{ map[tariff][0] }} kWh. Now charing {{ map[tariff][1]
         }} rates.
   - action: select.select_option
@@ -5826,41 +6083,52 @@ trigger: event
   mode: single
 - id: '1728402022145'
   alias: ⏯ Living Room Sound Night Mode
-  description: Changes the soundbar night mode
+  description: Changes the soundbar night mode based on schedule and bed presence
+    with 5-minute delay
   triggers:
   - trigger: state
-    entity_id:
-    - binary_sensor.samsung_soundbar_night_mode
+    entity_id: binary_sensor.samsung_soundbar_night_mode
     to: 'on'
     id: 'on'
   - trigger: state
-    entity_id:
-    - binary_sensor.samsung_soundbar_night_mode
+    entity_id: binary_sensor.samsung_soundbar_night_mode
     to: 'off'
     id: 'off'
+  - trigger: state
+    entity_id:
+    - binary_sensor.bed_presence_f56148_bed_occupied_either
+    to: 'on'
+    id: 'on'
+    for:
+      minutes: 5
+  - trigger: state
+    entity_id:
+    - binary_sensor.bed_presence_f56148_bed_occupied_either
+    to: 'off'
+    id: 'off'
+    for:
+      minutes: 5
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
-        id:
-        - 'on'
+        id: 'on'
       sequence:
       - action: input_boolean.turn_on
-        metadata: {}
-        data: {}
         target:
           entity_id: input_boolean.samsung_soundbar_night_mode
+        metadata: {}
+        data: {}
     - conditions:
       - condition: trigger
-        id:
-        - 'off'
+        id: 'off'
       sequence:
       - action: input_boolean.turn_off
-        metadata: {}
-        data: {}
         target:
           entity_id: input_boolean.samsung_soundbar_night_mode
+        metadata: {}
+        data: {}
   mode: restart
 - id: '1728622562146'
   alias: "\U0001F4A1 School Departure Light Indicator"
@@ -5939,29 +6207,36 @@ trigger: event
       none] }}'
     alias: Check for offline device
   actions:
+  - variables:
+      title: Oven Timer
+      message: The oven bake timer has finished
+      icon: local/icons/stove.png
+      color: '#f44336'
+      tag: oven
+      icon_mdi: mdi:stove
   - parallel:
     - data:
         send_to: parents
-        title: Oven Timer
-        message: The oven bake timer has finished
-        notification_icon: mdi:stove
-        color: '#f44336'
-        icon: local/icons/stove.png
-        tag: oven
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
         interruption_level: critical
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
         title: Oven
-        message: The oven bake timer has finished
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
         title: Oven
-        message: The oven bake timer has finished
-        icon: local/icons/stove.png
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -5969,12 +6244,12 @@ trigger: event
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: Oven
-        message: The oven bake timer has finished
-        tag: oven
-        large_icon: local/icons/stove.png
-        icon_color: '#f44336'
+        message: '{{ message }}'
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
+        icon_color: '{{ color }}'
+      alias: Send a notification to each device
       action: script.notify_tvoverlay
-    alias: Send a notification to each device
   mode: single
 - id: '1734069674224'
   alias: "\U0001F431 Cat Litterbox Full"
@@ -5986,30 +6261,38 @@ trigger: event
     to: 'on'
   conditions: []
   actions:
+  - variables:
+      title: Litterbox
+      message: The Litterbox bin is full
+      icon: local/icons/paw.png
+      icon_mdi: mdi:paw
+      color: '#ff9800'
+      tag: litterbox
+      group: Litterbox
   - parallel:
     - metadata: {}
       data:
         send_to: parents
-        title: Litterbox
-        message: The Litterbox bin is full
-        notification_icon: mdi:paw
-        color: '#FF9800'
-        icon: local/icons/paw.png
-        tag: litterbox
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - metadata: {}
       data:
         entity:
         - media_player.nasya
-        title: Litterbox
-        message: The Litterbox bin is full
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Litterbox
-        message: The Litterbox bin is full
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1734069969369'
@@ -6022,29 +6305,38 @@ trigger: event
     to: insufficient
   conditions: []
   actions:
+  - variables:
+      title: Litterbox
+      message: The Litterbox litter is low
+      icon: local/icons/paw.png
+      icon_mdi: mdi:paw
+      color: '#ff9800'
+      tag: litterbox
+      group: Litterbox
   - parallel:
     - metadata: {}
       data:
         send_to: parents
-        title: Litterbox
-        message: The Litterbox litter is low
-        notification_icon: mdi:paw
-        color: '#FF9800'
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - metadata: {}
       data:
         entity:
         - media_player.nasya
-        title: Litterbox
-        message: The Litterbox litter is low
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Litterbox
-        message: The Litterbox litter is low
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1734643266064'
@@ -6072,24 +6364,47 @@ trigger: event
     - unknown
   conditions: []
   actions:
+  - variables:
+      time_remaining: '{{ states(''sensor.ge_dishwasher_time_remaining'') | float(0)
+        }}'
   - choose:
     - conditions:
       - condition: state
         entity_id: sensor.ge_dishwasher_operating_mode
         state: Cycle Active
+      - condition: template
+        value_template: '{{ not is_state(''timer.ge_dishwasher'', ''active'') }}'
       sequence:
       - action: timer.start
         metadata: {}
         data:
-          duration: '{{ states(''sensor.ge_dishwasher_time_remaining'') }}:00'
+          duration: '{{ time_remaining }}:00'
         target:
           entity_id: timer.ge_dishwasher
     - conditions:
       - condition: state
         entity_id: sensor.ge_dishwasher_operating_mode
+        state: Cycle Active
+      - condition: template
+        value_template: '{{ is_state(''timer.ge_dishwasher'', ''active'') }}'
+      - condition: template
+        value_template: '{% set timer_remaining = (as_timestamp(states.timer.ge_dishwasher.attributes.finishes_at)
+          - as_timestamp(now())) / 60 | round(0) %} {% set time_diff = time_remaining
+          - timer_remaining | abs %} {{ time_diff > 5 }}
+
+          '
+      sequence:
+      - target:
+          entity_id: timer.ge_dishwasher
+        data:
+          duration: '{{ time_remaining }}:00'
+        action: timer.start
+    - conditions:
+      - condition: state
+        entity_id: sensor.ge_dishwasher_operating_mode
         state: Cycle Complete
       sequence:
-      - action: timer.cancel
+      - action: timer.finish
         metadata: {}
         data: {}
         target:
@@ -6127,7 +6442,7 @@ trigger: event
         value_template: '{{ trigger.from_state.state != "Off" and trigger.to_state.state
           == "Off" }}'
       sequence:
-      - action: timer.cancel
+      - action: timer.finish
         metadata: {}
         data: {}
         target:
@@ -6165,7 +6480,7 @@ trigger: event
         value_template: '{{ trigger.from_state.state != "Off" and trigger.to_state.state
           == "Off" }}'
       sequence:
-      - action: timer.cancel
+      - action: timer.finish
         metadata: {}
         data: {}
         target:
@@ -6205,34 +6520,41 @@ trigger: event
     value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
       null] and not trigger.to_state.state in ["unknown", "unavailable", null] }}'
   actions:
+  - variables:
+      title: Network
+      message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
+        }}
+      icon: local/icons/web.png
+      icon_mdi: mdi:web
+      color: '#e91e63'
+      tag: unifi-ip
+      group: Network
   - parallel:
     - data:
         send_to: joshua
-        title: Network
-        message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
-          }}
-        notification_icon: mdi:web
-        color: '#e91e63'
-        icon: local/icons/web.png
-        tag: unifi-ip
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         computer:
         - erebus
         - cartago
-        title: Network
-        message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
-          }}
-        icon: local/icons/web.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: restart
 - id: '1741307009888'
   alias: "\U0001F4E6 Mail Delivered"
   description: Notifies when mail has been delivered
   triggers:
-  - entity_id:
+  - trigger: state
+    entity_id:
     - binary_sensor.usps_mail_delivered
-    trigger: state
     to: 'on'
   conditions:
   - condition: template
@@ -6242,32 +6564,40 @@ trigger: event
   - variables:
       title: Mail Delivery
       message: Mail is delivered
+      icon: local/icons/mailbox-up.png
+      icon_mdi: mdi:mailbox-up
+      color: '#2096f3'
+      group: Delivery
+      tag: delivery-mail
+      camera: camera.mail_usps_camera
+      image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr("camera.mail_usps_camera",
+        "entity_picture") }}'
   - parallel:
     - data:
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:mailbox-up
-        color: '#2096f3'
-        camera: camera.mail_usps_camera
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        camera: '{{ camera }}'
         url: lovelace/main
-        group: Delivery
-        tag: delivery-mail
+        group: '{{ group }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
-        camera: camera.mail_usps_camera
+        camera: '{{ camera }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/mailbox-up.png
-        camera: camera.mail_usps_camera
+        icon: '{{ icon }}'
+        camera: '{{ camera }}'
       action: script.notify_lnxlink
     - data:
         entity:
@@ -6276,11 +6606,10 @@ trigger: event
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: delivery-mail
-        image: '{{ state_attr("sensor.hass_config", "internal_url") }}{{ state_attr("camera.mail_usps_camera",
-          "entity_picture") }}'
-        large_icon: mdi:mail
-        icon_color: '#2096f3'
+        tag: '{{ tag }}'
+        image: '{{ image }}'
+        large_icon: '{{ icon_mdi }}'
+        icon_color: '{{ color }}'
         duration: 15
       action: script.notify_tvoverlay
   mode: single
@@ -6288,15 +6617,21 @@ trigger: event
   alias: "\U0001F4AC Kona Started"
   description: Actions when the Kona starts
   triggers:
-  - event_type: hyundai_command_successful
+  - trigger: event
+    event_type: hyundai_command_successful
     event_data:
       command: remote_start
-    trigger: event
   conditions: []
   actions:
   - variables:
       title: Kona Remote Start
       message: The Kona started and is running.
+      icon: local/icons/hyundai.png
+      icon_mdi: mdi:car-connected
+      color: '#114be6'
+      group: Kona
+      tag: kona
+      url: lovelace#kona
   - data: {}
     target:
       entity_id: timer.kona_remote_start
@@ -6306,13 +6641,13 @@ trigger: event
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#114be6'
-        icon: local/icons/hyundai.png
-        group: Kona
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: kona
-        url: lovelace#kona
+        tag: '{{ tag }}'
+        url: '{{ url }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -6328,8 +6663,8 @@ trigger: event
             - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: kona
-            large_icon: local/icons/hyundai.png
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -6337,19 +6672,19 @@ trigger: event
             message: '{{ message }}'
           action: script.notify_speech
   - wait_for_trigger:
-    - entity_id:
+    - trigger: state
+      entity_id:
       - cover.garage_door
       to: closed
-      trigger: state
-    - event_type: hyundai_command_successful
+    - trigger: event
+      event_type: hyundai_command_successful
       event_data:
         command: remote_stop
-      trigger: event
-    - entity_id:
+    - trigger: state
+      entity_id:
       - binary_sensor.pixel_10_amy_android_auto
       - binary_sensor.pixel_10_joshua_android_auto
       to: 'on'
-      trigger: state
     timeout:
       minutes: 10
       seconds: 5
@@ -6363,28 +6698,36 @@ trigger: event
   alias: "\U0001F4AC Kona Failed Notification"
   description: Sends a notification when the Kona fails to start
   triggers:
-  - event_type: hyundai_command_failed
+  - trigger: event
+    event_type: hyundai_command_failed
     event_data:
       command: remote_start
-    trigger: event
   conditions: []
   actions:
   - variables:
+      title: Kona Remote Start
       message: Something went wrong when trying to start the Kona, please try again.
+      icon: local/icons/hyundai.png
+      icon_mdi: mdi:car-connected
+      color: '#0e4bef'
+      group: Kona
+      tag: kona
+      url: lovelace#kona
+      notification_actions:
+      - action: kona_remote_start_again
+        title: Retry
   - parallel:
     - data:
         send_to: parents
-        title: Kona Remote Start
+        title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#0e4bef'
-        icon: local/icons/hyundai.png
-        group: Kona
-        tag: kona
-        url: lovelace#kona
-        actions:
-        - action: kona_remote_start_again
-          title: Retry
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
+        url: '{{ url }}'
+        actions: '{{ notification_actions }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -6398,10 +6741,10 @@ trigger: event
             - media_player.living_room_googletv
             - media_player.shield_family_room
             - media_player.shield_main_bedroom
-            title: Kona Remote Start
+            title: '{{ title }}'
             message: '{{ message }}'
-            tag: kona
-            large_icon: local/icons/hyundai.png
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
           action: script.notify_tvoverlay
         - data:
             media_player:
@@ -6413,10 +6756,10 @@ trigger: event
   alias: "\U0001F4AC Kona Remote Start Expired Notification"
   description: Sends a notification when the Kona remote start expires
   triggers:
-  - event_type: timer.finished
+  - trigger: event
+    event_type: timer.finished
     event_data:
       entity_id: timer.kona_remote_start
-    trigger: event
   conditions:
   - condition: or
     conditions:
@@ -6430,21 +6773,28 @@ trigger: event
   - variables:
       title: Kona Remote Start
       message: The Kona shut off and is no longer running.
+      icon: local/icons/hyundai.png
+      icon_mdi: mdi:car-connected
+      color: '#114be6'
+      group: Kona
+      tag: kona
+      url: lovelace#kona
+      notification_actions:
+      - action: kona_remote_start_again
+        title: Start Again
   - parallel:
     - data:
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:car-connected
-        color: '#114be6'
-        icon: local/icons/hyundai.png
-        group: Kona
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
-        tag: kona
-        url: lovelace#kona
-        actions:
-        - action: kona_remote_start_again
-          title: Start Again
+        tag: '{{ tag }}'
+        url: '{{ url }}'
+        actions: '{{ notification_actions }}'
       action: script.notify_mobile
     - data:
         entity:
@@ -6453,11 +6803,12 @@ trigger: event
         - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: kona
-        large_icon: local/icons/hyundai.png
+        tag: '{{ tag }}'
+        large_icon: '{{ icon }}'
       action: script.notify_tvoverlay
     - data:
-        media_player: media_player.living_room_speaker
+        media_player:
+        - media_player.living_room_speaker
         message: '{{ message }}'
       action: script.notify_speech
   mode: single
@@ -6677,3 +7028,318 @@ trigger: event
               command: 'off'
       alias: When microphone and webcam are inactive
   mode: restart
+- id: '1755697332991'
+  alias: "\U0001F37D️ Microwave Finished"
+  description: Sends notification when the microwave is finished
+  triggers:
+  - entity_id:
+    - sensor.emporiavue_sub_kitchen_island_power
+    above: 100
+    trigger: numeric_state
+  actions:
+  - variables:
+      title: Microwave Finished
+      message: Enjoy your meal!
+      mdi_icon: mdi:microwave
+      icon: local/icons/microwave.png
+      color: '#e91e63'
+  - wait_for_trigger:
+    - entity_id:
+      - sensor.emporiavue_sub_kitchen_island_power
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
+      below: 5
+      trigger: numeric_state
+    continue_on_timeout: false
+    timeout:
+      hours: 0
+      minutes: 20
+      seconds: 0
+      milliseconds: 0
+  - parallel:
+    - if:
+      - condition: state
+        entity_id: person.joshua
+        state: home
+      then:
+      - action: script.notify_mobile
+        data:
+          send_to: joshua
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_icon: '{{ mdi_icon }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+    - if:
+      - condition: state
+        entity_id: person.amy
+        state: home
+      then:
+      - action: script.notify_mobile
+        data:
+          send_to: amy
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_icon: '{{ mdi_icon }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+  mode: restart
+- id: '1755697837330'
+  alias: "\U0001F916 Robot Vacuum Error"
+  description: Sends notification when a robot vacuum is stuck
+  triggers:
+  - entity_id:
+    - vacuum.r2dee2
+    - vacuum.dustin_mopman
+    to: error
+    trigger: state
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions: []
+  actions:
+  - variables:
+      title: Vacuum Stuck
+      message: '{{ trigger.to_state.attributes.friendly_name }} is stuck and needs
+        help!'
+      icon: local/icons/robot-vacuum.png
+      color: '#4caf50'
+      tag: vacuum
+      icon_mdi: mdi:robot-vacuum
+  - repeat:
+      sequence:
+      - parallel:
+        - action: script.notify_mobile
+          data:
+            send_to: all
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            tag: '{{ tag }}'
+        - action: script.notify_speech
+          data:
+            media_player:
+            - media_player.living_room_speaker
+            - media_player.family_room_speaker
+            - media_player.office_speaker
+            message: '{{ message }}'
+        - action: script.notify_lnxlink
+          data:
+            computer:
+            - erebus
+            title: '{{ title }}'
+            message: '{{ message }}'
+            icon: '{{ icon }}'
+        - action: script.notify_hass_agent
+          data:
+            entity:
+            - media_player.nasya
+            title: '{{ title }}'
+            message: '{{ message }}'
+      - delay:
+          minutes: 10
+      until:
+      - condition: template
+        value_template: '{{ is_state(trigger.entity_id, ''error'') }}'
+  mode: single
+- id: '1756855661235'
+  alias: "\U0001F4AC Guest Mode Check Reminder"
+  description: Sends notification to check Guest Mode status when returning home,
+    after 12 hours, or when leaving without it on
+  triggers:
+  - entity_id: group.people
+    from: not_home
+    to: home
+    id: returning_home
+    trigger: state
+  - entity_id: input_boolean.guest_mode
+    to: 'on'
+    for:
+      hours: 12
+    id: time_check
+    trigger: state
+  - entity_id:
+    - group.people
+    from: home
+    to: not_home
+    id: leaving_home
+    trigger: state
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  conditions:
+  - condition: or
+    conditions:
+    - condition: and
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.id in [''returning_home'', ''time_check''] }}'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'on'
+    - condition: and
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.id == ''leaving_home'' }}'
+      - condition: state
+        entity_id: input_boolean.guest_mode
+        state: 'off'
+  actions:
+  - variables:
+      title: '{% if trigger.id == ''leaving_home'' %} Guest Mode Off {% else %} Guest
+        Mode Active {% endif %}'
+      message: '{% if trigger.id == ''leaving_home'' %} Would you like to enable Guest
+        Mode before leaving? {% else %} Do you still need guest mode active? {% endif
+        %}'
+      icon: local/icons/account-question.png
+      icon_mdi: mdi:account-question
+      color: '#4caf50'
+      tag: guest-mode
+      group: Security
+      url: lovelace/security
+      notification_actions: "{% if trigger.id == 'leaving_home' %} [\n  {\"action\":
+        \"enable_guest_mode\", \"title\": \"Enable Guest Mode\"},\n  {\"action\":
+        \"no_guest_mode\", \"title\": \"No Guests\"}\n] {% else %} [\n  {\"action\":
+        \"disable_guest_mode\", \"title\": \"No Guests\"},\n  {\"action\": \"snooze_guest_mode\",
+        \"title\": \"Still Have Guests\"}\n] {% endif %}"
+  - data:
+      send_to: joshua
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      tag: '{{ tag }}'
+      url: '{{ url }}'
+      actions: '{{ notification_actions }}'
+    action: script.notify_mobile
+  mode: single
+- id: '1756855791463'
+  alias: ☑️ Guest Mode Check Handler
+  description: Handles notification actions for Guest Mode check
+  triggers:
+  - event_type: mobile_app_notification_action
+    event_data:
+      action: disable_guest_mode
+    trigger: event
+  - event_type: mobile_app_notification_action
+    event_data:
+      action: snooze_guest_mode
+    trigger: event
+  - event_type: mobile_app_notification_action
+    event_data:
+      action: enable_guest_mode
+    trigger: event
+  - event_type: mobile_app_notification_action
+    event_data:
+      action: no_guest_mode
+    trigger: event
+  conditions: []
+  actions:
+  - variables:
+      icon: local/icons/account-question.png
+      color: '#4caf50'
+      group: Security
+      tag: guest-mode
+      url: lovelace/security
+      action_responses:
+        disable_guest_mode:
+          title: Guest Mode Disabled
+          message: Guest Mode has been turned off
+          icon_mdi: mdi:account-group-off
+        snooze_guest_mode:
+          title: Guest Mode Snoozed
+          message: Will check again in 12 hours
+          icon_mdi: mdi:account-group-clock
+        enable_guest_mode:
+          title: Guest Mode Enabled
+          message: Guest Mode has been turned on
+          icon_mdi: mdi:account-group
+        no_guest_mode:
+          title: Guest Mode Skipped
+          message: Continuing without Guest Mode
+          icon_mdi: mdi:account-group-off
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.action == ''disable_guest_mode'' }}'
+      sequence:
+      - target:
+          entity_id: input_boolean.guest_mode
+        action: input_boolean.turn_off
+        data: {}
+      - data:
+          send_to: parents
+          title: '{{ action_responses[''disable_guest_mode''].title }}'
+          message: '{{ action_responses[''disable_guest_mode''].message }}'
+          notification_icon: '{{ action_responses[''disable_guest_mode''].icon_mdi
+            }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          interruption_level: passive
+          tag: '{{ tag }}'
+          url: '{{ url }}'
+        action: script.notify_mobile
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.action == ''snooze_guest_mode'' }}'
+      sequence:
+      - data:
+          send_to: parents
+          title: '{{ action_responses[''snooze_guest_mode''].title }}'
+          message: '{{ action_responses[''snooze_guest_mode''].message }}'
+          notification_icon: '{{ action_responses[''snooze_guest_mode''].icon_mdi
+            }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          interruption_level: passive
+          tag: '{{ tag }}'
+          url: '{{ url }}'
+        action: script.notify_mobile
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.action == ''enable_guest_mode'' }}'
+      sequence:
+      - target:
+          entity_id: input_boolean.guest_mode
+        action: input_boolean.turn_on
+        data: {}
+      - data:
+          send_to: parents
+          title: '{{ action_responses[''enable_guest_mode''].title }}'
+          message: '{{ action_responses[''enable_guest_mode''].message }}'
+          notification_icon: '{{ action_responses[''enable_guest_mode''].icon_mdi
+            }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          interruption_level: passive
+          tag: '{{ tag }}'
+          url: '{{ url }}'
+        action: script.notify_mobile
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.event.data.action == ''no_guest_mode'' }}'
+      sequence:
+      - data:
+          send_to: parents
+          title: '{{ action_responses[''no_guest_mode''].title }}'
+          message: '{{ action_responses[''no_guest_mode''].message }}'
+          notification_icon: '{{ action_responses[''no_guest_mode''].icon_mdi }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          interruption_level: passive
+          tag: '{{ tag }}'
+          url: '{{ url }}'
+        action: script.notify_mobile
+  mode: queued
