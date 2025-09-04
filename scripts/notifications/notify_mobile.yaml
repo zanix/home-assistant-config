@@ -45,8 +45,22 @@ notify_mobile:
               label: Parents
             - value: kids
               label: Kids
-            - value: family
-              label: Family
+            - value: all
+              label: All (Family)
+    location:
+      name: Location
+      description: When to send the notification based on location
+      default: any
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - value: any
+              label: Any Location
+            - value: home
+              label: At Home
+            - value: away
+              label: Away from Home
     title:
       name: Title
       description: Notification title
@@ -611,8 +625,61 @@ notify_mobile:
     - alias: Set local variables for reuse in this script.
       variables:
         debug: "{{ iif(enable_debug is defined, enable_debug, false) }}"
-        notification_service: notify.{{ send_to }}
         notification_type: "{{ notification_type | default('notify') }}"
+
+        # Map notification groups to person entities and their devices
+        person_map:
+          joshua:
+            - person: person.joshua
+              notify: notify.mobile_app_pixel_10_joshua
+          amy:
+            - person: person.amy
+              notify: notify.mobile_app_pixel_10_amy
+          ethan:
+            - person: person.ethan
+              notify: notify.mobile_app_ipad_ethan
+          emma:
+            - person: person.emma
+              notify: notify.mobile_app_ipad_emma
+          parents:
+            - person: person.joshua
+              notify: notify.mobile_app_pixel_10_joshua
+            - person: person.amy
+              notify: notify.mobile_app_pixel_10_amy
+          kids:
+            - person: person.ethan
+              notify: notify.mobile_app_ipad_ethan
+            - person: person.emma
+              notify: notify.mobile_app_ipad_emma
+          all:
+            - person: person.joshua
+              notify: notify.mobile_app_pixel_10_joshua
+            - person: person.amy
+              notify: notify.mobile_app_pixel_10_amy
+            - person: person.ethan
+              notify: notify.mobile_app_ipad_ethan
+            - person: person.emma
+              notify: notify.mobile_app_ipad_emma
+
+        # Get filtered list of notification services based on location
+        notification_services: >-
+          {% set ns = namespace(filtered=[]) %}
+          {% if send_to in person_map %}
+            {% set targets = person_map[send_to] %}
+            {% for target in targets %}
+              {% if location == 'any' %}
+                {% set ns.filtered = ns.filtered + [target.notify] %}
+              {% elif (location == 'home' and is_state(target.person, 'home')) or
+                      (location == 'away' and not is_state(target.person, 'home')) %}
+                {% set ns.filtered = ns.filtered + [target.notify] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.filtered }}
+          {% elif has %}
+            {{ ['notify.' ~ send_to] }}
+          {% endif %}
+
+        location: "{{ location | default('any') }}"
         title: "{{ title | default('', true) }}"
         message: |
           {{ message | default('', true)
@@ -699,12 +766,13 @@ notify_mobile:
             title: "DEBUG: script.notify_mobile"
             message: |-
               send_message: {{ states("input_boolean.mobile_notifications") }}
-              notification_service: {{ notification_service }}
+              notification_service: {{ notification_services | to_json }}
+              location: {{ location }}
               title: {{ title }}
               message: {{ message }}
               data: {{ notify_data }}
 
-    - alias: Only send the message if notifications are enabled.
+    - alias: Only send the message if notifications are enabled and we have targets.
       condition: state
       entity_id: input_boolean.mobile_notifications
       state: "on"
@@ -715,22 +783,28 @@ notify_mobile:
             - condition: template
               value_template: "{{ camera is string }}"
           sequence:
-            - alias: Send notification message.
-              action: "{{ notification_service }}"
-              data:
-                title: "{{ title }}"
-                message: "{{ message }}"
-                data: |-
-                  {%- set notify_data = dict(notify_data, **{
-                    "image": "/api/camera_proxy/" ~ camera,
-                    "entity_id": camera
-                  }) -%}
-                  {{ notify_data }}
+            - repeat:
+                for_each: "{{ notification_services }}"
+                sequence:
+                  - alias: Send notification message.
+                    action: "{{ repeat.item }}"
+                    data:
+                      title: "{{ title }}"
+                      message: "{{ message }}"
+                      data: |-
+                        {%- set notify_data = dict(notify_data, **{
+                          "image": "/api/camera_proxy/" ~ camera,
+                          "entity_id": camera
+                        }) -%}
+                        {{ notify_data }}
 
       default:
         - alias: Send a basic, link, or actionable notification message.
-          action: "{{ notification_service }}"
-          data:
-            title: "{{ title }}"
-            message: "{{ message }}"
-            data: "{{ notify_data }}"
+          repeat:
+            for_each: "{{ notification_services }}"
+            sequence:
+              - action: "{{ repeat.item }}"
+                data:
+                  title: "{{ title }}"
+                  message: "{{ message }}"
+                  data: "{{ notify_data }}"
