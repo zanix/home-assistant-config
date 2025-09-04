@@ -32,11 +32,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4779 |
-| Sensors        | 1660 |
+| All Entities   | 4853 |
+| Sensors        | 1694 |
 | Binary Sensors | 337 |
 | Lights         | 74 |
-| Switches       | 762 |
+| Switches       | 766 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -739,7 +739,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>149 Automations</summary>
+<details><summary>151 Automations</summary>
 
 - ⏯ Ensure PiPup is Running
 - ⏯ Family Room Media Auto Off
@@ -781,6 +781,7 @@ Material Design 3 Theme for Home Assistant
 - ⚙️ Update Database Filesize Sensor
 - ⚙️ Updates Available
 - ⚡ Tariff Changes
+- ⛩️ Automatic Garage Door
 - ✨ DreamScreen Harmony Power Off
 - ✨ DreamScreen Harmony Reactive Activity
 - ✨ DreamScreen Scene Changed
@@ -854,6 +855,7 @@ Material Design 3 Theme for Home Assistant
 - 📋 [Inovelli] Living Room Fan Light Switch
 - 📋 [Inovelli] Main Bedroom Switch
 - 📋 [Sensor Light] Basement Hallway
+- 📍 Itinerary Tracker Notification
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Delivered
 - 📦 Mail Today

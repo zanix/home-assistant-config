@@ -4321,6 +4321,14 @@ views:
                     tap_action: none
               chips:
                 - type: template
+                  entity: sensor.ascent_avg_fuel_consumption
+                  icon: mdi:leaf
+                  icon_color: green
+                  content: "{% if has_value(entity) %}\n  {{ states(entity) | round(1)\
+                    \ }}mpg\n{% endif %}"
+                  tap_action:
+                    action: more-info
+                - type: template
                   entity: sensor.ascent_fuel_level
                   content: "{% if has_value(entity) %}\n  {{ states(entity) | round(0)\
                     \ }}%\n{% endif %}"
@@ -4328,14 +4336,6 @@ views:
                   icon_color: '{% from "util.jinja" import battery_color %}
 
                     {{ battery_color(entity) }}'
-                  tap_action:
-                    action: more-info
-                - type: template
-                  entity: sensor.ascent_avg_fuel_consumption
-                  icon: mdi:leaf
-                  icon_color: green
-                  content: "{% if has_value(entity) %}\n  {{ states(entity) | round(1)\
-                    \ }}mpg\n{% endif %}"
                   tap_action:
                     action: more-info
           - type: custom:button-card
@@ -25563,3 +25563,151 @@ views:
         text_only: true
       layout: start
       badges_position: bottom
+  - title: Itinerary
+    path: vehicle-tracker-map
+    icon: mdi:map
+    subview: false
+    type: sections
+    max_columns: 4
+    cards: []
+    sections:
+      - type: grid
+        column_span: 1
+        cards:
+          - features:
+              - type: toggle
+            type: tile
+            entity: automation.automatic_gate
+            name: Automatic Garage Door
+            features_position: inline
+            hide_state: true
+            color: deep-orange
+            icon: mdi:car-connected
+            vertical: false
+            icon_tap_action:
+              action: more-info
+          - type: custom:mushroom-template-card
+            visibility:
+              - condition: state
+                entity: input_text.amy_itinerary
+                state:
+                  - arriving
+                  - on_approach
+            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
+              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
+              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
+              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
+              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
+              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
+              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {{\n      (\n        states[entity].last_updated\
+              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
+              \ %p')\n    }}\n\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
+              {% else %}\n  Unknown\n{% endif %}"
+            icon: mdi:map-clock
+            entity: sensor.amy_travel_time
+            icon_color: purple
+            tap_action:
+              action: call-service
+              service: homeassistant.update_entity
+              target:
+                entity_id: sensor.amy_travel_time
+            hold_action:
+              action: more-info
+            double_tap_action:
+              action: none
+            fill_container: false
+            layout_options:
+              grid_columns: 4
+              grid_rows: 1
+          - type: custom:mushroom-template-card
+            visibility:
+              - condition: state
+                entity: input_text.joshua_itinerary
+                state:
+                  - arriving
+                  - on_approach
+            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
+              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
+              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
+              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
+              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
+              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
+              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {{\n      (\n        states[entity].last_updated\
+              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
+              \ %p')\n    }}\n\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
+              {% else %}\n  Unknown\n{% endif %}"
+            icon: mdi:map-clock
+            entity: sensor.joshua_travel_time
+            icon_color: blue
+            tap_action:
+              action: call-service
+              service: homeassistant.update_entity
+              target:
+                entity_id: sensor.joshua_travel_time
+            hold_action:
+              action: more-info
+            double_tap_action:
+              action: none
+            fill_container: false
+            layout_options:
+              grid_columns: 4
+              grid_rows: 1
+          - type: map
+            entities:
+              - entity: person.amy
+              - entity: person.joshua
+            hours_to_show: 1
+            layout_options:
+              grid_columns: 4
+              grid_rows: 8
+            theme_mode: auto
+            card_mod:
+              style:
+                .: "ha-card {\n  /* Remove default card styling without affecting\
+                  \ child elements */\n  box-shadow: none;\n  border-width: 0;\n \
+                  \ transition: all 0s;\n}\n#buttons {\n  margin: 15px 0 0 3px;\n\
+                  }\n"
+                ha-map $ ha-entity-marker $: ".marker {\n  /* Style person marker\
+                  \ & adjust position to avoid blocking waypoints */\n  border-radius:\
+                  \ 50% 50% 50% 0px !important;\n  transform: rotate(-45deg) translate(50%,\
+                  \ -50%);\n  overflow: visible !important;\n}\n.entity-picture {\n\
+                  \  /* Correct orientation of person avatar */\n  transform: rotate(45deg);\n\
+                  \  border-radius: 50%;\n}\n"
+                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  fill:\
+                  \ color-mix(in srgb, var(--yellow-color) 50%, transparent);\n  stroke-width:\
+                  \ 0px;\n}\npath:nth-of-type(2) {\n  /* Style accuracy radius */\n\
+                  \  fill: color-mix(in srgb, var(--yellow-color) 50%, transparent);\n\
+                  \  stroke-width: 0px;\n}\n.leaflet-control-attribution {\n  /* Style\
+                  \ attribution text */\n  display: none !important;\n  background:\
+                  \ rgba(var(--rgb-card-background-color), 0.2) !important;\n  font-size:\
+                  \ 8px;\n}\n.leaflet-container a {\n  /* Set color of zoom icons\
+                  \ & attribution text */\n  color: var(--secondary-text-color);\n\
+                  }\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out {\n  /*\
+                  \ Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
+                  \ 19px) !important;\n  padding: 3px;\n  background: rgb(var(--rgb-secondary-text-color),\
+                  \ 0.2) !important;\n  margin: 8px 12px 0px;\n  border: var(--ha-card-border-width,\
+                  \ 1px) solid var(--ha-card-border-color, var(--divider-color, #e0e0e0))\
+                  \ !important;\n}\n.leaflet-control-zoom {\n  /* Remove extra margin\
+                  \ */\n  margin: 0px !important;\n\n  /* Remove zoom control border\
+                  \ */\n  border: none !important;\n}\n"
+    visible:
+      - user: ce9ee65ab49c4ca4af52496609016f1c
+      - user: f615672fc2554783beab56221097564e
