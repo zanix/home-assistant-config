@@ -626,60 +626,30 @@ notify_mobile:
       variables:
         debug: "{{ iif(enable_debug is defined, enable_debug, false) }}"
         notification_type: "{{ notification_type | default('notify') }}"
+        location: "{{ location | default('any') }}"
 
-        # Map notification groups to person entities and their devices
-        person_map:
-          joshua:
-            - person: person.joshua
-              notify: notify.mobile_app_pixel_10_joshua
-          amy:
-            - person: person.amy
-              notify: notify.mobile_app_pixel_10_amy
-          ethan:
-            - person: person.ethan
-              notify: notify.mobile_app_ipad_ethan
-          emma:
-            - person: person.emma
-              notify: notify.mobile_app_ipad_emma
-          parents:
-            - person: person.joshua
-              notify: notify.mobile_app_pixel_10_joshua
-            - person: person.amy
-              notify: notify.mobile_app_pixel_10_amy
-          kids:
-            - person: person.ethan
-              notify: notify.mobile_app_ipad_ethan
-            - person: person.emma
-              notify: notify.mobile_app_ipad_emma
-          all:
-            - person: person.joshua
-              notify: notify.mobile_app_pixel_10_joshua
-            - person: person.amy
-              notify: notify.mobile_app_pixel_10_amy
-            - person: person.ethan
-              notify: notify.mobile_app_ipad_ethan
-            - person: person.emma
-              notify: notify.mobile_app_ipad_emma
-
-        # Get filtered list of notification services based on location
-        notification_services: >-
-          {% set ns = namespace(filtered=[]) %}
-          {% if send_to in person_map %}
-            {% set targets = person_map[send_to] %}
-            {% for target in targets %}
-              {% if location == 'any' %}
-                {% set ns.filtered = ns.filtered + [target.notify] %}
-              {% elif (location == 'home' and is_state(target.person, 'home')) or
-                      (location == 'away' and not is_state(target.person, 'home')) %}
-                {% set ns.filtered = ns.filtered + [target.notify] %}
-              {% endif %}
-            {% endfor %}
-            {{ ns.filtered }}
-          {% elif has %}
+        targets: >-
+          {# Get map of notification groups to person entities and their devices #}
+          {% from 'variables.jinja' import person_device_map %}
+          {% if send_to in person_device_map %}
+            {{ person_device_map.get(send_to) }}
+          {% else %}
             {{ ['notify.' ~ send_to] }}
           {% endif %}
 
-        location: "{{ location | default('any') }}"
+        notification_services: >-
+          {# Get filtered list of notification services based on location #}
+          {% set ns = namespace(filtered=[]) %}
+          {% for target in targets %}
+            {% if location == 'any' %}
+              {% set ns.filtered = ns.filtered + [target.notify] %}
+            {% elif (location == 'home' and is_state(target.person, 'home')) or
+                    (location == 'away' and not is_state(target.person, 'home')) %}
+              {% set ns.filtered = ns.filtered + [target.notify] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.filtered }}
+
         title: "{{ title | default('', true) }}"
         message: |
           {{ message | default('', true)
@@ -765,7 +735,9 @@ notify_mobile:
             notification_id: notify_mobile
             title: "DEBUG: script.notify_mobile"
             message: |-
-              send_message: {{ states("input_boolean.mobile_notifications") }}
+              mobile_notifications: {{ states("input_boolean.mobile_notifications") }}
+              send_to: {{ send_to }}
+              targets: {{ targets | to_json }}
               notification_service: {{ notification_services | to_json }}
               location: {{ location }}
               title: {{ title }}
@@ -773,9 +745,13 @@ notify_mobile:
               data: {{ notify_data }}
 
     - alias: Only send the message if notifications are enabled and we have targets.
-      condition: state
-      entity_id: input_boolean.mobile_notifications
-      state: "on"
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.mobile_notifications
+          state: "on"
+        - condition: template
+          value_template: "{{ notification_services | length > 0 }}"
 
     - choose:
         - alias: Send camera stream.
