@@ -142,10 +142,10 @@
     action: media_player.select_sound_mode
   mode: restart
   variables:
-    sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH\
-      \ STEREO\n{%- elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube',\
-      \ 'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  DOLBY\
-      \ DIGITAL\n{%- else -%}\n  DIRECT\n{%- endif -%}"
+    sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH
+      STEREO\n{%- elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
+      'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  DOLBY DIGITAL\n{%-
+      else -%}\n  DIRECT\n{%- endif -%}"
 - id: '1745528112692'
   alias: ⏯ Living Room Media Off
   description: Ensure the Living Room media is turned off
@@ -217,10 +217,10 @@
       enabled: false
   actions:
   - variables:
-      sound_mode: "{%- if trigger.to_state.attributes.source in ['SmartTube', 'YouTube',\
-        \ 'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  Adaptive\
-        \ Sound\n{%- elif trigger.to_state.attributes.source in ['Spotify'] -%}\n\
-        \  Surround\n{%- else -%}\n  Standard\n{%- endif -%}"
+      sound_mode: "{%- if trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
+        'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  Adaptive
+        Sound\n{%- elif trigger.to_state.attributes.source in ['Spotify'] -%}\n  Surround\n{%-
+        else -%}\n  Standard\n{%- endif -%}"
   - choose:
     - conditions:
       - condition: state
@@ -269,7 +269,9 @@
     to: 'on'
     id: 'on'
     for:
-      minutes: 5
+      hours: 0
+      minutes: 2
+      seconds: 0
   - trigger: state
     entity_id:
     - binary_sensor.bed_presence_f56148_bed_occupied_either
@@ -1024,26 +1026,25 @@
     trigger: state
   conditions:
   - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n\
-      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and\
-      \ not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state\
-      \ in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n\
-      }}"
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
+      not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state
+      in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
   actions:
   - variables:
       devices: '{{ trigger.to_state.state | int(default=0) }}'
       title: Low Battery Level{{ iif(devices > 1, 's', '') }} ({{ devices }})
-      sensors: "{% if not trigger.to_state.state in ['unknown', 'unavailable', none]\
-        \ %}\n  {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id\
-        \ %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set\
-        \ name = device.name | replace(':', '') | regex_replace(find = ' battery level',\
-        \ replace = '', ignorecase = true) %}\n    {% set result.sensors = result.sensors\
-        \ + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n{% endif\
-        \ %}\n{{ result.sensors }}"
+      sensors: "{% if not trigger.to_state.state in ['unknown', 'unavailable', none]
+        %}\n  {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
+        %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set
+        name = device.name | replace(':', '') | regex_replace(find = ' battery level',
+        replace = '', ignorecase = true) %}\n    {% set result.sensors = result.sensors
+        + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n{% endif
+        %}\n{{ result.sensors }}"
   - if:
     - condition: template
-      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state\
-        \ | int(default=0)) > 0 }}"
+      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+        | int(default=0)) > 0 }}"
     then:
     - parallel:
       - data:
@@ -1234,25 +1235,24 @@
     trigger: state
   conditions:
   - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n\
-      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and\
-      \ not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state\
-      \ in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n\
-      }}"
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
+      not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state
+      in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
   actions:
   - variables:
       offline: '{{ trigger.to_state.state | int(default=0) }}'
       title: Offline Device{{ iif(offline > 1, 's', '') }} ({{ offline }})
-      sensors: "{% set result = namespace(sensors=[]) %} {% for entity_id in trigger.to_state.attributes.entity_id\
-        \ %}\n  {% set state = states(entity_id) %}\n  {% set time = iif(has_value(entity_id),\
-        \ \" (\" ~ as_datetime(state) | relative_time ~ \")\", \" (Unknown)\") %}\n\
-        \  {% set name = state_attr(entity_id, \"friendly_name\") | regex_replace(find\
-        \ = \" last seen\", replace = \"\", ignorecase = true) %}\n  {% set result.sensors\
-        \ = result.sensors + [name ~ time] %}\n{% endfor %}{{ result.sensors }}"
+      sensors: "{% set result = namespace(sensors=[]) %} {% for entity_id in trigger.to_state.attributes.entity_id
+        %}\n  {% set state = states(entity_id) %}\n  {% set time = iif(has_value(entity_id),
+        \" (\" ~ as_datetime(state) | relative_time ~ \")\", \" (Unknown)\") %}\n
+        \ {% set name = state_attr(entity_id, \"friendly_name\") | regex_replace(find
+        = \" last seen\", replace = \"\", ignorecase = true) %}\n  {% set result.sensors
+        = result.sensors + [name ~ time] %}\n{% endfor %}{{ result.sensors }}"
   - if:
     - condition: template
-      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state\
-        \ | int(default=0)) > 0 }}"
+      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+        | int(default=0)) > 0 }}"
     then:
     - data:
         notification_id: offline-devices
@@ -1393,19 +1393,18 @@
     trigger: state
   conditions:
   - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n\
-      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and\
-      \ not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and not\
-      \ trigger.from_state.state in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state\
-      \ != trigger.from_state.state\n}}"
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
+      not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and not trigger.from_state.state
+      in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
   actions:
   - variables:
       updates: '{{ trigger.to_state.state | int(default=0) }}'
       title: Update{{ iif(updates > 1, 's', '') }} Pending ({{ updates }})
   - if:
     - condition: template
-      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state\
-        \ | int(default=0)) > 0 }}"
+      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+        | int(default=0)) > 0 }}"
     then:
     - data:
         notification_id: hacs-update
@@ -1419,25 +1418,25 @@
     - parallel:
       - data:
           title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id\
-            \ -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,\
-            \ 'latest_version') -%}\n    {% set update = '__' ~ state_attr(repo, 'friendly_name')\
-            \ | replace(' update', '') ~ ':__ _' ~ state_attr(repo, 'installed_version')\
-            \ ~ '_ -> _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set\
-            \ list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor\
-            \ -%} {{ list.updates | join('\\n') }}"
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+            'latest_version') -%}\n    {% set update = '__' ~ state_attr(repo, 'friendly_name')
+            | replace(' update', '') ~ ':__ _' ~ state_attr(repo, 'installed_version')
+            ~ '_ -> _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set
+            list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
+            -%} {{ list.updates | join('\\n') }}"
           notification_id: hacs-update
         action: persistent_notification.create
       - data:
           send_to: joshua
           title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id\
-            \ -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,\
-            \ 'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo,\
-            \ 'friendly_name') | replace(' update', '') ~ ':</b> <em>' ~ state_attr(repo,\
-            \ 'installed_version') ~ '</em> -> <em>' ~ state_attr(repo, 'latest_version')\
-            \ ~ '</em>' %}\n    {%- set list.updates = list.updates + [update] -%}\n\
-            \  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('<br>') }}"
+          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+            'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo, 'friendly_name')
+            | replace(' update', '') ~ ':</b> <em>' ~ state_attr(repo, 'installed_version')
+            ~ '</em> -> <em>' ~ state_attr(repo, 'latest_version') ~ '</em>' %}\n
+            \   {%- set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%-
+            endfor -%} {{ list.updates | join('<br>') }}"
           notification_icon: mdi:update
           color: '#4caf50'
           icon: local/icons/update.png
@@ -1449,14 +1448,13 @@
           computer:
           - erebus
           title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%}\n{%- for repo in state_attr(\"\
-            sensor.updates\", \"entity_id\") -%}\n  {%- if state_attr(repo, 'installed_version')\
-            \ != state_attr(repo, 'latest_version') -%}\n    {% set update = '<b>'\
-            \ ~ state_attr(repo, 'friendly_name') | replace(' update', '') ~ ':</b>\
-            \ <i>' ~ state_attr(repo, 'installed_version') ~ '</i> -> <i>' ~ state_attr(repo,\
-            \ 'latest_version') ~ '</i>' %}\n    {%- set list.updates = list.updates\
-            \ + [update] -%}\n  {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join(\"\
-            \ | \") }}"
+          message: "{%- set list = namespace(updates=[]) -%}\n{%- for repo in state_attr(\"sensor.updates\",
+            \"entity_id\") -%}\n  {%- if state_attr(repo, 'installed_version') !=
+            state_attr(repo, 'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo,
+            'friendly_name') | replace(' update', '') ~ ':</b> <i>' ~ state_attr(repo,
+            'installed_version') ~ '</i> -> <i>' ~ state_attr(repo, 'latest_version')
+            ~ '</i>' %}\n    {%- set list.updates = list.updates + [update] -%}\n
+            \ {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join(\" | \") }}"
           icon: local/icons/update.png
         action: script.notify_lnxlink
   mode: restart
@@ -1482,7 +1480,7 @@
     trigger: numeric_state
   - entity_id:
     - binary_sensor.tariff_summer
-    to: null
+    to:
     id: season
     trigger: state
   conditions:
@@ -1494,14 +1492,14 @@
   - variables:
       season: '{{ iif(is_state(''binary_sensor.tariff_summer'', ''on''), ''summer'',
         ''winter'') }}'
-      map: "{{ {\n    'summer_tier_1': ['under 800', 'summer tier 1'],\n    'summer_tier_2':\
-        \ ['over 800', 'summer tier 2'],\n    'summer_tier_3': ['over 2000', 'summer\
-        \ tier 3'],\n    'winter_tier_1': ['under 800', 'winter tier 1'],\n    'winter_tier_2':\
-        \ ['over 800', 'winter tier 2'],\n    'winter_tier_3': ['over 2000', 'winter\
-        \ tier 3'],\n} }}\n"
-      tariff: "{% if trigger.id == 'season' and has_value('select.monthly_energy')\
-        \ %}\n  {{ season }}_tier_{{ states('select.monthly_energy').split('_')[2]\
-        \ }}\n{% else %}\n  {{ season }}_{{ trigger.id }}\n{% endif %}\n"
+      map: "{{ {\n    'summer_tier_1': ['under 800', 'summer tier 1'],\n    'summer_tier_2':
+        ['over 800', 'summer tier 2'],\n    'summer_tier_3': ['over 2000', 'summer
+        tier 3'],\n    'winter_tier_1': ['under 800', 'winter tier 1'],\n    'winter_tier_2':
+        ['over 800', 'winter tier 2'],\n    'winter_tier_3': ['over 2000', 'winter
+        tier 3'],\n} }}\n"
+      tariff: "{% if trigger.id == 'season' and has_value('select.monthly_energy')
+        %}\n  {{ season }}_tier_{{ states('select.monthly_energy').split('_')[2] }}\n{%
+        else %}\n  {{ season }}_{{ trigger.id }}\n{% endif %}\n"
       message: Power usage is {{ map[tariff][0] }} kWh. Now charing {{ map[tariff][1]
         }} rates.
   - action: select.select_option
@@ -1571,7 +1569,7 @@
   triggers:
   - entity_id:
     - sensor.apollo_msr_1_office_co2
-    to: null
+    to:
     trigger: state
   - event: start
     trigger: homeassistant
@@ -1680,7 +1678,7 @@
         action: light.turn_off
   mode: restart
 - id: '1740694410995'
-  alias: 🌐 IP Address Changed
+  alias: "\U0001F310 IP Address Changed"
   description: Sends notifications when the IP address changes
   triggers:
   - trigger: state
@@ -1720,7 +1718,7 @@
       action: script.notify_lnxlink
   mode: restart
 - id: '1669666972148'
-  alias: 🌐 UniFi WAN Status
+  alias: "\U0001F310 UniFi WAN Status"
   description: Sends notifications when the network status changes
   triggers:
   - entity_id:
@@ -1732,7 +1730,7 @@
   - entity_id:
     - sensor.ucg_ultra_state
     to: Disconnected
-    from: null
+    from:
     id: disconnected
     trigger: state
   conditions: []
@@ -1828,7 +1826,7 @@
     default: []
   mode: restart
 - id: '1737664483359'
-  alias: 🍽️ Dishwasher Timer
+  alias: "\U0001F37D️ Dishwasher Timer"
   description: Starts the timer when the dishwasher starts
   triggers:
   - trigger: state
@@ -1889,7 +1887,7 @@
           entity_id: timer.ge_dishwasher
   mode: single
 - id: '1665687778783'
-  alias: 🍽️ Dishwasher is Done
+  alias: "\U0001F37D️ Dishwasher is Done"
   description: Sends notification when the dishwasher is done
   triggers:
   - entity_id:
@@ -1945,7 +1943,7 @@
   mode: single
   max_exceeded: silent
 - id: '1755697332991'
-  alias: 🍽️ Microwave Finished
+  alias: "\U0001F37D️ Microwave Finished"
   description: Sends notification when the microwave is finished
   triggers:
   - entity_id:
@@ -1976,7 +1974,7 @@
       milliseconds: 0
   - action: script.notify_mobile
     data:
-      send_to: parents
+      send_to: joshua
       location: home
       title: '{{ title }}'
       message: '{{ message }}'
@@ -1985,7 +1983,7 @@
       icon: '{{ icon }}'
   mode: restart
 - id: '1730497546367'
-  alias: 🍽️ Oven Bake Timer Completed
+  alias: "\U0001F37D️ Oven Bake Timer Completed"
   description: Sends notification when the oven bake timer is finished
   triggers:
   - entity_id:
@@ -2044,7 +2042,7 @@
       action: script.notify_tvoverlay
   mode: single
 - id: '1737664900410'
-  alias: 🍽️ Oven Cook Timer
+  alias: "\U0001F37D️ Oven Cook Timer"
   description: Starts a timer when the oven cook timer starts
   triggers:
   - trigger: state
@@ -2082,7 +2080,7 @@
           entity_id: timer.ge_oven_cook
   mode: single
 - id: '1737665076651'
-  alias: 🍽️ Oven Kitchen Timer
+  alias: "\U0001F37D️ Oven Kitchen Timer"
   description: Starts a timer when the oven cook timer starts
   triggers:
   - trigger: state
@@ -2120,7 +2118,7 @@
           entity_id: timer.ge_oven_kitchen
   mode: single
 - id: '1723166117553'
-  alias: 🍽️ Oven Kitchen Timer Completed
+  alias: "\U0001F37D️ Oven Kitchen Timer Completed"
   description: Sends notification when the oven kitchen timer is finished
   triggers:
   - entity_id:
@@ -2177,7 +2175,7 @@
         icon_color: '{{ color }}'
   mode: single
 - id: '1723165470472'
-  alias: 🍽️ Oven is Preheated
+  alias: "\U0001F37D️ Oven is Preheated"
   description: Sends notification when the oven is preheated
   triggers:
   - entity_id:
@@ -2232,7 +2230,7 @@
       action: script.notify_tvoverlay
   mode: single
 - id: '1665697728164'
-  alias: 🎄 XMas Lights On/Off
+  alias: "\U0001F384 XMas Lights On/Off"
   description: ''
   trigger:
   - platform: sun
@@ -2264,7 +2262,7 @@
         action: switch.turn_off
   mode: single
 - id: '1665697781484'
-  alias: 🎄 XMas Tree On/Off
+  alias: "\U0001F384 XMas Tree On/Off"
   description: ''
   trigger:
   - platform: state
@@ -2307,7 +2305,7 @@
         action: light.turn_off
   mode: single
 - id: '1665689705099'
-  alias: 🏢 Joshua Office Mode
+  alias: "\U0001F3E2 Joshua Office Mode"
   description: Actions on day/night mode for the office
   triggers:
   - at: input_datetime.office_startup
@@ -2347,7 +2345,7 @@
           - switch.joshua_office_workbench
   mode: single
 - id: '1706291631355'
-  alias: 🐱 Cat Feeder Empty Notification
+  alias: "\U0001F431 Cat Feeder Empty Notification"
   description: Sends a notification when the Cat feeder is nearly empty
   triggers:
   - entity_id:
@@ -2399,7 +2397,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1709917613454'
-  alias: 🐱 Cat Feeder Error
+  alias: "\U0001F431 Cat Feeder Error"
   description: Sends a notification when the Cat feeder has an error
   triggers:
   - entity_id:
@@ -2443,7 +2441,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1734069674224'
-  alias: 🐱 Cat Litterbox Full
+  alias: "\U0001F431 Cat Litterbox Full"
   description: Sends a notification when the Litterbox is full
   triggers:
   - trigger: state
@@ -2487,7 +2485,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1734069969369'
-  alias: 🐱 Cat Litterbox Litter Low
+  alias: "\U0001F431 Cat Litterbox Litter Low"
   description: Sends a notification when the Litterbox litter is nearly empty
   triggers:
   - trigger: state
@@ -2531,7 +2529,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1665686312416'
-  alias: 💡 All Lights off when Away
+  alias: "\U0001F4A1 All Lights off when Away"
   description: Turns off all the lights when no one is home
   trigger:
   - platform: state
@@ -2570,7 +2568,7 @@
       action: script.notify_mobile
   mode: single
 - id: '1665686481763'
-  alias: 💡 Dim Front Lights at Night
+  alias: "\U0001F4A1 Dim Front Lights at Night"
   description: Dims the front lights at night
   triggers:
   - at: input_datetime.lights_front_night_dim
@@ -2593,7 +2591,7 @@
     action: light.turn_on
   mode: single
 - id: '1665686521519'
-  alias: 💡 Front Lights off at Sunrise
+  alias: "\U0001F4A1 Front Lights off at Sunrise"
   description: Turns the front lights off at sunrise
   trigger:
   - platform: sun
@@ -2609,7 +2607,7 @@
       - light.outside_entry
   mode: single
 - id: '1665686549835'
-  alias: 💡 Front Lights on at Sunset
+  alias: "\U0001F4A1 Front Lights on at Sunset"
   description: Turns the front lights on at sunset
   triggers:
   - event: sunset
@@ -2629,7 +2627,7 @@
       entity_id: '{{ scene }}'
   mode: single
 - id: '1665686584864'
-  alias: 💡 Living Room Lamps on/off
+  alias: "\U0001F4A1 Living Room Lamps on/off"
   description: Turns on/off the Living Room lamps
   triggers:
   - event: sunset
@@ -2676,7 +2674,7 @@
         action: light.turn_off
   mode: single
 - id: '1728622562146'
-  alias: 💡 School Departure Light Indicator
+  alias: "\U0001F4A1 School Departure Light Indicator"
   description: Changes some light colors when it's time to go school.
   triggers:
   - at: 07:15:00
@@ -2739,7 +2737,7 @@
         target:
           entity_id: light.kitchen_island
 - id: '1665686715952'
-  alias: 💡 Turn Lights On when Arrive
+  alias: "\U0001F4A1 Turn Lights On when Arrive"
   description: Turns lights on when someone arrives home after sunset
   triggers:
   - entity_id: group.people
@@ -2784,7 +2782,7 @@
     action: light.turn_off
   mode: single
 - id: '1665697635082'
-  alias: 💧 Shut-Off Valve Overheated
+  alias: "\U0001F4A7 Shut-Off Valve Overheated"
   description: Sends a notification if the water shut-off valve overheats
   triggers:
   - trigger: state
@@ -2853,7 +2851,7 @@
       action: script.notify_speech
   mode: single
 - id: '1665697614552'
-  alias: 💧 Softener Salt Level Low
+  alias: "\U0001F4A7 Softener Salt Level Low"
   description: Sends a notification when the water softener salt level is low
   triggers:
   - trigger: numeric_state
@@ -2901,7 +2899,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1665697122708'
-  alias: 💧 Water Leak Detected
+  alias: "\U0001F4A7 Water Leak Detected"
   description: Shuts off the water main and sends a notification when a water leak
     is detected
   triggers:
@@ -2925,10 +2923,10 @@
   actions:
   - variables:
       title: Water Leak Detected
-      location: "{{ trigger.to_state.name\n  | regex_replace(find=' water', replace='',\
-        \ ignorecase=true)\n  | regex_replace(find=' leak', replace='', ignorecase=true)\n\
-        \  | regex_replace(find=' detected', replace='', ignorecase=true)\n  | regex_replace(find='\
-        \ moisture', replace='', ignorecase=true)\n  | trim\n}}"
+      location: "{{ trigger.to_state.name\n  | regex_replace(find=' water', replace='',
+        ignorecase=true)\n  | regex_replace(find=' leak', replace='', ignorecase=true)\n
+        \ | regex_replace(find=' detected', replace='', ignorecase=true)\n  | regex_replace(find='
+        moisture', replace='', ignorecase=true)\n  | trim\n}}"
       message: There is a water leak in the {{ location }} and the water main has
         been shut off.
       icon: local/icons/water-alert.png
@@ -3010,7 +3008,7 @@
       minutes: 5
   mode: single
 - id: '1665689633891'
-  alias: 💬 Ascent Failed Notification
+  alias: "\U0001F4AC Ascent Failed Notification"
   description: Sends a notification when the Ascent fails to start
   triggers:
   - event_type: subaru_command_failed
@@ -3027,17 +3025,17 @@
       tag: ascent
       group: Ascent
       url: lovelace#ascent
-      message: "The Ascent didn't start.{{ \" \" }} {%- if 'doorNotLocked' in trigger.event.data.message\
-        \ -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.message\
-        \ -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.message\
-        \ -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow'\
-        \ in trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'otherCommandsOngoing'\
-        \ in trigger.event.data.message -%}\n  Another command is in-progress.\n{%-\
-        \ elif 'never received' in trigger.event.data.message -%}\n  The message wasn't\
-        \ recieved.\n{%- elif 'ignitionIsOn' in trigger.event.data.message -%}\n \
-        \ The car is already running.\n{%- elif '500' in trigger.event.data.message\
-        \ -%}\n  The service is offline.\n{%- elif 'unknown' in trigger.event.data.message\
-        \ -%}\n  I have no idea why. Please try again.\n{% endif %}"
+      message: "The Ascent didn't start.{{ \" \" }} {%- if 'doorNotLocked' in trigger.event.data.message
+        -%}\n  A door wasn't locked.\n{%- elif 'doorNotClosed' in trigger.event.data.message
+        -%}\n  A door wasn't closed.\n{%- elif 'Climate preset' in trigger.event.data.message
+        -%}\n  The {{ trigger.event.data.message }}\n{%- elif 'fuelLevelTooLow' in
+        trigger.event.data.message -%}\n  Fuel level is low.\n{%- elif 'otherCommandsOngoing'
+        in trigger.event.data.message -%}\n  Another command is in-progress.\n{%-
+        elif 'never received' in trigger.event.data.message -%}\n  The message wasn't
+        recieved.\n{%- elif 'ignitionIsOn' in trigger.event.data.message -%}\n  The
+        car is already running.\n{%- elif '500' in trigger.event.data.message -%}\n
+        \ The service is offline.\n{%- elif 'unknown' in trigger.event.data.message
+        -%}\n  I have no idea why. Please try again.\n{% endif %}"
   - parallel:
     - data:
         send_to: parents
@@ -3078,7 +3076,7 @@
           action: script.notify_speech
   mode: single
 - id: '1704385020720'
-  alias: 💬 Ascent Fuel Level Low
+  alias: "\U0001F4AC Ascent Fuel Level Low"
   description: Sends a notification when the Ascent's fuel level is low
   triggers:
   - entity_id:
@@ -3102,9 +3100,9 @@
       stations:
         Costco: '{{ states(''sensor.costco_regular_gas'') | float(3) }}'
         Maverik: '{{ (states(''sensor.maverik_regular_gas'') | float(3)) - 0.1 }}'
-      message: "Current gas prices. {%- for name, price in stations.items() %}\n \
-        \ {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gallons_remaining\
-        \ * price) }}\n{%- endfor %}\n"
+      message: "Current gas prices. {%- for name, price in stations.items() %}\n  {{
+        name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gallons_remaining
+        * price) }}\n{%- endfor %}\n"
   - parallel:
     - data:
         title: '{{ title }}'
@@ -3138,7 +3136,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1678829415008'
-  alias: 💬 Ascent Remote Start Expired Notification
+  alias: "\U0001F4AC Ascent Remote Start Expired Notification"
   description: Sends a notification when the Ascent remote start expires
   triggers:
   - event_type: timer.finished
@@ -3205,7 +3203,7 @@
           action: script.notify_speech
   mode: single
 - id: '1673152651576'
-  alias: 💬 Ascent Started
+  alias: "\U0001F4AC Ascent Started"
   description: Actions when the Ascent starts
   triggers:
   - event_type: subaru_command_successful
@@ -3287,7 +3285,7 @@
     action: timer.cancel
   mode: single
 - id: '1713983450425'
-  alias: 💬 Bambu P1S Print Completed
+  alias: "\U0001F4AC Bambu P1S Print Completed"
   description: Notify when the print is finished or failed.
   triggers:
   - entity_id:
@@ -3380,25 +3378,24 @@
     action: light.turn_off
   mode: single
 - id: '1713973263507'
-  alias: 💬 Bambu P1S Print Status
+  alias: "\U0001F4AC Bambu P1S Print Status"
   description: Notify current print status every 10% (or 25% for short prints).
   triggers:
   - entity_id:
     - sensor.bambu_p1s_print_progress
-    to: null
-    from: null
+    to:
+    from:
     trigger: state
   conditions:
   - alias: Update at 10% intervals
     condition: template
-    value_template: "{%- if has_value(\"sensor.bambu_p1s_end_time\")\n  and has_value(\"\
-      sensor.bambu_p1s_start_time\")\n  and has_value(\"sensor.bambu_p1s_print_progress\"\
-      )\n  and not states(\"sensor.bambu_p1s_print_progress\") in [\"0\", \"100\"\
-      ]\n-%}\n  {%- set total_time = (as_datetime(states(\"sensor.bambu_p1s_end_time\"\
-      )) - as_datetime(states(\"sensor.bambu_p1s_start_time\"))).total_seconds() /\
-      \ 60 -%}\n  {%- if total_time > 60 -%}\n    {%- set step = 10 -%}\n  {%- else\
-      \ -%}\n    {%- set step = 25 -%}\n  {%- endif -%}\n  {{ states(\"sensor.bambu_p1s_print_progress\"\
-      ) | int % step == 0 }}\n{%- else -%}\n  {{ false }}\n{%- endif -%}"
+    value_template: "{%- if has_value(\"sensor.bambu_p1s_end_time\")\n  and has_value(\"sensor.bambu_p1s_start_time\")\n
+      \ and has_value(\"sensor.bambu_p1s_print_progress\")\n  and not states(\"sensor.bambu_p1s_print_progress\")
+      in [\"0\", \"100\"]\n-%}\n  {%- set total_time = (as_datetime(states(\"sensor.bambu_p1s_end_time\"))
+      - as_datetime(states(\"sensor.bambu_p1s_start_time\"))).total_seconds() / 60
+      -%}\n  {%- if total_time > 60 -%}\n    {%- set step = 10 -%}\n  {%- else -%}\n
+      \   {%- set step = 25 -%}\n  {%- endif -%}\n  {{ states(\"sensor.bambu_p1s_print_progress\")
+      | int % step == 0 }}\n{%- else -%}\n  {{ false }}\n{%- endif -%}"
   actions:
   - variables:
       progress: '{{ states("sensor.bambu_p1s_print_progress") }}%'
@@ -3410,15 +3407,15 @@
       group: 3D Printer
       url: lovelace/bambu
       camera: camera.bambu_p1s_camera
-      model: "{{ states(\"sensor.bambu_p1s_task_name\")\n  | replace(\".3mf\", \"\"\
-        )\n  | replace(\".stl\", \"\")\n  | replace(\".gcode\", \"\")\n}}"
+      model: "{{ states(\"sensor.bambu_p1s_task_name\")\n  | replace(\".3mf\", \"\")\n
+        \ | replace(\".stl\", \"\")\n  | replace(\".gcode\", \"\")\n}}"
       end_time: '{{ states(''sensor.bambu_p1s_end_time'') | as_timestamp }}'
       time_remaining: '{% set time_to_end = states(''sensor.bambu_p1s_remaining_time'')
         | int %} {% set hours = (time_to_end / 60) | int %} {% set minutes = time_to_end
         % 60 %} {{ ''{:01}h {:01}m''.format(hours, minutes) }}'
-      finish_time: "{% if end_time | timestamp_custom('%Y-%m-%d') == now().date()\
-        \ | string %}\n  {{ end_time | timestamp_custom('%-I:%M %p') }}\n{% else %}\n\
-        \  {{ end_time | timestamp_custom('%m/%d %-I:%M %p') }}\n{% endif %}"
+      finish_time: "{% if end_time | timestamp_custom('%Y-%m-%d') == now().date()
+        | string %}\n  {{ end_time | timestamp_custom('%-I:%M %p') }}\n{% else %}\n
+        \ {{ end_time | timestamp_custom('%m/%d %-I:%M %p') }}\n{% endif %}"
       message: '{{ model }} will finish in {{ time_remaining }} at {{ finish_time
         }}'
   - parallel:
@@ -3444,7 +3441,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1714000511725'
-  alias: 💬 Bambu P1S Printer Error
+  alias: "\U0001F4AC Bambu P1S Printer Error"
   description: Notify on printer errors.
   triggers:
   - device_id: b9e70ce89bcabdccae4b86eeae1918f2
@@ -3489,7 +3486,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1665687879665'
-  alias: 💬 Door Closed
+  alias: "\U0001F4AC Door Closed"
   description: Clears notification when doors are closed
   triggers:
   - entity_id:
@@ -3526,7 +3523,7 @@
       action: script.notify_mobile
   mode: parallel
 - id: '1665687917160'
-  alias: 💬 Door Left Open
+  alias: "\U0001F4AC Door Left Open"
   description: Sends notification when a door is left open
   triggers:
   - entity_id:
@@ -3622,7 +3619,7 @@
         timeout: 00:05:00
   mode: parallel
 - id: '1665687973181'
-  alias: 💬 Door Left Open and Leaving
+  alias: "\U0001F4AC Door Left Open and Leaving"
   description: Sends notification if a door is open and everybody leaves
   triggers:
   - trigger: state
@@ -3649,12 +3646,12 @@
       color: '#00bcd4'
       group: Security
       url: lovelace/security
-      message: "{%- from \"util.jinja\" import get_friendly_names -%} {%- set doors\
-        \ = expand(\"binary_sensor.all_doors\") | selectattr(\"state\", \"==\", \"\
-        on\") | map(attribute=\"entity_id\") | list -%} {%- if doors | length == 1\
-        \ -%}\n  The {{ get_friendly_names(doors) }} was open when you left!\n{%-\
-        \ else -%}\n  The {{ get_friendly_names(doors) }} were open when you left!\n\
-        {%- endif -%}"
+      message: "{%- from \"util.jinja\" import get_friendly_names -%} {%- set doors
+        = expand(\"binary_sensor.all_doors\") | selectattr(\"state\", \"==\", \"on\")
+        | map(attribute=\"entity_id\") | list -%} {%- if doors | length == 1 -%}\n
+        \ The {{ get_friendly_names(doors) }} was open when you left!\n{%- else -%}\n
+        \ The {{ get_friendly_names(doors) }} were open when you left!\n{%- endif
+        -%}"
   - data:
       send_to: parents
       title: '{{ title }}'
@@ -3671,7 +3668,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1665687990814'
-  alias: 💬 Door Opened and Away
+  alias: "\U0001F4AC Door Opened and Away"
   description: Sends notification if a door is open when people are away
   triggers:
   - trigger: state
@@ -3721,7 +3718,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1665689270166'
-  alias: 💬 Garage Door Closed
+  alias: "\U0001F4AC Garage Door Closed"
   description: Clears notifications when the garage door closes
   trigger:
   - platform: state
@@ -3740,7 +3737,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1665689284289'
-  alias: 💬 Garage Door Left Open
+  alias: "\U0001F4AC Garage Door Left Open"
   description: Sends notification if the garage door is left open
   triggers:
   - trigger: state
@@ -3835,7 +3832,7 @@
         timeout: 00:30:00
   mode: single
 - id: '1665689297011'
-  alias: 💬 Garage Door Left Open and Leaving
+  alias: "\U0001F4AC Garage Door Left Open and Leaving"
   description: Sends notification if a door is open and everybody leaves
   triggers:
   - trigger: state
@@ -3884,7 +3881,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1665689312993'
-  alias: 💬 Garage Door Opened and Away
+  alias: "\U0001F4AC Garage Door Opened and Away"
   description: Sends notification if the garage door opens while people are away
   triggers:
   - trigger: state
@@ -3930,7 +3927,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1691033044070'
-  alias: 💬 Garbage Collection
+  alias: "\U0001F4AC Garbage Collection"
   description: Sends a notification when the garbage or recycling need to be taken
     to the curb.
   triggers:
@@ -3981,8 +3978,8 @@
       icon: '{{ state_attr(''calendar.'' ~ object_id, ''icon'') }}'
       icon_image: '{{ icon | replace(''mdi:'', '''') }}'
       icon_color: '#{{ iif(type == ''recycle'', ''4caf50'', ''745246'') }}'
-      description: "{% if trigger.calendar_event.description != \"\" %}\n  {{ \" \"\
-        \ }}({{ trigger.calendar_event.description }})\n{%- endif -%}"
+      description: "{% if trigger.calendar_event.description != \"\" %}\n  {{ \" \"
+        }}({{ trigger.calendar_event.description }})\n{%- endif -%}"
   - choose:
     - conditions:
       - condition: trigger
@@ -4024,7 +4021,7 @@
         action: script.notify_mobile
   mode: parallel
 - id: '1756855661235'
-  alias: 💬 Guest Mode Check Reminder
+  alias: "\U0001F4AC Guest Mode Check Reminder"
   description: Sends notification to check Guest Mode status when returning home,
     after 12 hours, or when leaving without it on
   triggers:
@@ -4079,11 +4076,11 @@
       tag: guest-mode
       group: Security
       url: lovelace/security
-      notification_actions: "{% if trigger.id == 'leaving_home' %} [\n  {\"action\"\
-        : \"enable_guest_mode\", \"title\": \"Enable Guest Mode\"},\n  {\"action\"\
-        : \"no_guest_mode\", \"title\": \"No Guests\"}\n] {% else %} [\n  {\"action\"\
-        : \"disable_guest_mode\", \"title\": \"No Guests\"},\n  {\"action\": \"snooze_guest_mode\"\
-        , \"title\": \"Still Have Guests\"}\n] {% endif %}"
+      notification_actions: "{% if trigger.id == 'leaving_home' %} [\n  {\"action\":
+        \"enable_guest_mode\", \"title\": \"Enable Guest Mode\"},\n  {\"action\":
+        \"no_guest_mode\", \"title\": \"No Guests\"}\n] {% else %} [\n  {\"action\":
+        \"disable_guest_mode\", \"title\": \"No Guests\"},\n  {\"action\": \"snooze_guest_mode\",
+        \"title\": \"Still Have Guests\"}\n] {% endif %}"
   - data:
       send_to: joshua
       title: '{{ title }}'
@@ -4098,7 +4095,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1725463478923'
-  alias: 💬 Kona Battery Low
+  alias: "\U0001F4AC Kona Battery Low"
   description: Sends a notification when the Kona's battery charge is low
   triggers:
   - trigger: numeric_state
@@ -4146,7 +4143,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1743734517684'
-  alias: 💬 Kona Failed Notification
+  alias: "\U0001F4AC Kona Failed Notification"
   description: Sends a notification when the Kona fails to start
   triggers:
   - trigger: event
@@ -4204,7 +4201,7 @@
           action: script.notify_speech
   mode: single
 - id: '1725462823177'
-  alias: 💬 Kona Fuel Level Low
+  alias: "\U0001F4AC Kona Fuel Level Low"
   description: Sends a notification when the Kona's fuel level is low
   triggers:
   - trigger: numeric_state
@@ -4228,9 +4225,9 @@
       stations:
         Costco: '{{ states(''sensor.costco_regular_gas'') | float(3) }}'
         Maverik: '{{ (states(''sensor.maverik_midgrade_gas'') | float(3)) - 0.1 }}'
-      message: "Current gas prices. {%- for name, price in stations.items() %}\n \
-        \ {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gallons_remaining\
-        \ * price) }}\n{%- endfor %}\n"
+      message: "Current gas prices. {%- for name, price in stations.items() %}\n  {{
+        name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{ \"${:.2f}\".format(gallons_remaining
+        * price) }}\n{%- endfor %}\n"
   - parallel:
     - data:
         title: '{{ title }}'
@@ -4264,7 +4261,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1743734754522'
-  alias: 💬 Kona Remote Start Expired Notification
+  alias: "\U0001F4AC Kona Remote Start Expired Notification"
   description: Sends a notification when the Kona remote start expires
   triggers:
   - trigger: event
@@ -4324,7 +4321,7 @@
       action: script.notify_speech
   mode: single
 - id: '1743734374088'
-  alias: 💬 Kona Started
+  alias: "\U0001F4AC Kona Started"
   description: Actions when the Kona starts
   triggers:
   - trigger: event
@@ -4405,7 +4402,7 @@
     action: timer.cancel
   mode: single
 - id: '1665700388935'
-  alias: 💬 Window Left Open
+  alias: "\U0001F4AC Window Left Open"
   description: Sends notification if a window is left open
   triggers:
   - trigger: state
@@ -4494,7 +4491,7 @@
         timeout: 00:05:00
   mode: parallel
 - id: '1710955585340'
-  alias: 📅 Emma's Projector On/Off
+  alias: "\U0001F4C5 Emma's Projector On/Off"
   description: ''
   trigger:
   - platform: state
@@ -4529,7 +4526,7 @@
         action: switch.turn_off
   mode: single
 - id: '1710955623615'
-  alias: 📅 Ethan's Projector On/Off
+  alias: "\U0001F4C5 Ethan's Projector On/Off"
   description: ''
   trigger:
   - platform: state
@@ -4564,7 +4561,7 @@
         action: switch.turn_off
   mode: single
 - id: '1682570311827'
-  alias: 📅 Garbage Collection Event Generator
+  alias: "\U0001F4C5 Garbage Collection Event Generator"
   description: Creates collection events for the next year.
   trigger:
   - platform: time
@@ -4591,7 +4588,7 @@
     action: script.generate_collection_dates
   mode: single
 - id: '1704594011311'
-  alias: 📅 Grow Light On/Off
+  alias: "\U0001F4C5 Grow Light On/Off"
   description: ''
   trigger:
   - platform: state
@@ -4627,7 +4624,7 @@
         action: switch.turn_off
   mode: single
 - id: '1699834374599'
-  alias: 📅 Living Room Fan On/Off
+  alias: "\U0001F4C5 Living Room Fan On/Off"
   description: ''
   triggers:
   - entity_id: schedule.living_room_fan
@@ -4660,7 +4657,7 @@
         action: fan.turn_off
   mode: single
 - id: '1699834405375'
-  alias: 📅 Main Bedroom Fan On/Off
+  alias: "\U0001F4C5 Main Bedroom Fan On/Off"
   description: ''
   triggers:
   - entity_id: schedule.main_bedroom_fan
@@ -4730,7 +4727,7 @@
           entity_id: fan.main_bedroom_ceiling
   mode: single
 - id: '1748056193923'
-  alias: 📅 Update KidsChore UI Helpers
+  alias: "\U0001F4C5 Update KidsChore UI Helpers"
   description: ''
   triggers:
   - trigger: homeassistant
@@ -4745,7 +4742,7 @@
       datetime: '{{ (now().replace(hour=23, minute=0, second=0, microsecond=0) + timedelta(days=1)).isoformat()
         }}'
 - id: '1665723372482'
-  alias: 📋 [Controller] Ikea Remote Main Bedroom
+  alias: "\U0001F4CB [Controller] Ikea Remote Main Bedroom"
   description: ''
   use_blueprint:
     path: EPMatt/ikea_e1524_e1810.yaml
@@ -4811,7 +4808,7 @@
           entity_id: fan.main_bedroom_ceiling
         action: fan.toggle
 - id: '1667780182339'
-  alias: 📋 [Inovelli] Amy Office Switch
+  alias: "\U0001F4CB [Inovelli] Amy Office Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -4842,7 +4839,7 @@
           data: {}
       switch: event.amy_office_switch_action
 - id: '1673311612826'
-  alias: 📋 [Inovelli] Emma Switch
+  alias: "\U0001F4CB [Inovelli] Emma Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -4873,7 +4870,7 @@
           target:
             entity_id: light.nebula_projector_emma_laser
 - id: '1667779119970'
-  alias: 📋 [Inovelli] Ethan Switch
+  alias: "\U0001F4CB [Inovelli] Ethan Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -4904,7 +4901,7 @@
           target:
             entity_id: light.nebula_projector_ethan_laser
 - id: '1738556679313'
-  alias: 📋 [Inovelli] Family Room Aux Switch
+  alias: "\U0001F4CB [Inovelli] Family Room Aux Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -4938,7 +4935,7 @@
           data:
             activity: Computer
 - id: '1667779287274'
-  alias: 📋 [Inovelli] Family Room Switch
+  alias: "\U0001F4CB [Inovelli] Family Room Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -4972,7 +4969,7 @@
           data:
             activity: Computer
 - id: '1667779442976'
-  alias: 📋 [Inovelli] Garage Switch
+  alias: "\U0001F4CB [Inovelli] Garage Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -5070,7 +5067,7 @@
           entity_id: automation.garage_light_switch_status
         action: automation.trigger
 - id: '1667779857021'
-  alias: 📋 [Inovelli] Joshua Office Switch
+  alias: "\U0001F4CB [Inovelli] Joshua Office Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -5147,7 +5144,7 @@
           target:
             entity_id: light.joshua_office_shelf_led
 - id: '1667779650555'
-  alias: 📋 [Inovelli] Living Room Fan Light Switch
+  alias: "\U0001F4CB [Inovelli] Living Room Fan Light Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -5181,7 +5178,7 @@
             entity_id: light.living_room_lights
           action: light.turn_off
 - id: '1667779709981'
-  alias: 📋 [Inovelli] Main Bedroom Switch
+  alias: "\U0001F4CB [Inovelli] Main Bedroom Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
@@ -5201,7 +5198,7 @@
             entity_id: light.main_bedroom_floor_lamp
           action: light.toggle
 - id: '1739377887654'
-  alias: 📋 [Sensor Light] Basement Hallway
+  alias: "\U0001F4CB [Sensor Light] Basement Hallway"
   description: ''
   use_blueprint:
     path: Blackshome/sensor-light.yaml
@@ -5223,7 +5220,7 @@
       night_light_transition_on: 1
       night_light_transition_off: 2
 - id: '1756940133048'
-  alias: 📍 Itinerary Tracker Notification
+  alias: "\U0001F4CD Itinerary Tracker Notification"
   description: ''
   use_blueprint:
     path: etiennec78/itinerary-tracker-notification.yaml
@@ -5248,7 +5245,7 @@
       - media_player.office_speaker
       drive_start_tts: true
 - id: '1665682398363'
-  alias: 📦 Clear Packages Out for Delivery
+  alias: "\U0001F4E6 Clear Packages Out for Delivery"
   description: Clears package delivery notification when packages are delivered
   triggers:
   - entity_id: sensor.mail_packages_in_transit
@@ -5256,10 +5253,10 @@
     trigger: state
   conditions:
   - condition: template
-    value_template: "{{ (trigger.from_state.state | int(default=0)) > 0\n  and (trigger.to_state.state\
-      \ | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not\
-      \ trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state\
-      \ in ['unknown', 'unavailable'] }}"
+    value_template: "{{ (trigger.from_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
+      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
   actions:
   - data:
       send_to: parents
@@ -5268,7 +5265,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1741307009888'
-  alias: 📦 Mail Delivered
+  alias: "\U0001F4E6 Mail Delivered"
   description: Notifies when mail has been delivered
   triggers:
   - trigger: state
@@ -5277,8 +5274,8 @@
     to: 'on'
   conditions:
   - condition: template
-    value_template: "{{ not trigger.from_state.state in ['unknown', 'unavailable']\n\
-      \  and not trigger.to_state.state in ['unknown', 'unavailable'] }}"
+    value_template: "{{ not trigger.from_state.state in ['unknown', 'unavailable']\n
+      \ and not trigger.to_state.state in ['unknown', 'unavailable'] }}"
   actions:
   - variables:
       title: Mail Delivery
@@ -5333,17 +5330,17 @@
       action: script.notify_tvoverlay
   mode: single
 - id: '1665682414590'
-  alias: 📦 Mail Today
+  alias: "\U0001F4E6 Mail Today"
   description: Notifies when mail will be delivered today
   triggers:
   - trigger: state
     entity_id: sensor.mail_usps_mail
   conditions:
   - condition: template
-    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state\
-      \ | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not\
-      \ trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state\
-      \ in ['unknown', 'unavailable'] }}"
+    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
+      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
   actions:
   - variables:
       title: Mail Today
@@ -5399,17 +5396,17 @@
       action: script.notify_tvoverlay
   mode: single
 - id: '1665682445018'
-  alias: 📦 Packages Delivered
+  alias: "\U0001F4E6 Packages Delivered"
   description: Notifies when packages have been delivered
   triggers:
   - trigger: state
     entity_id: sensor.mail_packages_delivered
   conditions:
   - condition: template
-    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state\
-      \ | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not\
-      \ trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state\
-      \ in ['unknown', 'unavailable'] }}"
+    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
+      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
+      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
+      in ['unknown', 'unavailable'] }}"
   actions:
   - variables:
       title: Package Delivery
@@ -5457,17 +5454,17 @@
       action: script.notify_tvoverlay
   mode: single
 - id: '1665682458887'
-  alias: 📦 Packages Out for Delivery
+  alias: "\U0001F4E6 Packages Out for Delivery"
   description: Notifies when packages are out for delivery
   triggers:
   - trigger: state
     entity_id: sensor.mail_packages_in_transit
   conditions:
   - condition: template
-    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state\
-      \ | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not\
-      \ trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state\
-      \ in [\"unknown\", \"unavailable\"] }}"
+    value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
+      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
+      trigger.from_state.state in [\"unknown\", \"unavailable\"]\n  and not trigger.to_state.state
+      in [\"unknown\", \"unavailable\"] }}"
   actions:
   - variables:
       title: Package Delivery
@@ -5515,7 +5512,7 @@
       action: script.notify_tvoverlay
   mode: single
 - id: '1665685653869'
-  alias: 📦 Update USPS Mail Camera
+  alias: "\U0001F4E6 Update USPS Mail Camera"
   description: Updates the mail image camera when mail is updated
   trigger:
   - platform: state
@@ -5528,7 +5525,7 @@
     action: mail_and_packages.update_image
   mode: single
 - id: '1665686891355'
-  alias: 🔒 Door Lock Jammed
+  alias: "\U0001F512 Door Lock Jammed"
   description: ''
   triggers:
   - trigger: state
@@ -5590,7 +5587,7 @@
       action: script.notify_speech
   mode: single
 - id: '1665686913548'
-  alias: 🔒 Lock Doors when Away
+  alias: "\U0001F512 Lock Doors when Away"
   description: ''
   triggers:
   - trigger: state
@@ -5657,7 +5654,7 @@
     action: script.notify_mobile
   mode: single
 - id: '1665688920005'
-  alias: 🔔 Doorbell Object or Ring
+  alias: "\U0001F514 Doorbell Object or Ring"
   description: Activity when an object is detected or rung at night
   trigger:
   - platform: state
@@ -5693,7 +5690,7 @@
     action: light.turn_on
   mode: restart
 - id: '1665688080710'
-  alias: 🔔 Doorbell Ring
+  alias: "\U0001F514 Doorbell Ring"
   description: Actions when the ring doorbell is pressed
   triggers:
   - entity_id:
@@ -5812,7 +5809,7 @@
         action: light.turn_on
   mode: single
 - id: '1693003933194'
-  alias: 🔔 Frigate Doorbell - Event Handler
+  alias: "\U0001F514 Frigate Doorbell - Event Handler"
   description: Sends notifications when an object is detected on the Doorbell camera
   triggers:
   - event_type: custom_frigate_doorbell_object
@@ -5922,7 +5919,7 @@
           action: light.turn_on
   mode: parallel
 - id: '1692245318569'
-  alias: 🔔 Frigate Doorbell - Object Seen
+  alias: "\U0001F514 Frigate Doorbell - Object Seen"
   description: Sends a notification when an object is detected on a camera
   triggers:
   - topic: frigate/events
@@ -6087,33 +6084,31 @@
           sequence:
           - data:
               title: Frigate Notification
-              message: "Info:\n  - FPS: {{ fps }}\n  - Frigate event Id: {{ id }}\n\
-                \  - Object (Formatted): {{ object }} ({{ label }})\n\nConfig:\n \
-                \ - Camera (Formatted): {{ camera }} ({{ camera_name }})\n  - Base\
-                \ URL: {{ base_url }}\n  - Alert once: {{ alert_once }}\n  - Update\
-                \ thumbnails: {{ update_thumbnail }}\n  - Clip: {{ clip }}\n  - Icon:\
-                \ {{ icon }}\n  - Cooldown: {{ cooldown }}s\n  - Loiter timer: {{\
-                \ loiter_timer }}s\n  - Title: {{ title }}\n  - Message: {{ message\
-                \ }}\n  - Actions: {{ actions | tojson }}\n\nFilters:\n  - Zones:\n\
-                \    - Zone filter on: {{ zones | length }}\n    - Required zones:\
-                \ {{ zones | join(', ') }}\n    - All Zones on: {{ zone_all }}\n \
-                \   - Entered Zones: {{ entered_zones }}\n    - Zone Filter TEST:\
-                \ {{ 'PASS (Multi)' if zone_multi_filter else 'PASS' if ( not zones\
-                \ | length or not zone_all and zones | select('in', entered_zones)\
-                \ | list | length ) else 'FAIL (Multi)' if zone_all else 'FAIL' }}\n\
-                \  - Required objects TEST:\n    - Labels: {{ labels | join(', ')\
-                \ }}\n    - TEST: {{ 'PASS' if not labels | length or object in labels\
-                \ else 'FAIL' }}\n  - Disabled times: {{ disable_times }}\n  - State\
-                \ Filter:\n    - State filter on: {{ iif(state_entities | list | count\
-                \ > 0, 'True', 'False') }}\n    - State filter entity: {{ state_entities\
-                \ | tojson }}\n    - Required states: {{ states_filter | join(', ')\
-                \ }}\n  {%- set state_filter = namespace(allow=[]) -%}\n  {%- for\
-                \ entity, time in state_entities.items() -%}\n    {%- set state =\n\
-                \      states(entity) in states_filter\n      and (as_timestamp(now())\
-                \ - as_timestamp(states[entity].last_changed)) | int / 60 > time\n\
-                \    -%}\n    {%- set state_filter.allow = state_filter.allow + [state]\
-                \ -%}\n  {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow\
-                \ | reject | first | default(true), 'PASS', 'FAIL') }}\n"
+              message: "Info:\n  - FPS: {{ fps }}\n  - Frigate event Id: {{ id }}\n
+                \ - Object (Formatted): {{ object }} ({{ label }})\n\nConfig:\n  -
+                Camera (Formatted): {{ camera }} ({{ camera_name }})\n  - Base URL:
+                {{ base_url }}\n  - Alert once: {{ alert_once }}\n  - Update thumbnails:
+                {{ update_thumbnail }}\n  - Clip: {{ clip }}\n  - Icon: {{ icon }}\n
+                \ - Cooldown: {{ cooldown }}s\n  - Loiter timer: {{ loiter_timer }}s\n
+                \ - Title: {{ title }}\n  - Message: {{ message }}\n  - Actions: {{
+                actions | tojson }}\n\nFilters:\n  - Zones:\n    - Zone filter on:
+                {{ zones | length }}\n    - Required zones: {{ zones | join(', ')
+                }}\n    - All Zones on: {{ zone_all }}\n    - Entered Zones: {{ entered_zones
+                }}\n    - Zone Filter TEST: {{ 'PASS (Multi)' if zone_multi_filter
+                else 'PASS' if ( not zones | length or not zone_all and zones | select('in',
+                entered_zones) | list | length ) else 'FAIL (Multi)' if zone_all else
+                'FAIL' }}\n  - Required objects TEST:\n    - Labels: {{ labels | join(',
+                ') }}\n    - TEST: {{ 'PASS' if not labels | length or object in labels
+                else 'FAIL' }}\n  - Disabled times: {{ disable_times }}\n  - State
+                Filter:\n    - State filter on: {{ iif(state_entities | list | count
+                > 0, 'True', 'False') }}\n    - State filter entity: {{ state_entities
+                | tojson }}\n    - Required states: {{ states_filter | join(', ')
+                }}\n  {%- set state_filter = namespace(allow=[]) -%}\n  {%- for entity,
+                time in state_entities.items() -%}\n    {%- set state =\n      states(entity)
+                in states_filter\n      and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+                | int / 60 > time\n    -%}\n    {%- set state_filter.allow = state_filter.allow
+                + [state] -%}\n  {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow
+                | reject | first | default(true), 'PASS', 'FAIL') }}\n"
             action: persistent_notification.create
       - alias: Notifications enabled for object label
         condition: template
@@ -6127,12 +6122,12 @@
               length > 0 and zones | reject(''in'', entered_zones) | list | length
               == 0) }}'
           - condition: template
-            value_template: "{%- set state_filter = namespace(allow=[]) -%} {%- for\
-              \ entity, time in state_entities.items() -%}\n  {%- set state =\n  \
-              \  states(entity) in states_filter\n    and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))\
-              \ | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow\
-              \ + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject |\
-              \ first | default(true), true, false) }}"
+            value_template: "{%- set state_filter = namespace(allow=[]) -%} {%- for
+              entity, time in state_entities.items() -%}\n  {%- set state =\n    states(entity)
+              in states_filter\n    and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+              | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
+              + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first
+              | default(true), true, false) }}"
           sequence:
           - alias: Fire event for other automations and scripts
             event: custom_frigate_doorbell_object
@@ -6178,26 +6173,25 @@
               entered_zones_changed: '{{ zones | length > 0 and (zones | select(''in'',
                 entered_zones) | list | length > 0 and not zones | select(''in'',
                 last_zones) | list | length) }}'
-              state_true: "{%- set state_filter = namespace(allow=[]) -%} {%- for\
-                \ entity, time in state_entities.items() -%}\n  {%- set state =\n\
-                \    states(entity) in states_filter\n    and (as_timestamp(now())\
-                \ - as_timestamp(states[entity].last_changed)) | int / 60 > time\n\
-                \  -%}\n  {%- set state_filter.allow = state_filter.allow + [state]\
-                \ -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first |\
-                \ default(true), true, false) }}"
-              sub_label: "{% if event['after']['sub_label'] %}\n  {{ event['after']['sub_label'][0]\
-                \ }}\n{% else %}\n  {{ event['after']['sub_label'] }}\n{% endif %}\n"
-              sub_label_before: "{% if event['before']['sub_label'] %}\n  {{ event['before']['sub_label'][0]\
-                \ }}\n{% else %}\n  {{ event['before']['sub_label'] }}\n{% endif %}\n"
+              state_true: "{%- set state_filter = namespace(allow=[]) -%} {%- for
+                entity, time in state_entities.items() -%}\n  {%- set state =\n    states(entity)
+                in states_filter\n    and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+                | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
+                + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject |
+                first | default(true), true, false) }}"
+              sub_label: "{% if event['after']['sub_label'] %}\n  {{ event['after']['sub_label'][0]
+                }}\n{% else %}\n  {{ event['after']['sub_label'] }}\n{% endif %}\n"
+              sub_label_before: "{% if event['before']['sub_label'] %}\n  {{ event['before']['sub_label'][0]
+                }}\n{% else %}\n  {{ event['before']['sub_label'] }}\n{% endif %}\n"
               sub_label_changed: '{{ sub_label != sub_label_before }}'
               update: '{{ alert_once or (new_snapshot and not loitering and not zone_only_changed
                 and not entered_zones_changed and not sub_label_changed) }}'
-              title: "{% if sub_label %}\n  {{ title | replace('A Person', sub_label\
-                \ | title) | replace('Person', sub_label | title) }}\n{% else %}\n\
-                \  {{ title }}\n{% endif %}\n"
-              message: "{% if sub_label %}\n  {{ message | replace('A Person', sub_label\
-                \ | title) | replace('Person', sub_label | title) }}\n{% else %}\n\
-                \  {{ message }}\n{% endif %}\n"
+              title: "{% if sub_label %}\n  {{ title | replace('A Person', sub_label
+                | title) | replace('Person', sub_label | title) }}\n{% else %}\n  {{
+                title }}\n{% endif %}\n"
+              message: "{% if sub_label %}\n  {{ message | replace('A Person', sub_label
+                | title) | replace('Person', sub_label | title) }}\n{% else %}\n  {{
+                message }}\n{% endif %}\n"
           - alias: Update thumbnail at end of event
             choose:
             - conditions:
@@ -6220,22 +6214,21 @@
               sequence:
               - data:
                   title: Frigate Notification Loop
-                  message: "Info:\n  - Last zones: {{ last_zones }}\n  - Current zones:\
-                    \ {{ entered_zones }}\n  - Sublabel: {{ sub_label }}\n  - URL:\
-                    \ api/frigate/notifications/{{ id }}/{{ camera + '/clip.mp4' if\
-                    \ clip | length > 0 and wait.trigger.payload_json['type'] == 'end'\
-                    \ else attachment }}\n  - Clip: \"{{ clip }}\"\n\nTriggers:\n\
-                    \  - New snapshot: {{ new_snapshot }}\n  - Stationary moved: {{\
-                    \ stationary_moved }}\n  - Entered zones changed: {{ entered_zones_changed\
-                    \ }}\n  - Sublabel changed: {{ sub_label_changed }}\n\nConditions:\n\
-                    \  - Loitering: {{ loitering }}\n  - Zone filter test: {{ 'ON'\
-                    \ if zones | length else 'OFF' }} - {{ 'PASS' if zone_filter else\
-                    \ 'FAIL' }}\n  - Multi-zone filter: {{ 'OFF' if not zones | length\
-                    \ or not zone_all else 'ON' }} - {{ 'PASS' if not zones | length\
-                    \ or not zone_all or ( entered_zones | length and zones and zones\
-                    \ | reject('in', entered_zones) | list | length == 0 ) else 'FAIL'\
-                    \ }}\n  - Image: api/frigate/notifications/{{ id }}/{{ attachment\
-                    \ }}\n"
+                  message: "Info:\n  - Last zones: {{ last_zones }}\n  - Current zones:
+                    {{ entered_zones }}\n  - Sublabel: {{ sub_label }}\n  - URL: api/frigate/notifications/{{
+                    id }}/{{ camera + '/clip.mp4' if clip | length > 0 and wait.trigger.payload_json['type']
+                    == 'end' else attachment }}\n  - Clip: \"{{ clip }}\"\n\nTriggers:\n
+                    \ - New snapshot: {{ new_snapshot }}\n  - Stationary moved: {{
+                    stationary_moved }}\n  - Entered zones changed: {{ entered_zones_changed
+                    }}\n  - Sublabel changed: {{ sub_label_changed }}\n\nConditions:\n
+                    \ - Loitering: {{ loitering }}\n  - Zone filter test: {{ 'ON'
+                    if zones | length else 'OFF' }} - {{ 'PASS' if zone_filter else
+                    'FAIL' }}\n  - Multi-zone filter: {{ 'OFF' if not zones | length
+                    or not zone_all else 'ON' }} - {{ 'PASS' if not zones | length
+                    or not zone_all or ( entered_zones | length and zones and zones
+                    | reject('in', entered_zones) | list | length == 0 ) else 'FAIL'
+                    }}\n  - Image: api/frigate/notifications/{{ id }}/{{ attachment
+                    }}\n"
                 action: persistent_notification.create
           - alias: Notify on loitering or significant change
             choose:
@@ -6265,7 +6258,7 @@
               == ''end'' }}'
   mode: parallel
 - id: '1727824341800'
-  alias: 🕗 Main Bedroom Ceiling Fan Default Light Status
+  alias: "\U0001F557 Main Bedroom Ceiling Fan Default Light Status"
   description: Adjusts the Main Bedroom ceiling fan light status based on the time
     of day.
   triggers:
@@ -6334,7 +6327,7 @@
           color_on: Red
   mode: single
 - id: '1665682307865'
-  alias: 🖥️ [Ardena] Power on Activity
+  alias: "\U0001F5A5️ [Ardena] Power on Activity"
   description: Turns on/off Ardena when the Family Room Harmony activity is changed
   trigger:
   - platform: state
@@ -6372,17 +6365,17 @@
         action: button.press
   mode: restart
 - id: '1745441734623'
-  alias: 🖥️ [Erebus] Microphone/Camera Active
+  alias: "\U0001F5A5️ [Erebus] Microphone/Camera Active"
   description: Changes basement hallway light animation when microphone or webcam
     is in use
   triggers:
   - entity_id:
     - binary_sensor.erebus_microphone_used
     trigger: state
-    to: null
+    to:
   - entity_id:
     - binary_sensor.erebus_camera_used
-    to: null
+    to:
     trigger: state
   conditions: []
   actions:
@@ -6426,7 +6419,7 @@
       alias: When microphone and webcam are inactive
   mode: restart
 - id: '1665695979311'
-  alias: 🖥️ [Quest] Charge Complete
+  alias: "\U0001F5A5️ [Quest] Charge Complete"
   description: Sends notification when Quest is done charging
   triggers:
   - entity_id:
@@ -6472,7 +6465,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1665696049425'
-  alias: 🖥️ [Quest] Interactive
+  alias: "\U0001F5A5️ [Quest] Interactive"
   description: Actions to take when the Quest is being used
   triggers:
   - entity_id: binary_sensor.quest_in_use
@@ -6513,17 +6506,17 @@
     default: []
   mode: single
 - id: '1751496724109'
-  alias: 🖥️ [Work Josh] Microphone/Camera Active
+  alias: "\U0001F5A5️ [Work Josh] Microphone/Camera Active"
   description: Changes basement hallway light animation when microphone or webcam
     is in use
   triggers:
   - entity_id:
     - binary_sensor.workjosh_mic_active
     trigger: state
-    to: null
+    to:
   - entity_id:
     - binary_sensor.workjosh_webcam_active
-    to: null
+    to:
     trigger: state
   conditions: []
   actions:
@@ -6594,7 +6587,7 @@
       alias: When microphone and webcam are inactive
   mode: restart
 - id: '1665695892233'
-  alias: 🖨️ Low Toner
+  alias: "\U0001F5A8️ Low Toner"
   description: Sends a notification when the printer toner is low
   triggers:
   - entity_id: sensor.canon_mf743c_black_toner
@@ -6655,7 +6648,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1665695909455'
-  alias: 🖨️ Out of Paper
+  alias: "\U0001F5A8️ Out of Paper"
   description: Sends a notification when the printer runs out of paper
   triggers:
   - entity_id: sensor.canon_mf743c_paper_tray
@@ -6707,7 +6700,7 @@
       action: script.notify_lnxlink
   mode: single
 - id: '1679340622496'
-  alias: 🗺️ Arriving Home
+  alias: "\U0001F5FA️ Arriving Home"
   description: Sends a notification when someone is arriving home.
   trigger:
   - platform: state
@@ -6767,7 +6760,7 @@
   mode: single
   max_exceeded: silent
 - id: '1677559331389'
-  alias: 🗺️ Leaving Zone
+  alias: "\U0001F5FA️ Leaving Zone"
   description: Sends a notification when someone is leaving a zone.
   triggers:
   - trigger: state
@@ -6779,8 +6772,8 @@
       minutes: 1
   conditions:
   - condition: template
-    value_template: "{{\n  not trigger.from_state.state in [\"home\", \"not_home\"\
-      , trigger.to_state.state]\n  and trigger.to_state.state != \"home\"\n}}"
+    value_template: "{{\n  not trigger.from_state.state in [\"home\", \"not_home\",
+      trigger.to_state.state]\n  and trigger.to_state.state != \"home\"\n}}"
   - condition: time
     after: 08:00:00
     before: '22:00:00'
@@ -6828,7 +6821,7 @@
       action: script.notify_speech
   mode: single
 - id: '1725260717620'
-  alias: 🚦 Amy Office Light Switch Status
+  alias: "\U0001F6A6 Amy Office Light Switch Status"
   description: Set Amy Office light switch LED light status
   trigger:
   - platform: state
@@ -6870,7 +6863,7 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: '1710965030799'
-  alias: 🚦 Emma Light Switch Status
+  alias: "\U0001F6A6 Emma Light Switch Status"
   description: Set Emma light switch LED on state changed
   trigger:
   - platform: state
@@ -6903,7 +6896,7 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: '1710964633068'
-  alias: 🚦 Ethan Light Switch Status
+  alias: "\U0001F6A6 Ethan Light Switch Status"
   description: Set Ethan light switch LED on state changed
   trigger:
   - platform: state
@@ -6936,7 +6929,7 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: '1722871416531'
-  alias: 🚦 Garage Entry Light Switch Status
+  alias: "\U0001F6A6 Garage Entry Light Switch Status"
   description: Set garage entry light switch LED when garage entry lock state has
     changed
   trigger:
@@ -6966,7 +6959,7 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: '1665688313389'
-  alias: 🚦 Garage Light Switch Status
+  alias: "\U0001F6A6 Garage Light Switch Status"
   description: Set Garage light switch LED when Garage Door and light status
   triggers:
   - entity_id:
@@ -7063,7 +7056,7 @@
       action: script.inovelli_blue_led
   mode: restart
 - id: '1665688406559'
-  alias: 🚦 Joshua Office Light Switch Status
+  alias: "\U0001F6A6 Joshua Office Light Switch Status"
   description: Set Joshua Office light switch LED light status
   trigger:
   - platform: state
@@ -7105,7 +7098,7 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: front_door_lock_state_change
-  alias: 🚦 Outside Entry Light Switch Status
+  alias: "\U0001F6A6 Outside Entry Light Switch Status"
   description: Set Outside Entry light switch LED when Front Door lock state has changed
   trigger:
   - platform: state
@@ -7134,7 +7127,7 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: '1755697837330'
-  alias: 🤖 Robot Vacuum Error
+  alias: "\U0001F916 Robot Vacuum Error"
   description: Sends notification when a robot vacuum is stuck
   triggers:
   - entity_id:
@@ -7198,7 +7191,7 @@
         value_template: '{{ not is_state(trigger.entity_id, ''error'') }}'
   mode: single
 - id: '1665686040957'
-  alias: 🧺 Dryer Notifications
+  alias: "\U0001F9FA Dryer Notifications"
   description: Actions when the dryer is running and is done
   triggers:
   - entity_id: sensor.emporiavue_main_dryer_power
@@ -7300,7 +7293,7 @@
   mode: single
   max_exceeded: silent
 - id: '1665686051361'
-  alias: 🧺 Washer Notifications
+  alias: "\U0001F9FA Washer Notifications"
   description: Actions when the washer is running and is done
   triggers:
   - entity_id: sensor.emporiavue_main_washer_power
