@@ -791,7 +791,7 @@ Material Design 3 Theme for Home Assistant
 - 🌐 UniFi WAN Status 🚫
 - 🍽️ Dishwasher is Done
 - 🍽️ Dishwasher Timer
-- 🍽️ Microwave Finished 🚫
+- 🍽️ Microwave Finished
 - 🍽️ Oven Bake Timer Completed
 - 🍽️ Oven Cook Timer
 - 🍽️ Oven is Preheated
