@@ -3103,78 +3103,82 @@ views:
                   extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
                     \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
                     \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: conditional
-                  conditions:
-                    - condition: state
-                      entity: input_boolean.washer_status
-                      state: 'on'
-                  card:
-                    type: custom:button-card
-                    template: badge
-                    entity: input_boolean.washer_status
-                    name: Washer
-                    icon: mdi:washing-machine-off
-                    label: "[[[\n  if (entity.state === 'on') return 'Running';\n\
-                      \  else return 'Off';\n]]]\n"
-                    tap_action:
-                      action: more-info
-                    variables:
-                      color: "[[[\n  if (entity.state === 'on') return 'var(--blue-color)';\n\
-                        \  else return 'var(--grey-color)';\n]]]\n"
-                    state:
-                      - value: 'on'
-                        icon: mdi:washing-machine
-                        styles:
-                          icon:
-                            - animation: shake 400ms ease-in-out infinite, drum 2s
-                                ease infinite
-                            - transform-origin: 50% 110%
-                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
-                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
-                      \ 4%, var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                      \ shake {\n    0%, 100% { transform: translate(0, 0) rotate(0);\
-                      \ }\n    20%  { transform: translate(0.4px, -0.4px) rotate(-4deg);\
-                      \ }\n    40%  { transform: translate(-0.4px, 0.4px) rotate(4deg);\
-                      \ }\n    60%  { transform: translate(0.4px, 0.4px) rotate(-4deg);\
-                      \ }\n    80%  { transform: translate(-0.4px, -0.4px) rotate(4deg);\
-                      \ }\n  }\n  @keyframes drum {\n    50%  { clip-path: polygon(0\
-                      \ 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47%\
-                      \ 79%, 34% 68%, 35% 100%, 100% 100%, 100% 0); }\n  }\n  `\n\
-                      \  ]]]\n"
-                - type: conditional
-                  conditions:
-                    - condition: state
-                      entity: input_boolean.dryer_status
-                      state: 'on'
-                  card:
-                    type: custom:button-card
-                    template: badge
-                    entity: input_boolean.dryer_status
-                    name: Dryer
-                    icon: mdi:tumble-dryer-off
-                    label: "[[[\n  if (entity.state === 'on') return 'Running';\n\
-                      \  else return 'Off';\n]]]\n"
-                    tap_action:
-                      action: more-info
-                    variables:
-                      color: "[[[\n  if (entity.state === 'on') return 'var(--orange-color)';\n\
-                        \  else return 'var(--grey-color)';\n]]]\n"
-                    state:
-                      - value: 'on'
-                        icon: mdi:tumble-dryer
-                        styles:
-                          icon:
-                            - animation: shake 400ms ease-in-out infinite, drum 1s
-                                infinite
-                            - transform-origin: 50% 65%
-                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
-                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
-                      \ 4%, var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                      \ shake {\n    0%, 100% { transform: rotate(4deg); }\n    50%\
-                      \  { transform: rotate(-4deg); }\n  }\n  @keyframes drum {\n\
-                      \    50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%,\
-                      \ 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100%\
-                      \ 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
+                - type: custom:button-card
+                  template: badge
+                  entity: input_select.washer_status
+                  triggers_update:
+                    - binary_sensor.washer_contact
+                  name: Washer
+                  icon: mdi:washing-machine
+                  label: "[[[\n  if (states['binary_sensor.washer_contact'].state\
+                    \ === 'on') return 'Open';\n  else return entity.state;\n]]]\n"
+                  tap_action:
+                    action: more-info
+                  variables:
+                    color: "[[[\n  if (states['binary_sensor.washer_contact'].state\
+                      \ === 'on') return 'var(--red-color)';\n  else if (entity.state\
+                      \ === 'Drying') return 'var(--blue-color)';\n  else if (entity.state\
+                      \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
+                      \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
+                      \ === 'Ready') return 'var(--lime-color)';\n  else if (entity.state\
+                      \ === 'Error') return 'var(--red-color)';\n  else return 'var(--grey-color)';\n\
+                      ]]]\n"
+                  state:
+                    - value: Error
+                      icon: mdi:washing-machine-alert
+                    - value: Washing
+                      styles:
+                        icon:
+                          - animation: shake 400ms ease-in-out infinite, drum 2s ease
+                              infinite
+                          - transform-origin: 50% 110%
+                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                    \ shake {\n    0%, 100% { transform: translate(0, 0) rotate(0);\
+                    \ }\n    20%  { transform: translate(0.4px, -0.4px) rotate(-4deg);\
+                    \ }\n    40%  { transform: translate(-0.4px, 0.4px) rotate(4deg);\
+                    \ }\n    60%  { transform: translate(0.4px, 0.4px) rotate(-4deg);\
+                    \ }\n    80%  { transform: translate(-0.4px, -0.4px) rotate(4deg);\
+                    \ }\n  }\n  @keyframes drum {\n    50%  { clip-path: polygon(0\
+                    \ 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47%\
+                    \ 79%, 34% 68%, 35% 100%, 100% 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
+                - type: custom:button-card
+                  template: badge
+                  entity: input_select.dryer_status
+                  triggers_update:
+                    - binary_sensor.dryer_contact
+                  name: Dryer
+                  icon: mdi:tumble-dryer
+                  label: "[[[\n  if (states['binary_sensor.dryer_contact'].state ===\
+                    \ 'on') return 'Open';\n  else return entity.state;\n]]]\n"
+                  tap_action:
+                    action: more-info
+                  variables:
+                    color: "[[[\n  if (states['binary_sensor.dryer_contact'].state\
+                      \ === 'on') return 'var(--red-color)';\n  else if (entity.state\
+                      \ === 'Drying') return 'var(--orange-color)';\n  else if (entity.state\
+                      \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
+                      \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
+                      \ === 'Ready') return 'var(--blue-color)';\n  else if (entity.state\
+                      \ === 'Error') return 'var(--red-color)';\n  else return 'var(--grey-color)';\n\
+                      ]]]\n"
+                  state:
+                    - value: Error
+                      icon: mdi:tumble-dryer-alert
+                    - value: Drying
+                      styles:
+                        icon:
+                          - animation: shake 400ms ease-in-out infinite, drum 1s infinite
+                          - transform-origin: 50% 65%
+                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                    \ shake {\n    0%, 100% { transform: rotate(4deg); }\n    50%\
+                    \  { transform: rotate(-4deg); }\n  }\n  @keyframes drum {\n \
+                    \   50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%,\
+                    \ 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100%\
+                    \ 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
                 - type: conditional
                   conditions:
                     - condition: or
@@ -10385,19 +10389,27 @@ views:
           \ 100%);\n    }\n  }\n  `\n  ]]]\n"
       - type: custom:button-card
         template: badge
-        entity: input_boolean.washer_status
+        entity: input_select.washer_status
+        triggers_update:
+          - binary_sensor.washer_contact
         name: Washer
-        icon: mdi:washing-machine-off
-        label: "[[[\n  if (entity.state === 'on') return 'Running';\n  else return\
-          \ 'Off';\n]]]\n"
+        icon: mdi:washing-machine
+        label: "[[[\n  if (states['binary_sensor.washer_contact'].state === 'on')\
+          \ return 'Open';\n  else return entity.state;\n]]]\n"
         tap_action:
           action: none
         variables:
-          color: "[[[\n  if (entity.state === 'on') return 'var(--blue-color)';\n\
+          color: "[[[\n  if (states['binary_sensor.washer_contact'].state === 'on')\
+            \ return 'var(--red-color)';\n  else if (entity.state === 'Drying') return\
+            \ 'var(--blue-color)';\n  else if (entity.state === 'Finished') return\
+            \ 'var(--green-color)';\n  else if (entity.state === 'Waiting') return\
+            \ 'var(--yellow-color)';\n  else if (entity.state === 'Ready') return\
+            \ 'var(--lime-color)';\n  else if (entity.state === 'Error') return 'var(--red-color)';\n\
             \  else return 'var(--grey-color)';\n]]]\n"
         state:
-          - value: 'on'
-            icon: mdi:washing-machine
+          - value: Error
+            icon: mdi:washing-machine-alert
+          - value: Washing
             styles:
               icon:
                 - animation: shake 400ms ease-in-out infinite, drum 2s ease infinite
@@ -10414,19 +10426,27 @@ views:
           \ 0); }\n  }\n  `\n  ]]]\n"
       - type: custom:button-card
         template: badge
-        entity: input_boolean.dryer_status
+        entity: input_select.dryer_status
+        triggers_update:
+          - binary_sensor.dryer_contact
         name: Dryer
-        icon: mdi:tumble-dryer-off
-        label: "[[[\n  if (entity.state === 'on') return 'Running';\n  else return\
-          \ 'Off';\n]]]\n"
+        icon: mdi:tumble-dryer
+        label: "[[[\n  if (states['binary_sensor.dryer_contact'].state === 'on') return\
+          \ 'Open';\n  else return entity.state;\n]]]\n"
         tap_action:
           action: none
         variables:
-          color: "[[[\n  if (entity.state === 'on') return 'var(--orange-color)';\n\
+          color: "[[[\n  if (states['binary_sensor.dryer_contact'].state === 'on')\
+            \ return 'var(--red-color)';\n  else if (entity.state === 'Drying') return\
+            \ 'var(--orange-color)';\n  else if (entity.state === 'Finished') return\
+            \ 'var(--green-color)';\n  else if (entity.state === 'Waiting') return\
+            \ 'var(--yellow-color)';\n  else if (entity.state === 'Ready') return\
+            \ 'var(--blue-color)';\n  else if (entity.state === 'Error') return 'var(--red-color)';\n\
             \  else return 'var(--grey-color)';\n]]]\n"
         state:
-          - value: 'on'
-            icon: mdi:tumble-dryer
+          - value: Error
+            icon: mdi:tumble-dryer-alert
+          - value: Drying
             styles:
               icon:
                 - animation: shake 400ms ease-in-out infinite, drum 1s infinite

@@ -7211,37 +7211,18 @@
   mode: single
 - id: '1665686040957'
   alias: "\U0001F9FA Dryer Notifications"
-  description: Actions when the dryer is running and is done
+  description: Actions when the dryer is running and is done, with door monitoring
+    and reminders
   triggers:
-  - entity_id: sensor.emporiavue_main_dryer_power
+  - alias: Dryer power above threshold
+    entity_id: sensor.emporiavue_main_dryer_power
     for:
       minutes: 1
     above: 100
     trigger: numeric_state
   conditions: []
   actions:
-  - alias: Set start time and start power tracking
-    variables:
-      start_time: '{{ now().timestamp() }}'
-      start_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'')
-        | float }}'
-  - alias: Set dryer active switch on
-    target:
-      entity_id: input_boolean.dryer_status
-    data: {}
-    action: input_boolean.turn_on
-  - alias: Wait until appliance has finished
-    wait_for_trigger:
-    - entity_id: sensor.emporiavue_main_dryer_power
-      below: 100
-      for:
-        seconds: 30
-      trigger: numeric_state
-    timeout:
-      hours: 2
-      minutes: 0
-      seconds: 0
-  - alias: Set message and stop power tracking
+  - alias: Set common variables
     variables:
       title: Dryer
       icon: local/icons/tumble-dryer.png
@@ -7249,6 +7230,37 @@
       color: '#ff9800'
       tag: laundry-dryer
       group: Laundry
+      end_reminder_notification_max_count: 3
+  - alias: Set start time and start power tracking
+    variables:
+      start_time: '{{ now().timestamp() }}'
+      start_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'')
+        | float }}'
+  - alias: Perform the run status action
+    target:
+      entity_id: input_select.dryer_status
+    data:
+      option: Drying
+    action: input_select.select_option
+  - alias: Wait until appliance has finished
+    wait_for_trigger:
+    - trigger: numeric_state
+      entity_id: sensor.emporiavue_main_dryer_power
+      below: 30
+      for:
+        seconds: 30
+    timeout:
+      hours: 2
+      minutes: 0
+      seconds: 0
+  - alias: Perform the run status action
+    action: input_select.select_option
+    target:
+      entity_id: input_select.dryer_status
+    data:
+      option: Finished
+  - alias: Set message and stop power tracking
+    variables:
       end_power_consumption: '{{ states(''sensor.emporiavue_main_dryer_daily'') |
         float }}'
       summary: The dryer is done!
@@ -7261,23 +7273,166 @@
       seconds: '{{ (duration % 60) | int }}'
       message: '{{ summary }} {{ ''\n'' }} Consumption: {{ kwh | round(2) }}kWh {{
         ''\n'' }} Approx Cost: {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration:
-        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
-        | format(seconds) }}
+        {{ ''%02d:%02d:%02d'' | format(hours, minutes, seconds) }}
 
         '
-  - alias: Set dryer active switch off
-    target:
-      entity_id: input_boolean.dryer_status
-    data: {}
-    action: input_boolean.turn_off
-  - alias: Send a notification to each device
+  - alias: Parallel actions for end notification
+    parallel:
+    - sequence:
+      - data:
+          send_to: parents
+          location: home
+          title: '{{ title }}'
+          subtitle: '{{ summary }} ⤵️'
+          message: '{{ message }}'
+          notification_icon: '{{ icon_mdi }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          interruption_level: critical
+          tag: '{{ tag }}'
+        action: script.notify_mobile
+      - data:
+          entity:
+          - media_player.nasya
+          title: '{{ title }}'
+          message: '{{ message }}'
+        action: script.notify_hass_agent
+      - data:
+          computer:
+          - erebus
+          title: '{{ title }}'
+          message: '{{ message }}'
+          icon: '{{ icon }}'
+        action: script.notify_lnxlink
+      - data:
+          entity:
+          - media_player.living_room_googletv
+          - media_player.shield_family_room
+          - media_player.shield_main_bedroom
+          title: '{{ title }}'
+          message: '{{ summary }}'
+          tag: '{{ tag }}'
+          large_icon: '{{ icon }}'
+          icon_color: '{{ color }}'
+        action: script.notify_tvoverlay
+  - wait_for_trigger:
+    - trigger: state
+      entity_id: binary_sensor.dryer_contact
+      to: 'on'
+    timeout:
+      minutes: 10
+  - repeat:
+      while:
+      - condition: template
+        value_template: "{{ (is_state('binary_sensor.dryer_contact', 'off'))\n  and
+          (repeat.index <= end_reminder_notification_max_count) }}"
+      sequence:
+      - alias: End reminder notification variables
+        variables:
+          reminder_message: Hey! Your fresh laundry has been waiting for {{ states.input_select.washer_status.last_changed
+            | relative_time }}, don't leave it hanging!
+      - alias: Parallel actions for reminder notification
+        parallel:
+        - data:
+            send_to: parents
+            location: home
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            group: '{{ group }}'
+            interruption_level: critical
+            tag: '{{ tag }}'
+          action: script.notify_mobile
+        - data:
+            entity:
+            - media_player.nasya
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+          action: script.notify_hass_agent
+        - data:
+            computer:
+            - erebus
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+            icon: '{{ icon }}'
+          action: script.notify_lnxlink
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
+          action: script.notify_tvoverlay
+      - choose:
+        - alias: Check reminder notification entity is OFF and max count is less before
+            waiting
+          conditions:
+          - condition: template
+            value_template: "{{ (is_state('binary_sensor.dryer_contact', 'off'))\n
+              \ and (repeat.index <= end_reminder_notification_max_count - 1) }}"
+          sequence:
+          - wait_for_trigger:
+            - trigger: state
+              entity_id: binary_sensor.dryer_contact
+              to: 'on'
+            timeout:
+              minutes: 10
+  - choose:
+    - alias: Perform the run status action
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.dryer_contact
+        state: 'off'
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.dryer_status
+        data:
+          option: Waiting
+  - choose:
+    - alias: Entity is ON, check run status options
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.dryer_contact
+        state: 'on'
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.dryer_status
+        data:
+          option: Ready
+    - alias: Entity is OFF, wait for it to turn ON
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.dryer_contact
+        state: 'off'
+      sequence:
+      - wait_for_trigger:
+        - trigger: state
+          entity_id: binary_sensor.dryer_contact
+          to: 'on'
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.dryer_status
+        data:
+          option: Ready
+  - alias: Set end reminder notification
+    variables:
+      attended_message: Fresh laundry on the move, let the sorting begin!
+  - alias: Parallel actions for end notification
     parallel:
     - data:
         send_to: parents
         location: home
         title: '{{ title }}'
-        subtitle: '{{ summary }} ⤵️'
-        message: '{{ message }}'
+        message: '{{ attended_message }}'
         notification_icon: '{{ icon_mdi }}'
         color: '{{ color }}'
         icon: '{{ icon }}'
@@ -7289,13 +7444,13 @@
         entity:
         - media_player.nasya
         title: '{{ title }}'
-        message: '{{ message }}'
+        message: '{{ attended_message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
         title: '{{ title }}'
-        message: '{{ message }}'
+        message: '{{ attended_message }}'
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
@@ -7304,7 +7459,7 @@
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: '{{ title }}'
-        message: '{{ summary }}'
+        message: '{{ attended_message }}'
         tag: '{{ tag }}'
         large_icon: '{{ icon }}'
         icon_color: '{{ color }}'
@@ -7313,37 +7468,18 @@
   max_exceeded: silent
 - id: '1665686051361'
   alias: "\U0001F9FA Washer Notifications"
-  description: Actions when the washer is running and is done
+  description: Actions when the washer is running and is done, with door monitoring
+    and reminders
   triggers:
-  - entity_id: sensor.emporiavue_main_washer_power
+  - alias: Washer power above threshold
+    entity_id: sensor.emporiavue_main_washer_power
     for:
       minutes: 1
-    above: 40
+    above: 30
     trigger: numeric_state
   conditions: []
   actions:
-  - alias: Set start time and start power tracking
-    variables:
-      start_time: '{{ now().timestamp() }}'
-      start_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'')
-        | float }}'
-  - alias: Set washer active switch on
-    target:
-      entity_id: input_boolean.washer_status
-    data: {}
-    action: input_boolean.turn_on
-  - alias: Wait until appliance has finished
-    wait_for_trigger:
-    - entity_id: sensor.emporiavue_main_washer_power
-      below: 10
-      for:
-        seconds: 30
-      trigger: numeric_state
-    timeout:
-      hours: 2
-      minutes: 0
-      seconds: 0
-  - alias: Set message and stop power tracking
+  - alias: Set common variables
     variables:
       title: Washer
       icon: local/icons/washing-machine.png
@@ -7351,6 +7487,37 @@
       color: '#ff9800'
       tag: laundry-washer
       group: Laundry
+      end_reminder_notification_max_count: 3
+  - alias: Set start time and start power tracking
+    variables:
+      start_time: '{{ now().timestamp() }}'
+      start_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'')
+        | float }}'
+  - alias: Perform the run status action
+    target:
+      entity_id: input_select.washer_status
+    data:
+      option: Washing
+    action: input_select.select_option
+  - alias: Wait until appliance has finished
+    wait_for_trigger:
+    - trigger: numeric_state
+      entity_id: sensor.emporiavue_main_washer_power
+      below: 10
+      for:
+        seconds: 30
+    timeout:
+      hours: 2
+      minutes: 0
+      seconds: 0
+  - alias: Perform the run status action
+    action: input_select.select_option
+    target:
+      entity_id: input_select.washer_status
+    data:
+      option: Finished
+  - alias: Set message and stop power tracking
+    variables:
       end_power_consumption: '{{ states(''sensor.emporiavue_main_washer_daily'') |
         float }}'
       summary: The washer is done!
@@ -7363,23 +7530,166 @@
       seconds: '{{ (duration % 60) | int }}'
       message: '{{ summary }} {{ ''\n'' }} Consumption: {{ kwh | round(2) }}kWh {{
         ''\n'' }} Approx Cost: {{ "${:.2f}".format(cost) }} {{ ''\n'' }} Duration:
-        {{ ''%02d'' | format(hours) }}:{{ ''%02d'' | format(minutes) }}:{{ ''%02d''
-        | format(seconds) }}
+        {{ ''%02d:%02d:%02d'' | format(hours, minutes, seconds) }}
 
         '
-  - alias: Set washer active switch off
-    target:
-      entity_id: input_boolean.washer_status
-    data: {}
-    action: input_boolean.turn_off
-  - alias: Send a notification to each device
+  - alias: Parallel actions for end notification
+    parallel:
+    - sequence:
+      - data:
+          send_to: parents
+          location: home
+          title: '{{ title }}'
+          subtitle: '{{ summary }} ⤵️'
+          message: '{{ message }}'
+          notification_icon: '{{ icon_mdi }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          interruption_level: critical
+          tag: '{{ tag }}'
+        action: script.notify_mobile
+      - data:
+          entity:
+          - media_player.nasya
+          title: '{{ title }}'
+          message: '{{ message }}'
+        action: script.notify_hass_agent
+      - data:
+          computer:
+          - erebus
+          title: '{{ title }}'
+          message: '{{ message }}'
+          icon: '{{ icon }}'
+        action: script.notify_lnxlink
+      - data:
+          entity:
+          - media_player.living_room_googletv
+          - media_player.shield_family_room
+          - media_player.shield_main_bedroom
+          title: '{{ title }}'
+          message: '{{ summary }}'
+          tag: '{{ tag }}'
+          large_icon: '{{ icon }}'
+          icon_color: '{{ color }}'
+        action: script.notify_tvoverlay
+  - wait_for_trigger:
+    - trigger: state
+      entity_id: binary_sensor.washer_contact
+      to: 'on'
+    timeout:
+      minutes: 10
+  - repeat:
+      while:
+      - condition: template
+        value_template: "{{ (is_state('binary_sensor.washer_contact', 'off'))\n  and
+          (repeat.index <= end_reminder_notification_max_count) }}"
+      sequence:
+      - alias: End reminder notification variables
+        variables:
+          reminder_message: Hey! Your fresh laundry has been waiting for {{ states.input_select.washer_status.last_changed
+            | relative_time }}, don't leave it hanging!
+      - alias: Parallel actions for reminder notification
+        parallel:
+        - data:
+            send_to: parents
+            location: home
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            group: '{{ group }}'
+            interruption_level: critical
+            tag: '{{ tag }}'
+          action: script.notify_mobile
+        - data:
+            entity:
+            - media_player.nasya
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+          action: script.notify_hass_agent
+        - data:
+            computer:
+            - erebus
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+            icon: '{{ icon }}'
+          action: script.notify_lnxlink
+        - data:
+            entity:
+            - media_player.living_room_googletv
+            - media_player.shield_family_room
+            - media_player.shield_main_bedroom
+            title: '{{ title }}'
+            message: '{{ reminder_message }}'
+            tag: '{{ tag }}'
+            large_icon: '{{ icon }}'
+            icon_color: '{{ color }}'
+          action: script.notify_tvoverlay
+      - choose:
+        - alias: Check reminder notification entity is OFF and max count is less before
+            waiting
+          conditions:
+          - condition: template
+            value_template: "{{ (is_state('binary_sensor.washer_contact', 'off'))\n
+              \ and (repeat.index <= end_reminder_notification_max_count - 1) }}"
+          sequence:
+          - wait_for_trigger:
+            - trigger: state
+              entity_id: binary_sensor.washer_contact
+              to: 'on'
+            timeout:
+              minutes: 10
+  - choose:
+    - alias: Perform the run status action
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.washer_contact
+        state: 'off'
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.washer_status
+        data:
+          option: Waiting
+  - choose:
+    - alias: Entity is ON, check run status options
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.washer_contact
+        state: 'on'
+      sequence:
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.washer_status
+        data:
+          option: Ready
+    - alias: Entity is OFF, wait for it to turn ON
+      conditions:
+      - condition: state
+        entity_id: binary_sensor.washer_contact
+        state: 'off'
+      sequence:
+      - wait_for_trigger:
+        - trigger: state
+          entity_id: binary_sensor.washer_contact
+          to: 'on'
+      - action: input_select.select_option
+        target:
+          entity_id: input_select.washer_status
+        data:
+          option: Ready
+  - alias: Set end reminder notification
+    variables:
+      attended_message: Fresh laundry on the move, let the drying begin!
+  - alias: Parallel actions for end notification
     parallel:
     - data:
         send_to: parents
         location: home
         title: '{{ title }}'
-        subtitle: '{{ summary }} ⤵️'
-        message: '{{ message }}'
+        message: '{{ attended_message }}'
         notification_icon: '{{ icon_mdi }}'
         color: '{{ color }}'
         icon: '{{ icon }}'
@@ -7391,13 +7701,13 @@
         entity:
         - media_player.nasya
         title: '{{ title }}'
-        message: '{{ message }}'
+        message: '{{ attended_message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
         title: '{{ title }}'
-        message: '{{ message }}'
+        message: '{{ attended_message }}'
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
@@ -7406,7 +7716,7 @@
         - media_player.shield_family_room
         - media_player.shield_main_bedroom
         title: '{{ title }}'
-        message: '{{ summary }}'
+        message: '{{ attended_message }}'
         tag: '{{ tag }}'
         large_icon: '{{ icon }}'
         icon_color: '{{ color }}'
