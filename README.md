@@ -318,6 +318,12 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
+### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.0]
+
+🔹 Use custom svg icons in Home Assistant
+
+Authors: [@thomasloven](https://github.com/thomasloven).
+
 ### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v1.0.6]
 
 Home Assistant integration for Dreame robot vacuums with map support
@@ -329,12 +335,6 @@ Authors: [@tasshack](https://github.com/tasshack).
 Home Assistant Service for sending commands to a Wifi enabled DreamScreen
 
 Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
-
-### [Fontawesome](https://github.com/thomasloven/hass-fontawesome) [v2.2.3]
-
-🔹 Use icons from fontawesome in home-assistant
-
-Authors: [@thomasloven](https://github.com/thomasloven).
 
 ### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.9.4]
 
