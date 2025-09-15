@@ -51,43 +51,28 @@
 {#
   Returns battery icon based on battery level.
 #}
-{%- macro battery_icon(entity) -%}
-  {%- if has_value(entity) -%}
-    {%- set battery_level = states(entity) | int -%}
-    {%- if battery_level == 100 -%}
-      mdi:battery
-    {%- elif battery_level >= 10 -%}
-      mdi:battery-{{ battery_level // 10 * 10 }}
-    {%- elif battery_level < 10 -%}
-      mdi:battery-outline
-    {%- endif -%}
+{%- macro battery_icon(battery_level, is_charging=false, is_wireless=false) -%}
+  {%- if (battery_level | int(None)) == None -%}
+    mdi:battery-unknown
   {%- else -%}
-    mdi:battery-alert-variant-outline
-  {%- endif -%}
-{%- endmacro -%}
-
-{#
-  Returns battery icon based on battery level and charge state.
-#}
-{%- macro cell_battery_icon(entity, charge, type) -%}
-  {%- if has_value(entity) -%}
+    {# Convert battery_level to integer #}
+    {%- set level = battery_level | int -%}
+    {# Determine icon base on charging state #}
     {%- set state = "battery" -%}
-    {%- if is_state(charge, "charging") -%}
+    {%- if is_charging -%}
       {%- set state = state ~ "-charging" -%}
-      {%- if is_state(type, "wireless") -%}
+      {%- if is_wireless -%}
         {%- set state = state ~ "-wireless" -%}
       {%- endif -%}
     {%- endif -%}
-    {%- set battery_level = states(entity) | int -%}
-    {%- if battery_level == 100 -%}
+    {# Determine icon based on battery level #}
+    {%- if level >= 100 -%}
       mdi:{{ state }}
-    {%- elif battery_level >= 10 -%}
-      mdi:{{ state }}-{{ battery_level // 10 * 10 }}
-    {%- elif battery_level < 10 -%}
+    {%- elif level >= 10 -%}
+      mdi:{{ state }}-{{ level // 10 * 10 }}
+    {%- elif level < 10 -%}
       mdi:{{ state }}-outline
     {%- endif -%}
-  {%- else -%}
-    mdi:battery-alert-variant-outline
   {%- endif -%}
 {%- endmacro -%}
 
