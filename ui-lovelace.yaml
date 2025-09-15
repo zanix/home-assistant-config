@@ -3124,7 +3124,7 @@ views:
                   variables:
                     color: "[[[\n  if (states['binary_sensor.washer_contact'].state\
                       \ === 'on') return 'var(--red-color)';\n  else if (entity.state\
-                      \ === 'Drying') return 'var(--blue-color)';\n  else if (entity.state\
+                      \ === 'Washing') return 'var(--blue-color)';\n  else if (entity.state\
                       \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
                       \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
                       \ === 'Ready') return 'var(--lime-color)';\n  else if (entity.state\
@@ -10421,7 +10421,7 @@ views:
           action: none
         variables:
           color: "[[[\n  if (states['binary_sensor.washer_contact'].state === 'on')\
-            \ return 'var(--red-color)';\n  else if (entity.state === 'Drying') return\
+            \ return 'var(--red-color)';\n  else if (entity.state === 'Washing') return\
             \ 'var(--blue-color)';\n  else if (entity.state === 'Finished') return\
             \ 'var(--green-color)';\n  else if (entity.state === 'Waiting') return\
             \ 'var(--yellow-color)';\n  else if (entity.state === 'Ready') return\
@@ -25636,14 +25636,57 @@ views:
             icon: mdi:car-connected
             vertical: false
             icon_tap_action:
-              action: more-info
+              action: none
           - type: custom:mushroom-template-card
+            entity: sensor.amy_travel_time
+            icon: mdi:map-clock
+            color: purple
+            features_position: bottom
+            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
+              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
+              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
+              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
+              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
+              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
+              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n    {{\n      (\n        states[entity].last_updated\
+              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
+              \ %p')\n    }}\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
+              {% else %}\n  Unknown\n{% endif %}"
+            tap_action:
+              action: perform-action
+              target:
+                entity_id: sensor.amy_travel_time
+              perform_action: homeassistant.update_entity
+              data:
+                entity_id:
+                  - sensor.amy_travel_time
+            hold_action:
+              action: more-info
+            double_tap_action:
+              action: none
             visibility:
               - condition: state
                 entity: input_text.amy_itinerary
                 state:
                   - arriving
                   - on_approach
+            layout_options:
+              grid_columns: 4
+              grid_rows: 1
+          - type: custom:mushroom-template-card
+            entity: sensor.joshua_travel_time
+            icon: mdi:map-clock
+            color: blue
+            features_position: bottom
             primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
               \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
               \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
@@ -25659,65 +25702,28 @@ views:
               \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
               \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
               \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n\n    {{\n      (\n        states[entity].last_updated\
+              \ %}\n    {% endif %}\n    {{\n      (\n        states[entity].last_updated\
               \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
-              \ %p')\n    }}\n\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
+              \ %p')\n    }}\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
               {% else %}\n  Unknown\n{% endif %}"
-            icon: mdi:map-clock
-            entity: sensor.amy_travel_time
-            icon_color: purple
             tap_action:
-              action: call-service
-              service: homeassistant.update_entity
+              action: perform-action
               target:
-                entity_id: sensor.amy_travel_time
+                entity_id: sensor.joshua_travel_time
+              perform_action: homeassistant.update_entity
+              data:
+                entity_id:
+                  - sensor.joshua_travel_time
             hold_action:
               action: more-info
             double_tap_action:
               action: none
-            fill_container: false
-            layout_options:
-              grid_columns: 4
-              grid_rows: 1
-          - type: custom:mushroom-template-card
             visibility:
               - condition: state
                 entity: input_text.joshua_itinerary
                 state:
                   - arriving
                   - on_approach
-            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
-              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
-              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
-              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
-              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
-              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
-              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
-              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
-              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
-              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
-            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
-              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
-              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
-              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n\n    {{\n      (\n        states[entity].last_updated\
-              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
-              \ %p')\n    }}\n\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
-              {% else %}\n  Unknown\n{% endif %}"
-            icon: mdi:map-clock
-            entity: sensor.joshua_travel_time
-            icon_color: blue
-            tap_action:
-              action: call-service
-              service: homeassistant.update_entity
-              target:
-                entity_id: sensor.joshua_travel_time
-            hold_action:
-              action: more-info
-            double_tap_action:
-              action: none
-            fill_container: false
             layout_options:
               grid_columns: 4
               grid_rows: 1
