@@ -412,38 +412,6 @@ button_card_templates:
         \    return `<ha-icon icon=\"mdi:circle\" style=\"width: 20px; height: 20px;\
         \ color: ${variables.badge_icon_color || 'var(--cyan-color)'};\"></ha-icon>`;\n\
         ]]]"
-  person:
-    template: room
-    show_entity_picture: true
-    variables:
-      - icon_color
-    custom_fields:
-      stat: "[[[\n  if (entity.state) return helpers.localize(entity)\n]]]\n"
-    state:
-      - value: not_home
-        styles:
-          card:
-            - background-color: rgba(244, 67, 54, 0.2)
-      - value: "[[[\n  if (['unknown', 'unavailable'].includes(entity.state)) return\
-          \ true; else return false\n]]]\n"
-        styles:
-          card:
-            - background-color: rgba(189, 189, 189, 0.2)
-      - value: home
-        operator: '!='
-        styles:
-          card:
-            - background-color: rgba(33, 150, 243, 0.2)
-    styles:
-      img_cell:
-        - top: 1px
-        - left: 1px
-        - width: 65px
-        - height: 65px
-      icon:
-        - position: relative
-        - width: 65px
-        - height: 65px
   room:
     variables:
       - icon_color
@@ -529,6 +497,38 @@ button_card_templates:
           - padding-right: calc(var(--ha-card-border-radius, 12px) / 2)
           - padding-top: 1px
           - padding-bottom: 1px
+  person:
+    template: room
+    show_entity_picture: true
+    variables:
+      - icon_color
+    custom_fields:
+      stat: "[[[\n  if (entity.state) return helpers.localize(entity)\n]]]\n"
+    state:
+      - value: not_home
+        styles:
+          card:
+            - background-color: rgba(244, 67, 54, 0.2)
+      - value: "[[[\n  if (['unknown', 'unavailable'].includes(entity.state)) return\
+          \ true; else return false\n]]]\n"
+        styles:
+          card:
+            - background-color: rgba(189, 189, 189, 0.2)
+      - value: home
+        operator: '!='
+        styles:
+          card:
+            - background-color: rgba(33, 150, 243, 0.2)
+    styles:
+      img_cell:
+        - top: 1px
+        - left: 1px
+        - width: 65px
+        - height: 65px
+      icon:
+        - position: relative
+        - width: 65px
+        - height: 65px
   vehicle:
     template: room
     show_entity_picture: true
@@ -3660,7 +3660,7 @@ views:
                     type: template
                     entity: binary_sensor.athos_connected
                     icon_color: lime
-                    icon: mdi:desktop-tower
+                    icon: mdi:gamepad-square-outline
                     tap_action:
                       action: none
                 - type: conditional
@@ -3675,29 +3675,26 @@ views:
                     tap_action:
                       action: none
                 - type: template
-                  entity: select.harmony_family_room_activities
-                  icon_color: "{% set state = states(entity) %}\n{% if state == \"\
-                    Computer\" %}\n  teal\n{% elif state == \"PS3\" %}\n  cyan\n{%\
-                    \ elif state == \"PS4\" %}\n  blue\n{% elif state == \"Switch\"\
-                    \ %}\n  red\n{% elif state == \"XBox\" %}\n  green\n{% else %}\n\
-                    \  disabled\n{% endif %}"
-                  icon: "{% set state = states(entity) %}\n{% if state == \"Computer\"\
-                    \ %}\n  mdi:desktop-tower\n{% elif state == \"PS3\" %}\n  simple-icons:playstation3\n\
-                    {% elif state == \"PS4\" %}\n  simple-icons:playstation4\n{% elif\
-                    \ state == \"Switch\" %}\n  mdi:nintendo-switch\n{% elif state\
-                    \ == \"XBox\" %}\n  mdi:microsoft-xbox\n{% else %}\n  mdi:gamepad-variant-outline\n\
-                    {% endif %}"
-                  tap_action:
-                    action: none
-                - type: template
                   entity: media_player.universal_family_room
-                  icon_color: "{% set state = states(entity) %}\n{% if state == \"\
-                    playing\" %}\n  green\n{% elif state == \"paused\" %}\n  amber\n\
-                    {% elif state == \"idle\" %}\n  light-blue\n{% elif state in [\"\
-                    standby\", \"on\"] %}\n  blue-grey\n{% else %}\n  disabled\n{%\
-                    \ endif %}"
-                  icon: '{% from "util.jinja" import media_icon %} {{ media_icon(entity)
-                    }}'
+                  icon_color: "{% set activity = states(\"select.harmony_family_room_activities\"\
+                    ) %}\n{% if activity == \"Shield\" %}\n  {% set state = states(entity)\
+                    \ %}\n  {% if state == \"playing\" %}\n    green\n  {% elif state\
+                    \ == \"paused\" %}\n    amber\n  {% elif state == \"idle\" %}\n\
+                    \    light-blue\n  {% elif state in [\"standby\", \"on\"] %}\n\
+                    \    blue-grey\n  {% endif %}\n{% elif activity == \"Computer\"\
+                    \ %}\n  teal\n{% elif activity == \"PS3\" %}\n  cyan\n{% elif\
+                    \ activity == \"PS4\" %}\n  blue\n{% elif activity == \"Switch\"\
+                    \ %}\n  red\n{% elif activity == \"XBox\" %}\n  green\n{% else\
+                    \ %}\n  disabled\n{% endif %}"
+                  icon: "{% from \"util.jinja\" import media_icon %}\n{% set activity\
+                    \ = states(\"select.harmony_family_room_activities\") %}\n{% if\
+                    \ activity == \"Shield\" %}\n  {{ media_icon(entity) }}\n{% elif\
+                    \ activity == \"Computer\" %}\n  mdi:desktop-tower\n{% elif activity\
+                    \ == \"PS3\" %}\n  simple-icons:playstation3\n{% elif activity\
+                    \ == \"PS4\" %}\n  simple-icons:playstation4\n{% elif activity\
+                    \ == \"Switch\" %}\n  mdi:nintendo-switch\n{% elif activity ==\
+                    \ \"XBox\" %}\n  mdi:microsoft-xbox\n{% else %}\n  mdi:gamepad-variant-outline\n\
+                    {% endif %}"
                   tap_action:
                     action: fire-dom-event
                     browser_mod:
@@ -12664,8 +12661,8 @@ views:
                   - camera: camera.garage
                   - stream: garage
     subview: true
-  - type: sections
-    title: Ethan's Chores
+  - title: Ethan's Chores
+    type: sections
     path: ethan-chores
     max_columns: 3
     sections:
@@ -14203,8 +14200,8 @@ views:
             users:
               - ce9ee65ab49c4ca4af52496609016f1c
               - f615672fc2554783beab56221097564e
-  - type: sections
-    title: Emma's Chores
+  - title: Emma's Chores
+    type: sections
     path: emma-chores
     max_columns: 3
     sections:
@@ -22616,9 +22613,9 @@ views:
       - user: f615672fc2554783beab56221097564e
       - user: 171eeb6104704b03afcad6553b7b793e
       - user: 6905264120304e96aa416e287aca5b80
-  - type: sections
+  - title: Power Stats
+    type: sections
     max_columns: 3
-    title: Power Stats
     path: power-stats
     subview: true
     sections:
@@ -23798,9 +23795,163 @@ views:
         column_span: 3
     icon: mdi:chart-sankey-variant
     cards: []
-  - type: sections
+  - title: Itinerary
+    path: vehicle-tracker-map
+    icon: mdi:map
+    subview: false
+    type: sections
+    max_columns: 4
+    cards: []
+    sections:
+      - type: grid
+        column_span: 1
+        cards:
+          - features:
+              - type: toggle
+            type: tile
+            entity: automation.automatic_gate
+            name: Automatic Garage Door
+            features_position: inline
+            hide_state: true
+            color: deep-orange
+            icon: mdi:car-connected
+            vertical: false
+            icon_tap_action:
+              action: none
+          - type: custom:mushroom-template-card
+            entity: sensor.amy_travel_time
+            icon: mdi:map-clock
+            color: purple
+            features_position: bottom
+            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
+              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
+              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
+              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
+              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
+              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
+              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n    {{\n      (\n        states[entity].last_updated\
+              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
+              \ %p')\n    }}\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
+              {% else %}\n  Unknown\n{% endif %}"
+            tap_action:
+              action: perform-action
+              target:
+                entity_id: sensor.amy_travel_time
+              perform_action: homeassistant.update_entity
+              data:
+                entity_id:
+                  - sensor.amy_travel_time
+            hold_action:
+              action: more-info
+            double_tap_action:
+              action: none
+            visibility:
+              - condition: state
+                entity: input_text.amy_itinerary
+                state:
+                  - arriving
+                  - on_approach
+            layout_options:
+              grid_columns: 4
+              grid_rows: 1
+          - type: custom:mushroom-template-card
+            entity: sensor.joshua_travel_time
+            icon: mdi:map-clock
+            color: blue
+            features_position: bottom
+            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
+              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
+              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
+              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
+              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
+              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
+              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
+              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
+              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
+              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
+              \ %}\n    {% endif %}\n    {{\n      (\n        states[entity].last_updated\
+              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
+              \ %p')\n    }}\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
+              {% else %}\n  Unknown\n{% endif %}"
+            tap_action:
+              action: perform-action
+              target:
+                entity_id: sensor.joshua_travel_time
+              perform_action: homeassistant.update_entity
+              data:
+                entity_id:
+                  - sensor.joshua_travel_time
+            hold_action:
+              action: more-info
+            double_tap_action:
+              action: none
+            visibility:
+              - condition: state
+                entity: input_text.joshua_itinerary
+                state:
+                  - arriving
+                  - on_approach
+            layout_options:
+              grid_columns: 4
+              grid_rows: 1
+          - type: map
+            entities:
+              - entity: person.amy
+              - entity: person.joshua
+            hours_to_show: 1
+            layout_options:
+              grid_columns: 4
+              grid_rows: 8
+            theme_mode: auto
+            card_mod:
+              style:
+                .: "ha-card {\n  /* Remove default card styling without affecting\
+                  \ child elements */\n  box-shadow: none;\n  border-width: 0;\n \
+                  \ transition: all 0s;\n}\n#buttons {\n  margin: 15px 0 0 3px;\n\
+                  }\n"
+                ha-map $ ha-entity-marker $: ".marker {\n  /* Style person marker\
+                  \ & adjust position to avoid blocking waypoints */\n  border-radius:\
+                  \ 50% 50% 50% 0px !important;\n  transform: rotate(-45deg) translate(50%,\
+                  \ -50%);\n  overflow: visible !important;\n}\n.entity-picture {\n\
+                  \  /* Correct orientation of person avatar */\n  transform: rotate(45deg);\n\
+                  \  border-radius: 50%;\n}\n"
+                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  fill:\
+                  \ color-mix(in srgb, var(--yellow-color) 50%, transparent);\n  stroke-width:\
+                  \ 0px;\n}\npath:nth-of-type(2) {\n  /* Style accuracy radius */\n\
+                  \  fill: color-mix(in srgb, var(--yellow-color) 50%, transparent);\n\
+                  \  stroke-width: 0px;\n}\n.leaflet-control-attribution {\n  /* Style\
+                  \ attribution text */\n  display: none !important;\n  background:\
+                  \ rgba(var(--rgb-card-background-color), 0.2) !important;\n  font-size:\
+                  \ 8px;\n}\n.leaflet-container a {\n  /* Set color of zoom icons\
+                  \ & attribution text */\n  color: var(--secondary-text-color);\n\
+                  }\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out {\n  /*\
+                  \ Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
+                  \ 19px) !important;\n  padding: 3px;\n  background: rgb(var(--rgb-secondary-text-color),\
+                  \ 0.2) !important;\n  margin: 8px 12px 0px;\n  border: var(--ha-card-border-width,\
+                  \ 1px) solid var(--ha-card-border-color, var(--divider-color, #e0e0e0))\
+                  \ !important;\n}\n.leaflet-control-zoom {\n  /* Remove extra margin\
+                  \ */\n  margin: 0px !important;\n\n  /* Remove zoom control border\
+                  \ */\n  border: none !important;\n}\n"
+    visible:
+      - user: ce9ee65ab49c4ca4af52496609016f1c
+      - user: f615672fc2554783beab56221097564e
+  - title: R2Dee2
+    type: sections
     max_columns: 2
-    title: R2Dee2
     path: r2dee2
     icon: mdi:robot-vacuum
     subview: true
@@ -24703,9 +24854,9 @@ views:
         text_only: true
       layout: start
       badges_position: bottom
-  - type: sections
+  - title: Dustin Mopman
+    type: sections
     max_columns: 2
-    title: Dustin Mopman
     path: dustin-mopman
     icon: mdi:robot-vacuum
     subview: true
@@ -25481,157 +25632,3 @@ views:
         text_only: true
       layout: start
       badges_position: bottom
-  - title: Itinerary
-    path: vehicle-tracker-map
-    icon: mdi:map
-    subview: false
-    type: sections
-    max_columns: 4
-    cards: []
-    sections:
-      - type: grid
-        column_span: 1
-        cards:
-          - features:
-              - type: toggle
-            type: tile
-            entity: automation.automatic_gate
-            name: Automatic Garage Door
-            features_position: inline
-            hide_state: true
-            color: deep-orange
-            icon: mdi:car-connected
-            vertical: false
-            icon_tap_action:
-              action: none
-          - type: custom:mushroom-template-card
-            entity: sensor.amy_travel_time
-            icon: mdi:map-clock
-            color: purple
-            features_position: bottom
-            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
-              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
-              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
-              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
-              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
-              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
-              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
-              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
-              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
-              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
-            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
-              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
-              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
-              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n    {{\n      (\n        states[entity].last_updated\
-              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
-              \ %p')\n    }}\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
-              {% else %}\n  Unknown\n{% endif %}"
-            tap_action:
-              action: perform-action
-              target:
-                entity_id: sensor.amy_travel_time
-              perform_action: homeassistant.update_entity
-              data:
-                entity_id:
-                  - sensor.amy_travel_time
-            hold_action:
-              action: more-info
-            double_tap_action:
-              action: none
-            visibility:
-              - condition: state
-                entity: input_text.amy_itinerary
-                state:
-                  - arriving
-                  - on_approach
-            layout_options:
-              grid_columns: 4
-              grid_rows: 1
-          - type: custom:mushroom-template-card
-            entity: sensor.joshua_travel_time
-            icon: mdi:map-clock
-            color: blue
-            features_position: bottom
-            primary: "Time remaining: {% if not is_state(entity, ['unknown', 'unavailable'])\
-              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
-              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
-              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n\n    {% set remaining = (\n        states[entity].last_updated\
-              \ | as_timestamp\n        - now() | as_timestamp\n        + value\n\
-              \      )\n    %}\n\n    {% if remaining >= 60 %}\n      {{ (remaining\
-              \ / 60) | round(0) }}min\n    {% elif remaining > 0 %}\n      {{ remaining\
-              \ | round(0) }}s\n    {% elif remaining > 120 %}\n      Soon\n    {%\
-              \ else %}\n      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
-              \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
-            secondary: "Arrival: {% if not is_state(entity, ['unknown', 'unavailable'])\
-              \ %}\n  {% if state_attr(entity, 'unit_of_measurement') in ['min', 's']\
-              \ %}\n    {% set value = states(entity) | float %}\n    {% if state_attr(entity,\
-              \ 'unit_of_measurement') == 'min' %}\n      {% set value = value * 60\
-              \ %}\n    {% endif %}\n    {{\n      (\n        states[entity].last_updated\
-              \ | as_timestamp\n        + value\n      ) | timestamp_custom('%-I:%M\
-              \ %p')\n    }}\n  {% else %}\n    Unsupported sensor\n  {% endif %}\n\
-              {% else %}\n  Unknown\n{% endif %}"
-            tap_action:
-              action: perform-action
-              target:
-                entity_id: sensor.joshua_travel_time
-              perform_action: homeassistant.update_entity
-              data:
-                entity_id:
-                  - sensor.joshua_travel_time
-            hold_action:
-              action: more-info
-            double_tap_action:
-              action: none
-            visibility:
-              - condition: state
-                entity: input_text.joshua_itinerary
-                state:
-                  - arriving
-                  - on_approach
-            layout_options:
-              grid_columns: 4
-              grid_rows: 1
-          - type: map
-            entities:
-              - entity: person.amy
-              - entity: person.joshua
-            hours_to_show: 1
-            layout_options:
-              grid_columns: 4
-              grid_rows: 8
-            theme_mode: auto
-            card_mod:
-              style:
-                .: "ha-card {\n  /* Remove default card styling without affecting\
-                  \ child elements */\n  box-shadow: none;\n  border-width: 0;\n \
-                  \ transition: all 0s;\n}\n#buttons {\n  margin: 15px 0 0 3px;\n\
-                  }\n"
-                ha-map $ ha-entity-marker $: ".marker {\n  /* Style person marker\
-                  \ & adjust position to avoid blocking waypoints */\n  border-radius:\
-                  \ 50% 50% 50% 0px !important;\n  transform: rotate(-45deg) translate(50%,\
-                  \ -50%);\n  overflow: visible !important;\n}\n.entity-picture {\n\
-                  \  /* Correct orientation of person avatar */\n  transform: rotate(45deg);\n\
-                  \  border-radius: 50%;\n}\n"
-                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  fill:\
-                  \ color-mix(in srgb, var(--yellow-color) 50%, transparent);\n  stroke-width:\
-                  \ 0px;\n}\npath:nth-of-type(2) {\n  /* Style accuracy radius */\n\
-                  \  fill: color-mix(in srgb, var(--yellow-color) 50%, transparent);\n\
-                  \  stroke-width: 0px;\n}\n.leaflet-control-attribution {\n  /* Style\
-                  \ attribution text */\n  display: none !important;\n  background:\
-                  \ rgba(var(--rgb-card-background-color), 0.2) !important;\n  font-size:\
-                  \ 8px;\n}\n.leaflet-container a {\n  /* Set color of zoom icons\
-                  \ & attribution text */\n  color: var(--secondary-text-color);\n\
-                  }\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out {\n  /*\
-                  \ Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
-                  \ 19px) !important;\n  padding: 3px;\n  background: rgb(var(--rgb-secondary-text-color),\
-                  \ 0.2) !important;\n  margin: 8px 12px 0px;\n  border: var(--ha-card-border-width,\
-                  \ 1px) solid var(--ha-card-border-color, var(--divider-color, #e0e0e0))\
-                  \ !important;\n}\n.leaflet-control-zoom {\n  /* Remove extra margin\
-                  \ */\n  margin: 0px !important;\n\n  /* Remove zoom control border\
-                  \ */\n  border: none !important;\n}\n"
-    visible:
-      - user: ce9ee65ab49c4ca4af52496609016f1c
-      - user: f615672fc2554783beab56221097564e
