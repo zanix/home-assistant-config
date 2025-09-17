@@ -504,6 +504,7 @@
       color: '#ff9800'
       icon: local/icons/garage.png
       group: Security
+      channel: Security
       tag: garage-door
       car_ui: true
       url: lovelace/security
@@ -572,19 +573,12 @@
     trigger: event
   - event_type: mobile_app_notification_action
     event_data:
-      action: snooze_guest_mode
-    trigger: event
-  - event_type: mobile_app_notification_action
-    event_data:
       action: enable_guest_mode
-    trigger: event
-  - event_type: mobile_app_notification_action
-    event_data:
-      action: no_guest_mode
     trigger: event
   conditions: []
   actions:
   - variables:
+      send_to: joshua
       icon: local/icons/account-question.png
       color: '#4caf50'
       group: Security
@@ -595,98 +589,28 @@
           title: Guest Mode Disabled
           message: Guest Mode has been turned off
           icon_mdi: mdi:account-group-off
-        snooze_guest_mode:
-          title: Guest Mode Snoozed
-          message: Will check again in 12 hours
-          icon_mdi: mdi:account-group-clock
         enable_guest_mode:
           title: Guest Mode Enabled
           message: Guest Mode has been turned on
           icon_mdi: mdi:account-group
-        no_guest_mode:
-          title: Guest Mode Skipped
-          message: Continuing without Guest Mode
-          icon_mdi: mdi:account-group-off
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.event.data.action == ''disable_guest_mode'' }}'
-      sequence:
-      - target:
-          entity_id: input_boolean.guest_mode
-        action: input_boolean.turn_off
-        data: {}
-      - data:
-          send_to: parents
-          title: '{{ action_responses[''disable_guest_mode''].title }}'
-          message: '{{ action_responses[''disable_guest_mode''].message }}'
-          notification_icon: '{{ action_responses[''disable_guest_mode''].icon_mdi
-            }}'
-          color: '{{ color }}'
-          icon: '{{ icon }}'
-          group: '{{ group }}'
-          interruption_level: passive
-          tag: '{{ tag }}'
-          car_ui: true
-          url: '{{ url }}'
-        action: script.notify_mobile
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.event.data.action == ''snooze_guest_mode'' }}'
-      sequence:
-      - data:
-          send_to: parents
-          title: '{{ action_responses[''snooze_guest_mode''].title }}'
-          message: '{{ action_responses[''snooze_guest_mode''].message }}'
-          notification_icon: '{{ action_responses[''snooze_guest_mode''].icon_mdi
-            }}'
-          color: '{{ color }}'
-          icon: '{{ icon }}'
-          group: '{{ group }}'
-          interruption_level: passive
-          tag: '{{ tag }}'
-          car_ui: true
-          url: '{{ url }}'
-        action: script.notify_mobile
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.event.data.action == ''enable_guest_mode'' }}'
-      sequence:
-      - target:
-          entity_id: input_boolean.guest_mode
-        action: input_boolean.turn_on
-        data: {}
-      - data:
-          send_to: parents
-          title: '{{ action_responses[''enable_guest_mode''].title }}'
-          message: '{{ action_responses[''enable_guest_mode''].message }}'
-          notification_icon: '{{ action_responses[''enable_guest_mode''].icon_mdi
-            }}'
-          color: '{{ color }}'
-          icon: '{{ icon }}'
-          group: '{{ group }}'
-          interruption_level: passive
-          tag: '{{ tag }}'
-          car_ui: true
-          url: '{{ url }}'
-        action: script.notify_mobile
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.event.data.action == ''no_guest_mode'' }}'
-      sequence:
-      - data:
-          send_to: parents
-          title: '{{ action_responses[''no_guest_mode''].title }}'
-          message: '{{ action_responses[''no_guest_mode''].message }}'
-          notification_icon: '{{ action_responses[''no_guest_mode''].icon_mdi }}'
-          color: '{{ color }}'
-          icon: '{{ icon }}'
-          group: '{{ group }}'
-          interruption_level: passive
-          tag: '{{ tag }}'
-          car_ui: true
-          url: '{{ url }}'
-        action: script.notify_mobile
+  - target:
+      entity_id: input_boolean.guest_mode
+    action: input_boolean.turn_off
+    data: {}
+  - data:
+      send_to: '{{ send_to }}'
+      title: '{{ action_responses[trigger.event.data.action].title }}'
+      message: '{{ action_responses[trigger.event.data.action].message }}'
+      notification_icon: '{{ action_responses[trigger.event.data.action].icon_mdi
+        }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      channel: Security
+      tag: '{{ tag }}'
+      car_ui: true
+      url: '{{ url }}'
+    action: script.notify_mobile
   mode: queued
 - id: '1665681528781'
   alias: ☑️ Ignore Door Alerts
@@ -725,6 +649,7 @@
       message: The Door Open alerts have been ignored until all doors are closed
       icon: local/icons/door-open.png
       group: Security
+      channel: Security
       tag: door-alerts-ignored
     action: script.notify_mobile
   - data:
@@ -775,6 +700,7 @@
         is closed
       icon: local/icons/garage-open.png
       group: Security
+      channel: Security
       tag: garage-door-alerts-ignored
     action: script.notify_mobile
   - data:
@@ -831,6 +757,7 @@
       color: '#9c27b0'
       icon: local/icons/window-open.png
       group: Security
+      channel: Security
       tag: window-alerts-ignored
     action: script.notify_mobile
   - data:
@@ -1699,7 +1626,7 @@
   - variables:
       title: Network
       message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
-        }}
+        }}. Be sure to update Namecheap API for SSL renewals!
       icon: local/icons/web.png
       icon_mdi: mdi:web
       color: '#e91e63'
@@ -2571,7 +2498,8 @@
         notification_icon: mdi:lightbulb
         color: '#9e9e9e'
         icon: local/icons/lightbulb.png
-        group: Light
+        group: Security
+        channel: Security
         car_ui: true
       action: script.notify_mobile
   mode: single
@@ -2782,7 +2710,7 @@
         notification_icon: mdi:lightbulb-on
         color: '#ffeb3b'
         icon: local/icons/lightbulb-on.png
-        group: Light
+        group: Security
       action: script.notify_mobile
   - delay:
       minutes: 5
@@ -3580,6 +3508,7 @@
             color: '{{ color }}'
             icon: '{{ icon }}'
             group: '{{ group }}'
+            channel: Security
             interruption_level: critical
             tag: '{{ tag }}'
             url: '{{ url }}'
@@ -3669,6 +3598,7 @@
       color: '{{ color }}'
       icon: '{{ icon }}'
       group: '{{ group }}'
+      channel: Security
       car_ui: true
       interruption_level: critical
       url: '{{ url }}'
@@ -3719,6 +3649,7 @@
       color: '{{ color }}'
       icon: '{{ icon }}'
       group: '{{ group }}'
+      channel: Security
       interruption_level: critical
       tag: '{{ tag }}'
       car_ui: true
@@ -3798,6 +3729,7 @@
             color: '{{ color }}'
             icon: '{{ icon }}'
             group: '{{ group }}'
+            channel: Security
             interruption_level: critical
             tag: '{{ tag }}'
             car_ui: true
@@ -3886,6 +3818,7 @@
       color: '{{ color }}'
       icon: '{{ icon }}'
       group: '{{ group }}'
+      channel: Security
       interruption_level: critical
       tag: '{{ tag }}'
       car_ui: true
@@ -3933,6 +3866,7 @@
       color: '{{ color }}'
       icon: '{{ icon }}'
       group: '{{ group }}'
+      channel: Security
       interruption_level: critical
       tag: '{{ tag }}'
       car_ui: true
@@ -4091,10 +4025,8 @@
       group: Security
       url: lovelace/security
       notification_actions: "{% if trigger.id == 'leaving_home' %} [\n  {\"action\":
-        \"enable_guest_mode\", \"title\": \"Enable Guest Mode\"},\n  {\"action\":
-        \"no_guest_mode\", \"title\": \"No Guests\"}\n] {% else %} [\n  {\"action\":
-        \"disable_guest_mode\", \"title\": \"No Guests\"},\n  {\"action\": \"snooze_guest_mode\",
-        \"title\": \"Still Have Guests\"}\n] {% endif %}"
+        \"enable_guest_mode\", \"title\": \"Enable\"}\n] {% else %} [\n  {\"action\":
+        \"disable_guest_mode\", \"title\": \"Disable\"}\n] {% endif %}"
   - data:
       send_to: joshua
       title: '{{ title }}'
@@ -4103,6 +4035,7 @@
       color: '{{ color }}'
       icon: '{{ icon }}'
       group: '{{ group }}'
+      channel: Security
       tag: '{{ tag }}'
       car_ui: true
       url: '{{ url }}'
@@ -4462,7 +4395,9 @@
             color: '{{ color }}'
             icon: '{{ icon }}'
             group: '{{ group }}'
+            channel: Security
             interruption_level: critical
+            car_ui: true
             tag: '{{ tag }}'
             url: '{{ url }}'
             actions: '{{ notification_actions }}'
@@ -5562,6 +5497,7 @@
       icon_mdi: mdi:lock-smart
       color: '#03a9f4'
       group: Security
+      tag: security-lock-jammed
   - parallel:
     - data:
         send_to: parents
@@ -5571,13 +5507,16 @@
         color: '{{ color }}'
         icon: '{{ icon }}'
         group: '{{ group }}'
+        channel: Security
         car_ui: true
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
         entity:
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
+        tag: '{{ tag }}'
       action: script.notify_hass_agent
     - data:
         computer:
@@ -5667,6 +5606,7 @@
       color: '{{ color }}'
       icon: '{{ icon }}'
       group: '{{ group }}'
+      channel: Security
       car_ui: true
     action: script.notify_mobile
   mode: single
@@ -7222,6 +7162,7 @@
   conditions: []
   actions:
   - variables:
+      send_to: all
       title: Dryer
       icon: local/icons/tumble-dryer.png
       icon_mdi: mdi:tumble-dryer
@@ -7268,7 +7209,7 @@
   - alias: Parallel actions for end notification
     parallel:
     - data:
-        send_to: parents
+        send_to: '{{ send_to }}'
         location: home
         title: '{{ title }}'
         subtitle: '{{ summary }} ⤵️'
@@ -7309,7 +7250,7 @@
       entity_id: binary_sensor.dryer_contact
       to: 'on'
     timeout:
-      minutes: 10
+      minutes: 20
   - repeat:
       while:
       - condition: template
@@ -7322,7 +7263,7 @@
       - alias: Parallel actions for reminder notification
         parallel:
         - data:
-            send_to: parents
+            send_to: '{{ send_to }}'
             location: home
             title: '{{ title }}'
             message: '{{ reminder_message }}'
@@ -7370,7 +7311,7 @@
               entity_id: binary_sensor.dryer_contact
               to: 'on'
             timeout:
-              minutes: 10
+              minutes: 20
   - choose:
     - alias: Perform the run status action
       conditions:
@@ -7415,7 +7356,7 @@
   - alias: Parallel actions for end notification
     parallel:
     - data:
-        send_to: parents
+        send_to: '{{ send_to }}'
         location: home
         title: '{{ title }}'
         message: '{{ attended_message }}'
@@ -7466,6 +7407,7 @@
   conditions: []
   actions:
   - variables:
+      send_to: all
       title: Washer
       icon: local/icons/washing-machine.png
       icon_mdi: mdi:washing-machine
@@ -7512,7 +7454,7 @@
   - alias: Parallel actions for end notification
     parallel:
     - data:
-        send_to: parents
+        send_to: '{{ send_to }}'
         location: home
         title: '{{ title }}'
         subtitle: '{{ summary }} ⤵️'
@@ -7553,7 +7495,7 @@
       entity_id: binary_sensor.washer_contact
       to: 'on'
     timeout:
-      minutes: 10
+      minutes: 20
   - repeat:
       while:
       - condition: template
@@ -7566,7 +7508,7 @@
       - alias: Parallel actions for reminder notification
         parallel:
         - data:
-            send_to: parents
+            send_to: '{{ send_to }}'
             location: home
             title: '{{ title }}'
             message: '{{ reminder_message }}'
@@ -7614,7 +7556,7 @@
               entity_id: binary_sensor.washer_contact
               to: 'on'
             timeout:
-              minutes: 10
+              minutes: 20
   - choose:
     - alias: Perform the run status action
       conditions:
@@ -7659,7 +7601,7 @@
   - alias: Parallel actions for end notification
     parallel:
     - data:
-        send_to: parents
+        send_to: '{{ send_to }}'
         location: home
         title: '{{ title }}'
         message: '{{ attended_message }}'
