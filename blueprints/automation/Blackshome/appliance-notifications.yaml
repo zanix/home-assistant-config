@@ -1,0 +1,2149 @@
+blueprint:
+  name: Appliance Notifications & Actions
+  description: >
+    # 📳 Appliance Notifications & Actions
+
+    **Version: 3.7**
+
+
+    🤔 Watts your appliance up to, you're always in the know from start to finish! 🛎️🔌💸
+
+
+    **If you like my blueprints, and would like to show your support or just say thank you?** [Click Here](https://www.paypal.com/donate/?hosted_button_id=WAZS3QSDTPGA8) 🙂
+
+
+    <details>
+    <summary><b>The Automation Process:</b> 👈</summary>
+
+      - **Appliance Trigger:**
+          - Enter the power sensor entity that measures the live current draw of the appliance. Common devices with these sensors include smart plugs, energy meters, etc.
+          - The automation is triggered when the appliance's current draw exceeds a set wattage.
+          - The automation ends when the appliance's current draw falls below a set value.
+
+      - **Notification Options:**
+          - Send notification messages to one or multiple devices when the appliance starts, finishes or the watchdog is triggered.
+          - Your end message can also include estimates of total power consumption and cost.
+          - Include duration tracking in your end message to track the appliance's operational time for the task or cycle.
+          - Opt to sends a repeated notifications to remind you when the appliance cycle is complete.
+          - Limit when notifications can be sent by using Notify Time Restrictions - helpful for avoiding alerts while you're asleep.
+          - Notifications are compatible with both Apple iOS and Android devices, ensuring universal accessibility.
+
+      - **Run Status:**
+          - Display your appliance's run status on your dashboard.
+
+      - **Notify Time Restrictions:**
+          - Restrict notifications to the specified start and end times on the selected days. Notifications outside this time range will be skipped.
+
+      - **Energy Tracking:**
+          - Use energy tracking to estimate the total energy usage (kWh) for each completed cycle. You can also choose to include the estimated cost of that cycle in the end notification.
+          - Or simply update the start and end helpers without including any energy information in the end notification - useful for your own custom actions or other Home Assistant logic.
+
+          ⚠️ **Disclaimer** - These values are estimates and should only be used as a guide. Please avoid relying solely on these estimates for accuracy and use them at your own risk. We cannot be held responsible for any inaccuracies or resulting losses, damages, inconvenience, or anything else that may occur.
+
+      - **Time Tracking:**
+          - Runtime Tracking - Records the total runtime of your appliance by updating a text helper each time it completes a full cycle.
+          - Duration Tracking - Tracks how long the appliance was running during each individual cycle and includes this duration in the end notification message.
+
+      - **Cycle Counter:**
+          - Use the cycle counter to track the total number of cycles completed by your appliance. You can also choose to include this information in your end message.
+
+      - **Service Reminders:**
+          - Service reminders help you track appliance usage and perform timely maintenance.
+          - Cycle-Based Reminder - Notifies you when a service is due based on the number of cycles completed.
+          - Time-Based Reminder - Notifies you when a service is due based on the total time the appliance has been in use since the last service.
+
+      - **Watchdog:**
+          - The watchdog option monitors an appliance cycle completion.
+          - It sends a notification if a cycle completion fails within the specified time frame.
+
+      - **Device Tracker:**
+          - You can choose to use the device tracker for Start, End, and Watchdog notifications.
+          - When enabled, only selected devices currently inside the chosen zone will receive those notifications.
+
+      - **Custom Actions:**
+          - Tailor custom actions to suit your preferences and needs, enhancing the automation's functionality.
+          - Configure actions such as triggering announcements on platforms like The Voice (HA), Google, Alexa, etc., to keep you informed about appliance events.
+
+      - **Custom Conditions:**
+          - Enter any custom conditions to further customize the automation process.
+    </details>
+
+
+    Need help?
+
+    - FAQ: [Click Here](https://community.home-assistant.io/t/650166/2)
+
+    - Community Support Including Updates: [Click Here](https://community.home-assistant.io/t/650166)
+
+
+    Required = *
+  domain: automation
+  source_url: https://gist.github.com/Blackshome/42586b567d243d432887cadf54e18906
+  input:
+    appliance_power_settings:
+      name: "Power Settings *"
+      icon: mdi:current-ac
+      collapsed: true
+      input:
+        power_sensor:
+          name: Power Sensor *
+          description: >
+            Please enter the power sensor entity that measures the live current draw of the appliance.
+            Common devices that have these sensors include smart plugs.
+            This sensor is essential for triggering the automation when the appliance starts and when it finishes.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: sensor
+        start_appliance_power:
+          name: Start - Appliance Power Setpoint
+          description: >
+            Specify the threshold that the power must exceed to indicate the appliance has started its cycle.
+            The power must transition from below to above this setpoint.
+          default: 10
+          selector:
+            number:
+              min: 1
+              max: 30
+              step: 1
+              unit_of_measurement: watts
+        start_time_delay:
+          name: Start - Power Time Delay
+          description: >
+            Specify the duration for which the power must remain above the threshold to indicate the appliance has started its cycle.
+            The power must remain above its setpoint for the specified time delay.
+            If the power falls below the setpoint again within this time frame, it will not trigger.
+            This will help prevent a false trigger.
+          default: 1
+          selector:
+            number:
+              min: 0.25
+              max: 5
+              step: 0.25
+              unit_of_measurement: minutes
+        running_dead_zone:
+          name: Running - Dead Zone
+          description: >
+            After the appliance starts, implementing a dead zone can prevent false end triggers,
+            especially if the power briefly dips below the appliance's end setpoint during the cycle after startup.
+            Setting the running dead zone beyond this point ensures a reliable conclusion by preventing a premature end trigger.
+
+
+            Additionally, the option to use 'End - Repeat Count' provides a similar functionality without being subjected to any specific time frame.
+            You can choose to use both the 'Running - Dead Zone' and 'End - Repeat Count,' with the 'End - Repeat Count' occurring after the 'Running - Dead Zone'.
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 120
+              step: 1
+              unit_of_measurement: minutes
+        end_appliance_power:
+          name: End - Appliance Power Setpoint
+          description: >
+            Specify the threshold that the power must stay below to indicate the appliance has finished its cycle.
+            The power must transition from above to below this setpoint.
+          default: 5
+          selector:
+            number:
+              min: 1
+              max: 30
+              step: 1
+              unit_of_measurement: watts
+        end_time_delay:
+          name: End - Power Time Delay
+          description: >
+            Specify the duration for which the power must remain below the threshold to indicate the appliance has finished its cycle.
+            The power must remain below its setpoint for the specified time delay.
+            If the power exceeds the setpoint again within this time frame, it will not trigger.
+          default: 1
+          selector:
+            number:
+              min: 0.25
+              max: 5
+              step: 0.25
+              unit_of_measurement: minutes
+        end_repeat_count:
+          name: End - Repeat Count
+          description: >
+            The number of times the 'End - Appliance Power Setpoint + End - Power Time Delay' condition should be met before triggering the end of the cycle.
+          default: 1
+          selector:
+            number:
+              min: 1
+              max: 10
+              mode: slider
+    start_notify_settings:
+      name: "Start Notify"
+      icon: mdi:bell-check-outline
+      collapsed: true
+      input:
+        include_start_notify:
+          name: Use the Start Notify Options (Optional)
+          description: >
+            Select 'Enable Start Notify Options' if you would like to receive a notification when the appliance starts.
+          default: disable_start_notify_options
+          selector:
+            select:
+              options:
+                - label: Enable Start Notify Options
+                  value: "enable_start_notify_options"
+                - label: Disable Start Notify Options
+                  value: "disable_start_notify_options"
+        start_notify_device:
+          name: Devices Notified
+          description: >
+            Select the devices to be notified when the appliance starts.
+          default: []
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+              multiple: true
+        start_title:
+          name: Title
+          description: >
+            Enter in the notification title that you would like to receive when the appliance starts.
+          default: Washing Machine
+          selector:
+            text:
+        start_message:
+          name: Message
+          description: >
+            Enter in the notification message that you would like to receive when the appliance starts.
+          default: YES! Another load is ON :)
+          selector:
+            text:
+        start_notify_tag:
+          name: Notification Tag
+          description: >
+            Use a tag to keep your notifications organized.
+            When a new notification with the same tag is sent, it replaces the old one, so you won't get cluttered with multiple notifications for the same appliance.
+
+
+            You can use the same tag across start, end, and watchdog notifications to ensure only one active notification remains throughout the appliance cycle.
+
+
+            If this input is left blank, no tag will be applied and each notification will be treated as separate.
+
+
+            For best results, use short, unique tags for each automation - for example: `washing-clothes`, `drying-clothes`, `washing-dishes`, etc.
+          default: []
+          selector:
+            text:
+        start_notify_interruption_level:
+          name: Interruption Level - iOS Only
+          description: >
+            On devices running iOS 15 and later, you can configure the interruption level for your notifications to ensure they are delivered according to your preferences.
+            Choose the desired interruption level from the dropdown list.
+            Critical and time-sensitive notifications must be turned ON within the Home Assistant App, and time-sensitive notifications must be allowed in your Focus settings.
+
+
+            For more information on interruption levels [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: active
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: Default
+                  value: "active"
+                - label: Critical Notifications
+                  value: "critical"
+                - label: Time Sensitive Notifications
+                  value: "time-sensitive"
+                - label: Quiet Notifications Without Waking Screen
+                  value: "passive"
+        start_notify_sound:
+          name: Notification Sound - iOS Only
+          description: >
+            The Home Assistant app for iOS includes built-in notification sounds, and you can import sounds from your iOS device into the app.
+            Custom sounds can also be added via iTunes or from your cloud storage.
+            When entering a sound, ensure you use the full filename, including the extension.
+
+
+            For more information on using sounds in the Home Assistant app, [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: []
+          selector:
+            text:
+        start_notify_data:
+          name: Android Only Options (Optional)
+          description: >
+            **High Priority** notifications ensure that you receive important alerts immediately.
+            These notifications bypass normal delivery delays and are delivered instantly to your device.
+
+
+            **Sticky Notification** ensure that important alerts are not dismissed when selected.
+            They remain on your notification screen until you actively clear or swipe them away, ensuring that critical information stays visible until addressed.
+
+
+            **Notification Channel** allow you to easily organize different notification settings,
+            including notification sounds, vibrations, and other device-specific features.
+            If you choose this option, please enter your desired channel name below.
+
+
+            **Icon** allows you to replace the default Home Assistant icon with one of your choice.
+            If selected, choose your preferred icon using the **Icon - Android Only** option below, and set the icon colour using **Icon Colour - Android Only**.
+
+
+            For more information on notification options [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: High Priority
+                  value: "high_priority"
+                - label: Sticky Notification
+                  value: "sticky"
+                - label: Notification Channel
+                  value: "channel"
+                - label: Icon
+                  value: "icon"
+        start_notify_channel:
+          name: Notification Channel - Android Only
+          description: >
+            If you have chosen to use a notification channel, simply enter the name of an existing channel to apply its pre-configured settings.
+            If you don't have a channel yet, you can create a new one by entering a name here.
+            When your automation sends the first notification, it will create the channel on your device.
+            After the channel is created, you can customize its notification settings to your preference directly on your device.
+          default: []
+          selector:
+            text:
+        start_notify_icon:
+          name: Icon - Android Only
+          description: >
+            Select a custom icon to replace the default Home Assistant icon in the notification.
+            This setting applies only if the **Icon** option is selected in **Android Only Options** above.
+          default: "mdi:washing-machine"
+          selector:
+            icon:
+        start_notify_icon_colour:
+          name: Icon Colour - Android Only
+          description: >
+            Choose a colour for your custom notification icon.
+            This setting applies only if the **Icon** option is selected in **Android Only Options** above.
+          default: [41, 121, 255]
+          selector:
+            color_rgb:
+    end_notify_settings:
+      name: "End Notify"
+      icon: mdi:bell-ring-outline
+      collapsed: true
+      input:
+        include_end_notify:
+          name: Use the End Notify Options (Optional)
+          description: >
+            Select 'Enable End Notify Options' if you would like to receive a notification when the appliance finishes.
+          default: disable_end_notify_options
+          selector:
+            select:
+              options:
+                - label: Enable End Notify Options
+                  value: "enable_end_notify_options"
+                - label: Disable End Notify Options
+                  value: "disable_end_notify_options"
+        end_notify_device:
+          name: Devices Notified
+          description: >
+            Select the devices to be notified when the appliance has finished.
+          default: []
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+              multiple: true
+        end_message_title:
+          name: Title
+          description: >
+            Enter in the notification title that you would like to receive when the appliance has finished.
+          default: Washing Machine
+          selector:
+            text:
+        end_message:
+          name: Message
+          description: >
+            Enter in the notification message that you would like to receive when the appliance has finished.
+          default: Yippee the washing machine is finished!
+          selector:
+            text:
+        end_notify_tag:
+          name: Notification Tag
+          description: >
+            Use a tag to keep your notifications organized.
+            When a new notification with the same tag is sent, it replaces the old one, so you won't get cluttered with multiple notifications for the same appliance.
+
+
+            You can use the same tag across start, end, and watchdog notifications to ensure only one active notification remains throughout the appliance cycle.
+
+
+            If this input is left blank, no tag will be applied and each notification will be treated as separate.
+
+
+            For best results, use short, unique tags for each automation - for example: `washing-clothes`, `drying-clothes`, `washing-dishes`, etc.
+          default: []
+          selector:
+            text:
+        end_notify_interruption_level:
+          name: Interruption Level - iOS Only
+          description: >
+            On devices running iOS 15 and later, you can configure the interruption level for your notifications to ensure they are delivered according to your preferences.
+            Choose the desired interruption level from the dropdown list.
+            Critical and time-sensitive notifications must be turned ON within the Home Assistant App, and time-sensitive notifications must be allowed in your Focus settings.
+
+
+            For more information on interruption levels [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: active
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: Default
+                  value: "active"
+                - label: Critical Notifications
+                  value: "critical"
+                - label: Time Sensitive Notifications
+                  value: "time-sensitive"
+                - label: Quiet Notifications Without Waking Screen
+                  value: "passive"
+        end_notify_sound:
+          name: Notification Sound - iOS Only
+          description: >
+            The Home Assistant app for iOS includes built-in notification sounds, and you can import sounds from your iOS device into the app.
+            Custom sounds can also be added via iTunes or from your cloud storage.
+            When entering a sound, ensure you use the full filename, including the extension.
+
+
+            For more information on using sounds in the Home Assistant app, [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: []
+          selector:
+            text:
+        end_notify_data:
+          name: Android Only Options (Optional)
+          description: >
+            **High Priority** notifications ensure that you receive important alerts immediately.
+            These notifications bypass normal delivery delays and are delivered instantly to your device.
+
+
+            **Sticky Notification** ensure that important alerts are not dismissed when selected.
+            They remain on your notification screen until you actively clear or swipe them away, ensuring that critical information stays visible until addressed.
+
+
+            **Notification Channel** allow you to easily organize different notification settings,
+            including notification sounds, vibrations, and other device-specific features.
+            If you choose this option, please enter your desired channel name below.
+
+
+            **Icon** allows you to replace the default Home Assistant icon with one of your choice.
+            If selected, choose your preferred icon using the **Icon - Android Only** option below, and set the icon colour using **Icon Colour - Android Only**.
+
+
+            For more information on notification options [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: High Priority
+                  value: "high_priority"
+                - label: Sticky Notification
+                  value: "sticky"
+                - label: Notification Channel
+                  value: "channel"
+                - label: Icon
+                  value: "icon"
+        end_notify_channel:
+          name: Notification Channel - Android Only
+          description: >
+            If you have chosen to use a notification channel, simply enter the name of an existing channel to apply its pre-configured settings.
+            If you don't have a channel yet, you can create a new one by entering a name here.
+            When your automation sends the first notification, it will create the channel on your device.
+            After the channel is created, you can customize its notification settings to your preference directly on your device.
+          default: []
+          selector:
+            text:
+        end_notify_icon:
+          name: Icon - Android Only
+          description: >
+            Select a custom icon to replace the default Home Assistant icon in the notification.
+            This setting applies only if the **Icon** option is selected in **Android Only Options** above.
+          default: "mdi:washing-machine"
+          selector:
+            icon:
+        end_notify_icon_colour:
+          name: Icon Colour - Android Only
+          description: >
+            Choose a colour for your custom notification icon.
+            This setting applies only if the **Icon** option is selected in **Android Only Options** above.
+          default: [0, 200, 83]
+          selector:
+            color_rgb:
+        end_reminder_notification:
+          name: Reminder Notification Options (Optional)
+          description: >
+            Set this option to receive repeated notifications reminding you that the
+            appliance cycle is complete. Notifications will continue until the specified
+            **Reminder Notification Entity** is **ON** or the **Reminder Notification Maximum Count** is
+            reached, helping ensure you don't miss the end of the cycle while avoiding
+            excessive reminders.
+
+
+            You can choose to:
+
+
+              - **Enable Reminder Notification**: Receive repeated reminders until the
+                **Reminder Notification Entity** is ON or the maximum notification
+                count is reached.
+
+              - **Enable Reminder Notification + Notify When Done**: Receive repeated
+                reminders until the **Reminder Notification Entity** is ON or the maximum
+                notification count is reached. When the entity turns ON, a one-time
+                notification will be sent using the **Notify When Done Message**.
+
+              - **Enable Reminder Notification + Clear When Done**: Receive repeated
+                reminders until the **Reminder Notification Entity** is ON or the maximum
+                notification count is reached. When the entity turns ON, the notification
+                will be cleared.
+
+
+                *Note: You must set the **End Notification Tag** above for this option to work.*
+
+              - **Disable Reminder Notification**: No reminder notifications will be sent.
+          default: disable_reminder_notification
+          selector:
+            select:
+              options:
+                - label: Enable Reminder Notification
+                  value: "enable_reminder_notification"
+                - label: Enable Reminder Notification + Notify When Done
+                  value: "enable_reminder_notification_notify"
+                - label: Enable Reminder Notification + Clear When Done
+                  value: "enable_reminder_notification_clear"
+                - label: Disable Reminder Notification
+                  value: "disable_reminder_notification"
+        end_reminder_notification_entity:
+          name: Reminder Notification Entity
+          description: >
+            Select the entity that signals someone has attended to the appliance (e.g., opened the washing machine door, emptied the dishwasher, etc.).
+
+
+            This entity is used to:
+              - Stop repeated reminder notifications when it turns **ON**.
+              - Send a one-time **Notify When Done** message if that option is selected above.
+              - Clear the notification if the **Clear When Done** option is selected above (requires an **End Notification Tag**).
+
+
+            Typically, this will be a binary sensor such as a door or lid sensor that turns **ON** when opened.
+
+
+            *Note: The behaviour of this entity depends on the selected option under **Reminder Notification Options** above.*
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: binary_sensor
+        end_reminder_notification_message:
+          name: Reminder Notification Message
+          description: >
+            Enter the message you would like to receive as a reminder that the appliance has finished its cycle.
+            This message will be sent repeatedly until the specified **Reminder Notification Entity** is ON or the maximum notification count is reached.
+          default: Hey! Your fresh laundry is ready, don't leave it hanging!
+          selector:
+            text:
+        end_reminder_notification_time_delay:
+          name: Reminder Notification Time Delay
+          description: >
+            Specify the duration to wait between reminder messages.
+            This sets the time interval at which the reminder will be sent repeatedly until the specified **Reminder Notification Entity** is ON or the maximum notification count is reached.
+          default: 10
+          selector:
+            number:
+              min: 1
+              max: 60
+              step: 1
+              unit_of_measurement: minutes
+        end_reminder_notification_max_count:
+          name: Reminder Notification Maximum Count
+          description: >
+            Specify the maximum number of times the reminder notification will be sent before stopping.
+            This ensures you won't receive excessive notifications.
+          default: 2
+          selector:
+            number:
+              min: 1
+              max: 10
+              step: 1
+        end_attended_notification_message:
+          name: Notify When Done Message
+          description: >
+            Enter the message to send when someone has attended to the appliance after its cycle completes
+            (e.g., removed the laundry, emptied the dishwasher, etc.). This message will be sent once when
+            the **Reminder Notification Entity** turns ON and the
+            **Enable Reminder Notification + Notify When Done** option is selected above.
+          default: YES! Fresh laundry on the move, let the drying begin!
+          selector:
+            text:
+    run_status_settings:
+      name: "Run Status"
+      icon: mdi:list-status
+      collapsed: true
+      input:
+        include_run_status:
+          name: Use the Run Status Option (Optional)
+          description: >
+            Enable this option to display your appliance's run status on your dashboard.
+
+
+            For more information on how to use Run Status [Click Here](https://community.home-assistant.io/t/650166/690)
+          default: run_status_disabled
+          selector:
+            select:
+              options:
+                - label: Enable run status
+                  value: "run_status_enabled"
+                - label: Disable run status
+                  value: "run_status_disabled"
+        run_status_entity:
+          name: Run Status Entity
+          description: >
+            Select the **Dropdown Helper** that contains all your run statuses.
+
+
+            ⚠️ The statuses must match exactly (including case sensitivity) with the ones defined below.
+            If they don't, the automation will stop running and an error will be logged.
+
+
+            Each status input includes examples to get you started, but you can be as creative as you like... have some fun with it!
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: input_select
+        run_status_start:
+          name: Start Status
+          description: >
+            Enter the status you want to display when the appliance starts.
+
+
+            For example: `Washing`, `Scrubbing Away!`, `Drying` etc
+          default: []
+          selector:
+            text:
+        run_status_watchdog:
+          name: Watchdog Status
+          description: >
+            Enter the status you want to display when the watchdog is triggered.
+
+
+            If you are not using the watchdog then you can leave this input blank.
+
+
+            For example: `Error`, `Drama in the Drum!`, etc
+          default: []
+          selector:
+            text:
+        run_status_end:
+          name: End Status
+          description: >
+            Enter the status you want to display when the appliance has finished.
+
+
+            This can be the final “Finished” status when your **not** using the **Reminder Notification Options**.
+
+
+            For example: `Finished`, `All Done!`, etc
+          default: []
+          selector:
+            text:
+        run_status_end_reminder:
+          name: End Reminder Status
+          description: >
+            Enter the status to display when all reminders have been sent and the appliance has not been attended.
+
+
+            For example: `Still Waiting`, `Wrinkle Risk Rising!`, `Please Unload Me!` etc
+          default: []
+          selector:
+            text:
+        run_status_end_attended:
+          name: End - Attended Status
+          description: >
+            Enter the status to display when the **Reminder Notification Entity**
+            detects the appliance has been attended to (e.g., door opened, lid lifted, etc.).
+
+
+            This is the final “Ready” status of your appliance when you are using the **Reminder Notification Options**.
+
+
+            For example: `Ready`, `Next Load Please!`, `Ready & Waiting!`, etc.
+          default: []
+          selector:
+            text:
+    notify_time_restrictions_settings:
+      name: "Notify Time Restrictions"
+      icon: mdi:clock-outline
+      collapsed: true
+      input:
+        include_time:
+          name: Use the Notify Time Restriction Option (Optional)
+          description: >
+            Restrict notifications to the specified start and end times on the selected days.
+            Notifications outside this time range will be skipped.
+            This is useful for avoiding notifications that could wake you while you're asleep, such as when running appliances at night.
+          default: time_disabled
+          selector:
+            select:
+              options:
+                - label: Enable notify time restrictions
+                  value: "time_enabled"
+                - label: Disable notify time restrictions
+                  value: "time_disabled"
+        after_time:
+          name: Start Time
+          description: >
+            Set the time when notifications are allowed to begin.
+          default: 00:00:00
+          selector:
+            time:
+        before_time:
+          name: End Time
+          description: >
+            Set the time when notifications should stop being sent.
+          default: 00:00:00
+          selector:
+            time:
+        weekday_options:
+          name: Weekdays
+          description: >
+            Select which days notifications are allowed.
+            To activate this, you must enable the Notification Time Restriction option above.
+          default:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+          selector:
+            select:
+              multiple: true
+              mode: list
+              options:
+                - label: Monday
+                  value: "mon"
+                - label: Tuesday
+                  value: "tue"
+                - label: Wednesday
+                  value: "wed"
+                - label: Thursday
+                  value: "thu"
+                - label: Friday
+                  value: "fri"
+                - label: Saturday
+                  value: "sat"
+                - label: Sunday
+                  value: "sun"
+    power_tracking_settings:
+      name: "Energy Tracking"
+      icon: mdi:meter-electric-outline
+      collapsed: true
+      input:
+        include_power_tracking:
+          name: Use the Energy Tracking Option (Optional)
+          description: >
+            Choose whether to track energy consumption for each completed cycle.
+            This lets you monitor how much energy is used every time a cycle finishes.
+
+
+            You can choose to:
+              - Include energy usage details (kWh) in the end notification.
+              - Include both energy usage and an estimated cost in the end notification.
+              - Or simply update the start and end helpers without including any energy information in the end notification - useful for your own custom actions or other Home Assistant logic.
+
+
+            ⚠️ **Disclaimer** - These values are estimates and should only be used as a guide.
+            Please avoid relying solely on these estimates for accuracy and use them at your own risk.
+            We cannot be held responsible for any inaccuracies or resulting losses, damages, inconvenience, or anything else that may occur.
+
+
+            For more information on how to use energy tracking [Click Here](https://community.home-assistant.io/t/650166/97)
+          default: disable_power_tracking
+          selector:
+            select:
+              options:
+                - label: Enable - End Notify with Energy Used (kWh)
+                  value: enable_power_tracking
+                - label: Enable - End Notify with Energy Used + Estimated Cost
+                  value: enable_power_tracking_and_cost
+                - label: Enable - Update Start & End Helpers Only
+                  value: enable_start_end_helpers
+                - label: Disable - Energy Tracking
+                  value: disable_power_tracking
+        power_consumption_sensor:
+          name: Energy Tracking - Energy Sensor
+          description: >
+            Select the sensor that reports the total energy used in kilowatt-hours (kWh).
+            This can be either a cumulative total or a daily value.
+
+
+            **Note** If you select a daily total sensor that resets at midnight, the data may be inaccurate for cycles that span across two days.
+            This is because the energy value should increase continuously throughout the cycle, without resetting to 0.0 kWh partway through.
+
+
+            Also, keep in mind that the blueprint takes a snapshot of the sensor's value at the start and end of the cycle.
+            If your energy sensor updates infrequently, it may not reflect the exact values at those moments, which can affect the start and end helpers, as well as the estimated energy usage and cost.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: sensor
+        end_message_kwh:
+          name: Energy Tracking - End Message - Energy Consumption
+          description: >
+            Enter the title used in the end notification for the estimated energy usage value.
+            This label is shown directly before the estimated energy usage (kWh) in the end notification.
+          default: Consumption
+          selector:
+            text:
+        end_message_cost:
+          name: Energy Tracking - End Message - Cost
+          description: >
+            Enter the title used in the end notification for the estimated cost.
+            This label is shown directly before the estimated cost value in the end notification.
+          default: Approx Cost $
+          selector:
+            text:
+        cost_per_kwh:
+          name: Energy Tracking - Cost per kWh
+          description: >
+            Please enter your number helper or an energy sensor to specify the electricity rate per kWh.
+
+
+            **Note** - Keep in mind that the rate used is determined when the appliance ends and remains constant throughout the cycle, even if your energy sensor value changes based on the time of day.
+            This may result in an inaccurate estimated cost if your electricity pricing varies during the cycle.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain:
+                  - input_number
+                  - sensor
+        start_power_consumption:
+          name: Energy Tracking - Start Number Helper
+          description: >
+            Select a number helper to store the kWh reading at the **start** of the cycle.
+            This must be a completely independent helper, and must not be the same one used
+            in the 'Energy Tracking - End Number Helper' input below.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: input_number
+        end_power_consumption:
+          name: Energy Tracking - End Number Helper
+          description: >
+            Select a number helper to store the kWh reading at the **end** of the cycle.
+            This must be a completely independent helper, and must not be the same one used
+            in the 'Energy Tracking - Start Number Helper' input above.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: input_number
+    time_tracking_settings:
+      name: "Time Tracking"
+      icon: mdi:timer-sand-complete
+      collapsed: true
+      input:
+        include_runtime_tracking:
+          name: Use the Runtime Tracking Option (Optional)
+          description: >
+            Enable Runtime Tracking option to record the total runtime of your appliance by updating a text helper each time it completes a full cycle.
+            You can also choose to include the total runtime in the end notification message.
+          default: disable_runtime_tracking
+          selector:
+            select:
+              options:
+                - label: Enable Runtime Tracking
+                  value: "enable_runtime_tracking"
+                - label: Enable Runtime Tracking with End Notify
+                  value: "enable_runtime_tracking_and_notify"
+                - label: Disable Runtime Tracking
+                  value: "disable_runtime_tracking"
+        runtime_tracking_helper:
+          name: Runtime Tracking - Text Helper
+          description: >
+            Select the text helper that will store the appliance's total runtime (in HH:MM:SS format).
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: input_text
+        runtime_tracking_end_message:
+          name: Runtime Tracking - End Message
+          description: >
+            Enter the title to display just before the total runtime in the end notification message.
+          default: Total Runtime
+          selector:
+            text:
+        include_duration_tracking:
+          name: Use the Duration Tracking Option (Optional)
+          description: >
+            Enable the Duration Tracking option to monitor how long your appliance runs during a full cycle.
+            This allows you to include the cycle's duration in the end notification message.
+          default: disable_duration_tracking
+          selector:
+            select:
+              options:
+                - label: Enable - End Notify Duration Tracking
+                  value: "enable_duration_tracking"
+                - label: Disable Duration Tracking
+                  value: "disable_duration_tracking"
+        end_message_duration_tracking:
+          name: Duration Tracking - End Message - Duration
+          description: >
+            Enter the title to display just before the duration tracking in the end notification message.
+          default: Duration
+          selector:
+            text:
+    cycle_counter_settings:
+      name: "Cycle Counter"
+      icon: mdi:counter
+      collapsed: true
+      input:
+        include_cycle_counter:
+          name: Use the Cycle Counter Option (Optional)
+          description: >
+            Enable the Cycle Counter option to update a counter every time the appliance completes a full cycle.
+            You can also choose to include the cycle count in the end notify message.
+          default: disable_cycle_counter
+          selector:
+            select:
+              options:
+                - label: Enable Cycle Counter
+                  value: "enable_cycle_counter"
+                - label: Enable Cycle Counter with End Notify
+                  value: "enable_cycle_counter_and_notify"
+                - label: Disable Cycle Counter
+                  value: "disable_cycle_counter"
+        cycle_counter_helper:
+          name: Cycle Counter - Counter Helper
+          description: >
+            Enter a counter helper that will track the number of appliance cycles.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: counter
+        cycle_counter_end_message:
+          name: Cycle Counter - End Message
+          description: >
+            Enter the title to display just before the cycle count in the end notification message.
+          default: Total Cycles
+          selector:
+            text:
+    service_reminders_settings:
+      name: "Service Reminders"
+      icon: mdi:wrench-check-outline
+      collapsed: true
+      input:
+        include_service_reminder:
+          name: Use the Cycle Counter Service Reminder Option (Optional)
+          description: >
+            Enable the Cycle Counter Service Reminder option to update a counter every time the appliance completes a full cycle.
+            You can also choose to include the service reminder in the end notify message.
+          default: disable_service_reminder
+          selector:
+            select:
+              options:
+                - label: Enable Service Reminder
+                  value: "enable_service_reminder"
+                - label: Enable Service Reminder with End Notify
+                  value: "enable_service_reminder_and_notify"
+                - label: Disable Service Reminder
+                  value: "disable_service_reminder"
+        service_reminder_counter_helper:
+          name: Cycle Counter Service Reminder - Counter Helper
+          description: >
+            Enter a counter helper that will track the number of appliance cycles since the last service.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: counter
+        service_reminder_cycles:
+          name: Cycle Counter Service Reminder - Service Cycles
+          description: >
+            Specify the number of appliance cycles required before a service reminder is triggered.
+          default: 30
+          selector:
+            number:
+              min: 1
+              max: 50
+              step: 1
+              unit_of_measurement: Cycles
+        service_reminder_end_message:
+          name: Cycle Counter Service Reminder - End Message
+          description: >
+            Enter the message that will appear in the end notification when the service reminder is triggered.
+
+
+            **NOTE** - This message will only appear if the service count reaches or exceeds the specified cycle threshold.
+          default: ⚠️ It's time to clean the filter!
+          selector:
+            text:
+        include_time_service_reminder:
+          name: Use the Time-Based Service Reminder Option (Optional)
+          description: >
+            Enable the Time-Based Service Reminder option to track the total time the appliance has been in use since the last service.
+            You can also choose to include the service reminder in the end notification.
+
+
+            **Note** - The time is only updated when the appliance completes a full cycle.
+          default: disable_time_service_reminder
+          selector:
+            select:
+              options:
+                - label: Enable Time-Based Service Reminder
+                  value: "enable_time_service_reminder"
+                - label: Enable Time-Based Service Reminder with End Notification
+                  value: "enable_time_service_reminder_and_notify"
+                - label: Disable Time-Based Service Reminder
+                  value: "disable_time_service_reminder"
+        service_reminder_time_helper:
+          name: Time-Based Service Reminder - Text Helper
+          description: >
+            Select a text helper to track the total time the appliance has been in use since the last service.
+
+
+            **NOTE** - To reset the tracked time, simply enter "0" into the helper.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: input_text
+        service_reminder_time_threshold:
+          name: Time-Based Service Reminder - Service Time
+          description: >
+            Specify the time threshold (in HH:MM:SS format) that will trigger the service reminder once reached.
+          default:
+            hours: 0
+            minutes: 0
+            seconds: 0
+          selector:
+            duration:
+        service_reminder_time_end_message:
+          name: Time-Based Service Reminder - End Message
+          description: >
+            Enter the message that will appear in the end notification when the service reminder is triggered.
+
+
+            **NOTE** - This message will only appear if the service time reaches or exceeds the specified time threshold.
+          default: ⚠️ It's time to clean the filter!
+          selector:
+            text:
+    watchdog_settings:
+      name: "Watchdog"
+      icon: mdi:dog-side
+      collapsed: true
+      input:
+        include_watchdog:
+          name: Use the Watchdog Option (Optional)
+          description: >
+            Enable the Watchdog option to monitor whether your appliance completes its cycle within the expected time frame.
+            If it fails to do so, the automation will time out and send a notification to alert you of a potential issue, helping you catch problems early.
+
+
+            **NOTE** - If the Watchdog is triggered, the automation will be cancelled.
+            If you're using Duration Tracking, Cycle Counter, or Service Reminders, they will not be updated, as the exact point of failure is unknown.
+          default: disable_watchdog
+          selector:
+            select:
+              options:
+                - label: Enable Watchdog
+                  value: "enable_watchdog"
+                - label: Disable Watchdog
+                  value: "disable_watchdog"
+        watchdog_timeframe:
+          name: Time Frame
+          description: >
+            Specify the maximum duration for the 'Watchdog' to wait for the appliance to complete its task.
+            If the appliance exceeds this time frame, the 'Watchdog' will trigger and notify you, indicating a potential issue.
+          default: 00:00:00
+          selector:
+            duration:
+        watchdog_notify_device:
+          name: Devices Notified
+          description: >
+            Select the devices that should receive a notification if the appliance fails to complete its task within the expected time frame, triggering the Watchdog.
+          default: []
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+              multiple: true
+        watchdog_title:
+          name: Title
+          description: >
+            Enter the notification title for the Watchdog timeout.
+          default: ⚠️ Appliance Watchdog
+          selector:
+            text:
+        watchdog_message:
+          name: Message
+          description: >
+            Enter the notification message for the Watchdog timeout.
+          default: Uh-oh! Time to check the washing machine.
+          selector:
+            text:
+        watchdog_notify_tag:
+          name: Notification Tag
+          description: >
+            Use a tag to keep your notifications organized.
+            When a new notification with the same tag is sent, it replaces the old one, so you won't get cluttered with multiple notifications for the same appliance.
+
+
+            You can use the same tag across start, end, and watchdog notifications to ensure only one active notification remains throughout the appliance cycle.
+
+
+            If this input is left blank, no tag will be applied and each notification will be treated as separate.
+
+
+            For best results, use short, unique tags for each automation - for example: `washing-clothes`, `drying-clothes`, `washing-dishes`, etc.
+          default: []
+          selector:
+            text:
+        watchdog_notify_interruption_level:
+          name: Interruption Level - iOS Only
+          description: >
+            On devices running iOS 15 and later, you can configure the interruption level for your notifications to ensure they are delivered according to your preferences.
+            Choose the desired interruption level from the dropdown list.
+            Critical and time-sensitive notifications must be turned ON within the Home Assistant App, and time-sensitive notifications must be allowed in your Focus settings.
+
+
+            For more information on interruption levels [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: active
+          selector:
+            select:
+              mode: dropdown
+              options:
+                - label: Default
+                  value: "active"
+                - label: Critical Notifications
+                  value: "critical"
+                - label: Time Sensitive Notifications
+                  value: "time-sensitive"
+                - label: Quiet Notifications Without Waking Screen
+                  value: "passive"
+        watchdog_notify_sound:
+          name: Notification Sound - iOS Only
+          description: >
+            The Home Assistant app for iOS includes built-in notification sounds, and you can import sounds from your iOS device into the app.
+            Custom sounds can also be added via iTunes or from your cloud storage.
+            When entering a sound, ensure you use the full filename, including the extension.
+
+
+            For more information on using sounds in the Home Assistant app, [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: []
+          selector:
+            text:
+        watchdog_notify_data:
+          name: Android Only Options (Optional)
+          description: >
+            **High Priority** notifications ensure that you receive important alerts immediately.
+            These notifications bypass normal delivery delays and are delivered instantly to your device.
+
+
+            **Sticky Notification** ensure that important alerts are not dismissed when selected.
+            They remain on your notification screen until you actively clear or swipe them away, ensuring that critical information stays visible until addressed.
+
+
+            **Notification Channel** allow you to easily organize different notification settings,
+            including notification sounds, vibrations, and other device-specific features.
+            If you choose this option, please enter your desired channel name below.
+
+
+            **Icon** allows you to replace the default Home Assistant icon with one of your choice.
+            If selected, choose your preferred icon using the **Icon - Android Only** option below, and set the icon colour using **Icon Colour - Android Only**.
+
+
+            For more information on notification options [Click Here](https://community.home-assistant.io/t/650166/278)
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: High Priority
+                  value: "high_priority"
+                - label: Sticky Notification
+                  value: "sticky"
+                - label: Notification Channel
+                  value: "channel"
+                - label: Icon
+                  value: "icon"
+        watchdog_notify_channel:
+          name: Notification Channel - Android Only
+          description: >
+            If you have chosen to use a notification channel, simply enter the name of an existing channel to apply its pre-configured settings.
+            If you don't have a channel yet, you can create a new one by entering a name here.
+            When your automation sends the first notification, it will create the channel on your device.
+            After the channel is created, you can customize its notification settings to your preference directly on your device.
+          default: []
+          selector:
+            text:
+        watchdog_notify_icon:
+          name: Icon - Android Only
+          description: >
+            Select a custom icon to replace the default Home Assistant icon in the notification.
+            This setting applies only if the **Icon** option is selected in **Android Only Options** above.
+          default: "mdi:washing-machine-alert"
+          selector:
+            icon:
+        watchdog_notify_icon_colour:
+          name: Icon Colour - Android Only
+          description: >
+            Choose a colour for your custom notification icon.
+            This setting applies only if the **Icon** option is selected in **Android Only Options** above.
+          default: [244, 67, 54]
+          selector:
+            color_rgb:
+    device_tracker_settings:
+      name: "Device Tracker"
+      icon: mdi:account-multiple-check-outline
+      collapsed: true
+      input:
+        include_device_tracker:
+          name: Use Device Tracker Options (Optional)
+          description: >
+            Home Assistant can track the location of your mobile devices using the built-in device tracker.
+            If your devices are set up for location tracking and you've defined one or more zones,
+            you can enable this option to send notifications **only** to the devices you've selected that are currently located within a selected zone.
+
+
+            Choose which notification(s) this should apply to:
+          default: []
+          selector:
+            select:
+              multiple: true
+              options:
+                - label: Apply to Start Notify
+                  value: "zone_start"
+                - label: Apply to End Notify
+                  value: "zone_end"
+                - label: Apply to Watchdog
+                  value: "zone_watchdog"
+        notify_zone:
+          name: Device Tracker - Zone
+          description: >
+            Select the zone to use for location-based notifications.
+            When any of the options above are enabled (Start Notify, End Notify, or Watchdog), notifications will be sent **only** to the devices you've selected in each section that are currently in this zone.
+          default: []
+          selector:
+            entity:
+              filter:
+                domain: zone
+    custom_actions_settings:
+      name: "Custom Actions"
+      icon: mdi:code-tags
+      collapsed: true
+      input:
+        include_custom_actions:
+          name: Use the Custom Action Options (Optional)
+          description: >
+            Customize your automation with any action you desire, whether it's for the start, watchdog, or end of a cycle.
+            It is commonly used for playing announcements on The Voice (HA), Google, Alexa, etc.
+            Additionally, it can be utilized for other notification services or any other actions you would like to perform.
+          default: []
+          selector:
+            select:
+              options:
+                - label: Enable Custom Actions - Start
+                  value: "enable_start_custom_actions"
+                - label: Enable Custom Actions - Watchdog
+                  value: "enable_watchdog_custom_actions"
+                - label: Enable Custom Actions - End
+                  value: "enable_end_custom_actions"
+              multiple: true
+        start_custom_actions:
+          name: Custom Actions - Start
+          description: >
+            Enter the actions you would like to run at the start.
+          default: []
+          selector:
+            action:
+        watchdog_custom_actions:
+          name: Custom Actions - Watchdog
+          description: >
+            Enter the actions you would like to run when the watchdog is triggered.
+          default: []
+          selector:
+            action:
+        end_custom_actions:
+          name: Custom Actions - End
+          description: >
+            Enter the actions you would like to run at the end.
+          default: []
+          selector:
+            action:
+    global_conditions_settings:
+      name: "Global Conditions"
+      icon: mdi:earth
+      collapsed: true
+      input:
+        global_conditions:
+          name: Global Conditions
+          description: >
+            Enter any global conditions you would like to apply to the automation.
+          default: []
+          selector:
+            condition:
+
+mode: single
+max_exceeded: silent
+
+variables:
+  power_sensor: !input power_sensor
+  start_appliance_power: !input start_appliance_power
+  start_time_delay: !input start_time_delay
+  end_appliance_power: !input end_appliance_power
+  end_time_delay: !input end_time_delay
+  end_repeat_count: !input end_repeat_count
+  include_start_notify: !input include_start_notify
+  start_notify_device: !input start_notify_device
+  start_title: !input start_title
+  start_message: !input start_message
+  start_notify_tag: !input start_notify_tag
+  start_notify_interruption_level: !input start_notify_interruption_level
+  start_notify_sound: !input start_notify_sound
+  start_notify_data: !input start_notify_data
+  start_notify_channel: !input start_notify_channel
+  start_notify_icon: !input start_notify_icon
+  start_notify_icon_colour: !input start_notify_icon_colour
+  running_dead_zone: !input running_dead_zone
+  include_end_notify: !input include_end_notify
+  end_notify_device: !input end_notify_device
+  end_message_title: !input end_message_title
+  end_message: !input end_message
+  end_notify_tag: !input end_notify_tag
+  end_notify_interruption_level: !input end_notify_interruption_level
+  end_notify_sound: !input end_notify_sound
+  end_notify_data: !input end_notify_data
+  end_notify_channel: !input end_notify_channel
+  end_notify_icon: !input end_notify_icon
+  end_notify_icon_colour: !input end_notify_icon_colour
+  end_reminder_notification: !input end_reminder_notification
+  end_reminder_notification_entity: !input end_reminder_notification_entity
+  end_reminder_notification_message: !input end_reminder_notification_message
+  end_reminder_notification_time_delay: !input end_reminder_notification_time_delay
+  end_reminder_notification_max_count: !input end_reminder_notification_max_count
+  end_attended_notification_message: !input end_attended_notification_message
+  include_run_status: !input include_run_status
+  run_status_entity: !input run_status_entity
+  run_status_start: !input run_status_start
+  run_status_watchdog: !input run_status_watchdog
+  run_status_end: !input run_status_end
+  run_status_end_reminder: !input run_status_end_reminder
+  run_status_end_attended: !input run_status_end_attended
+  include_time: !input include_time
+  after_time: !input after_time
+  before_time: !input before_time
+  weekday_options: !input weekday_options
+  include_power_tracking: !input include_power_tracking
+  power_consumption_sensor: !input power_consumption_sensor
+  end_message_kwh: !input end_message_kwh
+  end_message_cost: !input end_message_cost
+  cost_per_kwh: !input cost_per_kwh
+  start_power_consumption: !input start_power_consumption
+  end_power_consumption: !input end_power_consumption
+  start_time: "{{ now().timestamp() }}"
+  include_runtime_tracking: !input include_runtime_tracking
+  runtime_tracking_helper: !input runtime_tracking_helper
+  runtime_tracking_end_message: !input runtime_tracking_end_message
+  include_duration_tracking: !input include_duration_tracking
+  end_message_duration_tracking: !input end_message_duration_tracking
+  include_cycle_counter: !input include_cycle_counter
+  cycle_counter_helper: !input cycle_counter_helper
+  cycle_counter_end_message: !input cycle_counter_end_message
+  include_service_reminder: !input include_service_reminder
+  service_reminder_counter_helper: !input service_reminder_counter_helper
+  service_reminder_cycles: !input service_reminder_cycles
+  service_reminder_end_message: !input service_reminder_end_message
+  include_time_service_reminder: !input include_time_service_reminder
+  service_reminder_time_helper: !input service_reminder_time_helper
+  service_reminder_time_threshold: !input service_reminder_time_threshold
+  service_reminder_time_end_message: !input service_reminder_time_end_message
+  include_watchdog: !input include_watchdog
+  watchdog_timeframe: !input watchdog_timeframe
+  watchdog_notify_device: !input watchdog_notify_device
+  watchdog_title: !input watchdog_title
+  watchdog_message: !input watchdog_message
+  watchdog_notify_tag: !input watchdog_notify_tag
+  watchdog_notify_interruption_level: !input watchdog_notify_interruption_level
+  watchdog_notify_sound: !input watchdog_notify_sound
+  watchdog_notify_data: !input watchdog_notify_data
+  watchdog_notify_channel: !input watchdog_notify_channel
+  watchdog_notify_icon: !input watchdog_notify_icon
+  watchdog_notify_icon_colour: !input watchdog_notify_icon_colour
+  include_device_tracker: !input include_device_tracker
+  notify_zone: !input notify_zone
+  include_custom_actions: !input include_custom_actions
+  start_custom_actions: !input start_custom_actions
+  watchdog_custom_actions: !input watchdog_custom_actions
+  end_custom_actions: !input end_custom_actions
+  global_conditions: !input global_conditions
+
+# Start notify data
+
+  start_message_data: >-
+    {% set message = namespace(data={}) %}
+    {% set push = namespace(data={}) %}
+    {% if start_notify_interruption_level in ['active', 'critical', 'time-sensitive', 'passive'] %}
+      {% set push.data = dict(push.data, **{ 'interruption-level': start_notify_interruption_level }) %}
+    {% endif %}
+    {% if start_notify_sound != [] %}
+      {% set push.data = dict(push.data, **{ 'sound': start_notify_sound }) %}
+    {% endif %}
+    {% if push.data %}
+      {% set message.data = dict(message.data, **{ 'push': push.data }) %}
+    {% endif %}
+    {% if 'high_priority' in start_notify_data %}
+      {% set message.data = dict(message.data, **{ 'ttl': 0, 'priority': 'high' }) %}
+    {% endif %}
+    {% if 'channel' in start_notify_data %}
+      {% set message.data = dict(message.data, **{ 'channel': start_notify_channel }) %}
+    {% endif %}
+    {% if 'sticky' in start_notify_data %}
+      {% set message.data = dict(message.data, **{ 'sticky': "true" }) %}
+    {% endif %}
+    {% if 'icon' in start_notify_data %}
+      {% set message.data = dict(message.data, **{ 'notification_icon': start_notify_icon }) %}
+      {% if start_notify_icon_colour | length == 3 %}
+        {% set icon_colour = '#%02x%02x%02x' | format(start_notify_icon_colour[0], start_notify_icon_colour[1], start_notify_icon_colour[2]) %}
+        {% set message.data = dict(message.data, **{ 'color': icon_colour }) %}
+      {% endif %}
+    {% endif %}
+    {% if start_notify_tag != [] %}
+      {% set message.data = dict(message.data, **{ 'tag': start_notify_tag }) %}
+    {% endif %}
+    {{ message.data }}
+
+# End notify data
+
+  end_message_data: >-
+    {% set message = namespace(data={}) %}
+    {% set push = namespace(data={}) %}
+    {% if end_notify_interruption_level in ['active', 'critical', 'time-sensitive', 'passive'] %}
+      {% set push.data = dict(push.data, **{ 'interruption-level': end_notify_interruption_level }) %}
+    {% endif %}
+    {% if end_notify_sound != [] %}
+      {% set push.data = dict(push.data, **{ 'sound': end_notify_sound }) %}
+    {% endif %}
+    {% if push.data %}
+      {% set message.data = dict(message.data, **{ 'push': push.data }) %}
+    {% endif %}
+    {% if 'high_priority' in end_notify_data %}
+      {% set message.data = dict(message.data, **{ 'ttl': 0, 'priority': 'high' }) %}
+    {% endif %}
+    {% if 'channel' in end_notify_data %}
+      {% set message.data = dict(message.data, **{ 'channel': end_notify_channel }) %}
+    {% endif %}
+    {% if 'sticky' in end_notify_data %}
+      {% set message.data = dict(message.data, **{ 'sticky': "true" }) %}
+    {% endif %}
+    {% if 'icon' in end_notify_data %}
+      {% set message.data = dict(message.data, **{ 'notification_icon': end_notify_icon }) %}
+      {% if end_notify_icon_colour | length == 3 %}
+        {% set icon_colour = '#%02x%02x%02x' | format(end_notify_icon_colour[0], end_notify_icon_colour[1], end_notify_icon_colour[2]) %}
+        {% set message.data = dict(message.data, **{ 'color': icon_colour }) %}
+      {% endif %}
+    {% endif %}
+    {% if end_notify_tag != [] %}
+      {% set message.data = dict(message.data, **{ 'tag': end_notify_tag }) %}
+    {% endif %}
+    {{ message.data }}
+
+# Watchdog notify data
+
+  watchdog_message_data: >-
+    {% set message = namespace(data={}) %}
+    {% set push = namespace(data={}) %}
+    {% if watchdog_notify_interruption_level in ['active', 'critical', 'time-sensitive', 'passive'] %}
+      {% set push.data = dict(push.data, **{ 'interruption-level': watchdog_notify_interruption_level }) %}
+    {% endif %}
+    {% if watchdog_notify_sound != [] %}
+      {% set push.data = dict(push.data, **{ 'sound': watchdog_notify_sound }) %}
+    {% endif %}
+    {% if push.data %}
+      {% set message.data = dict(message.data, **{ 'push': push.data }) %}
+    {% endif %}
+    {% if 'high_priority' in watchdog_notify_data %}
+      {% set message.data = dict(message.data, **{ 'ttl': 0, 'priority': 'high' }) %}
+    {% endif %}
+    {% if 'channel' in watchdog_notify_data %}
+      {% set message.data = dict(message.data, **{ 'channel': watchdog_notify_channel }) %}
+    {% endif %}
+    {% if 'sticky' in watchdog_notify_data %}
+      {% set message.data = dict(message.data, **{ 'sticky': "true" }) %}
+    {% endif %}
+    {% if 'icon' in watchdog_notify_data %}
+      {% set message.data = dict(message.data, **{ 'notification_icon': watchdog_notify_icon }) %}
+      {% if watchdog_notify_icon_colour | length == 3 %}
+        {% set icon_colour = '#%02x%02x%02x' | format(watchdog_notify_icon_colour[0], watchdog_notify_icon_colour[1], watchdog_notify_icon_colour[2]) %}
+        {% set message.data = dict(message.data, **{ 'color': icon_colour }) %}
+      {% endif %}
+    {% endif %}
+    {% if watchdog_notify_tag != [] %}
+      {% set message.data = dict(message.data, **{ 'tag': watchdog_notify_tag }) %}
+    {% endif %}
+    {{ message.data }}
+
+# Work out the actual watchdog duration taking into account the running dead zone time
+
+  watchdog_duration: >-
+    {% set dead_zone_seconds = running_dead_zone * 60 %}
+    {% set hours = watchdog_timeframe.hours | default(0) %}
+    {% set minutes = watchdog_timeframe.minutes | default(0) %}
+    {% set seconds = watchdog_timeframe.seconds | default(0) %}
+    {% set watchdog_seconds = (hours * 3600) + (minutes * 60) + seconds %}
+    {% set duration_total_in_seconds = watchdog_seconds - dead_zone_seconds %}
+    {% set duration_hours = duration_total_in_seconds // 3600 %}
+    {% set duration_minutes = (duration_total_in_seconds % 3600) // 60 %}
+    {% set duration_seconds = duration_total_in_seconds % 60 %}
+    {{ '%02d:%02d:%02d' | format(duration_hours, duration_minutes, duration_seconds) }}
+
+triggers:
+  - trigger: numeric_state
+    id: "t0"
+    entity_id: !input power_sensor
+    above: !input start_appliance_power
+    below: "24000"
+    for:
+      minutes: !input start_time_delay
+
+# All Conditions
+conditions:
+
+# Global Conditions
+  - condition: and
+    conditions: !input global_conditions
+
+actions:
+  - choose:
+    - alias: "Check if power tracking is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_power_tracking != 'disable_power_tracking' }}"
+      sequence:
+        - action: input_number.set_value
+          target:
+            entity_id: !input start_power_consumption
+          data_template:
+            value: "{{ states(power_consumption_sensor) | float }}"
+  - choose:
+    - alias: "Check if start of notification is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_start_notify == 'enable_start_notify_options' }}"
+        - alias: "Check if notify time restriction is enabled before sending the message"
+          condition: or
+          conditions:
+            - condition: template
+              value_template: "{{ include_time == 'time_disabled' }}"
+            - condition: and
+              conditions:
+                - condition: time
+                  after: !input after_time
+                  before: !input before_time
+                  weekday: !input weekday_options
+                - condition: template
+                  value_template: "{{ include_time == 'time_enabled' }}"
+      sequence:
+        - variables:
+            zone_filtered_start_devices: >
+              {% if 'zone_start' in include_device_tracker %}
+                {% set zone_short_name = notify_zone.split('.')[-1] | lower | trim %}
+                {% set ns = namespace(devices=[]) %}
+                {% for device in start_notify_device %}
+                  {% set device_status = namespace(in_zone=false) %}
+                  {% set trackers = device_entities(device) | select('search', '^device_tracker\\.') | list %}
+                  {% for tracker in trackers %}
+                    {% if (states(tracker) | string).lower().strip() == zone_short_name %}
+                      {% set device_status.in_zone = true %}
+                    {% endif %}
+                  {% endfor %}
+                  {% if device_status.in_zone %}
+                    {% set ns.devices = ns.devices + [device] %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.devices }}
+              {% else %}
+                {{ start_notify_device }}
+              {% endif %}
+        - alias: "Send a notification to each device"
+          repeat:
+            for_each: "{{ zone_filtered_start_devices }}"
+            sequence:
+              - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+                data:
+                  title: !input start_title
+                  message: !input start_message
+                  data: "{{ start_message_data }}"
+  - choose:
+    - alias: "Perform the run status action"
+      conditions:
+        - condition: template
+          value_template: "{{ include_run_status == 'run_status_enabled' }}"
+        - condition: template
+          value_template: "{{ run_status_start != [] }}"
+      sequence:
+        - action: input_select.select_option
+          target:
+            entity_id: !input run_status_entity
+          data:
+            option: !input run_status_start
+  - choose:
+    - alias: "Perform the custom start action"
+      conditions:
+        - condition: template
+          value_template: "{{ 'enable_start_custom_actions' in include_custom_actions }}"
+      sequence: !input start_custom_actions
+  - alias: "Wait the number of minutes set in running dead zone"
+    delay:
+      minutes: !input running_dead_zone
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ include_watchdog == 'enable_watchdog' }}"
+        sequence:
+          - alias: "Wait until appliance has finished"
+            repeat:
+              count: !input end_repeat_count
+              sequence:
+                - wait_for_trigger:
+                    - trigger: numeric_state
+                      entity_id: !input power_sensor
+                      below: !input end_appliance_power
+                      for:
+                        minutes: !input end_time_delay
+                  timeout: "{{ watchdog_duration }}"
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ wait.trigger is none }}"
+                sequence:
+                  - choose:
+                    - alias: "Check if notify time restriction is enabled before sending the message"
+                      conditions:
+                        - condition: or
+                          conditions:
+                            - condition: template
+                              value_template: "{{ include_time == 'time_disabled' }}"
+                            - condition: and
+                              conditions:
+                                - condition: time
+                                  after: !input after_time
+                                  before: !input before_time
+                                  weekday: !input weekday_options
+                                - condition: template
+                                  value_template: "{{ include_time == 'time_enabled' }}"
+                      sequence:
+                        - variables:
+                            zone_filtered_watchdog_devices: >
+                              {% if 'zone_watchdog' in include_device_tracker %}
+                                {% set zone_short_name = notify_zone.split('.')[-1] | lower | trim %}
+                                {% set ns = namespace(devices=[]) %}
+                                {% for device in watchdog_notify_device %}
+                                  {% set device_status = namespace(in_zone=false) %}
+                                  {% set trackers = device_entities(device) | select('search', '^device_tracker\\.') | list %}
+                                  {% for tracker in trackers %}
+                                    {% if (states(tracker) | string).lower().strip() == zone_short_name %}
+                                      {% set device_status.in_zone = true %}
+                                    {% endif %}
+                                  {% endfor %}
+                                  {% if device_status.in_zone %}
+                                    {% set ns.devices = ns.devices + [device] %}
+                                  {% endif %}
+                                {% endfor %}
+                                {{ ns.devices }}
+                              {% else %}
+                                {{ watchdog_notify_device }}
+                              {% endif %}
+                        - alias: "Send a notification to each device"
+                          repeat:
+                            for_each: "{{ zone_filtered_watchdog_devices }}"
+                            sequence:
+                              - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+                                data:
+                                  title: !input watchdog_title
+                                  message: "{{watchdog_message}}"
+                                  data: "{{ watchdog_message_data }}"
+                  - choose:
+                    - alias: "Perform the run status action"
+                      conditions:
+                        - condition: template
+                          value_template: "{{ include_run_status == 'run_status_enabled' }}"
+                        - condition: template
+                          value_template: "{{ run_status_watchdog != [] }}"
+                      sequence:
+                        - action: input_select.select_option
+                          target:
+                            entity_id: !input run_status_entity
+                          data:
+                            option: !input run_status_watchdog
+                  - choose:
+                    - alias: "Perform the custom watchdoog action"
+                      conditions:
+                        - condition: template
+                          value_template: "{{ 'enable_watchdog_custom_actions' in include_custom_actions }}"
+                      sequence: !input watchdog_custom_actions
+                  - stop: "Stop the automation"
+      - conditions:
+        - condition: template
+          value_template: "{{ include_watchdog == 'disable_watchdog' }}"
+        sequence:
+          - alias: "Wait until appliance has finished"
+            repeat:
+              count: !input end_repeat_count
+              sequence:
+                - wait_for_trigger:
+                    - trigger: numeric_state
+                      entity_id: !input power_sensor
+                      below: !input end_appliance_power
+                      for:
+                        minutes: !input end_time_delay
+  - choose:
+    - alias: "Check if power tracking is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_power_tracking != 'disable_power_tracking' }}"
+      sequence:
+        - action: input_number.set_value
+          target:
+            entity_id: !input end_power_consumption
+          data_template:
+            value: "{{ states(power_consumption_sensor) | float }}"
+  - choose:
+    - alias: "Check if Runtime tracking is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_runtime_tracking != 'disable_runtime_tracking' }}"
+      sequence:
+        - variables:
+            current_run_time_total: >
+              {% set crtt = states(runtime_tracking_helper) %}
+              {% if ':' in crtt %}
+                {% set time = crtt.split(':') %}
+                {{ (time[0]|int * 3600) + (time[1]|int * 60) + (time[2]|int) }}
+              {% else %}
+                0
+              {% endif %}
+            run_time: "{{ (now().timestamp() - start_time) | int }}"
+            new_run_time_seconds: "{{ current_run_time_total + run_time }}"
+            hh: "{{ (new_run_time_seconds // 3600) | int }}"
+            mm: "{{ ((new_run_time_seconds % 3600) // 60) | int }}"
+            ss: "{{ (new_run_time_seconds % 60) | int }}"
+            total_run_time: "{{ '%02d:%02d:%02d' | format(hh, mm, ss) }}"
+        - action: input_text.set_value
+          target:
+            entity_id: !input runtime_tracking_helper
+          data:
+            value: "{{ total_run_time }}"
+  - choose:
+    - alias: "Check if time-based service reminder is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_time_service_reminder != 'disable_time_service_reminder' }}"
+      sequence:
+        - variables:
+            current_service_time_total: >
+              {% set cstt = states(service_reminder_time_helper) %}
+              {% if ':' in cstt %}
+                {% set time = cstt.split(':') %}
+                {{ (time[0]|int * 3600) + (time[1]|int * 60) + (time[2]|int) }}
+              {% else %}
+                0
+              {% endif %}
+            run_time: "{{ (now().timestamp() - start_time) | int }}"
+            new_service_time_seconds: "{{ current_service_time_total + run_time }}"
+            hh: "{{ (new_service_time_seconds // 3600) | int }}"
+            mm: "{{ ((new_service_time_seconds % 3600) // 60) | int }}"
+            ss: "{{ (new_service_time_seconds % 60) | int }}"
+            total_service_time: "{{ '%02d:%02d:%02d' | format(hh, mm, ss) }}"
+        - action: input_text.set_value
+          target:
+            entity_id: !input service_reminder_time_helper
+          data:
+            value: "{{ total_service_time }}"
+  - choose:
+    - alias: "Check if cycle count is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_cycle_counter != 'disable_cycle_counter' }}"
+      sequence:
+        - action: counter.increment
+          target:
+            entity_id: !input cycle_counter_helper
+  - choose:
+    - alias: "Check if service cycle count is enabled"
+      conditions:
+        - condition: template
+          value_template: "{{ include_service_reminder != 'disable_service_reminder' }}"
+      sequence:
+        - action: counter.increment
+          target:
+            entity_id: !input service_reminder_counter_helper
+  - choose:
+    - alias: "Perform the run status action"
+      conditions:
+        - condition: template
+          value_template: "{{ include_run_status == 'run_status_enabled' }}"
+        - condition: template
+          value_template: "{{ run_status_end != [] }}"
+      sequence:
+        - action: input_select.select_option
+          target:
+            entity_id: !input run_status_entity
+          data:
+            option: !input run_status_end
+  - alias: "Parallel actions for custom end actions & end notification"
+    parallel:
+      - sequence:
+          - choose:
+            - alias: "Perform the custom end action"
+              conditions:
+                - condition: template
+                  value_template: "{{ 'enable_end_custom_actions' in include_custom_actions }}"
+              sequence: !input end_custom_actions
+      - sequence:
+          - choose:
+            - alias: "Check if end of notification is enabled"
+              conditions:
+                - condition: template
+                  value_template: "{{ include_end_notify == 'enable_end_notify_options' }}"
+                - alias: "Check if notify time restriction is enabled before sending the message"
+                  condition: or
+                  conditions:
+                    - condition: template
+                      value_template: "{{ include_time == 'time_disabled' }}"
+                    - condition: and
+                      conditions:
+                      - condition: time
+                        after: !input after_time
+                        before: !input before_time
+                        weekday: !input weekday_options
+                      - condition: template
+                        value_template: "{{ include_time == 'time_enabled' }}"
+              sequence:
+                - variables:
+                    zone_filtered_end_devices: >
+                      {% if 'zone_end' in include_device_tracker %}
+                        {% set zone_short_name = notify_zone.split('.')[-1] | lower | trim %}
+                        {% set ns = namespace(devices=[]) %}
+                        {% for device in end_notify_device %}
+                          {% set device_status = namespace(in_zone=false) %}
+                          {% set trackers = device_entities(device) | select('search', '^device_tracker\\.') | list %}
+                          {% for tracker in trackers %}
+                            {% if (states(tracker) | string).lower().strip() == zone_short_name %}
+                              {% set device_status.in_zone = true %}
+                            {% endif %}
+                          {% endfor %}
+                          {% if device_status.in_zone %}
+                            {% set ns.devices = ns.devices + [device] %}
+                          {% endif %}
+                        {% endfor %}
+                        {{ ns.devices }}
+                      {% else %}
+                        {{ end_notify_device }}
+                      {% endif %}
+                    message: >-
+                      {% set message = namespace(text='') %}
+                      {% if include_service_reminder == 'enable_service_reminder_and_notify' %}
+                        {% set service_count = states(service_reminder_counter_helper) | int(0) %}
+                        {% set service_threshold = service_reminder_cycles | int %}
+                        {% if service_count >= service_threshold %}
+                          {% set message.text = message.text + service_reminder_end_message + '\n' %}
+                        {% endif %}
+                      {% endif %}
+                      {% if include_time_service_reminder == 'enable_time_service_reminder_and_notify' %}
+                        {% set service_reminder_helper_value = states(service_reminder_time_helper) %}
+                        {% if ':' in service_reminder_helper_value %}
+                          {% set time = service_reminder_helper_value.split(':') %}
+                          {% set service_reminder_helper_seconds = (time[0] | int * 3600) + (time[1] | int * 60) + (time[2] | int) %}
+                        {% else %}
+                          {% set service_reminder_helper_seconds = 0 %}
+                        {% endif %}
+                        {% set service_reminder_time_threshold_seconds =
+                          (service_reminder_time_threshold.hours | int * 3600) +
+                          (service_reminder_time_threshold.minutes | int * 60) +
+                          (service_reminder_time_threshold.seconds | int)
+                        %}
+                        {% if service_reminder_helper_seconds >= service_reminder_time_threshold_seconds %}
+                          {% set message.text = message.text + service_reminder_time_end_message + '\n' %}
+                        {% endif %}
+                      {% endif %}
+                      {% set message.text = message.text + end_message %}
+                      {% if include_power_tracking == 'enable_power_tracking' %}
+                        {% set kwh = (states(end_power_consumption) | float - states(start_power_consumption) | float) %}
+                        {% set message.text = message.text + '\n' + end_message_kwh + ' ' + (kwh | round(2) | string) + ' kWh' %}
+                      {% endif %}
+                      {% if include_power_tracking == 'enable_power_tracking_and_cost' %}
+                        {% set kwh = (states(end_power_consumption) | float - states(start_power_consumption) | float) %}
+                        {% set cost = kwh * (states(cost_per_kwh) | float) %}
+                        {% set message.text = message.text + '\n' + end_message_kwh + ' ' + (kwh | round(2) | string) + ' kWh' %}
+                        {% set message.text = message.text + '\n' + end_message_cost + (cost | round(2) | string) %}
+                      {% endif %}
+                      {% if include_runtime_tracking == 'enable_runtime_tracking_and_notify' %}
+                        {% set run_time = states(runtime_tracking_helper) %}
+                        {% set message.text = message.text + '\n' + runtime_tracking_end_message + ' ' + run_time %}
+                      {% endif %}
+                      {% if include_duration_tracking == 'enable_duration_tracking' %}
+                        {% set end_time = now().timestamp() %}
+                        {% set duration = (end_time - start_time) | int %}
+                        {% set hours = (duration // 3600) %}
+                        {% set minutes = ((duration % 3600) // 60) %}
+                        {% set seconds = (duration % 60) %}
+                        {% set message.text = message.text + '\n' + end_message_duration_tracking + ' ' + '%02d:%02d:%02d' | format(hours, minutes, seconds) %}
+                      {% endif %}
+                      {% if include_cycle_counter == 'enable_cycle_counter_and_notify' %}
+                        {% set cycle_count = states(cycle_counter_helper) | int(0) %}
+                        {% set message.text = message.text + '\n' + cycle_counter_end_message + ' ' + (cycle_count | string) %}
+                      {% endif %}
+                      {{ message.text }}
+                - alias: "Send a notification to each device"
+                  repeat:
+                    for_each: "{{ zone_filtered_end_devices }}"
+                    sequence:
+                      - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+                        data:
+                          title: !input end_message_title
+                          message: >
+                            {{message}}
+                          data: "{{ end_message_data }}"
+                - choose:
+                    - alias: "Check if end reminder notification is enabled"
+                      conditions:
+                        - condition: template
+                          value_template: "{{ end_reminder_notification != 'disable_reminder_notification' }}"
+                      sequence:
+                        - variables:
+                            reminder_message: >-
+                              {% set message = namespace(text='') %}
+                              {% if include_service_reminder == 'enable_service_reminder_and_notify' %}
+                                {% set service_count = states(service_reminder_counter_helper) | int(0) %}
+                                {% set service_threshold = service_reminder_cycles | int %}
+                                {% if service_count >= service_threshold %}
+                                  {% set message.text = message.text + service_reminder_end_message + '\n' %}
+                                {% endif %}
+                              {% endif %}
+                              {% if include_time_service_reminder == 'enable_time_service_reminder_and_notify' %}
+                                {% set service_reminder_helper_value = states(service_reminder_time_helper) %}
+                                {% if ':' in service_reminder_helper_value %}
+                                  {% set time = service_reminder_helper_value.split(':') %}
+                                  {% set service_reminder_helper_seconds = (time[0] | int * 3600) + (time[1] | int * 60) + (time[2] | int) %}
+                                {% else %}
+                                  {% set service_reminder_helper_seconds = 0 %}
+                                {% endif %}
+                                {% set service_reminder_time_threshold_seconds =
+                                  (service_reminder_time_threshold.hours | int * 3600) +
+                                  (service_reminder_time_threshold.minutes | int * 60) +
+                                  (service_reminder_time_threshold.seconds | int)
+                                %}
+                                {% if service_reminder_helper_seconds >= service_reminder_time_threshold_seconds %}
+                                  {% set message.text = message.text + service_reminder_time_end_message + '\n' %}
+                                {% endif %}
+                              {% endif %}
+                              {% set message.text = message.text + end_reminder_notification_message %}
+                              {{ message.text }}
+                        - wait_for_trigger:
+                            - trigger: state
+                              entity_id: !input end_reminder_notification_entity
+                              to: 'on'
+                          timeout:
+                            minutes: !input end_reminder_notification_time_delay
+                        - repeat:
+                            while:
+                              - condition: template
+                                value_template: "{{ (is_state(end_reminder_notification_entity, 'off')) and (repeat.index <= end_reminder_notification_max_count) }}"
+                            sequence:
+                              - variables:
+                                  zone_filtered_end_devices: >
+                                    {% if 'zone_end' in include_device_tracker %}
+                                      {% set zone_short_name = notify_zone.split('.')[-1] | lower | trim %}
+                                      {% set ns = namespace(devices=[]) %}
+                                      {% for device in end_notify_device %}
+                                        {% set device_status = namespace(in_zone=false) %}
+                                        {% set trackers = device_entities(device) | select('search', '^device_tracker\\.') | list %}
+                                        {% for tracker in trackers %}
+                                          {% if (states(tracker) | string).lower().strip() == zone_short_name %}
+                                            {% set device_status.in_zone = true %}
+                                          {% endif %}
+                                        {% endfor %}
+                                        {% if device_status.in_zone %}
+                                          {% set ns.devices = ns.devices + [device] %}
+                                        {% endif %}
+                                      {% endfor %}
+                                      {{ ns.devices }}
+                                    {% else %}
+                                      {{ end_notify_device }}
+                                    {% endif %}
+                              - repeat:
+                                  for_each: "{{ zone_filtered_end_devices }}"
+                                  sequence:
+                                    - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+                                      data:
+                                        title: !input end_message_title
+                                        message: >
+                                          {{reminder_message}}
+                                        data: "{{ end_message_data }}"
+                              - choose:
+                                - alias: "Check reminder notification entity is OFF and max count is less before waiting"
+                                  conditions:
+                                    - condition: template
+                                      value_template: "{{ (is_state(end_reminder_notification_entity, 'off')) and (repeat.index <= end_reminder_notification_max_count - 1) }}"
+                                  sequence:
+                                    - wait_for_trigger:
+                                        - trigger: state
+                                          entity_id: !input end_reminder_notification_entity
+                                          to: 'on'
+                                      timeout:
+                                        minutes: !input end_reminder_notification_time_delay
+                        - choose:
+                          - alias: "Perform the run status action"
+                            conditions:
+                              - condition: template
+                                value_template: "{{ include_run_status == 'run_status_enabled' }}"
+                              - condition: template
+                                value_template: "{{ run_status_end_reminder != [] }}"
+                              - condition: state
+                                entity_id: !input end_reminder_notification_entity
+                                state: 'off'
+                            sequence:
+                              - action: input_select.select_option
+                                target:
+                                  entity_id: !input run_status_entity
+                                data:
+                                  option: !input run_status_end_reminder
+                        - choose:
+                            - alias: "Entity is ON, check run status options"
+                              conditions:
+                                - condition: state
+                                  entity_id: !input end_reminder_notification_entity
+                                  state: 'on'
+                              sequence:
+                                - choose:
+                                  - alias: "Perform the run status action"
+                                    conditions:
+                                      - condition: template
+                                        value_template: "{{ include_run_status == 'run_status_enabled' }}"
+                                      - condition: template
+                                        value_template: "{{ run_status_end_attended != [] }}"
+                                    sequence:
+                                      - action: input_select.select_option
+                                        target:
+                                          entity_id: !input run_status_entity
+                                        data:
+                                          option: !input run_status_end_attended
+                            - alias: "Entity is OFF, wait for it to turn ON"
+                              conditions:
+                                - condition: state
+                                  entity_id: !input end_reminder_notification_entity
+                                  state: 'off'
+                              sequence:
+                                - wait_for_trigger:
+                                    - trigger: state
+                                      entity_id: !input end_reminder_notification_entity
+                                      to: 'on'
+                                - choose:
+                                  - alias: "Perform the run status action"
+                                    conditions:
+                                      - condition: template
+                                        value_template: "{{ include_run_status == 'run_status_enabled' }}"
+                                      - condition: template
+                                        value_template: "{{ run_status_end_attended != [] }}"
+                                    sequence:
+                                      - action: input_select.select_option
+                                        target:
+                                          entity_id: !input run_status_entity
+                                        data:
+                                          option: !input run_status_end_attended
+                        - choose:
+                            - alias: "Check if end reminder notification + notify is enabled"
+                              conditions:
+                                - condition: template
+                                  value_template: "{{ end_reminder_notification == 'enable_reminder_notification_notify' }}"
+                              sequence:
+                                - variables:
+                                    zone_filtered_end_devices: >
+                                      {% if 'zone_end' in include_device_tracker %}
+                                        {% set zone_short_name = notify_zone.split('.')[-1] | lower | trim %}
+                                        {% set ns = namespace(devices=[]) %}
+                                        {% for device in end_notify_device %}
+                                          {% set device_status = namespace(in_zone=false) %}
+                                          {% set trackers = device_entities(device) | select('search', '^device_tracker\\.') | list %}
+                                          {% for tracker in trackers %}
+                                            {% if (states(tracker) | string).lower().strip() == zone_short_name %}
+                                              {% set device_status.in_zone = true %}
+                                            {% endif %}
+                                          {% endfor %}
+                                          {% if device_status.in_zone %}
+                                            {% set ns.devices = ns.devices + [device] %}
+                                          {% endif %}
+                                        {% endfor %}
+                                        {{ ns.devices }}
+                                      {% else %}
+                                        {{ end_notify_device }}
+                                      {% endif %}
+                                    attended_message: >-
+                                      {% set message = namespace(text='') %}
+                                      {% if include_service_reminder == 'enable_service_reminder_and_notify' %}
+                                        {% set service_count = states(service_reminder_counter_helper) | int(0) %}
+                                        {% set service_threshold = service_reminder_cycles | int %}
+                                        {% if service_count >= service_threshold %}
+                                          {% set message.text = message.text + service_reminder_end_message + '\n' %}
+                                        {% endif %}
+                                      {% endif %}
+                                      {% if include_time_service_reminder == 'enable_time_service_reminder_and_notify' %}
+                                        {% set service_reminder_helper_value = states(service_reminder_time_helper) %}
+                                        {% if ':' in service_reminder_helper_value %}
+                                          {% set time = service_reminder_helper_value.split(':') %}
+                                          {% set service_reminder_helper_seconds = (time[0] | int * 3600) + (time[1] | int * 60) + (time[2] | int) %}
+                                        {% else %}
+                                          {% set service_reminder_helper_seconds = 0 %}
+                                        {% endif %}
+                                        {% set service_reminder_time_threshold_seconds =
+                                          (service_reminder_time_threshold.hours | int * 3600) +
+                                          (service_reminder_time_threshold.minutes | int * 60) +
+                                          (service_reminder_time_threshold.seconds | int)
+                                        %}
+                                        {% if service_reminder_helper_seconds >= service_reminder_time_threshold_seconds %}
+                                          {% set message.text = message.text + service_reminder_time_end_message + '\n' %}
+                                        {% endif %}
+                                      {% endif %}
+                                      {% set message.text = message.text + end_attended_notification_message %}
+                                      {{ message.text }}
+                                - alias: "Send a notification to each device to notify it has been attended to"
+                                  repeat:
+                                    for_each: "{{ zone_filtered_end_devices }}"
+                                    sequence:
+                                      - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+                                        data:
+                                          title: !input end_message_title
+                                          message: >
+                                            {{attended_message}}
+                                          data: "{{ end_message_data }}"
+                        - choose:
+                            - alias: "Check if end reminder notification + clear is enabled"
+                              conditions:
+                                - condition: template
+                                  value_template: "{{ end_reminder_notification == 'enable_reminder_notification_clear' }}"
+                              sequence:
+                                - alias: "Send a notification to each device to clear notification"
+                                  repeat:
+                                    for_each: !input end_notify_device
+                                    sequence:
+                                      - action: "notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify }}"
+                                        data:
+                                          message: clear_notification
+                                          data:
+                                            tag: !input end_notify_tag
