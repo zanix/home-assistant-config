@@ -31,6 +31,7 @@ notify_mobile:
       selector:
         select:
           mode: dropdown
+          multiple: true
           custom_value: true
           options:
             - value: joshua
@@ -50,7 +51,7 @@ notify_mobile:
     location:
       name: Location
       description: When to send the notification based on location
-      default: any
+      example: any
       selector:
         select:
           mode: dropdown
@@ -122,7 +123,6 @@ notify_mobile:
       description: >-
         When enabled, the notification will stay active on the device after
         tapping it and remain there until cleared.
-      default: false
       selector:
         boolean:
     interruption_level:
@@ -131,7 +131,6 @@ notify_mobile:
         Determines how the notification should be displayed when it's received,
         allowing it to be delivered silently or break through features like do not
         disturb (DND) or Focus profiles
-      default: active
       selector:
         select:
           mode: dropdown
@@ -616,6 +615,28 @@ notify_mobile:
         constant:
           value: true
           label: Enabled
+    alert_once:
+      name: Alert Once (Android)
+      description: Only alert once (no repeats/vibration if already shown)
+      selector:
+        boolean:
+    chronometer:
+      name: Chronometer (Android)
+      description: Show a running chronometer/timer in notification
+      selector:
+        boolean:
+    when:
+      name: Chronometer "When" Timestamp (Android)
+      description: Timestamp (epoch, ms) when the chronometer should end.
+      example: "1234567890"
+      selector:
+        text:
+    timeout:
+      name: Notification Timeout (Android)
+      description: How long before the notification disappears in seconds.
+      example: "360"
+      selector:
+        text:
     actions:
       name: Actions
       description: A list of actions for actionable notifications.
@@ -636,14 +657,27 @@ notify_mobile:
         notification_type: "{{ notification_type | default('notify') }}"
         location: "{{ location | default('any') }}"
 
+        send_to_list: >-
+          {% if send_to is string %}
+            {{ [ send_to ] }}
+          {% elif send_to is iterable %}
+            {{ send_to }}
+          {% else %}
+            {{ [] }}
+          {% endif %}
+
         targets: >-
           {# Get map of notification groups to person entities and their devices #}
           {% from 'variables.jinja' import person_device_map %}
-          {% if send_to in person_device_map %}
-            {{ person_device_map.get(send_to) }}
-          {% else %}
-            {{ ['notify.' ~ send_to] }}
-          {% endif %}
+          {% set out = namespace(all_targets=[]) %}
+          {% for st in send_to_list %}
+            {% if st in person_device_map %}
+              {% set out.all_targets = out.all_targets + person_device_map.get(st) %}
+            {% else %}
+              {% set out.all_targets = out.all_targets + [{'notify': 'notify.' ~ st}] %}
+            {% endif %}
+          {% endfor %}
+          {{ out.all_targets }}
 
         notification_services: >-
           {# Get filtered list of notification services based on location #}
@@ -701,6 +735,10 @@ notify_mobile:
           sticky: "{{ sticky | default(none, true) }}"
           car_ui: "{{ car_ui | default(none, true) }}"
           notification_icon: "{{ notification_icon | default(none, true) }}"
+          alert_once: "{{ alert_once | default(none, true) }}"
+          chronometer: "{{ chronometer | default(none, true) }}"
+          when: "{{ when | default(none, true) }}"
+          timeout: "{{ timeout | default(none, true) }}"
           push: "{{ push }}"
           color: |-
             {%- if color is defined -%}
@@ -746,6 +784,7 @@ notify_mobile:
             message: |-
               mobile_notifications: {{ states("input_boolean.mobile_notifications") }}
               send_to: {{ send_to }}
+              send_to_list: {{ send_to_list | to_json }}
               targets: {{ targets | to_json }}
               notification_service: {{ notification_services | to_json }}
               location: {{ location }}
@@ -762,16 +801,16 @@ notify_mobile:
         - condition: template
           value_template: "{{ notification_services | length > 0 }}"
 
-    - choose:
-        - alias: Send camera stream.
-          conditions:
-            - condition: template
-              value_template: "{{ camera is string }}"
-          sequence:
-            - repeat:
-                for_each: "{{ notification_services }}"
+    - alias: Send notifications to each service, handling camera if specified.
+      repeat:
+        for_each: "{{ notification_services }}"
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ camera is string }}"
                 sequence:
-                  - alias: Send notification message.
+                  - alias: Send notification message with camera.
                     action: "{{ repeat.item }}"
                     data:
                       title: "{{ title }}"
@@ -782,13 +821,9 @@ notify_mobile:
                           "entity_id": camera
                         }) -%}
                         {{ notify_data }}
-
-      default:
-        - alias: Send a basic, link, or actionable notification message.
-          repeat:
-            for_each: "{{ notification_services }}"
-            sequence:
-              - action: "{{ repeat.item }}"
+            default:
+              - alias: Send notification message without camera.
+                action: "{{ repeat.item }}"
                 data:
                   title: "{{ title }}"
                   message: "{{ message }}"
