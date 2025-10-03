@@ -13,7 +13,7 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 ## Software
 
-<details><summary>8 Add-ons</summary>
+<details><summary>9 Add-ons</summary>
 
 - Mosquitto broker
 - ESPHome Device Builder
@@ -23,6 +23,7 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 - Zigbee2MQTT
 - Z-Wave JS UI
 - Govee to MQTT Bridge
+- DbStats
 
 ---
 
@@ -32,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4885 |
-| Sensors        | 1697 |
-| Binary Sensors | 356 |
+| All Entities   | 4869 |
+| Sensors        | 1705 |
+| Binary Sensors | 347 |
 | Lights         | 74 |
-| Switches       | 766 |
+| Switches       | 756 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -308,17 +309,17 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.1]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.3]
 
 A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.5.3]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.6.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.0]
+### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.2]
 
 🔹 Use custom svg icons in Home Assistant
 
@@ -390,7 +391,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.44.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.45.2]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -438,7 +439,7 @@ YASSI (Yet another Samsung Soundbar integration) is a HomeAssistant integration 
 
 Authors: [@samuelspagl](https://github.com/samuelspagl).
 
-### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v3.1.0]
+### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v4.0.1]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
@@ -472,7 +473,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>39 Dashboard Plugins</summary>
+<details><summary>40 Dashboard Plugins</summary>
 
 ### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.17.0]
 
@@ -486,6 +487,10 @@ A comprehensive camera card for Home Assistant
 
 🔹Automatically populate the entities-list of lovelace cards
 
+### [Badge Horizontal Container Card](https://github.com/selvalt7/badge-horizontal-container-card) [v0.4.1]
+
+Simple badge container card for Home Assistant
+
 ### [Bar Card](https://github.com/spacerokk/bar-card) [v4.0.8]
 
 Customizable Animated Bar card for Home Assistant Lovelace
@@ -494,7 +499,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.3]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.4]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -510,11 +515,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.6.4]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.6.9]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.6.5]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v2.7.1]
 
 Expander card for HomeAssistant
 
@@ -526,7 +531,7 @@ Expander card for HomeAssistant
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
-### [Ha Floorplan 🖌🎨 | Your Imagination (Almost) Defines The Limits](https://github.com/ExperienceLovelace/ha-floorplan) [v1.1.3]
+### [Ha Floorplan 🖌🎨 | Your Imagination (Almost) Defines The Limits](https://github.com/ExperienceLovelace/ha-floorplan) [v1.1.4]
 
 Bring new life to Home Assistant. By mapping entities to a SVG-object, you're able to control devices, show states, calling services - and much more. Add custom styling on top, to visualize whatever you can think of. Your imagination just became the new limit.
 
@@ -546,7 +551,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v7.3.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v8.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -554,7 +559,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.12]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.15]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -562,11 +567,11 @@ Material Design 3 Color Theme Generation and Component Modification for Home Ass
 
 Minimalistic graph card for Home Assistant Lovelace UI
 
-### [Mini Media Player](https://github.com/kalkih/mini-media-player) [v1.16.9]
+### [Mini Media Player](https://github.com/kalkih/mini-media-player) [v1.16.10]
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.0.5]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.0.7]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -590,6 +595,10 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
+### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.1.6]
+
+A simple and configurable tabs card for Home Assistant Dashboards.
+
 ### [Steam Card](https://github.com/Kibibit/kb-steam-card) [v1.1.1]
 
 A Home Assistant card for Steam integrations
@@ -597,10 +606,6 @@ A Home Assistant card for Steam integrations
 ### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.1.0]
 
 Streamline your Lovelace configuration with with a card template system.
-
-### [Swipe Card](https://github.com/bramkragten/swipe-card) [v5.0.0]
-
-Card that allows you to swipe throught multiple cards for Home Assistant Lovelace
 
 ### [Tabbed Card](https://github.com/kinghat/tabbed-card) [v0.3.3]
 
@@ -638,7 +643,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.1]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.2]
 
 Material Design 3 Theme for Home Assistant
 
@@ -912,7 +917,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.9.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.10.0-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
