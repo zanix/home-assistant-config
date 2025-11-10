@@ -746,7 +746,7 @@ Material Design 3 Theme for Home Assistant
 
 <details><summary>151 Automations</summary>
 
-- ⏯ Ensure PiPup is Running
+- ⏯ Ensure Android TV Apps are Running
 - ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media Off
 - ⏯ Family Room Media State at Night 🚫

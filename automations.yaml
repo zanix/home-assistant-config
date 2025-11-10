@@ -1,5 +1,5 @@
 - id: '1679462212869'
-  alias: ⏯ Ensure PiPup is Running
+  alias: ⏯ Ensure Android TV Apps are Running
   description: ''
   triggers:
   - at: 04:30:00
@@ -8,6 +8,19 @@
   actions:
   - data:
       command: am start -n nl.rogro82.pipup/nl.rogro82.pipup.MainActivity
+    target:
+      entity_id:
+      - media_player.living_room_googletv
+      - media_player.shield_family_room
+      - media_player.shield_main_bedroom
+    action: androidtv.adb_command
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - data:
+      command: am start -n com.tabdeveloper.tvoverlay/com.tabdeveloper.tvoverlay.DefaultActivity
     target:
       entity_id:
       - media_player.living_room_googletv
@@ -1279,7 +1292,7 @@
   - data: {}
     target:
       device_id:
-      - 1dee4aa37e70d346348224829cd7c84f
+      - d54e33f71c95fd9ed964e58b9a488b0b
       - fd4ff1a9970156bb319e4d85d4450657
       - 49d046eb766685131c0c5deb9f0d2250
     action: homeassistant.reload_config_entry
@@ -1828,7 +1841,10 @@
     - sensor.ge_dishwasher_operating_mode
     to: Cycle Complete
     trigger: state
-  conditions: []
+  conditions:
+  - condition: template
+    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable",
+      "offline"] }}'
   actions:
   - variables:
       title: Dishwasher
@@ -1897,7 +1913,7 @@
       for:
         hours: 0
         minutes: 0
-        seconds: 5
+        seconds: 2
       below: 5
       trigger: numeric_state
     continue_on_timeout: false
@@ -5781,15 +5797,16 @@
 - id: '1665685653869'
   alias: "\U0001F4E6 Update USPS Mail Camera"
   description: Updates the mail image camera when mail is updated
-  trigger:
-  - platform: state
-    entity_id: sensor.mail_updated
-  - platform: homeassistant
-    event: start
-  condition: []
-  action:
-  - data: {}
-    action: mail_and_packages.update_image
+  triggers:
+  - entity_id: sensor.mail_updated
+    trigger: state
+  - event: start
+    trigger: homeassistant
+  conditions: []
+  actions:
+  - action: mail_and_packages.update_image
+    data:
+      entity_id: camera.mail_usps_camera
   mode: single
 - id: '1665686891355'
   alias: "\U0001F512 Door Lock Jammed"
