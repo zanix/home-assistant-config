@@ -5,9 +5,38 @@
 #
 # https://www.home-assistant.io/integrations/template/
 #
+
+trigger:
+  - trigger: time
+    at: "00:00:00"
+  - trigger: homeassistant
+    event: start
+  - trigger: event
+    event_type: templates_reloaded
+action:
+  - variables:
+      start:
+        macro: month_week_day
+        kwargs:
+          month: 11
+          week: 4
+          weekday: 7
+      end:
+        macro: month_day
+        kwargs:
+          month: 12
+          day: 31
+      event: >
+        {%- import 'easy_time.jinja' as easy_time %}
+        {%- set s = easy_time[start['macro']](**start.get('kwargs', {})) | as_datetime | as_local %}
+        {%- set e = easy_time[end['macro']](**end.get('kwargs', {})) | as_datetime | as_local %}
+        {%- if s.date() <= now().date() and e.date() >= now().date() %}
+          {{ true }}
+        {%- else %}
+          {{ false }}
+        {%- endif %}
 binary_sensor:
-  - name: Is Xmas
-    state: |-
-      {{ (now().month >= 11 and now().day >= 20)
-        or (now().month == 12 and now().day >= 1) }}
+  - unique_id: is_xmas
+    name: Is Xmas
+    state: "{{ event }}"
     icon: mdi:string-lights
