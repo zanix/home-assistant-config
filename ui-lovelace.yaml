@@ -2823,46 +2823,45 @@ streamline_templates:
                   ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
                     \ 28px !important;\n  width: 40px !important;\n  height: 40px\
                     \ !important;\n  border-radius: 20px !important;\n}\n"
-        - type: custom:mod-card
-          style:
-            hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
-              \  justify-content: space-around;\n}\n"
-          card:
-            type: grid
-            square: false
-            cards:
-              - type: custom:button-card
-                template: button_label
-                name: Find Phone
-                label: Press and Hold to Cancel
-                icon: mdi:target
-                variables:
-                  color: var(--red-color)
-                tap_action:
-                  action: call-service
-                  service: script.notify_mobile
-                  confirmation:
-                    text: Are you sure you want to ring this device?
-                  data:
-                    send_to: '{{ ''[[person]]'' }}'
-                    title: Find Phone
-                    message: Ringing phone...
-                    channel: alarm_stream
-                    tag: find-phone
-                    importance: high
-                  target: {}
-                hold_action:
-                  action: call-service
-                  service: script.notify_mobile
-                  confirmation:
-                    text: Cancel find phone?
-                  data:
-                    send_to: '{{ ''[[person]]'' }}'
-                    notification_type: clear_notification
-                    tag: find-phone
-                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                  \ {\n      background: color-mix(in srgb, ${variables.color}, transparent\
-                  \ 80%) !important;\n    }\n  }\n  `\n]]]\n"
+        - type: grid
+          square: false
+          card_mod:
+            style:
+              .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                \ space-around;\n}\n"
+          cards:
+            - type: custom:button-card
+              template: button_label
+              name: Find Phone
+              label: Press and Hold to Cancel
+              icon: mdi:target
+              variables:
+                color: var(--red-color)
+              tap_action:
+                action: call-service
+                service: script.notify_mobile
+                confirmation:
+                  text: Are you sure you want to ring this device?
+                data:
+                  send_to: '{{ ''[[person]]'' }}'
+                  title: Find Phone
+                  message: Ringing phone...
+                  channel: alarm_stream
+                  tag: find-phone
+                  importance: high
+                target: {}
+              hold_action:
+                action: call-service
+                service: script.notify_mobile
+                confirmation:
+                  text: Cancel find phone?
+                data:
+                  send_to: '{{ ''[[person]]'' }}'
+                  notification_type: clear_notification
+                  tag: find-phone
+              extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                \ {\n      background: color-mix(in srgb, ${variables.color}, transparent\
+                \ 80%) !important;\n    }\n  }\n  `\n  ]]]\n"
         - type: tile
           entity: sensor.[[phone_base]]_[[person]]_geocoded_location
           name: Location
@@ -3029,540 +3028,536 @@ views:
     sections:
       - type: grid
         cards:
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-            card:
-              type: grid
-              square: false
-              columns: 4
-              cards:
-                - type: custom:mushroom-template-badge
-                  entity: weather.openweathermap
-                  label: Weather
-                  icon: '{% from "util.jinja" import weather_icon %} {{ weather_icon(entity)
-                    }}'
-                  content: '{{ state_translated(entity) | truncate(16) }} / {{ states("sensor.ecowitt_outdoor_temperature")
-                    | round() }} {{ state_attr("sensor.ecowitt_outdoor_temperature",
-                    "unit_of_measurement") }}'
-                  tap_action:
-                    action: navigate
-                    navigation_path: weather
-                - type: custom:mushroom-template-badge
-                  entity: sensor.ecobee_mode
-                  label: Climate
-                  content: '{{ states("sensor.ecobee_current_temperature") | round(0)
-                    }} {{ state_attr("sensor.ecobee_current_temperature", "unit_of_measurement")
-                    }}'
-                  icon: mdi:thermostat
-                  color: "{% if is_state(entity, \"Heating\") %}\n  red\n{% elif is_state(entity,\
-                    \ \"Cooling\") %}\n  light-blue\n{% elif is_state(entity, \"Fan\"\
-                    ) %}\n  amber\n{% elif is_state(entity, \"Off\") %}\n  grey\n\
-                    {% else %}\n  blue-grey\n{% endif %}"
-                  tap_action:
-                    action: navigate
-                    navigation_path: climate
-                - type: custom:mushroom-template-badge
-                  entity: sensor.airgradient_kitchen_pm_2_5_aqi
-                  label: AQI
-                  content: '{{ states(entity) | int(default="?") }} / {{ states("sensor.airnow_air_quality_index")
-                    | int(default="?") }}'
-                  icon: '{{ iif(has_value(entity), "mdi:blur", "mdi:blur-off") }}'
-                  color: "{% if has_value(entity) %}\n  {% set level = states(entity)\
-                    \ | float(default=0) %}\n  {% if level >= 300 %}\n    red\n  {%\
-                    \ elif level >= 200 %}\n    purple\n  {% elif level >= 150 %}\n\
-                    \    pink\n  {% elif level >= 100 %}\n    orange\n  {% elif level\
-                    \ >= 50 %}\n    yellow\n  {% elif level >= 0 %}\n    green\n \
-                    \ {% endif %}\n{% else %}\n  grey\n{% endif %}"
-                  tap_action:
-                    action: navigate
-                    navigation_path: '#air-quality'
-                - type: custom:mushroom-template-badge
-                  entity: sensor.allergy_index_today
-                  label: Allergy
-                  content: '{{ states(entity) | float(default=0) }}'
-                  icon: mdi:flower-pollen
-                  color: "{% set level = states(entity) | float(default=0) %}\n{%\
-                    \ if level >= 9.7 %}\n  red\n{% elif level >= 7.3 %}\n  orange\n\
-                    {% elif level >= 4.9 %}\n  yellow\n{% elif level >= 2.5 %}\n \
-                    \ lime\n{% else %}\n  green\n{% endif %}"
-                  tap_action:
-                    action: navigate
-                    navigation_path: '#allergy'
-                - type: custom:mushroom-template-badge
-                  entity: sensor.garbage_collection
-                  label: Garbage
-                  content: "{% if is_state(\"input_boolean.garbage_collection\", \"\
-                    on\") %}\n  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n\
-                    {% elif is_state(entity, \"1\") %}\n  Tomorrow\n{% else %}\n \
-                    \ {{ state_attr(entity, \"days\") }} days\n{% endif %}"
-                  icon: mdi:trash-can
-                  color: "{% if is_state(\"input_boolean.garbage_collection\", \"\
-                    on\") %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n\
-                    {% elif is_state(entity, \"1\") %}\n  yellow\n{% else %}\n  grey\n\
-                    {% endif %}"
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: script.collection_at_curb
-                    target: {}
-                    data:
-                      entity: sensor.garbage_collection
-                - type: custom:mushroom-template-badge
-                  entity: sensor.recycle_collection
-                  label: Recycling
-                  content: "{% if is_state(\"input_boolean.recycle_collection\", \"\
-                    on\") %}\n  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n\
-                    {% elif is_state(entity, \"1\") %}\n  Tomorrow\n{% else %}\n \
-                    \ {{ state_attr(entity, \"days\") }} days\n{% endif %}"
-                  icon: mdi:recycle
-                  color: "{% if is_state(\"input_boolean.recycle_collection\", \"\
-                    on\") %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n\
-                    {% elif is_state(entity, \"1\") %}\n  yellow\n{% else %}\n  grey\n\
-                    {% endif %}"
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: script.collection_at_curb
-                    target: {}
-                    data:
-                      entity: sensor.recycle_collection
-                - type: custom:button-card
-                  template: badge
-                  entity: vacuum.r2dee2
-                  name: R2Dee2
-                  icon: mdi:robot-vacuum
-                  label: "[[[\n  if (states['sensor.r2dee2_error'].state !== 'no_error')\
-                    \ return 'Error';\n  else if (entity.state === 'returning') return\
-                    \ 'Returning';\n  else return helpers.localize(entity);\n]]]\n"
-                  tap_action:
-                    action: navigate
-                    navigation_path: r2dee2
-                  variables:
-                    color: "[[[\n  if (states['sensor.r2dee2_error'].state !== 'no_error')\
-                      \ return 'var(--red-color)';\n  else if (entity.state === 'error')\
-                      \ return 'var(--red-color)';\n  else if (entity.state === 'cleaning')\
-                      \ return 'var(--cyan-color)';\n  else if (entity.state === 'charging')\
-                      \ return 'var(--orange-color)';\n  else if (entity.state ===\
-                      \ 'paused') return 'var(--yellow-color)';\n  else if (entity.state\
-                      \ === 'returning') return 'var(--purple-color)';\n  else if\
-                      \ (entity.state === 'docked') return 'var(--blue-grey-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: cleaning
-                      icon: mdi:robot-vacuum
-                      styles:
-                        icon:
-                          - animation: cleaning 10s linear infinite
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                    \ cleaning {\n    0% { transform: translate(0px, 5px) rotate(0deg);\
-                    \ }\n    2% { transform: translate(0px, 5px) rotate(-45deg); }\n\
-                    \n    10% { transform: translate(-5px, 0px) rotate(-45deg); }\n\
-                    \    12% { transform: translate(-5px, 0px) rotate(45deg); }\n\n\
-                    \    20% { transform: translate(0px, -5px) rotate(45deg); }\n\
-                    \    22% { transform: translate(0px, -5px) rotate(135deg); }\n\
-                    \n    30% { transform: translate(5px, 0px) rotate(135deg); }\n\
-                    \    32% { transform: translate(5px, 0px) rotate(225deg); }\n\n\
-                    \    40% { transform: translate(0px, 5px) rotate(225deg); }\n\
-                    \    42% { transform: translate(0px, 5px) rotate(45deg); }\n \
-                    \   \n    50% { transform: translate(5px, 0px) rotate(45deg);\
-                    \ }\n    52% { transform: translate(5px, 0px) rotate(-45deg);\
-                    \ }\n\n    60% { transform: translate(0px, -5px) rotate(-45deg);\
-                    \ }\n    62% { transform: translate(0px, -5px) rotate(-135deg);\
-                    \ }\n\n    70% { transform: translate(-5px, 0px) rotate(-135deg);\
-                    \ }\n    72% { transform: translate(-5px, 0px) rotate(-225deg);\
-                    \ }\n\n    80% { transform: translate(0px, 5px) rotate(-225deg);\
-                    \ }\n    82% { transform: translate(0px, 5px) rotate(-180deg);\
-                    \ }\n\n    90% { transform: translate(0px, 5px) rotate(0deg);\
-                    \ }\n    100% { transform: translate(0px, 5px) rotate(0deg); }\n\
-                    \  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: vacuum.dustin_mopman
-                  name: D. Mopman
-                  icon: mdi:robot-vacuum
-                  label: "[[[\n  if (states['sensor.dustin_mopman_error'].state !==\
-                    \ 'no_error') return 'Error';\n  else if (entity.state === 'returning')\
-                    \ return 'Returning';\n  else return helpers.localize(entity);\n\
+          - type: grid
+            square: false
+            columns: 4
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-between;\n}\nmushroom-template-badge, hui-conditional-card\
+                  \ {\n  flex: 0 0 auto !important;\n}\n"
+            cards:
+              - type: custom:mushroom-template-badge
+                entity: weather.openweathermap
+                label: Weather
+                icon: '{% from "util.jinja" import weather_icon %} {{ weather_icon(entity)
+                  }}'
+                content: '{{ state_translated(entity) | truncate(16) }} / {{ states("sensor.ecowitt_outdoor_temperature")
+                  | round() }} {{ state_attr("sensor.ecowitt_outdoor_temperature",
+                  "unit_of_measurement") }}'
+                tap_action:
+                  action: navigate
+                  navigation_path: weather
+              - type: custom:mushroom-template-badge
+                entity: sensor.ecobee_mode
+                label: Climate
+                content: '{{ states("sensor.ecobee_current_temperature") | round(0)
+                  }} {{ state_attr("sensor.ecobee_current_temperature", "unit_of_measurement")
+                  }}'
+                icon: mdi:thermostat
+                color: "{% if is_state(entity, \"Heating\") %}\n  red\n{% elif is_state(entity,\
+                  \ \"Cooling\") %}\n  light-blue\n{% elif is_state(entity, \"Fan\"\
+                  ) %}\n  amber\n{% elif is_state(entity, \"Off\") %}\n  grey\n{%\
+                  \ else %}\n  blue-grey\n{% endif %}"
+                tap_action:
+                  action: navigate
+                  navigation_path: climate
+              - type: custom:mushroom-template-badge
+                entity: sensor.airgradient_kitchen_pm_2_5_aqi
+                label: AQI
+                content: '{{ states(entity) | int(default="?") }} / {{ states("sensor.airnow_air_quality_index")
+                  | int(default="?") }}'
+                icon: '{{ iif(has_value(entity), "mdi:blur", "mdi:blur-off") }}'
+                color: "{% if has_value(entity) %}\n  {% set level = states(entity)\
+                  \ | float(default=0) %}\n  {% if level >= 300 %}\n    red\n  {%\
+                  \ elif level >= 200 %}\n    purple\n  {% elif level >= 150 %}\n\
+                  \    pink\n  {% elif level >= 100 %}\n    orange\n  {% elif level\
+                  \ >= 50 %}\n    yellow\n  {% elif level >= 0 %}\n    green\n  {%\
+                  \ endif %}\n{% else %}\n  grey\n{% endif %}"
+                tap_action:
+                  action: navigate
+                  navigation_path: '#air-quality'
+              - type: custom:mushroom-template-badge
+                entity: sensor.allergy_index_today
+                label: Allergy
+                content: '{{ states(entity) | float(default=0) }}'
+                icon: mdi:flower-pollen
+                color: "{% set level = states(entity) | float(default=0) %}\n{% if\
+                  \ level >= 9.7 %}\n  red\n{% elif level >= 7.3 %}\n  orange\n{%\
+                  \ elif level >= 4.9 %}\n  yellow\n{% elif level >= 2.5 %}\n  lime\n\
+                  {% else %}\n  green\n{% endif %}"
+                tap_action:
+                  action: navigate
+                  navigation_path: '#allergy'
+              - type: custom:mushroom-template-badge
+                entity: sensor.garbage_collection
+                label: Garbage
+                content: "{% if is_state(\"input_boolean.garbage_collection\", \"\
+                  on\") %}\n  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n\
+                  {% elif is_state(entity, \"1\") %}\n  Tomorrow\n{% else %}\n  {{\
+                  \ state_attr(entity, \"days\") }} days\n{% endif %}"
+                icon: mdi:trash-can
+                color: "{% if is_state(\"input_boolean.garbage_collection\", \"on\"\
+                  ) %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif\
+                  \ is_state(entity, \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif\
+                  \ %}"
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: script.collection_at_curb
+                  target: {}
+                  data:
+                    entity: sensor.garbage_collection
+              - type: custom:mushroom-template-badge
+                entity: sensor.recycle_collection
+                label: Recycling
+                content: "{% if is_state(\"input_boolean.recycle_collection\", \"\
+                  on\") %}\n  At Curb\n{% elif is_state(entity, \"0\") %}\n  Today\n\
+                  {% elif is_state(entity, \"1\") %}\n  Tomorrow\n{% else %}\n  {{\
+                  \ state_attr(entity, \"days\") }} days\n{% endif %}"
+                icon: mdi:recycle
+                color: "{% if is_state(\"input_boolean.recycle_collection\", \"on\"\
+                  ) %}\n  green\n{% elif is_state(entity, \"0\") %}\n  red\n{% elif\
+                  \ is_state(entity, \"1\") %}\n  yellow\n{% else %}\n  grey\n{% endif\
+                  \ %}"
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: script.collection_at_curb
+                  target: {}
+                  data:
+                    entity: sensor.recycle_collection
+              - type: custom:button-card
+                template: badge
+                entity: vacuum.r2dee2
+                name: R2Dee2
+                icon: mdi:robot-vacuum
+                label: "[[[\n  if (states['sensor.r2dee2_error'].state !== 'no_error')\
+                  \ return 'Error';\n  else if (entity.state === 'returning') return\
+                  \ 'Returning';\n  else return helpers.localize(entity);\n]]]\n"
+                tap_action:
+                  action: navigate
+                  navigation_path: r2dee2
+                variables:
+                  color: "[[[\n  if (states['sensor.r2dee2_error'].state !== 'no_error')\
+                    \ return 'var(--red-color)';\n  else if (entity.state === 'error')\
+                    \ return 'var(--red-color)';\n  else if (entity.state === 'cleaning')\
+                    \ return 'var(--cyan-color)';\n  else if (entity.state === 'charging')\
+                    \ return 'var(--orange-color)';\n  else if (entity.state === 'paused')\
+                    \ return 'var(--yellow-color)';\n  else if (entity.state === 'returning')\
+                    \ return 'var(--purple-color)';\n  else if (entity.state === 'docked')\
+                    \ return 'var(--blue-grey-color)';\n  else return 'var(--grey-color)';\n\
                     ]]]\n"
+                state:
+                  - value: cleaning
+                    icon: mdi:robot-vacuum
+                    styles:
+                      icon:
+                        - animation: cleaning 10s linear infinite
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                  \ cleaning {\n    0% { transform: translate(0px, 5px) rotate(0deg);\
+                  \ }\n    2% { transform: translate(0px, 5px) rotate(-45deg); }\n\
+                  \n    10% { transform: translate(-5px, 0px) rotate(-45deg); }\n\
+                  \    12% { transform: translate(-5px, 0px) rotate(45deg); }\n\n\
+                  \    20% { transform: translate(0px, -5px) rotate(45deg); }\n  \
+                  \  22% { transform: translate(0px, -5px) rotate(135deg); }\n\n \
+                  \   30% { transform: translate(5px, 0px) rotate(135deg); }\n   \
+                  \ 32% { transform: translate(5px, 0px) rotate(225deg); }\n\n   \
+                  \ 40% { transform: translate(0px, 5px) rotate(225deg); }\n    42%\
+                  \ { transform: translate(0px, 5px) rotate(45deg); }\n    \n    50%\
+                  \ { transform: translate(5px, 0px) rotate(45deg); }\n    52% { transform:\
+                  \ translate(5px, 0px) rotate(-45deg); }\n\n    60% { transform:\
+                  \ translate(0px, -5px) rotate(-45deg); }\n    62% { transform: translate(0px,\
+                  \ -5px) rotate(-135deg); }\n\n    70% { transform: translate(-5px,\
+                  \ 0px) rotate(-135deg); }\n    72% { transform: translate(-5px,\
+                  \ 0px) rotate(-225deg); }\n\n    80% { transform: translate(0px,\
+                  \ 5px) rotate(-225deg); }\n    82% { transform: translate(0px, 5px)\
+                  \ rotate(-180deg); }\n\n    90% { transform: translate(0px, 5px)\
+                  \ rotate(0deg); }\n    100% { transform: translate(0px, 5px) rotate(0deg);\
+                  \ }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: vacuum.dustin_mopman
+                name: D. Mopman
+                icon: mdi:robot-vacuum
+                label: "[[[\n  if (states['sensor.dustin_mopman_error'].state !==\
+                  \ 'no_error') return 'Error';\n  else if (entity.state === 'returning')\
+                  \ return 'Returning';\n  else return helpers.localize(entity);\n\
+                  ]]]\n"
+                tap_action:
+                  action: navigate
+                  navigation_path: dustin-mopman
+                variables:
+                  color: "[[[\n  if (states['sensor.dustin_mopman_error'].state !==\
+                    \ 'no_error') return 'var(--red-color)';\n  else if (entity.state\
+                    \ === 'error') return 'var(--red-color)';\n  else if (entity.state\
+                    \ === 'cleaning') return 'var(--cyan-color)';\n  else if (entity.state\
+                    \ === 'charging') return 'var(--orange-color)';\n  else if (entity.state\
+                    \ === 'paused') return 'var(--yellow-color)';\n  else if (entity.state\
+                    \ === 'returning') return 'var(--purple-color)';\n  else if (entity.state\
+                    \ === 'docked') return 'var(--blue-grey-color)';\n  else return\
+                    \ 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: cleaning
+                    icon: mdi:robot-vacuum
+                    styles:
+                      icon:
+                        - animation: cleaning 10s linear infinite
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                  \ cleaning {\n    0% { transform: translate(0px, 5px) rotate(0deg);\
+                  \ }\n    2% { transform: translate(0px, 5px) rotate(-45deg); }\n\
+                  \n    10% { transform: translate(-5px, 0px) rotate(-45deg); }\n\
+                  \    12% { transform: translate(-5px, 0px) rotate(45deg); }\n\n\
+                  \    20% { transform: translate(0px, -5px) rotate(45deg); }\n  \
+                  \  22% { transform: translate(0px, -5px) rotate(135deg); }\n\n \
+                  \   30% { transform: translate(5px, 0px) rotate(135deg); }\n   \
+                  \ 32% { transform: translate(5px, 0px) rotate(225deg); }\n\n   \
+                  \ 40% { transform: translate(0px, 5px) rotate(225deg); }\n    42%\
+                  \ { transform: translate(0px, 5px) rotate(45deg); }\n    \n    50%\
+                  \ { transform: translate(5px, 0px) rotate(45deg); }\n    52% { transform:\
+                  \ translate(5px, 0px) rotate(-45deg); }\n\n    60% { transform:\
+                  \ translate(0px, -5px) rotate(-45deg); }\n    62% { transform: translate(0px,\
+                  \ -5px) rotate(-135deg); }\n\n    70% { transform: translate(-5px,\
+                  \ 0px) rotate(-135deg); }\n    72% { transform: translate(-5px,\
+                  \ 0px) rotate(-225deg); }\n\n    80% { transform: translate(0px,\
+                  \ 5px) rotate(-225deg); }\n    82% { transform: translate(0px, 5px)\
+                  \ rotate(-180deg); }\n\n    90% { transform: translate(0px, 5px)\
+                  \ rotate(0deg); }\n    100% { transform: translate(0px, 5px) rotate(0deg);\
+                  \ }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.ge_dishwasher_cycle_state
+                triggers_update:
+                  - binary_sensor.ge_dishwasher_is_clean
+                  - sensor.ge_dishwasher_duration
+                  - sensor.ge_dishwasher_time_remaining
+                name: Dishwasher
+                icon: mdi:dishwasher-off
+                label: "[[[\n  if (states['binary_sensor.ge_dishwasher_is_clean'].state\
+                  \ === 'on') return 'Clean';\n  else if (entity.state === 'N/A')\
+                  \ return 'Off';\n  else return helpers.localize(entity);\n]]]\n"
+                tap_action:
+                  action: navigate
+                  navigation_path: '#dishwasher'
+                variables:
+                  color: "[[[\n  if (states['binary_sensor.ge_dishwasher_is_clean'].state\
+                    \ === 'on') return 'var(--green-color)';\n  else if (entity.state\
+                    \ === 'Pre Wash') return 'var(--purple-color)';\n  else if (entity.state\
+                    \ === 'Main Wash') return 'var(--cyan-color)';\n  else if (entity.state\
+                    \ === 'Rinsing') return 'var(--blue-color)';\n  else if (entity.state\
+                    \ === 'Sanitizing') return 'var(--light-blue-color)';\n  else\
+                    \ if (entity.state === 'Drying') return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: "[[[\n  if (entity.state === 'N/A' && states['binary_sensor.ge_dishwasher_is_clean'].state\
+                      \ === 'on') return true;\n  return false;\n]]]\n"
+                    operator: template
+                    icon: mdi:dishwasher
+                  - value: unavailable
+                  - value: N/A
+                    operator: '!='
+                    icon: mdi:dishwasher
+                    styles:
+                      icon:
+                        - animation: bounce 1.5s ease-in-out infinite, wash 1s ease-in-out
+                            infinite
+                        - transform-origin: 50% 75%
+                styles:
+                  img_cell:
+                    - background: "[[[\n  let entity_remain = \"sensor.ge_dishwasher_time_remaining\"\
+                        ;\n  let entity_duration = \"sensor.ge_dishwasher_duration\"\
+                        ;\n\n  if (entity.state !== \"Off\"\n    && states[entity_remain].state\n\
+                        \    && states[entity_duration].state\n    && states[entity_duration].state\
+                        \ !== \"Off\"\n  ) {\n    let remaining = states[entity_remain].state.split(\"\
+                        :\");\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
+                        \    let duration = states[entity_duration].state.split(\"\
+                        :\");\n    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
+                        \n    return `radial-gradient(var(--card-background-color)\
+                        \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
+                        \ ${Math.round((remaining / duration) * 100, 0)}% 0%, var(--card-background-color)\
+                        \ 0% 100%)`;\n  } else {\n    return 'inherit';\n  }\n]]]\n"
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                  \ bounce {\n    0%, 20%, 50%, 80%, 100% {transform: translateY(0);\
+                  \ }\n    40% { transform: translateY(-1.2px) rotate(5deg); }\n \
+                  \   60% { transform: translateY(-1.1px) rotate(-4deg); }\n  }\n\
+                  \  @keyframes wash {\n    50% { clip-path: polygon(0 0, 0 100%,\
+                  \ 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%,\
+                  \ 35% 100%, 100% 100%, 100% 0); }\n  }\n  `\n]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.ge_oven_current_state
+                triggers_update:
+                  - sensor.ge_oven_kitchen_timer
+                  - sensor.ge_oven_kitchen_timer_duration
+                  - sensor.ge_oven_cook_time_remaining
+                  - sensor.ge_oven_cook_time_duration
+                name: Oven
+                icon: '[[[ return variables.icon ]]]'
+                label: "[[[\n  if (entity.state !== 'Off') {\n    return helpers.localize(entity);\n\
+                  \  }\n  else if (states['sensor.ge_oven_cook_time_remaining'].state\
+                  \ !== 'Off') {\n    return \"Cook Time\";\n  }\n  else if (states['sensor.ge_oven_kitchen_timer'].state\
+                  \ !== 'Off') {\n    return \"Timer\";\n  }\n  else {\n    return\
+                  \ helpers.localize(entity);\n  }\n]]]\n"
+                tap_action:
+                  action: navigate
+                  navigation_path: '#oven'
+                variables:
+                  icon: "[[[\n  if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_cook_time_remaining'].state))\
+                    \ return 'mdi:timer-play';\n  else if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_kitchen_timer'].state))\
+                    \ return 'mdi:timer';\n  else return \"mdi:stove\";\n]]]\n"
+                  color: "[[[\n if (entity.state === 'Preheat') return 'var(--yellow-color)';\n\
+                    \ else if (entity.state === 'Bake') return 'var(--red-color)';\n\
+                    \ else if (entity.state === 'Air Fry') return 'var(--orange-color)';\n\
+                    \ else if (entity.state === 'Convection') return 'var(--amber-color)';\n\
+                    \ else if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_cook_time_remaining'].state))\
+                    \ return 'var(--cyan-color)';\n else if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_kitchen_timer'].state))\
+                    \ return 'var(--purple-color)';\n else return 'var(--grey-color)';\n\
+                    ]]]\n"
+                styles:
+                  img_cell:
+                    - background: "[[[\n  let cook_time_remain = \"sensor.ge_oven_cook_time_remaining\"\
+                        ;\n  let cook_time_duration = \"sensor.ge_oven_cook_time_duration\"\
+                        ;\n\n  let timer_remain = \"sensor.ge_oven_kitchen_timer\"\
+                        ;\n  let timer_duration = \"sensor.ge_oven_kitchen_timer_duration\"\
+                        ;\n\n  let remaining = \"\";\n  let duration = \"\";\n  if\
+                        \ (states[cook_time_remain]?.state\n    && states[cook_time_duration]?.state\
+                        \ !== \"Off\"\n  ) {\n    remaining = states[cook_time_remain].state.split(\"\
+                        :\");\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
+                        \    duration = states[cook_time_duration].state.split(\"\
+                        :\");\n    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
+                        \n    return `radial-gradient(var(--card-background-color)\
+                        \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
+                        \ ${Math.round((remaining / duration) * 100, 0)}% 0%, var(--card-background-color)\
+                        \ 0% 100%)`;\n  }\n  else if (states[timer_remain]?.state\n\
+                        \    && states[timer_duration]?.state !== \"Off\"\n  ) {\n\
+                        \    remaining = states[timer_remain].state.split(\":\");\n\
+                        \    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
+                        \    duration = states[timer_duration].state.split(\":\");\n\
+                        \    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
+                        \n    return `radial-gradient(var(--card-background-color)\
+                        \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
+                        \ ${Math.round((remaining / duration) * 100, 0)}% 0%, var(--card-background-color)\
+                        \ 0% 100%)`;\n  }\n]]]\n"
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: input_select.washer_status
+                triggers_update:
+                  - binary_sensor.washer_contact
+                name: Washer
+                icon: mdi:washing-machine
+                label: "[[[\n  if (states['binary_sensor.washer_contact'].state ===\
+                  \ 'on') return 'Open';\n  else return entity.state;\n]]]\n"
+                tap_action:
+                  action: more-info
+                variables:
+                  color: "[[[\n  if (states['binary_sensor.washer_contact'].state\
+                    \ === 'on') return 'var(--red-color)';\n  else if (entity.state\
+                    \ === 'Washing') return 'var(--blue-color)';\n  else if (entity.state\
+                    \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
+                    \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
+                    \ === 'Ready') return 'var(--lime-color)';\n  else if (entity.state\
+                    \ === 'Error') return 'var(--red-color)';\n  else return 'var(--grey-color)';\n\
+                    ]]]\n"
+                state:
+                  - value: Error
+                    icon: mdi:washing-machine-alert
+                  - value: Washing
+                    styles:
+                      icon:
+                        - animation: shake 400ms ease-in-out infinite, drum 2s ease
+                            infinite
+                        - transform-origin: 50% 110%
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                  \ shake {\n    0%, 100% { transform: translate(0, 0) rotate(0);\
+                  \ }\n    20%  { transform: translate(0.4px, -0.4px) rotate(-4deg);\
+                  \ }\n    40%  { transform: translate(-0.4px, 0.4px) rotate(4deg);\
+                  \ }\n    60%  { transform: translate(0.4px, 0.4px) rotate(-4deg);\
+                  \ }\n    80%  { transform: translate(-0.4px, -0.4px) rotate(4deg);\
+                  \ }\n  }\n  @keyframes drum {\n    50%  { clip-path: polygon(0 0,\
+                  \ 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%,\
+                  \ 34% 68%, 35% 100%, 100% 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: input_select.dryer_status
+                triggers_update:
+                  - binary_sensor.dryer_contact
+                name: Dryer
+                icon: mdi:tumble-dryer
+                label: "[[[\n  if (states['binary_sensor.dryer_contact'].state ===\
+                  \ 'on') return 'Open';\n  else return entity.state;\n]]]\n"
+                tap_action:
+                  action: more-info
+                variables:
+                  color: "[[[\n  if (states['binary_sensor.dryer_contact'].state ===\
+                    \ 'on') return 'var(--red-color)';\n  else if (entity.state ===\
+                    \ 'Drying') return 'var(--orange-color)';\n  else if (entity.state\
+                    \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
+                    \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
+                    \ === 'Ready') return 'var(--blue-color)';\n  else if (entity.state\
+                    \ === 'Error') return 'var(--red-color)';\n  else return 'var(--grey-color)';\n\
+                    ]]]\n"
+                state:
+                  - value: Error
+                    icon: mdi:tumble-dryer-alert
+                  - value: Drying
+                    styles:
+                      icon:
+                        - animation: shake 400ms ease-in-out infinite, drum 1s infinite
+                        - transform-origin: 50% 65%
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
+                  \ shake {\n    0%, 100% { transform: rotate(4deg); }\n    50%  {\
+                  \ transform: rotate(-4deg); }\n  }\n  @keyframes drum {\n    50%\
+                  \  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%, 31% 43%,\
+                  \ 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100% 100%, 100%\
+                  \ 0); }\n  }\n  `\n  ]]]\n"
+              - type: conditional
+                conditions:
+                  - condition: or
+                    conditions:
+                      - condition: numeric_state
+                        entity: sensor.mail_usps_mail
+                        above: 0
+                      - condition: state
+                        entity: binary_sensor.usps_mail_delivered
+                        state: 'on'
+                card:
+                  type: custom:mushroom-template-badge
+                  entity: sensor.mail_usps_mail
+                  label: Mail
+                  content: "{% if is_state(\"binary_sensor.usps_mail_delivered\",\
+                    \ \"on\") %}\n  Delivered\n{% else %}\n  {{ states(entity) }}\
+                    \ {{ iif(is_state(entity, \"1\"), \"piece\", \"pieces\") }}\n\
+                    {% endif %}"
+                  icon: '{{ iif(is_state("binary_sensor.usps_mail_delivered", "on"),
+                    "mdi:mailbox-up", "mdi:mail") }}'
+                  color: '{{ iif(is_state("binary_sensor.usps_mail_delivered", "on"),
+                    "cyan", "blue") }}'
                   tap_action:
-                    action: navigate
-                    navigation_path: dustin-mopman
-                  variables:
-                    color: "[[[\n  if (states['sensor.dustin_mopman_error'].state\
-                      \ !== 'no_error') return 'var(--red-color)';\n  else if (entity.state\
-                      \ === 'error') return 'var(--red-color)';\n  else if (entity.state\
-                      \ === 'cleaning') return 'var(--cyan-color)';\n  else if (entity.state\
-                      \ === 'charging') return 'var(--orange-color)';\n  else if (entity.state\
-                      \ === 'paused') return 'var(--yellow-color)';\n  else if (entity.state\
-                      \ === 'returning') return 'var(--purple-color)';\n  else if\
-                      \ (entity.state === 'docked') return 'var(--blue-grey-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: cleaning
-                      icon: mdi:robot-vacuum
-                      styles:
-                        icon:
-                          - animation: cleaning 10s linear infinite
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                    \ cleaning {\n    0% { transform: translate(0px, 5px) rotate(0deg);\
-                    \ }\n    2% { transform: translate(0px, 5px) rotate(-45deg); }\n\
-                    \n    10% { transform: translate(-5px, 0px) rotate(-45deg); }\n\
-                    \    12% { transform: translate(-5px, 0px) rotate(45deg); }\n\n\
-                    \    20% { transform: translate(0px, -5px) rotate(45deg); }\n\
-                    \    22% { transform: translate(0px, -5px) rotate(135deg); }\n\
-                    \n    30% { transform: translate(5px, 0px) rotate(135deg); }\n\
-                    \    32% { transform: translate(5px, 0px) rotate(225deg); }\n\n\
-                    \    40% { transform: translate(0px, 5px) rotate(225deg); }\n\
-                    \    42% { transform: translate(0px, 5px) rotate(45deg); }\n \
-                    \   \n    50% { transform: translate(5px, 0px) rotate(45deg);\
-                    \ }\n    52% { transform: translate(5px, 0px) rotate(-45deg);\
-                    \ }\n\n    60% { transform: translate(0px, -5px) rotate(-45deg);\
-                    \ }\n    62% { transform: translate(0px, -5px) rotate(-135deg);\
-                    \ }\n\n    70% { transform: translate(-5px, 0px) rotate(-135deg);\
-                    \ }\n    72% { transform: translate(-5px, 0px) rotate(-225deg);\
-                    \ }\n\n    80% { transform: translate(0px, 5px) rotate(-225deg);\
-                    \ }\n    82% { transform: translate(0px, 5px) rotate(-180deg);\
-                    \ }\n\n    90% { transform: translate(0px, 5px) rotate(0deg);\
-                    \ }\n    100% { transform: translate(0px, 5px) rotate(0deg); }\n\
-                    \  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.ge_dishwasher_cycle_state
-                  triggers_update:
-                    - binary_sensor.ge_dishwasher_is_clean
-                    - sensor.ge_dishwasher_duration
-                    - sensor.ge_dishwasher_time_remaining
-                  name: Dishwasher
-                  icon: mdi:dishwasher-off
-                  label: "[[[\n  if (states['binary_sensor.ge_dishwasher_is_clean'].state\
-                    \ === 'on') return 'Clean';\n  else if (entity.state === 'N/A')\
-                    \ return 'Off';\n  else return helpers.localize(entity);\n]]]\n"
-                  tap_action:
-                    action: navigate
-                    navigation_path: '#dishwasher'
-                  variables:
-                    color: "[[[\n  if (states['binary_sensor.ge_dishwasher_is_clean'].state\
-                      \ === 'on') return 'var(--green-color)';\n  else if (entity.state\
-                      \ === 'Pre Wash') return 'var(--purple-color)';\n  else if (entity.state\
-                      \ === 'Main Wash') return 'var(--cyan-color)';\n  else if (entity.state\
-                      \ === 'Rinsing') return 'var(--blue-color)';\n  else if (entity.state\
-                      \ === 'Sanitizing') return 'var(--light-blue-color)';\n  else\
-                      \ if (entity.state === 'Drying') return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: "[[[\n  if (entity.state === 'N/A' && states['binary_sensor.ge_dishwasher_is_clean'].state\
-                        \ === 'on') return true;\n  return false;\n]]]\n"
-                      operator: template
-                      icon: mdi:dishwasher
-                    - value: unavailable
-                    - value: N/A
-                      operator: '!='
-                      icon: mdi:dishwasher
-                      styles:
-                        icon:
-                          - animation: bounce 1.5s ease-in-out infinite, wash 1s ease-in-out
-                              infinite
-                          - transform-origin: 50% 75%
-                  styles:
-                    img_cell:
-                      - background: "[[[\n  let entity_remain = \"sensor.ge_dishwasher_time_remaining\"\
-                          ;\n  let entity_duration = \"sensor.ge_dishwasher_duration\"\
-                          ;\n\n  if (entity.state !== \"Off\"\n    && states[entity_remain].state\n\
-                          \    && states[entity_duration].state\n    && states[entity_duration].state\
-                          \ !== \"Off\"\n  ) {\n    let remaining = states[entity_remain].state.split(\"\
-                          :\");\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
-                          \    let duration = states[entity_duration].state.split(\"\
-                          :\");\n    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
-                          \n    return `radial-gradient(var(--card-background-color)\
-                          \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
-                          \ ${Math.round((remaining / duration) * 100, 0)}% 0%, var(--card-background-color)\
-                          \ 0% 100%)`;\n  } else {\n    return 'inherit';\n  }\n]]]\n"
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                    \ bounce {\n    0%, 20%, 50%, 80%, 100% {transform: translateY(0);\
-                    \ }\n    40% { transform: translateY(-1.2px) rotate(5deg); }\n\
-                    \    60% { transform: translateY(-1.1px) rotate(-4deg); }\n  }\n\
-                    \  @keyframes wash {\n    50% { clip-path: polygon(0 0, 0 100%,\
-                    \ 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%,\
-                    \ 35% 100%, 100% 100%, 100% 0); }\n  }\n  `\n]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.ge_oven_current_state
-                  triggers_update:
-                    - sensor.ge_oven_kitchen_timer
-                    - sensor.ge_oven_kitchen_timer_duration
-                    - sensor.ge_oven_cook_time_remaining
-                    - sensor.ge_oven_cook_time_duration
-                  name: Oven
-                  icon: '[[[ return variables.icon ]]]'
-                  label: "[[[\n  if (entity.state !== 'Off') {\n    return helpers.localize(entity);\n\
-                    \  }\n  else if (states['sensor.ge_oven_cook_time_remaining'].state\
-                    \ !== 'Off') {\n    return \"Cook Time\";\n  }\n  else if (states['sensor.ge_oven_kitchen_timer'].state\
-                    \ !== 'Off') {\n    return \"Timer\";\n  }\n  else {\n    return\
-                    \ helpers.localize(entity);\n  }\n]]]\n"
-                  tap_action:
-                    action: navigate
-                    navigation_path: '#oven'
-                  variables:
-                    icon: "[[[\n  if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_cook_time_remaining'].state))\
-                      \ return 'mdi:timer-play';\n  else if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_kitchen_timer'].state))\
-                      \ return 'mdi:timer';\n  else return \"mdi:stove\";\n]]]\n"
-                    color: "[[[\n if (entity.state === 'Preheat') return 'var(--yellow-color)';\n\
-                      \ else if (entity.state === 'Bake') return 'var(--red-color)';\n\
-                      \ else if (entity.state === 'Air Fry') return 'var(--orange-color)';\n\
-                      \ else if (entity.state === 'Convection') return 'var(--amber-color)';\n\
-                      \ else if (!['Off', 'unknown', 'unavailable'].includes(states['sensor.ge_oven_cook_time_remaining'].state))\
-                      \ return 'var(--cyan-color)';\n else if (!['Off', 'unknown',\
-                      \ 'unavailable'].includes(states['sensor.ge_oven_kitchen_timer'].state))\
-                      \ return 'var(--purple-color)';\n else return 'var(--grey-color)';\n\
-                      ]]]\n"
-                  styles:
-                    img_cell:
-                      - background: "[[[\n  let cook_time_remain = \"sensor.ge_oven_cook_time_remaining\"\
-                          ;\n  let cook_time_duration = \"sensor.ge_oven_cook_time_duration\"\
-                          ;\n\n  let timer_remain = \"sensor.ge_oven_kitchen_timer\"\
-                          ;\n  let timer_duration = \"sensor.ge_oven_kitchen_timer_duration\"\
-                          ;\n\n  let remaining = \"\";\n  let duration = \"\";\n \
-                          \ if (states[cook_time_remain]?.state\n    && states[cook_time_duration]?.state\
-                          \ !== \"Off\"\n  ) {\n    remaining = states[cook_time_remain].state.split(\"\
-                          :\");\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
-                          \    duration = states[cook_time_duration].state.split(\"\
-                          :\");\n    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
-                          \n    return `radial-gradient(var(--card-background-color)\
-                          \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
-                          \ ${Math.round((remaining / duration) * 100, 0)}% 0%, var(--card-background-color)\
-                          \ 0% 100%)`;\n  }\n  else if (states[timer_remain]?.state\n\
-                          \    && states[timer_duration]?.state !== \"Off\"\n  ) {\n\
-                          \    remaining = states[timer_remain].state.split(\":\"\
-                          );\n    remaining = parseInt(remaining[0] * 60) + parseInt(remaining[1]);\n\
-                          \    duration = states[timer_duration].state.split(\":\"\
-                          );\n    duration = parseInt(duration[0] * 60) + parseInt(duration[1]);\n\
-                          \n    return `radial-gradient(var(--card-background-color)\
-                          \ 60%, transparent calc(60% + 1px)), conic-gradient(${variables.color}\
-                          \ ${Math.round((remaining / duration) * 100, 0)}% 0%, var(--card-background-color)\
-                          \ 0% 100%)`;\n  }\n]]]\n"
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: input_select.washer_status
-                  triggers_update:
-                    - binary_sensor.washer_contact
-                  name: Washer
-                  icon: mdi:washing-machine
-                  label: "[[[\n  if (states['binary_sensor.washer_contact'].state\
-                    \ === 'on') return 'Open';\n  else return entity.state;\n]]]\n"
-                  tap_action:
-                    action: more-info
-                  variables:
-                    color: "[[[\n  if (states['binary_sensor.washer_contact'].state\
-                      \ === 'on') return 'var(--red-color)';\n  else if (entity.state\
-                      \ === 'Washing') return 'var(--blue-color)';\n  else if (entity.state\
-                      \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
-                      \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
-                      \ === 'Ready') return 'var(--lime-color)';\n  else if (entity.state\
-                      \ === 'Error') return 'var(--red-color)';\n  else return 'var(--grey-color)';\n\
-                      ]]]\n"
-                  state:
-                    - value: Error
-                      icon: mdi:washing-machine-alert
-                    - value: Washing
-                      styles:
-                        icon:
-                          - animation: shake 400ms ease-in-out infinite, drum 2s ease
-                              infinite
-                          - transform-origin: 50% 110%
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                    \ shake {\n    0%, 100% { transform: translate(0, 0) rotate(0);\
-                    \ }\n    20%  { transform: translate(0.4px, -0.4px) rotate(-4deg);\
-                    \ }\n    40%  { transform: translate(-0.4px, 0.4px) rotate(4deg);\
-                    \ }\n    60%  { transform: translate(0.4px, 0.4px) rotate(-4deg);\
-                    \ }\n    80%  { transform: translate(-0.4px, -0.4px) rotate(4deg);\
-                    \ }\n  }\n  @keyframes drum {\n    50%  { clip-path: polygon(0\
-                    \ 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47%\
-                    \ 79%, 34% 68%, 35% 100%, 100% 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: input_select.dryer_status
-                  triggers_update:
-                    - binary_sensor.dryer_contact
-                  name: Dryer
-                  icon: mdi:tumble-dryer
-                  label: "[[[\n  if (states['binary_sensor.dryer_contact'].state ===\
-                    \ 'on') return 'Open';\n  else return entity.state;\n]]]\n"
-                  tap_action:
-                    action: more-info
-                  variables:
-                    color: "[[[\n  if (states['binary_sensor.dryer_contact'].state\
-                      \ === 'on') return 'var(--red-color)';\n  else if (entity.state\
-                      \ === 'Drying') return 'var(--orange-color)';\n  else if (entity.state\
-                      \ === 'Finished') return 'var(--green-color)';\n  else if (entity.state\
-                      \ === 'Waiting') return 'var(--yellow-color)';\n  else if (entity.state\
-                      \ === 'Ready') return 'var(--blue-color)';\n  else if (entity.state\
-                      \ === 'Error') return 'var(--red-color)';\n  else return 'var(--grey-color)';\n\
-                      ]]]\n"
-                  state:
-                    - value: Error
-                      icon: mdi:tumble-dryer-alert
-                    - value: Drying
-                      styles:
-                        icon:
-                          - animation: shake 400ms ease-in-out infinite, drum 1s infinite
-                          - transform-origin: 50% 65%
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  @keyframes\
-                    \ shake {\n    0%, 100% { transform: rotate(4deg); }\n    50%\
-                    \  { transform: rotate(-4deg); }\n  }\n  @keyframes drum {\n \
-                    \   50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%,\
-                    \ 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100%\
-                    \ 100%, 100% 0); }\n  }\n  `\n  ]]]\n"
-                - type: conditional
-                  conditions:
-                    - condition: or
-                      conditions:
-                        - condition: numeric_state
-                          entity: sensor.mail_usps_mail
-                          above: 0
-                        - condition: state
-                          entity: binary_sensor.usps_mail_delivered
-                          state: 'on'
-                  card:
-                    type: custom:mushroom-template-badge
-                    entity: sensor.mail_usps_mail
-                    label: Mail
-                    content: "{% if is_state(\"binary_sensor.usps_mail_delivered\"\
-                      , \"on\") %}\n  Delivered\n{% else %}\n  {{ states(entity) }}\
-                      \ {{ iif(is_state(entity, \"1\"), \"piece\", \"pieces\") }}\n\
-                      {% endif %}"
-                    icon: '{{ iif(is_state("binary_sensor.usps_mail_delivered", "on"),
-                      "mdi:mailbox-up", "mdi:mail") }}'
-                    color: '{{ iif(is_state("binary_sensor.usps_mail_delivered", "on"),
-                      "cyan", "blue") }}'
-                    tap_action:
-                      action: fire-dom-event
-                      browser_mod:
-                        service: browser_mod.popup
-                        data:
-                          title: Mail
-                          size: fullscreen
-                          content:
-                            type: picture-entity
-                            entity: camera.mail_usps_camera
-                            camera_image: camera.mail_usps_camera
-                            show_name: false
-                            show_state: false
-                            card_mod:
-                              style: "ha-card {\n  --ha-card-background: none;\n"
-                - type: conditional
-                  conditions:
-                    - condition: numeric_state
-                      entity: sensor.mail_packages_delivered
-                      above: 0
-                  card:
-                    type: custom:mushroom-template-badge
+                    action: fire-dom-event
+                    browser_mod:
+                      service: browser_mod.popup
+                      data:
+                        title: Mail
+                        size: fullscreen
+                        content:
+                          type: picture-entity
+                          entity: camera.mail_usps_camera
+                          camera_image: camera.mail_usps_camera
+                          show_name: false
+                          show_state: false
+                          card_mod:
+                            style: "ha-card {\n  --ha-card-background: none;\n"
+              - type: conditional
+                conditions:
+                  - condition: numeric_state
                     entity: sensor.mail_packages_delivered
-                    label: '{{ iif(is_state(entity, "1"), "Package", "Packages") }}
+                    above: 0
+                card:
+                  type: custom:mushroom-template-badge
+                  entity: sensor.mail_packages_delivered
+                  label: '{{ iif(is_state(entity, "1"), "Package", "Packages") }}
 
-                      '
-                    content: '{{ states(entity) }} Delivered
+                    '
+                  content: '{{ states(entity) }} Delivered
 
-                      '
-                    icon: mdi:package-variant
-                    color: orange
-                - type: conditional
-                  conditions:
-                    - condition: numeric_state
-                      entity: sensor.mail_usps_delivering
-                      above: 0
-                    - condition: state
-                      entity: sensor.mail_usps_delivering
-                      state_not: unavailable
-                    - condition: state
-                      entity: sensor.mail_usps_delivering
-                      state_not: unknown
-                  card:
-                    type: custom:streamline-card
-                    template: package_delivery
-                    variables:
-                      - entity: sensor.mail_usps_delivering
-                      - name: USPS
-                      - icon: simple-icons:usps
-                      - icon_color: blue
-                      - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=##TRACK_ID##
-                - type: conditional
-                  conditions:
-                    - condition: numeric_state
-                      entity: sensor.mail_ups_delivering
-                      above: 0
-                    - condition: state
-                      entity: sensor.mail_ups_delivering
-                      state_not: unavailable
-                    - condition: state
-                      entity: sensor.mail_ups_delivering
-                      state_not: unknown
-                  card:
-                    type: custom:streamline-card
-                    template: package_delivery
-                    variables:
-                      - entity: sensor.mail_ups_delivering
-                      - name: UPS
-                      - icon: simple-icons:ups
-                      - icon_color: brown
-                      - url: https://www.ups.com/track?loc=en_US&tracknum=##TRACK_ID##
-                - type: conditional
-                  conditions:
-                    - condition: numeric_state
-                      entity: sensor.mail_fedex_delivering
-                      above: 0
-                    - condition: state
-                      entity: sensor.mail_fedex_delivering
-                      state_not: unavailable
-                    - condition: state
-                      entity: sensor.mail_fedex_delivering
-                      state_not: unknown
-                  card:
-                    type: custom:streamline-card
-                    template: package_delivery
-                    variables:
-                      - entity: sensor.mail_fedex_delivering
-                      - name: FedEx
-                      - icon: simple-icons:fedex
-                      - icon_color: purple
-                      - url: https://www.fedex.com/fedextrack/?trknbr=##TRACK_ID##
-                - type: conditional
-                  conditions:
-                    - condition: numeric_state
-                      entity: sensor.mail_amazon_packages
-                      above: 0
-                    - condition: state
-                      entity: sensor.mail_amazon_packages
-                      state_not: unavailable
-                    - condition: state
-                      entity: sensor.mail_amazon_packages
-                      state_not: unknown
-                  card:
-                    type: custom:streamline-card
-                    template: package_delivery
-                    variables:
-                      - entity: sensor.mail_amazon_packages
-                      - name: Amazon
-                      - icon: simple-icons:amazon
-                      - icon_color: yellow
-                      - url: https://www.amazon.com/gp/your-account/order-details?orderID=##TRACK_ID##
+                    '
+                  icon: mdi:package-variant
+                  color: orange
+              - type: conditional
+                conditions:
+                  - condition: numeric_state
+                    entity: sensor.mail_usps_delivering
+                    above: 0
+                  - condition: state
+                    entity: sensor.mail_usps_delivering
+                    state_not: unavailable
+                  - condition: state
+                    entity: sensor.mail_usps_delivering
+                    state_not: unknown
+                card:
+                  type: custom:streamline-card
+                  template: package_delivery
+                  variables:
+                    - entity: sensor.mail_usps_delivering
+                    - name: USPS
+                    - icon: simple-icons:usps
+                    - icon_color: blue
+                    - url: https://tools.usps.com/go/TrackConfirmAction?tLabels=##TRACK_ID##
+              - type: conditional
+                conditions:
+                  - condition: numeric_state
+                    entity: sensor.mail_ups_delivering
+                    above: 0
+                  - condition: state
+                    entity: sensor.mail_ups_delivering
+                    state_not: unavailable
+                  - condition: state
+                    entity: sensor.mail_ups_delivering
+                    state_not: unknown
+                card:
+                  type: custom:streamline-card
+                  template: package_delivery
+                  variables:
+                    - entity: sensor.mail_ups_delivering
+                    - name: UPS
+                    - icon: simple-icons:ups
+                    - icon_color: brown
+                    - url: https://www.ups.com/track?loc=en_US&tracknum=##TRACK_ID##
+              - type: conditional
+                conditions:
+                  - condition: numeric_state
+                    entity: sensor.mail_fedex_delivering
+                    above: 0
+                  - condition: state
+                    entity: sensor.mail_fedex_delivering
+                    state_not: unavailable
+                  - condition: state
+                    entity: sensor.mail_fedex_delivering
+                    state_not: unknown
+                card:
+                  type: custom:streamline-card
+                  template: package_delivery
+                  variables:
+                    - entity: sensor.mail_fedex_delivering
+                    - name: FedEx
+                    - icon: simple-icons:fedex
+                    - icon_color: purple
+                    - url: https://www.fedex.com/fedextrack/?trknbr=##TRACK_ID##
+              - type: conditional
+                conditions:
+                  - condition: numeric_state
+                    entity: sensor.mail_amazon_packages
+                    above: 0
+                  - condition: state
+                    entity: sensor.mail_amazon_packages
+                    state_not: unavailable
+                  - condition: state
+                    entity: sensor.mail_amazon_packages
+                    state_not: unknown
+                card:
+                  type: custom:streamline-card
+                  template: package_delivery
+                  variables:
+                    - entity: sensor.mail_amazon_packages
+                    - name: Amazon
+                    - icon: simple-icons:amazon
+                    - icon_color: yellow
+                    - url: https://www.amazon.com/gp/your-account/order-details?orderID=##TRACK_ID##
       - type: grid
         cards:
           - type: custom:streamline-card
@@ -7569,50 +7564,47 @@ views:
                     name: Litter Level
                     tap_action:
                       action: none
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-around;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:button-card
-                      template: button_label
-                      name: Clean
-                      label: Press and Hold to Clean
-                      icon: mdi:wiper-wash
-                      variables:
-                        color: var(--blue-color)
-                      tap_action:
-                        action: none
-                      hold_action:
-                        action: perform-action
-                        perform_action: button.press
-                        target:
-                          entity_id: button.luna_box_clean
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button_label
-                      name: Level
-                      label: Press and Hold to Level
-                      icon: mdi:spirit-level
-                      variables:
-                        color: var(--lime-color)
-                      tap_action:
-                        action: none
-                      hold_action:
-                        action: perform-action
-                        perform_action: button.press
-                        target:
-                          entity_id: button.luna_box_level
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-around;\n}\n"
+                cards:
+                  - type: custom:button-card
+                    template: button_label
+                    name: Clean
+                    label: Press and Hold to Clean
+                    icon: mdi:wiper-wash
+                    variables:
+                      color: var(--blue-color)
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: perform-action
+                      perform_action: button.press
+                      target:
+                        entity_id: button.luna_box_clean
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button_label
+                    name: Level
+                    label: Press and Hold to Level
+                    icon: mdi:spirit-level
+                    variables:
+                      color: var(--lime-color)
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: perform-action
+                      perform_action: button.press
+                      target:
+                        entity_id: button.luna_box_level
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
               - type: custom:button-card
                 show_state: false
                 show_label: false
@@ -7751,156 +7743,154 @@ views:
                     color: var(--light-green-color)
                   - value: 100
                     color: var(--green-color)
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                    \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  columns: 4
-                  cards:
-                    - type: custom:button-card
-                      template: badge
-                      entity: switch.luna_box_automatic_cover
-                      name: Auto Cover
-                      icon: mdi:close-circle
-                      label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
-                        \  else return 'Disabled';\n]]]\n"
-                      tap_action:
-                        action: toggle
-                      variables:
-                        color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
-                          \  else return 'var(--grey-color)';\n]]]\n"
-                      styles:
-                        card:
-                          - background-color: color-mix(in srgb, var(--disabled-color)
-                              12%, var(--card-background-color) 100%) !important;
-                      state:
-                        - value: 'on'
-                          icon: mdi:check-circle
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color} 4%, var(--card-background-color) 100%)\
-                        \ !important;\n    }\n  }\n  `\n  ]]]\n"
-                    - type: custom:button-card
-                      template: badge
-                      entity: switch.luna_box_automatic_leveling
-                      name: Auto Level
-                      icon: mdi:close-circle
-                      label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
-                        \  else return 'Disabled';\n]]]\n"
-                      tap_action:
-                        action: toggle
-                      variables:
-                        color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
-                          \  else return 'var(--grey-color)';\n]]]\n"
-                      styles:
-                        card:
-                          - background-color: color-mix(in srgb, var(--disabled-color)
-                              12%, var(--card-background-color) 100%) !important;
-                      state:
-                        - value: 'on'
-                          icon: mdi:check-circle
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color} 4%, var(--card-background-color) 100%)\
-                        \ !important;\n    }\n  }\n  `\n  ]]]\n"
-                    - type: custom:button-card
-                      template: badge
-                      entity: switch.luna_box_automatic_recovery
-                      name: Auto Recovery
-                      icon: mdi:close-circle
-                      label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
-                        \  else return 'Disabled';\n]]]\n"
-                      tap_action:
-                        action: toggle
-                      variables:
-                        color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
-                          \  else return 'var(--grey-color)';\n]]]\n"
-                      styles:
-                        card:
-                          - background-color: color-mix(in srgb, var(--disabled-color)
-                              12%, var(--card-background-color) 100%) !important;
-                      state:
-                        - value: 'on'
-                          icon: mdi:check-circle
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color} 4%, var(--card-background-color) 100%)\
-                        \ !important;\n    }\n  }\n  `\n  ]]]\n"
-                    - type: custom:button-card
-                      template: badge
-                      entity: switch.luna_box_child_lock
-                      name: Lock
-                      icon: mdi:close-circle
-                      label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
-                        \  else return 'Disabled';\n]]]\n"
-                      tap_action:
-                        action: toggle
-                      variables:
-                        color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
-                          \  else return 'var(--grey-color)';\n]]]\n"
-                      styles:
-                        card:
-                          - background-color: color-mix(in srgb, var(--disabled-color)
-                              12%, var(--card-background-color) 100%) !important;
-                      state:
-                        - value: 'on'
-                          icon: mdi:check-circle
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color} 4%, var(--card-background-color) 100%)\
-                        \ !important;\n    }\n  }\n  `\n  ]]]\n"
-                    - type: custom:button-card
-                      template: badge
-                      entity: switch.luna_box_silent_mode
-                      name: Silent Mode
-                      icon: mdi:close-circle
-                      label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
-                        \  else return 'Disabled';\n]]]\n"
-                      tap_action:
-                        action: toggle
-                      variables:
-                        color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
-                          \  else return 'var(--grey-color)';\n]]]\n"
-                      styles:
-                        card:
-                          - background-color: color-mix(in srgb, var(--disabled-color)
-                              12%, var(--card-background-color) 100%) !important;
-                      state:
-                        - value: 'on'
-                          icon: mdi:check-circle
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color} 4%, var(--card-background-color) 100%)\
-                        \ !important;\n    }\n  }\n  `\n  ]]]\n"
-                    - type: custom:button-card
-                      template: badge
-                      entity: switch.luna_box_unstoppable_cycle
-                      name: Unstopable
-                      icon: mdi:close-circle
-                      label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
-                        \  else return 'Disabled';\n]]]\n"
-                      tap_action:
-                        action: none
-                      hold_action:
-                        action: toggle
-                      variables:
-                        color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
-                          \  else return 'var(--grey-color)';\n]]]\n"
-                      styles:
-                        card:
-                          - background-color: color-mix(in srgb, var(--disabled-color)
-                              12%, var(--card-background-color) 100%) !important;
-                      state:
-                        - value: 'on'
-                          icon: mdi:check-circle
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color} 4%, var(--card-background-color) 100%)\
-                        \ !important;\n    }\n  }\n  `\n  ]]]\n"
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-between;\n}\nmushroom-template-badge,\
+                      \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
+                cards:
+                  - type: custom:button-card
+                    template: badge
+                    entity: switch.luna_box_automatic_cover
+                    name: Auto Cover
+                    icon: mdi:close-circle
+                    label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
+                      \  else return 'Disabled';\n]]]\n"
+                    tap_action:
+                      action: toggle
+                    variables:
+                      color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
+                        \  else return 'var(--grey-color)';\n]]]\n"
+                    styles:
+                      card:
+                        - background-color: color-mix(in srgb, var(--disabled-color)
+                            12%, var(--card-background-color) 100%) !important;
+                    state:
+                      - value: 'on'
+                        icon: mdi:check-circle
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
+                      \ 4%, var(--card-background-color) 100%) !important;\n    }\n\
+                      \  }\n  `\n  ]]]\n"
+                  - type: custom:button-card
+                    template: badge
+                    entity: switch.luna_box_automatic_leveling
+                    name: Auto Level
+                    icon: mdi:close-circle
+                    label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
+                      \  else return 'Disabled';\n]]]\n"
+                    tap_action:
+                      action: toggle
+                    variables:
+                      color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
+                        \  else return 'var(--grey-color)';\n]]]\n"
+                    styles:
+                      card:
+                        - background-color: color-mix(in srgb, var(--disabled-color)
+                            12%, var(--card-background-color) 100%) !important;
+                    state:
+                      - value: 'on'
+                        icon: mdi:check-circle
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
+                      \ 4%, var(--card-background-color) 100%) !important;\n    }\n\
+                      \  }\n  `\n  ]]]\n"
+                  - type: custom:button-card
+                    template: badge
+                    entity: switch.luna_box_automatic_recovery
+                    name: Auto Recovery
+                    icon: mdi:close-circle
+                    label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
+                      \  else return 'Disabled';\n]]]\n"
+                    tap_action:
+                      action: toggle
+                    variables:
+                      color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
+                        \  else return 'var(--grey-color)';\n]]]\n"
+                    styles:
+                      card:
+                        - background-color: color-mix(in srgb, var(--disabled-color)
+                            12%, var(--card-background-color) 100%) !important;
+                    state:
+                      - value: 'on'
+                        icon: mdi:check-circle
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
+                      \ 4%, var(--card-background-color) 100%) !important;\n    }\n\
+                      \  }\n  `\n  ]]]\n"
+                  - type: custom:button-card
+                    template: badge
+                    entity: switch.luna_box_child_lock
+                    name: Lock
+                    icon: mdi:close-circle
+                    label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
+                      \  else return 'Disabled';\n]]]\n"
+                    tap_action:
+                      action: toggle
+                    variables:
+                      color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
+                        \  else return 'var(--grey-color)';\n]]]\n"
+                    styles:
+                      card:
+                        - background-color: color-mix(in srgb, var(--disabled-color)
+                            12%, var(--card-background-color) 100%) !important;
+                    state:
+                      - value: 'on'
+                        icon: mdi:check-circle
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
+                      \ 4%, var(--card-background-color) 100%) !important;\n    }\n\
+                      \  }\n  `\n  ]]]\n"
+                  - type: custom:button-card
+                    template: badge
+                    entity: switch.luna_box_silent_mode
+                    name: Silent Mode
+                    icon: mdi:close-circle
+                    label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
+                      \  else return 'Disabled';\n]]]\n"
+                    tap_action:
+                      action: toggle
+                    variables:
+                      color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
+                        \  else return 'var(--grey-color)';\n]]]\n"
+                    styles:
+                      card:
+                        - background-color: color-mix(in srgb, var(--disabled-color)
+                            12%, var(--card-background-color) 100%) !important;
+                    state:
+                      - value: 'on'
+                        icon: mdi:check-circle
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
+                      \ 4%, var(--card-background-color) 100%) !important;\n    }\n\
+                      \  }\n  `\n  ]]]\n"
+                  - type: custom:button-card
+                    template: badge
+                    entity: switch.luna_box_unstoppable_cycle
+                    name: Unstopable
+                    icon: mdi:close-circle
+                    label: "[[[\n  if (entity.state === 'on') return 'Enabled';\n\
+                      \  else return 'Disabled';\n]]]\n"
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: toggle
+                    variables:
+                      color: "[[[\n  if (entity.state === 'on') return 'var(--green-color)';\n\
+                        \  else return 'var(--grey-color)';\n]]]\n"
+                    styles:
+                      card:
+                        - background-color: color-mix(in srgb, var(--disabled-color)
+                            12%, var(--card-background-color) 100%) !important;
+                    state:
+                      - value: 'on'
+                        icon: mdi:check-circle
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color}\
+                      \ 4%, var(--card-background-color) 100%) !important;\n    }\n\
+                      \  }\n  `\n  ]]]\n"
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -7920,53 +7910,50 @@ views:
                     show_state: true
                     tap_action:
                       action: none
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-around;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:button-card
-                      template: button_label
-                      name: Dispense Food
-                      label: Press and Hold to Dispense
-                      icon: mdi:food-drumstick
-                      variables:
-                        color: var(--green-color)
-                      tap_action:
-                        action: none
-                      hold_action:
-                        action: perform-action
-                        perform_action: script.feeder_start
-                        target: {}
-                        data:
-                          feeder: Cat Feeder
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button_label
-                      name: Reset Food Level
-                      label: Press and Hold to Reset
-                      icon: mdi:progress-upload
-                      variables:
-                        color: var(--yellow-color)
-                      tap_action:
-                        action: none
-                      hold_action:
-                        action: call-service
-                        service: utility_meter.calibrate
-                        target:
-                          entity_id: sensor.cat_feeder_total_weight
-                        data:
-                          value: '0'
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-around;\n}\n"
+                cards:
+                  - type: custom:button-card
+                    template: button_label
+                    name: Dispense Food
+                    label: Press and Hold to Dispense
+                    icon: mdi:food-drumstick
+                    variables:
+                      color: var(--green-color)
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: perform-action
+                      perform_action: script.feeder_start
+                      target: {}
+                      data:
+                        feeder: Cat Feeder
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button_label
+                    name: Reset Food Level
+                    label: Press and Hold to Reset
+                    icon: mdi:progress-upload
+                    variables:
+                      color: var(--yellow-color)
+                    tap_action:
+                      action: none
+                    hold_action:
+                      action: call-service
+                      service: utility_meter.calibrate
+                      target:
+                        entity_id: sensor.cat_feeder_total_weight
+                      data:
+                        value: '0'
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
               - features:
                   - style: buttons
                     type: numeric-input
@@ -8198,25 +8185,23 @@ views:
                   layout_type: masonry
                 sort:
                   method: friendly_name
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-around;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:button-card
-                      template: button
-                      name: Updates Page
-                      icon: mdi:update
-                      tap_action:
-                        action: navigate
-                        navigation_path: /config/updates
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-around;\n}\n"
+                cards:
+                  - type: custom:button-card
+                    template: button
+                    name: Updates Page
+                    icon: mdi:update
+                    tap_action:
+                      action: navigate
+                      navigation_path: /config/updates
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -8790,154 +8775,139 @@ views:
                     name: Cook
                   - entity: timer.ge_oven_kitchen
                     name: Kitchen
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-around;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 300°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === 300\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 300
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 350°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === 350\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 350
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 375°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === 375\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 375
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 400°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === 400\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 400
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 425°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === 425\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 425
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 450°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === 450\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 450
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: water_heater.ge_oven
-                      name: 475°F
-                      icon: mdi:thermometer
-                      variables:
-                        color: "[[[\n  return entity.attributes.operation_mode !==\
-                          \ 'Off'\n    && entity.attributes.temperature === '475'\n\
-                          \    ? 'var(--green-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      tap_action:
-                        action: call-service
-                        service: water_heater.set_temperature
-                        service_data:
-                          temperature: 475
-                          operation_mode: Bake
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-around;\n}\n"
+                cards:
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 300°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === 300\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 300
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 350°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === 350\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 350
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 375°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === 375\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 375
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 400°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === 400\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 400
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 425°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === 425\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 425
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 450°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === 450\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 450
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: water_heater.ge_oven
+                    name: 475°F
+                    icon: mdi:thermometer
+                    variables:
+                      color: "[[[\n  return entity.attributes.operation_mode !== 'Off'\n\
+                        \    && entity.attributes.temperature === '475'\n    ? 'var(--green-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    tap_action:
+                      action: call-service
+                      service: water_heater.set_temperature
+                      service_data:
+                        temperature: 475
+                        operation_mode: Bake
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
               - type: conditional
                 conditions:
                   - condition: state
@@ -8950,33 +8920,32 @@ views:
                     entity: water_heater.ge_oven
                     state_not: unknown
                 card:
-                  type: custom:mod-card
-                  style:
-                    hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                      \ wrap;\n  justify-content: space-around;\n}\n"
-                  card:
-                    type: grid
-                    square: false
-                    cards:
-                      - type: custom:button-card
-                        template: button
-                        entity: water_heater.ge_oven
-                        name: 'Off'
-                        icon: mdi:power
-                        variables:
-                          color: "[[[\n  return entity.attributes.operation_mode !==\
-                            \ 'Off'\n    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
-                            ]]]\n"
-                        tap_action:
-                          action: call-service
-                          service: water_heater.set_operation_mode
-                          service_data:
-                            entity_id: water_heater.ge_oven
-                            operation_mode: 'Off'
-                        extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                          \    ha-card:hover {\n      background: color-mix(in srgb,\
-                          \ ${variables.color}, transparent 80%) !important;\n   \
-                          \ }\n  }\n  `\n]]]\n"
+                  type: grid
+                  square: false
+                  card_mod:
+                    style:
+                      .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                        \  justify-content: space-around;\n}\n"
+                  cards:
+                    - type: custom:button-card
+                      template: button
+                      entity: water_heater.ge_oven
+                      name: 'Off'
+                      icon: mdi:power
+                      variables:
+                        color: "[[[\n  return entity.attributes.operation_mode !==\
+                          \ 'Off'\n    ? 'var(--red-color)'\n    : 'var(--grey-color)';\n\
+                          ]]]\n"
+                      tap_action:
+                        action: call-service
+                        service: water_heater.set_operation_mode
+                        service_data:
+                          entity_id: water_heater.ge_oven
+                          operation_mode: 'Off'
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
               - features:
                   - type: select-options
                 type: tile
@@ -12246,36 +12215,34 @@ views:
               - condition: state
                 entity: binary_sensor.water_leak_detected
                 state: 'on'
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-around;\n}\n"
-            card:
-              type: grid
-              square: false
-              cards:
-                - type: custom:button-card
-                  template: button_label
-                  entity: valve.water_main_valve
-                  name: Water Main Valve
-                  label: "[[[\n  if (entity.state == \"open\") {\n    return \"Press\
-                    \ and Hold to Close\";\n  } else if (entity.state == \"closed\"\
-                    ) {\n    return \"Press and Hold to Open\";\n  }\n]]]\n"
-                  icon: "[[[\n  if (entity.state == \"open\") {\n    return \"mdi:valve-open\"\
-                    ;\n  } else if (entity.state == \"closed\") {\n    return \"mdi:valve-closed\"\
-                    ;\n  } else {\n    return \"mdi:valve\";\n  }\n]]]\n"
-                  variables:
-                    color: "[[[\n  if (entity.state == \"open\") {\n    return \"\
-                      var(--green-color)\";\n  } else if (entity.state == \"closed\"\
-                      ) {\n    return \"var(--red-color)\";\n  } else {\n    return\
-                      \ \"var(--grey-color)\";\n  }\n]]]\n"
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: toggle
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color},\
-                    \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+          - type: grid
+            square: false
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-around;\n}\n"
+            cards:
+              - type: custom:button-card
+                template: button_label
+                entity: valve.water_main_valve
+                name: Water Main Valve
+                label: "[[[\n  if (entity.state == \"open\") {\n    return \"Press\
+                  \ and Hold to Close\";\n  } else if (entity.state == \"closed\"\
+                  ) {\n    return \"Press and Hold to Open\";\n  }\n]]]\n"
+                icon: "[[[\n  if (entity.state == \"open\") {\n    return \"mdi:valve-open\"\
+                  ;\n  } else if (entity.state == \"closed\") {\n    return \"mdi:valve-closed\"\
+                  ;\n  } else {\n    return \"mdi:valve\";\n  }\n]]]\n"
+                variables:
+                  color: "[[[\n  if (entity.state == \"open\") {\n    return \"var(--green-color)\"\
+                    ;\n  } else if (entity.state == \"closed\") {\n    return \"var(--red-color)\"\
+                    ;\n  } else {\n    return \"var(--grey-color)\";\n  }\n]]]\n"
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: toggle
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color}, transparent\
+                  \ 80%) !important;\n    }\n  }\n  `\n]]]\n"
           - type: custom:expander-card
             animation: true
             gap: 0em
@@ -21102,92 +21069,86 @@ views:
                 width_desktop: 50vw
                 margin_top_mobile: 70vh
                 modules: []
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-around;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:button-card
-                      template: button
-                      entity: sensor.bambu_p1s_speed_profile
-                      name: Silent
-                      icon: mdi:gauge-empty
-                      tap_action:
-                        action: perform-action
-                        perform_action: select.select_option
-                        target:
-                          entity_id: select.bambu_p1s_printing_speed
-                        data:
-                          option: silent
-                      variables:
-                        color: "[[[\n  return entity.state === 'silent'\n    ? 'var(--state-active-color)'\n\
-                          \    : 'var(--grey-color)';\n]]]\n"
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: sensor.bambu_p1s_speed_profile
-                      name: Standard
-                      show_state: false
-                      icon: mdi:gauge-low
-                      tap_action:
-                        action: perform-action
-                        perform_action: select.select_option
-                        target:
-                          entity_id: select.bambu_p1s_printing_speed
-                        data:
-                          option: standard
-                      variables:
-                        color: "[[[\n  return entity.state === 'standard'\n    ? 'var(--state-active-color)'\n\
-                          \    : 'var(--grey-color)';\n]]]\n"
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: sensor.bambu_p1s_speed_profile
-                      name: Sport
-                      icon: mdi:gauge
-                      tap_action:
-                        action: perform-action
-                        perform_action: select.select_option
-                        target:
-                          entity_id: select.bambu_p1s_printing_speed
-                        data:
-                          option: sport
-                      variables:
-                        color: "[[[\n  return entity.state === 'sport'\n    ? 'var(--state-active-color)'\n\
-                          \    : 'var(--grey-color)';\n]]]\n"
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
-                    - type: custom:button-card
-                      template: button
-                      entity: sensor.bambu_p1s_speed_profile
-                      name: Ludicrous
-                      icon: mdi:gauge-full
-                      tap_action:
-                        action: perform-action
-                        perform_action: select.select_option
-                        target:
-                          entity_id: select.bambu_p1s_printing_speed
-                        data:
-                          option: ludicrous
-                      variables:
-                        color: "[[[\n  return entity.state === 'ludicrous'\n    ?\
-                          \ 'var(--state-active-color)'\n    : 'var(--grey-color)';\n\
-                          ]]]\n"
-                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
-                        \    ha-card:hover {\n      background: color-mix(in srgb,\
-                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
-                        \  }\n  `\n]]]\n"
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-around;\n}\n"
+                cards:
+                  - type: custom:button-card
+                    template: button
+                    entity: sensor.bambu_p1s_speed_profile
+                    name: Silent
+                    icon: mdi:gauge-empty
+                    tap_action:
+                      action: perform-action
+                      perform_action: select.select_option
+                      target:
+                        entity_id: select.bambu_p1s_printing_speed
+                      data:
+                        option: silent
+                    variables:
+                      color: "[[[\n  return entity.state === 'silent'\n    ? 'var(--state-active-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: sensor.bambu_p1s_speed_profile
+                    name: Standard
+                    show_state: false
+                    icon: mdi:gauge-low
+                    tap_action:
+                      action: perform-action
+                      perform_action: select.select_option
+                      target:
+                        entity_id: select.bambu_p1s_printing_speed
+                      data:
+                        option: standard
+                    variables:
+                      color: "[[[\n  return entity.state === 'standard'\n    ? 'var(--state-active-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: sensor.bambu_p1s_speed_profile
+                    name: Sport
+                    icon: mdi:gauge
+                    tap_action:
+                      action: perform-action
+                      perform_action: select.select_option
+                      target:
+                        entity_id: select.bambu_p1s_printing_speed
+                      data:
+                        option: sport
+                    variables:
+                      color: "[[[\n  return entity.state === 'sport'\n    ? 'var(--state-active-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  - type: custom:button-card
+                    template: button
+                    entity: sensor.bambu_p1s_speed_profile
+                    name: Ludicrous
+                    icon: mdi:gauge-full
+                    tap_action:
+                      action: perform-action
+                      perform_action: select.select_option
+                      target:
+                        entity_id: select.bambu_p1s_printing_speed
+                      data:
+                        option: ludicrous
+                    variables:
+                      color: "[[[\n  return entity.state === 'ludicrous'\n    ? 'var(--state-active-color)'\n\
+                        \    : 'var(--grey-color)';\n]]]\n"
+                    extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n  \
+                      \  ha-card:hover {\n      background: color-mix(in srgb, ${variables.color},\
+                      \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -22250,63 +22211,62 @@ views:
                     \  font-size: 2rem;\n  font-weight: 800;\n  color: #FFFFFF;\n\
                     }\nbar-card-name {\n  margin: 20px;\n  font-size: 1.25rem;\n \
                     \ font-weight: 800;\n  color: #FFFFFF;\n}\n"
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                    \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_main_phase_a_voltage
-                      label: Phase A voltage
-                      icon: mdi:sine-wave
-                      color: blue
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_main_phase_a_current
-                      label: Phase A current
-                      icon: mdi:current-ac
-                      color: green
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_main_phase_a_frequency
-                      label: Phase A frequency
-                      icon: mdi:waveform
-                      color: amber
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_main_phase_b_voltage
-                      label: Phase B voltage
-                      icon: mdi:sine-wave
-                      color: blue
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_main_phase_b_current
-                      label: Phase B current
-                      icon: mdi:current-ac
-                      color: green
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_main_phase_b_phase_angle
-                      label: Phase B phase
-                      icon: mdi:cosine-wave
-                      color: amber
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-between;\n}\nmushroom-template-badge,\
+                      \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
+                cards:
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_main_phase_a_voltage
+                    label: Phase A voltage
+                    icon: mdi:sine-wave
+                    color: blue
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_main_phase_a_current
+                    label: Phase A current
+                    icon: mdi:current-ac
+                    color: green
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_main_phase_a_frequency
+                    label: Phase A frequency
+                    icon: mdi:waveform
+                    color: amber
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_main_phase_b_voltage
+                    label: Phase B voltage
+                    icon: mdi:sine-wave
+                    color: blue
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_main_phase_b_current
+                    label: Phase B current
+                    icon: mdi:current-ac
+                    color: green
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_main_phase_b_phase_angle
+                    label: Phase B phase
+                    icon: mdi:cosine-wave
+                    color: amber
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
           - type: vertical-stack
             cards:
               - type: heading
@@ -22395,63 +22355,62 @@ views:
                     \  font-size: 2rem;\n  font-weight: 800;\n  color: #FFFFFF;\n\
                     }\nbar-card-name {\n  margin: 20px;\n  font-size: 1.25rem;\n \
                     \ font-weight: 800;\n  color: #FFFFFF;\n}\n"
-              - type: custom:mod-card
-                style:
-                  hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                    \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                    \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-                card:
-                  type: grid
-                  square: false
-                  cards:
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_sub_phase_a_voltage
-                      label: Phase A voltage
-                      icon: mdi:sine-wave
-                      color: blue
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_sub_phase_a_current
-                      label: Phase A current
-                      icon: mdi:current-ac
-                      color: green
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_sub_phase_a_frequency
-                      label: Phase A frequency
-                      icon: mdi:waveform
-                      color: amber
-                      tap_action:
-                        action: more-info
-                      content: '{{ states(entity, with_unit=true) }}'
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_sub_phase_b_voltage
-                      label: Phase B voltage
-                      icon: mdi:sine-wave
-                      color: blue
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_sub_phase_b_current
-                      label: Phase B current
-                      icon: mdi:current-ac
-                      color: green
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
-                    - type: custom:mushroom-template-badge
-                      entity: sensor.emporiavue_sub_phase_b_phase_angle
-                      label: Phase B phase
-                      icon: mdi:cosine-wave
-                      color: amber
-                      content: '{{ states(entity, with_unit=true) }}'
-                      tap_action:
-                        action: more-info
+              - type: grid
+                square: false
+                card_mod:
+                  style:
+                    .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                      \  justify-content: space-between;\n}\nmushroom-template-badge,\
+                      \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
+                cards:
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_sub_phase_a_voltage
+                    label: Phase A voltage
+                    icon: mdi:sine-wave
+                    color: blue
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_sub_phase_a_current
+                    label: Phase A current
+                    icon: mdi:current-ac
+                    color: green
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_sub_phase_a_frequency
+                    label: Phase A frequency
+                    icon: mdi:waveform
+                    color: amber
+                    tap_action:
+                      action: more-info
+                    content: '{{ states(entity, with_unit=true) }}'
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_sub_phase_b_voltage
+                    label: Phase B voltage
+                    icon: mdi:sine-wave
+                    color: blue
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_sub_phase_b_current
+                    label: Phase B current
+                    icon: mdi:current-ac
+                    color: green
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
+                  - type: custom:mushroom-template-badge
+                    entity: sensor.emporiavue_sub_phase_b_phase_angle
+                    label: Phase B phase
+                    icon: mdi:cosine-wave
+                    color: amber
+                    content: '{{ states(entity, with_unit=true) }}'
+                    tap_action:
+                      action: more-info
         column_span: 2
     dense_section_placement: true
     cards: []
@@ -24414,253 +24373,250 @@ views:
             heading: Maintenance
             heading_style: title
             icon: mdi:basket-fill
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-            card:
-              type: grid
-              square: false
-              columns: 5
-              cards:
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.r2dee2_filter_time_left
-                  name: Filter
-                  icon: mdi:air-filter
-                  label: '[[[ return helpers.localize(entity); ]]]
+          - type: grid
+            square: false
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-between;\n}\nmushroom-template-badge, hui-conditional-card\
+                  \ {\n  flex: 0 0 auto !important;\n}\n"
+            cards:
+              - type: custom:button-card
+                template: badge
+                entity: sensor.r2dee2_filter_time_left
+                name: Filter
+                icon: mdi:air-filter
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.r2dee2
-                    data:
-                      consumable: filter
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.r2dee2_main_brush_time_left
-                  name: Main brush
-                  icon: mdi:car-turbocharger
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.r2dee2
+                  data:
+                    consumable: filter
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.r2dee2_main_brush_time_left
+                name: Main brush
+                icon: mdi:car-turbocharger
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.r2dee2
-                    data:
-                      consumable: main_brush
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.r2dee2_mop_pad_time_left
-                  name: Mop pad
-                  icon: mdi:hydro-power
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.r2dee2
+                  data:
+                    consumable: main_brush
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.r2dee2_mop_pad_time_left
+                name: Mop pad
+                icon: mdi:hydro-power
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.r2dee2
-                    data:
-                      consumable: mop_pad
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.r2dee2_sensor_dirty_time_left
-                  name: Sensors
-                  icon: mdi:radar
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.r2dee2
+                  data:
+                    consumable: mop_pad
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.r2dee2_sensor_dirty_time_left
+                name: Sensors
+                icon: mdi:radar
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.r2dee2
-                    data:
-                      consumable: sensor
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.r2dee2_side_brush_time_left
-                  name: Side brush
-                  icon: mdi:pinwheel-outline
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.r2dee2
+                  data:
+                    consumable: sensor
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.r2dee2_side_brush_time_left
+                name: Side brush
+                icon: mdi:pinwheel-outline
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.r2dee2
-                    data:
-                      consumable: side_brush
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-around;\n}\n"
-            card:
-              type: grid
-              square: false
-              cards:
-                - type: custom:button-card
-                  template: button
-                  name: Clean Washboard
-                  icon: mdi:wiper-wash
-                  variables:
-                    color: var(--pink-color)
-                  tap_action:
-                    action: none
-                  hold_action:
-                    action: perform-action
-                    perform_action: vacuum.send_command
-                    target:
-                      entity_id: vacuum.r2dee2
-                    data:
-                      command: action
-                      params:
-                        siid: 4
-                        aiid: 4
-                        in:
-                          - value: 5,1
-                            piid: 10
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color},\
-                    \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.r2dee2
+                  data:
+                    consumable: side_brush
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+          - type: grid
+            square: false
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-around;\n}\n"
+            cards:
+              - type: custom:button-card
+                template: button
+                name: Clean Washboard
+                icon: mdi:wiper-wash
+                variables:
+                  color: var(--pink-color)
+                tap_action:
+                  action: none
+                hold_action:
+                  action: perform-action
+                  perform_action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.r2dee2
+                  data:
+                    command: action
+                    params:
+                      siid: 4
+                      aiid: 4
+                      in:
+                        - value: 5,1
+                          piid: 10
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color}, transparent\
+                  \ 80%) !important;\n    }\n  }\n  `\n]]]\n"
     header:
       card:
         type: markdown
@@ -25181,252 +25137,249 @@ views:
             heading: Maintenance
             heading_style: title
             icon: mdi:basket-fill
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-between;\n}\nmushroom-template-badge,\
-                \ hui-conditional-card {\n  flex: 0 0 auto !important;\n}\n"
-            card:
-              type: grid
-              square: false
-              columns: 5
-              cards:
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.dustin_mopman_filter_time_left
-                  name: Filter
-                  icon: mdi:air-filter
-                  label: '[[[ return helpers.localize(entity); ]]]
+          - type: grid
+            square: false
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-between;\n}\nmushroom-template-badge, hui-conditional-card\
+                  \ {\n  flex: 0 0 auto !important;\n}\n"
+            cards:
+              - type: custom:button-card
+                template: badge
+                entity: sensor.dustin_mopman_filter_time_left
+                name: Filter
+                icon: mdi:air-filter
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.dustin_mopman
-                    data:
-                      consumable: filter
-                  variables:
-                    color: "[[[\n  if (entity.state <= 10) return 'var(--red-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.dustin_mopman_main_brush_time_left
-                  name: Main brush
-                  icon: mdi:car-turbocharger
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.dustin_mopman
+                  data:
+                    consumable: filter
+                variables:
+                  color: "[[[\n  if (entity.state <= 10) return 'var(--red-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.dustin_mopman_main_brush_time_left
+                name: Main brush
+                icon: mdi:car-turbocharger
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.dustin_mopman
-                    data:
-                      consumable: main_brush
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.dustin_mopman_mop_pad_time_left
-                  name: Mop pad
-                  icon: mdi:hydro-power
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.dustin_mopman
+                  data:
+                    consumable: main_brush
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.dustin_mopman_mop_pad_time_left
+                name: Mop pad
+                icon: mdi:hydro-power
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.dustin_mopman
-                    data:
-                      consumable: mop_pad
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.dustin_mopman_sensor_dirty_time_left
-                  name: Sensors
-                  icon: mdi:radar
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.dustin_mopman
+                  data:
+                    consumable: mop_pad
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.dustin_mopman_sensor_dirty_time_left
+                name: Sensors
+                icon: mdi:radar
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.dustin_mopman
-                    data:
-                      consumable: sensor
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-                - type: custom:button-card
-                  template: badge
-                  entity: sensor.dustin_mopman_side_brush_time_left
-                  name: Side brush
-                  icon: mdi:pinwheel-outline
-                  label: '[[[ return helpers.localize(entity); ]]]
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.dustin_mopman
+                  data:
+                    consumable: sensor
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+              - type: custom:button-card
+                template: badge
+                entity: sensor.dustin_mopman_side_brush_time_left
+                name: Side brush
+                icon: mdi:pinwheel-outline
+                label: '[[[ return helpers.localize(entity); ]]]
 
-                    '
-                  tap_action:
-                    action: more-info
-                  hold_action:
-                    action: perform-action
-                    perform_action: dreame_vacuum.vacuum_reset_consumable
-                    target:
-                      entity_id: vacuum.dustin_mopman
-                    data:
-                      consumable: side_brush
-                  variables:
-                    color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
-                      \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
-                      \  else return 'var(--grey-color)';\n]]]\n"
-                  state:
-                    - value: 5
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
-                              100%)
-                        icon:
-                          - color: var(--white-color)
-                    - value: 10
-                      operator: <=
-                      styles:
-                        card:
-                          - background: color-mix(in srgb, var(--orange-color) 40%,
-                              var(--card-background-color) 100%)
-                        icon:
-                          - color: var(--white-color)
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
-                    \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
-          - type: custom:mod-card
-            style:
-              hui-grid-card$: "#root {\n  display: flex !important;\n  flex-wrap:\
-                \ wrap;\n  justify-content: space-around;\n}\n"
-            card:
-              type: grid
-              square: false
-              cards:
-                - type: custom:button-card
-                  template: button
-                  name: Clean Washboard
-                  icon: mdi:wiper-wash
-                  variables:
-                    color: var(--pink-color)
-                  tap_action:
-                    action: none
-                  hold_action:
-                    action: perform-action
-                    perform_action: vacuum.send_command
-                    target:
-                      entity_id: vacuum.dustin_mopman
-                    data:
-                      command: action
-                      params:
-                        siid: 4
-                        aiid: 4
-                        in:
-                          - value: 5,1
-                            piid: 10
-                  extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
-                    \ {\n      background: color-mix(in srgb, ${variables.color},\
-                    \ transparent 80%) !important;\n    }\n  }\n  `\n]]]\n"
+                  '
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: perform-action
+                  perform_action: dreame_vacuum.vacuum_reset_consumable
+                  target:
+                    entity_id: vacuum.dustin_mopman
+                  data:
+                    consumable: side_brush
+                variables:
+                  color: "[[[\n  if (entity.state <= 5) return 'var(--red-color)';\n\
+                    \  else if (entity.state <= 10) return 'var(--orange-color)';\n\
+                    \  else return 'var(--grey-color)';\n]]]\n"
+                state:
+                  - value: 5
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--red-color) 40%, var(--card-background-color)
+                            100%)
+                      icon:
+                        - color: var(--white-color)
+                  - value: 10
+                    operator: <=
+                    styles:
+                      card:
+                        - background: color-mix(in srgb, var(--orange-color) 40%,
+                            var(--card-background-color) 100%)
+                      icon:
+                        - color: var(--white-color)
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color} 4%,\
+                  \ var(--card-background-color) 100%);\n    }\n  }\n  `\n  ]]]\n"
+          - type: grid
+            square: false
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-around;\n}\n"
+            cards:
+              - type: custom:button-card
+                template: button
+                name: Clean Washboard
+                icon: mdi:wiper-wash
+                variables:
+                  color: var(--pink-color)
+                tap_action:
+                  action: none
+                hold_action:
+                  action: perform-action
+                  perform_action: vacuum.send_command
+                  target:
+                    entity_id: vacuum.dustin_mopman
+                  data:
+                    command: action
+                    params:
+                      siid: 4
+                      aiid: 4
+                      in:
+                        - value: 5,1
+                          piid: 10
+                extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n    ha-card:hover\
+                  \ {\n      background: color-mix(in srgb, ${variables.color}, transparent\
+                  \ 80%) !important;\n    }\n  }\n  `\n]]]\n"
     header:
       card:
         type: markdown

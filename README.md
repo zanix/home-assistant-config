@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4869 |
-| Sensors        | 1705 |
-| Binary Sensors | 347 |
-| Lights         | 74 |
-| Switches       | 756 |
+| All Entities   | 4876 |
+| Sensors        | 1730 |
+| Binary Sensors | 358 |
+| Lights         | 73 |
+| Switches       | 747 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -301,7 +301,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>28 Custom Integrations</summary>
+<details><summary>26 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.26.0]
 
@@ -309,7 +309,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.11]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.12]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -409,7 +409,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2025.2.0]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2025.11.0]
 
 Fill out your Media Player Entity with MQTT Topics
 
@@ -421,23 +421,11 @@ Home Assistant Neakasa Integration
 
 Authors: [@timniklas](https://github.com/timniklas).
 
-### [Nintendo Switch Parental Controls](https://github.com/pantherale0/ha-nintendoparentalcontrols) [v2025.11.1]
-
-Home Assistant integration for Nintendo Switch Parental Controls
-
-Authors: [@pantherale0](https://github.com/pantherale0).
-
 ### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.5.2]
 
 OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
-
-### [Samsung Soundbar](https://github.com/samuelspagl/ha_samsung_soundbar) [v0.4.1]
-
-YASSI (Yet another Samsung Soundbar integration) is a HomeAssistant integration for Samsung Soundbars.
-
-Authors: [@samuelspagl](https://github.com/samuelspagl).
 
 ### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v4.0.1]
 
@@ -445,7 +433,7 @@ A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
 Authors: [@frenck](https://github.com/frenck).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.19]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.20]
 
 MySubaru Connected Services Custom Component for Home Assistant
 
@@ -503,11 +491,11 @@ Battery state card for Home Assistant
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
-### [Button Card](https://github.com/custom-cards/button-card) [v6.0.0]
+### [Button Card](https://github.com/custom-cards/button-card) [v7.0.1]
 
 ❇️ Lovelace button-card for home assistant
 
-### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v3.4.6]
+### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v4.0.0]
 
 🔹 Add CSS styles to (almost) any lovelace card
 
@@ -519,7 +507,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v3.0.1]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v3.2.0]
 
 Expander card for HomeAssistant
 
@@ -527,7 +515,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v1.7.0]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v1.7.1]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -559,7 +547,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.22]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.23]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -595,7 +583,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
-### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.1.6]
+### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.1.7]
 
 A simple and configurable tabs card for Home Assistant Dashboards.
 
@@ -643,7 +631,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.3]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.4]
 
 Material Design 3 Theme for Home Assistant
 
@@ -753,12 +741,12 @@ Material Design 3 Theme for Home Assistant
 - ⏯ Family Room Sound Mode
 - ⏯ Living Room Media Off
 - ⏯ Living Room Media State at Night 🚫
-- ⏯ Living Room Sound Mode
+- ⏯ Living Room Sound Mode 🚫
 - ⏯ Living Room Sound Night Mode
 - ⏯ Main Bedroom Media Auto Off
 - ⏯ PS4 Harmony Activity
-- ⏯️ Samsung Soundbar Night Mode
-- ⏯️ Samsung Soundbar Voice Enhancer
+- ⏯️ Samsung Soundbar Night Mode 🚫
+- ⏯️ Samsung Soundbar Voice Enhancer 🚫
 - ☑️ Cat Feeder Filled
 - ☑️ Close Garage Door
 - ☑️ Garbage Collection
@@ -917,7 +905,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.10.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.11.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
