@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4912 |
-| Sensors        | 1732 |
-| Binary Sensors | 358 |
-| Lights         | 77 |
-| Switches       | 754 |
+| All Entities   | 5178 |
+| Sensors        | 1730 |
+| Binary Sensors | 352 |
+| Lights         | 81 |
+| Switches       | 750 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -303,13 +303,13 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>26 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.28.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.29.0]
 
 Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.16]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.18]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -337,13 +337,13 @@ Home Assistant Service for sending commands to a Wifi enabled DreamScreen
 
 Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.11.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.14.1]
 
 Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.4]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.5]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -385,13 +385,13 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@DrR0X-glitch](https:/
 
 Authors: [@bruxy70](https://github.com/bruxy70).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.1.0]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.1.1]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.46.2]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.47.5]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -403,7 +403,7 @@ KidsChores Custom Integration for Home Assistant
 
 Authors: [@ad-ha](https://github.com/ad-ha).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.2]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.6]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -463,7 +463,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>40 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.19.4]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.26.0]
 
 A comprehensive camera card for Home Assistant
 
@@ -503,11 +503,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.7.4]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.7.9]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v4.0.3]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v4.5.0]
 
 Expander card for HomeAssistant
 
@@ -527,7 +527,7 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
-### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.3.1]
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.4.0]
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
@@ -547,7 +547,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.27]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.28]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -559,7 +559,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.0.8]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.0.9]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -583,7 +583,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
-### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.1.7]
+### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.1.8]
 
 A simple and configurable tabs card for Home Assistant Dashboards.
 
@@ -905,7 +905,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2025.11.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2025.12.5-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
