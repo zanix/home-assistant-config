@@ -125,8 +125,9 @@ button_card_templates:
         \ <div style=\"position: relative; background-color: ${color}; width: 100%;\
         \ height: 100%; top: ${99 - remain}%; border-top: 2px solid black;\"></div>\n\
         \  `;\n]]]\n"
-      value: "[[[\n  if (entity.attributes.remain) {\n    return entity.attributes.remain\
-        \ + ' %';\n  } else {\n    return '&nbsp;';\n  }\n]]]\n"
+      value: "[[[\n  if (entity.attributes.remain && entity.attributes.remain > 0)\
+        \ {\n    return entity.attributes.remain + ' %';\n  } else {\n    return '&nbsp;';\n\
+        \  }\n]]]\n"
       slotnum: "[[[\n  if (variables.slotnum) {\n    return `<ha-icon icon=\"mdi:numeric-${variables.slotnum}-box\"\
         ></ha-icon>`;\n  }\n  return `<ha-icon icon=\"mdi:alpha-e-box\"></ha-icon>`;\n\
         ]]]\n"
@@ -1117,20 +1118,6 @@ streamline_templates:
             - type: custom:button-card
               template: remote_source
               entity: media_player.universal_living_room
-              name: Cartoon Network
-              icon: local:cartoon-network
-              variables:
-                source: Cartoon Network
-              styles:
-                card:
-                  - background: '#000000'
-                icon:
-                  - color: var(--white-color)
-                name:
-                  - color: var(--white-color)
-            - type: custom:button-card
-              template: remote_source
-              entity: media_player.universal_living_room
               name: YouTube Kids
               icon: simple-icons:youtubekids
               variables:
@@ -1299,20 +1286,6 @@ streamline_templates:
               styles:
                 card:
                   - background: '#1db954'
-            - type: custom:button-card
-              template: remote_source
-              entity: media_player.universal_family_room
-              name: Cartoon Network
-              icon: local:cartoon-network
-              variables:
-                source: Cartoon Network
-              styles:
-                card:
-                  - background: '#000000'
-                icon:
-                  - color: var(--white-color)
-                name:
-                  - color: var(--white-color)
             - type: custom:button-card
               template: remote_source
               entity: media_player.universal_family_room
@@ -3024,11 +2997,6 @@ views:
           - type: grid
             square: false
             columns: 4
-            card_mod:
-              style:
-                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
-                  \ space-between;\n}\nmushroom-template-badge, hui-conditional-card\
-                  \ {\n  flex: 0 0 auto !important;\n}\n"
             cards:
               - type: custom:mushroom-template-badge
                 entity: weather.openweathermap
@@ -3544,6 +3512,11 @@ views:
                     - icon: simple-icons:amazon
                     - icon_color: yellow
                     - url: https://www.amazon.com/gp/your-account/order-details?orderID=##TRACK_ID##
+            card_mod:
+              style:
+                .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n  justify-content:\
+                  \ space-between;\n}\nmushroom-template-badge, hui-conditional-card\
+                  \ {\n  flex: 0 0 auto !important;\n}\n"
       - type: grid
         cards:
           - type: custom:streamline-card
@@ -4648,6 +4621,7 @@ views:
                   person: joshua
                   name: Joshua
                   phone_base: pixel_10
+                  watch_base: pixel_watch_3
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -4667,6 +4641,7 @@ views:
                   person: amy
                   name: Amy
                   phone_base: pixel_10
+                  watch_base: pixel_watch_3
           - type: vertical-stack
             cards:
               - type: custom:bubble-card
@@ -10949,6 +10924,24 @@ views:
               columns: 6
               rows: 1
             modules: []
+          - type: custom:bubble-card
+            card_type: button
+            button_type: switch
+            card_layout: large
+            entity: switch.grow_light
+            name: Grow Light
+            use_accent_color: true
+            show_attribute: true
+            attribute: brightness
+            tap_action:
+              action: toggle
+            hold_action:
+              action: more-info
+            grid_options:
+              columns: 6
+              rows: 1
+            modules: []
+            icon: mdi:lightbulb-fluorescent-tube
     cards: []
     badges:
       - type: custom:mushroom-template-badge
@@ -16437,27 +16430,6 @@ views:
                       - stream: livingroom
             layout_options:
               grid_columns: 2
-          - show_state: false
-            show_name: false
-            camera_view: auto
-            type: picture-entity
-            entity: camera.litterbox
-            aspect_ratio: '16:9'
-            tap_action:
-              action: fire-dom-event
-              browser_mod:
-                service: browser_mod.popup
-                data:
-                  title: Litterbox
-                  size: fullscreen
-                  content:
-                    type: custom:streamline-card
-                    template: camera_popup
-                    variables:
-                      - camera: camera.litterbox
-                      - stream: litterbox
-            layout_options:
-              grid_columns: 2
       - type: grid
         cards:
           - type: heading
@@ -16696,7 +16668,6 @@ views:
               - camera_entity: camera.garage
               - camera_entity: camera.livingroom
               - camera_entity: camera.familyroom
-              - camera_entity: camera.litterbox
             view:
               default: timeline
               camera_select: current
@@ -18427,13 +18398,13 @@ views:
                       name: Storage
                       icon: mdi:harddisk
                       entities:
-                        - entity: sensor.erebus_disk_dev_nvme1n1p2
+                        - entity: sensor.erebus_disk_dev_nvme0n1p2
                           unit: '%'
                           name: /
                           color: var(--blue-color)
                           show_state: true
                           show_points: false
-                        - entity: sensor.erebus_disk_dev_nvme0n1p1
+                        - entity: sensor.erebus_disk_dev_nvme1n1p1
                           unit: '%'
                           name: DevDrive
                           color: var(--green-color)
@@ -19490,7 +19461,6 @@ views:
                     card:
                       type: custom:mushroom-template-card
                       entity: button.magicmirror_suspend
-                      vertical: true
                       icon: mdi:progress-clock
                       color: '{{ is_state(entity, "on") | iif("green", "grey") }}'
                       vertical: true
@@ -19676,11 +19646,12 @@ views:
                 margin_top_mobile: calc(0px - var(--header-height))
                 tap_action:
                   action: none
-                double_tap_action:
-                  action: none
-                hold_action:
-                  action: none
                 modules: []
+                button_action:
+                  tap_action:
+                    action: none
+                  hold_action:
+                    action: none
               - type: custom:bar-card
                 card_mod:
                   style: "bar-card-name,\nbar-card-value {\n  font-weight: 500;\n\
@@ -22756,7 +22727,6 @@ views:
                                                 text: kWh
                                         series:
                                           - entity: sensor.emporiavue_main_total_daily
-                                            type: area
                                             opacity: 0.2
                                             name: Home
                                             color: var(--grey-color)
@@ -22972,7 +22942,7 @@ views:
                                             duration: 1day
                                         yaxis:
                                           - min: ~1
-                                            max: ~70
+                                            max: ~1
                                             apex_config:
                                               tickAmount: 4
                                               forceNiceScale: true
@@ -23194,7 +23164,7 @@ views:
                                             duration: 1day
                                         yaxis:
                                           - min: ~1
-                                            max: ~70
+                                            max: ~1
                                             apex_config:
                                               tickAmount: 4
                                               forceNiceScale: true
@@ -23415,8 +23385,8 @@ views:
                                             start_with_last: true
                                             duration: 30day
                                         yaxis:
-                                          - min: ~-500
-                                            max: ~1500
+                                          - min: ~1
+                                            max: ~1
                                             apex_config:
                                               tickAmount: 4
                                               forceNiceScale: true
