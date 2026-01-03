@@ -349,7 +349,7 @@ Component to integrate with GasBuddy fuel price tracker.
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2025.11.0]
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2025.12.0]
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
