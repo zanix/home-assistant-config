@@ -290,28 +290,47 @@
         data: {}
   mode: restart
 - id: '1665685997408'
-  alias: ⏯ Main Bedroom Media Auto Off
+  alias: ⏯ Main Bedroom Media Off
   description: Automatically turn off the Media Center in the Main Bedroom
-  trigger:
-  - platform: state
+  triggers:
+  - trigger: state
+    entity_id:
+    - remote.harmony_main_bedroom
+    from: 'on'
+    to: 'off'
+    id: remote
+  - trigger: state
     entity_id:
     - remote.androidtv_main_bedroom
+    from: 'on'
     to: 'off'
-  condition:
-  - condition: template
-    value_template: '{{ not trigger.from_state.state in ["unknown", "unavailable"]
-      }}'
-  - condition: state
-    entity_id: remote.harmony_main_bedroom
-    state: 'on'
-  - condition: state
-    entity_id: remote.harmony_main_bedroom
-    attribute: current_activity
-    state: Shield TV
-  action:
-  - entity_id: remote.harmony_main_bedroom
-    action: remote.turn_off
-  mode: restart
+    id: media
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - remote
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        target:
+          entity_id: media_player.androidtv_main_bedroom
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - media
+      sequence:
+      - action: media_player.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id:
+          - media_player.main_bedroom_cast
+          - media_player.shield_main_bedroom
+  mode: single
 - id: '1665695943529'
   alias: ⏯ PS4 Harmony Activity
   description: Turns on the PS4 when the activity is active
@@ -895,6 +914,41 @@
         icon_color: '#009688'
       action: script.notify_tvoverlay
   mode: single
+- id: '1766442085353'
+  alias: ⚙️ Automation Fail Detector
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: system_log_event
+    event_data:
+      level: ERROR
+  conditions:
+  - condition: template
+    value_template: '{{ [''automation.'', ''script.''] | select(''in'', (trigger.event.data.name
+      | lower)) | list | count > 0 }}
+
+      '
+    enabled: true
+  - condition: template
+    value_template: '{{ not [''.automation_script_fail_detector''] | select(''in'',
+      trigger.event.data.name | lower) | list }}'
+  actions:
+  - action: persistent_notification.create
+    metadata: {}
+    data:
+      title: '{{ trigger.event.data.name.split(''.'')[2] }} has failed: {{ trigger.event.data.name
+        }}'
+      message: '>> {{ trigger.event.data.name }} <<
+
+        Error Message: {{ trigger.event.data.message }}
+
+        Source File: {{ trigger.event.data.source }}
+
+        Time: {{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}    {% if trigger.event.data.exception
+        != '''' %}Exception Details: {{ trigger.event.data.exception }}{% endif %}'
+  mode: queued
+  max: 20
+  max_exceeded: silent
 - id: '1665696751056'
   alias: ⚙️ Action Sniffer [Zigbee]
   description: Listen for Zigbee actions

@@ -742,7 +742,7 @@ Material Design 3 Theme for Home Assistant
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode 🚫
 - ⏯ Living Room Sound Night Mode 🚫
-- ⏯ Main Bedroom Media Auto Off
+- ⏯ Main Bedroom Media Off
 - ⏯ PS4 Harmony Activity
 - ⏯️ Samsung Soundbar Night Mode 🚫
 - ⏯️ Samsung Soundbar Voice Enhancer 🚫
@@ -759,6 +759,7 @@ Material Design 3 Theme for Home Assistant
 - ♨️ iBBQ Grill Alerts
 - ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
+- ⚙️ Automation Fail Detector
 - ⚙️ Battery Level Low
 - ⚙️ Clear TTS Cache 🚫
 - ⚙️ Disk Space Low
