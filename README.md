@@ -735,14 +735,13 @@ Material Design 3 Theme for Home Assistant
 <details><summary>151 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running
-- ⏯ Family Room Media Auto Off
 - ⏯ Family Room Media Off
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode
 - ⏯ Living Room Media Off
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode 🚫
-- ⏯ Living Room Sound Night Mode
+- ⏯ Living Room Sound Night Mode 🚫
 - ⏯ Main Bedroom Media Auto Off
 - ⏯ PS4 Harmony Activity
 - ⏯️ Samsung Soundbar Night Mode 🚫
