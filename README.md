@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5178 |
-| Sensors        | 1730 |
+| All Entities   | 5173 |
+| Sensors        | 1731 |
 | Binary Sensors | 352 |
-| Lights         | 81 |
-| Switches       | 750 |
+| Lights         | 77 |
+| Switches       | 745 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -734,7 +734,7 @@ Material Design 3 Theme for Home Assistant
 
 <details><summary>151 Automations</summary>
 
-- ⏯ Ensure Android TV Apps are Running
+- ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
 - ⏯ Family Room Media State at Night 🚫
 - ⏯ Family Room Sound Mode
@@ -833,7 +833,7 @@ Material Design 3 Theme for Home Assistant
 - 📅 Emma's Projector On/Off
 - 📅 Ethan's Projector On/Off
 - 📅 Garbage Collection Event Generator
-- 📅 Grow Light On/Off 🚫
+- 📅 Grow Light On/Off
 - 📅 Living Room Fan On/Off
 - 📅 Main Bedroom Fan On/Off
 - 📅 Update KidsChore UI Helpers

@@ -114,10 +114,6 @@
     - condition: state
       entity_id: media_player.denon_avr_s760h
       state: 'off'
-    - condition: state
-      entity_id: media_player.universal_family_room
-      attribute: source
-      state: nl.rogro82.pipup
   - condition: template
     value_template: '{{ sound_mode != state_attr("media_player.denon_avr_s760h", "sound_mode")
       }}'
@@ -450,6 +446,13 @@
     trigger: mqtt
   conditions: []
   actions:
+  - variables:
+      title: Cat Feeder
+      message: The Cat feeder was refilled
+      icon: local/icons/paw.png
+      icon_mdi: mdi:paw
+      color: '#ff9800'
+      tag: cat-feeder
   - metadata: {}
     data:
       value: '0'
@@ -460,26 +463,26 @@
     - metadata: {}
       data:
         send_to: parents
-        title: Cat Feeder
-        message: The Cat feeder was refilled
-        notification_icon: mdi:paw
-        color: '#FF9800'
-        icon: local/icons/paw.png
-        tag: cat-feeder
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - metadata: {}
       data:
         entity:
         - media_player.nasya
-        title: Cat Feeder
-        message: The Cat feeder was refilled
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Cat Feeder
-        message: The Cat feeder was refilled
-        icon: local/icons/paw.png
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon }}'
       action: script.notify_lnxlink
   mode: single
 - id: '1665680853122'
@@ -493,6 +496,10 @@
   - event_type: hass_agent_notifications
     event_data:
       action: close_garage_door
+    trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: close_garage_door
     trigger: event
   - topic: lnxlink/+/monitor_controls/notify/button_press
     payload: Garage Door Close Door
@@ -541,6 +548,8 @@
   condition: []
   action:
   - variables:
+      title: '{{ type }} Collection'
+      message: The {{ type }} can is at the curb
       tag: '{{ trigger.event.data.tag }}'
       type: '{{ iif(tag == ''recycle_collection'', ''Recycling'', ''Garbage'') }}'
   - target:
@@ -549,8 +558,8 @@
   - parallel:
     - data:
         send_to: parents
-        title: '{{ type }} Collection'
-        message: The {{ type }} can is at the curb
+        title: '{{ title }}'
+        message: '{{ message }}'
         notification_icon: '{{ trigger.event.data.notification_icon }}'
         color: '{{ trigger.event.data.color }}'
         icon: '{{ trigger.event.data.icon_url }}'
@@ -560,14 +569,14 @@
     - data:
         entity:
         - media_player.nasya
-        title: '{{ type }} Collection'
-        message: The {{ type }} can is at the curb
+        title: '{{ title }}'
+        message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: '{{ type }} Collection'
-        message: The {{ type }} can is at the curb
+        title: '{{ title }}'
+        message: '{{ message }}'
         icon: '{{ trigger.event.data.icon_url }}'
       action: script.notify_lnxlink
   mode: single
@@ -632,12 +641,25 @@
     event_data:
       action: ignore_door_alerts
     trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: ignore_door_alerts
+    trigger: event
   - topic: lnxlink/+/monitor_controls/notify/button_press
     payload: Ignore Door Alerts
     value_template: '{{ value_json.button }}'
     trigger: mqtt
   conditions: []
   actions:
+  - variables:
+      title: Door Alerts Ignored
+      message: The Door Open alerts have been ignored until all doors are closed
+      icon: local/icons/door-open.png
+      icon_mdi: mdi:door-open
+      color: '#00bcd4'
+      tag: door-alerts-ignored
+      group: Security
+      channel: Security
   - target:
       entity_id: input_boolean.door_open_alerts
     data: {}
@@ -653,26 +675,34 @@
       action: script.notify_mobile
   - data:
       send_to: parents
-      title: Door Alerts Ignored
-      message: The Door Open alerts have been ignored until all doors are closed
-      icon: local/icons/door-open.png
-      group: Security
-      channel: Security
-      tag: door-alerts-ignored
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      channel: '{{ channel }}'
+      tag: '{{ tag }}'
     action: script.notify_mobile
   - data:
       entity:
       - media_player.nasya
-      title: Door Alerts Ignored
-      message: The Door Open alerts have been ignored until all doors are closed
+      title: '{{ title }}'
+      message: '{{ message }}'
     action: script.notify_hass_agent
   - data:
       computer:
       - erebus
-      title: Door Alerts Ignored
-      message: The Door Open alerts have been ignored until all doors are closed
-      icon: local/icons/door-open.png
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon }}'
     action: script.notify_lnxlink
+  - data:
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon_mdi }}'
+      background_color: '{{ color }}'
+    action: script.notify_quickbars
   mode: single
 - id: '1665681539044'
   alias: ☑️ Ignore Garage Door Alerts
@@ -686,12 +716,26 @@
     event_data:
       action: ignore_garage_door_alerts
     trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: ignore_garage_door_alerts
+    trigger: event
   - topic: lnxlink/+/monitor_controls/notify/button_press
     payload: Garage Door Ignore Alerts
     value_template: '{{ value_json.title ~ '' '' ~ value_json.button }}'
     trigger: mqtt
   conditions: []
   actions:
+  - variables:
+      title: Garage Door Alerts Ignored
+      message: The Garage Door Open alerts have been ignored until the Garage Door
+        is closed
+      icon: local/icons/garage-open.png
+      icon_mdi: mdi:garage-open
+      color: '#ff9800'
+      tag: garage-door-alerts-ignored
+      group: Security
+      channel: Security
   - target:
       entity_id: input_boolean.garage_door_open_alerts
     data: {}
@@ -703,29 +747,34 @@
     action: script.notify_mobile
   - data:
       send_to: parents
-      title: Garage Door Alerts Ignored
-      message: The Garage Door Open alerts have been ignored until the Garage Door
-        is closed
-      icon: local/icons/garage-open.png
-      group: Security
-      channel: Security
-      tag: garage-door-alerts-ignored
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      channel: '{{ channel }}'
+      tag: '{{ tag }}'
     action: script.notify_mobile
   - data:
       entity:
       - media_player.nasya
-      title: Garage Door Alerts Ignored
-      message: The Garage Door Open alerts have been ignored until the Garage Door
-        is closed
+      title: '{{ title }}'
+      message: '{{ message }}'
     action: script.notify_hass_agent
   - data:
       computer:
       - erebus
-      title: Garage Door Alerts Ignored
-      message: The Garage Door Open alerts have been ignored until the Garage Door
-        is closed
-      icon: local/icons/garage-open.png
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon }}'
     action: script.notify_lnxlink
+  - data:
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon_mdi }}'
+      background_color: '{{ color }}'
+    action: script.notify_quickbars
   mode: single
 - id: '1665683799664'
   alias: ☑️ Ignore Window Alerts
@@ -744,6 +793,15 @@
     value_template: '{{ value_json.button }}'
     trigger: mqtt
   actions:
+  - variables:
+      title: Window Alerts Ignored
+      message: The Window Open alerts have been ignored until all windows are closed
+      mdi_icon: mdi:window-open
+      color: '#9c27b0'
+      icon: local/icons/window-open.png
+      group: Security
+      channel: Security
+      tag: window-alerts-ignored
   - target:
       entity_id: input_boolean.window_open_alerts
     data: {}
@@ -759,28 +817,34 @@
       action: script.notify_mobile
   - data:
       send_to: parents
-      title: Window Alerts Ignored
-      message: The Window Open alerts have been ignored until all windows are closed
-      notification_icon: mdi:window-open
-      color: '#9c27b0'
-      icon: local/icons/window-open.png
-      group: Security
-      channel: Security
-      tag: window-alerts-ignored
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ mdi_icon }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      channel: '{{ channel }}'
+      tag: '{{ tag }}'
     action: script.notify_mobile
   - data:
       entity:
       - media_player.nasya
-      title: Window Alerts Ignored
-      message: The Window Open alerts have been ignored until all windows are closed
+      title: '{{ title }}'
+      message: '{{ message }}'
     action: script.notify_hass_agent
   - data:
       computer:
       - erebus
-      title: Window Alerts Ignored
-      message: The Window Open alerts have been ignored until all windows are closed
-      icon: local/icons/window-open.png
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon }}'
     action: script.notify_lnxlink
+  - data:
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon_mdi }}'
+      background_color: '{{ color }}'
+    action: script.notify_quickbars
 - id: '1665681550417'
   alias: ☑️ Retry Remote Start Ascent
   description: Starts the Ascent (usually after a failure) when the action is pressed
@@ -792,6 +856,10 @@
   - event_type: hass_agent_notifications
     event_data:
       action: ascent_remote_start_again
+    trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: ascent_remote_start_again
     trigger: event
   conditions: []
   actions:
@@ -821,6 +889,10 @@
     event_data:
       action: kona_remote_start_again
     trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: kona_remote_start_again
+    trigger: event
   conditions: []
   actions:
   - parallel:
@@ -848,6 +920,10 @@
     event_data:
       action: turn_on_water
     trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: turn_on_water
+    trigger: event
   - topic: lnxlink/+/monitor_controls/notify/button_press
     payload: Turn Water Main On
     value_template: '{{ value_json.button }}'
@@ -857,6 +933,11 @@
   - variables:
       title: Water Main
       message: The water main has been turned back on after the leak was detected.
+      mdi_icon: mdi:water-alert
+      color: '#009688'
+      icon: local/icons/water-alert.png
+      group: Water Leak
+      tag: water-leak
   - parallel:
     - target:
         entity_id: valve.water_main_valve
@@ -865,10 +946,10 @@
     - data:
         send_to: parents
         notification_type: clear_notification
-        tag: water-leak
+        tag: '{{ tag }}'
       action: script.notify_mobile
     - data:
-        notification_id: water-leak
+        notification_id: '{{ tag }}'
       action: persistent_notification.dismiss
   - wait_for_trigger:
     - entity_id:
@@ -881,10 +962,10 @@
         send_to: parents
         title: '{{ title }}'
         message: '{{ message }}'
-        notification_icon: mdi:water-alert
-        color: '#009688'
-        icon: local/icons/water-alert.png
-        group: Water Leak
+        notification_icon: '{{ mdi_icon }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
         interruption_level: critical
         tag: water-leak-main-on
       action: script.notify_mobile
@@ -899,20 +980,15 @@
         - erebus
         title: '{{ title }}'
         message: '{{ message }}'
-        icon: local/icons/water-alert.png
+        icon: '{{ icon }}'
         importance: critical
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: water-leak-main-on
-        large_icon: local/icons/water-alert.png
-        icon_color: '#009688'
-      action: script.notify_tvoverlay
+        icon: '{{ mdi_icon }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   mode: single
 - id: '1766442085353'
   alias: ⚙️ Automation Fail Detector
@@ -1669,7 +1745,7 @@
   - variables:
       title: Network
       message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
-        }}. Be sure to update Namecheap API for SSL renewals!
+        }}.
       icon: local/icons/web.png
       icon_mdi: mdi:web
       color: '#e91e63'
@@ -1719,10 +1795,6 @@
       color: '#e91e63'
       tag: unifi-www
       group: Network
-      tv_entities:
-      - media_player.shield_living_room
-      - media_player.shield_family_room
-      - media_player.shield_main_bedroom
   - choose:
     - conditions:
       - condition: trigger
@@ -1742,13 +1814,11 @@
             tag: '{{ tag }}'
           action: script.notify_mobile
         - data:
-            entity: '{{ tv_entities }}'
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
         - data:
             entity:
             - media_player.nasya
@@ -1780,13 +1850,11 @@
             tag: '{{ tag }}'
           action: script.notify_mobile
         - data:
-            entity: '{{ tv_entities }}'
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
         - data:
             entity:
             - media_player.nasya
@@ -1909,16 +1977,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
     alias: Send a notification to each device
   mode: single
   max_exceeded: silent
@@ -1998,28 +2061,22 @@
     - data:
         entity:
         - media_player.nasya
-        title: Oven
+        title: '{{ title }}'
         message: '{{ message }}'
       action: script.notify_hass_agent
     - data:
         computer:
         - erebus
-        title: Oven
+        title: '{{ title }}'
         message: '{{ message }}'
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: Oven
+        title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      alias: Send a notification to each device
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   mode: single
 - id: '1737664900410'
   alias: "\U0001F37D️ Oven Cook Timer"
@@ -2142,17 +2199,12 @@
         title: '{{ title }}'
         message: '{{ message }}'
         icon: '{{ icon }}'
-    - action: script.notify_tvoverlay
+    - action: script.notify_quickbars
       data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
   mode: single
 - id: '1723165470472'
   alias: "\U0001F37D️ Oven is Preheated"
@@ -2198,16 +2250,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   mode: single
 - id: '1665697728164'
   alias: "\U0001F384 XMas Lights On/Off"
@@ -2363,6 +2410,9 @@
       color: '#ff9800'
       tag: cat-feeder
       group: Cat Feeder
+      notification_actions:
+      - action: cat_feeder_full
+        title: Feeder Full
   - parallel:
     - metadata: {}
       data:
@@ -2373,9 +2423,7 @@
         color: '{{ color }}'
         icon: '{{ icon }}'
         tag: '{{ tag }}'
-        actions:
-        - action: cat_feeder_full
-          title: Feeder Full
+        actions: '{{ notification_actions }}'
       action: script.notify_mobile
     - metadata: {}
       data:
@@ -2383,9 +2431,7 @@
         - media_player.nasya
         title: '{{ title }}'
         message: '{{ message }}'
-        actions:
-        - action: cat_feeder_full
-          title: Feeder Full
+        actions: '{{ notification_actions }}'
       action: script.notify_hass_agent
     - data:
         computer:
@@ -2835,16 +2881,11 @@
         importance: critical
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
     - data:
         media_player:
         - media_player.living_room_speaker
@@ -2936,8 +2977,9 @@
       icon_mdi: mdi:water-alert
       color: '#009688'
       group: Water Leak
+      channel: Water Leak
       tag: water-leak
-      actions_water:
+      notification_actions:
       - action: turn_on_water
         title: Turn Water Main On
   - parallel:
@@ -2950,17 +2992,6 @@
         message: '{{ message }}'
         notification_id: '{{ tag }}'
       action: persistent_notification.create
-    - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: '{{ title }}'
-        message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
     - data:
         media_player:
         - media_player.living_room_speaker
@@ -2985,17 +3016,17 @@
       tag: '{{ tag }}'
       car_ui: true
       interruption_level: critical
-      channel: Water Leak
+      channel: '{{ channel }}'
       importance: high
       url: lovelace/utility
-      actions: '{{ actions_water }}'
+      actions: '{{ notification_actions }}'
     action: script.notify_mobile
   - data:
       entity:
       - media_player.nasya
       title: '{{ title }}'
       message: '{{ message }}'
-      actions: '{{ actions_water }}'
+      actions: '{{ notification_actions }}'
     action: script.notify_hass_agent
   - data:
       computer:
@@ -3008,6 +3039,14 @@
       actions:
       - Turn Water Main On
     action: script.notify_lnxlink
+  - data:
+      title: '{{ title }}'
+      message: '{{ message }}'
+      icon: '{{ icon_mdi }}'
+      background_color: '{{ color }}'
+      action_1_id: '{{ notification_actions[0].action }}'
+      action_1_title: '{{ notification_actions[0].title }}'
+    action: script.notify_quickbars
   - delay:
       minutes: 5
   mode: single
@@ -3040,6 +3079,9 @@
         car is already running.\n{%- elif '500' in trigger.event.data.message -%}\n
         \ The service is offline.\n{%- elif 'unknown' in trigger.event.data.message
         -%}\n  I have no idea why. Please try again.\n{% endif %}"
+      notification_actions:
+      - action: ascent_remote_start_again
+        title: Retry
   - parallel:
     - data:
         send_to: parents
@@ -3051,9 +3093,7 @@
         group: '{{ group }}'
         tag: '{{ tag }}'
         url: '{{ url }}'
-        actions:
-        - action: ascent_remote_start_again
-          title: Retry
+        actions: '{{ notification_actions }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -3063,16 +3103,13 @@
       then:
       - parallel:
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+            action_1_id: '{{ notification_actions[0].action }}'
+            action_1_title: '{{ notification_actions[0].title }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -3166,6 +3203,9 @@
       tag: ascent
       group: Ascent
       url: lovelace#ascent
+      notification_actions:
+      - action: ascent_remote_start_again
+        title: Start Again
   - parallel:
     - data:
         send_to: parents
@@ -3178,9 +3218,7 @@
         interruption_level: critical
         tag: '{{ tag }}'
         url: '{{ url }}'
-        actions:
-        - action: ascent_remote_start_again
-          title: Start Again
+        actions: '{{ notification_actions }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -3190,16 +3228,13 @@
       then:
       - parallel:
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+            action_1_id: '{{ notification_actions[0].action }}'
+            action_1_title: '{{ notification_actions[0].title }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -3250,16 +3285,11 @@
       then:
       - parallel:
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -3565,6 +3595,9 @@
           tag: door-{{ trigger.to_state.object_id }}
           group: Security
           url: lovelace/security
+          notification_actions:
+          - action: ignore_door_alerts
+            title: Ignore Alerts
       - parallel:
         - data:
             send_to: parents
@@ -3579,18 +3612,14 @@
             interruption_level: critical
             tag: '{{ tag }}'
             url: '{{ url }}'
-            actions:
-            - action: ignore_door_alerts
-              title: Ignore Alerts
+            actions: '{{ notification_actions }}'
           action: script.notify_mobile
         - data:
             entity:
             - media_player.nasya
             title: '{{ title }}'
             message: '{{ message }}'
-            actions:
-            - action: ignore_door_alerts
-              title: Ignore Alerts
+            actions: '{{ notification_actions }}'
           action: script.notify_hass_agent
         - data:
             computer:
@@ -3603,16 +3632,13 @@
             - Ignore Door Alerts
           action: script.notify_lnxlink
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+            action_1_id: '{{ notification_actions[0].action }}'
+            action_1_title: '{{ notification_actions[0].title }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -3822,16 +3848,15 @@
             - Close Door
           action: script.notify_lnxlink
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+            action_1_id: '{{ notification_actions[0].action }}'
+            action_1_title: '{{ notification_actions[0].title }}'
+            action_2_id: '{{ notification_actions[1].action }}'
+            action_2_title: '{{ notification_actions[1].title }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -4199,15 +4224,13 @@
       then:
       - parallel:
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+            action_1_id: '{{ notification_actions[0].action }}'
+            action_1_title: '{{ notification_actions[0].title }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -4319,15 +4342,13 @@
         actions: '{{ notification_actions }}'
       action: script.notify_mobile
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+        action_1_id: '{{ notification_actions[0].action }}'
+        action_1_title: '{{ notification_actions[0].title }}'
+      action: script.notify_quickbars
     - data:
         media_player:
         - media_player.living_room_speaker
@@ -4378,15 +4399,11 @@
       then:
       - parallel:
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -4486,16 +4503,13 @@
             - Ignore Window Alerts
           action: script.notify_lnxlink
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+            action_1_id: '{{ notification_actions[0].action }}'
+            action_1_title: '{{ notification_actions[0].title }}'
+          action: script.notify_quickbars
         - data:
             media_player:
             - media_player.living_room_speaker
@@ -5377,16 +5391,11 @@
                 icon: '{{ icon }}'
               action: script.notify_lnxlink
             - data:
-                entity:
-                - media_player.shield_living_room
-                - media_player.shield_family_room
-                - media_player.shield_main_bedroom
                 title: '{{ title }}'
                 message: '{{ message }}'
-                tag: '{{ tag }}'
-                large_icon: '{{ icon }}'
-                icon_color: '{{ color }}'
-              action: script.notify_tvoverlay
+                icon: '{{ notification_icon }}'
+                background_color: '{{ color }}'
+              action: script.notify_quickbars
             - alias: If nearly_arrived_tts enabled, someone is home, TTS devices are
                 set
               if:
@@ -5438,6 +5447,7 @@
           variables:
             message: '{{ strings.itinerary_ongoing.format(driver_name=driver_name,
               arrival=arrival, remaining_minutes=remaining_minutes) }}'
+            notification_icon: mdi:map-marker-account
         - alias: Send ETA notification
           parallel:
           - data:
@@ -5445,7 +5455,7 @@
               location: home
               title: '{{ title }}'
               message: '{{ message }}'
-              notification_icon: mdi:map-marker-account
+              notification_icon: '{{ notification_icon }}'
               color: '{{ color }}'
               group: '{{ group }}'
               channel: '{{ channel }}'
@@ -5471,16 +5481,11 @@
               icon: '{{ icon }}'
             action: script.notify_lnxlink
           - data:
-              entity:
-              - media_player.shield_living_room
-              - media_player.shield_family_room
-              - media_player.shield_main_bedroom
               title: '{{ title }}'
               message: '{{ message }}'
-              tag: '{{ tag }}'
-              large_icon: '{{ icon }}'
-              icon_color: '{{ color }}'
-            action: script.notify_tvoverlay
+              icon: '{{ notification_icon }}'
+              background_color: '{{ color }}'
+            action: script.notify_quickbars
           - data:
               media_player: '{{ speaker_tts_devices }}'
               message: '{{ message }}'
@@ -5499,6 +5504,7 @@
     - alias: Get driver arrived message
       variables:
         message: '{{ strings.driver_arrived.format(driver_name=driver_name) }}'
+        notification_icon: mdi:home-map-marker
     - alias: Send arrival notification
       parallel:
       - data:
@@ -5506,7 +5512,7 @@
           location: home
           title: '{{ title }}'
           message: '{{ message }}'
-          notification_icon: mdi:home-map-marker
+          notification_icon: '{{ notification_icon }}'
           color: '{{ color }}'
           group: '{{ group }}'
           channel: '{{ channel }}'
@@ -5529,16 +5535,11 @@
           icon: '{{ icon }}'
         action: script.notify_lnxlink
       - data:
-          entity:
-          - media_player.shield_living_room
-          - media_player.shield_family_room
-          - media_player.shield_main_bedroom
           title: '{{ title }}'
           message: '{{ message }}'
-          tag: '{{ tag }}'
-          large_icon: '{{ icon }}'
-          icon_color: '{{ color }}'
-        action: script.notify_tvoverlay
+          icon: '{{ notification_icon }}'
+          background_color: '{{ color }}'
+        action: script.notify_quickbars
     - alias: If driver_arrived_tts enabled, someone is home, TTS devices are set
       if:
       - condition: template
@@ -5629,18 +5630,13 @@
         camera: '{{ camera }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
+        icon: '{{ icon_mdi }}'
         image: '{{ image }}'
-        large_icon: '{{ icon_mdi }}'
-        icon_color: '{{ color }}'
+        background_color: '{{ color }}'
         duration: 15
-      action: script.notify_tvoverlay
+      action: script.notify_quickbars
   mode: single
 - id: '1665682414590'
   alias: "\U0001F4E6 Mail Today"
@@ -5695,18 +5691,13 @@
         camera: '{{ camera }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
+        icon: '{{ icon_mdi }}'
         image: '{{ image }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
+        background_color: '{{ color }}'
         duration: 15
-      action: script.notify_tvoverlay
+      action: script.notify_quickbars
   mode: single
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
@@ -5755,16 +5746,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   mode: single
 - id: '1665682458887'
   alias: "\U0001F4E6 Packages Out for Delivery"
@@ -5813,16 +5799,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   mode: single
 - id: '1665685653869'
   alias: "\U0001F4E6 Update USPS Mail Camera"
@@ -5890,15 +5871,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
     - data:
         media_player:
         - media_player.living_room_speaker
@@ -6099,14 +6076,11 @@
         importance: critical
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
-        title: '{{ title }}'
-        message: '{{ message }}'
-        video: '{{ camera }}'
-      action: script.notify_pipup
+        camera_entity: '{{ camera }}'
+        camera_title: '{{ title }}'
+        size_mode: preset
+        size: large
+      action: script.notify_quickbars_camera
     - if:
       - condition: state
         entity_id: light.wled_joshua_office_desk
@@ -6204,15 +6178,14 @@
         - Silence Doorbell
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ message }}'
-        tag: '{{ id }}{{ ''-loitering'' if loitering }}'
-        image: '{{ image }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        image: '{{ image }}?format=android'
+        background_color: '{{ color }}'
+        action_1_id: silence_doorbell
+        action_1_title: Silence Doorbell
+      action: script.notify_quickbars
     - if:
       - condition: trigger
         id:
@@ -6253,13 +6226,17 @@
     trigger: mqtt
   - event_type: mobile_app_notification_action
     event_data:
-      action: silence-doorbell
+      action: silence_doorbell
     id: silence
     trigger: event
   - event_type: hass_agent_notifications
     event_data:
-      action: silence-doorbell
+      action: silence_doorbell
     id: silence
+    trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: silence_doorbell
     trigger: event
   - topic: lnxlink/+/monitor_controls/notify/button_press
     payload: Silence Doorbell
@@ -6303,12 +6280,14 @@
             title: Doorbell Motion Silenced
             message: Motion notifications have been silenced for {{ silence_timer
               }} minutes.
+            notification_icon: mdi:doorbell-video
+            color: '#e91e63'
         - data:
             send_to: parents
             title: '{{ title }}'
             message: '{{ message }}'
-            notification_icon: mdi:doorbell-video
-            color: '#e91e63'
+            notification_icon: '{{ notification_icon }}'
+            color: '{{ color }}'
             group: '{{ camera_name }} Notification'
             car_ui: true
             interruption_level: critical
@@ -6330,15 +6309,11 @@
             importance: critical
           action: script.notify_lnxlink
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ message }}'
-            large_icon: local/icons/doorbell-video.png
-            icon_color: '#e91e63'
-          action: script.notify_tvoverlay
+            icon: '{{ notification_icon }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
       - target:
           entity_id: '{{ this.entity_id }}'
         data:
@@ -7605,16 +7580,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ summary }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   - wait_for_trigger:
     - trigger: state
       entity_id: binary_sensor.dryer_contact
@@ -7658,16 +7628,11 @@
             icon: '{{ icon }}'
           action: script.notify_lnxlink
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ reminder_message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
       - choose:
         - alias: Check reminder notification entity is OFF and max count is less before
             waiting
@@ -7754,16 +7719,11 @@
       action: script.notify_lnxlink
       enabled: false
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ attended_message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
       enabled: false
   mode: single
   max_exceeded: silent
@@ -7859,16 +7819,11 @@
         icon: '{{ icon }}'
       action: script.notify_lnxlink
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ summary }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
   - wait_for_trigger:
     - trigger: state
       entity_id: binary_sensor.washer_contact
@@ -7912,16 +7867,11 @@
             icon: '{{ icon }}'
           action: script.notify_lnxlink
         - data:
-            entity:
-            - media_player.shield_living_room
-            - media_player.shield_family_room
-            - media_player.shield_main_bedroom
             title: '{{ title }}'
             message: '{{ reminder_message }}'
-            tag: '{{ tag }}'
-            large_icon: '{{ icon }}'
-            icon_color: '{{ color }}'
-          action: script.notify_tvoverlay
+            icon: '{{ icon_mdi }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
       - choose:
         - alias: Check reminder notification entity is OFF and max count is less before
             waiting
@@ -8008,16 +7958,11 @@
       action: script.notify_lnxlink
       enabled: false
     - data:
-        entity:
-        - media_player.shield_living_room
-        - media_player.shield_family_room
-        - media_player.shield_main_bedroom
         title: '{{ title }}'
         message: '{{ attended_message }}'
-        tag: '{{ tag }}'
-        large_icon: '{{ icon }}'
-        icon_color: '{{ color }}'
-      action: script.notify_tvoverlay
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+      action: script.notify_quickbars
       enabled: false
   mode: single
   max_exceeded: silent

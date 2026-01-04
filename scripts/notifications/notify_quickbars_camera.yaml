@@ -1,0 +1,585 @@
+---
+notify_quickbars_camera:
+  alias: '[Notify] QuickBars Camera'
+  description: 'Show camera on devices with QuickBars.'
+  icon: mdi:picture-in-picture-top-right
+  mode: parallel
+
+  fields:
+    app_id:
+      name: 'QuickBars App ID'
+      description: '8-character ID from the TV app (Settings → "QuickBars App ID"). Leave blank to broadcast to all QuickBars devices on the local network.'
+      selector:
+        select:
+          mode: dropdown
+          multiple: true
+          custom_value: true
+          options:
+            - label: Living Room TV
+              value: '9JDTWVEM'
+            - label: Family Room TV
+              value: 'QMN96VDM'
+            - label: Main Bedroom TV
+              value: 'XTCQQJO4'
+
+    # Camera
+    camera_entity:
+      name: Camera Entity
+      description: This camera entity must be imported to the QuickBars app.
+      selector:
+        entity:
+          filter:
+            - domain: camera
+
+    camera_alias:
+      name: Camera Alias (QuickBars)
+      description: Use the camera alias defined in the QuickBars app.
+      selector:
+        text:
+
+    rtsp_url:
+      name: RTSP URL
+      description: "Example: rtsp://user:pass@host:554/path"
+      selector:
+        text:
+
+    # Advanced RTSP Settings
+    mute_audio:
+      name: Mute Camera Audio
+      description: Mutes audio from the camera feed.
+      selector:
+        boolean:
+
+    rtsp_transport:
+      name: Transport Protocol
+      description: "TCP is recommended for Home Assistant to prevent artifacts/smearing. UDP is faster but requires a stable WiFi."
+      default: udp
+      selector:
+        select:
+          options:
+            - label: TCP (Recommended)
+              value: tcp
+            - label: UDP (Faster, Low Latency)
+              value: udp
+            - label: Auto
+              value: auto
+
+    rtsp_latency:
+      name: Stream Latency / Buffer
+      description: "Low = 500ms buffer (fast). Balanced = 1s buffer. High = 2.5s buffer (fixes stuttering)."
+      default: balanced
+      selector:
+        select:
+          options:
+            - label: Low Latency
+              value: low
+            - label: Balanced (Standard)
+              value: balanced
+            - label: High Stability
+              value: high
+
+    software_decoder:
+      name: Force Software Decoder
+      description: "Try enabling this if you don't see any stream. Forces the CPU to decode video (requires higher processing power and may cause stuttering)."
+      selector:
+        boolean:
+
+    # Size & Position
+    position:
+      name: Position
+      description: Screen corner for the PiP window.
+      default: top_left
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: Top Left
+              value: 'top_left'
+            - label: Top Right
+              value: 'top_right'
+            - label: Bottom Left
+              value: 'bottom_left'
+            - label: Bottom Right
+              value: 'bottom_right'
+
+    size_mode:
+      name: Size Mode
+      description: |-
+        Choose how to size the camera PiP window:
+        - Auto: Existing camera size setting in QuickBars app (if imported camera) or default size.
+        - Preset: Choose from predefined sizes (small, medium, large).
+        - Custom: Specify exact width and height in pixels (can be used to support non-standard aspect ratios).
+      default: auto
+      selector:
+        select:
+          options:
+            - label: Auto
+              value: auto
+            - label: Preset
+              value: preset
+            - label: Custom
+              value: custom
+
+    size:
+      name: Size Preset
+      description: Used only when Size mode = preset. Choose from predefined sizes.
+      selector:
+        select:
+          options:
+            - small
+            - medium
+            - large
+
+    custom_width:
+      name: Custom Width (pixels)
+      description: Used only when Size mode = custom. Width in pixels (48-3840).
+      selector:
+        number:
+          min: 48
+          max: 3840
+          step: 1
+          unit_of_measurement: px
+
+    custom_height:
+      name: Custom Height (pixels)
+      description: Used only when Size mode = custom. Height in pixels (48-2160).
+      selector:
+        number:
+          min: 48
+          max: 2160
+          step: 1
+          unit_of_measurement: px
+
+    # Behavior
+    auto_hide:
+      name: Auto-hide (seconds)
+      description: Seconds before the camera automatically hides. Set to 0 to never auto-hide, requiring manual dismissal.
+      selector:
+        number:
+          min: 0
+          max: 300
+          step: 1
+          unit_of_measurement: seconds
+
+    show_title:
+      name: Show Camera Title
+      description: Whether to show the camera's title in the PiP window.
+      default: true
+      selector:
+        boolean:
+
+    camera_title:
+      name: Custom Camera Title
+      description: Optional custom title to display in the camera title bar (used when "Show camera title" is enabled). Leave blank to use the default camera name.
+      selector:
+        text:
+
+    show_toast:
+      name: Show Camera Toggle Toast
+      description: Whether to show a brief toast (pop-up message) when the camera PiP is toggled.
+      selector:
+        boolean:
+
+    enable_debug:
+      name: Enable debug output?
+      selector:
+        constant:
+          value: true
+          label: Enabled
+
+  sequence:
+    # Validation: Check that appropriate source is provided
+    - variables:
+        debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+        app_id: '{{ app_id | default([]) }}'
+        app_id_list: >
+          {% set app_ids = namespace(names=[]) %}
+          {% if app_id %}
+            {# Convert to a list #}
+            {% if ',' in app_id %}
+              {% set app_id_num = app_id.split(',') | count %}
+              {% for i in range(0, app_id_num) %}
+                {% set app_ids.names = app_ids.names + [app_id.split(',')[i] | string | trim ] %}
+              {% endfor %}
+            {% elif app_id[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+              {% set app_ids.names = app_ids.names + [app_id | string | trim] %}
+            {% else %}
+              {% set app_ids.names = app_id %}
+            {% endif %}
+          {% endif %}
+          {{ app_ids.names | unique | list | upper }}
+
+        source_type: >
+          {% if camera_entity is defined and camera_entity | string | trim %}
+            entity
+          {% elif camera_alias is defined and camera_alias | string | trim %}
+            alias
+          {% elif rtsp_url is defined and rtsp_url | string | trim %}
+            rtsp
+          {% else %}
+            none
+          {% endif %}
+
+        mute_audio: "{{ iif(mute_audio is defined, mute_audio, false) }}"
+        rtsp_transport: "{{ iif(rtsp_transport is defined, rtsp_transport, 'udp') }}"
+        rtsp_latency: "{{ iif(rtsp_latency is defined, rtsp_latency, 'balanced') }}"
+        software_decoder: "{{ iif(software_decoder is defined, software_decoder, false) }}"
+        position: "{{ iif(position is defined, position, 'top_left') }}"
+        size_mode: "{{ iif(size_mode is defined, size_mode, 'auto') }}"
+        size: "{{ iif(size is defined, size, 'medium') }}"
+        custom_width: "{{ iif(custom_width is defined, custom_width, iif(size_mode == 'custom', 640, '')) }}"
+        custom_height: "{{ iif(custom_height is defined, custom_height, iif(size_mode == 'custom', 360, '')) }}"
+        auto_hide: "{{ iif(auto_hide is defined, auto_hide, 30) }}"
+        show_title: "{{ iif(show_title is defined, show_title, true) }}"
+        camera_title: "{{ iif(camera_title is defined, camera_title, '') }}"
+        show_toast: "{{ iif(show_toast is defined, show_toast, false) }}"
+
+    - alias: Set enable_debug = true above to provide output troubleshooting information.
+      if:
+        - condition: template
+          value_template: '{{ debug == true }}'
+      then:
+        - action: persistent_notification.create
+          data:
+            notification_id: 'notify_quickbars_camera'
+            title: 'DEBUG: script.notify_quickbars_camera'
+            message: |-
+              app_id_list: {{ app_id_list }}
+              camera_entity: {{ camera_entity }}
+              camera_alias: {{ camera_alias }}
+              rtsp_url: {{ rtsp_url }}
+              source_type: {{ source_type }}
+              mute_audio: {{ mute_audio }}
+              rtsp_transport: {{ rtsp_transport }}
+              rtsp_latency: {{ rtsp_latency }}
+              software_decoder: {{ software_decoder }}
+              position: {{ position }}
+              size_mode: {{ size_mode }}
+              size: {{ size }}
+              custom_width: {{ custom_width }}
+              custom_height: {{ custom_height }}
+              auto_hide: {{ auto_hide }}
+              show_title: {{ show_title }}
+              camera_title: {{ camera_title }}
+              show_toast: {{ show_toast }}
+
+    # Fire event with or without app_id
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ (app_id | string | trim) | length > 0 }}"
+          sequence:
+            - alias: Loop through app_id_list
+              repeat:
+                for_each: '{{ app_id_list }}'
+                sequence:
+                  - choose:
+                      # Entity + Custom
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'entity' and size_mode == 'custom' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              camera_entity: "{{ camera_entity }}"
+                              position: "{{ position }}"
+                              size_px:
+                                w: "{{ (custom_width | int) }}"
+                                h: "{{ (custom_height | int) }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+
+                      # Entity + Preset
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'entity' and size_mode == 'preset' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              camera_entity: "{{ camera_entity }}"
+                              position: "{{ position }}"
+                              size: "{{ size }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+
+                      # Entity + Auto
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'entity' and size_mode == 'auto' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              camera_entity: "{{ camera_entity }}"
+                              position: "{{ position }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+
+                      # Alias + Custom
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'alias' and size_mode == 'custom' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              camera_alias: "{{ camera_alias }}"
+                              position: "{{ position }}"
+                              size_px:
+                                w: "{{ (custom_width | int) }}"
+                                h: "{{ (custom_height | int) }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+
+                      # Alias + Preset
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'alias' and size_mode == 'preset' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              camera_alias: "{{ camera_alias }}"
+                              position: "{{ position }}"
+                              size: "{{ size }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+
+                      # Alias + Auto
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'alias' and size_mode == 'auto' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              camera_alias: "{{ camera_alias }}"
+                              position: "{{ position }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+
+                      # RTSP + Custom
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'rtsp' and size_mode == 'custom' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              rtsp_url: "{{ rtsp_url }}"
+                              position: "{{ position }}"
+                              size_px:
+                                w: "{{ (custom_width | int) }}"
+                                h: "{{ (custom_height | int) }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+                              mute_audio: "{{ mute_audio }}"
+                              rtsp_transport: "{{ rtsp_transport }}"
+                              rtsp_latency: "{{ rtsp_latency }}"
+                              software_decoder: "{{ software_decoder }}"
+
+                      # RTSP + Preset
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'rtsp' and size_mode == 'preset' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              rtsp_url: "{{ rtsp_url }}"
+                              position: "{{ position }}"
+                              size: "{{ size }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+                              mute_audio: "{{ mute_audio }}"
+                              rtsp_transport: "{{ rtsp_transport }}"
+                              rtsp_latency: "{{ rtsp_latency }}"
+                              software_decoder: "{{ software_decoder }}"
+
+                      # RTSP + Auto
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ source_type == 'rtsp' and size_mode == 'auto' }}"
+                        sequence:
+                          - event: quickbars.open
+                            event_data:
+                              id: "{{ repeat.item }}"
+                              rtsp_url: "{{ rtsp_url }}"
+                              position: "{{ position }}"
+                              auto_hide: "{{ (auto_hide | int) }}"
+                              show_title: "{{ show_title }}"
+                              camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                              show_toast: "{{ show_toast }}"
+                              mute_audio: "{{ mute_audio }}"
+                              rtsp_transport: "{{ rtsp_transport }}"
+                              rtsp_latency: "{{ rtsp_latency }}"
+                              software_decoder: "{{ software_decoder }}"
+      default:
+        - choose:
+            # Entity + Custom
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'entity' and size_mode == 'custom' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    camera_entity: "{{ camera_entity }}"
+                    position: "{{ position }}"
+                    size_px:
+                      w: "{{ (custom_width | int) }}"
+                      h: "{{ (custom_height | int) }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+
+            # Entity + Preset
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'entity' and size_mode == 'preset' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    camera_entity: "{{ camera_entity }}"
+                    position: "{{ position }}"
+                    size: "{{ size }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+
+            # Entity + Auto
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'entity' and size_mode == 'auto' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    camera_entity: "{{ camera_entity }}"
+                    position: "{{ position }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+
+            # Alias + Custom
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'alias' and size_mode == 'custom' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    camera_alias: "{{ camera_alias }}"
+                    position: "{{ position }}"
+                    size_px:
+                      w: "{{ (custom_width | int) }}"
+                      h: "{{ (custom_height | int) }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+
+            # Alias + Preset
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'alias' and size_mode == 'preset' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    camera_alias: "{{ camera_alias }}"
+                    position: "{{ position }}"
+                    size: "{{ size }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+
+            # Alias + Auto
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'alias' and size_mode == 'auto' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    camera_alias: "{{ camera_alias }}"
+                    position: "{{ position }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+
+            # RTSP + Custom
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'rtsp' and size_mode == 'custom' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    rtsp_url: "{{ rtsp_url }}"
+                    position: "{{ position }}"
+                    size_px:
+                      w: "{{ (custom_width | int) }}"
+                      h: "{{ (custom_height | int) }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+                    mute_audio: "{{ mute_audio }}"
+                    rtsp_transport: "{{ rtsp_transport }}"
+                    rtsp_latency: "{{ rtsp_latency }}"
+                    software_decoder: "{{ software_decoder }}"
+
+            # RTSP + Preset
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'rtsp' and size_mode == 'preset' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    rtsp_url: "{{ rtsp_url }}"
+                    position: "{{ position }}"
+                    size: "{{ size }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+                    mute_audio: "{{ mute_audio }}"
+                    rtsp_transport: "{{ rtsp_transport }}"
+                    rtsp_latency: "{{ rtsp_latency }}"
+                    software_decoder: "{{ software_decoder }}"
+
+            # RTSP + Auto
+            - conditions:
+                - condition: template
+                  value_template: "{{ source_type == 'rtsp' and size_mode == 'auto' }}"
+              sequence:
+                - event: quickbars.open
+                  event_data:
+                    rtsp_url: "{{ rtsp_url }}"
+                    position: "{{ position }}"
+                    auto_hide: "{{ (auto_hide | int) }}"
+                    show_title: "{{ show_title }}"
+                    camera_title: "{{ camera_title if (camera_title | string | trim) else none }}"
+                    show_toast: "{{ show_toast }}"
+                    mute_audio: "{{ mute_audio }}"
+                    rtsp_transport: "{{ rtsp_transport }}"
+                    rtsp_latency: "{{ rtsp_latency }}"
+                    software_decoder: "{{ software_decoder }}"

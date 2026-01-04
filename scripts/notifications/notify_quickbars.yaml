@@ -1,0 +1,399 @@
+---
+notify_quickbars:
+  alias: '[Notify] QuickBars'
+  description: 'Notify devices with QuickBars.'
+  icon: mdi:picture-in-picture-top-right
+  mode: parallel
+
+  fields:
+    app_id:
+      name: 'QuickBars App ID'
+      description: '8-character ID from the TV app (Settings → "QuickBars App ID"). Leave blank to broadcast to all QuickBars devices on the local network.'
+      selector:
+        select:
+          mode: dropdown
+          multiple: true
+          custom_value: true
+          options:
+            - label: Living Room TV
+              value: '9JDTWVEM'
+            - label: Family Room TV
+              value: 'QMN96VDM'
+            - label: Main Bedroom TV
+              value: 'XTCQQJO4'
+
+    # Content
+    title:
+      name: 'Title'
+      description: 'Title of the notification. Only for normal notifications.'
+      example: 'Home Assistant'
+      selector:
+        text:
+    message:
+      name: 'Message'
+      example: 'Message text'
+      selector:
+        text:
+          multiline: true
+    icon:
+      name: 'Icon'
+      description: Sets icon to display in the title row. Accepts mdi icons.
+      example: 'mdi:icon_name'
+      selector:
+        icon:
+    image:
+      name: 'Image'
+      description: 'Accepts image URLs. local/image.png, or http://url.to.image'
+      example: 'local/image.png, or http://url.to.image'
+      selector:
+        text:
+
+    # Appearance
+    background_color:
+      name: 'Background color'
+      description: 'Color in RGB or HEX format "#RRGGBB".'
+      example: '#0f0e0e'
+      selector:
+        color_rgb:
+    background_transparency:
+      name: 'Background transparency'
+      description: 'Background transparency. 0 = opaque, 1 = fully transparent.'
+      default: 0.2
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+    background_darken:
+      name: 'Background darken'
+      description: 'Darkens the background color. Background darken. 0 = fully darkened, 1 = no darken.'
+      default: 0.2
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.05
+    position:
+      name: 'Position'
+      description: 'Location of the notification.'
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - label: Top Left
+              value: 'top_left'
+            - label: Top Right
+              value: 'top_right'
+            - label: Bottom Left
+              value: 'bottom_left'
+            - label: Bottom Right
+              value: 'bottom_right'
+
+    # Behavior
+    duration:
+      name: 'Duration'
+      description: 'The duration in seconds for which the notification will be displayed. BACK can dismiss earlier.'
+      example: 8
+      selector:
+        number:
+          unit_of_measurement: seconds
+          min: 3
+          max: 300
+          step: 1
+    interrupt:
+      name: 'Interrupt'
+      description: 'If true, replace any currently shown notification.'
+      selector:
+        boolean:
+
+    # Sound
+    sound:
+      name: 'Sound'
+      description: 'Local or Publicly available URL for a sound to play with the notification.'
+      example: 'local/sound.wav, or http://url.to.sound'
+      selector:
+        text:
+    sound_volume:
+      name: Sound volume
+      description: 0-200 (100 = system volume; > 100 uses software boost, may distort/clip).
+      selector:
+        number:
+          min: 0
+          max: 200
+
+    # Action 1
+    action_1_id:
+      name: Action 1 - ID
+      description: Internal identifier (e.g., "turn_on")
+      selector:
+        text:
+    action_1_label:
+      name: Action 1 - Label
+      description: Button text (e.g., "Turn On")
+      selector:
+        text:
+    action_1_action:
+      name: Action 1 - Action to Perform
+      description: Optional action(s) to run when this button is pressed
+      selector:
+        action:
+    # Action 2
+    action_2_id:
+      name: Action 2 - ID
+      description: Internal identifier (e.g., "turn_on")
+      selector:
+        text:
+    action_2_label:
+      name: Action 2 - Label
+      description: Button text (e.g., "Turn On")
+      selector:
+        text:
+    action_2_action:
+      name: Action 2 - Action to Perform
+      description: Optional action(s) to run when this button is pressed
+      selector:
+        action:
+    # Action 3
+    action_3_id:
+      name: Action 3 - ID
+      description: Internal identifier (e.g., "turn_on")
+      selector:
+        text:
+    action_3_label:
+      name: Action 3 - Label
+      description: Button text (e.g., "Turn On")
+      selector:
+        text:
+    action_3_action:
+      name: Action 3 - Action to Perform
+      description: Optional action(s) to run when this button is pressed
+      selector:
+        action:
+
+    enable_debug:
+      name: Enable debug output?
+      selector:
+        constant:
+          value: true
+          label: Enabled
+
+  sequence:
+    - alias: Set local variables for reuse in this script.
+      variables:
+        debug: '{{ iif(enable_debug is defined, enable_debug, false) }}'
+        app_id: '{{ app_id | default([]) }}'
+        app_id_list: >
+          {% set app_ids = namespace(names=[]) %}
+          {% if app_id %}
+            {# Convert to a list #}
+            {% if ',' in app_id %}
+              {% set app_id_num = app_id.split(',') | count %}
+              {% for i in range(0, app_id_num) %}
+                {% set app_ids.names = app_ids.names + [app_id.split(',')[i] | string | trim ] %}
+              {% endfor %}
+            {% elif app_id[0] | count == 1 %} {# if the first item in the list has only a single character, it can't be a valid entity #}
+              {% set app_ids.names = app_ids.names + [app_id | string | trim] %}
+            {% else %}
+              {% set app_ids.names = app_id %}
+            {% endif %}
+          {% endif %}
+          {{ app_ids.names | unique | list | upper }}
+
+        image_path: >-
+          {% if image is string %}
+            {% if image.startswith("http") %}
+              {{ image }}
+            {% else %}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ image }}
+            {% endif %}
+          {% endif %}
+        sound_path: |-
+          {% if sound is string %}
+            {% if sound.startswith("http") %}
+              {{ sound }}
+            {% else %}
+              {{ state_attr("sensor.hass_config", "internal_url") }}/{{ sound }}
+            {% endif %}
+          {% else %}
+            {{ none }}
+          {% endif %}
+        background_darken: '{{ background_darken | default(0.2) | float }}'
+        background_color_rgb: |-
+          {% if background_color is defined %}
+            {% set _rgb = background_color %}
+            {% if _rgb is string %}
+              {% set _rgb = _rgb.lstrip('#') %}
+              {% set _rgb = [int(_rgb[0:2], base=16), int(_rgb[2:4], base=16), int(_rgb[4:6], base=16)] %}
+            {% endif %}
+            {% if background_darken is defined %}
+              {% set darken = background_darken | float %}
+              {% if darken < 1 %}
+                {% set r = (_rgb[0] * darken) | int %}
+                {% set g = (_rgb[1] * darken) | int %}
+                {% set b = (_rgb[2] * darken) | int %}
+                {% set _rgb = [r, g, b] %}
+              {% endif %}
+            {% endif %}
+            {{ _rgb }}
+          {% endif %}
+        message: '{{ message | default("") }}'
+        duration: '{{ duration | default(10) | int }}'
+        position: '{{ position | default("top_left") }}'
+
+
+
+
+        _cid: "{{ now().timestamp() | int ~ '-' ~ (range(1000,9999) | random) }}"
+        _ev: |-
+          {{
+            dict(
+              title=title, 
+              message=message, 
+              actions=(
+                [
+                  dict(id=action_1_id, label=action_1_label)
+                ] if action_1_id is defined else []
+              ) + (
+                [
+                  dict(id=action_2_id, label=action_2_label)
+                ] if action_2_id is defined else []
+              ) + (
+                [
+                  dict(id=action_3_id, label=action_3_label)
+                ] if action_3_id is defined else []
+              ),
+              duration=duration, 
+              position=position,
+              color=(background_color_rgb if background_color is defined and background_color_rgb else ''), 
+              transparency=(background_transparency | default(0.2) | float),
+              interrupt=(interrupt | default(false, true)),
+              cid=_cid
+            )
+            | combine( dict(mdi_icon=icon) if (icon is defined) else {} )
+            | combine( dict(image_url=image_path) if image is defined and image_path else {} )
+            | combine( dict(sound_url=sound_path) if sound is defined and sound_path else {} )
+            | combine( dict(sound_volume_percent=sound_volume) if sound is defined and sound_path else {} )
+          }}
+
+    - alias: Set enable_debug = true above to provide output troubleshooting information.
+      if:
+        - condition: template
+          value_template: '{{ debug == true }}'
+      then:
+        - action: persistent_notification.create
+          data:
+            notification_id: 'notify_quickbars'
+            title: 'DEBUG: script.notify_quickbars'
+            message: |-
+              app_id_list: {{ app_id_list }}
+              title: {{ _ev.title }}
+              message: {{ _ev.message }}
+              actions: {{ _ev.actions }}
+              duration: {{ _ev.duration }}
+              position: {{ _ev.position }}
+              color: {{ _ev.color }}
+              transparency: {{ _ev.transparency }}
+              darken: {{ background_darken }}
+              interrupt: {{ _ev.interrupt }}
+              cid: {{ _ev.cid }}
+              mdi_icon: {{ _ev.mdi_icon if _ev.get('mdi_icon') else '' }}
+              image_url: {{ _ev.image_url if _ev.get('image_url') else '' }}
+              sound_url: {{ _ev.sound_url if _ev.get('sound_url') else '' }}
+              sound_volume_percent: >-
+                {{ _ev.sound_volume_percent if _ev.get('sound_volume_percent') else '' }}
+
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ app_id_list | count > 0 }}"
+          sequence:
+            - alias: Loop through app_id_list
+              repeat:
+                for_each: '{{ app_id_list }}'
+                sequence:
+                  - event: quickbars.notify
+                    event_data:
+                      id: "{{ repeat.item }}"
+                      title: "{{ _ev.title }}"
+                      message: "{{ _ev.message }}"
+                      actions: "{{ _ev.actions }}"
+                      duration: "{{ _ev.duration }}"
+                      position: "{{ _ev.position }}"
+                      color: "{{ _ev.color }}"
+                      transparency: "{{ _ev.transparency }}"
+                      interrupt: "{{ _ev.interrupt }}"
+                      cid: "{{ _ev.cid }}"
+                      mdi_icon: "{{ _ev.mdi_icon if _ev.get('mdi_icon') else '' }}"
+                      image_url: "{{ _ev.image_url if _ev.get('image_url') else '' }}"
+                      sound_url: "{{ _ev.sound_url if _ev.get('sound_url') else '' }}"
+                      sound_volume_percent: >-
+                        {{ _ev.sound_volume_percent if _ev.get('sound_volume_percent') else '' }}
+      default:
+        - event: quickbars.notify
+          event_data:
+            title: "{{ _ev.title }}"
+            message: "{{ _ev.message }}"
+            actions: "{{ _ev.actions }}"
+            duration: "{{ _ev.duration }}"
+            position: "{{ _ev.position }}"
+            color: "{{ _ev.color }}"
+            transparency: "{{ _ev.transparency }}"
+            interrupt: "{{ _ev.interrupt }}"
+            cid: "{{ _ev.cid }}"
+            mdi_icon: "{{ _ev.mdi_icon if _ev.get('mdi_icon') else '' }}"
+            image_url: "{{ _ev.image_url if _ev.get('image_url') else '' }}"
+            sound_url: "{{ _ev.sound_url if _ev.get('sound_url') else '' }}"
+            sound_volume_percent: >-
+              {{ _ev.sound_volume_percent if _ev.get('sound_volume_percent') else '' }}
+
+    - wait_for_trigger:
+        - trigger: event
+          event_type: quickbars.action
+      timeout:
+        seconds: "{{ duration if duration > 0 else 300 }}"
+      continue_on_timeout: false
+
+    - variables:
+        _action_id: "{{ wait.trigger.event.data.action_id | default('') }}"
+        _trigger_cid: "{{ wait.trigger.event.data.cid | default('') }}"
+
+    - condition: template
+      value_template: "{{ _trigger_cid == _cid }}"
+
+    - choose:
+        # Action 1
+        - conditions:
+            - condition: template
+              value_template: "{{ _action_id == action_1_id and action_1_action is defined }}"
+          sequence:
+            - alias: Loop through action_1_action
+              repeat:
+                for_each: '{{ action_1_action }}'
+                sequence:
+                  - action: "{{ repeat.item.action }}"
+                    data: "{{ repeat.item.data }}"
+                    target: "{{ repeat.item.target }}"
+        # Action 2
+        - conditions:
+            - condition: template
+              value_template: "{{ _action_id == action_2_id and action_2_action is defined }}"
+          sequence:
+            - alias: Loop through action_2_action
+              repeat:
+                for_each: '{{ action_2_action }}'
+                sequence:
+                  - action: "{{ repeat.item.action }}"
+                    data: "{{ repeat.item.data }}"
+                    target: "{{ repeat.item.target }}"
+        # Action 3
+        - conditions:
+            - condition: template
+              value_template: "{{ _action_id == action_3_id and action_3_action is defined }}"
+          sequence:
+            - alias: Loop through action_3_action
+              repeat:
+                for_each: '{{ action_3_action }}'
+                sequence:
+                  - action: "{{ repeat.item.action }}"
+                    data: "{{ repeat.item.data }}"
+                    target: "{{ repeat.item.target }}"
