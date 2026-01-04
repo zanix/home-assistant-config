@@ -219,23 +219,21 @@ notify_quickbars:
           {% endif %}
         background_darken: '{{ background_darken | default(0.2) | float }}'
         background_color_rgb: |-
-          {% if background_color is defined %}
-            {% set _rgb = background_color %}
-            {% if _rgb is string %}
-              {% set _rgb = _rgb.lstrip('#') %}
-              {% set _rgb = [int(_rgb[0:2], base=16), int(_rgb[2:4], base=16), int(_rgb[4:6], base=16)] %}
-            {% endif %}
-            {% if background_darken is defined %}
-              {% set darken = background_darken | float %}
-              {% if darken < 1 %}
-                {% set r = (_rgb[0] * darken) | int %}
-                {% set g = (_rgb[1] * darken) | int %}
-                {% set b = (_rgb[2] * darken) | int %}
-                {% set _rgb = [r, g, b] %}
-              {% endif %}
-            {% endif %}
-            {{ _rgb }}
+          {% set _rgb = background_color | default([0, 0, 0]) %}
+          {% if _rgb is string %}
+            {% set _rgb = _rgb.lstrip('#') %}
+            {% set _rgb = [int(_rgb[0:2], base=16), int(_rgb[2:4], base=16), int(_rgb[4:6], base=16)] %}
           {% endif %}
+          {% if background_darken is defined %}
+            {% set darken = background_darken | float %}
+            {% if darken < 1 %}
+              {% set r = (_rgb[0] * darken) | int %}
+              {% set g = (_rgb[1] * darken) | int %}
+              {% set b = (_rgb[2] * darken) | int %}
+              {% set _rgb = [r, g, b] %}
+            {% endif %}
+          {% endif %}
+          {{ _rgb }}
         message: '{{ message | default("") }}'
         duration: '{{ duration | default(10) | int }}'
         position: '{{ position | default("top_left") }}'
@@ -261,7 +259,7 @@ notify_quickbars:
               ),
               duration=duration,
               position=position,
-              color=(background_color_rgb if background_color is defined and background_color_rgb else ''),
+              color=background_color_rgb,
               transparency=(background_transparency | default(0.2) | float),
               interrupt=(interrupt | default(false, true)),
               cid=_cid
