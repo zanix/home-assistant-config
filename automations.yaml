@@ -1579,7 +1579,8 @@
   mode: single
 - id: '1756939658715'
   alias: ⛩️ Automatic Garage Door
-  description: ''
+  description: Open and close a garage door automatically based on driving status
+    and location.
   use_blueprint:
     path: etiennec78/automatic-gate.yaml
     input:
@@ -1597,9 +1598,7 @@
       itinerary_sensors:
       - input_text.amy_itinerary
       - input_text.joshua_itinerary
-      wifi_devices:
-      - device_tracker.pixel_10_amy
-      - device_tracker.pixel_10_joshua
+      wifi_devices: []
       locks:
       - lock.garage_entry
       dont_lock_if_people_remaining: true
@@ -1611,8 +1610,8 @@
       - e4ca1450b85b5d46e8d6d867f7b4e8e6
       departure_opening_behavior: notif
       only_open_near:
-      - wifi
-      lead_time: 45
+      - gps
+      lead_time: 30
       departure_closing_behavior: notif
       travel_time_rate: continuous
 - id: '1704733260383'
@@ -5248,315 +5247,35 @@
       - use_brightness
       night_light_transition_on: 1
       night_light_transition_off: 2
-- id: '1756940133048'
+- id: '1767724933503'
   alias: "\U0001F4CD Itinerary Tracker Notification"
-  description: Notifies household members when someone starts driving home, with updates
-    on arrival time, and announces when the driver is nearly home or has arrived.
-  triggers:
-  - entity_id:
-    - binary_sensor.pixel_10_amy_android_auto
-    - binary_sensor.pixel_10_joshua_android_auto
-    from: 'off'
-    to: 'on'
-    trigger: state
-  conditions: []
-  actions:
-  - alias: Store list index of driver and init variables
-    variables:
+  description: ''
+  use_blueprint:
+    path: etiennec78/itinerary-tracker-notification.yaml
+    input:
+      tts_volume_night_time_end: 08:00:00
       persons:
       - person.amy
       - person.joshua
+      notify_devices:
+      - 5d251328aa63591bec98a091f08427b1
+      - e4ca1450b85b5d46e8d6d867f7b4e8e6
       driving_sensors:
       - binary_sensor.pixel_10_amy_android_auto
       - binary_sensor.pixel_10_joshua_android_auto
       travel_time_sensors:
       - sensor.amy_travel_time
       - sensor.joshua_travel_time
+      dead_zone: 500
+      persistent_notification: true
       speaker_tts_devices:
       - media_player.living_room_speaker
       - media_player.family_room_speaker
       - media_player.office_speaker
-      nearly_arrived_tts: true
-      driver_arrived_tts: true
+      speaker_tts_service: tts.home_assistant_cloud
+      drive_start_tts: false
       nearly_arrived_time: 3
-      strings:
-        itinerary_started: '{driver_name} started driving'
-        itinerary_ongoing: '{driver_name} will arrive around {arrival}'
-        nearly_arrived: '{driver_name} will arrive in {remaining_minutes} minutes'
-        driver_arrived: '{driver_name} just arrived home'
-      idx: '{{ driving_sensors.index(trigger.entity_id) }}'
-      driving_sensor: '{{ driving_sensors[idx] }}'
-      driver: '{{ persons[idx] }}'
-      driver_name: '{{ state_attr(driver, ''friendly_name'') }}'
-      notification_tag: '{{ ''itinerary-tracker-'' ~ this.context.id }}'
-      next_refresh: 0
-      remaining: 0
-      nearly_arrived_sent: false
-      last_arrival_timestamp: '{{ none }}'
-      send_to: parents
-      title: Itinerary Status
-      message: '{{ strings.itinerary_started.format(driver_name=driver_name) }}'
-      notification_icon: mdi:car
-      icon: local/icons/car-estate.png
-      color: '#00bcd4'
-      group: Itinerary Status
-      channel: Itinerary Status
-  - alias: Only continue if driver not home
-    condition: template
-    value_template: '{{ not is_state(driver, ''home'') }}'
-  - alias: Notify about itinerary start
-    data:
-      send_to: '{{ send_to }}'
-      location: home
-      title: '{{ title }}'
-      message: '{{ message }}'
-      notification_icon: '{{ notification_icon }}'
-      icon: '{{ icon }}'
-      color: '{{ color }}'
-      group: '{{ group }}'
-      channel: '{{ channel }}'
-      tag: '{{ notification_tag }}'
-      url: /lovelace/vehicle-tracker-map
-      sticky: true
-      alert_once: true
-    action: script.notify_mobile
-  - alias: If travel time sensors set
-    if:
-    - condition: template
-      value_template: '{{ travel_time_sensors != [] }}'
-    then:
-    - variables:
-        travel_time_sensor: '{{ travel_time_sensors[idx] }}'
-    - alias: Repeat while driver still driving
-      repeat:
-        while:
-        - condition: template
-          value_template: '{{ is_state(driving_sensor, ''on'') }}'
-        sequence:
-        - alias: Wait for travel time update, vehicle left, or notification cleared
-          wait_for_trigger:
-          - id: travel_time
-            event_type: state_changed
-            event_data:
-              entity_id: '{{ travel_time_sensor }}'
-            trigger: event
-          - id: vehicle_left
-            value_template: '{{ is_state(driving_sensor, ''off'') }}'
-            trigger: template
-          timeout:
-            seconds: "{% set values = [43200] %}\n{# End of cooldown #}\n{% if next_refresh
-              > now() | as_timestamp %}\n  {% set values = values | union([next_refresh
-              - now() | as_timestamp]) %}\n{% endif %}\n{# Nearly arrived TTS #}\n{%
-              if not nearly_arrived_sent and remaining > nearly_arrived_time*60 %}\n
-              \ {% set values = values | union([remaining - nearly_arrived_time*60])
-              %}\n{% endif %}\n{{ min(values) }}"
-        - alias: If travel time remaining needs to trigger nearly arrived TTS
-          if:
-          - condition: template
-            value_template: "{{ not nearly_arrived_sent\n  and next_refresh != 0\n
-              \ and remaining <= nearly_arrived_time*60\n  and speaker_tts_devices
-              != []\n  and persons | select('is_state', 'home') | list != []\n}}"
-          then:
-          - alias: Get nearly arrived message
-            variables:
-              message: '{{ strings.nearly_arrived.format(driver_name=driver_name,
-                remaining_minutes=remaining_minutes) }}'
-          - alias: Send nearly arrived notification
-            parallel:
-            - data:
-                send_to: '{{ send_to }}'
-                location: home
-                title: '{{ title }}'
-                message: '{{ message }}'
-                notification_icon: '{{ notification_icon }}'
-                color: '{{ color }}'
-                group: '{{ group }}'
-                channel: '{{ channel }}'
-                tag: '{{ notification_tag }}'
-                url: /lovelace/vehicle-tracker-map
-                sticky: true
-              action: script.notify_mobile
-            - data:
-                entity:
-                - media_player.nasya
-                title: '{{ title }}'
-                message: '{{ message }}'
-              action: script.notify_hass_agent
-            - data:
-                computer:
-                - erebus
-                title: '{{ title }}'
-                message: '{{ message }}'
-                icon: '{{ icon }}'
-              action: script.notify_lnxlink
-            - data:
-                title: '{{ title }}'
-                message: '{{ message }}'
-                icon: '{{ notification_icon }}'
-                background_color: '{{ color }}'
-              action: script.notify_quickbars
-            - alias: If nearly_arrived_tts enabled, someone is home, TTS devices are
-                set
-              if:
-              - condition: template
-                value_template: "{{ nearly_arrived_tts\n  and speaker_tts_devices
-                  != []\n  and persons | select('is_state', 'home') | list != []\n}}"
-              then:
-              - alias: Play TTS
-                data:
-                  media_player: '{{ speaker_tts_devices }}'
-                  message: '{{ message }}'
-                action: script.notify_speech
-          - alias: Mark nearly arrived TTS as already sent
-            variables:
-              nearly_arrived_sent: true
-        - alias: Only continue loop if triggered by travel time update
-          condition: template
-          value_template: '{{ wait.trigger.id == ''travel_time'' }}'
-        - alias: Only continue loop if notifications not on cooldown
-          condition: template
-          value_template: '{{ next_refresh <= now() | as_timestamp }}'
-        - alias: Calculate next refresh
-          variables:
-            cooldown: '{{ max(10, (remaining)/4) }}'
-            next_refresh: '{{ now() | as_timestamp + cooldown }}'
-        - alias: Calculate ETA
-          variables:
-            remaining: "{% if state_attr(travel_time_sensor, 'duration') != none %}\n
-              \ {{ state_attr(travel_time_sensor, 'duration') | float * 60 }}\n{%
-              elif state_attr(travel_time_sensor, 'unit_of_measurement') == \"min\"
-              %}\n  {{ states(travel_time_sensor) | float * 60 }}\n{% elif state_attr(travel_time_sensor,
-              'unit_of_measurement') == \"s\" %}\n  {{ states(travel_time_sensor)
-              | float }}\n{% else %}\n  {{ none }}\n{% endif %}"
-        - alias: Convert ETA to needed types
-          variables:
-            remaining_minutes: '{{ (remaining/60) | round }}'
-            arrival_timestamp: '{{ as_timestamp(now()) + remaining }}'
-            arrival: '{{ arrival_timestamp | timestamp_custom(''%H:%M'') }}'
-        - alias: Do not send notification if the time of arrival did not change
-          condition: template
-          value_template: "{# If the next notification will be sent near the arrival
-            #}\n{% if arrival_timestamp - next_refresh < 120 %}\n  {{ (last_arrival_timestamp
-            | int - arrival_timestamp | int) | abs < 5 }}\n{% else %}\n  {{ (last_arrival_timestamp
-            / 60) | int != (arrival_timestamp / 60) | int }}\n{% endif %}"
-        - alias: Save the current time of arrival
-          variables:
-            last_arrival_timestamp: '{{ arrival_timestamp }}'
-        - alias: Get itinerary ongoing message
-          variables:
-            message: '{{ strings.itinerary_ongoing.format(driver_name=driver_name,
-              arrival=arrival, remaining_minutes=remaining_minutes) }}'
-            notification_icon: mdi:map-marker-account
-        - alias: Send ETA notification
-          parallel:
-          - data:
-              send_to: '{{ send_to }}'
-              location: home
-              title: '{{ title }}'
-              message: '{{ message }}'
-              notification_icon: '{{ notification_icon }}'
-              color: '{{ color }}'
-              group: '{{ group }}'
-              channel: '{{ channel }}'
-              tag: '{{ notification_tag }}'
-              url: /lovelace/vehicle-tracker-map
-              sticky: true
-              alert_once: true
-              timeout: '{{ remaining | int }}'
-              chronometer: true
-              chronometer_when: '{{ arrival_timestamp | int }}'
-            action: script.notify_mobile
-          - data:
-              entity:
-              - media_player.nasya
-              title: '{{ title }}'
-              message: '{{ message }}'
-            action: script.notify_hass_agent
-          - data:
-              computer:
-              - erebus
-              title: '{{ title }}'
-              message: '{{ message }}'
-              icon: '{{ icon }}'
-            action: script.notify_lnxlink
-          - data:
-              title: '{{ title }}'
-              message: '{{ message }}'
-              icon: '{{ notification_icon }}'
-              background_color: '{{ color }}'
-            action: script.notify_quickbars
-          - data:
-              media_player: '{{ speaker_tts_devices }}'
-              message: '{{ message }}'
-            action: script.notify_speech
-    else:
-    - alias: Wait for user to leave vehicle
-      wait_for_trigger:
-      - id: vehicle_left
-        value_template: '{{ is_state(driving_sensor, ''off'') }}'
-        trigger: template
-  - alias: If driver arrived home
-    if:
-    - condition: template
-      value_template: '{{ is_state(driver, ''home'') }}'
-    then:
-    - alias: Get driver arrived message
-      variables:
-        message: '{{ strings.driver_arrived.format(driver_name=driver_name) }}'
-        notification_icon: mdi:home-map-marker
-    - alias: Send arrival notification
-      parallel:
-      - data:
-          send_to: '{{ send_to }}'
-          location: home
-          title: '{{ title }}'
-          message: '{{ message }}'
-          notification_icon: '{{ notification_icon }}'
-          color: '{{ color }}'
-          group: '{{ group }}'
-          channel: '{{ channel }}'
-          tag: '{{ notification_tag }}'
-          url: /lovelace/vehicle-tracker-map
-          sticky: true
-          timeout: 300
-        action: script.notify_mobile
-      - data:
-          entity:
-          - media_player.nasya
-          title: '{{ title }}'
-          message: '{{ message }}'
-        action: script.notify_hass_agent
-      - data:
-          computer:
-          - erebus
-          title: '{{ title }}'
-          message: '{{ message }}'
-          icon: '{{ icon }}'
-        action: script.notify_lnxlink
-      - data:
-          title: '{{ title }}'
-          message: '{{ message }}'
-          icon: '{{ notification_icon }}'
-          background_color: '{{ color }}'
-        action: script.notify_quickbars
-    - alias: If driver_arrived_tts enabled, someone is home, TTS devices are set
-      if:
-      - condition: template
-        value_template: "{{ driver_arrived_tts\n  and speaker_tts_devices != []\n
-          \ and persons | select('is_state', 'home') | list != []\n}}"
-      then:
-      - alias: Play TTS
-        data:
-          media_player: '{{ speaker_tts_devices }}'
-          message: '{{ message }}'
-        action: script.notify_speech
-    else:
-    - alias: Remove itinerary notification
-      data:
-        message: clear_notification
-        tag: '{{ notification_tag }}'
-      action: script.notify_mobile
-  mode: parallel
+      tts_volume_night_time_start: '20:00:00'
 - id: '1665682398363'
   alias: "\U0001F4E6 Clear Packages Out for Delivery"
   description: Clears package delivery notification when packages are delivered
