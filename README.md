@@ -732,7 +732,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>151 Automations</summary>
+<details><summary>150 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -873,7 +873,6 @@ Material Design 3 Theme for Home Assistant
 - 🖥️ [Work Josh] Microphone/Camera Active
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
-- 🗺️ Arriving Home 🚫
 - 🗺️ Leaving Zone
 - 🚦 Amy Office Light Switch Status 🚫
 - 🚦 Emma Light Switch Status

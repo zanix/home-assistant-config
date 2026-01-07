@@ -711,11 +711,15 @@ actions:
       sequence:
         - action: "{{ repeat.item }}"
           data:
+            title: Itinerary Status
             message: "{{ message }}"
             data:
+              car_ui: true
               notification_icon: mdi:car
+              color: "#00bcd4"
               tag: "{{ notification_tag }}"
-              channel: Itinerary status
+              channel: Itinerary Status
+              group: Itinerary Status
               sticky: true
               # Hack to retrieve notification service when dismissed
               confirmation: "{{ repeat.item }}"
@@ -741,82 +745,10 @@ actions:
             and persons | select('is_state', 'home') | list != []
           }}
       - alias: Play TTS on each speaker
-        repeat:
-          for_each: "{{ speaker_tts_devices }}"
-          sequence:
-            - alias: Initialize a variable to store the speaker volume later
-              variables:
-                old_volume: "{{ none }}"
-            - alias: If the tts night mode is currently active
-              if:
-                - condition: template
-                  value_template: |-
-                    {% set start = today_at(tts_volume_night_time_start) %}
-                    {% set end = today_at(tts_volume_night_time_end) %}
-                    {% set time = now() %}
-                    {{
-                      tts_volume_night_time_start != ''
-                      and tts_volume_night_time_end != ''
-                      and (
-                        start <= end and start <= time <= end
-                        or start > end and (time >= start or time <= end)
-                      )
-                    }}
-              then:
-                - alias: If the speaker is not exposing its volume because it is turned off
-                  if:
-                    - condition: template
-                      value_template: |-
-                        {{
-                          is_state(repeat.item, 'off')
-                          and state_attr(repeat.item, 'volume_level') is none
-                        }}
-                  then:
-                    - alias: Turn on the speaker
-                      action: media_player.turn_on
-                      target:
-                        entity_id: "{{ repeat.item }}"
-                    - alias: Wait for the speaker to turn on
-                      wait_template: "{{ not is_state(repeat.item, 'off') }}"
-                      continue_on_timeout: true
-                      timeout: 3
-                - alias: Only continue if the speaker has a higher volume than night mode
-                  condition: template
-                  value_template: |-
-                    {{
-                      state_attr(repeat.item, 'volume_level') is none
-                      or (
-                        state_attr(repeat.item, 'volume_level') * 100
-                      ) | int > tts_volume_at_night
-                    }}
-                - alias: Save the current volume
-                  variables:
-                    old_volume: "{{ state_attr(repeat.item, 'volume_level') }}"
-                - alias: Lower the volume
-                  action: media_player.volume_set
-                  target:
-                    entity_id: "{{ repeat.item }}"
-                  data:
-                    volume_level: "{{ tts_volume_at_night / 100 }}"
-            - alias: Play the TTS
-              action: tts.speak
-              data:
-                cache: true
-                media_player_entity_id: "{{ repeat.item }}"
-                message: "{{ message }}"
-              target:
-                entity_id: "{{ speaker_tts_service }}"
-            - alias: If the old volume could be saved
-              if:
-                - condition: template
-                  value_template: "{{ old_volume is not none }}"
-              then:
-                - alias: Restore the old volume
-                  action: media_player.volume_set
-                  target:
-                    entity_id: "{{ repeat.item }}"
-                  data:
-                    volume_level: "{{ old_volume }}"
+        action: script.notify_speech
+        data:
+          media_player: "{{ speaker_tts_devices }}"
+          message: '{{ message }}'
   - alias: If travel time sensors set
     if:
       condition: template
@@ -1016,7 +948,7 @@ actions:
             - alias: Convert ETA to needed types
               variables:
                 arrival_timestamp: "{{ as_timestamp(now()) + remaining }}"
-                arrival: "{{ arrival_timestamp | timestamp_custom('%H:%M') }}"
+                arrival: "{{ arrival_timestamp | timestamp_custom('%-I:%M %p') }}"
             - alias: If the nearly arrived tts has not been triggered yet
               if:
                 - condition: template
@@ -1070,11 +1002,15 @@ actions:
                 sequence:
                   - action: "{{ repeat.item }}"
                     data:
+                      title: Itinerary Status
                       message: "{{ message }}"
                       data:
+                        car_ui: true
                         notification_icon: mdi:map-marker-account
+                        color: "#00bcd4"
                         tag: "{{ notification_tag }}"
-                        channel: Itinerary status
+                        channel: Itinerary Status
+                        group: Itinerary Status
                         sticky: true
                         # Hack to retrieve notification service when dismissed
                         confirmation: "{{ repeat.item }}"
@@ -1120,9 +1056,12 @@ actions:
               data:
                 message: "{{ message }}"
                 data:
+                  car_ui: true
                   notification_icon: mdi:home-map-marker
+                  color: "#00bcd4"
                   tag: "{{ notification_tag }}"
-                  channel: Itinerary status
+                  channel: Itinerary Status
+                  group: Itinerary Status
                   url: !input on_tap_link
                   clickAction: !input on_tap_link
                   timeout: 300
