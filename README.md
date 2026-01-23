@@ -133,10 +133,6 @@ Integrates INKBIRD devices into Home Assistant.
 
 The iqvia sensor platform collects and displays allergy, asthma and disease information.
 
-### [Jellyfin](https://www.home-assistant.io/integrations/jellyfin)
-
-Exposes a Jellyfin server as a media source in Home Assistant.
-
 ### [Local Calendar](https://www.home-assistant.io/integrations/local_calendar)
 
 The local calendar integration allows you to create a calendar of events for powering automations.
@@ -301,7 +297,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>26 Custom Integrations</summary>
+<details><summary>31 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
@@ -324,6 +320,10 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 Bubble Card Tools is a custom integration that handles the Bubble Card backend. Required for the Module Store and module installs.
 
 Authors: [@Clooos](https://github.com/Clooos).
+
+### [C.A.F.E.](https://github.com/FezVrasta/cafe-hass) [v0.3.1]
+
+The "Third Way" for Home Assistant Automations.
 
 ### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.2]
 
@@ -373,6 +373,12 @@ Home Assistant Google Home custom component
 
 Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://github.com/DurgNomis-drol), [@ArnyminerZ](https://github.com/ArnyminerZ), [@KapJI](https://github.com/KapJI).
 
+### [Ha Jellyfin](https://github.com/n00bcodr/ha-jellyfin) [v0.0.3]
+
+[WIP] Jellyfin HomeAssistant Integration using API
+
+Authors: [@n00bcodr](https://github.com/n00bcodr).
+
 ### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v2.0.5]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
@@ -408,6 +414,12 @@ Authors: [@fuatakgun](https://github.com/fuatakgun).
 KidsChores Custom Integration for Home Assistant
 
 Authors: [@ad-ha](https://github.com/ad-ha).
+
+### [Lubelogger](https://github.com/hollowpnt92/lubelogger-ha) [v1.0.14]
+
+hacs integration for lube logger
+
+Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
 ### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.7]
 
@@ -450,6 +462,12 @@ Authors: [@G-Two](https://github.com/G-Two).
 Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
+
+### [Unraid Api](https://github.com/chris-mc1/unraid_api) [v1.4.0]
+
+Unraid API integration for Home Assistant using the local GraphQL API
+
+Authors: [@chris-mc1](https://github.com/chris-mc1).
 
 ### [Watchman](https://github.com/dummylabs/thewatchman) [v0.6.5]
 
