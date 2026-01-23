@@ -319,6 +319,12 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
+### [Bubble Card Tools](https://github.com/Clooos/Bubble-Card-Tools) [v1.0.0]
+
+Bubble Card Tools is a custom integration that handles the Bubble Card backend. Required for the Module Store and module installs.
+
+Authors: [@Clooos](https://github.com/Clooos).
+
 ### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.2]
 
 🔹 Use custom svg icons in Home Assistant
@@ -487,7 +493,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.0.4]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.0]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 

@@ -1,0 +1,967 @@
+icon_border_progress:
+  name: Icon Border Progress
+  version: v1.7.0
+  creator: lsmarsden
+  description: |-
+    <div><h2>Icon Border Progress</h2>
+        <p>
+            Forked from <a href="https://github.com/Clooos/Bubble-Card/discussions/1296" target="_blank">Nick's module</a>.
+
+            This module adds the ability to show progress of an entity via icon borders. If using a custom border-radius please make sure you define --bubble-icon-border-radius for this to work correctly.
+
+            Also supports timers!
+        </p>
+
+        <p>
+            For full documentation including configuration, examples, and more, visit the <a
+                href="https://github.com/lsmarsden/bubble-card-modules/tree/main/modules/icon_border_progress"
+                target="_blank">GitHub repo</a>.
+        </p>
+    </div>
+  supported:
+    - button
+    - climate
+    - cover
+    - media-player
+    - pop-up
+    - select
+    - separator
+  code: |-
+    ${(() => {
+    /**
+     * ======== IMPORTED HELPER FUNCTIONS =========
+     */
+
+    const getState = (input, fallbackToRaw = true) => {
+      if (input == null) return undefined;
+      if (typeof input !== "string" && typeof input !== "object") return fallbackToRaw ? input : undefined;
+
+      const entityDetails = parseEntity(input);
+      const stateObj = hass.states[entityDetails.entityId];
+
+      if (!stateObj) return fallbackToRaw ? input : undefined;
+
+      return entityDetails.attribute ? stateObj.attributes[entityDetails.attribute] : stateObj.state;
+    };
+
+    const parseEntity = (input) => {
+      let entityId, attribute;
+      if (typeof input === "object" && input !== null) {
+        entityId = input.entity_id || input.entity;
+        attribute = input.attribute || input.att;
+      }
+      if (typeof input === "string") {
+        // Pattern: entity_id[attribute]
+        const match = input.match(/^([A-z0-9_.]+)\[([A-z0-9_]+)]$/);
+        if (match) {
+          [, entityId, attribute] = match;
+        } else {
+          entityId = input;
+        }
+      }
+      return { entityId, attribute };
+    };
+
+    function checkAllConditions(cProp) {
+      if (!cProp) return true;
+      if (Array.isArray(cProp)) {
+        return cProp.every((condition) => evaluateSingleCondition(condition));
+      }
+      return evaluateSingleCondition(cProp);
+    }
+
+
+
+    function evaluateSingleCondition(condObj) {
+      if (!condObj || typeof condObj !== "object") return false;
+      if (!condObj.condition) return false;
+      const t = condObj.condition;
+      switch (t) {
+        case "state": {
+          const state = getState(condObj, false);
+          if (state === undefined) return false;
+          if (Array.isArray(condObj.state)) {
+            return condObj.state.includes(state);
+          }
+          return state === condObj.state;
+        }
+        case "numeric_state": {
+          const numVal = parseFloat(getState(condObj));
+          if (isNaN(numVal)) return false;
+
+          const aboveVal = parseFloat(getState(condObj.above));
+          if (!isNaN(aboveVal) && numVal <= aboveVal) {
+            return false;
+          }
+
+          const belowVal = parseFloat(getState(condObj.below));
+          if (!isNaN(belowVal) && numVal >= belowVal) {
+            return false;
+          }
+
+          return true;
+        }
+        case "exists":
+          return getState(condObj) !== undefined;
+        case "and":
+          if (!Array.isArray(condObj.conditions)) return false;
+          return condObj.conditions.every((sc) => evaluateSingleCondition(sc));
+        case "or":
+          if (!Array.isArray(condObj.conditions)) return false;
+          return condObj.conditions.some((sc) => evaluateSingleCondition(sc));
+        case "not":
+          if (Array.isArray(condObj.conditions) && condObj.conditions.length > 0) {
+            return !evaluateSingleCondition(condObj.conditions[0]);
+          }
+          if (condObj.conditions) {
+            return !evaluateSingleCondition(condObj.conditions);
+          }
+          return false;
+        default:
+          return false;
+      }
+    }
+
+
+    function resolveColor(color, defaultColor) {
+      let resolvedColor = getState(color);
+      if (!resolvedColor) return defaultColor ?? "var(--primary-color)";
+      if (typeof resolvedColor !== "string") return defaultColor ?? "var(--primary-color)";
+
+      resolvedColor = resolvedColor.trim();
+      const validPrefixes = ["#", "rgb", "hsl", "var(--"];
+
+      if (validPrefixes.some((prefix) => resolvedColor.startsWith(prefix))) {
+        return resolvedColor;
+      }
+
+      return `var(--${resolvedColor}-color)`;
+    }
+
+
+
+    function resolveColorFromStops(progress, stops, interpolate) {
+      // handles the situation when HA reformats arrays into objects keyed by numbers.
+      if (!Array.isArray(stops) && typeof stops === "object" && stops !== null) {
+        stops = Object.values(stops).sort((a, b) => a.percent - b.percent);
+      }
+      if (!Array.isArray(stops) || !stops || stops.length === 0) {
+        return "var(--primary-color)";
+      }
+      // Sort stops in ascending order by percent
+      const sortedStops = stops.slice().sort((a, b) => a.percent - b.percent);
+
+      // Handle out-of-range progress values
+      if (progress <= sortedStops[0].percent) {
+        return resolveColor(sortedStops[0].color);
+      }
+      if (progress >= sortedStops[sortedStops.length - 1].percent) {
+        return resolveColor(sortedStops[sortedStops.length - 1].color);
+      }
+
+      // Find the lower and upper bounds
+      const lower = [...sortedStops].reverse().find((s) => s.percent <= progress);
+      const upper = sortedStops.find((s) => s.percent >= progress);
+
+      if (!interpolate || resolveColor(lower.color) === resolveColor(upper.color)) {
+        return resolveColor(lower.color);
+      }
+
+      const range = upper.percent - lower.percent;
+      const frac = (progress - lower.percent) / range;
+      const format = (v) => parseFloat(v.toFixed(2));
+
+      return `color-mix(in srgb, ${resolveColor(lower.color)} ${format((1 - frac) * 100)}%, ${resolveColor(upper.color)} ${format(frac * 100)}%)`;
+    }
+
+
+    function applyEffects(element, effects) {
+      Object.values(effects).forEach((eff) => {
+        if (eff.effect) {
+          if (checkAllConditions(eff.condition)) {
+            element.classList.add(`progress-effect-${eff.effect}`, "has-effect");
+          } else {
+            element.classList.remove(`progress-effect-${eff.effect}`);
+          }
+        }
+      });
+    }
+
+
+    function toArray(object) {
+      if (Array.isArray(object)) return object;
+      if (!object || typeof object !== "object") return [];
+
+      return Object.values(object);
+    }
+
+    const resolveConfig = (sources, defaultValue = undefined) => {
+      for (const source of sources) {
+        const keys = Array.isArray(source.path) ? source.path : source.path.split(".");
+        const value = getConfigValue(source.config, keys);
+
+        if (value !== undefined && (!source.condition || source.condition(value, source.config))) {
+          const metadata = source.metadata || {};
+          if (metadata.deprecated) {
+            console.warn(
+              `[DEPRECATED] Config path "${source.path}" used.` +
+                (metadata.replacedWith ? ` Use "${metadata.replacedWith}" instead.` : "") +
+                (metadata.message ? ` ${metadata.message}` : ""),
+            );
+          }
+          return value;
+        }
+      }
+      return defaultValue;
+    };
+
+    function getConfigValue(config, keys) {
+      let current = config;
+      for (const key of keys) {
+        if (current && key in current) {
+          current = current[key];
+        } else {
+          return undefined;
+        }
+      }
+      return current;
+    }
+
+    function detectElementShape(element, dimensions, borderRadiusOverride) {
+      // Priority: config override > computed CSS > default
+      let borderRadiusStyle;
+
+      if (borderRadiusOverride !== undefined && borderRadiusOverride !== null) {
+        // Convert number to px string, or use string as-is
+        borderRadiusStyle =
+          typeof borderRadiusOverride === "number" ? `${borderRadiusOverride}px` : String(borderRadiusOverride);
+      } else {
+        // Fall back to computed CSS
+        borderRadiusStyle = getBorderRadiusStyle(element);
+      }
+
+      return detectShapeFromBorderRadius(borderRadiusStyle, dimensions);
+    }
+
+    function detectShapeFromBorderRadius(borderRadiusStyle, dimensions) {
+      const { width, height } = dimensions;
+      let borderRadius = 0;
+
+      if (!borderRadiusStyle) {
+        return { isCircular: false, borderRadius: 0 };
+      }
+
+      // Parse border radius value to pixels
+      if (borderRadiusStyle.includes("%")) {
+        const percent = parseInt(borderRadiusStyle) || 0;
+        // For percentages, calculate actual pixel value
+        // 50% of a 40px element = 20px border radius
+        borderRadius = (percent / 100) * Math.min(width, height);
+      } else {
+        // For pixel values, just parse the number
+        borderRadius = parseInt(borderRadiusStyle) || 0;
+      }
+      const isCircular = width === height && borderRadius >= width / 2;
+
+      return { isCircular, borderRadius };
+    }
+
+    function getBorderRadiusStyle(element) {
+      if (typeof getComputedStyle === "undefined") {
+        return "";
+      }
+
+      const computedStyle = getComputedStyle(element);
+      return computedStyle.borderRadius || "";
+    }
+
+    function createProgressBorder(element, progressValue, progressColor, remainingColor, options) {
+      const { strokeWidth = 3, animationDuration = 800, borderRadiusOverride, offsetPercent = 0 } = options;
+      progressValue = Math.max(0, Math.min(100, progressValue || 0));
+      const clampedOffsetPercent = Math.max(0, Math.min(100, offsetPercent));
+
+      let svg = element.querySelector(".stroke-dash-aligned-svg");
+
+      if (!svg) {
+        const computedStyle = typeof getComputedStyle !== "undefined" ? getComputedStyle(element) : {};
+        if (computedStyle.position === "static") {
+          element.style.position = "relative";
+        }
+
+        svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "stroke-dash-aligned-svg");
+        svg.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none";
+        element.appendChild(svg);
+      }
+
+      const dimensions = getEffectiveDimensions(element);
+      svg.setAttribute("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`);
+      svg.style.width = `${dimensions.width}px`;
+      svg.style.height = `${dimensions.height}px`;
+
+      // Detect shape from border-radius CSS property using helper
+      const { isCircular, borderRadius } = detectElementShape(element, dimensions, borderRadiusOverride);
+
+      // Check if SVG needs rebuilding
+      const existingPath = svg.querySelector(".progress-path");
+      const currentData = `${isCircular}-${borderRadius}-${dimensions.width}-${dimensions.height}`;
+      const storedData = svg.getAttribute("data-config");
+
+      if (!existingPath || currentData !== storedData) {
+        // Rebuild SVG
+        svg.innerHTML = "";
+        svg.setAttribute("data-config", currentData);
+
+        // Create path data using actual dimensions
+        const { width, height } = dimensions;
+        let pathData;
+
+        if (isCircular) {
+          // For circles, use the smaller dimension as radius - start at top center
+          const radius = (Math.min(width, height) - strokeWidth) / 2;
+          const centerX = width / 2;
+          pathData = `M ${centerX} ${strokeWidth / 2} A ${radius} ${radius} 0 1 1 ${centerX - 0.01} ${strokeWidth / 2}`;
+        } else {
+          const r = Math.min(borderRadius, (Math.min(width, height) - strokeWidth) / 2);
+          const x = strokeWidth / 2;
+          const y = strokeWidth / 2;
+          const w = width - strokeWidth;
+          const h = height - strokeWidth;
+
+          if (r > 0) {
+            // Rounded rectangle - start from top center
+            const startX = width / 2;
+            pathData = `M ${startX} ${y} 
+                        L ${x + w - r} ${y} 
+                        Q ${x + w} ${y} ${x + w} ${y + r} 
+                        L ${x + w} ${y + h - r} 
+                        Q ${x + w} ${y + h} ${x + w - r} ${y + h} 
+                        L ${x + r} ${y + h} 
+                        Q ${x} ${y + h} ${x} ${y + h - r} 
+                        L ${x} ${y + r} 
+                        Q ${x} ${y} ${x + r} ${y} 
+                        L ${startX} ${y}`;
+          } else {
+            // Sharp rectangle - start from top center
+            const startX = width / 2;
+            pathData = `M ${startX} ${y} L ${x + w} ${y} L ${x + w} ${y + h} L ${x} ${y + h} L ${x} ${y} Z`;
+          }
+        }
+
+        // Create background and progress paths
+        ["bg-path", "progress-path"].forEach((className, index) => {
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("class", className);
+          path.setAttribute("d", pathData);
+          path.setAttribute("stroke", index ? "transparent" : remainingColor); // Start progress path as transparent
+          path.setAttribute("stroke-width", strokeWidth);
+          path.setAttribute("fill", "none");
+
+          if (index) {
+            // progress path
+            path.setAttribute("stroke-linecap", "round");
+            path.style.transition = `all ${animationDuration}ms ease-out`;
+          }
+
+          svg.appendChild(path);
+        });
+
+        // Calculate path metrics
+        const progressPath = svg.querySelector(".progress-path");
+        const pathLength = progressPath.getTotalLength ? progressPath.getTotalLength() : 300; // Fallback for environments without getTotalLength
+
+        progressPath.setAttribute("data-length", pathLength);
+      }
+
+      // Update progress
+      const bgPath = svg.querySelector(".bg-path");
+      const progressPath = svg.querySelector(".progress-path");
+
+      bgPath.setAttribute("stroke", remainingColor);
+
+      // Apply progress
+      const pathLength = parseFloat(progressPath.getAttribute("data-length"));
+      const progressLength = (progressValue / 100) * pathLength;
+      const offsetLength = (clampedOffsetPercent / 100) * pathLength;
+
+      // Check if this is the first time setting a non-zero progress value
+      const wasTransparent = progressPath.getAttribute("stroke") === "transparent";
+      const isFirstPositiveProgress = wasTransparent && progressValue > 0;
+
+      if (progressValue <= 0) {
+        // Make progress invisible when 0 or less - keeps transitions working
+        progressPath.setAttribute("stroke", "transparent");
+        progressPath.setAttribute("stroke-dasharray", `0 ${pathLength}`);
+        progressPath.setAttribute("stroke-dashoffset", "0");
+      } else {
+        // Show progress path with proper color
+        progressPath.setAttribute("stroke", progressColor);
+        progressPath.setAttribute("stroke-dashoffset", "0"); // Always 0 with new offset approach
+
+        const getDashArray = () => {
+          if (progressValue >= 100) {
+            return `${pathLength} 0`;
+          } else if (progressLength === 0) {
+            return `0 ${pathLength}`;
+          } else if (offsetLength + progressLength <= pathLength) {
+            // No wrap-around needed
+            // Pattern: [transparent offset] [progress] [remaining transparent]
+            return `0 ${offsetLength} ${progressLength} ${pathLength - offsetLength - progressLength}`;
+          } else {
+            // Wrap-around needed
+            const endProgress = pathLength - offsetLength;
+            const wrapProgress = progressLength - endProgress;
+            // Pattern: [wrap progress] [gap] [main progress] [remaining]
+            return `${wrapProgress} ${offsetLength - wrapProgress} ${endProgress} 0`;
+          }
+        };
+
+        if (isFirstPositiveProgress) {
+          // Start from 0 and animate to target on first appearance
+          progressPath.setAttribute("stroke-dasharray", `0 ${offsetLength} 0 ${pathLength - offsetLength}`);
+          progressPath.getBoundingClientRect();
+          requestAnimationFrame(() => {
+            progressPath.setAttribute("stroke-dasharray", getDashArray());
+          });
+        } else {
+          progressPath.setAttribute("stroke-dasharray", getDashArray());
+        }
+      }
+    }
+
+
+
+    function getEffectiveDimensions(element) {
+      if (!element || !element.getBoundingClientRect) {
+        return { width: 38, height: 38 };
+      }
+
+      const rect = element.getBoundingClientRect();
+      const width = rect.width || 38;
+      const height = rect.height || 38;
+
+      return { width, height };
+    }
+
+
+
+    const getDashArray = () => {
+          if (progressValue >= 100) {
+            return `${pathLength} 0`;
+          } else if (progressLength === 0) {
+            return `0 ${pathLength}`;
+          } else if (offsetLength + progressLength <= pathLength) {
+            // No wrap-around needed
+            // Pattern: [transparent offset] [progress] [remaining transparent]
+            return `0 ${offsetLength} ${progressLength} ${pathLength - offsetLength - progressLength}`;
+          } else {
+            // Wrap-around needed
+            const endProgress = pathLength - offsetLength;
+            const wrapProgress = progressLength - endProgress;
+            // Pattern: [wrap progress] [gap] [main progress] [remaining]
+            return `${wrapProgress} ${offsetLength - wrapProgress} ${endProgress} 0`;
+          }
+        };
+
+    function removeProgressBorder(element) {
+      const svg = element.querySelector(".stroke-dash-aligned-svg");
+      if (svg) {
+        svg.remove();
+      }
+    }
+
+    const getAttributes = (input) => {
+      if (input == null) return undefined;
+      if (typeof input !== "string" && typeof input !== "object") return undefined;
+
+      const entityDetails = parseEntity(input);
+      const stateObj = hass.states[entityDetails.entityId];
+
+      if (!stateObj) return undefined;
+      return stateObj.attributes || {};
+    };
+
+    const getDomain = (input) => {
+      if (input == null) return undefined;
+      if (typeof input !== "string" && typeof input !== "object") return undefined;
+
+      const entityDetails = parseEntity(input);
+      return entityDetails.entityId ? entityDetails.entityId.split(".")[0] : undefined;
+    };
+
+    function parseHHMMSSToSeconds(timeString) {
+      if (!timeString || typeof timeString !== "string") return 0;
+
+      const parts = timeString.split(":");
+      if (parts.length !== 3) return 0;
+
+      const [hours, minutes, seconds] = parts.map(Number);
+      if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) return 0;
+
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+
+    function calculateProgressValue(progressSource, progressOptions = { start: 0, end: 100 }) {
+      // Check if this is a timer entity
+      const domain = getDomain(progressSource);
+      if (domain === "timer") {
+        return calculateTimerProgress(progressSource);
+      }
+
+      // Existing numeric progress calculation
+      let progressValue = parseFloat(getState(progressSource));
+      let startValue = parseFloat(getState(progressOptions.start));
+      let endValue = parseFloat(getState(progressOptions.end));
+
+      startValue = isNaN(startValue) ? 0 : startValue;
+      endValue = isNaN(endValue) ? 100 : endValue;
+
+      if (isNaN(progressValue) || progressValue < startValue) {
+        progressValue = startValue;
+      }
+      if (progressValue > endValue) {
+        progressValue = endValue;
+      }
+
+      return ((progressValue - startValue) / (endValue - startValue)) * 100;
+    }
+
+    function calculateTimerProgress(timer) {
+      const timerState = getState(timer);
+      const attributes = getAttributes(timer);
+
+      if (!timerState || !attributes) {
+        return 0;
+      }
+
+      if (timerState === "active") {
+        // Calculate progress based on current time, duration, and finishes_at
+        const duration = attributes.duration;
+        const finishesAt = attributes.finishes_at;
+
+        if (!duration || !finishesAt) return 0;
+
+        const durationSeconds = parseHHMMSSToSeconds(duration);
+        const finishTime = new Date(finishesAt);
+        const currentTime = new Date();
+
+        if (durationSeconds === 0) return 0;
+
+        // Calculate remaining time and then elapsed time
+        const remainingSeconds = (finishTime.getTime() - currentTime.getTime()) / 1000;
+        const elapsedSeconds = durationSeconds - remainingSeconds;
+
+        // Clamp between 0 and 100%
+        return Math.max(0, Math.min(100, (elapsedSeconds / durationSeconds) * 100));
+      } else if (timerState === "paused") {
+        // Calculate progress based on duration and remaining
+        const duration = attributes.duration;
+        const remaining = attributes.remaining;
+
+        if (!duration || !remaining) return 0;
+
+        const durationSeconds = parseHHMMSSToSeconds(duration);
+        const remainingSeconds = parseHHMMSSToSeconds(remaining);
+
+        if (durationSeconds === 0) return 0;
+
+        const elapsedSeconds = durationSeconds - remainingSeconds;
+        return Math.max(0, Math.min(100, (elapsedSeconds / durationSeconds) * 100));
+      }
+
+      // All other states (idle, finished, etc.) return 0
+      return 0;
+    }
+
+    function isActiveTimer(progressSource) {
+      return isTimerEntity(progressSource) && getState(progressSource) === "active";
+    }
+
+    function isTimerEntity(progressSource) {
+      return getDomain(progressSource) === "timer";
+    }
+
+    function manageTimerUpdater(element, progressSource, updateFn) {
+      const hasUpdater = !!element.dataset.progress_update_interval;
+      const shouldHaveUpdater = isActiveTimer(progressSource);
+
+      if (shouldHaveUpdater && !hasUpdater) {
+        element.dataset.progress_update_interval = setInterval(updateFn, 1000);
+      }
+
+      if (!shouldHaveUpdater && hasUpdater) {
+        clearInterval(Number(element.dataset.progress_update_interval));
+        element.removeAttribute("data-progress_update_interval");
+      }
+    }
+
+    /**
+     * ======== MAIN MODULE CODE =========
+     */
+
+
+      // this allows IDEs to parse the file normally - will be removed automatically during build.
+      const { icon_border_progress: config } = this.config;
+
+      function getElementSelector(button) {
+        if (button === "main-button" || button === "main") {
+          return ".bubble-icon-container";
+        } else {
+          return `.bubble-${button}`;
+        }
+      }
+
+      function storeOriginalBackground(element) {
+        if (element.dataset.originalBackground === undefined) {
+          element.dataset.originalBackground = element.style.background || "";
+        }
+      }
+
+      function cleanupProgressStyling(element) {
+        element.style.background = element.dataset.originalBackground;
+
+        removeProgressBorder(element);
+      }
+
+      function resolveColorConfigs(buttonConfig) {
+        const remainingColor = resolveConfig([
+          { config: buttonConfig, path: "remaining_color" },
+          {
+            config: buttonConfig,
+            path: "remainingcolor",
+            metadata: { deprecated: true, replacedWith: "remaining_color" },
+          },
+        ]);
+
+        const backColor = resolveConfig([
+          { config: buttonConfig, path: "background_color" },
+          {
+            config: buttonConfig,
+            path: "backcolor",
+            metadata: { deprecated: true, replacedWith: "background_color" },
+          },
+        ]);
+
+        return {
+          remainingProgressColor: resolveColor(remainingColor, "var(--dark-grey-color)"),
+          backgroundColor: resolveColor(backColor, "var(--bubble-icon-background-color)"),
+          hasBackgroundColor: backColor !== undefined && backColor !== null,
+        };
+      }
+
+      function applyProgressStyling(element, progressValue, progressColor, colors, buttonConfig) {
+        // Only set background if one was configured
+        // This allows us to pass-through colours that Bubble Card sets automatically
+        // e.g. colours based on the light entity
+        if (colors.hasBackgroundColor) {
+          element.style.background = `${colors.backgroundColor}`;
+        }
+        element.style.position = "relative"; // Ensure element can contain absolutely positioned SVG
+
+        createProgressBorder(element, progressValue, progressColor, colors.remainingProgressColor, {
+          strokeWidth: 3,
+          animationDuration: 800,
+          borderRadiusOverride: buttonConfig?.border_radius,
+          offsetPercent: buttonConfig?.offset_percent || 0,
+        });
+      }
+
+      function updateProgressDisplay(progressSource, buttonConfig, buttonElement) {
+        const progressValue = calculateProgressValue(progressSource, buttonConfig);
+        const inverted = buttonConfig?.invert || false;
+        const adjustedProgress = inverted ? 100 - progressValue : progressValue;
+        const colorStops = buttonConfig.color_stops || [];
+        const progressColor = resolveColorFromStops(adjustedProgress, colorStops, buttonConfig.interpolate_colors);
+        const colors = resolveColorConfigs(buttonConfig);
+
+        applyProgressStyling(buttonElement, adjustedProgress, progressColor, colors, buttonConfig);
+      }
+
+      // group button configs by button name
+      function groupByButton(configArray) {
+        return configArray.reduce((groups, buttonConfig) => {
+          const button = buttonConfig.button;
+          if (!button) return groups;
+
+          if (!groups.has(button)) {
+            groups.set(button, []);
+          }
+          groups.get(button).push(buttonConfig);
+          return groups;
+        }, new Map());
+      }
+
+      // Main processing loop
+      groupByButton(toArray(config)).forEach((buttonConfigs, button) => {
+        const selector = getElementSelector(button);
+        const buttonElement = card.querySelector(selector);
+        if (!buttonElement) return;
+
+        storeOriginalBackground(buttonElement);
+
+        // Find the first configuration with matching conditions
+        const matchingConfig = buttonConfigs.find((config) => checkAllConditions(config.condition));
+
+        if (!matchingConfig) {
+          // No matching conditions found, cleanup styling
+          cleanupProgressStyling(buttonElement);
+          const updateIntervalId = buttonElement.dataset.progress_update_interval;
+          if (updateIntervalId) {
+            buttonElement.removeAttribute("data-progress_update_interval");
+            clearInterval(Number(updateIntervalId));
+          }
+          return;
+        }
+
+        const progressSource = resolveConfig([
+          {
+            config: matchingConfig,
+            path: "source",
+          },
+          {
+            config: matchingConfig,
+            path: "entity",
+            metadata: { deprecated: true, replacedWith: "source" },
+          },
+        ]);
+
+        manageTimerUpdater(buttonElement, progressSource, () => {
+          updateProgressDisplay(progressSource, matchingConfig, buttonElement);
+        });
+        updateProgressDisplay(progressSource, matchingConfig, buttonElement);
+        applyEffects(buttonElement, matchingConfig.effects || []);
+      });
+    })()}
+
+    :root {
+        --animated-progress-stroke-width: 3;
+        --animated-progress-transition-duration: 0.3s;
+        --bubble-border-inset: 2px;
+    }
+
+    .bubble-icon-container {
+        container-type: size;
+    }
+
+    .progress-border {
+        position: relative;
+    }
+
+    .animated-mask-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+
+        /* Performance optimizations */
+        contain: layout style paint;
+        transform: translateZ(0);
+        /* Force hardware acceleration */
+    }
+
+    .mask-sector {
+        fill: black;
+        transition: d var(--animated-progress-transition-duration) cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: d;
+        contain: layout style paint;
+    }
+
+    .bg-path,
+    .progress-path {
+        fill: none;
+        stroke-width: var(--animated-progress-stroke-width, 3);
+        stroke-linecap: round;
+        transition: all var(--animated-progress-transition-duration, 0.3s) cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: stroke;
+    }
+  editor:
+    - type: expandable
+      title: Dynamic Entity Resolution
+      icon: mdi:information-variant-circle-outline
+      schema:
+        - type: constant
+          label: Dynamic Entity Resolution (DER)
+          value: If you see ✨ in an input field, then it supports DER. This allows entry of an entity, attribute, or regular value. Just enter the entity name. For attributes, use the format ENTITY[ATTRIBUTE], e.g., sensor.my_phone[battery_level].
+    - type: expandable
+      name: '0'
+      title: Icon 1 settings (define more in YAML)
+      schema:
+        - name: button
+          label: Button to apply to. Use 'main' or 'sub-button-1' etc.
+          selector:
+            text: null
+        - name: source
+          label: ✨Source entity
+          selector:
+            entity: {}
+        - name: invert
+          label: Invert the progress direction
+          selector:
+            boolean:
+              default: false
+        - name: condition
+          label: Condition to show progress (see docs for additional condition configuration)
+          selector:
+            condition: {}
+        - type: expandable
+          label: Custom start/end values (optional)
+          schema:
+            - type: constant
+              value: Use these to override the default 0-100 progress range.
+            - name: start
+              label: ✨Start value of entity
+              selector:
+                number:
+                  default: 0
+            - name: end
+              label: ✨End value of entity
+              selector:
+                number:
+                  default: 100
+        - name: border_radius
+          label: Border radius override (e.g., 10 for 10px, or '50%' for circular)
+          selector:
+            text: null
+        - type: expandable
+          label: Color settings
+          schema:
+            - name: interpolate_colors
+              label: Gradually transition between colours
+              selector:
+                boolean: null
+            - type: expandable
+              name: color_stops
+              label: Progress colors - add more in YAML
+              schema:
+                - type: expandable
+                  label: Color 1
+                  name: '0'
+                  schema:
+                    - name: color
+                      label: ✨Color
+                      selector:
+                        ui_color: null
+                    - name: percent
+                      label: From %
+                      selector:
+                        number:
+                          min: 0
+                          max: 100
+                          step: 1
+                          unit_of_measurement: '%'
+                - type: expandable
+                  label: Color 2
+                  name: '1'
+                  schema:
+                    - name: color
+                      label: ✨Color
+                      selector:
+                        ui_color: null
+                    - name: percent
+                      label: From %
+                      selector:
+                        number:
+                          min: 0
+                          max: 100
+                          step: 1
+                          unit_of_measurement: '%'
+            - name: background_color
+              label: ✨Background colour of icon
+              selector:
+                ui_color: null
+            - name: remaining_color
+              label: ✨Color of remaining progress section
+              selector:
+                ui_color: null
+    - type: expandable
+      name: '1'
+      title: Icon 2 settings (define more in YAML)
+      schema:
+        - name: button
+          label: Button to apply to. Use 'main' or 'sub-button-1' etc.
+          selector:
+            text: null
+        - name: source
+          label: ✨Source entity
+          selector:
+            entity: {}
+        - name: invert
+          label: Invert the progress direction
+          selector:
+            boolean:
+              default: false
+        - name: condition
+          label: Condition to show progress (see docs for additional condition configuration)
+          selector:
+            condition: {}
+        - type: expandable
+          label: Custom start/end values (optional)
+          schema:
+            - type: constant
+              value: Use these to override the default 0-100 progress range.
+            - name: start
+              label: ✨Start value of entity
+              selector:
+                number:
+                  default: 0
+            - name: end
+              label: ✨End value of entity
+              selector:
+                number:
+                  default: 100
+        - name: border_radius
+          label: Border radius override (e.g., 10 for 10px, or '50%' for circular)
+          selector:
+            text: null
+        - type: expandable
+          label: Color settings
+          schema:
+            - name: interpolate_colors
+              label: Gradually transition between colours
+              selector:
+                boolean: null
+            - type: expandable
+              name: color_stops
+              label: Progress colors - add more in YAML
+              schema:
+                - type: expandable
+                  label: Color 1
+                  name: '0'
+                  schema:
+                    - name: color
+                      label: ✨Color
+                      selector:
+                        ui_color: null
+                    - name: percent
+                      label: From %
+                      selector:
+                        number:
+                          min: 0
+                          max: 100
+                          step: 1
+                          unit_of_measurement: '%'
+                - type: expandable
+                  label: Color 2
+                  name: '1'
+                  schema:
+                    - name: color
+                      label: ✨Color
+                      selector:
+                        ui_color: null
+                    - name: percent
+                      label: From %
+                      selector:
+                        number:
+                          min: 0
+                          max: 100
+                          step: 1
+                          unit_of_measurement: '%'
+            - name: background_color
+              label: ✨Background colour of icon
+              selector:
+                ui_color: null
+            - name: remaining_color
+              label: ✨Color of remaining progress section
+              selector:
+                ui_color: null
+  link: https://github.com/Clooos/Bubble-Card/discussions/1525
