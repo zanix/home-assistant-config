@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4888 |
-| Sensors        | 1729 |
-| Binary Sensors | 351 |
+| All Entities   | 4980 |
+| Sensors        | 1738 |
+| Binary Sensors | 357 |
 | Lights         | 77 |
-| Switches       | 741 |
+| Switches       | 746 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -303,7 +303,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>26 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.0]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -315,7 +315,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.6.4]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.7.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -367,7 +367,7 @@ Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.13.1]
+### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.13.2]
 
 Home Assistant Google Home custom component
 
@@ -379,7 +379,7 @@ HACS gives you a powerful UI to handle downloads of all your custom needs.
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Hass.Agent 2 Integration   Media Player & Notifications](https://github.com/hass-agent/HASS.Agent-Integration) [v2.1.1]
+### [Hass.Agent 2 Integration   Media Player & Notifications](https://github.com/hass-agent/HASS.Agent-Integration) [v2.1.2]
 
 HASS.Agent's Home Assistant integration. Adds notifications and mediaplayer capabilities to HASS.Agent - a Windows based client (companion app) for Home Assistant.
 
@@ -391,13 +391,13 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@DrR0X-glitch](https:/
 
 Authors: [@bruxy70](https://github.com/bruxy70).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.1.1]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.1.2]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.47.7]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.48.8]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -409,7 +409,7 @@ KidsChores Custom Integration for Home Assistant
 
 Authors: [@ad-ha](https://github.com/ad-ha).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.6]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.4.7]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -421,7 +421,7 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.2]
+### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.2.1]
 
 Home Assistant Neakasa Integration
 
@@ -445,7 +445,7 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.0.12]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.0.13]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -509,11 +509,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.7.9]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.7.10]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v4.5.0]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v4.6.0]
 
 Expander card for HomeAssistant
 
@@ -521,7 +521,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v1.8.1.1]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.0.0]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -553,7 +553,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.29]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.30]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -589,7 +589,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
-### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.1.8]
+### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.2.0]
 
 A simple and configurable tabs card for Home Assistant Dashboards.
 
@@ -637,7 +637,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.5]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.6]
 
 Material Design 3 Theme for Home Assistant
 
@@ -910,7 +910,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.1.0-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.1.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
