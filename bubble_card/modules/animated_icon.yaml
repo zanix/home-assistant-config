@@ -1,0 +1,864 @@
+animated_icon:
+  name: Animated Icons 2
+  version: v2.4.0
+  creator: Airblader (+ @ozumado)
+  link: https://github.com/Clooos/Bubble-Card/discussions/2075
+  supported:
+    - button
+    - climate
+    - cover
+    - media-player
+    - sub-buttons
+  description: |
+    <p>Bring your card icons to life with Animated Icons 2.</p>
+    <ol>
+      <li>Enable animation based on the entity's "on" state or custom conditions.</li>
+      <li>Supports both the main and sub-button icons.</li>
+      <li>Over a dozen different icon animations to choose from.</li>
+    </ol>
+  code: |
+    ${(() => {
+      const moduleConfig = this.config?.animated_icon;
+      if (!moduleConfig) return;
+
+      this.__icon_animations ??= createAnimations();
+
+      return createConfigurations(moduleConfig)
+        .filter(config => !!config.mode)
+        .map(config => {
+          const iconSelector = config.index === -1
+            ? '.bubble-main-icon'
+            : `.bubble-sub-button-${config.index + 1} .bubble-sub-button-icon`;
+
+          // Clean up any leftover nodes if the mode was changed.
+          const iconItem = card.querySelector(iconSelector);
+          const parent = iconItem?.parentNode;
+          parent?.querySelectorAll(`:scope > [class^="clone-"]:not(.clone-${config.mode})`)
+            .forEach(el => el.remove());
+
+          const ignoreState = config.ignore_state ?? false;
+          const conditions = config.conditions ?? [];
+
+          const animation = this.__icon_animations[config.mode];
+          if (!animation) {
+            console.error(`[Animated Icon] Unknown animation: ${config.mode}`);
+            return "";
+          }
+
+          const stateEntity = (config.use_button_entity ?? false)
+            ? getEntityByIndex(this.config, config.index)
+            : entity;
+          const isOn = isEntityOn(stateEntity, ignoreState, conditions);
+
+          const noOffIcon = config.no_off_icon ?? false;
+          const newIcon = (isOn || noOffIcon) ? animation.iconOn : (animation.iconOff ?? animation.iconOn);
+
+          // We cannot use subButtonIcon here, see
+          // https://github.com/Clooos/Bubble-Card/discussions/1668#discussioncomment-15391491
+          (config.index === -1
+            ? icon
+            : card.querySelector(`.bubble-sub-button-${config.index + 1} .bubble-sub-button-icon:not(.clone)`)
+          )?.setAttribute("icon", newIcon)
+
+          return `
+            ${isOn ? createBackgroundStyle(config) : ''}
+            ${animation.animate(config.mode, iconSelector, isOn)}
+          `;
+        }
+      ).reduce((a, b) => a + b, "");
+
+      // ================================================================================
+
+      function createAnimations() {
+        return {
+          air_purifier: {
+            iconOn: "mdi:air-purifier",
+            iconOff: "mdi:air-purifier-off",
+            animate: animatedAirPurifier,
+          },
+          alarm: {
+            iconOn: "mdi:alarm",
+            iconOff: "mdi:alarm-off",
+            animate: animatedAlarm,
+          },
+          alert: {
+            iconOn: "mdi:alarm-light",
+            iconOff: "mdi:alarm-light-off",
+            animate: animatedAlert,
+          },
+          boil: {
+            iconOn: "mdi:kettle-steam",
+            animate: animatedBoil,
+          },
+          ding: {
+            iconOn: "mdi:bell-ring",
+            animate: animatedDing,
+          },
+          dishwasher: {
+            iconOn: "mdi:dishwasher",
+            iconOff: "mdi:dishwasher-off",
+            animate: animatedDishwasher,
+          },
+          dryer: {
+            iconOn: "mdi:tumble-dryer",
+            iconOff: "mdi:tumble-dryer-off",
+            animate: animatedDryer,
+          },
+          fan: {
+            iconOn: "mdi:fan",
+            iconOff: "mdi:fan-off",
+            animate: animatedFan,
+          },
+          heat_pump: {
+            iconOn: "mdi:heat-pump-outline",
+            animate: animatedHeatPump,
+          },
+          microwave: {
+            iconOn: "mdi:microwave",
+            iconOff: "mdi:microwave-off",
+            animate: animatedMicrowave,
+          },
+          motion: {
+            iconOn: "mdi:motion-sensor",
+            iconOff: "mdi:motion-sensor-off",
+            animate: animatedMotion,
+          },
+          radiator: {
+            iconOn: "mdi:radiator",
+            iconOff: "mdi:radiator-disabled",
+            animate: animatedRadiator,
+          },
+          vacuum: {
+            iconOn: "mdi:robot-vacuum",
+            iconOff: "mdi:robot-vacuum-off",
+            animate: animatedVacuum,
+          },
+          washing_machine: {
+            iconOn: "mdi:washing-machine",
+            iconOff: "mdi:washing-machine-off",
+            animate: animatedWashingMachine,
+          },
+        };
+      }
+
+      function createConfigurations(moduleConfig) {
+        return [
+          ...(moduleConfig.mode
+            ? [{
+                mode: moduleConfig.mode,
+                ignore_state: moduleConfig.ignore_state ?? false,
+                background: moduleConfig.background ?? 'none',
+                conditions: moduleConfig.conditions ?? [],
+                index: -1,
+              }]
+            : []
+          ),
+
+          ...(moduleConfig?.buttons ?? []),
+        ];
+      }
+
+      function isEntityOn(entityId, ignoreState, conditions) {
+        if (!checkConditionsMet([].concat(conditions), hass)) {
+          return false;
+        }
+
+        if (!ignoreState) {
+            // Copied and modified from
+            // https://github.com/Clooos/Bubble-Card/blob/9164b7540d86e397b64113cb45f553e1bf7b6121/src/tools/utils.js#L289-L328
+            const state = hass.states[entityId];
+            const normalizedState = state?.state?.toLowerCase();
+            const isTemperature = state?.attributes["unit_of_measurement"]?.includes('°');
+            const numericState = Number(state?.state);
+            const activeStringStates = [
+                'on',
+                'open',
+                'opening',
+                'closing',
+                'cleaning',
+                'true',
+                'home',
+                'playing',
+                'locked',
+                'unlocked',
+                'occupied',
+                'available',
+                'running',
+                'active',
+                'connected',
+                'online',
+                'mowing',
+                'edgecut',
+                'starting',
+                'heat',
+                'cool',
+                'dry',
+                'heat_cool',
+                'fan_only',
+                'auto',
+                'alarm',
+                'error'
+            ];
+
+            return activeStringStates.includes(normalizedState) || numericState || isTemperature;
+        }
+
+        return true;
+      }
+
+      function getEntityByIndex(config, index) {
+        if (!config) return undefined;
+
+        if (index === -1) {
+          return config.entity;
+        }
+
+        return getSubButtonEntities(config)[index] ?? config.entity;
+      }
+
+      function getSubButtonEntities(config) {
+        if (!config?.sub_button) return [];
+
+        return [
+          ...getSubButtonCategoryEntities(config.sub_button?.main),
+          ...getSubButtonCategoryEntities(config.sub_button?.bottom)
+        ];
+      }
+
+      function getSubButtonCategoryEntities(buttons) {
+        if (!buttons) return [];
+
+        return buttons
+          .flatMap(v => v.group ?? v)
+          .map(button => button.entity);
+      }
+
+      function createBackgroundStyle(config) {
+        if (!config?.background || config.background === 'none') {
+          return "";
+        }
+
+        const selector = config.index === -1
+          ? '.bubble-main-icon-container'
+          : `.bubble-sub-button-${config.index + 1}`;
+
+        return `
+          ${selector} {
+            background-color: var(--${config.background}-color) !important;
+          }
+        `;
+      }
+
+      // ================================================================================
+
+      function animatedAirPurifier(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: air-purifier-air 1s linear infinite;' : ''}
+          }
+
+          @keyframes air-purifier-air {
+            0%, 100% { clip-path: inset(0 0 0 0); }
+            25% { clip-path: polygon(100% 100%, 0 100%, 0 0, 100% 0, 98% 32%, 63% 42%, 65% 58%, 100% 43%); }
+            75% { clip-path: polygon(100% 100%, 0 100%, 0 0, 100% 0, 100% 44%, 64% 61%, 64% 73%, 100% 72%); }
+            50% { clip-path: polygon(100% 100%, 0 100%, 0 0, 100% 0, 78% 38%, 64% 43%, 64% 72%, 100% 73%); }
+          }
+        `;
+      }
+
+      function animatedAlarm(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: alarm-alarm 0.75s ease infinite;' : ''}
+          }
+
+          @keyframes alarm-alarm {
+            0%, 80%, 100% { transform: translateY(0); }
+            10% { transform: translateY(-2px) rotate(-27deg); }
+            20% { transform: translateY(-2px) rotate(21deg); }
+            30% { transform: translateY(-2px) rotate(-15deg); }
+            40% { transform: translateY(-2px) rotate(9deg); }
+            50% { transform: translateY(0); }
+            60% { transform: translateY(-1.2px) }
+          }
+        `;
+      }
+
+      function animatedAlert(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: alert-alert 0.75s linear infinite, alert-shake 0.5s linear infinite;' : ''}
+          }
+
+          @keyframes alert-alert {
+            50% { clip-path: polygon(0% 55%, 25% 55%, 25% 35%, 35% 25%, 50% 18%, 65% 20%, 75% 35%, 75% 55%, 100% 55%, 100% 100%, 0 100%);}
+          }
+
+          @keyframes alert-shake {
+            0%, 100% { transform: translate(0, 0) rotate(0); }
+            20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }
+            40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }
+            60%  { transform: translate(0.4px, 0.4px) rotate(-4deg); }
+            80%  { transform: translate(-0.4px, -0.4px) rotate(4deg); }
+          }
+        `;
+      }
+
+      function animatedBoil(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: boil-boil 600ms linear infinite;' : ''}
+          }
+
+          @keyframes boil-boil {
+            0%, 100% { transform: translate(1.5px, -1.0px) rotate(-6deg); }
+            10% { transform: translate(-1.9px, 1.1px) rotate(4deg);
+                  clip-path: polygon(0 0, 66% 10%, 67% 30%, 88% 52%, 100% 100%, 0 100%); }
+            20% { transform: translate(0.8px, 2.3px) rotate(9deg); }
+            30% { transform: translate(-1.4px, -1.6px) rotate(-3deg); }
+            40% { transform: translate(0.2px, 1.5px) rotate(6deg); }
+            50% { transform: translate(-2.4px, 0.5px) rotate(0deg); }
+            60% { transform: translate(2.0px, -1.1px) rotate(-8deg); }
+            70% { transform: translate(-0.9px, 1.8px) rotate(5deg); }
+            80% { transform: translate(0.4px, -1.4px) rotate(-4deg); }
+            90% { transform: translate(-0.6px, 0.9px) rotate(1deg); }
+          }
+        `;
+      }
+
+      function animatedDing(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: ding-ring 4s linear infinite;' : ''}
+            transform-origin: 50% 15%;
+          }
+
+          @keyframes ding-ring {
+            0% { transform: rotate(0); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            2% { transform: rotate(30deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            6% { transform: rotate(-28deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            10% { transform: rotate(34deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            14% { transform: rotate(-32deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            18% { transform: rotate(30deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            22% { transform: rotate(-28deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            26% { transform: rotate(26deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            30% { transform: rotate(-24deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            34% { transform: rotate(22deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            38% { transform: rotate(-20deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            42% { transform: rotate(18deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            46% { transform: rotate(-16deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            50% { transform: rotate(14deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            54% { transform: rotate(-12deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            58% { transform: rotate(10deg); clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
+            62% { transform: rotate(-8deg); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+            66% { transform: rotate(6deg); }
+            70% { transform: rotate(-4deg); }
+            74% { transform: rotate(2deg); }
+            78% { transform: rotate(-1deg); }
+            82% { transform: rotate(1deg); }
+            86% { transform: rotate(0); }
+            100% { transform: rotate(0); clip-path: polygon(0 50%, 0 100%, 100% 100%, 100% 50%, 85% 50%, 80% 30%, 60% 5%, 40% 5%, 20% 30%, 15% 50%); }
+          }
+        `;
+      }
+
+      function animatedDishwasher(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: dishwasher-bounce 1.5s ease-in-out infinite, dishwasher-wash 1s ease-in-out infinite;' : ''}
+            transform-origin: 50% 75%;
+          }
+
+          @keyframes dishwasher-bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0); }
+            40% { transform: translateY(-1.2px) rotate(5deg); }
+            60% { transform: translateY(-1.1px) rotate(-4deg); }
+          }
+
+          @keyframes dishwasher-wash {
+            50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100% 100%, 100% 0); }
+          }
+        `;
+      }
+
+      function animatedDryer(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: dryer-shake 400ms ease-in-out infinite, dryer-drum 1s infinite;' : ''}
+            transform-origin: 50% 65%;
+          }
+
+          @keyframes dryer-shake {
+            0%, 100% { transform: rotate(4deg); }
+            50%  { transform: rotate(-4deg); }
+          }
+
+          @keyframes dryer-drum {
+            50%  { clip-path: polygon(0 0, 0 100%, 35% 100%, 36% 74%, 31% 43%, 61% 40%, 71% 69%, 62% 78%, 36% 73%, 35% 100%, 100% 100%, 100% 0); }
+          }
+        `;
+      }
+
+      function animatedFan(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: fan-spin 1s linear infinite;' : ''}
+          }
+
+          @keyframes fan-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+          }
+        `;
+      }
+
+      function animatedHeatPump(mode, iconSelector, isOn) {
+        const iconItem = card.querySelector(iconSelector);
+        const parent = iconItem?.parentNode;
+        if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
+          const clone = iconItem.cloneNode(true);
+          clone.setAttribute("icon", iconItem.getAttribute("icon"));
+          clone.classList.add('clone');
+          clone.classList.add('clone-'+mode);
+          parent.insertBefore(clone, iconItem);
+        }
+
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}.clone {
+            clip-path: polygon(0% 0%, 0% 100%, 23% 100%, 23% 23%, 78% 22%, 77% 78%, 23% 78%, 22% 100%, 100% 100%, 100% 0%);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: heat-pump-spin 2s linear infinite;' : ''}
+            clip-path: circle(27.3% at 50% 50%);
+          }
+
+          @keyframes heat-pump-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+          }
+        `;
+      }
+
+      function animatedMicrowave(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:before {
+            content: "";
+            position: absolute;
+            width: 55%;
+            height: 45%;
+            top: 28%;
+            left: 15%;
+            ${isOn ? 'background: var(--bubble-icon-color, var(--bubble-button-background-color));' : ''}
+            ${isOn ? 'animation: microwave-cook 1.5s linear infinite;' : ''}
+          }
+
+          @keyframes microwave-cook {
+            0%, 100% { opacity: 20%; }
+            50%      { opacity: 60%; }
+          }
+        `;
+      }
+
+      function animatedMotion(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: motion-clip 1.5s linear infinite;' : ''}
+          }
+
+          @keyframes motion-clip {
+            50% { clip-path: polygon(0 0, 55% 0, 100% 100%, 0 100%); }
+          }
+        `;
+      }
+
+      function animatedRadiator(mode, iconSelector, isOn) {
+        const iconItem = card.querySelector(iconSelector);
+        const parent = iconItem?.parentNode;
+        if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
+          const clone = iconItem.cloneNode(true);
+          clone.setAttribute("icon", iconItem.getAttribute("icon"));
+          clone.classList.add('clone');
+          clone.classList.add('clone-'+mode);
+          parent.insertBefore(clone, iconItem);
+        }
+
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}.clone {
+            ${isOn ? 'animation: radiator-waves 2s ease-in-out infinite;' : ''}
+            transform-origin: 50% 59%;
+            clip-path: rect(auto auto 45% auto);
+          }
+
+          ${iconSelector}:not(.clone) {
+            clip-path: rect(45% auto auto auto);
+          }
+
+          @keyframes radiator-waves {
+            0% { transform: translateY(5%); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-15%); opacity: 0; }
+          }
+        `;
+      }
+
+      function animatedVacuum(mode, iconSelector, isOn) {
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: vacuum-spin 15s ease-in-out infinite;' : ''}
+          }
+
+          @keyframes vacuum-spin {
+            0%  { transform: translate(0%, 0%) rotate(45deg); }
+            5% { transform: translate(15%, -15%) rotate(45deg); }
+            8% { transform: translate(15%, -15%) rotate(-90deg); }
+            18% { transform: translate(-15%, -15%) rotate(-90deg); }
+            21% { transform: translate(-15%, -15%) rotate(-180deg); }
+            31% { transform: translate(-15%, 15%) rotate(-180deg); }
+            34% { transform: translate(-15%, 15%) rotate(-270deg); }
+            44% { transform: translate(15%, 15%) rotate(-270deg); }
+            47% { transform: translate(15%, 15%) rotate(-405deg); }
+            57% { transform: translate(-15%, -15%) rotate(-405deg); }
+            60% { transform: translate(-15%, -15%) rotate(-270deg); }
+            70% { transform: translate(15%, -15%) rotate(-270deg); }
+            73% { transform: translate(15%, -15%) rotate(-135deg); }
+            83% { transform: translate(-15%, 15%) rotate(-135deg); }
+            86% { transform: translate(-15%, 15%) rotate(-270deg); }
+            90% { transform: translate(0%, 15%) rotate(-270deg); }
+            93% { transform: translate(0%, 15%) rotate(-360deg); }
+            97% { transform: translate(0%, 0%) rotate(-360deg); }
+            100% { transform: translate(0%, 0%) rotate(-315deg); }
+          }
+        `;
+      }
+
+      function animatedWashingMachine(mode, iconSelector, isOn) {
+        const iconItem = card.querySelector(iconSelector);
+        const parent = iconItem?.parentNode;
+        if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
+          const clone = iconItem.cloneNode(true);
+          clone.setAttribute("icon", iconItem.getAttribute("icon"));
+          clone.classList.add('clone');
+          clone.classList.add('clone-'+mode);
+          parent.insertBefore(clone, iconItem);
+        }
+
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}.clone {
+            ${isOn ? 'animation: washing-machine-shake 400ms ease-in-out infinite;' : ''}
+            transform-origin: 50% 59%;
+            clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0);
+          }
+
+          ${iconSelector}:not(.clone) {
+            ${isOn ? 'animation: washing-machine-spin 1s linear infinite;' : ''}
+            transform-origin: 50% 59%;
+            clip-path: circle(22% at 50% 59%);
+          }
+
+          @keyframes washing-machine-shake {
+            0%, 100% { transform: translate(0, 0) rotate(0); }
+            20%  { transform: translate(0.4px, -0.4px) rotate(-4deg); }
+            40%  { transform: translate(-0.4px, 0.4px) rotate(4deg); }
+            60%  { transform: translate(0.4px, 0.4px) rotate(-4deg); }
+            80%  { transform: translate(-0.4px, -0.4px) rotate(4deg); }
+          }
+
+          @keyframes washing-machine-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+          }
+        `;
+      }
+    })()}
+  editor:
+    - type: expandable
+      expanded: true
+      label: Main Icon
+      schema:
+        - name: mode
+          label: Animation (optional)
+          selector:
+            select:
+              options:
+                - label: Air Purifier
+                  value: air_purifier
+                - label: Alarm
+                  value: alarm
+                - label: Alert
+                  value: alert
+                - label: Boil
+                  value: boil
+                - label: Ding
+                  value: ding
+                - label: Dishwasher
+                  value: dishwasher
+                - label: Dryer
+                  value: dryer
+                - label: Fan
+                  value: fan
+                - label: Heat Pump
+                  value: heat_pump
+                - label: Microwave
+                  value: microwave
+                - label: Motion
+                  value: motion
+                - label: Radiator
+                  value: radiator
+                - label: Vacuum
+                  value: vacuum
+                - label: Washing Machine
+                  value: washing_machine
+              multiple: false
+              custom_value: false
+              mode: dropdown
+        - name: ignore_state
+          label: Ignore entity's on/off state
+          selector:
+            boolean: {}
+        - name: no_off_icon
+          label: Do not show 'off' icon if animation is disabled
+          selector:
+            boolean: {}
+        - name: background
+          label: Backgound color
+          selector:
+            ui_color:
+              include_none: true
+              default_color: none
+        - type: constant
+          label: Define additional conditions that must pass for the animation to play.
+        - name: conditions
+          label: Conditions
+          selector:
+            condition: {}
+    - name: buttons
+      label: Sub-Button Icons
+      selector:
+        object:
+          multiple: true
+          label_field: mode
+          fields:
+            index:
+              label: Sub-Button Index
+              default: 0
+              required: true
+              selector:
+                number:
+                  min: 0
+                  step: 1
+                  mode: box
+            mode:
+              label: Animation
+              selector:
+                select:
+                  options:
+                    - label: Air Purifier
+                      value: air_purifier
+                    - label: Alarm
+                      value: alarm
+                    - label: Alert
+                      value: alert
+                    - label: Boil
+                      value: boil
+                    - label: Ding
+                      value: ding
+                    - label: Dishwasher
+                      value: dishwasher
+                    - label: Dryer
+                      value: dryer
+                    - label: Fan
+                      value: fan
+                    - label: Heat Pump
+                      value: heat_pump
+                    - label: Microwave
+                      value: microwave
+                    - label: Motion
+                      value: motion
+                    - label: Radiator
+                      value: radiator
+                    - label: Vacuum
+                      value: vacuum
+                    - label: Washing Machine
+                      value: washing_machine
+                  multiple: false
+                  custom_value: false
+                  mode: dropdown
+              required: true
+            use_button_entity:
+              label: Use sub-button entity
+              selector:
+                boolean: {}
+            ignore_state:
+              label: Ignore entity's on/off state
+              selector:
+                boolean: {}
+            no_off_icon:
+              label: Do not show 'off' icon if animation is disabled
+              selector:
+                boolean: {}
+            background:
+              label: Backgound color
+              selector:
+                ui_color:
+                  include_none: true
+                  default_color: none
+            conditions:
+              label: Conditions
+              selector:
+                condition: {}
