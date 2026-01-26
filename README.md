@@ -750,7 +750,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>147 Automations</summary>
+<details><summary>144 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -759,11 +759,8 @@ Material Design 3 Theme for Home Assistant
 - ⏯ Living Room Media Off
 - ⏯ Living Room Media State at Night 🚫
 - ⏯ Living Room Sound Mode 🚫
-- ⏯ Living Room Sound Night Mode 🚫
 - ⏯ Main Bedroom Media Off
 - ⏯ PS4 Harmony Activity
-- ⏯️ Samsung Soundbar Night Mode 🚫
-- ⏯️ Samsung Soundbar Voice Enhancer 🚫
 - ☑️ Cat Feeder Filled
 - ☑️ Close Garage Door
 - ☑️ Garbage Collection

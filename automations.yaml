@@ -64,18 +64,18 @@
 - id: '1665700097529'
   alias: ⏯ Family Room Media State at Night
   description: Brighten/Dim the lights when Media is paused
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - media_player.androidtv_family_room
-  condition:
+    trigger: state
+  conditions:
   - condition: state
     entity_id: sun.sun
     state: below_horizon
   - condition: state
     entity_id: light.family_room
     state: 'on'
-  action:
+  actions:
   - choose:
     - conditions:
       - condition: state
@@ -84,7 +84,7 @@
       sequence:
       - data:
           transition: 5
-          brightness_pct: 60
+          brightness_pct: 100
         target:
           entity_id: light.family_room
         action: light.turn_on
@@ -123,7 +123,10 @@
     data:
       sound_mode: '{{ sound_mode }}'
     action: media_player.select_sound_mode
-  mode: restart
+  - delay:
+      seconds: 30
+  mode: single
+  max_exceeded: silent
   variables:
     sound_mode: "{%- if trigger.to_state.attributes.source == 'Spotify' -%}\n  MCH
       STEREO\n{%- elif trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
@@ -1079,15 +1082,16 @@
 - id: '1665696525167'
   alias: ⚙️ Failed Login
   description: Sends a notification when there is a failed login
-  trigger:
-  - platform: persistent_notification
-    update_type: added
-  condition:
+  triggers:
+  - update_type: added
+    trigger: persistent_notification
+  conditions:
   - condition: template
-    value_template: '{%- set notification = trigger.notification.message -%} {{ "Too
-      many login attempts" in notification or "invalid authentication" in notification
-      or "login attempt" in notification }}'
-  action:
+    value_template: "{%- set notification = trigger.notification.message -%}\n{{ (\n
+      \   \"Too many login attempts\" in notification\n    or \"invalid authentication\"
+      in notification\n    or \"login attempt\" in notification\n  )\n  and not \"127.0.0.1\"
+      in notification\n}}"
+  actions:
   - data:
       send_to: joshua
       title: '{{ trigger.notification.title }}'
@@ -2110,34 +2114,28 @@
 - id: '1665697728164'
   alias: "\U0001F384 XMas Lights On/Off"
   description: ''
-  trigger:
-  - platform: sun
-    event: sunset
+  triggers:
+  - event: sunset
     offset: -00:20:00
     id: 'on'
-  - platform: time
-    at: input_datetime.xmas_lights_off
+    trigger: sun
+  - at: input_datetime.xmas_lights_off
     id: 'off'
-  condition:
+    trigger: time
+  conditions:
   - condition: state
     entity_id: binary_sensor.is_xmas
     state: 'on'
-  action:
+  actions:
   - choose:
     - conditions:
       - condition: trigger
         id: 'on'
-      sequence:
-      - entity_id: switch.eve
-        action: switch.turn_on
+      sequence: []
     - conditions:
       - condition: trigger
         id: 'off'
-      sequence:
-      - target:
-          entity_id: switch.eve
-        data: {}
-        action: switch.turn_off
+      sequence: []
   mode: single
 - id: '1665697781484'
   alias: "\U0001F384 XMas Tree On/Off"
@@ -6341,7 +6339,14 @@
   triggers:
   - entity_id: binary_sensor.quest_in_use
     trigger: state
-  conditions: []
+  conditions:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.denon_source
+      state:
+      - Shield
+      - Switch
   actions:
   - choose:
     - conditions:
@@ -6370,7 +6375,7 @@
       - parallel:
         - data:
             transition: 1
-            brightness_pct: 25
+            brightness_pct: 20
           target:
             entity_id: light.family_room
           action: light.turn_on
