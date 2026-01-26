@@ -297,7 +297,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>31 Custom Integrations</summary>
+<details><summary>30 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
@@ -336,12 +336,6 @@ Authors: [@thomasloven](https://github.com/thomasloven).
 Home Assistant integration for Dreame robot vacuums with map support
 
 Authors: [@tasshack](https://github.com/tasshack).
-
-### [Dreamscreen Service](https://github.com/J3n50m4t/Home-Assistant-DreamScreen-Service)
-
-Home Assistant Service for sending commands to a Wifi enabled DreamScreen
-
-Authors: [https://github.com/GregoryDosh](https://github.com/https://github.com/GregoryDosh).
 
 ### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.14.1]
 
@@ -672,7 +666,7 @@ Material Design 3 Theme for Home Assistant
 ### Lighting
 
 - [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
-- [DreamScreen](https://www.amazon.com/dp/B01M6UETVR) (4K DIY) - Responsive LED Backlighting for Video, Music & Games
+
 - [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
 - [Honeywell 39348/ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Inovelli LZW30 Black Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-spec-sheet)
@@ -756,7 +750,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>150 Automations</summary>
+<details><summary>147 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -799,9 +793,6 @@ Material Design 3 Theme for Home Assistant
 - ⚙️ Updates Available
 - ⚡ Tariff Changes
 - ⛩️ Automatic Garage Door
-- ✨ DreamScreen Harmony Power Off
-- ✨ DreamScreen Harmony Reactive Activity
-- ✨ DreamScreen Scene Changed
 - ✴️ Joshua Office CO2 Levels
 - ✴️ Joshua Office Light On/Off Presence
 - 🌐 IP Address Changed
