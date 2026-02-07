@@ -756,7 +756,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>144 Automations</summary>
+<details><summary>145 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -877,6 +877,7 @@ Material Design 3 Theme for Home Assistant
 - 📱 MagicMirror Dim at Sunset
 - 📱 MagicMirror On/Off Presence
 - 📱 MagicMirror On/Off Schedule
+- 📱 MagicMirror Recover Disconnect
 - 🔒 Door Lock Jammed
 - 🔒 Lock Doors when Away
 - 🔔 Doorbell Object or Ring
