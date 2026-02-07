@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 4947 |
-| Sensors        | 1720 |
-| Binary Sensors | 355 |
+| All Entities   | 5145 |
+| Sensors        | 1731 |
+| Binary Sensors | 369 |
 | Lights         | 77 |
-| Switches       | 746 |
+| Switches       | 802 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -297,7 +297,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>30 Custom Integrations</summary>
+<details><summary>31 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
@@ -305,13 +305,13 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.19]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.20]
 
 A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.7.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.7.2]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -321,7 +321,7 @@ Bubble Card Tools is a custom integration that handles the Bubble Card backend. 
 
 Authors: [@Clooos](https://github.com/Clooos).
 
-### [C.A.F.E.](https://github.com/FezVrasta/cafe-hass) [v0.4.1]
+### [C.A.F.E.](https://github.com/FezVrasta/cafe-hass) [v0.5.0]
 
 The "Third Way" for Home Assistant Automations.
 
@@ -331,7 +331,7 @@ The "Third Way" for Home Assistant Automations.
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v1.0.7]
+### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v1.0.8]
 
 Home Assistant integration for Dreame robot vacuums with map support
 
@@ -397,7 +397,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.49.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.49.1]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -451,19 +451,25 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.0.13]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.3]
 
 Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Unraid Api](https://github.com/chris-mc1/unraid_api) [v1.4.0]
+### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.2.3]
 
-Unraid API integration for Home Assistant using the local GraphQL API
+Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
-Authors: [@chris-mc1](https://github.com/chris-mc1).
+Authors: [@ruaan-deysel](https://github.com/ruaan-deysel).
 
-### [Watchman](https://github.com/dummylabs/thewatchman) [v0.7.0-beta.1]
+### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.2.1]
+
+Home Assistant Integration for the Management Agent for Unraid
+
+Authors: [@ruaan-deysel](https://github.com/ruaan-deysel).
+
+### [Watchman](https://github.com/dummylabs/thewatchman) [v0.8.3]
 
 Home Assistant custom integration to keep track of missing entities and actions in your config files
 
@@ -505,7 +511,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.0]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.1]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -513,7 +519,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 ❇️ Lovelace button-card for home assistant
 
-### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v4.1.0]
+### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v4.2.0]
 
 🔹 Add CSS styles to (almost) any lovelace card
 
@@ -521,11 +527,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.7.11]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.7.12]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v4.6.0]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v5.0.0]
 
 Expander card for HomeAssistant
 
@@ -533,7 +539,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.0.0]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.1.1]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -557,7 +563,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v9.0.2]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v10.0.1]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -565,7 +571,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.30]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.0.34]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -577,7 +583,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.0.9]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.0.10]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -637,7 +643,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.3.1]
+### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.3.2]
 
 This card provides a user-friendly way to fully control map-based vacuums in Home Assistant. Supported brands include Xiaomi (Roborock/Viomi/Dreame/Roidmi/Valetudo/Valetudo RE), Neato, Wyze, Roomba, Ecovacs (and probably more).
 
@@ -645,11 +651,11 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 </details><details><summary>2 Themes</summary>
 
-### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-3.2.1]
+### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-4.0.0]
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.6]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.7]
 
 Material Design 3 Theme for Home Assistant
 
@@ -916,7 +922,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.1.3-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.2.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
