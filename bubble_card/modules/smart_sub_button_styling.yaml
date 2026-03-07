@@ -1,0 +1,600 @@
+smart_sub_button_styling:
+  name: Smart Sub-button Styling
+  version: 1.3
+  creator: MadMan
+  supported:
+    - button
+    - separator
+    - sub-buttons
+    - horizontal-buttons-stack
+    - pop-up
+  unsupported:
+    - cover
+    - empty-column
+    - media-player
+    - select
+  description: |
+    Automatically style sub-buttons based on entity type with dynamic colors and icons.
+    Supports up to 20 sub-buttons (optimized for performance)!
+    - Light entities: Icon and background change based on light color (grey if white), auto lightbulb-off icon when off
+    - Climate entities: Icon and background change based on HVAC mode, icons auto-applied
+    - Other entities: Use conditions (same as Home Assistant automation conditions)
+    - Dropdown to treat entity as: Auto-detect, Light, Climate, or Switch
+    - Icon control: Three modes - Condition-based, HVAC modes (6 modes + off), On/Off states
+    - Organized UI: Expandable sections for Color Styling and Icon Styling
+    - 22 built-in color names: red, blue, green, yellow, orange, purple, pink, cyan, deep-purple, deep-blue, deep-orange, amber, lime, teal, indigo, brown, light-blue, light-green, grey, white, black, or custom RGBA
+    - Dynamic configuration: Add/remove sub-button styling rules as needed with sub-button index selector (1-20)
+    Note: Backward compatible with v1.2 configuration format.
+  code: |
+    ${(() => {
+      // Ensure card and hass are available
+      if (!card || !hass || !this.config) return;
+      
+      const config = this.config.smart_sub_button_styling || {};
+      const cardConfig = this.config.sub_button;
+      
+      // Early exit if no config
+      if (Object.keys(config).length === 0) return;
+      
+      // Retry mechanism for initialization timing issues
+      const attemptStyling = () => {
+      
+      // Function to get entity from sub-button config - CALLED ONCE
+      const getAllEntities = (subButtonList) => {
+        if (!subButtonList) return [];
+        
+        // Flatten nested groups from main and bottom sections
+        const allButtons = [];
+        if (subButtonList.main) {
+          subButtonList.main.forEach(section => {
+            if (section.group) {
+              allButtons.push(...section.group);
+            } else {
+              allButtons.push(section);
+            }
+          });
+        }
+        if (subButtonList.bottom) {
+          subButtonList.bottom.forEach(section => {
+            if (section.group) {
+              allButtons.push(...section.group);
+            } else {
+              allButtons.push(section);
+            }
+          });
+        }
+        
+        return allButtons;
+      };
+      
+      // Cache the entity list - build once, use many times
+      const entityList = getAllEntities(cardConfig);
+      
+      // Define color maps once for all buttons (performance optimization)
+      const colorNames = {
+        red: 'rgba(231, 76, 60, 1)',
+        blue: 'rgba(52, 152, 219, 1)',
+        green: 'rgba(46, 204, 113, 1)',
+        yellow: 'rgba(241, 196, 15, 1)',
+        orange: 'rgba(230, 126, 34, 1)',
+        purple: 'rgba(155, 89, 182, 1)',
+        pink: 'rgba(233, 30, 99, 1)',
+        cyan: 'rgba(0, 188, 212, 1)',
+        grey: 'rgba(149, 165, 166, 1)',
+        gray: 'rgba(149, 165, 166, 1)',
+        white: 'rgba(236, 240, 241, 1)',
+        black: 'rgba(44, 62, 80, 1)',
+        'deep-purple': 'rgba(103, 58, 183, 1)',
+        'deep-blue': 'rgba(33, 150, 243, 1)',
+        'deep-orange': 'rgba(255, 87, 34, 1)',
+        amber: 'rgba(255, 193, 7, 1)',
+        lime: 'rgba(205, 220, 57, 1)',
+        teal: 'rgba(0, 150, 136, 1)',
+        indigo: 'rgba(63, 81, 181, 1)',
+        brown: 'rgba(121, 85, 72, 1)',
+        'light-blue': 'rgba(3, 169, 244, 1)',
+        'light-green': 'rgba(139, 195, 74, 1)',
+      };
+      
+      const bgColorNames = {
+        red: 'rgba(231, 76, 60, 0.2)',
+        blue: 'rgba(52, 152, 219, 0.2)',
+        green: 'rgba(46, 204, 113, 0.2)',
+        yellow: 'rgba(241, 196, 15, 0.2)',
+        orange: 'rgba(230, 126, 34, 0.2)',
+        purple: 'rgba(155, 89, 182, 0.2)',
+        pink: 'rgba(233, 30, 99, 0.2)',
+        cyan: 'rgba(0, 188, 212, 0.2)',
+        grey: 'rgba(149, 165, 166, 0.2)',
+        gray: 'rgba(149, 165, 166, 0.2)',
+        white: 'rgba(236, 240, 241, 0.2)',
+        black: 'rgba(44, 62, 80, 0.2)',
+        'deep-purple': 'rgba(103, 58, 183, 0.2)',
+        'deep-blue': 'rgba(33, 150, 243, 0.2)',
+        'deep-orange': 'rgba(255, 87, 34, 0.2)',
+        amber: 'rgba(255, 193, 7, 0.2)',
+        lime: 'rgba(205, 220, 57, 0.2)',
+        teal: 'rgba(0, 150, 136, 0.2)',
+        indigo: 'rgba(63, 81, 181, 0.2)',
+        brown: 'rgba(121, 85, 72, 0.2)',
+        'light-blue': 'rgba(3, 169, 244, 0.2)',
+        'light-green': 'rgba(139, 195, 74, 0.2)',
+      };
+      
+      // HVAC icon map - defined once
+      const hvacIconDefaults = {
+        auto: 'mdi:autorenew',
+        cool: 'mdi:snowflake',
+        heat: 'mdi:fire',
+        dry: 'mdi:water-percent',
+        heat_cool: 'mdi:sun-snowflake',
+        fan_only: 'mdi:fan',
+        off: 'mdi:snowflake-off'
+      };
+      
+      const applyStyle = (subbutton, icon, subbuttonConfig = {}, entity) => {
+        // Early exit if no entity
+        if (!entity) return;
+        
+        // Check if auto-detection is disabled for this button
+        const autoDetectionDisabled = subbuttonConfig?.disable_auto_detection === true;
+        
+        let isLight = !autoDetectionDisabled && entity?.entity_id?.startsWith('light.');
+        let isClimate = !autoDetectionDisabled && entity?.entity_id?.startsWith('climate.');
+        
+        // Handle entity_type dropdown (auto, light, climate, switch)
+        // Backward compatibility: convert old boolean fields to new dropdown value
+        let entityType = subbuttonConfig?.entity_type || 'auto';
+        if (!subbuttonConfig?.entity_type) {
+          // Check for old boolean fields
+          if (subbuttonConfig?.treat_as_light) {
+            entityType = 'light';
+          } else if (subbuttonConfig?.treat_as_climate) {
+            entityType = 'climate';
+          } else if (subbuttonConfig?.treat_as_switch) {
+            entityType = 'switch';
+          }
+        }
+        
+        // Only apply entity_type override if auto-detection is not disabled
+        if (!autoDetectionDisabled) {
+          if (entityType === 'light') {
+            isLight = true;
+            isClimate = false;
+          } else if (entityType === 'climate') {
+            isClimate = true;
+            isLight = false;
+          }
+        }
+        // entityType 'switch' is handled in treat_as_switch logic below
+        // entityType 'auto' uses the default detection above
+        
+        let bgColor = '';
+        let iconColor = '';
+        
+        if (isLight && entity.state === 'on') {
+          // Light entity styling
+          if (entity.attributes?.rgb_color) {
+            const [r, g, b] = entity.attributes.rgb_color;
+            const isWhite = r > 240 && g > 240 && b > 240;
+            iconColor = isWhite ? 'rgba(150, 150, 150, 1)' : `rgba(${r}, ${g}, ${b}, 1)`;
+            bgColor = `rgba(${r}, ${g}, ${b}, 0.2)`;
+          } else {
+            iconColor = 'rgba(255, 193, 7, 1)';
+            bgColor = 'rgba(255, 193, 7, 0.2)';
+          }
+        } else if (isClimate) {
+          // Climate entity styling
+          const state = entity.state;
+          const colorMap = {
+            heat: { icon: 'rgba(231, 76, 60, 1)', bg: 'rgba(231, 76, 60, 0.2)' },
+            on: { icon: 'rgba(231, 76, 60, 1)', bg: 'rgba(231, 76, 60, 0.2)' },
+            cool: { icon: 'rgba(52, 152, 219, 1)', bg: 'rgba(52, 152, 219, 0.2)' },
+            heat_cool: { icon: 'rgba(155, 89, 182, 1)', bg: 'rgba(155, 89, 182, 0.2)' },
+            auto: { icon: 'rgba(155, 89, 182, 1)', bg: 'rgba(155, 89, 182, 0.2)' },
+            dry: { icon: 'rgba(241, 196, 15, 1)', bg: 'rgba(241, 196, 15, 0.2)' },
+            fan_only: { icon: 'rgba(46, 204, 113, 1)', bg: 'rgba(46, 204, 113, 0.2)' },
+          };
+          
+          if (colorMap[state]) {
+            iconColor = colorMap[state].icon;
+            bgColor = colorMap[state].bg;
+          }
+        } else {
+          // Other entities - use conditions
+          const condition = subbuttonConfig?.condition;
+          let conditionMet;
+          
+          // Cache condition result to avoid duplicate evaluation
+          if (condition) {
+            conditionMet = checkConditionsMet(
+              Array.isArray(condition) ? condition : [condition],
+              hass
+            );
+          } else {
+            conditionMet = true; // No condition = always met
+          }
+          
+          // Handle treat_as_switch - customizable icon/bg color when on
+          // Backward compatibility: check both new dropdown and old boolean
+          if (entityType === 'switch' || subbuttonConfig?.treat_as_switch) {
+            if (entity.state === 'on') {
+              // Use custom colors if provided, otherwise default to red icon only
+              if (subbuttonConfig?.switch_on_icon_color) {
+                const colorName = subbuttonConfig.switch_on_icon_color.toLowerCase();
+                iconColor = colorNames[colorName] || subbuttonConfig.switch_on_icon_color;
+              } else {
+                iconColor = 'rgba(231, 76, 60, 1)'; // Default red
+              }
+              
+              if (subbuttonConfig?.switch_on_bg_color) {
+                const colorName = subbuttonConfig.switch_on_bg_color.toLowerCase();
+                bgColor = bgColorNames[colorName] || subbuttonConfig.switch_on_bg_color;
+              }
+              // No default background color
+            }
+          } else if (conditionMet) {
+            if (subbuttonConfig?.icon_color) {
+              const colorName = subbuttonConfig.icon_color.toLowerCase();
+              iconColor = colorNames[colorName] || subbuttonConfig.icon_color;
+            }
+            if (subbuttonConfig?.bg_color) {
+              const colorName = subbuttonConfig.bg_color.toLowerCase();
+              bgColor = bgColorNames[colorName] || subbuttonConfig.bg_color;
+            }
+          } else {
+            // Condition not met - use alternative colors if provided
+            if (subbuttonConfig?.icon_color_not_met) {
+              const colorName = subbuttonConfig.icon_color_not_met.toLowerCase();
+              iconColor = colorNames[colorName] || subbuttonConfig.icon_color_not_met;
+            }
+            if (subbuttonConfig?.bg_color_not_met) {
+              const colorName = subbuttonConfig.bg_color_not_met.toLowerCase();
+              bgColor = bgColorNames[colorName] || subbuttonConfig.bg_color_not_met;
+            }
+          }
+        }
+        
+        // Apply styles
+        if (bgColor) subbutton.style.backgroundColor = bgColor;
+        if (iconColor && icon) icon.style.color = iconColor;
+        
+        // Apply icon change based on configuration type
+        let iconName = null;
+        
+        // Auto-detect entity if not specified
+        const iconEntity = subbuttonConfig?.icon_entity ? hass.states[subbuttonConfig.icon_entity] : entity;
+        
+        // Check which icon mode is configured
+        const hasConditionIcons = !!(subbuttonConfig?.icon_condition_met || subbuttonConfig?.icon_condition_not_met);
+        const hasHvacIcons = !!(
+          subbuttonConfig?.icon_auto ||
+          subbuttonConfig?.icon_cool ||
+          subbuttonConfig?.icon_heat ||
+          subbuttonConfig?.icon_dry ||
+          subbuttonConfig?.icon_heat_cool ||
+          subbuttonConfig?.icon_fan_only ||
+          subbuttonConfig?.icon_off
+        );
+        const hasOnOffIcons = !!(subbuttonConfig?.icon_on || subbuttonConfig?.icon_off_state);
+        
+        // Auto-apply HVAC icons for climate entities even if not configured (unless auto-detection disabled)
+        const isClimateForIcon = !autoDetectionDisabled && iconEntity?.entity_id?.startsWith?.('climate.');
+        
+        if (isClimateForIcon) {
+          // Climate entity - use HVAC icons (configured or default)
+          const hvacState = iconEntity.state;
+          const hvacIconMap = {
+            auto: subbuttonConfig?.icon_auto || hvacIconDefaults.auto,
+            cool: subbuttonConfig?.icon_cool || hvacIconDefaults.cool,
+            heat: subbuttonConfig?.icon_heat || hvacIconDefaults.heat,
+            dry: subbuttonConfig?.icon_dry || hvacIconDefaults.dry,
+            heat_cool: subbuttonConfig?.icon_heat_cool || hvacIconDefaults.heat_cool,
+            fan_only: subbuttonConfig?.icon_fan_only || hvacIconDefaults.fan_only,
+            off: subbuttonConfig?.icon_off || hvacIconDefaults.off
+          };
+          if (hvacState && hvacIconMap[hvacState]) {
+            iconName = hvacIconMap[hvacState];
+          }
+        } else if (hasOnOffIcons && iconEntity && ['on', 'off'].includes(iconEntity.state)) {
+          // On/Off state icons
+          if (iconEntity.state === 'on' && subbuttonConfig.icon_on) {
+            iconName = subbuttonConfig.icon_on;
+          } else if (iconEntity.state === 'off' && subbuttonConfig.icon_off_state) {
+            iconName = subbuttonConfig.icon_off_state;
+          }
+        } else if (hasConditionIcons) {
+          // Condition-based icons - uses the main button entity (from conditions)
+          const iconCondition = subbuttonConfig?.icon_condition;
+          let iconConditionMet;
+          
+          // Reuse color condition result if same condition (performance optimization)
+          if (iconCondition && subbuttonConfig?.condition && 
+              JSON.stringify(iconCondition) === JSON.stringify(subbuttonConfig.condition)) {
+            // Same condition as colors - reuse the cached result
+            iconConditionMet = conditionMet;
+          } else if (iconCondition) {
+            // Different condition - evaluate it
+            iconConditionMet = checkConditionsMet(
+              Array.isArray(iconCondition) ? iconCondition : [iconCondition],
+              hass
+            );
+          } else {
+            iconConditionMet = true; // No condition = always met
+          }
+          
+          if (iconConditionMet && subbuttonConfig?.icon_condition_met) {
+            iconName = subbuttonConfig.icon_condition_met;
+          } else if (!iconConditionMet && subbuttonConfig?.icon_condition_not_met) {
+            iconName = subbuttonConfig.icon_condition_not_met;
+          }
+        }
+        
+        // Auto-apply lightbulb-off for lights when off (if no custom icon and auto-detection not disabled)
+        if (!iconName && !autoDetectionDisabled && iconEntity?.entity_id?.startsWith?.('light.') && iconEntity.state === 'off') {
+          iconName = 'mdi:lightbulb-off';
+        }
+        
+        // Apply icon if determined
+        if (iconName) {
+          const oldIcon = subbutton.querySelector('ha-icon, iron-icon, svg');
+          if (oldIcon) {
+            try {
+              if ('icon' in oldIcon) {
+                oldIcon.icon = iconName;
+              } else {
+                oldIcon.setAttribute('icon', iconName);
+              }
+            } catch (e) {
+              try {
+                const newIcon = document.createElement('ha-icon');
+                newIcon.setAttribute('icon', iconName);
+                newIcon.className = oldIcon.className || '';
+                newIcon.style.cssText = oldIcon.style?.cssText || '';
+                oldIcon.replaceWith(newIcon);
+              } catch (e) {
+                // Silent fail
+              }
+            }
+          }
+        }
+        
+        // If no colors were set, clear custom styles to use Bubble Card defaults
+        if (!bgColor) subbutton.style.backgroundColor = '';
+        if (!iconColor && icon) icon.style.color = '';
+      };
+      
+      // Build config map from styles array (new UI format) and legacy button_N format
+      const configMap = {};
+      
+      // New format: styles array with sub_button_index
+      const stylesArray = config.styles || [];
+      stylesArray.forEach(styleConfig => {
+        if (styleConfig?.sub_button_index) {
+          // Flatten nested objects for backward compatibility
+          const flatConfig = { ...styleConfig };
+          
+          // Merge color_styling fields
+          if (styleConfig.color_styling) {
+            Object.assign(flatConfig, styleConfig.color_styling);
+          }
+          
+          // Merge icon_styling fields
+          if (styleConfig.icon_styling) {
+            // Merge condition_icons
+            if (styleConfig.icon_styling.condition_icons) {
+              Object.assign(flatConfig, styleConfig.icon_styling.condition_icons);
+            }
+            // Merge hvac_icons
+            if (styleConfig.icon_styling.hvac_icons) {
+              Object.assign(flatConfig, styleConfig.icon_styling.hvac_icons);
+            }
+            // Merge onoff_icons
+            if (styleConfig.icon_styling.onoff_icons) {
+              Object.assign(flatConfig, styleConfig.icon_styling.onoff_icons);
+            }
+          }
+          
+          configMap[styleConfig.sub_button_index] = flatConfig;
+        }
+      });
+      
+      // Legacy format: button_1, button_2, etc. (backward compatibility)
+      for (let i = 1; i <= 20; i++) {
+        if (config[`button_${i}`] && !configMap[i]) {
+          configMap[i] = config[`button_${i}`];
+        }
+      }
+      
+      // Process buttons with auto-detection - hard limit of 20 buttons for performance
+      const MAX_BUTTONS = 20;
+      
+      for (let buttonIndex = 0; buttonIndex < MAX_BUTTONS; buttonIndex++) {
+        const buttonNumber = buttonIndex + 1;
+        const selector = `.bubble-sub-button-${buttonNumber}`;
+        
+        // Check if this sub-button exists in DOM
+        const subbutton = card.querySelector(selector);
+        if (!subbutton) {
+          // Stop at first missing button to avoid unnecessary queries
+          break;
+        }
+        
+        // Get entity from cached list or manual config
+        const entityId = entityList[buttonIndex]?.entity || configMap[buttonNumber]?.entity;
+        
+        if (entityId) {
+          const entity = hass.states[entityId];
+          if (entity) {
+            const cfg = configMap[buttonNumber] || {};
+            // Query icon once and pass it
+            const icon = subbutton.querySelector('ha-icon');
+            // Pass the already-queried DOM elements instead of querying inside
+            applyStyle(subbutton, icon, cfg, entity);
+          }
+        }
+      }
+      }; // End of attemptStyling function
+      
+      // Try immediately
+      attemptStyling();
+      
+      // Retry after a short delay to handle initialization timing
+      setTimeout(() => attemptStyling(), 50);
+    })()}
+  editor:
+    - name: styles
+      label: Sub-button Styles
+      selector:
+        object:
+          multiple: true
+          fields:
+            name:
+              label: Name (optional - for organization)
+              selector:
+                text: {}
+            sub_button_index:
+              label: Sub-button Index
+              required: true
+              selector:
+                number:
+                  min: 1
+                  max: 20
+                  step: 1
+                  mode: box
+            disable_auto_detection:
+              label: Disable Auto-Detection (colors & icons)
+              selector:
+                boolean: {}
+            entity_type:
+              label: Treat Entity As
+              selector:
+                select:
+                  mode: dropdown
+                  options:
+                    - label: Auto-detect
+                      value: auto
+                    - label: Light
+                      value: light
+                    - label: Climate
+                      value: climate
+                    - label: Switch
+                      value: switch
+            color_styling:
+              label: Color Styling
+              selector:
+                object:
+                  fields:
+                    switch_on_icon_color:
+                      label: Switch On Icon Color (optional, default red)
+                      selector:
+                        text:
+                          placeholder: red
+                    switch_on_bg_color:
+                      label: Switch On Background Color (optional, default none)
+                      selector:
+                        text:
+                          placeholder: red
+                    condition:
+                      label: Condition for color to apply
+                      selector:
+                        condition: {}
+                    icon_color:
+                      label: Icon Color (red, blue, green, yellow, orange, purple, pink, cyan, deep-purple, deep-blue, deep-orange, amber, lime, teal, indigo, brown, light-blue, light-green, grey, white, black, or rgba)
+                      selector:
+                        text:
+                          placeholder: red
+                    bg_color:
+                      label: Background Color (red, blue, green, yellow, orange, purple, pink, cyan, deep-purple, deep-blue, deep-orange, amber, lime, teal, indigo, brown, light-blue, light-green, grey, white, black, or rgba)
+                      selector:
+                        text:
+                          placeholder: red
+                    icon_color_not_met:
+                      label: Icon Color When Condition Not Met (optional)
+                      selector:
+                        text:
+                          placeholder: grey
+                    bg_color_not_met:
+                      label: Background Color When Condition Not Met (optional)
+                      selector:
+                        text:
+                          placeholder: grey
+            icon_styling:
+              label: Icon Styling
+              selector:
+                object:
+                  fields:
+                    condition_icons:
+                      label: Condition-based Icons
+                      selector:
+                        object:
+                          fields:
+                            icon_condition:
+                              label: Condition for icon to change
+                              selector:
+                                condition: {}
+                            icon_condition_met:
+                              label: Icon when condition is met
+                              selector:
+                                icon: {}
+                            icon_condition_not_met:
+                              label: Icon when condition is not met
+                              selector:
+                                icon: {}
+                    hvac_icons:
+                      label: HVAC Mode Icons
+                      selector:
+                        object:
+                          fields:
+                            icon_entity:
+                              label: Entity for Icon (optional - uses button entity by default)
+                              selector:
+                                entity: {}
+                            icon_auto:
+                              label: Auto mode icon
+                              selector:
+                                icon: {}
+                            icon_cool:
+                              label: Cool mode icon
+                              selector:
+                                icon: {}
+                            icon_heat:
+                              label: Heat mode icon
+                              selector:
+                                icon: {}
+                            icon_dry:
+                              label: Dry mode icon
+                              selector:
+                                icon: {}
+                            icon_heat_cool:
+                              label: Heat/Cool mode icon
+                              selector:
+                                icon: {}
+                            icon_fan_only:
+                              label: Fan only mode icon
+                              selector:
+                                icon: {}
+                            icon_off:
+                              label: Off mode icon
+                              selector:
+                                icon: {}
+                    onoff_icons:
+                      label: On/Off State Icons
+                      selector:
+                        object:
+                          fields:
+                            icon_entity:
+                              label: Entity for Icon (optional - uses button entity by default)
+                              selector:
+                                entity: {}
+                            icon_on:
+                              label: Icon when state is on
+                              selector:
+                                icon: {}
+                            icon_off_state:
+                              label: Icon when state is off
+                              selector:
+                                icon: {}
+          label_field: name
+          description_field: sub_button_index
+  link: https://github.com/Clooos/Bubble-Card/discussions/2190

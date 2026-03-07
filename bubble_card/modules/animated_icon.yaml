@@ -1,6 +1,6 @@
 animated_icon:
   name: Animated Icons 2
-  version: v2.4.0
+  version: v2.7.0
   creator: Airblader (+ @ozumado)
   link: https://github.com/Clooos/Bubble-Card/discussions/2075
   supported:
@@ -48,10 +48,15 @@ animated_icon:
           const stateEntity = (config.use_button_entity ?? false)
             ? getEntityByIndex(this.config, config.index)
             : entity;
+
           const isOn = isEntityOn(stateEntity, ignoreState, conditions);
+          if (!isOn) {
+            parent?.querySelectorAll(`:scope > .clone`).forEach(el => el.remove());
+          }
 
           const noOffIcon = config.no_off_icon ?? false;
-          const newIcon = (isOn || noOffIcon) ? animation.iconOn : (animation.iconOff ?? animation.iconOn);
+          const offIcon = config.custom_off_icon ?? animation.iconOff;
+          const newIcon = (isOn || noOffIcon) ? animation.iconOn : (offIcon ?? animation.iconOn);
 
           // We cannot use subButtonIcon here, see
           // https://github.com/Clooos/Bubble-Card/discussions/1668#discussioncomment-15391491
@@ -62,7 +67,7 @@ animated_icon:
 
           return `
             ${isOn ? createBackgroundStyle(config) : ''}
-            ${animation.animate(config.mode, iconSelector, isOn)}
+            ${isOn ? animation.animate(config.mode, iconSelector) : ''}
           `;
         }
       ).reduce((a, b) => a + b, "");
@@ -113,6 +118,11 @@ animated_icon:
             iconOn: "mdi:heat-pump-outline",
             animate: animatedHeatPump,
           },
+          light_bulb: {
+            iconOn: "mdi:lightbulb-on",
+            iconOff: "mdi:lightbulb-off",
+            animate: animatedLightBulb,
+          },
           microwave: {
             iconOn: "mdi:microwave",
             iconOff: "mdi:microwave-off",
@@ -138,6 +148,11 @@ animated_icon:
             iconOff: "mdi:washing-machine-off",
             animate: animatedWashingMachine,
           },
+          wifi: {
+            iconOn: "mdi:wifi",
+            iconOff: "mdi:wifi-off",
+            animate: animatedWifi,
+          },
         };
       }
 
@@ -147,6 +162,8 @@ animated_icon:
             ? [{
                 mode: moduleConfig.mode,
                 ignore_state: moduleConfig.ignore_state ?? false,
+                custom_off_icon: moduleConfig.custom_off_icon ?? undefined,
+                no_off_icon: moduleConfig.no_off_icon ?? false,
                 background: moduleConfig.background ?? 'none',
                 conditions: moduleConfig.conditions ?? [],
                 index: -1,
@@ -251,7 +268,7 @@ animated_icon:
 
       // ================================================================================
 
-      function animatedAirPurifier(mode, iconSelector, isOn) {
+      function animatedAirPurifier(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -265,7 +282,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: air-purifier-air 1s linear infinite;' : ''}
+            animation: air-purifier-air 1s linear infinite;
           }
 
           @keyframes air-purifier-air {
@@ -277,7 +294,7 @@ animated_icon:
         `;
       }
 
-      function animatedAlarm(mode, iconSelector, isOn) {
+      function animatedAlarm(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -291,7 +308,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: alarm-alarm 0.75s ease infinite;' : ''}
+            animation: alarm-alarm 0.75s ease infinite;
           }
 
           @keyframes alarm-alarm {
@@ -306,7 +323,7 @@ animated_icon:
         `;
       }
 
-      function animatedAlert(mode, iconSelector, isOn) {
+      function animatedAlert(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -320,7 +337,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: alert-alert 0.75s linear infinite, alert-shake 0.5s linear infinite;' : ''}
+            animation: alert-alert 0.75s linear infinite, alert-shake 0.5s linear infinite;
           }
 
           @keyframes alert-alert {
@@ -337,7 +354,7 @@ animated_icon:
         `;
       }
 
-      function animatedBoil(mode, iconSelector, isOn) {
+      function animatedBoil(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -351,7 +368,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: boil-boil 600ms linear infinite;' : ''}
+            animation: boil-boil 600ms linear infinite;
           }
 
           @keyframes boil-boil {
@@ -370,7 +387,7 @@ animated_icon:
         `;
       }
 
-      function animatedDing(mode, iconSelector, isOn) {
+      function animatedDing(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -384,7 +401,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: ding-ring 4s linear infinite;' : ''}
+            animation: ding-ring 4s linear infinite;
             transform-origin: 50% 15%;
           }
 
@@ -417,7 +434,7 @@ animated_icon:
         `;
       }
 
-      function animatedDishwasher(mode, iconSelector, isOn) {
+      function animatedDishwasher(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -431,7 +448,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: dishwasher-bounce 1.5s ease-in-out infinite, dishwasher-wash 1s ease-in-out infinite;' : ''}
+            animation: dishwasher-bounce 1.5s ease-in-out infinite, dishwasher-wash 1s ease-in-out infinite;
             transform-origin: 50% 75%;
           }
 
@@ -447,7 +464,7 @@ animated_icon:
         `;
       }
 
-      function animatedDryer(mode, iconSelector, isOn) {
+      function animatedDryer(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -461,7 +478,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: dryer-shake 400ms ease-in-out infinite, dryer-drum 1s infinite;' : ''}
+            animation: dryer-shake 400ms ease-in-out infinite, dryer-drum 1s infinite;
             transform-origin: 50% 65%;
           }
 
@@ -476,7 +493,7 @@ animated_icon:
         `;
       }
 
-      function animatedFan(mode, iconSelector, isOn) {
+      function animatedFan(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -490,7 +507,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: fan-spin 1s linear infinite;' : ''}
+            animation: fan-spin 1s linear infinite;
           }
 
           @keyframes fan-spin {
@@ -500,7 +517,7 @@ animated_icon:
         `;
       }
 
-      function animatedHeatPump(mode, iconSelector, isOn) {
+      function animatedHeatPump(mode, iconSelector) {
         const iconItem = card.querySelector(iconSelector);
         const parent = iconItem?.parentNode;
         if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
@@ -528,7 +545,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: heat-pump-spin 2s linear infinite;' : ''}
+            animation: heat-pump-spin 2s linear infinite;
             clip-path: circle(27.3% at 50% 50%);
           }
 
@@ -539,7 +556,20 @@ animated_icon:
         `;
       }
 
-      function animatedMicrowave(mode, iconSelector, isOn) {
+      function animatedLightBulb(mode, iconSelector) {
+        return `
+          ${iconSelector}:not(.clone) {
+            animation: lightbulb-illumination 2s infinite;
+          }
+
+          @keyframes lightbulb-illumination {
+            0%, 100% { clip-path: inset(0 0 0 0); }
+            80% { clip-path: polygon(0% 99%, 20% 55%, 22% 37%, 39% 20%, 61% 21%, 77% 35%, 79% 57%, 99% 100%); }
+          }
+        `;
+      }
+
+      function animatedMicrowave(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -559,8 +589,8 @@ animated_icon:
             height: 45%;
             top: 28%;
             left: 15%;
-            ${isOn ? 'background: var(--bubble-icon-color, var(--bubble-button-background-color));' : ''}
-            ${isOn ? 'animation: microwave-cook 1.5s linear infinite;' : ''}
+            background: var(--bubble-icon-color, var(--bubble-button-background-color));
+            animation: microwave-cook 1.5s linear infinite;
           }
 
           @keyframes microwave-cook {
@@ -570,7 +600,7 @@ animated_icon:
         `;
       }
 
-      function animatedMotion(mode, iconSelector, isOn) {
+      function animatedMotion(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -584,7 +614,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: motion-clip 1.5s linear infinite;' : ''}
+            animation: motion-clip 1.5s linear infinite;
           }
 
           @keyframes motion-clip {
@@ -593,7 +623,7 @@ animated_icon:
         `;
       }
 
-      function animatedRadiator(mode, iconSelector, isOn) {
+      function animatedRadiator(mode, iconSelector) {
         const iconItem = card.querySelector(iconSelector);
         const parent = iconItem?.parentNode;
         if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
@@ -617,7 +647,7 @@ animated_icon:
           }
 
           ${iconSelector}.clone {
-            ${isOn ? 'animation: radiator-waves 2s ease-in-out infinite;' : ''}
+            animation: radiator-waves 2s ease-in-out infinite;
             transform-origin: 50% 59%;
             clip-path: rect(auto auto 45% auto);
           }
@@ -635,7 +665,7 @@ animated_icon:
         `;
       }
 
-      function animatedVacuum(mode, iconSelector, isOn) {
+      function animatedVacuum(mode, iconSelector) {
         return `
           ${iconSelector} {
             display: flex;
@@ -649,7 +679,7 @@ animated_icon:
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: vacuum-spin 15s ease-in-out infinite;' : ''}
+            animation: vacuum-spin 15s ease-in-out infinite;
           }
 
           @keyframes vacuum-spin {
@@ -676,7 +706,7 @@ animated_icon:
         `;
       }
 
-      function animatedWashingMachine(mode, iconSelector, isOn) {
+      function animatedWashingMachine(mode, iconSelector) {
         const iconItem = card.querySelector(iconSelector);
         const parent = iconItem?.parentNode;
         if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
@@ -700,13 +730,13 @@ animated_icon:
           }
 
           ${iconSelector}.clone {
-            ${isOn ? 'animation: washing-machine-shake 400ms ease-in-out infinite;' : ''}
+            animation: washing-machine-shake 400ms ease-in-out infinite;
             transform-origin: 50% 59%;
             clip-path: polygon(0 0, 0 100%, 35% 100%, 34% 68%, 60% 41%, 71% 56%, 65% 74%, 47% 79%, 32% 69%, 35% 100%, 100% 100%, 100% 0);
           }
 
           ${iconSelector}:not(.clone) {
-            ${isOn ? 'animation: washing-machine-spin 1s linear infinite;' : ''}
+            animation: washing-machine-spin 1s linear infinite;
             transform-origin: 50% 59%;
             clip-path: circle(22% at 50% 59%);
           }
@@ -722,6 +752,48 @@ animated_icon:
           @keyframes washing-machine-spin {
             from { transform: rotate(0deg); }
             to   { transform: rotate(360deg); }
+          }
+        `;
+      }
+
+      function animatedWifi(mode, iconSelector) {
+        const iconItem = card.querySelector(iconSelector);
+        const parent = iconItem?.parentNode;
+        if (iconItem && parent && !parent.querySelector(`${iconSelector}.clone`)) {
+          const clone = iconItem.cloneNode(true);
+          clone.setAttribute("icon", iconItem.getAttribute("icon"));
+          clone.classList.add('clone');
+          clone.classList.add('clone-'+mode);
+          parent.insertBefore(clone, iconItem);
+        }
+
+        return `
+          ${iconSelector} {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: calc((100% - var(--mdc-icon-size))/2);
+            left: calc((100% - var(--mdc-icon-size))/2);
+            width: var(--mdc-icon-size);
+            height: var(--mdc-icon-size);
+          }
+
+          ${iconSelector}.clone {
+            animation: wifi-reveal 2.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+            clip-path: circle(0% at 50% 88%);
+          }
+
+          ${iconSelector}:not(.clone) {
+            opacity: 0.25;
+          }
+
+          @keyframes wifi-reveal {
+            0%   { opacity: 1; clip-path: circle(0% at 50% 88%); }
+            25%  { opacity: 1; clip-path: circle(25% at 50% 88%); }
+            50%  { opacity: 1; clip-path: circle(50% at 50% 88%); }
+            75%  { opacity: 1; clip-path: circle(100% at 50% 88%); }
+            100% { opacity: 0; clip-path: circle(120% at 50% 88%); }
           }
         `;
       }
@@ -754,6 +826,8 @@ animated_icon:
                   value: fan
                 - label: Heat Pump
                   value: heat_pump
+                - label: Light Bulb
+                  value: light_bulb
                 - label: Microwave
                   value: microwave
                 - label: Motion
@@ -764,6 +838,8 @@ animated_icon:
                   value: vacuum
                 - label: Washing Machine
                   value: washing_machine
+                - label: WiFi
+                  value: wifi
               multiple: false
               custom_value: false
               mode: dropdown
@@ -771,6 +847,10 @@ animated_icon:
           label: Ignore entity's on/off state
           selector:
             boolean: {}
+        - name: custom_off_icon
+          label: Use custom 'off' icon
+          selector:
+            icon: {}
         - name: no_off_icon
           label: Do not show 'off' icon if animation is disabled
           selector:
@@ -826,6 +906,8 @@ animated_icon:
                       value: fan
                     - label: Heat Pump
                       value: heat_pump
+                    - label: Light Bulb
+                      value: light_bulb
                     - label: Microwave
                       value: microwave
                     - label: Motion
@@ -836,6 +918,8 @@ animated_icon:
                       value: vacuum
                     - label: Washing Machine
                       value: washing_machine
+                    - label: WiFi
+                      value: wifi
                   multiple: false
                   custom_value: false
                   mode: dropdown
@@ -848,6 +932,10 @@ animated_icon:
               label: Ignore entity's on/off state
               selector:
                 boolean: {}
+            custom_off_icon:
+              label: Use custom 'off' icon
+              selector:
+                icon: {}
             no_off_icon:
               label: Do not show 'off' icon if animation is disabled
               selector:
