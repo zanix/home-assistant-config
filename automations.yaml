@@ -5566,12 +5566,15 @@
   triggers:
   - entity_id:
     - binary_sensor.doorbell_visitor
-    to: 'on'
+from:
+    - 'off'
+    to:
+    - 'on'
     trigger: state
   conditions: []
   actions:
   - variables:
-      camera_name: doorbell
+      camera_name: doorbell_clear
       camera: camera.{{ camera_name }}
       base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
       link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40)
@@ -6130,6 +6133,279 @@
           - condition: template
             value_template: '{{ not wait.trigger or wait.trigger.payload_json[''type'']
               == ''end'' }}'
+  mode: parallel
+- id: '1772853734209'
+  alias: "\U0001F514 Reolink Doorbell - Object Seen"
+  description: Sends a notification when an object is detected on the doorbell
+  triggers:
+  - trigger: state
+    id: person
+    entity_id:
+    - binary_sensor.doorbell_person
+    from:
+    - 'off'
+    - 'on'
+  - trigger: state
+    id: pet
+    entity_id:
+    - binary_sensor.doorbell_pet
+    from:
+    - 'off'
+    - 'on'
+  - event_type: mobile_app_notification_action
+    event_data:
+      action: silence_doorbell
+    id: silence
+    trigger: event
+  - event_type: hass_agent_notifications
+    event_data:
+      action: silence_doorbell
+    id: silence
+    trigger: event
+  - event_type: quickbars.action
+    event_data:
+      action_id: silence_doorbell
+    id: silence
+    trigger: event
+  - trigger: mqtt
+    id: silence
+    options:
+      topic: lnxlink/+/monitor_controls/notify/button_press
+      payload: Silence Doorbell
+      value_template: '{{ value_json.button }}'
+  conditions: []
+  actions:
+  - variables:
+      camera: doorbell_clear
+      camera_name: Doorbell
+      base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
+      attachment: snapshot.jpg
+      alert_once: false
+      labels:
+      - person
+      - pet
+      disable_times: []
+      cooldown: 30
+      silence_timer: 30
+      state_entities:
+        binary_sensor.front_door_contact: 2
+        binary_sensor.doorbell_visitor: 2
+      states_filter:
+      - 'off'
+      debug: false
+  - choose:
+    - alias: Silence New Object Notifications
+      conditions:
+      - condition: trigger
+        id: silence
+      sequence:
+      - parallel:
+        - variables:
+            title: Doorbell Motion Silenced
+            message: Motion notifications have been silenced for {{ silence_timer
+              }} minutes.
+            notification_icon: mdi:doorbell-video
+            color: '#e91e63'
+        - data:
+            send_to: parents
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_icon: '{{ notification_icon }}'
+            color: '{{ color }}'
+            group: '{{ camera_name }} Notification'
+            car_ui: true
+            interruption_level: critical
+            channel: Doorbell Motion
+            importance: high
+            url: lovelace/security#camera-doorbell
+          action: script.notify_mobile
+        - data:
+            entity:
+            - media_player.nasya
+            title: '{{ title }}'
+            message: '{{ message }}'
+          action: script.notify_hass_agent
+        - data:
+            computer:
+            - erebus
+            title: '{{ title }}'
+            message: '{{ message }}'
+            importance: critical
+          action: script.notify_lnxlink
+        - data:
+            title: '{{ title }}'
+            message: '{{ message }}'
+            icon: '{{ notification_icon }}'
+            background_color: '{{ color }}'
+          action: script.notify_quickbars
+      - target:
+          entity_id: '{{ this.entity_id }}'
+        data:
+          stop_actions: false
+        action: automation.turn_off
+      - delay:
+          minutes: '{{ silence_timer }}'
+      - target:
+          entity_id: '{{ this.entity_id }}'
+        action: automation.turn_on
+        data: {}
+    - alias: Reolink Event
+      conditions:
+      - condition: trigger
+        id:
+        - person
+        - pet
+      - condition: template
+        value_template: '{{ is_state(this.entity_id, ''on'') }}'
+      - condition: template
+        value_template: '{{ not this.attributes.last_triggered or (now() - this.attributes.last_triggered).seconds
+          > cooldown }}'
+      sequence:
+      - variables:
+          object: '{{ trigger.id }}'
+          label: '{{ trigger.id | title }}'
+          title: '{{ camera_name }} ({{ label }})'
+          message: A {{ label }} was detected on the {{ camera_name }} camera.
+          color: '#e91e63'
+          link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40)
+            }}'
+          stream: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
+          icon: "{% if trigger.id == 'person' %}\n  mdi:account-outline\n{% elif trigger.id
+            == 'pet' %}\n  mdi:dog\n{% else %}\n  mdi:home-assistant\n{% endif %}"
+          actions:
+          - action: URI
+            title: Stream
+            uri: '{{ stream }}'
+          - action: silence_{{ camera }}
+            title: Silence ({{ silence_timer }} min)
+            destructive: true
+      - action: webrtc.create_link
+        data:
+          link_id: '{{ link_id }}'
+          url: rtsp://127.0.0.1:8554/{{ camera | lower }}
+          open_limit: 0
+          time_to_live: 600
+      - alias: 'Debug: set notification'
+        choose:
+        - conditions:
+          - condition: template
+            value_template: '{{ debug }}'
+          sequence:
+          - action: persistent_notification.create
+            data:
+              title: Reolink Notification
+              message: "Info:\n  - Object (Formatted): {{ object }} ({{ label }})\n\nConfig:\n
+                \ - Camera (Formatted): {{ camera }} ({{ camera_name }})\n  - Base
+                URL: {{ base_url }}\n  - Alert once: {{ alert_once }}\n  - Icon: {{
+                icon }}\n  - Cooldown: {{ cooldown }}s\n  - Title: {{ title }}\n  -
+                Message: {{ message }}\n  - Actions: {{ actions | tojson }}\n\nFilters:\n
+                \ - Disabled times: {{ disable_times }}\n  - State Filter:\n    -
+                State filter on: {{ iif(state_entities | list | count > 0, 'True',
+                'False') }}\n    - State filter entity: {{ state_entities | tojson
+                }}\n    - Required states: {{ states_filter | join(', ') }}\n  {%-
+                set state_filter = namespace(allow=[]) -%}\n  {%- for entity, time
+                in state_entities.items() -%}\n    {%- set state =\n      states(entity)
+                in states_filter\n      and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+                | int / 60 > time\n    -%}\n    {%- set state_filter.allow = state_filter.allow
+                + [state] -%}\n  {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow
+                | reject | first | default(true), 'PASS', 'FAIL') }}\n"
+      - alias: Notify on new object
+        choose:
+        - conditions:
+          - condition: template
+            value_template: "{%- set state_filter = namespace(allow=[]) -%} {%- for
+              entity, time in state_entities.items() -%}\n  {%- set state =\n    states(entity)
+              in states_filter\n    and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
+              | int / 60 > time\n  -%}\n  {%- set state_filter.allow = state_filter.allow
+              + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first
+              | default(true), true, false) }}"
+          sequence:
+          - parallel:
+            - if:
+              - condition: trigger
+                id:
+                - initial
+              then:
+              - data:
+                  media_player:
+                  - media_player.living_room_speaker
+                  - media_player.family_room_speaker
+                  - media_player.office_speaker
+                  message: A {{ label }} was detected at the front door.
+                action: script.notify_speech
+            - data:
+                send_to: parents
+                title: '{{ title }}'
+                message: '{{ message }}'
+                notification_icon: '{{ icon }}'
+                color: '{{ color }}'
+                camera: camera.{{ camera }}
+                group: '{{ camera_name }} Notification'
+                car_ui: true
+                interruption_level: critical
+                sticky: true
+                channel: Doorbell Motion
+                importance: high
+                url: lovelace/security#camera-doorbell
+                actions: '{{ actions }}'
+              action: script.notify_mobile
+            - data:
+                entity:
+                - media_player.nasya
+                title: '{{ title }}'
+                message: '{{ message }}'
+                camera: camera.{{ camera }}
+                duration: 10
+                actions: '{{ actions }}'
+              action: script.notify_hass_agent
+            - data:
+                computer:
+                - erebus
+                title: '{{ title }}'
+                message: '{{ message }}'
+                camera: camera.{{ camera }}
+                importance: critical
+                actions:
+                - Silence Doorbell
+              action: script.notify_lnxlink
+            - data:
+                title: '{{ title }}'
+                message: '{{ message }}'
+                icon: '{{ icon }}'
+                image: '{{ state_attr(''sensor.hass_config'', ''internal_url'') ~
+                  state_attr(camera, ''entity_picture'') }}'
+                background_color: '{{ color }}'
+                duration: 10
+                action_1_id: '{{ actions[1].action }}'
+                action_1_label: '{{ actions[1].title }}'
+              action: script.notify_quickbars
+            - if:
+              - condition: trigger
+                id:
+                - initial
+              then:
+              - if:
+                - condition: state
+                  entity_id: light.wled_joshua_office_desk
+                  state: 'on'
+                then:
+                - data:
+                    value: '80'
+                  target:
+                    entity_id: number.wled_joshua_office_desk_speed
+                  action: number.set_value
+                - target:
+                    entity_id: light.wled_joshua_office_desk
+                  data:
+                    effect: Phased
+                  action: light.turn_on
+                - delay:
+                    seconds: 5
+                - target:
+                    entity_id: light.wled_joshua_office_desk
+                  data:
+                    effect: Solid
+                  action: light.turn_on
   mode: parallel
 - id: '1727824341800'
   alias: "\U0001F557 Main Bedroom Ceiling Fan Default Light Status"

@@ -1408,20 +1408,24 @@ streamline_templates:
                   - background: '#f70000'
   camera_popup:
     default:
-      - ptz: 'off'
+      - live: go2rtc
+      - frigate: true
     card:
       type: custom:advanced-camera-card
       cameras:
         - camera_entity: '[[camera]]'
-          live_provider: go2rtc
+          live_provider: '[[live]]'
           go2rtc:
             modes:
               - webrtc
-              - mse
             stream: '[[stream]]'
       menu:
         style: outside
         buttons:
+          clips:
+            enabled: '[[frigate]]'
+          timeline:
+            enabled: '[[frigate]]'
           iris:
             enabled: false
           cameras:
@@ -1450,7 +1454,6 @@ streamline_templates:
         controls:
           builtin: false
           ptz:
-            mode: '[[ptz]]'
             orientation: vertical
             hide_zoom: true
         lazy_load: false
@@ -3501,7 +3504,6 @@ views:
                           variables:
                             - camera: camera.livingroom
                             - stream: livingroom
-                            - ptz: 'on'
               chips:
                 - type: template
                   entity: media_player.universal_living_room
@@ -3660,7 +3662,6 @@ views:
                           variables:
                             - camera: camera.familyroom
                             - stream: familyroom
-                            - ptz: 'on'
               chips:
                 - type: conditional
                   conditions:
@@ -4203,7 +4204,7 @@ views:
               color: 139, 195, 74
               chips_top:
                 - type: template
-                  entity: camera.doorbell
+                  entity: camera.doorbell_clear
                   icon: mdi:doorbell-video
                   icon_color: '{{ iif(has_value(entity), "cyan", "red") }}'
                   tap_action:
@@ -4217,8 +4218,9 @@ views:
                           type: custom:streamline-card
                           template: camera_popup
                           variables:
-                            - camera: camera.doorbell
-                            - stream: doorbell
+                            - camera: camera.doorbell_clear
+                            - live: auto
+                            - frigate: false
               chips:
                 - type: template
                   entity: binary_sensor.sprinkler_zones
@@ -4307,7 +4309,6 @@ views:
                           variables:
                             - camera: camera.garage
                             - stream: garage
-                            - ptz: 'on'
               chips:
                 - type: conditional
                   conditions:
@@ -16100,7 +16101,7 @@ views:
             heading: Cameras
             heading_style: subtitle
           - type: picture-elements
-            camera_image: camera.doorbell
+            camera_image: camera.doorbell_clear
             elements:
               - type: icon
                 icon: mdi:cctv
@@ -16123,10 +16124,11 @@ views:
                         type: custom:streamline-card
                         template: camera_popup
                         variables:
-                          - camera: camera.doorbell
-                          - stream: doorbell
+                          - camera: camera.doorbell_clear
+                          - live: auto
+                          - frigate: false
               - type: state-icon
-                entity: sensor.doorbell_person_count
+                entity: binary_sensor.doorbell_person
                 icon: mdi:walk
                 state_color: true
                 style:
@@ -16139,7 +16141,7 @@ views:
                 tap_action:
                   action: more-info
               - type: state-icon
-                entity: binary_sensor.doorbell_camera_motion
+                entity: binary_sensor.doorbell_motion
                 icon: mdi:motion-sensor
                 state_color: true
                 style:
@@ -16322,62 +16324,17 @@ views:
                 width_desktop: calc(100% - var(--mdc-drawer-width))
                 margin_top_mobile: calc(0px - var(--header-height))
                 modules: []
-              - type: custom:advanced-camera-card
-                cameras:
-                  - camera_entity: camera.doorbell
-                    live_provider: go2rtc
-                    go2rtc:
-                      modes:
-                        - webrtc
-                        - mse
-                      stream: doorbell
-                menu:
-                  style: outside
-                  buttons:
-                    cameras:
-                      enabled: false
-                    media_player:
-                      enabled: false
-                    download:
-                      enabled: false
-                    microphone:
-                      enabled: true
-                      type: toggle
-                      alignment: opposing
-                    mute:
-                      enabled: true
-                      alignment: opposing
-                    play:
-                      enabled: true
-                      alignment: opposing
-                      priority: 45
-                    fullscreen:
-                      alignment: opposing
-                      priority: 40
-                    iris:
-                      enabled: false
-                live:
-                  draggable: false
-                  preload: true
-                  controls:
-                    builtin: false
-                    ptz:
-                      mode: 'off'
-                      orientation: vertical
-                      hide_zoom: true
-                  lazy_load: true
-                media_viewer:
-                  transition_effect: slide
-                timeline:
-                  controls:
-                    thumbnails:
-                      mode: below
-                dimensions:
-                  aspect_ratio_mode: dynamic
-                performance:
-                  features:
-                    media_chunk_size: 20
-                view: {}
+                sub_button:
+                  main: []
+                  bottom: []
+                slider_fill_orientation: left
+                slider_value_position: right
+              - type: custom:streamline-card
+                template: camera_popup
+                variables:
+                  - camera: camera.doorbell_clear
+                  - live: auto
+                  - frigate: false
     cards: []
     badges:
       - type: custom:mushroom-template-badge
@@ -16421,7 +16378,7 @@ views:
         tap_action:
           action: more-info
       - type: custom:mushroom-template-badge
-        entity: sensor.doorbell_person_count
+        entity: binary_sensor.doorbell_person
         label: Last Person
         content: '{% from "util.jinja" import nominal_change_history %} {{ nominal_change_history(entity)
           }}'
