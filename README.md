@@ -363,12 +363,6 @@ Home Assistant Google Home custom component
 
 Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://github.com/DurgNomis-drol), [@ArnyminerZ](https://github.com/ArnyminerZ), [@KapJI](https://github.com/KapJI).
 
-### [Ha Jellyfin](https://github.com/n00bcodr/ha-jellyfin) [v0.0.3]
-
-[WIP] Jellyfin HomeAssistant Integration using API
-
-Authors: [@n00bcodr](https://github.com/n00bcodr).
-
 ### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v2.0.5]
 
 HACS gives you a powerful UI to handle downloads of all your custom needs.
@@ -386,6 +380,12 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@DrR0X-glitch](https:/
 📅 Custom Home Assistant integration for public holidays - also used for garbage_collection integration to automatically move scheduled events that fall on a public holiday (by an automation blueprint)
 
 Authors: [@bruxy70](https://github.com/bruxy70).
+
+### [Jellyfin](https://github.com/n00bcodr/jellyfin) [v0.0.8]
+
+[WIP] Jellyfin HomeAssistant Integration using API
+
+Authors: [@n00bcodr](https://github.com/n00bcodr).
 
 ### [Keymaster](https://github.com/FutureTense/keymaster) [v0.2.1]
 
