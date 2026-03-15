@@ -281,7 +281,7 @@
       action: cat_feeder_full
     trigger: event
   - topic: lnxlink/+/monitor_controls/notify/button_press
-    payload: Feeder Full
+    payload: Feeder Refilled
     value_template: '{{ value_json.button }}'
     trigger: mqtt
   conditions: []
@@ -983,6 +983,50 @@
     action: tts.clear_cache
   mode: single
   initial_state: false
+- id: '1770909212973'
+  alias: ⚙️ Disable Integration During Time
+  description: Disables an integration during a specified time period and re-enables
+    it afterwards
+  triggers:
+  - at: '22:00:00'
+    id: disable_time
+    trigger: time
+  - at: 02:00:00
+    id: enable_time
+    trigger: time
+  conditions:
+  - condition: template
+    value_template: '{% set start_date = ''2026-02-12'' %}
+
+      {% set end_date = ''2026-02-13'' %}
+
+      {{ start_date <= now().strftime(''%Y-%m-%d'') <= end_date }}
+
+      '
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: disable_time
+      sequence:
+      - action: homeassistant.disable_config_entry
+        data:
+          config_entry_id: 01KBZM96B8FXBJVS3ZJTG14ZZV
+      - data:
+          message: Integration has been disabled for the night
+          title: Integration Disabled
+        action: notify.persistent_notification
+    - conditions:
+      - condition: trigger
+        id: enable_time
+      sequence:
+      - action: homeassistant.enable_config_entry
+        data:
+          config_entry_id: 01KBZM96B8FXBJVS3ZJTG14ZZV
+      - data:
+          message: Integration has been re-enabled
+          title: Integration Enabled
+        action: notify.persistent_notification
 - id: '1665696511584'
   alias: ⚙️ Disk Space Low
   description: Sends a notification when the Disk space is low
@@ -1240,7 +1284,6 @@
     target:
       device_id:
       - d54e33f71c95fd9ed964e58b9a488b0b
-      - fd4ff1a9970156bb319e4d85d4450657
       - 49d046eb766685131c0c5deb9f0d2250
     action: homeassistant.reload_config_entry
   - delay:
@@ -1248,12 +1291,34 @@
   - data:
       entity:
       - media_player.ardena
-      - media_player.athos
       - media_player.nasya
     action: script.hass_publish_sensors
   - data:
       message: Startup automation complete...
     action: browser_mod.notification
+  - variables:
+      title: Home Assistant Started
+      icon: local/icons/home-assistant.png
+      icon_mdi: mdi:home-assistant
+      color: '#2196f3'
+      group: System
+      tag: startup
+  - parallel:
+    - data:
+        send_to: joshua
+        title: '{{ title }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        title: '{{ title }}'
+        icon: '{{ icon }}'
+      action: script.notify_lnxlink
   - enabled: false
     data:
       stop_actions: false
@@ -1314,9 +1379,9 @@
             -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
             'latest_version') -%}\n    {% set update = '__' ~ state_attr(repo, 'friendly_name')
             | replace(' update', '') ~ ':__ _' ~ state_attr(repo, 'installed_version')
-            ~ '_ -> _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set
-            list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
-            -%} {{ list.updates | join('\\n') }}"
+            ~ '_ ➜ _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set list.updates
+            = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
+            | join('\\n') }}"
           notification_id: hacs-update
         action: persistent_notification.create
       - data:
@@ -1326,9 +1391,9 @@
             -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
             'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo, 'friendly_name')
             | replace(' update', '') ~ ':</b> <em>' ~ state_attr(repo, 'installed_version')
-            ~ '</em> -> <em>' ~ state_attr(repo, 'latest_version') ~ '</em>' %}\n
-            \   {%- set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%-
-            endfor -%} {{ list.updates | join('<br>') }}"
+            ~ '</em> ➜ <em>' ~ state_attr(repo, 'latest_version') ~ '</em>' %}\n    {%-
+            set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
+            -%} {{ list.updates | join('<br>') }}"
           notification_icon: mdi:update
           color: '#4caf50'
           icon: local/icons/update.png
@@ -1344,9 +1409,9 @@
             \"entity_id\") -%}\n  {%- if state_attr(repo, 'installed_version') !=
             state_attr(repo, 'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo,
             'friendly_name') | replace(' update', '') ~ ':</b> <i>' ~ state_attr(repo,
-            'installed_version') ~ '</i> -> <i>' ~ state_attr(repo, 'latest_version')
+            'installed_version') ~ '</i> ➜ <i>' ~ state_attr(repo, 'latest_version')
             ~ '</i>' %}\n    {%- set list.updates = list.updates + [update] -%}\n
-            \ {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join(\" | \") }}"
+            \ {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join('<br>') }}"
           icon: local/icons/update.png
         action: script.notify_lnxlink
   mode: restart
@@ -1600,7 +1665,7 @@
   actions:
   - variables:
       title: Network
-      message: IP address changed {{ trigger.from_state.state }} -> {{ trigger.to_state.state
+      message: IP address changed {{ trigger.from_state.state }} ➜ {{ trigger.to_state.state
         }}.
       icon: local/icons/web.png
       icon_mdi: mdi:web
@@ -2262,7 +2327,7 @@
       group: Cat Feeder
       notification_actions:
       - action: cat_feeder_full
-        title: Feeder Full
+        title: Feeder Refilled
   - parallel:
     - metadata: {}
       data:
@@ -2290,7 +2355,7 @@
         message: '{{ message }}'
         icon: '{{ icon }}'
         actions:
-        - Feeder Full
+        - Feeder Refilled
       action: script.notify_lnxlink
   mode: single
 - id: '1709917613454'
@@ -5475,9 +5540,6 @@
   actions:
   - if:
     - condition: state
-      entity_id: schedule.front_door_auto_lock
-      state: 'off'
-    - condition: state
       entity_id: lock.front_door
       state: unlocked
     - condition: state
@@ -5490,9 +5552,6 @@
         entity_id: lock.front_door
       action: lock.lock
   - if:
-    - condition: state
-      entity_id: schedule.garage_entry_auto_lock
-      state: 'off'
     - condition: state
       entity_id: lock.garage_entry
       state: unlocked

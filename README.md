@@ -33,7 +33,7 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5456 |
+| All Entities   | 5455 |
 | Sensors        | 1831 |
 | Binary Sensors | 411 |
 | Lights         | 77 |
@@ -756,7 +756,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>145 Automations</summary>
+<details><summary>147 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -783,6 +783,7 @@ Material Design 3 Theme for Home Assistant
 - ⚙️ Automation Fail Detector
 - ⚙️ Battery Level Low
 - ⚙️ Clear TTS Cache 🚫
+- ⚙️ Disable Integration During Time 🚫
 - ⚙️ Disk Space Low
 - ⚙️ Event Sniffer 🚫
 - ⚙️ Event Sniffer [Z-Wave JS] 🚫
@@ -882,8 +883,9 @@ Material Design 3 Theme for Home Assistant
 - 🔒 Lock Doors when Away
 - 🔔 Doorbell Object or Ring
 - 🔔 Doorbell Ring
-- 🔔 Frigate Doorbell - Event Handler
-- 🔔 Frigate Doorbell - Object Seen
+- 🔔 Frigate Doorbell - Event Handler 🚫
+- 🔔 Frigate Doorbell - Object Seen 🚫
+- 🔔 Reolink Doorbell - Object Seen
 - 🕗 Main Bedroom Ceiling Fan Default Light Status
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Erebus] Microphone/Camera Active
