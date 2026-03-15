@@ -4,6 +4,25 @@
 #
 # https://www.home-assistant.io/integrations/template/
 #
+trigger:
+  - platform: state
+    entity_id: sensor.ascent_range
+action:
+  - if:
+      - condition: template
+        value_template: >
+          {{ trigger.to_state.state not in ['unknown', 'unavailable', 'none', None]
+            and trigger.from_state.state not in ['unknown', 'unavailable', 'none', None] }}
+      - condition: template
+        value_template: >
+          {{ trigger.to_state.state | float(0) >= 280
+            and trigger.from_state.state | float(999) < 280 }}
+    then:
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.ascent_refueled_range
+        data:
+          value: "{{ trigger.to_state.state | float(0) }}"
 sensor:
   - name: Ascent Fuel Level
     unique_id: ascent_fuel_level
@@ -11,5 +30,12 @@ sensor:
     icon: mdi:fuel
     unit_of_measurement: "%"
     state: |
-      {% set range = int(states("sensor.ascent_range"), 0) %}
-      {{ (range / 360 * 100) | round(0) }}
+      {% set current_range = trigger.to_state.state | float(0) %}
+      {% set refueled_range = states('input_number.ascent_refueled_range') | float(300) %}
+      {% if refueled_range > 0 %}
+        {{ [[(current_range / refueled_range * 100) | round(1), 0] | max, 100] | min }}
+      {% else %}
+        0
+      {% endif %}
+    attributes:
+      last_updated: "{{ now().isoformat() }}"
