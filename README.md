@@ -481,7 +481,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>40 Dashboard Plugins</summary>
+<details><summary>41 Dashboard Plugins</summary>
 
 ### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.27.4]
 
@@ -638,6 +638,10 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 ### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.1.0]
 
 Home Assistant Lovelace Windrose Card
+
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.1.0]
+
+A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
 ### [Xiaomi Vacuum Map Card](https://github.com/PiotrMachowski/lovelace-xiaomi-vacuum-map-card) [v2.3.2]
 
