@@ -307,7 +307,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.8.2]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.9.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -339,7 +339,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.5]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.1.6]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -387,7 +387,7 @@ Authors: [@fillefilip8](https://github.com/fillefilip8), [@DrR0X-glitch](https:/
 
 Authors: [@bruxy70](https://github.com/bruxy70).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.1.3]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.2.1]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
@@ -453,13 +453,13 @@ Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.2.3]
+### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.3.0]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
 Authors: [@ruaan-deysel](https://github.com/ruaan-deysel).
 
-### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.2.2]
+### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.3.1]
 
 Home Assistant Integration for the Management Agent for Unraid
 
@@ -507,7 +507,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.3]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.4]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -523,11 +523,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.8.2]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.8.3]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v6.0.4]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.0.1]
 
 Expander card for HomeAssistant
 
@@ -535,7 +535,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.3.0]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.5]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -559,7 +559,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v10.0.1]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v11.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -567,7 +567,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.2]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.4]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -635,7 +635,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.0.0]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.1.0]
 
 Home Assistant Lovelace Windrose Card
 
@@ -647,11 +647,11 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 </details><details><summary>2 Themes</summary>
 
-### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-4.0.1]
+### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-4.0.2]
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.8]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.9]
 
 Material Design 3 Theme for Home Assistant
 

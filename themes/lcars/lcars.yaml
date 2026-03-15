@@ -201,7 +201,6 @@
   paper-font-title_-_font-family: var(--primary-font-family)
   ha-card-header-font-family: var(--primary-font-family)
   header-font-size: 40px
-  menu-font-size: 25px
   button-font-size: 17px
   # Text
   ha-card-header-color: var(--lcars-text-gray)
@@ -221,10 +220,7 @@
   app-drawer-width: 75px
   sidebar-menu-button-text-color: var(--lcars-text-dark)
   # States and Badges
-  state-inactive-color: var(--lcars-text-dark)
   state-icon-color: var(--lcars-text-light)
-  state-icon-active-color: var(--lcars-text-gray)
-  state-icon-unavailable-color: var(--disabled-text-color)
   # Sliders
   paper-slider-knob-color: var(--lcars-text-light)
   paper-slider-knob-start-color: var(--paper-slider-knob-color)
@@ -337,6 +333,7 @@
         --lcars-horizontal-border: {{ states('input_number.lcars_horizontal') if has_value('input_number.lcars_horizontal') else 10 }}px !important;
         --lcars-vertical-border: {{ states('input_number.lcars_vertical') if has_value('input_number.lcars_vertical') else 35 }}px !important;
         --lcars-middle-vertical-border: {{ states('input_number.lcars_vertical') if has_value('input_number.lcars_vertical') else 35 }}px !important;
+        --menu-font-size: {{ states('input_number.lcars_menu_font') if has_value('input_number.lcars_menu_font') else 24 }}px !important;
         &:not(.type-undefined,.type-custom-grid-layout) {
           height: 100%;
         }
@@ -373,6 +370,7 @@
                  .header-open
       ):not(div > *) {
         display: block !important;
+        height: 100%;
         border: 0px solid var(--lcars-card-top-color);
         border-top-width: var(--lcars-horizontal-border);
         border-radius: 0px;
@@ -446,6 +444,7 @@
                  .middle-blank
       ):not(div > *)  {
         display: block !important;
+        height: 100%;
         background-color: var(--lcars-background-color);
         padding: 0px;
         box-sizing: border-box;
@@ -509,6 +508,7 @@
                  .footer-open
       ):not(div > *) {
         display: block !important;
+        height: 100%;
         padding: 0px;          
         box-sizing: border-box;
         border-radius: 0px;
@@ -712,8 +712,9 @@
           /* Big Slider Card */
           &:is(#container) {
             > #slider {
-              right: calc((1 - var(--bsc-percent) / 100% ) * ( 100% - var(--lcars-vertical-border) - 6px));
+              right: 0;
               left: calc(var(--lcars-vertical-border) + 6px);
+              background: linear-gradient(90deg, var(--bsc-slider-color), var(--bsc-slider-color) var(--bsc-percent), transparent var(--bsc-percent), transparent 100%);
             }
             > #content {
               padding-left: calc(var(--lcars-vertical-border) + 18px);
@@ -753,8 +754,9 @@
           /* Big Slider Card */
           &:is(#container) {
             > #slider {
-              right: calc(100% - (var(--bsc-percent)/100%)*(100% - var(--lcars-vertical-border) - 6px));
+              right: calc(var(--lcars-vertical-border) + 6px);
               left: 0;
+              background: linear-gradient(90deg, var(--bsc-slider-color), var(--bsc-slider-color) var(--bsc-percent), transparent var(--bsc-percent), transparent 100%);
             }
             > #content {
               padding-left: var(--ha-card-border-radius);
@@ -858,8 +860,9 @@
           /* Big Slider Card */
           &:is(#container) {
             > #slider {
-              right: calc(100% - (var(--bsc-percent)/100%)*(100% - var(--lcars-vertical-border) - 6px));
-              left: 0;
+              right: 0;
+              left: calc(var(--lcars-vertical-border) + 6px);
+              background: linear-gradient(90deg, var(--bsc-slider-color), var(--bsc-slider-color) var(--bsc-percent), transparent var(--bsc-percent), transparent 100%);
             }
             > #content {
               position: relative;
@@ -897,8 +900,9 @@
           /* Big Slider Card */
           &:is(#container) {
             > #slider {
-              right: calc(100% - (var(--bsc-percent)/100%)*(100% - var(--lcars-vertical-border) - 6px));
+              right: calc(var(--lcars-vertical-border) + 6px);
               left: 0;
+              background: linear-gradient(90deg, var(--bsc-slider-color), var(--bsc-slider-color) var(--bsc-percent), transparent var(--bsc-percent), transparent 100%);
             }
             > #content {
               padding-left: var(--ha-card-border-radius);
@@ -1017,10 +1021,17 @@
         padding-top: 12px !important;
       }
 
+    # Gauge cards on various themes and styles need a background color
+    "ha-card ha-gauge$": |
+      .gauge {
+        --primary-background-color: var(--lcars-dark-gray);
+      }
+
   # ===================================================== #
   #          TOOLBAR AND DASHBOARD MODIFICATIONS          #
   # ===================================================== #
   card-mod-root-yaml: &card-mod-root |
+
     ha-tab-group$: |
       :host {
         margin-left: 30px;
@@ -1083,6 +1094,10 @@
             padding-right: 0px !important;
             margin-right: -22px;
             margin-left: -16px;
+          }
+          .main-title
+          {
+            margin-left: 22px !important;
           }
         }
         
@@ -1287,19 +1302,80 @@
       {% endif %}
 
   # ===================================================== #
+  #                 CONFIG MODIFICATIONS                  #
+  # ===================================================== #
+  card-mod-config-yaml: &card-mod-config |
+    "ha-config-logs $ hass-subpage div search-input.header $ ha-textfield$": |
+      label.mdc-text-field--filled {
+        height: var(--header-height);
+
+        span#label {
+          line-height: 1.25rem;
+        }
+        input.mdc-text-field__input {
+          align-self: end;
+        }
+      }
+    "* $":
+      .: |
+        hass-subpage, hass-tabs-subpage {
+          --icon-primary-color: var(--sidebar-text-color);
+          --mdc-text-field-label-ink-color: var(--sidebar-text-color);
+          --mdc-text-field-ink-color: var(--sidebar-text-color);
+          font-family: var(--font-family);
+
+          ha-card {
+            overflow: hidden;
+          }
+        }
+      "hass-tabs-subpage $": |
+        div.bottom-bar {
+          --header-height: 50px;
+        }
+      "hass-tabs-subpage-data-table $ hass-tabs-subpage $": |
+        div.bottom-bar {
+          --header-height: 50px;
+        }
+
+  # ===================================================== #
+  #                 DIALOG MODIFICATIONS                  #
+  # ===================================================== #
+  card-mod-dialog-yaml: |
+    $: |
+      :host {
+        font-family: var(--font-family);
+      }
+  # ===================================================== #
+  #              MORE INFO MODIFICATIONS                  #
+  # ===================================================== #
+  card-mod-more-info-yaml: |
+    $: |
+      :host {
+        font-family: var(--font-family);
+      }
+
+    .: |
+      button.breadcrumb {
+        font-family: var(--font-family);
+      }
+
+  # ===================================================== #
   #                 SIDEBAR MODIFICATIONS                 #
   # ===================================================== #
   card-mod-sidebar-yaml: &card-mod-sidebar |
     ha-md-list-item$: |
       md-item {
         --md-list-item-leading-space: 0px;
+        --md-list-item-trailing-space: 3px;
+        --ha-md-list-item-gap: 0px;
       }
+
+    ha-md-list$: |
+      :host {
+        --menu-font-size: {{ states('input_number.lcars_menu_font') if has_value('input_number.lcars_menu_font') else 24 }}px !important;
+      }
+
     .: |
-      /* =============================================== */
-      /*            SECTION-SPECIFIC SETTINGS            */
-      /* =============================================== */
-      
-      /* ============== HA 2025.05 UPDATES ============= */
       :host {
         content: "";
         border-right: 0px !important;
@@ -1335,7 +1411,6 @@
         border-bottom: 5px solid;
         background-color: var(--lcars-ui-secondary);
         width: 100% !important;
-        height: 50px;
         margin: unset !important;
         padding-left: 0px;
         border-radius: unset !important;
@@ -1347,19 +1422,19 @@
           font-family: var(--font-family);
           text-align: right;
           text-transform: uppercase;
-          line-height: 0.8em;
+          line-height: 1;
           color: var(--lcars-text-dark); 
         }
         span.item-text {
-          margin: unset;
           font-size: var(--menu-font-size) !important;
-          position: absolute;
-          top: 0px;
-          right: 0px;
-          height: var(--menu-font-size);
-          width: 185px;
+          align-content: center;
+          align-self: end;
+          box-sizing: border-box;
+          height: 100%;
+          min-height: 40px;
           margin: 0px 0px 0px 0px;
-          padding: 10px 8px 10px 5px;
+          padding: 9px 8px 11px 5px;
+          width: calc( 100% + 3px );
         }
         span.badge {
           position: absolute;
@@ -1370,12 +1445,12 @@
           background-color: var(--lcars-background-color);
           border-radius: 0px;
           height: 100%;
-          font-size: 48px;
+          font-size: 38px; 
           line-height: 1;
           min-width: 46px;
           border-top: 0px solid var(--lcars-background-color);
           overflow: hidden;
-          padding: 0 0 5px 0;
+          padding: 0 0 0 0;
           margin: 0px;
           text-align: center;
         }      
@@ -1387,13 +1462,9 @@
             color: var(--lcars-ui-config-button);
             background-color: var(--lcars-background-color);
             border: 3px var(--lcars-ui-config-button) solid;
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            height: 25px;
-            width: 179px;
-            margin: 0px 0px 0px 0px;
-            padding: 7px 5px 7px 5px;
+            margin-right: -3px;
+            padding-top: 6px;
+            padding-bottom: 8px;
           }
 
           > span.badge {
@@ -1429,18 +1500,15 @@
           background-color: var(--lcars-ui-app-header-clock);
 
           &::before {
-            opacity: 0 !important;
+            display: none;
           }
           > span.item-text {
             color: var(--lcars-ui-app-header-clock);
             background-color: var(--lcars-background-color);
             border: 3px var(--lcars-ui-app-header-clock) solid;
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            width: calc(100% - 78px);
-            margin: 0px 0px 0px 0px;
-            padding: 7px 5px 7px 5px;
+            margin-right: -3px;
+            padding-top: 6px;
+            padding-bottom: 8px;
           }    
           
           > ha-icon,
@@ -1470,11 +1538,15 @@
         }
       }
 
-      .menu ha-icon-button {
-        margin-top: 150px;
-        margin-right: 94px;
-        margin-left: 0px;
-        z-index: 99;
+      div.menu {
+        overflow: visible;
+
+        ha-icon-button {
+          margin-top: 150px;
+          margin-right: 94px;
+          margin-left: 0px;
+          z-index: 99;
+        }
       }
       @media screen and (max-width: 870px) {
         .ha-scrollbar::before {
@@ -1491,21 +1563,23 @@
         }
       }
 
-      ha-user-badge {
-        width: 24px;
-        height: 24px;
-      }
-
       :host ha-icon,
-      :host ha-user-badge,
-      :host ha-svg-icon {
+      :host ha-svg-icon,
+      :host ha-user-badge {
         left: 0px;
-        padding-top: 11px;
-        padding-bottom: 11px;
+        align-content: center;
+        padding-top: 8px;
+        padding-bottom: 8px;
         padding-right: 16px;
         padding-left: 16px;
+        min-height: 100%;
         background-color: var(--lcars-ui-secondary);
         border-right: 5px solid var(--lcars-background-color);
+      }
+      :host ha-user-badge {
+        box-sizing: border-box;
+        width: calc( var(--mdc-icon-size,24px) + 37px);
+        padding-block: 8px;
       }
 
       :host([expanded]) {
@@ -1525,16 +1599,22 @@
           background-color: var(--lcars-ui-tertiary);
           align-items: center;
         }
+        span.badge {
+          font-size: max( 38px, var(--menu-font-size) + 10px );
+        }
+        ha-user-badge {
+          padding-block: max( 8px, var(--menu-font-size)/2 - 2px );
+        }
       }
 
       mwc-button {
         --mdc-theme-primary: var(--lcars-text-dark);
       }
-      
+
       ha-icon-button.hide-panel {
         color: var(--lcars-text-dark) !important;
       }
-      
+
       ha-md-list.ha-scrollbar > .spacer::before {
         content: "";
         position: relative;
