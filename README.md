@@ -293,7 +293,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>31 Custom Integrations</summary>
+<details><summary>30 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
@@ -316,10 +316,6 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 Bubble Card Tools is a custom integration that handles the Bubble Card backend. Required for the Module Store and module installs.
 
 Authors: [@Clooos](https://github.com/Clooos).
-
-### [C.A.F.E.](https://github.com/FezVrasta/cafe-hass) [v0.5.0]
-
-The "Third Way" for Home Assistant Automations.
 
 ### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.2]
 
@@ -535,7 +531,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.5]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.6]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -603,7 +599,7 @@ A power distribution card inspired by the official Energy Distribution card for 
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
-### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.2.0]
+### [Simple Tabs Card](https://github.com/agoberg85/home-assistant-simple-tabs) [v1.3.1]
 
 A simple and configurable tabs card for Home Assistant Dashboards.
 
