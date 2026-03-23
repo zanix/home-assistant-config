@@ -3191,6 +3191,10 @@
         interruption_level: critical
         tag: '{{ tag }}'
         url: '{{ url }}'
+        chronometer: true
+        when: '{{ 10 * 60 }}'
+        when_relative: true
+        timeout: '{{ 10 * 60 }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -3228,6 +3232,11 @@
       minutes: 10
       seconds: 5
     continue_on_timeout: false
+  - data:
+      notification_type: clear_notification
+      send_to: parents
+      tag: '{{ tag }}'
+    action: script.notify_mobile
   - data: {}
     target:
       entity_id: timer.ascent_remote_start
@@ -3380,6 +3389,9 @@
         tag: '{{ tag }}'
         interruption_level: critical
         url: '{{ url }}'
+        chronometer: true
+        when: '{{ end_time }}'
+        timeout: '{{ states(''sensor.bambu_p1s_remaining_time'') | int * 60 }}'
       action: script.notify_mobile
     - data:
         computer:
@@ -4296,6 +4308,7 @@
       group: Kona
       tag: kona
       url: lovelace#kona
+      timeout: '{{ states(''input_number.kona_start_duration'') }}'
   - data: {}
     target:
       entity_id: timer.kona_remote_start
@@ -4312,6 +4325,10 @@
         interruption_level: critical
         tag: '{{ tag }}'
         url: '{{ url }}'
+        chronometer: true
+        when: '{{ timeout * 60 }}'
+        when_relative: true
+        timeout: '{{ timeout * 60 }}'
       action: script.notify_mobile
     - alias: Check the car is in the garage
       if:
@@ -4349,6 +4366,13 @@
       minutes: '{{ states(''input_number.kona_start_duration'') | int }}'
       seconds: 5
     continue_on_timeout: false
+  - action: script.notify_mobile
+    metadata: {}
+    data:
+      notification_type: clear_notification
+      send_to:
+      - parents
+      tag: '{{ tag }}'
   - data: {}
     target:
       entity_id: timer.kona_remote_start
@@ -5651,7 +5675,7 @@
         uri: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
   - data:
       link_id: '{{ link_id }}'
-      url: rtsp://127.0.0.1:8554/{{ camera_name }}
+      entity: '{{ camera }}'
       open_limit: 0
       time_to_live: 600
     action: webrtc.create_link
@@ -6203,6 +6227,7 @@
     - binary_sensor.doorbell_person
     from:
     - 'off'
+    to:
     - 'on'
   - trigger: state
     id: pet
@@ -6210,6 +6235,7 @@
     - binary_sensor.doorbell_pet
     from:
     - 'off'
+    to:
     - 'on'
   - event_type: mobile_app_notification_action
     event_data:
@@ -6235,14 +6261,9 @@
   conditions: []
   actions:
   - variables:
-      camera: doorbell_clear
+      camera: camera.doorbell_clear
       camera_name: Doorbell
       base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
-      attachment: snapshot.jpg
-      alert_once: false
-      labels:
-      - person
-      - pet
       disable_times: []
       cooldown: 30
       silence_timer: 30
@@ -6335,13 +6356,13 @@
           - action: URI
             title: Stream
             uri: '{{ stream }}'
-          - action: silence_{{ camera }}
+          - action: silence_doorbell
             title: Silence ({{ silence_timer }} min)
             destructive: true
       - action: webrtc.create_link
         data:
           link_id: '{{ link_id }}'
-          url: rtsp://127.0.0.1:8554/{{ camera | lower }}
+          entity: '{{ camera }}'
           open_limit: 0
           time_to_live: 600
       - alias: 'Debug: set notification'
@@ -6355,18 +6376,18 @@
               title: Reolink Notification
               message: "Info:\n  - Object (Formatted): {{ object }} ({{ label }})\n\nConfig:\n
                 \ - Camera (Formatted): {{ camera }} ({{ camera_name }})\n  - Base
-                URL: {{ base_url }}\n  - Alert once: {{ alert_once }}\n  - Icon: {{
-                icon }}\n  - Cooldown: {{ cooldown }}s\n  - Title: {{ title }}\n  -
-                Message: {{ message }}\n  - Actions: {{ actions | tojson }}\n\nFilters:\n
-                \ - Disabled times: {{ disable_times }}\n  - State Filter:\n    -
-                State filter on: {{ iif(state_entities | list | count > 0, 'True',
-                'False') }}\n    - State filter entity: {{ state_entities | tojson
-                }}\n    - Required states: {{ states_filter | join(', ') }}\n  {%-
-                set state_filter = namespace(allow=[]) -%}\n  {%- for entity, time
-                in state_entities.items() -%}\n    {%- set state =\n      states(entity)
-                in states_filter\n      and (as_timestamp(now()) - as_timestamp(states[entity].last_changed))
-                | int / 60 > time\n    -%}\n    {%- set state_filter.allow = state_filter.allow
-                + [state] -%}\n  {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow
+                URL: {{ base_url }}\n  - Icon: {{ icon }}\n  - Cooldown: {{ cooldown
+                }}s\n  - Title: {{ title }}\n  - Message: {{ message }}\n  - Actions:
+                {{ actions | tojson }}\n\nFilters:\n  - Disabled times: {{ disable_times
+                }}\n  - State Filter:\n    - State filter on: {{ iif(state_entities
+                | list | count > 0, 'True', 'False') }}\n    - State filter entity:
+                {{ state_entities | tojson }}\n    - Required states: {{ states_filter
+                | join(', ') }}\n  {%- set state_filter = namespace(allow=[]) -%}\n
+                \ {%- for entity, time in state_entities.items() -%}\n    {%- set
+                state =\n      states(entity) in states_filter\n      and (as_timestamp(now())
+                - as_timestamp(states[entity].last_changed)) | int / 60 > time\n    -%}\n
+                \   {%- set state_filter.allow = state_filter.allow + [state] -%}\n
+                \ {%- endfor %}\n    - State Filter TEST: {{ iif(state_filter.allow
                 | reject | first | default(true), 'PASS', 'FAIL') }}\n"
       - alias: Notify on new object
         choose:
@@ -6398,7 +6419,7 @@
                 message: '{{ message }}'
                 notification_icon: '{{ icon }}'
                 color: '{{ color }}'
-                camera: camera.{{ camera }}
+                camera: '{{ camera }}'
                 group: '{{ camera_name }} Notification'
                 car_ui: true
                 interruption_level: critical
@@ -6413,7 +6434,7 @@
                 - media_player.nasya
                 title: '{{ title }}'
                 message: '{{ message }}'
-                camera: camera.{{ camera }}
+                camera: '{{ camera }}'
                 duration: 10
                 actions: '{{ actions }}'
               action: script.notify_hass_agent
@@ -6422,7 +6443,7 @@
                 - erebus
                 title: '{{ title }}'
                 message: '{{ message }}'
-                camera: camera.{{ camera }}
+                camera: '{{ camera }}'
                 importance: critical
                 actions:
                 - Silence Doorbell
@@ -7303,7 +7324,9 @@
   actions:
   - variables:
       title: Vacuum Stuck
-      message: '{{ trigger.to_state.attributes.friendly_name }} needs help!'
+      message: '{{ trigger.to_state.attributes.friendly_name }} needs help in the
+        {{ states(''sensor.'' ~ trigger.entity_id.split(''.'')[1] ~ ''_current_room'')
+        }}!'
       icon: local/icons/robot-vacuum.png
       color: '#4caf50'
       tag: '{{ trigger.entity_id.split(''.'')[1] }}-vacuum-error'
