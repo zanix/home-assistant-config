@@ -317,6 +317,12 @@ Bubble Card Tools is a custom integration that handles the Bubble Card backend. 
 
 Authors: [@Clooos](https://github.com/Clooos).
 
+### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.0.5]
+
+☑️ ChoreOps - A sophisticated household task and routine manager for Home Assistant. Gamify your chores for motivation, or just ensure the trash gets taken out on time.
+
+Authors: [@ccpk1](https://github.com/ccpk1).
+
 ### [Custom Icons](https://github.com/thomasloven/hass-custom_icons) [v1.0.2]
 
 🔹 Use custom svg icons in Home Assistant
@@ -394,12 +400,6 @@ Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://git
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
 Authors: [@fuatakgun](https://github.com/fuatakgun).
-
-### [Kidschores](https://github.com/ad-ha/kidschores-ha) [v0.3.1]
-
-KidsChores Custom Integration for Home Assistant
-
-Authors: [@ad-ha](https://github.com/ad-ha).
 
 ### [Lubelogger](https://github.com/hollowpnt92/lubelogger-ha) [v1.0.14]
 
