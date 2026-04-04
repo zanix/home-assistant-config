@@ -428,10 +428,12 @@
     event_data:
       action: disable_guest_mode
     trigger: event
+    id: disable
   - event_type: mobile_app_notification_action
     event_data:
       action: enable_guest_mode
     trigger: event
+    id: enable
   conditions: []
   actions:
   - variables:
@@ -441,33 +443,51 @@
       group: Security
       tag: guest-mode
       url: lovelace/security
-      action_responses:
-        disable_guest_mode:
-          title: Guest Mode Disabled
-          message: Guest Mode has been turned off
-          icon_mdi: mdi:account-group-off
-        enable_guest_mode:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - enable
+      sequence:
+      - target:
+          entity_id: input_boolean.guest_mode
+        action: input_boolean.turn_on
+        data: {}
+      - data:
+          send_to: '{{ send_to }}'
           title: Guest Mode Enabled
           message: Guest Mode has been turned on
-          icon_mdi: mdi:account-group
-  - target:
-      entity_id: input_boolean.guest_mode
-    action: input_boolean.turn_off
-    data: {}
-  - data:
-      send_to: '{{ send_to }}'
-      title: '{{ action_responses[trigger.event.data.action].title }}'
-      message: '{{ action_responses[trigger.event.data.action].message }}'
-      notification_icon: '{{ action_responses[trigger.event.data.action].icon_mdi
-        }}'
-      color: '{{ color }}'
-      icon: '{{ icon }}'
-      group: '{{ group }}'
-      channel: Security
-      tag: '{{ tag }}'
-      car_ui: true
-      url: '{{ url }}'
-    action: script.notify_mobile
+          notification_icon: mdi:account-group
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          channel: Security
+          tag: '{{ tag }}'
+          car_ui: true
+          url: '{{ url }}'
+        action: script.notify_mobile
+    - conditions:
+      - condition: trigger
+        id:
+        - disable
+      sequence:
+      - target:
+          entity_id: input_boolean.guest_mode
+        action: input_boolean.turn_off
+        data: {}
+      - data:
+          send_to: '{{ send_to }}'
+          title: Guest Mode Disabled
+          message: Guest Mode has been turned off
+          notification_icon: mdi:account-group-off
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          group: '{{ group }}'
+          channel: Security
+          tag: '{{ tag }}'
+          car_ui: true
+          url: '{{ url }}'
+        action: script.notify_mobile
   mode: queued
 - id: '1665681528781'
   alias: ☑️ Ignore Door Alerts
@@ -1540,6 +1560,7 @@
       security_features:
       - lock
       - unlock
+      suggest_closing_after: 60
 - id: '1704733260383'
   alias: ✴️ Joshua Office CO2 Levels
   description: Sets MSR-1 LED color Alerts when CO2 levels in Joshua's Office are
@@ -1956,7 +1977,8 @@
   triggers:
   - entity_id:
     - sensor.ge_oven_cook_time_remaining
-    to: 'Off'
+    to:
+    - '0'
     trigger: state
   conditions:
   - condition: template
@@ -2085,7 +2107,8 @@
   triggers:
   - entity_id:
     - sensor.ge_oven_kitchen_timer
-    to: 'Off'
+    to:
+    - '0'
     trigger: state
   conditions:
   - condition: template
@@ -4022,7 +4045,7 @@
     trigger: state
     for:
       hours: 0
-      minutes: 20
+      minutes: 10
       seconds: 0
   conditions:
   - condition: or
