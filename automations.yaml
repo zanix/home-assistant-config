@@ -368,25 +368,25 @@
 - id: '1665681396617'
   alias: ☑️ Garbage Collection
   description: Confirm collection can is on the curb
-  trigger:
-  - platform: event
-    event_type: mobile_app_notification_action
+  triggers:
+  - event_type: mobile_app_notification_action
     event_data:
       action: garbage_collection
-  - platform: event
-    event_type: mobile_app_notification_action
+    trigger: event
+  - event_type: mobile_app_notification_action
     event_data:
       action: recycle_collection
-  - platform: event
-    event_type: hass_agent_notifications
+    trigger: event
+  - event_type: hass_agent_notifications
     event_data:
       action: garbage_collection
-  - platform: event
-    event_type: hass_agent_notifications
+    trigger: event
+  - event_type: hass_agent_notifications
     event_data:
       action: recycle_collection
-  condition: []
-  action:
+    trigger: event
+  conditions: []
+  actions:
   - variables:
       title: '{{ type }} Collection'
       message: The {{ type }} can is at the curb
@@ -888,11 +888,12 @@
 - id: '1665696751056'
   alias: ⚙️ Action Sniffer [Zigbee]
   description: Listen for Zigbee actions
-  trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/+/action
-  condition: []
-  action:
+  triggers:
+  - trigger: mqtt
+    options:
+      topic: zigbee2mqtt/+/action
+  conditions: []
+  actions:
   - variables:
       device: '{{ trigger.topic.split("/")[1] }}'
       action: '{{ trigger.payload }}'
@@ -989,16 +990,16 @@
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
-  trigger:
-  - platform: time
-    at: 00:00:00
-  condition:
+  triggers:
+  - at: 00:00:00
+    trigger: time
+  conditions:
   - condition: time
     weekday:
     - mon
     before: 00:00:00
     after: 00:00:00
-  action:
+  actions:
   - data: {}
     action: tts.clear_cache
   mode: single
@@ -1050,12 +1051,13 @@
 - id: '1665696511584'
   alias: ⚙️ Disk Space Low
   description: Sends a notification when the Disk space is low
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.disk_use_percent
+  triggers:
+  - entity_id:
+    - sensor.disk_use_percent
     above: 89
-  condition: []
-  action:
+    trigger: numeric_state
+  conditions: []
+  actions:
   - parallel:
     - data:
         title: Low Disk Space
@@ -1101,6 +1103,7 @@
     trigger: event
   - event_type: dreame_vacuum_error
     trigger: event
+    event_data: {}
   conditions: []
   actions:
   - data:
@@ -1224,12 +1227,13 @@
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
   description: Sends a notification when the RAM usage is high
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.memory_use_percent
+  triggers:
+  - entity_id:
+    - sensor.memory_use_percent
     above: 59
-  condition: []
-  action:
+    trigger: numeric_state
+  conditions: []
+  actions:
   - parallel:
     - data:
         title: RAM Usage High
@@ -1258,10 +1262,10 @@
 - id: '1702017706466'
   alias: ⚙️ Scan Interval
   description: Devices with custom scan intervals
-  trigger:
-  - platform: time_pattern
-    minutes: '*'
-  action:
+  triggers:
+  - minutes: '*'
+    trigger: time_pattern
+  actions:
   - variables:
       entities:
         binary_sensor.canon_mf743c_online: 1
@@ -1349,13 +1353,13 @@
 - id: '1698644135975'
   alias: ⚙️ Update Database Filesize Sensor
   description: Updates the file size sensor for the database.
-  trigger:
-  - platform: time_pattern
-    minutes: /30
+  triggers:
+  - minutes: /30
     seconds: '0'
     hours: '*'
-  condition: []
-  action:
+    trigger: time_pattern
+  conditions: []
+  actions:
   - data: {}
     target:
       entity_id: sensor.home_assistant_v2_db_size
@@ -1529,7 +1533,7 @@
       - lock.garage_entry
       dont_lock_if_people_remaining: true
       arrival_opening_behavior: timer
-      arrival_closing_behavior: notif
+      arrival_closing_behavior: 'off'
       timer: 20
       notify_devices:
       - 5d251328aa63591bec98a091f08427b1
@@ -1538,7 +1542,7 @@
       only_open_near:
       - gps
       lead_time: 25
-      departure_closing_behavior: notif
+      departure_closing_behavior: auto
       travel_time_rate: continuous
       custom_translations:
         title:
@@ -1642,23 +1646,24 @@
 - id: '1704671260235'
   alias: ✴️ Joshua Office Light On/Off Presence
   description: Turn on/off the light based on presence
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.apollo_msr_1_office_radar_target
     id: 'on'
     to: 'on'
-  - platform: state
-    entity_id:
+    trigger: state
+  - entity_id:
     - binary_sensor.apollo_msr_1_office_radar_target
     id: 'off'
-    to: 'off'
+    to:
+    - 'off'
     for:
       hours: 0
       minutes: 5
       seconds: 0
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -2233,20 +2238,22 @@
 - id: '1665697781484'
   alias: "\U0001F384 XMas Tree On/Off"
   description: ''
-  trigger:
-  - platform: state
-    entity_id: schedule.xmas_tree
+  triggers:
+  - entity_id:
+    - schedule.xmas_tree
     id: 'on'
-    to: 'on'
-  - platform: state
-    entity_id: schedule.xmas_tree
+    to:
+    - 'on'
+    trigger: state
+  - entity_id: schedule.xmas_tree
     id: 'off'
     to: 'off'
-  condition:
+    trigger: state
+  conditions:
   - condition: state
     entity_id: binary_sensor.is_xmas
     state: 'on'
-  action:
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -2520,14 +2527,19 @@
 - id: '1665686312416'
   alias: "\U0001F4A1 All Lights off when Away"
   description: Turns off all the lights when no one is home
-  trigger:
-  - platform: state
-    entity_id: group.people
-    from: home
-    to: not_home
+  triggers:
+  - entity_id:
+    - group.people
+    from:
+    - home
+    to:
+    - not_home
     for:
-      minutes: 15
-  condition:
+      hours: 0
+      minutes: 10
+      seconds: 0
+    trigger: state
+  conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
@@ -2540,7 +2552,7 @@
   - condition: state
     entity_id: light.all_lights
     state: 'on'
-  action:
+  actions:
   - parallel:
     - data: {}
       target:
@@ -2584,12 +2596,12 @@
 - id: '1665686521519'
   alias: "\U0001F4A1 Front Lights off at Sunrise"
   description: Turns the front lights off at sunrise
-  trigger:
-  - platform: sun
-    event: sunrise
+  triggers:
+  - event: sunrise
     offset: +00:20:00
-  condition: []
-  action:
+    trigger: sun
+  conditions: []
+  actions:
   - action: light.turn_off
     data: {}
     target:
@@ -3709,12 +3721,14 @@
 - id: '1665689270166'
   alias: "\U0001F4AC Garage Door Closed"
   description: Clears notifications when the garage door closes
-  trigger:
-  - platform: state
-    entity_id: cover.garage_door
-    to: closed
-  condition: []
-  action:
+  triggers:
+  - entity_id:
+    - cover.garage_door
+    to:
+    - closed
+    trigger: state
+  conditions: []
+  actions:
   - target:
       entity_id: input_boolean.garage_door_open_alerts
     data: {}
@@ -3933,10 +3947,10 @@
   description: Sends a notification when the garbage or recycling need to be taken
     to the curb.
   triggers:
-  - event: start
+  - alias: 'Garbage Collection: Tomorrow (6pm)'
+    event: start
     offset: '-6:0:0'
     entity_id: calendar.garbage_collection
-    alias: 'Garbage Collection: Tomorrow (6pm)'
     id: garbage-tomorrow
     trigger: calendar
   - event: start
@@ -4039,13 +4053,15 @@
     trigger: state
   - entity_id:
     - group.people
-    from: home
-    to: not_home
+    from:
+    - home
+    to:
+    - not_home
     id: leaving_home
     trigger: state
     for:
       hours: 0
-      minutes: 10
+      minutes: 2
       seconds: 0
   conditions:
   - condition: or
@@ -4496,17 +4512,19 @@
 - id: '1710955585340'
   alias: "\U0001F4C5 Emma's Projector On/Off"
   description: ''
-  trigger:
-  - platform: state
-    entity_id: schedule.emma_projector
+  triggers:
+  - entity_id: schedule.emma_projector
     id: 'on'
     to: 'on'
-  - platform: state
-    entity_id: schedule.emma_projector
+    trigger: state
+  - entity_id:
+    - schedule.emma_projector
     id: 'off'
-    to: 'off'
-  condition: []
-  action:
+    to:
+    - 'off'
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -4531,17 +4549,19 @@
 - id: '1710955623615'
   alias: "\U0001F4C5 Ethan's Projector On/Off"
   description: ''
-  trigger:
-  - platform: state
-    entity_id: schedule.ethan_projector
+  triggers:
+  - entity_id:
+    - schedule.ethan_projector
     id: 'on'
-    to: 'on'
-  - platform: state
-    entity_id: schedule.ethan_projector
+    to:
+    - 'on'
+    trigger: state
+  - entity_id: schedule.ethan_projector
     id: 'off'
     to: 'off'
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -4593,19 +4613,21 @@
 - id: '1704594011311'
   alias: "\U0001F4C5 Grow Light On/Off"
   description: ''
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - schedule.grow_light
     id: 'on'
-    to: 'on'
-  - platform: state
-    entity_id:
+    to:
+    - 'on'
+    trigger: state
+  - entity_id:
     - schedule.grow_light
     id: 'off'
-    to: 'off'
-  condition: []
-  action:
+    to:
+    - 'off'
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -5576,11 +5598,16 @@
   description: ''
   triggers:
   - trigger: state
-    entity_id: group.people
-    from: home
-    to: not_home
+    entity_id:
+    - group.people
+    from:
+    - home
+    to:
+    - not_home
     for:
+      hours: 0
       minutes: 5
+      seconds: 0
   conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
@@ -5637,16 +5664,17 @@
 - id: '1665688920005'
   alias: "\U0001F514 Doorbell Object or Ring"
   description: Activity when an object is detected or rung at night
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.doorbell_visitor
-    to: 'on'
-  - platform: event
-    event_type: custom_frigate_doorbell_object
+    to:
+    - 'on'
+    trigger: state
+  - event_type: custom_frigate_doorbell_object
     event_data:
       object: person
-  condition:
+    trigger: event
+  conditions:
   - condition: or
     conditions:
     - condition: time
@@ -5655,7 +5683,7 @@
     - condition: sun
       before: sunrise
       before_offset: -01:00:00
-  action:
+  actions:
   - data:
       brightness_pct: 80
     target:
@@ -7031,21 +7059,23 @@
 - id: '1725260717620'
   alias: "\U0001F6A6 Amy Office Light Switch Status"
   description: Set Amy Office light switch LED light status
-  trigger:
-  - platform: state
-    id: 'on'
+  triggers:
+  - id: 'on'
     entity_id:
     - light.amy_office
-    from: 'off'
-    to: 'on'
-  - platform: state
-    id: 'off'
+    from:
+    - 'off'
+    to:
+    - 'on'
+    trigger: state
+  - id: 'off'
     entity_id:
     - light.amy_office
     from: 'on'
     to: 'off'
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -7073,11 +7103,11 @@
 - id: '1710965030799'
   alias: "\U0001F6A6 Emma Light Switch Status"
   description: Set Emma light switch LED on state changed
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - switch.nebula_projector_emma_main_switch
-  action:
+    trigger: state
+  actions:
   - choose:
     - conditions:
       - condition: state
@@ -7106,11 +7136,11 @@
 - id: '1710964633068'
   alias: "\U0001F6A6 Ethan Light Switch Status"
   description: Set Ethan light switch LED on state changed
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - switch.nebula_projector_ethan_main_switch
-  action:
+    trigger: state
+  actions:
   - choose:
     - conditions:
       - condition: state
@@ -7140,11 +7170,11 @@
   alias: "\U0001F6A6 Garage Entry Light Switch Status"
   description: Set garage entry light switch LED when garage entry lock state has
     changed
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - lock.garage_entry
-  action:
+    trigger: state
+  actions:
   - choose:
     - conditions:
       - condition: template
@@ -7266,21 +7296,23 @@
 - id: '1665688406559'
   alias: "\U0001F6A6 Joshua Office Light Switch Status"
   description: Set Joshua Office light switch LED light status
-  trigger:
-  - platform: state
-    id: 'on'
+  triggers:
+  - id: 'on'
     entity_id:
     - light.joshua_office
-    from: 'off'
-    to: 'on'
-  - platform: state
-    id: 'off'
+    from:
+    - 'off'
+    to:
+    - 'on'
+    trigger: state
+  - id: 'off'
     entity_id:
     - light.joshua_office
     from: 'on'
     to: 'off'
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
@@ -7308,11 +7340,11 @@
 - id: front_door_lock_state_change
   alias: "\U0001F6A6 Outside Entry Light Switch Status"
   description: Set Outside Entry light switch LED when Front Door lock state has changed
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - lock.front_door
-  action:
+    trigger: state
+  actions:
   - choose:
     - conditions:
       - condition: template
