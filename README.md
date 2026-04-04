@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5322 |
-| Sensors        | 1714 |
-| Binary Sensors | 405 |
+| All Entities   | 5373 |
+| Sensors        | 1723 |
+| Binary Sensors | 407 |
 | Lights         | 77 |
-| Switches       | 790 |
+| Switches       | 791 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -307,7 +307,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.10.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.10.2]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -335,7 +335,7 @@ Home Assistant integration for Dreame robot vacuums with map support
 
 Authors: [@tasshack](https://github.com/tasshack).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.0]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.2]
 
 Frigate integration for Home Assistant
 
@@ -389,11 +389,11 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.2.1]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.3.0]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
-Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325).
+Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
 ### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.52.0]
 
@@ -455,7 +455,7 @@ Monitor and control your Unraid server directly from Home Assistant. Track syste
 
 Authors: [@ruaan-deysel](https://github.com/ruaan-deysel).
 
-### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.3.1]
+### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.3.2]
 
 Home Assistant Integration for the Management Agent for Unraid
 
@@ -499,11 +499,11 @@ Simple badge container card for Home Assistant
 
 Customizable Animated Bar card for Home Assistant Lovelace
 
-### [Battery State Card / Entity Row](https://github.com/maxwroc/battery-state-card) [v4.0.1]
+### [Battery State Card / Entity Row](https://github.com/maxwroc/battery-state-card) [v4.2.0]
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.4]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.5]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -523,7 +523,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.0.3]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.0.4]
 
 Expander card for HomeAssistant
 
@@ -531,7 +531,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.7]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.9]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -555,7 +555,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v11.0.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v12.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -563,7 +563,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.4]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.5]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -591,11 +591,11 @@ Adds highly configurable buttons that use actions and per-state styling.
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.6]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.7]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.10.1]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.10.3]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -631,7 +631,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.3.0]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.4.0]
 
 Home Assistant Lovelace Windrose Card
 
@@ -651,7 +651,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 LCARS theme for Home Assistant
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.9]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.10]
 
 Material Design 3 Theme for Home Assistant
 
