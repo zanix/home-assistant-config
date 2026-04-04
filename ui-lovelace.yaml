@@ -1894,6 +1894,45 @@ streamline_templates:
         - type: horizontal-stack
           cards:
             - type: custom:mushroom-template-card
+              entity: sensor.[[person]]_travel_time
+              icon: mdi:map-clock
+              color: purple
+              features_position: bottom
+              vertical: true
+              primary: "{% if entity | has_value %}\n  {% if state_attr(entity, 'unit_of_measurement')\
+                \ in ['min', 's'] %}\n    {% set value = states(entity) | float %}\n\
+                \    {% if state_attr(entity, 'unit_of_measurement') == 'min' %}\n\
+                \      {% set value = value * 60 %}\n    {% endif %}\n\n    {% set\
+                \ remaining = (\n        states[entity].last_updated | as_timestamp\n\
+                \        - now() | as_timestamp\n        + value\n      )\n    %}\n\
+                \n    {% if remaining >= 60 %}\n      {{ (remaining / 60) | round(0)\
+                \ }}min\n    {% elif remaining > 0 %}\n      {{ remaining | round(0)\
+                \ }}s\n    {% elif remaining > 120 %}\n      Soon\n    {% else %}\n\
+                \      Time passed\n    {% endif %}\n\n  {% else %}\n    Unsupported\
+                \ sensor\n  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+              secondary: "{% if entity | has_value %}\n  {% if state_attr(entity,\
+                \ 'unit_of_measurement') in ['min', 's'] %}\n    {% set value = states(entity)\
+                \ | float %}\n    {% if state_attr(entity, 'unit_of_measurement')\
+                \ == 'min' %}\n      {% set value = value * 60 %}\n    {% endif %}\n\
+                \n    {% set eta = states[entity].last_updated | as_timestamp + value\
+                \ %}\n    {{ eta | timestamp_custom('%-I:%M %p') }}\n\n    {% set\
+                \ eta_date = eta | timestamp_custom('%D') %}\n    {% set now_date\
+                \ = now() | as_timestamp | timestamp_custom('%D') %}\n    {{ eta_date\
+                \ if eta_date > now_date }}\n\n  {% else %}\n    Unsupported sensor\n\
+                \  {% endif %}\n{% else %}\n  Unknown\n{% endif %}"
+              tap_action:
+                action: more-info
+              hold_action:
+                action: perform-action
+                target:
+                  entity_id: sensor.[[person]]_travel_time
+                perform_action: homeassistant.update_entity
+                data:
+                  entity_id:
+                    - sensor.[[person]]_travel_time
+              double_tap_action:
+                action: none
+            - type: custom:mushroom-template-card
               entity: sensor.home_[[person]]_direction_of_travel
               primary: "{% if is_state(\"person.[[person]]\", \"home\") %}\n  Home\n\
                 {% elif is_state(\"person.[[person]]\", \"not_home\") %}\n  Away\n\
@@ -1908,16 +1947,7 @@ streamline_templates:
               features_position: bottom
               vertical: true
               tap_action:
-                action: none
-              icon_tap_action:
                 action: more-info
-              card_mod:
-                style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\n"
-                  ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
-                    \ 28px !important;\n  width: 40px !important;\n  height: 40px\
-                    \ !important;\n  border-radius: 20px !important;\n}\n"
             - type: custom:mushroom-template-card
               entity: sensor.[[phone_base]]_[[person]]_battery_level
               primary: '{{ states(entity) }}%'
@@ -1942,15 +1972,11 @@ streamline_templates:
               features_position: bottom
               vertical: true
               tap_action:
-                action: none
-              icon_tap_action:
                 action: more-info
               card_mod:
                 style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\nha-state-icon {\n  /*\
-                    \ Icon charging animation */\n  {{ 'animation: charge 3s linear\
-                    \ infinite;' if is_state(\"sensor.[[phone_base]]_[[person]]_battery_state\"\
+                  .: "ha-state-icon {\n  /* Icon charging animation */\n  {{ 'animation:\
+                    \ charge 3s linear infinite;' if is_state(\"sensor.[[phone_base]]_[[person]]_battery_state\"\
                     , \"charging\") }}\n}\n@keyframes charge {\n  0%, 80% { clip-path:\
                     \ inset(0 0 0 0); }\n  10% { clip-path: polygon(0% 0%, 0% 100%,\
                     \ 34% 100%, 34% 26%, 67% 26%, 67% 84%, 34% 84%, 34% 100%, 100%\
@@ -1967,9 +1993,6 @@ streamline_templates:
                     \ 100%, 100% 0%); }\n  70% { clip-path: polygon(0% 0%, 0% 100%,\
                     \ 34% 100%, 34% 26%, 67% 26%, 67% 24%, 34% 24%, 34% 100%, 100%\
                     \ 100%, 100% 0%); }\n}\n"
-                  ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
-                    \ 28px !important;\n  width: 40px !important;\n  height: 40px\
-                    \ !important;\n  border-radius: 20px !important;\n}\n"
                   mushroom-shape-icon$: ".shape {\n  /* Radial progress bar */\n \
                     \ background:\n    radial-gradient(var(--card-background-color)\
                     \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--icon-color)\
@@ -1978,34 +2001,6 @@ streamline_templates:
                     \  content: \"\";\n  height: 100%;\n  width: 100%;\n  position:\
                     \ absolute;\n  border-radius: var(--icon-border-radius);\n  background:\
                     \ var(--shape-color);\n}\n"
-            - type: custom:mushroom-template-card
-              entity: sensor.[[phone_base]]_[[person]]_network_type
-              layout: vertical
-              primary: "{%- if is_state(entity, \"cellular\") -%}\n  Cellular\n{%-\
-                \ elif not is_state(\"sensor.[[phone_base]]_[[person]]_wi_fi_connection\"\
-                , \"<not connected>\") -%}\n  {{ states(\"sensor.[[phone_base]]_[[person]]_wi_fi_connection\"\
-                ) | truncate(16) }}\n{%- else -%}\n  Not Connected\n{%- endif -%}"
-              secondary: "{% set signal_level = int(states(\"sensor.[[phone_base]]_[[person]]_wi_fi_signal_strength\"\
-                ), 0) %} {% if signal_level != -1 %}\n  {{ signal_level }} dBm\n{%\
-                \ endif %}"
-              icon: '{% from "util.jinja" import wifi_icon %} {{ wifi_icon("sensor.[[phone_base]]_[[person]]_wi_fi_signal_strength",
-                "sensor.[[phone_base]]_[[person]]_wi_fi_connection") }}'
-              color: cyan
-              features_position: bottom
-              vertical: true
-              tap_action:
-                action: none
-              icon_tap_action:
-                action: more-info
-              card_mod:
-                style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\n"
-                  ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
-                    \ 28px !important;\n  width: 40px !important;\n  height: 40px\
-                    \ !important;\n  border-radius: 20px !important;\n}\n"
-        - type: horizontal-stack
-          cards:
             - type: custom:mushroom-template-card
               entity: sensor.[[watch_base]]_[[person]]_battery_level
               layout: vertical
@@ -2029,21 +2024,33 @@ streamline_templates:
               features_position: bottom
               vertical: true
               tap_action:
-                action: none
-              icon_tap_action:
                 action: more-info
               card_mod:
                 style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\n"
                   ha-tile-icon$: "{% from \"util.jinja\" import battery_color %}\n\
-                    .container {\n  /* Adjust icon size */\n  --mdc-icon-size: 28px\
-                    \ !important;\n  width: 40px !important;\n  height: 40px !important;\n\
-                    \  border-radius: 20px !important;\n\n  /* Radial progress bar\
-                    \ */\n  background:\n    radial-gradient(var(--card-background-color)\
-                    \ 60%, transparent calc(60% + 1px)),\n    conic-gradient(var(--tile-color)\
-                    \ {{ states(config.entity) }}% 0%, var(--card-background-color)\
-                    \ 0% 100%\n  );\n}\n"
+                    .container {\n  /* Radial progress bar */\n  background:\n   \
+                    \ radial-gradient(var(--card-background-color) 60%, transparent\
+                    \ calc(60% + 1px)),\n    conic-gradient(var(--tile-color) {{ states(config.entity)\
+                    \ }}% 0%, var(--card-background-color) 0% 100%\n  );\n}\n"
+        - type: horizontal-stack
+          cards:
+            - type: custom:mushroom-template-card
+              entity: sensor.[[phone_base]]_[[person]]_network_type
+              layout: vertical
+              color: cyan
+              features_position: bottom
+              vertical: true
+              icon: '{% from "util.jinja" import wifi_icon %} {{ wifi_icon("sensor.[[phone_base]]_[[person]]_wi_fi_signal_strength",
+                "sensor.[[phone_base]]_[[person]]_wi_fi_connection") }}'
+              primary: "{%- if is_state(entity, \"cellular\") -%}\n  Cellular\n{%-\
+                \ elif not is_state(\"sensor.[[phone_base]]_[[person]]_wi_fi_connection\"\
+                , \"<not connected>\") -%}\n  {{ states(\"sensor.[[phone_base]]_[[person]]_wi_fi_connection\"\
+                ) | truncate(16) }}\n{%- else -%}\n  Not Connected\n{%- endif -%}"
+              secondary: "{% set signal_level = int(states(\"sensor.[[phone_base]]_[[person]]_wi_fi_signal_strength\"\
+                ), 0) %} {% if signal_level != -1 %}\n  {{ signal_level }} dBm\n{%\
+                \ endif %}"
+              tap_action:
+                action: more-info
             - type: custom:mushroom-template-card
               entity: sensor.[[watch_base]]_[[person]]_activity_state
               layout: vertical
@@ -2054,16 +2061,7 @@ streamline_templates:
               features_position: bottom
               vertical: true
               tap_action:
-                action: none
-              icon_tap_action:
                 action: more-info
-              card_mod:
-                style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\n"
-                  ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
-                    \ 28px !important;\n  width: 40px !important;\n  height: 40px\
-                    \ !important;\n  border-radius: 20px !important;\n}\n"
             - type: custom:mushroom-template-card
               entity: sensor.[[watch_base]]_[[person]]_daily_steps
               layout: vertical
@@ -2074,16 +2072,7 @@ streamline_templates:
               features_position: bottom
               vertical: true
               tap_action:
-                action: none
-              icon_tap_action:
                 action: more-info
-              card_mod:
-                style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\n"
-                  ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
-                    \ 28px !important;\n  width: 40px !important;\n  height: 40px\
-                    \ !important;\n  border-radius: 20px !important;\n}\n"
             - type: custom:mushroom-template-card
               entity: sensor.[[watch_base]]_[[person]]_daily_calories
               layout: vertical
@@ -2094,16 +2083,7 @@ streamline_templates:
               features_position: bottom
               vertical: true
               tap_action:
-                action: none
-              icon_tap_action:
                 action: more-info
-              card_mod:
-                style:
-                  .: "ha-card {\n  /* Remove default card styling */\n  --ha-card-box-shadow:\
-                    \ none;\n  --ha-card-border-width: 0;\n}\n"
-                  ha-tile-icon$: ".container {\n  /* Adjust icon size */\n  --mdc-icon-size:\
-                    \ 28px !important;\n  width: 40px !important;\n  height: 40px\
-                    \ !important;\n  border-radius: 20px !important;\n}\n"
         - type: grid
           square: false
           card_mod:
@@ -3095,7 +3075,11 @@ views:
                     icon_color: lime
                     icon: mdi:gamepad-square-outline
                     tap_action:
-                      action: none
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          popup_card_id: computer-athos
                 - type: conditional
                   conditions:
                     - entity: binary_sensor.quest_interactive
@@ -3229,7 +3213,11 @@ views:
                     icon_color: orange
                     icon: mdi:laptop
                     tap_action:
-                      action: none
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          popup_card_id: computer-workjosh
                 - type: conditional
                   conditions:
                     - entity: binary_sensor.cartago_connected
@@ -3240,7 +3228,11 @@ views:
                     icon_color: red
                     icon: mdi:laptop
                     tap_action:
-                      action: none
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          popup_card_id: computer-cartago
                 - type: conditional
                   conditions:
                     - entity: binary_sensor.erebus_connected
@@ -3251,7 +3243,11 @@ views:
                     icon_color: blue
                     icon: mdi:desktop-tower
                     tap_action:
-                      action: none
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          popup_card_id: computer-erebus
                 - type: template
                   entity: light.joshua_office_lights
                   icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
@@ -3313,7 +3309,11 @@ views:
                     icon_color: purple
                     icon: mdi:laptop
                     tap_action:
-                      action: none
+                      action: fire-dom-event
+                      browser_mod:
+                        service: browser_mod.popup
+                        data:
+                          popup_card_id: computer-nasya
                 - type: template
                   entity: light.amy_office_lights
                   icon: '{{ iif(is_state(entity, "on"), "mdi:lightbulb-on", "mdi:lightbulb")
@@ -5117,9 +5117,10 @@ views:
               primary_font_size: 20px
             needle: true
             gradient: true
-            gradient_resolution: medium
+            round: small
+            gradient_resolution: auto
             min: 1
-            max: 5.4
+            max: 5.5
             segments:
               - from: 1
                 color: var(--red-color)
@@ -5131,26 +5132,32 @@ views:
                 color: var(--green-color)
             inner:
               mode: severity
-              min: 1
-              max: 3.3
+              min: 2
+              max: 3.4
               gradient: true
-              gradient_resolution: medium
+              gradient_resolution: 100
               segments:
                 - from: 2
                   color: var(--red-color)
-                - from: 2.5
+                - from: 2.2
                   color: var(--orange-color)
-                - from: 2.8
+                - from: 2.6
                   color: var(--yellow-color)
                 - from: 3
                   color: var(--green-color)
+              setpoint:
+                type: number
+                value: 3.2
+                color: lightgreen
+              gradient_background: false
+              severity_centered: false
             tap_action:
               action: none
             primary_value_text_tap_action:
               action: more-info
             secondary_value_text_tap_action:
               action: more-info
-            round: small
+            icons: {}
           - type: custom:mushroom-template-card
             entity: sensor.ecowitt_wh90_battery
             primary: System Status
@@ -5622,44 +5629,6 @@ views:
               action: more-info
             double_tap_action:
               action: none
-          - type: map
-            entities:
-              - entity: person.amy
-              - entity: person.joshua
-            hours_to_show: 1
-            layout_options:
-              grid_columns: 4
-              grid_rows: 8
-            theme_mode: auto
-            card_mod:
-              style:
-                .: "ha-card {\n  /* Remove default card styling without affecting\
-                  \ child elements */\n  box-shadow: none;\n  border-width: 0;\n \
-                  \ transition: all 0s;\n}\n#buttons {\n  margin: 15px 0 0 3px;\n\
-                  }\n"
-                ha-map $ ha-entity-marker $: ".marker {\n  /* Style person marker\
-                  \ & adjust position to avoid blocking waypoints */\n  border-radius:\
-                  \ 50% 50% 50% 0px !important;\n  transform: rotate(-45deg) translate(50%,\
-                  \ -50%);\n  overflow: visible !important;\n}\n.entity-picture {\n\
-                  \  /* Correct orientation of person avatar */\n  transform: rotate(45deg);\n\
-                  \  border-radius: 50%;\n}\n"
-                ha-map $: "path:first-child {\n  /* Style accuracy radius */\n  fill:\
-                  \ color-mix(in srgb, var(--yellow-color) 50%, transparent);\n  stroke-width:\
-                  \ 0px;\n}\npath:nth-of-type(2) {\n  /* Style accuracy radius */\n\
-                  \  fill: color-mix(in srgb, var(--yellow-color) 50%, transparent);\n\
-                  \  stroke-width: 0px;\n}\n.leaflet-control-attribution {\n  /* Style\
-                  \ attribution text */\n  display: none !important;\n  background:\
-                  \ rgba(var(--rgb-card-background-color), 0.2) !important;\n  font-size:\
-                  \ 8px;\n}\n.leaflet-container a {\n  /* Set color of zoom icons\
-                  \ & attribution text */\n  color: var(--secondary-text-color);\n\
-                  }\n.leaflet-control-zoom-in,\n.leaflet-control-zoom-out {\n  /*\
-                  \ Style zoom buttons like Chips */\n  border-radius: var(--mush-chip-border-radius,\
-                  \ 19px) !important;\n  padding: 3px;\n  background: rgb(var(--rgb-secondary-text-color),\
-                  \ 0.2) !important;\n  margin: 8px 12px 0px;\n  border: var(--ha-card-border-width,\
-                  \ 1px) solid var(--ha-card-border-color, var(--divider-color, #e0e0e0))\
-                  \ !important;\n}\n.leaflet-control-zoom {\n  /* Remove extra margin\
-                  \ */\n  margin: 0px !important;\n\n  /* Remove zoom control border\
-                  \ */\n  border: none !important;\n}\n"
       - type: grid
         cards:
           - type: vertical-stack
@@ -11611,1174 +11580,11 @@ views:
         tap_action:
           action: more-info
         label: This Month
-      - type: custom:mushroom-template-badge
-        content: Stats
-        icon: mdi:chart-sankey-variant
-        color: pink
-        tap_action:
-          action: navigate
-          navigation_path: power-stats
     visible:
       - user: ce9ee65ab49c4ca4af52496609016f1c
       - user: f615672fc2554783beab56221097564e
       - user: 171eeb6104704b03afcad6553b7b793e
       - user: 6905264120304e96aa416e287aca5b80
-  - title: Power Stats
-    type: sections
-    subview: true
-    path: power-stats
-    max_columns: 3
-    icon: mdi:chart-sankey-variant
-    cards: []
-    sections:
-      - type: grid
-        cards:
-          - type: vertical-stack
-            cards:
-              - type: custom:simple-tabs
-                tabs:
-                  - title: Current
-                    icon: mdi:clock-outline
-                    card:
-                      type: custom:vertical-stack-in-card
-                      cards:
-                        - type: horizontal-stack
-                          cards:
-                            - type: custom:apexcharts-card
-                              card_mod:
-                                style: "ha-card {\n  padding: 0px;\n  border: none;\n\
-                                  \  box-shadow: none;\n  margin-bottom: -15px;\n\
-                                  }\n#state__value > #state {\n  font-size: 1.2em\
-                                  \ !important;\n}\n.apexcharts-tooltip-series-group\
-                                  \ {\n  padding-top: 0px !important;\n  padding-bottom:\
-                                  \ 0px !important;\n  margin-top: 0px !important;\n\
-                                  \  margin-bottom: 0px !important;\n  display: none;\n\
-                                  \  text-align: left;\n  justify-content: left;\n\
-                                  \  align-items: center;\n}\n"
-                              apex_config:
-                                chart:
-                                  height: 250px
-                                  toolbar:
-                                    show: false
-                                grid:
-                                  borderColor: '#7B7B7B'
-                                legend:
-                                  show: false
-                                tooltip:
-                                  shared: true
-                                title:
-                                  text: Current Power
-                                  align: center
-                                  margin: 10
-                                  offsetX: 0
-                                  offsetY: 10
-                                  floating: true
-                                  style:
-                                    fontSize: 1rem
-                                    fontWeight: bold
-                                    color: var(--primary-text-color)
-                                xaxis:
-                                  tooltip:
-                                    enabled: false
-                              header:
-                                show: false
-                                show_states: true
-                                colorize_states: true
-                                standard_format: true
-                              all_series_config:
-                                stroke_width: 2
-                                float_precision: 0
-                                show:
-                                  in_header: raw
-                                  legend_value: false
-                                type: area
-                                opacity: 0.2
-                                group_by:
-                                  func: avg
-                                  duration: 5min
-                              span:
-                                end: minute
-                              graph_span: 24h
-                              yaxis:
-                                - min: ~-500
-                                  max: ~500
-                                  decimals: 0
-                                  apex_config:
-                                    tickAmount: 3
-                                    forceNiceScale: true
-                                    title:
-                                      text: W
-                                      rotate: 0
-                              series:
-                                - entity: sensor.emporiavue_main_total_power
-                                  name: Home
-                                  color: var(--grey-color)
-                            - type: custom:button-card
-                              tap_action:
-                                action: navigate
-                                navigation_path: /energy
-                              icon: mdi:magnify-expand
-                              styles:
-                                card:
-                                  - width: 3.5rem
-                                  - border: none
-                                  - background: none
-                                  - box-shadow: none
-                                  - margin-left: -40px
-                        - type: custom:sankey-chart
-                          layout: horizontal
-                          show_names: true
-                          show_icons: true
-                          wide: true
-                          min_state: 1
-                          throttle: 1000
-                          round: 0
-                          height: 500
-                          show_units: true
-                          min_box_size: 16
-                          card_mod:
-                            style: "ha-card {\n  margin: 5px;\n  padding: 0px;\n \
-                              \ font-size: 0.8rem;\n  font-weight: bold;\n  border:\
-                              \ none;\n  box-shadow: none;\n  overflow-x: clip !important;\n\
-                              }\n.container {\n  padding: 0px !important;\n}\n.box\
-                              \ div:first-child {\n  color: white;\n}\n"
-                          sections:
-                            - entities:
-                                - entity_id: sensor.emporiavue_main_total_power
-                                  color: var(--cyan-color)
-                                  name: Home
-                                  icon: mdi:home-import-outline
-                                  children:
-                                    - sensor.emporiavue_sub_total_power
-                                    - sensor.emporiavue_main_a_c_power
-                                    - sensor.emporiavue_main_dryer_power
-                                    - sensor.emporiavue_main_dishwasher_disposal_power
-                                    - sensor.emporiavue_main_garage_laundry_outside_lights_power
-                                    - sensor.emporiavue_main_garage_outlets_power
-                                    - sensor.emporiavue_main_kitchen_dining_lights_power
-                                    - sensor.emporiavue_main_kitchen_outlets_1_power
-                                    - sensor.emporiavue_main_kitchen_outlets_2_power
-                                    - sensor.emporiavue_main_microwave_power
-                                    - sensor.emporiavue_main_outside_outlet_power
-                                    - sensor.emporiavue_main_range_power
-                                    - sensor.emporiavue_main_washer_power
-                                    - sensor.remaining
-                            - entities:
-                                - entity_id: sensor.emporiavue_sub_total_power
-                                  name: Sub Panel
-                                  icon: mdi:transmission-tower
-                                  children:
-                                    - sensor.emporiavue_sub_balance_power
-                                    - sensor.emporiavue_sub_basement_bath_outlet_power
-                                    - sensor.emporiavue_sub_basement_bedrooms_power
-                                    - sensor.emporiavue_sub_basement_lights_utility_room_power
-                                    - sensor.emporiavue_sub_bathroom_outlets_power
-                                    - sensor.emporiavue_sub_bedroom_lights_power
-                                    - sensor.emporiavue_sub_eve_outlet_power
-                                    - sensor.emporiavue_sub_family_room_power
-                                    - sensor.emporiavue_sub_furnace_power
-                                    - sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_power
-                                    - sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_power
-                                    - sensor.emporiavue_sub_kitchen_island_power
-                                    - sensor.emporiavue_sub_living_room_power
-                                    - sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_power
-                                    - sensor.remaining_sub
-                                - entity_id: sensor.emporiavue_main_a_c_power
-                                  name: Air Conditioner
-                                  icon: mdi:air-conditioner
-                                - entity_id: sensor.emporiavue_main_dryer_power
-                                  name: Dryer
-                                  icon: mdi:tumble-dryer
-                                - entity_id: sensor.emporiavue_main_dishwasher_disposal_power
-                                  name: Dishwasher / Disposal
-                                  icon: mdi:dishwasher
-                                - entity_id: sensor.emporiavue_main_garage_laundry_outside_lights_power
-                                  name: Garage, Laundry, Outside Lights
-                                  icon: mdi:lightbulb-group
-                                - entity_id: sensor.emporiavue_main_garage_outlets_power
-                                  name: Garage Outlets
-                                  icon: mdi:power-plug
-                                - entity_id: sensor.emporiavue_main_kitchen_dining_lights_power
-                                  name: Kitchen, Dining Lights
-                                  icon: mdi:lightbulb-group
-                                - entity_id: sensor.emporiavue_main_kitchen_outlets_1_power
-                                  name: Kitchen Outlets 1
-                                  icon: mdi:power-plug
-                                - entity_id: sensor.emporiavue_main_kitchen_outlets_2_power
-                                  name: Kitchen Outlets 2
-                                  icon: mdi:power-plug
-                                - entity_id: sensor.emporiavue_main_microwave_power
-                                  name: Microwave
-                                  icon: mdi:microwave
-                                - entity_id: sensor.emporiavue_main_outside_outlet_power
-                                  name: Outside Outlet
-                                  icon: mdi:power-plug
-                                - entity_id: sensor.emporiavue_main_range_power
-                                  name: Range
-                                  icon: mdi:stove
-                                - entity_id: sensor.emporiavue_main_washer_power
-                                  name: Washer
-                                  icon: mdi:washing-machine
-                                - entity_id: sensor.remaining
-                                  type: remaining_parent_state
-                                  name: Other < 1W
-                                  color: var(--grey-color)
-                            - entities:
-                                - entity_id: sensor.emporiavue_sub_balance_power
-                                  name: Sub Balance
-                                  icon: mdi:home-analytics
-                                - entity_id: sensor.emporiavue_sub_basement_bath_outlet_power
-                                  name: Basement Bath Outlet
-                                  icon: mdi:hair-dryer
-                                - entity_id: sensor.emporiavue_sub_basement_bedrooms_power
-                                  name: Basement Bedrooms
-                                  icon: mdi:home-floor-0
-                                - entity_id: sensor.emporiavue_sub_basement_lights_utility_room_power
-                                  name: Basement Lights/Utility Room
-                                  icon: mdi:progress-wrench
-                                - entity_id: sensor.emporiavue_sub_bathroom_outlets_power
-                                  name: Bathroom Outlets
-                                  icon: mdi:hair-dryer
-                                - entity_id: sensor.emporiavue_sub_bedroom_lights_power
-                                  name: Bedroom Lights
-                                  icon: mdi:lightbulb-group
-                                - entity_id: sensor.emporiavue_sub_eve_outlet_power
-                                  name: Eve Outlet
-                                  icon: mdi:rounded-corner
-                                - entity_id: sensor.emporiavue_sub_family_room_power
-                                  name: Family Room
-                                  icon: mdi:gamepad-circle
-                                - entity_id: sensor.emporiavue_sub_furnace_power
-                                  name: Furnace
-                                  icon: mdi:hvac
-                                - entity_id: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_power
-                                  name: Hall, Bath Lights/Main Bed Outlets
-                                  icon: mdi:home-floor-1
-                                - entity_id: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_power
-                                  name: Hall, Bedroom Outlets/Entry, Outside Lights
-                                  icon: mdi:home-floor-1
-                                - entity_id: sensor.emporiavue_sub_kitchen_island_power
-                                  name: Kitchen Island
-                                  icon: mdi:table-chair
-                                - entity_id: sensor.emporiavue_sub_living_room_power
-                                  name: Living Room
-                                  icon: mdi:sofa-single
-                                - entity_id: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_power
-                                  name: Theater, Family Outlets/Basement Lighting
-                                  icon: mdi:theater
-                                - entity_id: sensor.remaining_sub
-                                  type: remaining_parent_state
-                                  name: Other < 1W
-                                  color: var(--grey-color)
-                      card_mod:
-                        style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow:\
-                          \ none;\n}\n"
-                  - title: Consumption
-                    icon: mdi:counter
-                    card:
-                      type: custom:vertical-stack-in-card
-                      cards:
-                        - type: custom:simple-tabs
-                          tabs:
-                            - title: Today
-                              icon: mdi:calendar-today-outline
-                              card:
-                                type: vertical-stack
-                                cards:
-                                  - type: horizontal-stack
-                                    cards:
-                                      - type: custom:apexcharts-card
-                                        card_mod:
-                                          style: "ha-card {\n  padding: 0px;\n  border:\
-                                            \ none;\n  box-shadow: none;\n}\n#state__value\
-                                            \ > #state {\n  font-size: 1.2em !important;\n\
-                                            }\n"
-                                        stacked: true
-                                        apex_config:
-                                          chart:
-                                            height: 200px
-                                            toolbar:
-                                              show: false
-                                          grid:
-                                            borderColor: '#7B7B7B'
-                                          legend:
-                                            show: false
-                                          tooltip:
-                                            shared: true
-                                          xaxis:
-                                            tooltip:
-                                              enabled: false
-                                        span:
-                                          start: day
-                                        graph_span: 1d
-                                        header:
-                                          show: false
-                                          show_states: true
-                                          colorize_states: true
-                                          standard_format: true
-                                        all_series_config:
-                                          stroke_width: 2
-                                          opacity: 0.2
-                                          float_precision: 1
-                                          show:
-                                            in_header: raw
-                                            legend_value: false
-                                          type: column
-                                          statistics:
-                                            type: sum
-                                          group_by:
-                                            func: diff
-                                            start_with_last: true
-                                            duration: 1hour
-                                        yaxis:
-                                          - min: ~1
-                                            max: ~1
-                                            apex_config:
-                                              tickAmount: 4
-                                              forceNiceScale: true
-                                              title:
-                                                text: kWh
-                                        series:
-                                          - entity: sensor.emporiavue_main_total_daily
-                                            opacity: 0.2
-                                            name: Home
-                                            color: var(--grey-color)
-                                      - type: custom:button-card
-                                        tap_action:
-                                          action: navigate
-                                          navigation_path: /energy
-                                        icon: mdi:magnify-expand
-                                        styles:
-                                          card:
-                                            - width: 3.5rem
-                                            - border: none
-                                            - background: none
-                                            - box-shadow: none
-                                            - margin-left: -40px
-                                  - type: custom:sankey-chart
-                                    layout: horizontal
-                                    show_names: true
-                                    show_icons: true
-                                    unit_prefix: k
-                                    wide: true
-                                    throttle: 1000
-                                    round: 2
-                                    height: 500
-                                    show_units: true
-                                    min_box_size: 16
-                                    card_mod:
-                                      style: "ha-card {\n  margin: 5px;\n  padding:\
-                                        \ 0px;\n  font-size: 0.8rem;\n  font-weight:\
-                                        \ bold;\n  border: none;\n  box-shadow: none;\n\
-                                        \  overflow-x: clip !important;\n}\n.container\
-                                        \ {\n  padding: 0px !important;\n}\n.box div:first-child\
-                                        \ {\n  color: white;\n}\n"
-                                    sections:
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_main_total_daily
-                                            color: var(--cyan-color)
-                                            name: Home
-                                            icon: mdi:home-import-outline
-                                            children:
-                                              - sensor.emporiavue_sub_total_daily
-                                              - sensor.emporiavue_main_a_c_daily
-                                              - sensor.emporiavue_main_dryer_daily
-                                              - sensor.emporiavue_main_dishwasher_disposal_daily
-                                              - sensor.emporiavue_main_garage_laundry_outside_lights_daily
-                                              - sensor.emporiavue_main_garage_outlets_daily
-                                              - sensor.emporiavue_main_kitchen_dining_lights_daily
-                                              - sensor.emporiavue_main_kitchen_outlets_1_daily
-                                              - sensor.emporiavue_main_kitchen_outlets_2_daily
-                                              - sensor.emporiavue_main_microwave_daily
-                                              - sensor.emporiavue_main_outside_outlet_daily
-                                              - sensor.emporiavue_main_range_daily
-                                              - sensor.emporiavue_main_washer_daily
-                                              - sensor.remaining
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_total_daily
-                                            name: Sub Panel
-                                            icon: mdi:transmission-tower
-                                            children:
-                                              - sensor.emporiavue_sub_balance_daily
-                                              - sensor.emporiavue_sub_basement_bath_outlet_daily
-                                              - sensor.emporiavue_sub_basement_bedrooms_daily
-                                              - sensor.emporiavue_sub_basement_lights_utility_room_daily
-                                              - sensor.emporiavue_sub_bathroom_outlets_daily
-                                              - sensor.emporiavue_sub_bedroom_lights_daily
-                                              - sensor.emporiavue_sub_eve_outlet_daily
-                                              - sensor.emporiavue_sub_family_room_daily
-                                              - sensor.emporiavue_sub_furnace_daily
-                                              - sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_daily
-                                              - sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_daily
-                                              - sensor.emporiavue_sub_kitchen_island_daily
-                                              - sensor.emporiavue_sub_living_room_daily
-                                              - sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_daily
-                                              - sensor.remaining_sub
-                                          - entity_id: sensor.emporiavue_main_a_c_daily
-                                            name: Air Conditioner
-                                            icon: mdi:air-conditioner
-                                          - entity_id: sensor.emporiavue_main_dryer_daily
-                                            name: Dryer
-                                            icon: mdi:tumble-dryer
-                                          - entity_id: sensor.emporiavue_main_dishwasher_disposal_daily
-                                            name: Dishwasher / Disposal
-                                            icon: mdi:dishwasher
-                                          - entity_id: sensor.emporiavue_main_garage_laundry_outside_lights_daily
-                                            name: Garage, Laundry, Outside Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_garage_outlets_daily
-                                            name: Garage Outlets
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_dining_lights_daily
-                                            name: Kitchen, Dining Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_1_daily
-                                            name: Kitchen Outlets 1
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_2_daily
-                                            name: Kitchen Outlets 2
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_microwave_daily
-                                            name: Microwave
-                                            icon: mdi:microwave
-                                          - entity_id: sensor.emporiavue_main_outside_outlet_daily
-                                            name: Outside Outlet
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_range_daily
-                                            name: Range
-                                            icon: mdi:stove
-                                          - entity_id: sensor.emporiavue_main_washer_daily
-                                            name: Washer
-                                            icon: mdi:washing-machine
-                                          - entity_id: sensor.remaining
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_balance_daily
-                                            name: Sub Balance
-                                            icon: mdi:home-analytics
-                                          - entity_id: sensor.emporiavue_sub_basement_bath_outlet_daily
-                                            name: Basement Bath Outlet
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_basement_bedrooms_daily
-                                            name: Basement Bedrooms
-                                            icon: mdi:home-floor-0
-                                          - entity_id: sensor.emporiavue_sub_basement_lights_utility_room_daily
-                                            name: Basement Lights/Utility Room
-                                            icon: mdi:progress-wrench
-                                          - entity_id: sensor.emporiavue_sub_bathroom_outlets_daily
-                                            name: Bathroom Outlets
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_bedroom_lights_daily
-                                            name: Bedroom Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_sub_eve_outlet_daily
-                                            name: Eve Outlet
-                                            icon: mdi:rounded-corner
-                                          - entity_id: sensor.emporiavue_sub_family_room_daily
-                                            name: Family Room
-                                            icon: mdi:gamepad-circle
-                                          - entity_id: sensor.emporiavue_sub_furnace_daily
-                                            name: Furnace
-                                            icon: mdi:hvac
-                                          - entity_id: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_daily
-                                            name: Hall, Bath Lights/Main Bed Outlets
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_daily
-                                            name: Hall, Bedroom Outlets/Entry, Outside
-                                              Lights
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_kitchen_island_daily
-                                            name: Kitchen Island
-                                            icon: mdi:table-chair
-                                          - entity_id: sensor.emporiavue_sub_living_room_daily
-                                            name: Living Room
-                                            icon: mdi:sofa-single
-                                          - entity_id: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_daily
-                                            name: Theater, Family Outlets/Basement
-                                              Lighting
-                                            icon: mdi:theater
-                                          - entity_id: sensor.remaining_sub
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                            - title: Week
-                              icon: mdi:calendar-week-outline
-                              card:
-                                type: vertical-stack
-                                cards:
-                                  - type: horizontal-stack
-                                    cards:
-                                      - type: custom:apexcharts-card
-                                        card_mod:
-                                          style: "ha-card {\n  padding: 0px;\n  border:\
-                                            \ none;\n  box-shadow: none;\n}\n#state__value\
-                                            \ > #state {\n  font-size: 1.2em !important;\n\
-                                            }\n"
-                                        stacked: true
-                                        apex_config:
-                                          chart:
-                                            height: 200px
-                                            toolbar:
-                                              show: false
-                                          grid:
-                                            borderColor: '#7B7B7B'
-                                          legend:
-                                            show: false
-                                          tooltip:
-                                            shared: true
-                                          xaxis:
-                                            tooltip:
-                                              enabled: false
-                                        span:
-                                          end: day
-                                        graph_span: 7d
-                                        header:
-                                          show: false
-                                          show_states: true
-                                          colorize_states: true
-                                          standard_format: true
-                                        all_series_config:
-                                          stroke_width: 2
-                                          opacity: 0.2
-                                          float_precision: 1
-                                          show:
-                                            in_header: raw
-                                            legend_value: false
-                                          type: column
-                                          statistics:
-                                            type: sum
-                                          group_by:
-                                            func: diff
-                                            start_with_last: true
-                                            duration: 1day
-                                        yaxis:
-                                          - min: ~1
-                                            max: ~1
-                                            apex_config:
-                                              tickAmount: 4
-                                              forceNiceScale: true
-                                              title:
-                                                text: kWh
-                                        series:
-                                          - entity: sensor.emporiavue_main_total_weekly
-                                            opacity: 0.2
-                                            name: Home
-                                            color: var(--grey-color)
-                                      - type: custom:button-card
-                                        tap_action:
-                                          action: navigate
-                                          navigation_path: /energy
-                                        icon: mdi:magnify-expand
-                                        styles:
-                                          card:
-                                            - width: 3.5rem
-                                            - border: none
-                                            - background: none
-                                            - box-shadow: none
-                                            - margin-left: -40px
-                                  - type: custom:sankey-chart
-                                    layout: horizontal
-                                    show_names: true
-                                    show_icons: true
-                                    wide: true
-                                    unit_prefix: k
-                                    round: 2
-                                    height: 500
-                                    show_units: true
-                                    min_box_size: 16
-                                    card_mod:
-                                      style: "ha-card {\n  margin: 5px;\n  padding:\
-                                        \ 0px;\n  font-size: 0.8rem;\n  font-weight:\
-                                        \ bold;\n  border: none;\n  box-shadow: none;\n\
-                                        \  overflow-x: clip !important;\n}\n.container\
-                                        \ {\n  padding: 0px !important;\n}\n.box div:first-child\
-                                        \ {\n  color: white;\n}\n"
-                                    sections:
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_main_total_weekly
-                                            color: var(--cyan-color)
-                                            name: Home
-                                            icon: mdi:home-import-outline
-                                            children:
-                                              - sensor.emporiavue_sub_total_weekly
-                                              - sensor.emporiavue_main_a_c_weekly
-                                              - sensor.emporiavue_main_dryer_weekly
-                                              - sensor.emporiavue_main_dishwasher_disposal_weekly
-                                              - sensor.emporiavue_main_garage_laundry_outside_lights_weekly
-                                              - sensor.emporiavue_main_garage_outlets_weekly
-                                              - sensor.emporiavue_main_kitchen_dining_lights_weekly
-                                              - sensor.emporiavue_main_kitchen_outlets_1_weekly
-                                              - sensor.emporiavue_main_kitchen_outlets_2_weekly
-                                              - sensor.emporiavue_main_microwave_weekly
-                                              - sensor.emporiavue_main_outside_outlet_weekly
-                                              - sensor.emporiavue_main_range_weekly
-                                              - sensor.emporiavue_main_washer_weekly
-                                              - sensor.remaining
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_total_weekly
-                                            name: Sub Panel
-                                            icon: mdi:transmission-tower
-                                            children:
-                                              - sensor.emporiavue_sub_balance_weekly
-                                              - sensor.emporiavue_sub_basement_bath_outlet_weekly
-                                              - sensor.emporiavue_sub_basement_bedrooms_weekly
-                                              - sensor.emporiavue_sub_basement_lights_utility_room_weekly
-                                              - sensor.emporiavue_sub_bathroom_outlets_weekly
-                                              - sensor.emporiavue_sub_bedroom_lights_weekly
-                                              - sensor.emporiavue_sub_eve_outlet_weekly
-                                              - sensor.emporiavue_sub_family_room_weekly
-                                              - sensor.emporiavue_sub_furnace_weekly
-                                              - sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_weekly
-                                              - sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_weekly
-                                              - sensor.emporiavue_sub_kitchen_island_weekly
-                                              - sensor.emporiavue_sub_living_room_weekly
-                                              - sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_weekly
-                                              - sensor.remaining_sub
-                                          - entity_id: sensor.emporiavue_main_a_c_weekly
-                                            name: Air Conditioner
-                                            icon: mdi:air-conditioner
-                                          - entity_id: sensor.emporiavue_main_dryer_weekly
-                                            name: Dryer
-                                            icon: mdi:tumble-dryer
-                                          - entity_id: sensor.emporiavue_main_dishwasher_disposal_weekly
-                                            name: Dishwasher / Disposal
-                                            icon: mdi:dishwasher
-                                          - entity_id: sensor.emporiavue_main_garage_laundry_outside_lights_weekly
-                                            name: Garage, Laundry, Outside Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_garage_outlets_weekly
-                                            name: Garage Outlets
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_dining_lights_weekly
-                                            name: Kitchen, Dining Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_1_weekly
-                                            name: Kitchen Outlets 1
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_2_weekly
-                                            name: Kitchen Outlets 2
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_microwave_weekly
-                                            name: Microwave
-                                            icon: mdi:microwave
-                                          - entity_id: sensor.emporiavue_main_outside_outlet_weekly
-                                            name: Outside Outlet
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_range_weekly
-                                            name: Range
-                                            icon: mdi:stove
-                                          - entity_id: sensor.emporiavue_main_washer_weekly
-                                            name: Washer
-                                            icon: mdi:washing-machine
-                                          - entity_id: sensor.remaining
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_balance_weekly
-                                            name: Sub Balance
-                                            icon: mdi:home-analytics
-                                          - entity_id: sensor.emporiavue_sub_basement_bath_outlet_weekly
-                                            name: Basement Bath Outlet
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_basement_bedrooms_weekly
-                                            name: Basement Bedrooms
-                                            icon: mdi:home-floor-0
-                                          - entity_id: sensor.emporiavue_sub_basement_lights_utility_room_weekly
-                                            name: Basement Lights/Utility Room
-                                            icon: mdi:progress-wrench
-                                          - entity_id: sensor.emporiavue_sub_bathroom_outlets_weekly
-                                            name: Bathroom Outlets
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_bedroom_lights_weekly
-                                            name: Bedroom Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_sub_eve_outlet_weekly
-                                            name: Eve Outlet
-                                            icon: mdi:rounded-corner
-                                          - entity_id: sensor.emporiavue_sub_family_room_weekly
-                                            name: Family Room
-                                            icon: mdi:gamepad-circle
-                                          - entity_id: sensor.emporiavue_sub_furnace_weekly
-                                            name: Furnace
-                                            icon: mdi:hvac
-                                          - entity_id: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_weekly
-                                            name: Hall, Bath Lights/Main Bed Outlets
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_weekly
-                                            name: Hall, Bedroom Outlets/Entry, Outside
-                                              Lights
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_kitchen_island_weekly
-                                            name: Kitchen Island
-                                            icon: mdi:table-chair
-                                          - entity_id: sensor.emporiavue_sub_living_room_weekly
-                                            name: Living Room
-                                            icon: mdi:sofa-single
-                                          - entity_id: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_weekly
-                                            name: Theater, Family Outlets/Basement
-                                              Lighting
-                                            icon: mdi:theater
-                                          - entity_id: sensor.remaining_sub
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                            - title: Month
-                              icon: mdi:calendar-month-outline
-                              card:
-                                type: vertical-stack
-                                cards:
-                                  - type: horizontal-stack
-                                    cards:
-                                      - type: custom:apexcharts-card
-                                        card_mod:
-                                          style: "ha-card {\n  padding: 0px;\n  border:\
-                                            \ none;\n  box-shadow: none;\n}\n#state__value\
-                                            \ > #state {\n  font-size: 1.2em !important;\n\
-                                            }\n"
-                                        stacked: true
-                                        apex_config:
-                                          chart:
-                                            height: 200px
-                                            toolbar:
-                                              show: false
-                                          grid:
-                                            borderColor: '#7B7B7B'
-                                          legend:
-                                            show: false
-                                          tooltip:
-                                            shared: true
-                                          xaxis:
-                                            tooltip:
-                                              enabled: false
-                                        span:
-                                          end: day
-                                        graph_span: 30d
-                                        header:
-                                          show: false
-                                          show_states: true
-                                          colorize_states: true
-                                          standard_format: true
-                                        all_series_config:
-                                          stroke_width: 2
-                                          opacity: 0.2
-                                          float_precision: 1
-                                          show:
-                                            in_header: raw
-                                            legend_value: false
-                                          type: column
-                                          statistics:
-                                            type: sum
-                                          group_by:
-                                            func: diff
-                                            start_with_last: true
-                                            duration: 1day
-                                        yaxis:
-                                          - min: ~1
-                                            max: ~1
-                                            apex_config:
-                                              tickAmount: 4
-                                              forceNiceScale: true
-                                              title:
-                                                text: kWh
-                                        series:
-                                          - entity: sensor.emporiavue_main_total_monthly
-                                            opacity: 0.2
-                                            name: Home
-                                            color: var(--grey-color)
-                                      - type: custom:button-card
-                                        tap_action:
-                                          action: navigate
-                                          navigation_path: /energy
-                                        icon: mdi:magnify-expand
-                                        styles:
-                                          card:
-                                            - width: 3.5rem
-                                            - border: none
-                                            - background: none
-                                            - box-shadow: none
-                                            - margin-left: -40px
-                                  - type: custom:sankey-chart
-                                    layout: horizontal
-                                    show_names: true
-                                    show_icons: true
-                                    wide: true
-                                    unit_prefix: k
-                                    round: 2
-                                    height: 500
-                                    show_units: true
-                                    min_box_size: 16
-                                    card_mod:
-                                      style: "ha-card {\n  margin: 5px;\n  padding:\
-                                        \ 0px;\n  font-size: 0.8rem;\n  font-weight:\
-                                        \ bold;\n  border: none;\n  box-shadow: none;\n\
-                                        \  overflow-x: clip !important;\n}\n.container\
-                                        \ {\n  padding: 0px !important;\n}\n.box div:first-child\
-                                        \ {\n  color: white;\n}\n"
-                                    sections:
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_main_total_monthly
-                                            color: var(--cyan-color)
-                                            name: Home
-                                            icon: mdi:home-import-outline
-                                            children:
-                                              - sensor.emporiavue_sub_total_monthly
-                                              - sensor.emporiavue_main_a_c_monthly
-                                              - sensor.emporiavue_main_dryer_monthly
-                                              - sensor.emporiavue_main_dishwasher_disposal_monthly
-                                              - sensor.emporiavue_main_garage_laundry_outside_lights_monthly
-                                              - sensor.emporiavue_main_garage_outlets_monthly
-                                              - sensor.emporiavue_main_kitchen_dining_lights_monthly
-                                              - sensor.emporiavue_main_kitchen_outlets_1_monthly
-                                              - sensor.emporiavue_main_kitchen_outlets_2_monthly
-                                              - sensor.emporiavue_main_microwave_monthly
-                                              - sensor.emporiavue_main_outside_outlet_monthly
-                                              - sensor.emporiavue_main_range_monthly
-                                              - sensor.emporiavue_main_washer_monthly
-                                              - sensor.remaining
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_total_monthly
-                                            name: Sub Panel
-                                            icon: mdi:transmission-tower
-                                            children:
-                                              - sensor.emporiavue_sub_balance_monthly
-                                              - sensor.emporiavue_sub_basement_bath_outlet_monthly
-                                              - sensor.emporiavue_sub_basement_bedrooms_monthly
-                                              - sensor.emporiavue_sub_basement_lights_utility_room_monthly
-                                              - sensor.emporiavue_sub_bathroom_outlets_monthly
-                                              - sensor.emporiavue_sub_bedroom_lights_monthly
-                                              - sensor.emporiavue_sub_eve_outlet_monthly
-                                              - sensor.emporiavue_sub_family_room_monthly
-                                              - sensor.emporiavue_sub_furnace_monthly
-                                              - sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_monthly
-                                              - sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_monthly
-                                              - sensor.emporiavue_sub_kitchen_island_monthly
-                                              - sensor.emporiavue_sub_living_room_monthly
-                                              - sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_monthly
-                                              - sensor.remaining_sub
-                                          - entity_id: sensor.emporiavue_main_a_c_monthly
-                                            name: Air Conditioner
-                                            icon: mdi:air-conditioner
-                                          - entity_id: sensor.emporiavue_main_dryer_monthly
-                                            name: Dryer
-                                            icon: mdi:tumble-dryer
-                                          - entity_id: sensor.emporiavue_main_dishwasher_disposal_monthly
-                                            name: Dishwasher / Disposal
-                                            icon: mdi:dishwasher
-                                          - entity_id: sensor.emporiavue_main_garage_laundry_outside_lights_monthly
-                                            name: Garage, Laundry, Outside Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_garage_outlets_monthly
-                                            name: Garage Outlets
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_dining_lights_monthly
-                                            name: Kitchen, Dining Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_1_monthly
-                                            name: Kitchen Outlets 1
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_2_monthly
-                                            name: Kitchen Outlets 2
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_microwave_monthly
-                                            name: Microwave
-                                            icon: mdi:microwave
-                                          - entity_id: sensor.emporiavue_main_outside_outlet_monthly
-                                            name: Outside Outlet
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_range_monthly
-                                            name: Range
-                                            icon: mdi:stove
-                                          - entity_id: sensor.emporiavue_main_washer_monthly
-                                            name: Washer
-                                            icon: mdi:washing-machine
-                                          - entity_id: sensor.remaining
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_balance_monthly
-                                            name: Sub Balance
-                                            icon: mdi:home-analytics
-                                          - entity_id: sensor.emporiavue_sub_basement_bath_outlet_monthly
-                                            name: Basement Bath Outlet
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_basement_bedrooms_monthly
-                                            name: Basement Bedrooms
-                                            icon: mdi:home-floor-0
-                                          - entity_id: sensor.emporiavue_sub_basement_lights_utility_room_monthly
-                                            name: Basement Lights/Utility Room
-                                            icon: mdi:progress-wrench
-                                          - entity_id: sensor.emporiavue_sub_bathroom_outlets_monthly
-                                            name: Bathroom Outlets
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_bedroom_lights_monthly
-                                            name: Bedroom Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_sub_eve_outlet_monthly
-                                            name: Eve Outlet
-                                            icon: mdi:rounded-corner
-                                          - entity_id: sensor.emporiavue_sub_family_room_monthly
-                                            name: Family Room
-                                            icon: mdi:gamepad-circle
-                                          - entity_id: sensor.emporiavue_sub_furnace_monthly
-                                            name: Furnace
-                                            icon: mdi:hvac
-                                          - entity_id: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_monthly
-                                            name: Hall, Bath Lights/Main Bed Outlets
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_monthly
-                                            name: Hall, Bedroom Outlets/Entry, Outside
-                                              Lights
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_kitchen_island_monthly
-                                            name: Kitchen Island
-                                            icon: mdi:table-chair
-                                          - entity_id: sensor.emporiavue_sub_living_room_monthly
-                                            name: Living Room
-                                            icon: mdi:sofa-single
-                                          - entity_id: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_monthly
-                                            name: Theater, Family Outlets/Basement
-                                              Lighting
-                                            icon: mdi:theater
-                                          - entity_id: sensor.remaining_sub
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                            - title: Year
-                              icon: mdi:calendar-multiple
-                              card:
-                                type: vertical-stack
-                                cards:
-                                  - type: horizontal-stack
-                                    cards:
-                                      - type: custom:apexcharts-card
-                                        card_mod:
-                                          style: "ha-card {\n  padding: 0px;\n  border:\
-                                            \ none;\n  box-shadow: none;\n}\n#state__value\
-                                            \ > #state {\n  font-size: 1.2em !important;\n\
-                                            }\n"
-                                        stacked: true
-                                        apex_config:
-                                          chart:
-                                            height: 200px
-                                            toolbar:
-                                              show: false
-                                          grid:
-                                            borderColor: '#7B7B7B'
-                                          legend:
-                                            show: false
-                                          tooltip:
-                                            shared: true
-                                          xaxis:
-                                            tooltip:
-                                              enabled: false
-                                        span:
-                                          end: month
-                                        graph_span: 1year
-                                        header:
-                                          show: false
-                                          show_states: true
-                                          colorize_states: true
-                                          standard_format: true
-                                        all_series_config:
-                                          stroke_width: 2
-                                          opacity: 0.2
-                                          float_precision: 1
-                                          show:
-                                            in_header: raw
-                                            legend_value: false
-                                          type: column
-                                          statistics:
-                                            type: sum
-                                          group_by:
-                                            func: diff
-                                            start_with_last: true
-                                            duration: 30day
-                                        yaxis:
-                                          - min: ~1
-                                            max: ~1
-                                            apex_config:
-                                              tickAmount: 4
-                                              forceNiceScale: true
-                                              title:
-                                                text: kWh
-                                        series:
-                                          - entity: sensor.emporiavue_main_total_yearly
-                                            opacity: 0.2
-                                            name: Home
-                                            color: var(--grey-color)
-                                      - type: custom:button-card
-                                        tap_action:
-                                          action: navigate
-                                          navigation_path: /energy
-                                        icon: mdi:magnify-expand
-                                        styles:
-                                          card:
-                                            - width: 3.5rem
-                                            - border: none
-                                            - background: none
-                                            - box-shadow: none
-                                            - margin-left: -40px
-                                  - type: custom:sankey-chart
-                                    layout: horizontal
-                                    show_names: true
-                                    show_icons: true
-                                    wide: true
-                                    unit_prefix: k
-                                    round: 2
-                                    height: 500
-                                    show_units: true
-                                    min_box_size: 16
-                                    card_mod:
-                                      style: "ha-card {\n  margin: 5px;\n  padding:\
-                                        \ 0px;\n  font-size: 0.8rem;\n  font-weight:\
-                                        \ bold;\n  border: none;\n  box-shadow: none;\n\
-                                        \  overflow-x: clip !important;\n}\n.container\
-                                        \ {\n  padding: 0px !important;\n}\n.box div:first-child\
-                                        \ {\n  color: white;\n}\n"
-                                    sections:
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_main_total_yearly
-                                            color: var(--cyan-color)
-                                            name: Home
-                                            icon: mdi:home-import-outline
-                                            children:
-                                              - sensor.emporiavue_sub_total_yearly
-                                              - sensor.emporiavue_main_a_c_yearly
-                                              - sensor.emporiavue_main_dryer_yearly
-                                              - sensor.emporiavue_main_dishwasher_disposal_yearly
-                                              - sensor.emporiavue_main_garage_laundry_outside_lights_yearly
-                                              - sensor.emporiavue_main_garage_outlets_yearly
-                                              - sensor.emporiavue_main_kitchen_dining_lights_yearly
-                                              - sensor.emporiavue_main_kitchen_outlets_1_yearly
-                                              - sensor.emporiavue_main_kitchen_outlets_2_yearly
-                                              - sensor.emporiavue_main_microwave_yearly
-                                              - sensor.emporiavue_main_outside_outlet_yearly
-                                              - sensor.emporiavue_main_range_yearly
-                                              - sensor.emporiavue_main_washer_yearly
-                                              - sensor.remaining
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_total_yearly
-                                            name: Sub Panel
-                                            icon: mdi:transmission-tower
-                                            children:
-                                              - sensor.emporiavue_sub_balance_yearly
-                                              - sensor.emporiavue_sub_basement_bath_outlet_yearly
-                                              - sensor.emporiavue_sub_basement_bedrooms_yearly
-                                              - sensor.emporiavue_sub_basement_lights_utility_room_yearly
-                                              - sensor.emporiavue_sub_bathroom_outlets_yearly
-                                              - sensor.emporiavue_sub_bedroom_lights_yearly
-                                              - sensor.emporiavue_sub_eve_outlet_yearly
-                                              - sensor.emporiavue_sub_family_room_yearly
-                                              - sensor.emporiavue_sub_furnace_yearly
-                                              - sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_yearly
-                                              - sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_yearly
-                                              - sensor.emporiavue_sub_kitchen_island_yearly
-                                              - sensor.emporiavue_sub_living_room_yearly
-                                              - sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_yearly
-                                              - sensor.remaining_sub
-                                          - entity_id: sensor.emporiavue_main_a_c_yearly
-                                            name: Air Conditioner
-                                            icon: mdi:air-conditioner
-                                          - entity_id: sensor.emporiavue_main_dryer_yearly
-                                            name: Dryer
-                                            icon: mdi:tumble-dryer
-                                          - entity_id: sensor.emporiavue_main_dishwasher_disposal_yearly
-                                            name: Dishwasher / Disposal
-                                            icon: mdi:dishwasher
-                                          - entity_id: sensor.emporiavue_main_garage_laundry_outside_lights_yearly
-                                            name: Garage, Laundry, Outside Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_garage_outlets_yearly
-                                            name: Garage Outlets
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_dining_lights_yearly
-                                            name: Kitchen, Dining Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_1_yearly
-                                            name: Kitchen Outlets 1
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_kitchen_outlets_2_yearly
-                                            name: Kitchen Outlets 2
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_microwave_yearly
-                                            name: Microwave
-                                            icon: mdi:microwave
-                                          - entity_id: sensor.emporiavue_main_outside_outlet_yearly
-                                            name: Outside Outlet
-                                            icon: mdi:power-plug
-                                          - entity_id: sensor.emporiavue_main_range_yearly
-                                            name: Range
-                                            icon: mdi:stove
-                                          - entity_id: sensor.emporiavue_main_washer_yearly
-                                            name: Washer
-                                            icon: mdi:washing-machine
-                                          - entity_id: sensor.remaining
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                                      - entities:
-                                          - entity_id: sensor.emporiavue_sub_balance_yearly
-                                            name: Sub Balance
-                                            icon: mdi:home-analytics
-                                          - entity_id: sensor.emporiavue_sub_basement_bath_outlet_yearly
-                                            name: Basement Bath Outlet
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_basement_bedrooms_yearly
-                                            name: Basement Bedrooms
-                                            icon: mdi:home-floor-0
-                                          - entity_id: sensor.emporiavue_sub_basement_lights_utility_room_yearly
-                                            name: Basement Lights/Utility Room
-                                            icon: mdi:progress-wrench
-                                          - entity_id: sensor.emporiavue_sub_bathroom_outlets_yearly
-                                            name: Bathroom Outlets
-                                            icon: mdi:hair-dryer
-                                          - entity_id: sensor.emporiavue_sub_bedroom_lights_yearly
-                                            name: Bedroom Lights
-                                            icon: mdi:lightbulb-group
-                                          - entity_id: sensor.emporiavue_sub_eve_outlet_yearly
-                                            name: Eve Outlet
-                                            icon: mdi:rounded-corner
-                                          - entity_id: sensor.emporiavue_sub_family_room_yearly
-                                            name: Family Room
-                                            icon: mdi:gamepad-circle
-                                          - entity_id: sensor.emporiavue_sub_furnace_yearly
-                                            name: Furnace
-                                            icon: mdi:hvac
-                                          - entity_id: sensor.emporiavue_sub_hall_bath_lights_main_bed_outlets_yearly
-                                            name: Hall, Bath Lights/Main Bed Outlets
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_hall_bedroom_outlets_entry_outside_lights_yearly
-                                            name: Hall, Bedroom Outlets/Entry, Outside
-                                              Lights
-                                            icon: mdi:home-floor-1
-                                          - entity_id: sensor.emporiavue_sub_kitchen_island_yearly
-                                            name: Kitchen Island
-                                            icon: mdi:table-chair
-                                          - entity_id: sensor.emporiavue_sub_living_room_yearly
-                                            name: Living Room
-                                            icon: mdi:sofa-single
-                                          - entity_id: sensor.emporiavue_sub_theater_family_room_outlets_basement_lighting_yearly
-                                            name: Theater, Family Outlets/Basement
-                                              Lighting
-                                            icon: mdi:theater
-                                          - entity_id: sensor.remaining_sub
-                                            type: remaining_parent_state
-                                            name: Other < 1W
-                                            color: var(--grey-color)
-                          options:
-                            defaultTabIndex: 0
-                      card_mod:
-                        style: "ha-card {\n  padding: 0px;\n  border: none;\n  box-shadow:\
-                          \ none;\n}\n"
-                options:
-                  defaultTabIndex: 0
-            grid_options:
-              columns: full
-        column_span: 3
   - title: RoboVac
     type: sections
     subview: true
@@ -13192,9 +11998,8 @@ views:
                           o={"(Completed)":"✔️","(Interrupted)":"❌","(Manually Ignored)":"⛔","(Automatically
                           Ignored)":"⭕","(Edited)":"📝","(Original)":"✅","(Backup)":"💾"},a=new
                           RegExp(Object.keys(o).join("|").replaceAll(")","\\)").replaceAll("(","\\("),"g"),n=function(t){return
-                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);let
-                          l="";for(let s=0;s<e.length;s++)l+=''<mwc-list-item value="''+s+''"''+(t==s?"
-                          selected activated":"")+">"+n(e[s])+"</mwc-list-item>";i.innerHTML=l,i.value=t+"",i.selectedText=n(e[t])};const
+                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);const
+                          l=e.map((e,i)=>({value:String(i),label:n(e)}));i.options=l,i.value=String(t)};const
                           a="picture-selector",n=t.shadowRoot.querySelector("ha-card#"+a);n&&n.remove();const
                           l=document.createElement("ha-card");let s;l.id=a,l.style.cssText="cursor:default;display:block;padding:12px
                           16px 16px;overflow:visible;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none;",t.shadowRoot.children.length?t.shadowRoot.insertBefore(l,t.shadowRoot.children[0]):t.shadowRoot.appendChild(l),e.title&&e.title.length&&("
@@ -13203,15 +12008,15 @@ views:
                           16px 16px"},{overflow:"hidden"},{"border-radius":"var(--ha-card-border-radius,12px)"},{"border-width":"var(--ha-card-border-width,1px)"},{"border-style":"solid"},{"border-color":"var(--ha-card-border-color,var(--divider-color,#e0e0e0))"},{background:"var(--input-disabled-fill-color);"}]));const
                           r=t._hass.states[e.entity];t._a=r?r.attributes.access_token:"";const
                           c=t.__items(t._hass),d=document.createElement("ha-select");if(d.style.cssText="width:auto;display:block;",e.icon&&e.icon.length){d.style.cssText+="margin:4px
-                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",d.naturalMenuWidth=!0,1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
+                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
                           u=function(e){const i=function(i){if(!i)return;const o=function(t){const
                           e=t.target.parentElement.querySelectorAll("ha-circular-progress").forEach((t=>t.remove()));e&&e.remove(),t.target.style.cursor=""};i.onload=function(t){i.style.height="",t.target.style.opacity=1,o(t),t.target.onload=null},i.onerror=function(e){t._i=!1,o(e),t.update()},i.style.opacity=0,i.style.cursor="wait",e&&0==i.naturalHeight&&i.width&&(i.style.height=i.width+"px");const
                           a=document.createElement("ha-circular-progress");a.active=!0,a.size="large",a.style.position="absolute",i.parentElement.appendChild(a)},o=t.shadowRoot.querySelector("#icon");o&&"IMG"==o.tagName?i(o):setTimeout((function(){const
-                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''closed'',function(e){e.stopPropagation()});if(d.onchange=function(e){if(""!=e.target.value){const
+                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''selected'',function(e){e.stopPropagation()});if(d.addEventListener(''selected'',function(e){if(e.detail&&e.detail.value!==undefined){const
                           a=t.__items(t._hass);if(0===a[1].length)return void(t._i=!1);const
-                          n=parseInt(e.target.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
+                          n=parseInt(e.detail.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
                           t._i=[a[0][n],a[1][n]];t._config.hold_action.url_path=t._i[1];const
-                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",u(),t.update()}}},t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
+                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",t._s.value=String(n),u(),t.update()}}}),t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
                           e=c[1][0].match(o);t._x=e&&e.length>1?e[1]:"";const i=t.shadowRoot.querySelector("#icon");i&&"IMG"==i.tagName?t._i=[c[0][0],c[1][0]]:(t.style.opacity=0,setTimeout((function(){t._i=[c[0][0],c[1][0]],u(!0),t.update(),t.style.opacity=1}),0))}}return
                           t._i?t._i[1]+(e.extra_params&&e.extra_params.length?"&"+e.extra_params:""):void
                           0}(this) ]]]
@@ -13257,9 +12062,8 @@ views:
                           o={"(Completed)":"✔️","(Interrupted)":"❌","(Manually Ignored)":"⛔","(Automatically
                           Ignored)":"⭕","(Edited)":"📝","(Original)":"✅","(Backup)":"💾"},a=new
                           RegExp(Object.keys(o).join("|").replaceAll(")","\\)").replaceAll("(","\\("),"g"),n=function(t){return
-                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);let
-                          l="";for(let s=0;s<e.length;s++)l+=''<mwc-list-item value="''+s+''"''+(t==s?"
-                          selected activated":"")+">"+n(e[s])+"</mwc-list-item>";i.innerHTML=l,i.value=t+"",i.selectedText=n(e[t])};const
+                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);const
+                          l=e.map((e,i)=>({value:String(i),label:n(e)}));i.options=l,i.value=String(t)};const
                           a="picture-selector",n=t.shadowRoot.querySelector("ha-card#"+a);n&&n.remove();const
                           l=document.createElement("ha-card");let s;l.id=a,l.style.cssText="cursor:default;display:block;padding:12px
                           16px 16px;overflow:visible;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none;",t.shadowRoot.children.length?t.shadowRoot.insertBefore(l,t.shadowRoot.children[0]):t.shadowRoot.appendChild(l),e.title&&e.title.length&&("
@@ -13268,15 +12072,15 @@ views:
                           16px 16px"},{overflow:"hidden"},{"border-radius":"var(--ha-card-border-radius,12px)"},{"border-width":"var(--ha-card-border-width,1px)"},{"border-style":"solid"},{"border-color":"var(--ha-card-border-color,var(--divider-color,#e0e0e0))"},{background:"var(--input-disabled-fill-color);"}]));const
                           r=t._hass.states[e.entity];t._a=r?r.attributes.access_token:"";const
                           c=t.__items(t._hass),d=document.createElement("ha-select");if(d.style.cssText="width:auto;display:block;",e.icon&&e.icon.length){d.style.cssText+="margin:4px
-                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",d.naturalMenuWidth=!0,1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
+                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
                           u=function(e){const i=function(i){if(!i)return;const o=function(t){const
                           e=t.target.parentElement.querySelectorAll("ha-circular-progress").forEach((t=>t.remove()));e&&e.remove(),t.target.style.cursor=""};i.onload=function(t){i.style.height="",t.target.style.opacity=1,o(t),t.target.onload=null},i.onerror=function(e){t._i=!1,o(e),t.update()},i.style.opacity=0,i.style.cursor="wait",e&&0==i.naturalHeight&&i.width&&(i.style.height=i.width+"px");const
                           a=document.createElement("ha-circular-progress");a.active=!0,a.size="large",a.style.position="absolute",i.parentElement.appendChild(a)},o=t.shadowRoot.querySelector("#icon");o&&"IMG"==o.tagName?i(o):setTimeout((function(){const
-                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''closed'',function(e){e.stopPropagation()});if(d.onchange=function(e){if(""!=e.target.value){const
+                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''selected'',function(e){e.stopPropagation()});if(d.addEventListener(''selected'',function(e){if(e.detail&&e.detail.value!==undefined){const
                           a=t.__items(t._hass);if(0===a[1].length)return void(t._i=!1);const
-                          n=parseInt(e.target.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
+                          n=parseInt(e.detail.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
                           t._i=[a[0][n],a[1][n]];t._config.hold_action.url_path=t._i[1];const
-                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",u(),t.update()}}},t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
+                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",t._s.value=String(n),u(),t.update()}}}),t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
                           e=c[1][0].match(o);t._x=e&&e.length>1?e[1]:"";const i=t.shadowRoot.querySelector("#icon");i&&"IMG"==i.tagName?t._i=[c[0][0],c[1][0]]:(t.style.opacity=0,setTimeout((function(){t._i=[c[0][0],c[1][0]],u(!0),t.update(),t.style.opacity=1}),0))}}return
                           t._i?t._i[1]+(e.extra_params&&e.extra_params.length?"&"+e.extra_params:""):void
                           0}(this) ]]]
@@ -13967,9 +12771,8 @@ views:
                           o={"(Completed)":"✔️","(Interrupted)":"❌","(Manually Ignored)":"⛔","(Automatically
                           Ignored)":"⭕","(Edited)":"📝","(Original)":"✅","(Backup)":"💾"},a=new
                           RegExp(Object.keys(o).join("|").replaceAll(")","\\)").replaceAll("(","\\("),"g"),n=function(t){return
-                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);let
-                          l="";for(let s=0;s<e.length;s++)l+=''<mwc-list-item value="''+s+''"''+(t==s?"
-                          selected activated":"")+">"+n(e[s])+"</mwc-list-item>";i.innerHTML=l,i.value=t+"",i.selectedText=n(e[t])};const
+                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);const
+                          l=e.map((e,i)=>({value:String(i),label:n(e)}));i.options=l,i.value=String(t)};const
                           a="picture-selector",n=t.shadowRoot.querySelector("ha-card#"+a);n&&n.remove();const
                           l=document.createElement("ha-card");let s;l.id=a,l.style.cssText="cursor:default;display:block;padding:12px
                           16px 16px;overflow:visible;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none;",t.shadowRoot.children.length?t.shadowRoot.insertBefore(l,t.shadowRoot.children[0]):t.shadowRoot.appendChild(l),e.title&&e.title.length&&("
@@ -13978,15 +12781,15 @@ views:
                           16px 16px"},{overflow:"hidden"},{"border-radius":"var(--ha-card-border-radius,12px)"},{"border-width":"var(--ha-card-border-width,1px)"},{"border-style":"solid"},{"border-color":"var(--ha-card-border-color,var(--divider-color,#e0e0e0))"},{background:"var(--input-disabled-fill-color);"}]));const
                           r=t._hass.states[e.entity];t._a=r?r.attributes.access_token:"";const
                           c=t.__items(t._hass),d=document.createElement("ha-select");if(d.style.cssText="width:auto;display:block;",e.icon&&e.icon.length){d.style.cssText+="margin:4px
-                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",d.naturalMenuWidth=!0,1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
+                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
                           u=function(e){const i=function(i){if(!i)return;const o=function(t){const
                           e=t.target.parentElement.querySelectorAll("ha-circular-progress").forEach((t=>t.remove()));e&&e.remove(),t.target.style.cursor=""};i.onload=function(t){i.style.height="",t.target.style.opacity=1,o(t),t.target.onload=null},i.onerror=function(e){t._i=!1,o(e),t.update()},i.style.opacity=0,i.style.cursor="wait",e&&0==i.naturalHeight&&i.width&&(i.style.height=i.width+"px");const
                           a=document.createElement("ha-circular-progress");a.active=!0,a.size="large",a.style.position="absolute",i.parentElement.appendChild(a)},o=t.shadowRoot.querySelector("#icon");o&&"IMG"==o.tagName?i(o):setTimeout((function(){const
-                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''closed'',function(e){e.stopPropagation()});if(d.onchange=function(e){if(""!=e.target.value){const
+                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''selected'',function(e){e.stopPropagation()});if(d.addEventListener(''selected'',function(e){if(e.detail&&e.detail.value!==undefined){const
                           a=t.__items(t._hass);if(0===a[1].length)return void(t._i=!1);const
-                          n=parseInt(e.target.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
+                          n=parseInt(e.detail.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
                           t._i=[a[0][n],a[1][n]];t._config.hold_action.url_path=t._i[1];const
-                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",u(),t.update()}}},t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
+                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",t._s.value=String(n),u(),t.update()}}}),t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
                           e=c[1][0].match(o);t._x=e&&e.length>1?e[1]:"";const i=t.shadowRoot.querySelector("#icon");i&&"IMG"==i.tagName?t._i=[c[0][0],c[1][0]]:(t.style.opacity=0,setTimeout((function(){t._i=[c[0][0],c[1][0]],u(!0),t.update(),t.style.opacity=1}),0))}}return
                           t._i?t._i[1]+(e.extra_params&&e.extra_params.length?"&"+e.extra_params:""):void
                           0}(this) ]]]
@@ -14032,9 +12835,8 @@ views:
                           o={"(Completed)":"✔️","(Interrupted)":"❌","(Manually Ignored)":"⛔","(Automatically
                           Ignored)":"⭕","(Edited)":"📝","(Original)":"✅","(Backup)":"💾"},a=new
                           RegExp(Object.keys(o).join("|").replaceAll(")","\\)").replaceAll("(","\\("),"g"),n=function(t){return
-                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);let
-                          l="";for(let s=0;s<e.length;s++)l+=''<mwc-list-item value="''+s+''"''+(t==s?"
-                          selected activated":"")+">"+n(e[s])+"</mwc-list-item>";i.innerHTML=l,i.value=t+"",i.selectedText=n(e[t])};const
+                          t&&t.length?t.replace(a,(t=>o[t])):""};(t<0||t>=e.length)&&(t=0);const
+                          l=e.map((e,i)=>({value:String(i),label:n(e)}));i.options=l,i.value=String(t)};const
                           a="picture-selector",n=t.shadowRoot.querySelector("ha-card#"+a);n&&n.remove();const
                           l=document.createElement("ha-card");let s;l.id=a,l.style.cssText="cursor:default;display:block;padding:12px
                           16px 16px;overflow:visible;border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none;",t.shadowRoot.children.length?t.shadowRoot.insertBefore(l,t.shadowRoot.children[0]):t.shadowRoot.appendChild(l),e.title&&e.title.length&&("
@@ -14043,15 +12845,15 @@ views:
                           16px 16px"},{overflow:"hidden"},{"border-radius":"var(--ha-card-border-radius,12px)"},{"border-width":"var(--ha-card-border-width,1px)"},{"border-style":"solid"},{"border-color":"var(--ha-card-border-color,var(--divider-color,#e0e0e0))"},{background:"var(--input-disabled-fill-color);"}]));const
                           r=t._hass.states[e.entity];t._a=r?r.attributes.access_token:"";const
                           c=t.__items(t._hass),d=document.createElement("ha-select");if(d.style.cssText="width:auto;display:block;",e.icon&&e.icon.length){d.style.cssText+="margin:4px
-                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",d.naturalMenuWidth=!0,1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
+                          0 0 40px;";const i=document.createElement("state-badge");i.stateObj=r,i.overrideIcon=e.icon,i.style.cssText="float:left;margin-top:12px;",l.appendChild(i),t._l=i}d.label=!(!e.label||!r)&&e.label,d.value="0",1==c[0].length&&0==c[0][0].length&&(s?(d.style.display="none",t._l&&(t._l.style.display="none"),s.style.padding="0"):l.style.display="none"),t.__populate(0,c[0],d),l.appendChild(d),t._s=d;const
                           u=function(e){const i=function(i){if(!i)return;const o=function(t){const
                           e=t.target.parentElement.querySelectorAll("ha-circular-progress").forEach((t=>t.remove()));e&&e.remove(),t.target.style.cursor=""};i.onload=function(t){i.style.height="",t.target.style.opacity=1,o(t),t.target.onload=null},i.onerror=function(e){t._i=!1,o(e),t.update()},i.style.opacity=0,i.style.cursor="wait",e&&0==i.naturalHeight&&i.width&&(i.style.height=i.width+"px");const
                           a=document.createElement("ha-circular-progress");a.active=!0,a.size="large",a.style.position="absolute",i.parentElement.appendChild(a)},o=t.shadowRoot.querySelector("#icon");o&&"IMG"==o.tagName?i(o):setTimeout((function(){const
-                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''closed'',function(e){e.stopPropagation()});if(d.onchange=function(e){if(""!=e.target.value){const
+                          e=t.shadowRoot.querySelector("#icon");e&&0==e.naturalHeight&&e.width&&(e.style.height=e.width+"px"),i(e)}),0)};d.addEventListener(''selected'',function(e){e.stopPropagation()});if(d.addEventListener(''selected'',function(e){if(e.detail&&e.detail.value!==undefined){const
                           a=t.__items(t._hass);if(0===a[1].length)return void(t._i=!1);const
-                          n=parseInt(e.target.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
+                          n=parseInt(e.detail.value);if(n>=0&&n<a[1].length&&(!t._i||t._i[0]!=a[0][n]&&t._i[1]!=a[1][n])){if(t._i){if(t._i[0]=a[0][n],t._i[1].match(i)[1]===a[1][n].match(i)[1])return;t._i[1]=a[1][n]}else
                           t._i=[a[0][n],a[1][n]];t._config.hold_action.url_path=t._i[1];const
-                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",u(),t.update()}}},t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
+                          e=t._i[1].match(o);t._x=e&&e.length>1?e[1]:"",t._s.value=String(n),u(),t.update()}}}),t._i=!1,t._config.hold_action={action:"url"},c[0].length){t._config.hold_action.url_path=c[1][0];const
                           e=c[1][0].match(o);t._x=e&&e.length>1?e[1]:"";const i=t.shadowRoot.querySelector("#icon");i&&"IMG"==i.tagName?t._i=[c[0][0],c[1][0]]:(t.style.opacity=0,setTimeout((function(){t._i=[c[0][0],c[1][0]],u(!0),t.update(),t.style.opacity=1}),0))}}return
                           t._i?t._i[1]+(e.extra_params&&e.extra_params.length?"&"+e.extra_params:""):void
                           0}(this) ]]]
@@ -16631,6 +15433,9 @@ views:
                         action: more-info
                       hold_action:
                         action: toggle
+                      card_mod:
+                        style: ".badge {\n  background: none !important;\n  box-shadow:\
+                          \ none !important;\n}\n"
                     - type: custom:mushroom-template-badge
                       entity: lock.garage_door_lock_remotes
                       label: Remotes
@@ -16641,6 +15446,9 @@ views:
                       color: '{{ iif(is_state(entity, "locked"), "red", "green") }}'
                       tap_action:
                         action: more-info
+                      card_mod:
+                        style: ".badge {\n  background: none !important;\n  box-shadow:\
+                          \ none !important;\n}\n"
                 - features:
                     - type: cover-open-close
                     - type: cover-position
@@ -18684,17 +17492,6 @@ views:
                   hide_state: true
                   vertical: false
                   color: blue
-                - type: markdown
-                  title: Schedule
-                  content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n\
-                    {%- set feedings = states(\"sensor.cat_feeder_schedule\") | replace(\"\
-                    '\", '\"') | from_json -%}\n{%- for feeding in feedings -%}\n\
-                    \  {{ feeding.size }} portions at {{ as_timestamp(today_at(feeding.hour\
-                    \ ~ \":\" ~ feeding.minute)) | timestamp_custom(\"%-I:%M %p\"\
-                    , True) }}\n{% endfor -%}\n{%- endif -%}"
-                  card_mod:
-                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
-                      \ none;\n}\n"
                 - type: custom:bar-card
                   card_mod:
                     style: "ha-card {\n  background: none;\n  border-width: 0;\n \
@@ -18754,6 +17551,20 @@ views:
                       color: var(--light-green-color)
                     - value: 100
                       color: var(--green-color)
+                - type: heading
+                  icon: mdi:calendar
+                  heading: Schedule
+                  heading_style: subtitle
+                - type: markdown
+                  content: "{%- if has_value(\"sensor.cat_feeder_schedule\") -%}\n\
+                    {%- set feedings = states(\"sensor.cat_feeder_schedule\") | replace(\"\
+                    '\", '\"') | from_json -%}\n{%- for feeding in feedings -%}\n\
+                    \  {{ feeding.size }} portions at {{ as_timestamp(today_at(feeding.hour\
+                    \ ~ \":\" ~ feeding.minute)) | timestamp_custom(\"%-I:%M %p\"\
+                    , True) }}\n{% endfor -%}\n{%- endif -%}"
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ none;\n}\n"
           - type: custom:popup-card
             title: Low Battery
             icon: mdi:battery-alert
@@ -18934,6 +17745,7 @@ views:
                             service: browser_mod.popup
                             data:
                               title: Trouble Codes
+                              tag: trouble
                               adaptive: true
                               content:
                                 type: markdown
@@ -19532,6 +18344,7 @@ views:
                             service: browser_mod.popup
                             data:
                               title: Trouble Codes
+                              tag: trouble
                               adaptive: true
                               content:
                                 type: custom:auto-entities
@@ -20440,7 +19253,7 @@ views:
                     \  {%- if not state_attr(\"sensor.allergy_index_today\", attr)\
                     \ in [\"unknown\", \"unavailable\", None] -%}\n    {%- set ns.allergens\
                     \ = ns.allergens + [ state_attr(\"sensor.allergy_index_today\"\
-                    , attr) ] -%}\n  {%- endif -%}\n{%- endfor -%} {{ ns.allergens\
+                    , attr) ] -%}\n  {%- endif -%}\n{%- endfor -%}\n#### {{ ns.allergens\
                     \ | join(\", \") }}\n{{ state_attr(\"sensor.allergy_index_forecasted_average\"\
                     , \"outlook\") | default(\"\", true) }}"
                 - type: heading
@@ -20460,8 +19273,11 @@ views:
                       \ 1px #000000;\n}\n"
                   entities:
                     - entity: sensor.allergy_index_today
+                      name: Today
                     - entity: sensor.allergy_index_tomorrow
+                      name: Tomorrow
                     - entity: sensor.allergy_index_forecasted_average
+                      name: Forecasted Average
                   min: 0
                   max: 12
                   decimal: 1
@@ -20498,8 +19314,11 @@ views:
                       \ 1px #000000;\n}\n"
                   entities:
                     - entity: sensor.asthma_index_today
+                      name: Today
                     - entity: sensor.asthma_index_tomorrow
+                      name: Tomorrow
                     - entity: sensor.asthma_index_forecasted_average
+                      name: Forecasted Average
                   min: 0
                   max: 12
                   decimal: 1
@@ -20536,7 +19355,9 @@ views:
                       \ 1px #000000;\n}\n"
                   entities:
                     - entity: sensor.cold_flu_index_today
+                      name: Today
                     - entity: sensor.cold_flu_forecasted_average
+                      name: Forecasted Average
                   min: 0
                   max: 12
                   decimal: 1
