@@ -293,7 +293,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>31 Custom Integrations</summary>
+<details><summary>32 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
@@ -306,6 +306,12 @@ Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://g
 A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
+
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v1.16.0]
+
+Automatically update Home Assistant blueprints via native update entities
+
+Authors: [@luuquangvu](https://github.com/luuquangvu).
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v2.10.2]
 
