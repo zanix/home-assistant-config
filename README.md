@@ -293,7 +293,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>30 Custom Integrations</summary>
+<details><summary>31 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
 
@@ -449,6 +449,12 @@ Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v6.2.0]
+
+💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
+
+Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
+
 ### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.3.2]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
@@ -477,7 +483,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>41 Dashboard Plugins</summary>
+<details><summary>40 Dashboard Plugins</summary>
 
 ### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.27.4]
 
@@ -510,10 +516,6 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 ### [Button Card](https://github.com/custom-cards/button-card) [v7.0.1]
 
 ❇️ Lovelace button-card for home assistant
-
-### [Card Mod](https://github.com/thomasloven/lovelace-card-mod) [v4.2.1]
-
-🔹 Add CSS styles to (almost) any lovelace card
 
 ### [Card Tools](https://github.com/thomasloven/lovelace-card-tools) [v11]
 
