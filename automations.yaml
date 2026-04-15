@@ -936,12 +936,13 @@
   triggers:
   - entity_id: sensor.low_battery_devices
     trigger: state
-  conditions:
-  - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
-      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
-      not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state
-      in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
+    not_from:
+    - unavailable
+    - unknown
+    not_to:
+    - unavailable
+    - unknown
+  conditions: []
   actions:
   - variables:
       devices: '{{ trigger.to_state.state | int(default=0) }}'
@@ -1191,13 +1192,14 @@
   triggers:
   - entity_id:
     - sensor.offline_devices
+    not_from:
+    - unavailable
+    - unknown
+    not_to:
+    - unavailable
+    - unknown
     trigger: state
-  conditions:
-  - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
-      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
-      not trigger.from_state in ['unknown', 'unavailable', none]\n  and not trigger.from_state.state
-      in ['unknown', 'unavailable', none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
+  conditions: []
   actions:
   - variables:
       offline: '{{ trigger.to_state.state | int(default=0) }}'
@@ -1372,12 +1374,17 @@
   - entity_id:
     - sensor.updates
     trigger: state
+    not_from:
+    - unavailable
+    - unknown
+    not_to:
+    - unavailable
+    - unknown
   conditions:
   - condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
-      \ and not trigger.to_state.state in ['unknown', 'unavailable', none]\n  and
-      not trigger.from_state in [\"unknown\", \"unavailable\", none]\n  and not trigger.from_state.state
-      in [\"unknown\", \"unavailable\", none]\n  and trigger.to_state.state != trigger.from_state.state\n}}"
+    value_template: '{{ now() > states(''sensor.uptime'') | as_datetime + timedelta(seconds=300)
+      }}'
+    alias: Home Assistant started more than 5 minutes ago
   actions:
   - variables:
       updates: '{{ trigger.to_state.state | int(default=0) }}'
@@ -1438,7 +1445,12 @@
             \ {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join('<br>') }}"
           icon: local/icons/update.png
         action: script.notify_lnxlink
-  mode: restart
+  - delay:
+      hours: 0
+      minutes: 2
+      seconds: 0
+      milliseconds: 0
+  mode: single
 - id: '1725915027719'
   alias: ⚡ Tariff Changes
   description: Sets the current tariff and sends a notification.
@@ -1542,7 +1554,7 @@
       only_open_near:
       - gps
       lead_time: 25
-      departure_closing_behavior: auto
+      departure_closing_behavior: timer
       travel_time_rate: continuous
       custom_translations:
         title:
@@ -1564,7 +1576,6 @@
       security_features:
       - lock
       - unlock
-      suggest_closing_after: 60
 - id: '1704733260383'
   alias: ✴️ Joshua Office CO2 Levels
   description: Sets MSR-1 LED color Alerts when CO2 levels in Joshua's Office are
@@ -1828,10 +1839,10 @@
   - trigger: state
     entity_id:
     - sensor.ge_dishwasher_operating_mode
-    not_to:
+    not_from:
     - unavailable
     - unknown
-    not_from:
+    not_to:
     - unavailable
     - unknown
   conditions: []
@@ -2037,10 +2048,10 @@
   - trigger: state
     entity_id:
     - sensor.ge_oven_cook_time_remaining
-    not_to:
+    not_from:
     - unavailable
     - unknown
-    not_from:
+    not_to:
     - unavailable
     - unknown
   conditions: []
@@ -2075,10 +2086,10 @@
   - trigger: state
     entity_id:
     - sensor.ge_oven_kitchen_timer
-    not_to:
+    not_from:
     - unavailable
     - unknown
-    not_from:
+    not_to:
     - unavailable
     - unknown
   conditions: []
@@ -2113,7 +2124,7 @@
   - entity_id:
     - sensor.ge_oven_kitchen_timer
     to:
-    - '0'
+    - '0.0'
     trigger: state
   conditions:
   - condition: template
@@ -5351,12 +5362,16 @@
   triggers:
   - trigger: state
     entity_id: sensor.mail_usps_mail
+    not_from:
+    - unavailable
+    - unknown
+    not_to:
+    - unavailable
+    - unknown
   conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
-      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
-      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
-      in ['unknown', 'unavailable'] }}"
+      | int(default=0)) != (trigger.from_state.state | int(default=0)) }}"
   actions:
   - variables:
       title: Mail Today
@@ -5411,12 +5426,16 @@
   triggers:
   - trigger: state
     entity_id: sensor.mail_packages_delivered
+    not_from:
+    - unavailable
+    - unknown
+    not_to:
+    - unavailable
+    - unknown
   conditions:
   - condition: template
     value_template: "{{ (trigger.to_state.state | int(default=0)) > 0\n  and (trigger.to_state.state
-      | int(default=0)) != (trigger.from_state.state | int(default=0))\n  and not
-      trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
-      in ['unknown', 'unavailable'] }}"
+      | int(default=0)) != (trigger.from_state.state | int(default=0)) }}"
   actions:
   - variables:
       title: Package Delivery
@@ -5710,114 +5729,140 @@
     to:
     - 'on'
     trigger: state
+    id: ring
+  - trigger: mqtt
+    id: stream
+    options:
+      topic: lnxlink/+/monitor_controls/notify/button_press
+      payload: Stream
+      value_template: '{{ value_json.button }}'
   conditions: []
   actions:
   - variables:
-      camera_name: doorbell_clear
-      camera: camera.{{ camera_name }}
+      camera: camera.doorbell_clear
       base_url: '{{ state_attr(''sensor.hass_config'', ''external_url'') }}'
       link_id: '{% from ''util.jinja'' import random_string %}{{ random_string(40)
         }}'
+      stream: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
       volume: '{{ iif(is_state(''schedule.quiet_hours'', ''on''), 40, 90) }}'
       media_location: media-source://media_source/local/sounds/ds9_doorchime.mp3
       title: Doorbell
-      message: Ring Ring!
+      message: Ring!
       actions:
       - action: URI
         title: Snapshot
         uri: '{{ base_url }}{{ state_attr(camera, ''entity_picture'') }}'
       - action: URI
         title: Stream
-        uri: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
+        uri: '{{ stream }}'
   - data:
       link_id: '{{ link_id }}'
       entity: '{{ camera }}'
       open_limit: 0
-      time_to_live: 600
+      time_to_live: 300
     action: webrtc.create_link
-  - parallel:
-    - if:
-      - condition: state
-        entity_id: input_boolean.audio_notifications
-        state: 'on'
-      then:
-      - repeat:
-          for_each:
-          - media_player.family_room_speaker
-          - media_player.office_speaker
-          sequence:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - stream
+      sequence:
+      - action: script.lnklink_launch
+        metadata: {}
+        data:
+          command: '{{ stream }}'
+          computer:
+          - '{{ trigger.topic.split(''/'')[1] }}'
+    - conditions:
+      - condition: trigger
+        id:
+        - ring
+      sequence:
+      - parallel:
+        - if:
+          - condition: state
+            entity_id: input_boolean.audio_notifications
+            state: 'on'
+          then:
+          - repeat:
+              for_each:
+              - media_player.family_room_speaker
+              - media_player.office_speaker
+              sequence:
+              - target:
+                  entity_id: script.media_play
+                data:
+                  variables:
+                    media_player: '{{ repeat.item }}'
+                    media_location: '{{ media_location }}'
+                    volume: '{{ volume }}'
+                action: script.turn_on
+        - data:
+            send_to: parents
+            title: '{{ title }}'
+            message: '{{ message }}'
+            notification_icon: mdi:doorbell-video
+            color: '#e91e63'
+            icon: local/icons/doorbell-video.png
+            camera: '{{ camera }}'
+            url: lovelace/security#camera-doorbell
+            group: Doorbell
+            interruption_level: critical
+            tag: doorbell-ring
+            car_ui: true
+            channel: Doorbell Ring
+            importance: high
+            actions: '{{ actions }}'
+          action: script.notify_mobile
+        - data:
+            entity:
+            - media_player.nasya
+            title: '{{ title }}'
+            message: '{{ message }}'
+            tag: doorbell-ring
+            camera: '{{ camera }}'
+            duration: 20
+            actions: '{{ actions }}'
+          action: script.notify_hass_agent
+        - data:
+            computer:
+            - erebus
+            - cartago
+            title: '{{ title }}'
+            message: '{{ message }}'
+            icon: local/icons/doorbell-video.png
+            importance: critical
+            actions:
+            - Stream
+          action: script.notify_lnxlink
+        - data:
+            camera_entity: '{{ camera }}'
+            show_title: true
+            size_mode: preset
+            size: large
+          action: script.notify_quickbars_camera
+        - if:
+          - condition: state
+            entity_id: light.wled_joshua_office_desk
+            state: 'on'
+          then:
+          - data:
+              value: '180'
+            target:
+              entity_id: number.wled_joshua_office_desk_speed
+            action: number.set_value
           - target:
-              entity_id: script.media_play
+              entity_id: light.wled_joshua_office_desk
             data:
-              variables:
-                media_player: '{{ repeat.item }}'
-                media_location: '{{ media_location }}'
-                volume: '{{ volume }}'
-            action: script.turn_on
-    - data:
-        send_to: parents
-        title: '{{ title }}'
-        message: '{{ message }}'
-        notification_icon: mdi:doorbell-video
-        color: '#e91e63'
-        icon: local/icons/doorbell-video.png
-        camera: '{{ camera }}'
-        url: lovelace/security#camera-doorbell
-        group: Doorbell
-        interruption_level: critical
-        tag: doorbell-ring
-        car_ui: true
-        channel: Doorbell Ring
-        importance: high
-        actions: '{{ actions }}'
-      action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.nasya
-        title: '{{ title }}'
-        message: '{{ message }}'
-        tag: doorbell-ring
-        camera: '{{ camera }}'
-        duration: 20
-        actions: '{{ actions }}'
-      action: script.notify_hass_agent
-    - data:
-        computer:
-        - erebus
-        - cartago
-        title: '{{ title }}'
-        message: '{{ message }}'
-        icon: local/icons/doorbell-video.png
-        importance: critical
-      action: script.notify_lnxlink
-    - data:
-        camera_entity: '{{ camera }}'
-        show_title: true
-        size_mode: preset
-        size: large
-      action: script.notify_quickbars_camera
-    - if:
-      - condition: state
-        entity_id: light.wled_joshua_office_desk
-        state: 'on'
-      then:
-      - data:
-          value: '180'
-        target:
-          entity_id: number.wled_joshua_office_desk_speed
-        action: number.set_value
-      - target:
-          entity_id: light.wled_joshua_office_desk
-        data:
-          effect: Sunrise
-        action: light.turn_on
-      - delay:
-          seconds: 5
-      - target:
-          entity_id: light.wled_joshua_office_desk
-        data:
-          effect: Solid
-        action: light.turn_on
+              effect: Sunrise
+            action: light.turn_on
+          - delay:
+              seconds: 5
+          - target:
+              entity_id: light.wled_joshua_office_desk
+            data:
+              effect: Solid
+            action: light.turn_on
   mode: single
 - id: '1693003933194'
   alias: "\U0001F514 Frigate Doorbell - Event Handler"
@@ -6407,7 +6452,7 @@
             }}'
           stream: '{{ base_url }}/webrtc/embed?url={{ link_id }}'
           icon: "{% if trigger.id == 'person' %}\n  mdi:account-outline\n{% elif trigger.id
-            == 'pet' %}\n  mdi:dog\n{% else %}\n  mdi:home-assistant\n{% endif %}"
+            == 'pet' %}\n  mdi:paw\n{% else %}\n  mdi:home-assistant\n{% endif %}"
           actions:
           - action: URI
             title: Stream
@@ -6420,7 +6465,7 @@
           link_id: '{{ link_id }}'
           entity: '{{ camera }}'
           open_limit: 0
-          time_to_live: 600
+          time_to_live: 300
       - alias: 'Debug: set notification'
         choose:
         - conditions:
@@ -6502,6 +6547,7 @@
                 camera: '{{ camera }}'
                 importance: critical
                 actions:
+                - Stream
                 - Silence Doorbell
               action: script.notify_lnxlink
             - data:
