@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5373 |
-| Sensors        | 1723 |
-| Binary Sensors | 407 |
+| All Entities   | 5445 |
+| Sensors        | 1731 |
+| Binary Sensors | 393 |
 | Lights         | 77 |
-| Switches       | 791 |
+| Switches       | 793 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -317,13 +317,13 @@ Authors: [@luuquangvu](https://github.com/luuquangvu).
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Bubble Card Tools](https://github.com/Clooos/Bubble-Card-Tools) [v1.0.0]
+### [Bubble Card Tools](https://github.com/Clooos/Bubble-Card-Tools) [v1.0.2]
 
 Bubble Card Tools is a custom integration that handles the Bubble Card backend. Required for the Module Store and module installs.
 
 Authors: [@Clooos](https://github.com/Clooos).
 
-### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.0.5]
+### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.0.7]
 
 ☑️ ChoreOps - A sophisticated household task and routine manager for Home Assistant. Gamify your chores for motivation, or just ensure the trash gets taken out on time.
 
@@ -395,13 +395,13 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.3.0]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.3.1]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.52.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v2.54.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -449,7 +449,7 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.8]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.9]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -461,13 +461,13 @@ Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.3.2]
+### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.4.1]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
 Authors: [@ruaan-deysel](https://github.com/ruaan-deysel).
 
-### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.3.2]
+### [Unraid Management Agent](https://github.com/ruaan-deysel/ha-unraid-management-agent) [v2026.4.0]
 
 Home Assistant Integration for the Management Agent for Unraid
 
@@ -515,7 +515,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.5]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.1.6]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -531,7 +531,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.0.4]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.0.5]
 
 Expander card for HomeAssistant
 
@@ -539,7 +539,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.9]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.10]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -563,7 +563,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v12.0.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v13.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -571,7 +571,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.5]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.6]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -599,11 +599,11 @@ Adds highly configurable buttons that use actions and per-state styling.
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.2.7]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.3.2]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
-### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v3.10.3]
+### [Sankey Chart Card](https://github.com/MindFreeze/ha-sankey-chart) [v4.0.2]
 
 A Home Assistant lovelace card to display a sankey chart. For example for power consumption
 
@@ -615,7 +615,7 @@ A simple and configurable tabs card for Home Assistant Dashboards.
 
 A Home Assistant card for Steam integrations
 
-### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.1.0]
+### [Streamline Card](https://github.com/brunosabot/streamline-card) [v0.2.0]
 
 Streamline your Lovelace configuration with with a card template system.
 
@@ -643,7 +643,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.1.0]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.4.0]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
@@ -929,7 +929,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.3.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.4.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
