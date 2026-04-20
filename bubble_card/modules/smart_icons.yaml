@@ -1,0 +1,1249 @@
+smart_icons:
+  name: "Smart Icons"
+  version: "1.6"
+  creator: "Zsolt"
+  link: "https://github.com/Clooos/Bubble-Card/discussions/1750"
+
+  supported:
+    - button
+    - calendar
+    - climate
+    - cover
+    - media-player
+
+  description: |
+    Intelligent conditional icon and badge overlay system with JavaScript expressions support.
+
+    Key features:
+    - Dynamic icon replacement with conditional logic
+    - Icon color and background manipulation
+    - Multiple badges on the main card icon and sub-buttons, 6 positions
+    - Smart shape detection (auto, circle, rounded)
+    - JavaScript expressions with _js suffix for advanced users
+    - Unlimited custom names for both icons and badges
+    - Badge tap and hold actions support (integrated with Bubble Card)
+    - Configurable animation targets (icon-only or container-wide)
+    - Performance optimized with efficient change detection
+    - NEW v1.6: Helper functions for cleaner, more readable expressions
+    - NEW v1.6: Enhanced cache detection for attribute and entity references
+
+    Target locations:
+    - main_icon: Main card icon and badges
+    - sub_buttons: Sub-buttons (button_1, button_2, etc.)
+
+    JavaScript expressions (YAML only):
+    Any property can be made dynamic by adding _js suffix:
+    - icon_js: "state === 'heat' ? 'mdi:fire' : 'mdi:thermostat'"
+    - icon_color_js: "state > 25 ? 'red' : 'blue'"
+    - background_color_js: "state > 30 ? '#ff000030' : null"
+    - effect_js: "state === 'heat' ? 'pulse' : null"
+
+    Expression context provides:
+    - state: Current entity's state
+    - lowerState: Current entity's state in lowercase
+    - entity: Full entity object for the current context
+    - attributes: Entity attributes object
+    - states(entityId): Get any entity's state
+    - getEntity(entityId): Get any entity object
+    - attr(entityId, attribute): Get entity attribute
+    - Math, Date, parseInt, parseFloat
+
+    Helper functions (NEW):
+    - cond(value, {key: result}, fallback, op='==='): Conditional mapping with operator support
+    - thresholds(value, {threshold: result}, fallback, op='>='): Ordered numeric thresholds
+    - entityCond(entityId, conditions, fallback, {attr, op}): Condition check on different entity
+    - between(value, min, max, inclusive=true): Range checking
+    - above(value, threshold), below(value, threshold), equals(value, target): Comparisons
+    - slugify(string, separator='_'): Transform strings to clean identifiers
+
+    Badge Actions (Auto-enabled):
+    Badges automatically become interactive when they have an entity. Default behavior:
+    - Tap: Opens more-info dialog for the badge's entity
+    - Hold: No default action (configure as needed)
+
+    Override default behavior with custom actions:
+    - action: call-service, navigate, url, toggle, more-info, none
+    - service: (for call-service) - service to call
+    - service_data: (for call-service) - data to pass to service
+    - navigation_path: (for navigate) - path to navigate to
+    - url_path: (for url) - URL to open
+    - entity: (for toggle/more-info) - entity to act upon
+
+    <b>YAML example:</b> Complete thermostat with dynamic icons and interactive badges (using v1.6 helper functions):
+
+    <code-block><pre>
+    smart_icons:
+      icons:
+        - name: thermostat_state
+          target: main_icon
+          entity: climate.living_room
+          icon_js: "cond(state, {heat: 'mdi:fire', cool: 'mdi:snowflake'}, 'mdi:thermostat')"
+          icon_color_js: "cond(state, {heat: '#ff6b35', cool: '#4a90e2'}, '#666')"
+          background_color_js: "cond(state, {heat: '#ff6b3520', cool: '#4a90e220'}, null)"
+          effect_js: "cond(state, {heat: 'pulse', cool: 'glow'}, null)"
+          effect_target: container  # Badges animate with icon (default)
+          
+        - name: button_light_status
+          target: button_1
+          entity: light.living_room
+          icon_js: "cond(state, {on: 'mdi:lightbulb'}, 'mdi:lightbulb-off')"
+          icon_color_js: "cond(state, {on: '#ffc107'}, '#666')"
+          background_color_js: "cond(state, {on: '#ffc10720'}, null)"
+          effect_js: "cond(state, {on: 'glow'}, null)"
+          effect_target: icon  # Only icon glows, not the whole button
+
+      badges:
+        - name: temp_display
+          target: main_icon
+          entity: climate.living_room
+          attribute: current_temperature
+          text_js: "Math.round(state) + '°'"
+          background_color_js: "thresholds(state, {25: 'red', 18: 'green'}, 'blue')"
+          text_color: white
+          scale: 0.8
+          tap_action:
+            action: more-info
+            entity: climate.living_room
+          hold_action:
+            action: call-service
+            service: climate.set_temperature
+            service_data:
+              entity_id: climate.living_room
+              temperature: 22
+          
+        - name: humidity_alert
+          target: main_icon
+          entity: sensor.humidity
+          position: bottom-left
+          icon: mdi:water-percent
+          background_color_js: "above(state, 70) ? 'orange' : 'blue'"
+          effect_js: "above(state, 80) ? 'blink' : null"
+          tap_action:
+            action: navigate
+            navigation_path: /lovelace/climate
+          hold_action:
+            action: call-service
+            service: fan.toggle
+            service_data:
+              entity_id: fan.bathroom
+          conditions:
+            - condition: numeric_state
+              entity: sensor.humidity
+              above: 60
+          
+        - name: outdoor_temp_check
+          target: main_icon
+          position: top-left
+          text_js: "entityCond('weather.forecast', {sunny: '☀️', rainy: '🌧️'}, '☁️')"
+          background_color_js: "between(attr('sensor.outdoor_temp', 'temperature'), 20, 25) ? 'green' : 'orange'"
+          scale: 0.6
+          
+        - name: room_identifier
+          target: main_icon  
+          position: bottom-left
+          text_js: "slugify(attr('climate.living_room', 'friendly_name'))"
+          background_color: blue
+          scale: 0.5
+    </pre></code-block>
+
+  code: |
+    .bubble-main-icon-badge {
+      position: absolute;
+      min-width: 18px;
+      height: 16px;
+      border-radius: 8px;
+      background-color: var(--badge-color, var(--primary-color));
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      z-index: 1;
+      box-sizing: border-box;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      transform: scale(var(--badge-scale, 1));
+      transform-origin: center;
+      pointer-events: auto;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+    }
+
+    .bubble-main-icon-badge:active {
+      transform: scale(calc(var(--badge-scale, 1) * 0.95));
+    }
+
+    .bubble-main-icon-badge:hover {
+      opacity: 0.9;
+    }
+
+    .bubble-main-icon-badge.no-background {
+      background-color: transparent;
+      box-shadow: none;
+    }
+
+    .bubble-main-icon-badge.no-actions {
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .bubble-main-icon-badge.no-actions:active,
+    .bubble-main-icon-badge.no-actions:hover {
+      transform: scale(var(--badge-scale, 1));
+      opacity: 1;
+    }
+
+    .bubble-main-icon-badge.circular {
+      min-width: 20px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      padding: 0;
+      font-size: 10px;
+    }
+
+    .bubble-main-icon-badge .badge-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+    }
+
+    .bubble-main-icon-badge.circular .badge-icon {
+      width: 12px;
+      height: 12px;
+    }
+
+    .bubble-main-icon-badge.position-top-left { top: 0; left: 0; }
+    .bubble-main-icon-badge.position-top { top: 0; left: 50%; transform: translateX(-50%) scale(var(--badge-scale, 1)); }
+    .bubble-main-icon-badge.position-top-right { top: 0; right: 0; }
+    .bubble-main-icon-badge.position-bottom-left { bottom: 0; left: 0; }
+    .bubble-main-icon-badge.position-bottom { bottom: 0; left: 50%; transform: translateX(-50%) scale(var(--badge-scale, 1)); }
+    .bubble-main-icon-badge.position-bottom-right { bottom: 0; right: 0; }
+
+    .bubble-icon-container { overflow: visible !important; position: relative; }
+    .bubble-icon-container::after { border-radius: 100%; }
+    .bubble-entity-picture {
+      border-radius: var(--bubble-icon-border-radius, var(--bubble-border-radius, 50%));
+    }
+
+    .smart-effect-pulse { animation: smart-pulse 2s infinite ease-in-out; }
+    .smart-effect-rotate { animation: smart-rotate 3s infinite ease-in-out; }
+    .smart-effect-spin { animation: smart-spin 3s linear infinite; }
+    .smart-effect-glow { animation: smart-glow 2s infinite ease-in-out; }
+    .smart-effect-float { animation: smart-float 3s infinite ease-in-out; }
+    .smart-effect-zoom { animation: smart-zoom 1.5s infinite ease-in-out; }
+    .smart-effect-shake { animation: smart-shake 0.8s infinite ease-in-out; }
+    .smart-effect-vibrate { animation: smart-vibrate 0.6s linear infinite; }
+    .smart-effect-flip { animation: smart-flip 2s linear infinite; }
+    .smart-effect-blink { animation: smart-blink 1s infinite step-end; }
+
+    @keyframes smart-pulse {
+      0%, 100% { transform: scale(var(--badge-scale, 1)); }
+      50% { transform: scale(calc(var(--badge-scale, 1) * 1.1)); }
+    }
+
+    @keyframes smart-rotate {
+      0% { transform: scale(var(--badge-scale, 1)) rotate(0deg); }
+      25% { transform: scale(var(--badge-scale, 1)) rotate(15deg); }
+      50% { transform: scale(var(--badge-scale, 1)) rotate(0deg); }
+      75% { transform: scale(var(--badge-scale, 1)) rotate(-15deg); }
+      100% { transform: scale(var(--badge-scale, 1)) rotate(0deg); }
+    }
+
+    @keyframes smart-spin {
+      from { transform: scale(var(--badge-scale, 1)) rotate(0deg); }
+      to { transform: scale(var(--badge-scale, 1)) rotate(360deg); }
+    }
+
+    @keyframes smart-glow {
+      0%, 100% { 
+        transform: scale(var(--badge-scale, 1));
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2); 
+      }
+      50% { 
+        transform: scale(var(--badge-scale, 1));
+        box-shadow: 0 0 10px var(--glow-color, rgba(255,255,255,0.7)); 
+      }
+    }
+
+    @keyframes smart-float {
+      0%, 100% { transform: scale(var(--badge-scale, 1)) translateY(0); }
+      50% { transform: scale(var(--badge-scale, 1)) translateY(-4px); }
+    }
+
+    @keyframes smart-zoom {
+      0%, 100% { transform: scale(var(--badge-scale, 1)); }
+      50% { transform: scale(calc(var(--badge-scale, 1) * 1.2)); }
+    }
+
+    @keyframes smart-shake {
+      0%, 100% { transform: scale(var(--badge-scale, 1)) translateX(0); }
+      25% { transform: scale(var(--badge-scale, 1)) translateX(-3px); }
+      75% { transform: scale(var(--badge-scale, 1)) translateX(3px); }
+    }
+
+    @keyframes smart-vibrate {
+      0% { transform: scale(var(--badge-scale, 1)) translate(0,0); }
+      20% { transform: scale(var(--badge-scale, 1)) translate(-1px,0); }
+      40% { transform: scale(var(--badge-scale, 1)) translate(1px,0); }
+      60% { transform: scale(var(--badge-scale, 1)) translate(-1px,0); }
+      80% { transform: scale(var(--badge-scale, 1)) translate(1px,0); }
+      100% { transform: scale(var(--badge-scale, 1)) translate(0,0); }
+    }
+
+    @keyframes smart-flip {
+      0% { transform: scale(var(--badge-scale, 1)) rotateY(0deg); }
+      50% { transform: scale(var(--badge-scale, 1)) rotateY(180deg); }
+      100% { transform: scale(var(--badge-scale, 1)) rotateY(360deg); }
+    }
+
+    @keyframes smart-blink {
+      0%, 50% { 
+        transform: scale(var(--badge-scale, 1));
+        opacity: 1; 
+      }
+      51%, 100% { 
+        transform: scale(var(--badge-scale, 1));
+        opacity: 0.3; 
+      }
+    }
+
+    ${(() => {
+      try {
+        const config = this.config["smart_icons"];
+        if (!config) return '';
+
+        const processColor = (color, entityCtx = {}) => {
+          if (!color) return null;
+          
+          // If it's already a complete color format, return as-is
+          if (color.match(/^(#|rgb|hsl|var\()/)) return color;
+          
+          // Check if it's a JavaScript expression for CSS variables
+          if (color.includes('var(--') || color.includes('${')) {
+            try {
+              // Evaluate the expression to get the CSS variable
+              let compiledFn = card._smartExpressionCache?.get(color);
+              if (!compiledFn) {
+                compiledFn = new Function('ctx', `with(ctx) { return \`${color}\`; }`);
+                if (!card._smartExpressionCache) card._smartExpressionCache = new Map();
+                card._smartExpressionCache.set(color, compiledFn);
+              }
+              
+              const globalCtx = {
+                Math, Date, parseInt, parseFloat,
+                states: (id) => hass.states[id]?.state,
+                getEntity: (id) => hass.states[id],
+                attr: (id, attr) => hass.states[id]?.attributes[attr],
+                ...entityCtx
+              };
+              
+              return compiledFn(globalCtx) || color;
+            } catch (err) {
+              console.warn(`[smart_icons] Color expression error: ${err.message}`);
+              return color;
+            }
+          }
+          
+          // Default: wrap simple names as CSS variables
+          return `var(--${color}-color)`;
+        };
+
+        if (!card._smartExpressionCache) {
+          card._smartExpressionCache = new Map();
+        }
+
+        // Define helpers once at module level (before evalExpr function)
+        if (!window._smartIconsHelpers) {
+          window._smartIconsHelpers = {
+            cond: (value, conditions, fallback, op = '==') => {
+              for (const [key, result] of Object.entries(conditions)) {
+                switch (op) {
+                  case '==': if (value == key) return result; break;
+                  case '!=': if (value != key) return result; break;
+                }
+              }
+              return fallback;
+            },
+            
+            thresholds: (value, thresholdObj, fallback, op = '>=') => {
+              const sortedKeys = Object.keys(thresholdObj).map(Number).sort((a, b) => b - a);
+              for (const threshold of sortedKeys) {
+                const condition = op === '>=' ? value >= threshold :
+                                op === '<=' ? value <= threshold :
+                                op === '>' ? value > threshold :
+                                op === '<' ? value < threshold :
+                                value === threshold;
+                if (condition) return thresholdObj[threshold];
+              }
+              return fallback;
+            },
+            
+            between: (val, min, max, inclusive = true) => 
+              inclusive ? (val >= min && val <= max) : (val > min && val < max),
+              
+            above: (val, threshold) => val > threshold,
+            below: (val, threshold) => val < threshold,
+            equals: (val, target) => val === target,
+            
+            entityCond: (entityId, conditions, fallback, opts = {}) => {
+              const entity = hass.states[entityId];
+              if (!entity) return fallback;
+              const value = opts.attr ? entity.attributes[opts.attr] : entity.state;
+              return window._smartIconsHelpers.cond(value, conditions, fallback, opts.op);
+            },
+            
+            slugify: (str, separator = '_') => {
+              if (!str || typeof str !== 'string') return '';
+              return str
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^\w\s-]/g, '')
+                .trim()
+                .replace(/[\s_-]+/g, separator)
+                .replace(new RegExp(`^${separator}+|${separator}+$`, 'g'), '');
+            }
+          };
+          
+          // Expose directly on window for convenience in CSS context
+          Object.assign(window, window._smartIconsHelpers);
+        }
+
+        const evalExpr = (expr, fallback, entityCtx = {}) => {
+          if (!expr) return fallback;
+          try {
+            let compiledFn = card._smartExpressionCache.get(expr);
+            if (!compiledFn) {
+              compiledFn = new Function('ctx', `with(ctx) { return ${expr}; }`);
+              card._smartExpressionCache.set(expr, compiledFn);
+            }
+            
+            const globalCtx = {
+              Math, Date, parseInt, parseFloat,
+              states: (id) => hass.states[id]?.state,
+              getEntity: (id) => hass.states[id],
+              attr: (id, attr) => hass.states[id]?.attributes[attr],
+              
+              ...window._smartIconsHelpers,      
+              ...entityCtx
+            };
+            
+            return compiledFn(globalCtx) ?? fallback;
+          } catch (err) {
+            console.warn(`[smart_icons] Expression error: ${err.message}`);
+            return fallback;
+          }
+        };
+
+        const shouldShow = (config) => {
+          if (!config.conditions) return true;
+          try {
+            return checkConditionsMet([].concat(config.conditions), hass);
+          } catch (err) {
+            return false;
+          }
+        };
+
+        const applyEffect = (element, effect) => {
+          element.className = element.className.replace(/smart-effect-\w+/g, '');
+          if (effect) element.classList.add(`smart-effect-${effect}`);
+        };
+
+        // Enhanced expression caching that includes attribute values
+        const getCacheKey = () => {
+          const extractAttributeRefs = (expr) => {
+            if (!expr || typeof expr !== 'string') return [];
+            const matches = [];
+            // Look for attributes.attributeName or attr(...) patterns
+            const attrPatterns = [
+              /attributes\.(\w+)/g,
+              /attr\([^,]+,\s*["'](\w+)["']\)/g
+            ];
+            
+            attrPatterns.forEach(pattern => {
+              let match;
+              while ((match = pattern.exec(expr)) !== null) {
+                matches.push(match[1]);
+              }
+            });
+            return matches;
+          };
+
+          const extractEntityRefs = (expr) => {
+            if (!expr || typeof expr !== 'string') return [];
+            const refs = [];
+            
+            // Helper function patterns that reference entities
+            const entityPatterns = [
+              /entityCond\(\s*["']([^"']+)["']/g,  // entityCond('entity.id', ...)
+              /states\(\s*["']([^"']+)["']\)/g,    // states('entity.id')
+              /getEntity\(\s*["']([^"']+)["']\)/g  // getEntity('entity.id')
+            ];
+            
+            entityPatterns.forEach(pattern => {
+              let match;
+              while ((match = pattern.exec(expr)) !== null) {
+                refs.push(match[1]);
+              }
+            });
+            
+            return refs;
+          };
+
+          const getEntityCacheData = (configItem, fallbackEntity) => {
+            const eid = configItem.entity || fallbackEntity;
+            const e = hass.states[eid];
+            if (!e) return null;
+            
+            // Get base cache data
+            const baseData = [e.state, e.last_changed];
+            
+            // Extract referenced attributes and entities from all JS expressions
+            const jsProps = Object.keys(configItem).filter(k => k.endsWith('_js'));
+            const referencedAttrs = new Set();
+            const referencedEntities = new Set();
+            
+            jsProps.forEach(prop => {
+              const expr = configItem[prop];
+              extractAttributeRefs(expr).forEach(attr => referencedAttrs.add(attr));
+              extractEntityRefs(expr).forEach(entityId => referencedEntities.add(entityId));
+            });
+            
+            // Add attribute values to cache data
+            const attrData = Array.from(referencedAttrs).map(attr => e.attributes[attr]);
+            
+            // Add external entity states to cache data  
+            const entityData = Array.from(referencedEntities).map(entityId => {
+              const extEntity = hass.states[entityId];
+              return extEntity ? [extEntity.state, extEntity.last_changed] : null;
+            }).filter(Boolean).flat();
+            
+            return [...baseData, ...attrData, ...entityData];
+          };
+
+          return JSON.stringify([
+            entity,
+            ...((config.badges || []).map(b => getEntityCacheData(b, entity))),
+            ...((config.icons || []).map(i => getEntityCacheData(i, entity)))
+          ]);
+        };
+
+        const currentCacheKey = getCacheKey();
+        
+        // Always update icons even when styles are cached
+        (config.icons || []).forEach(iconConfig => {
+          if (!iconConfig.name || !shouldShow(iconConfig)) return;
+          
+          const entityId = iconConfig.entity || entity;
+          const entityObj = hass.states[entityId];
+          const entityCtx = {
+            entity: entityObj,
+            state: entityObj?.state,
+            lowerState: entityObj?.state?.toLowerCase?.() || '',
+            attributes: entityObj?.attributes || {}
+          };
+
+          const resolvedIcon = evalExpr(iconConfig.icon_js, iconConfig.icon, entityCtx);
+
+          if (iconConfig.target === 'main_icon' && resolvedIcon) {
+            icon.icon = resolvedIcon;
+          } else if (iconConfig.target !== 'main_icon') {
+            const buttonIndex = parseInt(iconConfig.target.split('_')[1]) - 1;
+            if (resolvedIcon && subButtonIcon && subButtonIcon[buttonIndex]) {
+              subButtonIcon[buttonIndex].icon = resolvedIcon;
+            }
+          }
+        });
+
+        if (card._smartIconsCache?.key === currentCacheKey) {
+          return card._smartIconsCache.styles;
+        }
+
+        let iconStyles = [];
+
+        (config.icons || []).forEach(iconConfig => {
+          if (!iconConfig.name || !shouldShow(iconConfig)) return;
+          
+          const entityId = iconConfig.entity || entity;
+          const entityObj = hass.states[entityId];
+          const entityCtx = {
+            entity: entityObj,
+            state: entityObj?.state,
+            lowerState: entityObj?.state?.toLowerCase?.() || '',
+            attributes: entityObj?.attributes || {}
+          };
+
+          const resolved = {
+            icon: evalExpr(iconConfig.icon_js, iconConfig.icon, entityCtx),
+            iconColor: evalExpr(iconConfig.icon_color_js, iconConfig.icon_color, entityCtx),
+            backgroundColor: evalExpr(iconConfig.background_color_js, iconConfig.background_color, entityCtx),
+            backgroundOpacity: evalExpr(iconConfig.background_opacity_js, iconConfig.background_opacity, entityCtx),
+            effect: evalExpr(iconConfig.effect_js, iconConfig.effect, entityCtx),
+            effectTarget: evalExpr(iconConfig.effect_target_js, iconConfig.effect_target || 'container', entityCtx)
+          };
+
+          if (iconConfig.target === 'main_icon') {
+            if (resolved.iconColor) {
+              iconStyles.push(`.bubble-icon { color: ${processColor(resolved.iconColor)} !important; }`);
+            }
+            if (resolved.backgroundColor) {
+              iconStyles.push(`.bubble-icon-container { background-color: ${processColor(resolved.backgroundColor)} !important; }`);
+            }
+            if (resolved.backgroundOpacity !== undefined) {
+              iconStyles.push(`.bubble-icon-container { opacity: ${resolved.backgroundOpacity} !important; }`);
+            }
+            if (resolved.effect) {
+              const targetSelector = resolved.effectTarget === 'icon' ? '.bubble-icon' : '.bubble-icon-container';
+              iconStyles.push(`${targetSelector} { animation: smart-${resolved.effect} 2s infinite ease-in-out !important; }`);
+            }
+          } else {
+            const buttonIndex = parseInt(iconConfig.target.split('_')[1]) - 1;
+            
+            const container = card.querySelector(`.bubble-sub-button-${buttonIndex + 1}`);
+            if (container) {
+              const iconEl = container.querySelector('ha-icon');
+              if (iconEl && resolved.iconColor) {
+                iconEl.style.color = processColor(resolved.iconColor);
+              }
+              if (resolved.backgroundColor) {
+                container.style.backgroundColor = processColor(resolved.backgroundColor);
+              }
+              if (resolved.backgroundOpacity !== undefined) {
+                container.style.opacity = resolved.backgroundOpacity;
+              }
+              if (resolved.effectTarget === 'icon' && iconEl) {
+                applyEffect(iconEl, resolved.effect);
+              } else {
+                applyEffect(container, resolved.effect);
+              }
+            }
+          }
+        });
+
+        (config.badges || []).forEach(badgeConfig => {
+          if (!badgeConfig.name || !badgeConfig.target || !shouldShow(badgeConfig)) {
+            const badgeKey = `${badgeConfig.target}_${badgeConfig.name}`;
+            const existing = card.querySelector(`[data-badge-key="${badgeKey}"]`);
+            if (existing) existing.remove();
+            return;
+          }
+          
+          const entityId = badgeConfig.entity || entity;
+          const entityObj = hass.states[entityId];
+          const entityCtx = {
+            entity: entityObj,
+            state: entityObj?.state,
+            lowerState: entityObj?.state?.toLowerCase?.() || '',
+            attributes: entityObj?.attributes || {}
+          };
+
+          const resolved = {
+            icon: evalExpr(badgeConfig.icon_js, badgeConfig.icon, entityCtx),
+            text: evalExpr(badgeConfig.text_js, '', entityCtx),
+            bg: evalExpr(badgeConfig.background_color_js, badgeConfig.background_color, entityCtx),
+            textColor: evalExpr(badgeConfig.text_color_js, badgeConfig.text_color, entityCtx),
+            scale: evalExpr(badgeConfig.scale_js, badgeConfig.scale, entityCtx),
+            fontScale: evalExpr(badgeConfig.font_scale_js, badgeConfig.font_scale, entityCtx),
+            glow: evalExpr(badgeConfig.glow_color_js, badgeConfig.glow_color, entityCtx),
+            hOffset: evalExpr(badgeConfig.h_offset_js, badgeConfig.h_offset ?? -4, entityCtx),
+            vOffset: evalExpr(badgeConfig.v_offset_js, badgeConfig.v_offset ?? -4, entityCtx),
+            position: evalExpr(badgeConfig.position_js, badgeConfig.position || 'top-right', entityCtx),
+            shape: evalExpr(badgeConfig.shape_js, badgeConfig.shape || 'auto', entityCtx),
+            effect: evalExpr(badgeConfig.effect_js, badgeConfig.effect, entityCtx),
+            showBg: badgeConfig.show_background,
+            entityValue: entityId ? (
+              badgeConfig.attribute 
+                ? entityObj?.attributes[badgeConfig.attribute] || ''
+                : hass.formatEntityState?.(entityObj) || entityObj?.state || ''
+            ) : null
+          };
+
+          const container = badgeConfig.target === 'main_icon' 
+            ? card.querySelector('.bubble-icon-container')
+            : card.querySelector(`.bubble-sub-button-${badgeConfig.target.split('_')[1]}`);
+          
+          if (!container) return;
+          
+          if (container.style.position === 'static' || !container.style.position) {
+            container.style.position = 'relative';
+          }
+
+          const badgeKey = `${badgeConfig.target}_${badgeConfig.name}`;
+          let badge = container.querySelector(`[data-badge-key="${badgeKey}"]`);
+
+          if (!badge) {
+            badge = document.createElement('div');
+            badge.className = 'bubble-main-icon-badge';
+            badge.setAttribute('data-badge-key', badgeKey);
+            container.appendChild(badge);
+          }
+
+          // Configure badge actions using Bubble Card's system
+          if (badgeConfig.tap_action || badgeConfig.hold_action || badgeConfig.entity) {
+            // Determine the entity to use for actions
+            const actionEntity = badgeConfig.entity || entity;
+            
+            // Create action configurations with entity included
+            // Default to more-info if no tap_action specified but entity exists
+            const tapAction = badgeConfig.tap_action ? {
+              ...badgeConfig.tap_action,
+              entity: badgeConfig.tap_action.entity || actionEntity
+            } : actionEntity ? {
+              action: "more-info",
+              entity: actionEntity
+            } : { action: "none" };
+
+            const holdAction = badgeConfig.hold_action ? {
+              ...badgeConfig.hold_action, 
+              entity: badgeConfig.hold_action.entity || actionEntity
+            } : { action: "none" };
+
+            // Add Bubble Card action system
+            badge.classList.add('bubble-action');
+            badge.dataset.entity = actionEntity;
+            badge.dataset.tapAction = JSON.stringify(tapAction);
+            badge.dataset.doubleTapAction = JSON.stringify({ action: "none" });
+            badge.dataset.holdAction = JSON.stringify(holdAction);
+            
+            // Add enabled class for styling
+            if (tapAction.action !== "none" || holdAction.action !== "none") {
+              badge.classList.add('bubble-action-enabled');
+            }
+          } else {
+            badge.classList.add('no-actions');
+          }
+
+          badge.className = 'bubble-main-icon-badge';
+          badge.setAttribute('data-badge-key', badgeKey);
+          badge.classList.add(`position-${resolved.position}`);
+          
+          if (resolved.shape === 'circle' || (resolved.shape === 'auto' && resolved.icon)) {
+            badge.classList.add('circular');
+          }
+          
+          if (resolved.showBg === false) {
+            badge.classList.add('no-background');
+          }
+          
+          // Re-add action classes if they exist
+          if (badgeConfig.tap_action || badgeConfig.hold_action || badgeConfig.entity) {
+            badge.classList.add('bubble-action');
+            const tapAction = badgeConfig.tap_action ? {
+              ...badgeConfig.tap_action,
+              entity: badgeConfig.tap_action.entity || (badgeConfig.entity || entity)
+            } : (badgeConfig.entity || entity) ? {
+              action: "more-info",
+              entity: badgeConfig.entity || entity
+            } : { action: "none" };
+            
+            const holdAction = badgeConfig.hold_action ? {
+              ...badgeConfig.hold_action, 
+              entity: badgeConfig.hold_action.entity || (badgeConfig.entity || entity)
+            } : { action: "none" };
+            
+            if (tapAction.action !== "none" || holdAction.action !== "none") {
+              badge.classList.add('bubble-action-enabled');
+            }
+          } else {
+            badge.classList.add('no-actions');
+          }
+
+          if (resolved.bg) badge.style.setProperty('--badge-color', processColor(resolved.bg, entityCtx));
+          if (resolved.textColor) badge.style.color = processColor(resolved.textColor, entityCtx);
+          if (resolved.glow) badge.style.setProperty('--glow-color', processColor(resolved.glow, entityCtx));
+          
+          const defaultScale = badgeConfig.target.startsWith('button_') ? 0.7 : 1;
+          const scale = resolved.scale ?? defaultScale;
+          badge.style.setProperty('--badge-scale', scale);
+          
+          if (resolved.fontScale && resolved.fontScale !== 1) {
+            badge.style.fontSize = `${resolved.fontScale}em`;
+          }
+          
+          if (resolved.position === 'top' || resolved.position === 'bottom') {
+            badge.style.marginTop = resolved.position === 'top' ? `${resolved.vOffset}px` : '';
+            badge.style.marginBottom = resolved.position === 'bottom' ? `${Math.abs(resolved.vOffset)}px` : '';
+          } else {
+            const [vSide, hSide] = resolved.position.split('-');
+            badge.style[vSide] = `${resolved.vOffset}px`;
+            badge.style[hSide] = `${resolved.hOffset}px`;
+          }
+          
+          applyEffect(badge, resolved.effect);
+
+          if (resolved.icon) {
+            badge.innerHTML = `<ha-icon class="badge-icon" icon="${resolved.icon}" style="width: ${badge.classList.contains('circular') ? '12px' : '13px'}; height: ${badge.classList.contains('circular') ? '12px' : '13px'}; display: flex; align-items: center; justify-content: center;"></ha-icon>`;
+          } else if (resolved.text) {
+            badge.textContent = resolved.text;
+          } else if (resolved.entityValue) {
+            badge.textContent = resolved.entityValue;
+          }
+        });
+
+        const finalStyles = iconStyles.join('\n');
+        
+        card._smartIconsCache = { 
+          key: currentCacheKey, 
+          styles: finalStyles 
+        };
+        
+        return finalStyles;
+
+      } catch (err) {
+        console.error("[smart_icons] Error:", err);
+        return '';
+      }
+    })()}
+
+  editor:
+    - type: constant
+      label: >-
+        Configure dynamic icons and badges for the main card icon and sub-buttons.
+        Icons can be replaced dynamically based on entity states, and badges provide
+        additional overlay information with interactive actions.
+    - type: heading
+      heading: Dynamic Icons
+    - name: icons
+      label: Icon Overrides
+      selector:
+        object:
+          fields:
+            name:
+              label: Override Name
+              description: >-
+                Unique name for this icon override (e.g., thermostat_mode,
+                light_status)
+              required: true
+              selector:
+                text: {}
+            target:
+              label: Target Container
+              description: Which icon to override
+              default: main_icon
+              required: true
+              selector:
+                select:
+                  options:
+                    - label: Main Icon
+                      value: main_icon
+                    - label: Sub-button 1
+                      value: button_1
+                    - label: Sub-button 2
+                      value: button_2
+                    - label: Sub-button 3
+                      value: button_3
+                    - label: Sub-button 4
+                      value: button_4
+                  multiple: false
+                  custom_value: false
+                  mode: "dropdown"
+            entity:
+              label: Entity
+              description: Entity to monitor for state changes
+              selector:
+                entity: {}
+            icon:
+              label: Static Icon
+              description: Fixed icon to use (use icon_js for dynamic icons)
+              selector:
+                icon: {}
+            icon_color:
+              label: Icon Color
+              description: Static color for the icon
+              selector:
+                ui_color: {}
+            background_color:
+              label: Background Color
+              description: Static background color for the icon container
+              selector:
+                ui_color: {}
+            background_opacity:
+              label: Background Opacity
+              description: Opacity for the background (0.0 to 1.0)
+              selector:
+                number:
+                  min: 0
+                  max: 1
+                  step: 0.1
+                  mode: slider
+            effect:
+              label: Animation Effect
+              description: Static animation effect for the icon
+              selector:
+                select:
+                  options:
+                    - label: Pulse (gentle scaling)
+                      value: pulse
+                    - label: Glow (soft light effect)
+                      value: glow
+                    - label: Rotate (gentle rocking)
+                      value: rotate
+                    - label: Spin (continuous rotation)
+                      value: spin
+                    - label: Float (up and down)
+                      value: float
+                    - label: Zoom (scaling animation)
+                      value: zoom
+                    - label: Shake (quick wiggle)
+                      value: shake
+                    - label: Vibrate (rapid shake)
+                      value: vibrate
+                    - label: Flip (3D flip effect)
+                      value: flip
+                    - label: Blink (on/off flashing)
+                      value: blink
+                  multiple: false
+                  custom_value: false
+                  mode: dropdown
+            effect_target:
+              label: Animation Target
+              description: >-
+                Where to apply the animation effect. 'container' animates badges
+                together with icon, 'icon' keeps badges static.
+              default: container
+              selector:
+                select:
+                  options:
+                    - label: Container (badges animate with icon)
+                      value: container
+                    - label: Icon Only (badges stay static)
+                      value: icon
+                  multiple: false
+                  custom_value: false
+                  mode: "dropdown"
+            conditions:
+              label: Display Conditions
+              description: Only apply icon override when these conditions are met
+              selector:
+                condition: {}
+            icon_js:
+              label: Dynamic Icon (JavaScript)
+              description: >-
+                JavaScript expression for dynamic icon selection. Example: state ===
+                "heating" ? "mdi:fire" : "mdi:thermostat"
+              selector:
+                text:
+                  multiline: true
+            icon_color_js:
+              label: Dynamic Icon Color (JavaScript)
+              description: >-
+                JavaScript expression for dynamic color. Example: state === "on" ?
+                "#ffc107" : "#666"
+              selector:
+                text:
+                  multiline: true
+            background_color_js:
+              label: Dynamic Background Color (JavaScript)
+              description: >-
+                JavaScript expression for background. Example: state === "heating" ?
+                "#ff000030" : null
+              selector:
+                text:
+                  multiline: true
+            background_opacity_js:
+              label: Dynamic Background Opacity (JavaScript)
+              description: >-
+                JavaScript expression for opacity. Example: state === "on" ? 0.8 :
+                0.3
+              selector:
+                text:
+                  multiline: true
+            effect_js:
+              label: Dynamic Effect (JavaScript)
+              description: >-
+                JavaScript expression for effect. Example: state === "heating" ?
+                "pulse" : null
+              selector:
+                text:
+                  multiline: true
+            effect_target_js:
+              label: Dynamic Animation Target (JavaScript)
+              description: >-
+                JavaScript expression for animation target. Example: state ===
+                "active" ? "icon" : "container"
+              selector:
+                text:
+                  multiline: true
+          multiple: true
+          label_field: name
+    - type: heading
+      heading: Badge Overlays
+    - name: badges
+      label: Smart Badges
+      selector:
+        object:
+          fields:
+            name:
+              label: Badge Name
+              description: Unique name for this badge
+              required: true
+              selector:
+                text: {}
+            target:
+              label: Target Container
+              description: Where to place this badge
+              default: main_icon
+              required: true
+              selector:
+                select:
+                  options:
+                    - label: Main Icon
+                      value: main_icon
+                    - label: Sub-button 1
+                      value: button_1
+                    - label: Sub-button 2
+                      value: button_2
+                    - label: Sub-button 3
+                      value: button_3
+                    - label: Sub-button 4
+                      value: button_4
+                  multiple: false
+                  custom_value: false
+                  mode: "dropdown"
+            entity:
+              label: Entity
+              description: Entity to monitor and display (use this OR icon, not both)
+              selector:
+                entity: {}
+            attribute:
+              label: Entity Attribute
+              description: Specific attribute to display (leave empty to show entity state)
+              selector:
+                text: {}
+            icon:
+              label: Icon
+              description: Static icon to display (use this OR icon, not both)
+              selector:
+                icon: {}
+            # Actions Section
+            tap_action:
+              description: Action when badge is tapped (defaults to more-info if entity exists)
+              selector:
+                ui_action:
+                  default_action: "more-info"
+            hold_action:
+              label: Hold Action
+              description: Action when badge is held
+              selector:
+                ui_action:
+                  default_action: "none"
+            # Display Section
+            position:
+              label: Position
+              description: Where to place the badge
+              default: top-right
+              required: true
+              selector:
+                select:
+                  options:
+                    - label: Top Left
+                      value: top-left
+                    - label: Top Center
+                      value: top
+                    - label: Top Right
+                      value: top-right
+                    - label: Bottom Left
+                      value: bottom-left
+                    - label: Bottom Center
+                      value: bottom
+                    - label: Bottom Right
+                      value: bottom-right
+                  multiple: false
+                  custom_value: false
+                  mode: "dropdown"
+            shape:
+              label: Shape
+              description: Badge shape (auto detects based on content)
+              default: auto
+              required: true
+              selector:
+                select:
+                  options:
+                    - label: Auto (circle for icons, rounded for text)
+                      value: auto
+                    - label: Circle
+                      value: circle
+                    - label: Rounded Rectangle
+                      value: rounded
+                  multiple: false
+                  custom_value: false
+                  mode: "dropdown"
+            # Colors Section
+            background_color:
+              label: Background Color
+              description: Badge background color (hex, theme color, or CSS variable)
+              selector:
+                ui_color: {}
+            text_color:
+              label: Text Color
+              description: Text color for the badge
+              default: "#ffffff"
+              selector:
+                ui_color: {}
+            # Animation Section
+            effect:
+              label: Animation Effect
+              description: Optional animation for the badge
+              selector:
+                select:
+                  options:
+                    - label: Pulse
+                      value: pulse
+                    - label: Glow
+                      value: glow
+                    - label: Rotate
+                      value: rotate
+                    - label: Spin
+                      value: spin
+                    - label: Float
+                      value: float
+                    - label: Zoom
+                      value: zoom
+                    - label: Shake
+                      value: shake
+                    - label: Vibrate
+                      value: vibrate
+                    - label: Flip
+                      value: flip
+                    - label: Blink
+                      value: blink
+                  multiple: false
+                  custom_value: false
+                  mode: dropdown
+            # Advanced Section
+            font_scale:
+              label: Font Scale
+              description: Text size within the badge
+              default: 1
+              selector:
+                number:
+                  min: 0.5
+                  max: 1.5
+                  step: 0.1
+                  mode: slider
+            glow_color:
+              label: Glow Color
+              description: Color for glow effect (only works with glow animation)
+              selector:
+                ui_color: {}
+            scale:
+              label: Badge Scale
+              description: Overall size of the badge
+              default: 1
+              selector:
+                number:
+                  min: 0.3
+                  max: 2
+                  step: 0.1
+                  mode: slider
+            h_offset:
+              label: Horizontal Offset
+              description: Fine-tune horizontal position
+              default: -4
+              selector:
+                number:
+                  min: -20
+                  max: 20
+                  step: 1
+                  mode: box
+            v_offset:
+              label: Vertical Offset
+              description: Fine-tune vertical position
+              default: -4
+              selector:
+                number:
+                  min: -20
+                  max: 20
+                  step: 1
+                  mode: box
+            show_background:
+              label: Show Background
+              description: Whether to show the badge background
+              default: true
+              selector:
+                boolean: {}
+            conditions:
+              label: Display Conditions
+              description: Only show badge when these conditions are met
+              selector:
+                condition: {}
+            # JavaScript Expressions
+            text_js:
+              label: Dynamic Text (JavaScript)
+              description: JavaScript expression for dynamic text
+              selector:
+                text:
+                  multiline: true
+            icon_js:
+              label: Dynamic Icon (JavaScript)
+              description: JavaScript expression for dynamic icon
+              selector:
+                text:
+                  multiline: true
+            background_color_js:
+              label: Dynamic Background Color (JavaScript)
+              description: JavaScript expression for background color
+              selector:
+                text:
+                  multiline: true
+            text_color_js:
+              label: Dynamic Text Color (JavaScript)
+              description: JavaScript expression for text color
+              selector:
+                text:
+                  multiline: true
+            scale_js:
+              label: Dynamic Scale (JavaScript)
+              description: JavaScript expression for scale
+              selector:
+                text:
+                  multiline: true
+            font_scale_js:
+              label: Dynamic Font Scale (JavaScript)
+              description: JavaScript expression for font scale
+              selector:
+                text:
+                  multiline: true
+            glow_color_js:
+              label: Dynamic Glow Color (JavaScript)
+              description: JavaScript expression for glow color
+              selector:
+                text:
+                  multiline: true
+            h_offset_js:
+              label: Dynamic Horizontal Offset (JavaScript)
+              description: JavaScript expression for horizontal offset
+              selector:
+                text:
+                  multiline: true
+            v_offset_js:
+              label: Dynamic Vertical Offset (JavaScript)
+              description: JavaScript expression for vertical offset
+              selector:
+                text:
+                  multiline: true
+            position_js:
+              label: Dynamic Position (JavaScript)
+              description: JavaScript expression for position
+              selector:
+                text:
+                  multiline: true
+            shape_js:
+              label: Dynamic Shape (JavaScript)
+              description: JavaScript expression for shape
+              selector:
+                text:
+                  multiline: true
+            effect_js:
+              label: Dynamic Effect (JavaScript)
+              description: JavaScript expression for animation effect
+              selector:
+                text:
+                  multiline: true
+          multiple: true
+          label_field: name
