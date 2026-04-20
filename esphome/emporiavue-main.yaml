@@ -91,16 +91,16 @@ esphome:
   name: $name
   friendly_name: $friendly_name
 
-external_components:
-  - source: github://emporia-vue-local/esphome@vue3
-    components:
-      - emporia_vue
-
 esp32:
   board: esp32dev
   framework:
     type: esp-idf
     version: recommended
+
+external_components:
+  - source: github://emporia-vue-local/esphome@dev
+    components:
+      - emporia_vue
 
 # Enable Home Assistant API
 api:
@@ -123,7 +123,7 @@ ota:
 # Enable logging
 logger:
   logs:
-    # By default, every reading will be printed to the UART, which is very slow
+    # by default, every reading will be printed to the UART, which is very slow
     # This will disable printing the readings but keep other helpful messages
     sensor: INFO
 
@@ -135,7 +135,8 @@ wifi:
 # captive_portal:
 
 preferences:
-  # The default of 1min is far too short--flash chip is rated for approx 100k writes.
+  # avoid wearing out the flash lifespan with rapidly-updating sensor data!
+  # please also make sure `restore: false` is set on all `platform: total_daily_energy` sensors below.
   flash_write_interval: "48h"
 
 output:
@@ -180,7 +181,7 @@ light:
     id: ethernet_led
     name: "Ethernet LED"
     pin: 4
-    restore_mode: RESTORE_DEFAULT_ON
+    restore_mode: ALWAYS_OFF
 
 text_sensor:
   - platform: version
@@ -191,7 +192,9 @@ text_sensor:
       name: "Reset Reason"
 
 i2c:
-  sda: 5
+  sda:
+    number: 5
+    ignore_strapping_warning: true
   scl: 18
   scan: false
   frequency: 400kHz
@@ -206,9 +209,10 @@ time:
 debug:
   update_interval: 120s
 
-# these are called references in YAML. They allow you to reuse
-# this configuration in each sensor, while only defining it once
-.defaultfilters:
+.filters:
+  # these are called references in YAML. They allow you to reuse
+  # this configuration in each sensor, while only defining it once
+  # you can adjust them here, split them up differently, even copy some inline…
   - &throttle_avg
     # average all raw readings together over a 5 second span before publishing
     throttle_average: 5s
@@ -230,6 +234,7 @@ debug:
 
 sensor:
   - platform: emporia_vue
+    variant: vue3
     i2c_id: i2c_a
     phases:
       - id: phase_a
@@ -253,13 +258,14 @@ sensor:
           filters: [ *throttle_avg, *pos ]
 
     ct_clamps:
-      # Do not specify a name for any of the power sensors here, only an id. This leaves the power sensors internal to ESPHome.
-      # Copy sensors will filter and then send power measurements to HA
-      # These non-throttled power sensors are used for accurately calculating energy
+      # These non-throttled power sensors are used for accurately calculating energy.
+      # Recommend not to specify a `name` for any of the power sensors here — only the `id`!
+      # This leaves them internal to ESPHome locally; post-processed data is sent to HA below.
       - phase_id: phase_a
         input: "A"
         power:
           id: phase_a_power
+          device_class: power
           filters: [ *pos ]
         current:
           id: phase_a_current
@@ -269,12 +275,13 @@ sensor:
         input: "B"
         power:
           id: phase_b_power
+          device_class: power
           filters: [ *pos ]
         current:
           id: phase_b_current
           filters: [ *pos ]
 
-      # Pay close attention to set the phase_id for each breaker by matching it to the phase/leg it connects to in the panel
+      # Pay close attention to set the `phase_id` for each breaker by matching it to the phase/leg it connects to in the panel
       - { phase_id:  $circuit_phase_1, input:  "1", power: { id:  circuit_1_power, filters: [ *pos, multiply:  $circuit_factor_1 ] } }
       - { phase_id:  $circuit_phase_2, input:  "2", power: { id:  circuit_2_power, filters: [ *pos, multiply:  $circuit_factor_2 ] } }
       - { phase_id:  $circuit_phase_3, input:  "3", power: { id:  circuit_3_power, filters: [ *pos, multiply:  $circuit_factor_3 ] } }
