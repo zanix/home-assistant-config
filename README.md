@@ -750,7 +750,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>147 Automations</summary>
+<details><summary>150 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -817,6 +817,9 @@ Material Design 3 Theme for Home Assistant
 - 💡 Living Room Lamps on/off
 - 💡 School Departure Light Indicator
 - 💡 Turn Lights On when Arrive
+- 💦 Basement Bathroom Humidity Exhaust Fan
+- 💦 Bathroom Humidity Exhaust Fan
+- 💦 Main Bathroom Humidity Exhaust Fan
 - 💧 Shut-Off Valve Overheated
 - 💧 Softener Salt Level Low
 - 💧 Water Leak Detected
