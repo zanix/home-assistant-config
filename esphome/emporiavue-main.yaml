@@ -8,7 +8,6 @@
 substitutions:
   name: emporiavue-main
   friendly_name: EmporiaVue Main
-
   timezone_name: "America/Boise"
 
   # Phases
@@ -21,16 +20,7 @@ substitutions:
   phase_a_calibration: "0.01935"
   phase_b_calibration: "0.01916"
 
-  # Suffixes
-  # Add a beginning space if you want a space between the circuit name and suffix.
-  power_suffix_name: " power"
-  current_suffix_name: " current"
-  daily_suffix_name: " daily"
-  voltage_suffix_name: " voltage"
-  frequency_suffix_name: " frequency"
-  phase_angle_suffix_name: " phase angle"
-
-  # Calculated
+  # Calculated circuits
   total_name: "Total"
   balance_name: "Balance"
 
@@ -41,9 +31,9 @@ substitutions:
   circuit_name_4: "Dryer"
   circuit_name_5: "A⁄C"
   circuit_name_6: "Kitchen Outlets 1"
-  circuit_name_7: "Microwave"
+  circuit_name_7: "Kitchen Outlets 2"
   circuit_name_8: "Dishwasher, Disposal"
-  circuit_name_9: "Kitchen Outlets 2"
+  circuit_name_9: "Microwave"
   circuit_name_10: "Outside Outlet"
   circuit_name_11: "Garage Outlets"
   circuit_name_12: "Garage, Laundry, Outside Lights"
@@ -67,9 +57,10 @@ substitutions:
   circuit_phase_12: phase_a
   circuit_phase_13: phase_a
   circuit_phase_14: phase_b
-  circuit_phase_15: phase_b
-  circuit_phase_16: phase_a
+  circuit_phase_15: phase_a
+  circuit_phase_16: phase_b
 
+  # Power multiplier for split-phase circuits (e.g. 240V water heater on a 120V clamp)
   circuit_factor_1: "1"
   circuit_factor_2: "1"
   circuit_factor_3: "1"
@@ -131,8 +122,20 @@ wifi:
   ssid: !secret wifi_not_ssid
   password: !secret wifi_not_password
   fast_connect: true
+  on_connect:
+    - light.turn_on: wifi_led
+  on_disconnect:
+    - light.turn_off: wifi_led
 
-# captive_portal:
+# ethernet:
+#  type: RTL8201
+#  mdc_pin: GPIO32
+#  mdio_pin: GPIO33
+#  clk_mode: GPIO0_IN
+#  on_connect:
+#    - light.turn_on: ethernet_led
+#  on_disconnect:
+#    - light.turn_off: ethernet_led
 
 preferences:
   # avoid wearing out the flash lifespan with rapidly-updating sensor data!
@@ -219,7 +222,7 @@ debug:
   - &throttle_time
     # only send the most recent measurement every 60 seconds
     throttle: 60s
-  - &invert
+  - &neg
     # invert and filter out any values below 0.
     lambda: 'return max(-x, 0.0f);'
   - &pos
@@ -241,20 +244,20 @@ sensor:
         input: BLACK
         calibration: $phase_a_calibration
         voltage:
-          name: "${phase_a_name}${voltage_suffix_name}"
+          name: "${phase_a_name} voltage"
           filters: [ *throttle_avg, *pos ]
         frequency:
-          name: "${phase_a_name}${frequency_suffix_name}"
+          name: "${phase_a_name} frequency"
           filters: [ *throttle_avg, *pos ]
 
       - id: phase_b
         input: RED
         calibration: $phase_b_calibration
         voltage:
-          name: "${phase_b_name}${voltage_suffix_name}"
+          name: "${phase_b_name} voltage"
           filters: [ *throttle_avg, *pos ]
         phase_angle:
-          name: "${phase_b_name}${phase_angle_suffix_name}"
+          name: "${phase_b_name} phase angle"
           filters: [ *throttle_avg, *pos ]
 
     ct_clamps:
@@ -306,35 +309,35 @@ sensor:
         - component.update: dryer_power
 
   # The copy sensors filter and send the power state to HA
-  - { platform: copy, source_id: phase_a_power, filters: *throttle_avg, name: "${phase_a_name}${power_suffix_name}" }
-  - { platform: copy, source_id: phase_b_power, filters: *throttle_avg, name: "${phase_b_name}${power_suffix_name}" }
+  - { platform: copy, source_id: phase_a_power, filters: *throttle_avg, name: "${phase_a_name} power" }
+  - { platform: copy, source_id: phase_b_power, filters: *throttle_avg, name: "${phase_b_name} power" }
 
-  - { platform: copy, source_id: total_power, filters: *throttle_avg, name: "${total_name}${power_suffix_name}" }
-  - { platform: copy, source_id: balance_power, filters: *throttle_avg, name: "${balance_name}${power_suffix_name}" }
+  - { platform: copy, source_id: total_power, filters: *throttle_avg, name: "${total_name} power" }
+  - { platform: copy, source_id: balance_power, filters: *throttle_avg, name: "${balance_name} power" }
 
-  - { platform: copy, source_id: phase_a_current, filters: *throttle_avg, name: "${phase_a_name}${current_suffix_name}" }
-  - { platform: copy, source_id: phase_b_current, filters: *throttle_avg, name: "${phase_b_name}${current_suffix_name}" }
+  - { platform: copy, source_id: phase_a_current, filters: *throttle_avg, name: "${phase_a_name} current" }
+  - { platform: copy, source_id: phase_b_current, filters: *throttle_avg, name: "${phase_b_name} current" }
 
-  # - { platform: copy, source_id:  circuit_1_power, filters: *throttle_avg, name:  "${circuit_name_1}${power_suffix_name}" }
-  # - { platform: copy, source_id:  circuit_2_power, filters: *throttle_avg, name:  "${circuit_name_2}${power_suffix_name}" }
-  # - { platform: copy, source_id:  circuit_3_power, filters: *throttle_avg, name:  "${circuit_name_3}${power_suffix_name}" }
-  # - { platform: copy, source_id:  circuit_4_power, filters: *throttle_avg, name:  "${circuit_name_4}${power_suffix_name}" }
-  - { platform: copy, source_id:  circuit_5_power, filters: *throttle_avg, name:  "${circuit_name_5}${power_suffix_name}" }
-  - { platform: copy, source_id:  circuit_6_power, filters: *throttle_avg, name:  "${circuit_name_6}${power_suffix_name}" }
-  - { platform: copy, source_id:  circuit_7_power, filters: *throttle_avg, name:  "${circuit_name_7}${power_suffix_name}" }
-  - { platform: copy, source_id:  circuit_8_power, filters: *throttle_avg, name:  "${circuit_name_8}${power_suffix_name}" }
-  - { platform: copy, source_id:  circuit_9_power, filters: *throttle_avg, name:  "${circuit_name_9}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_10_power, filters: *throttle_avg, name: "${circuit_name_10}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_11_power, filters: *throttle_avg, name: "${circuit_name_11}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_12_power, filters: *throttle_avg, name: "${circuit_name_12}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_13_power, filters: *throttle_avg, name: "${circuit_name_13}${power_suffix_name}" }
-  - { platform: copy, source_id: circuit_14_power, filters: *throttle_avg, name: "${circuit_name_14}${power_suffix_name}" }
-  # - { platform: copy, source_id: circuit_15_power, filters: *throttle_avg, name: "${circuit_name_15}${power_suffix_name}" }
-  # - { platform: copy, source_id: circuit_16_power, filters: *throttle_avg, name: "${circuit_name_16}${power_suffix_name}" }
+  # - { platform: copy, source_id:  circuit_1_power, filters: *throttle_avg, name:  "${circuit_name_1} power" }
+  # - { platform: copy, source_id:  circuit_2_power, filters: *throttle_avg, name:  "${circuit_name_2} power" }
+  # - { platform: copy, source_id:  circuit_3_power, filters: *throttle_avg, name:  "${circuit_name_3} power" }
+  # - { platform: copy, source_id:  circuit_4_power, filters: *throttle_avg, name:  "${circuit_name_4} power" }
+  - { platform: copy, source_id:  circuit_5_power, filters: *throttle_avg, name:  "${circuit_name_5} power" }
+  - { platform: copy, source_id:  circuit_6_power, filters: *throttle_avg, name:  "${circuit_name_6} power" }
+  - { platform: copy, source_id:  circuit_7_power, filters: *throttle_avg, name:  "${circuit_name_7} power" }
+  - { platform: copy, source_id:  circuit_8_power, filters: *throttle_avg, name:  "${circuit_name_8} power" }
+  - { platform: copy, source_id:  circuit_9_power, filters: *throttle_avg, name:  "${circuit_name_9} power" }
+  - { platform: copy, source_id: circuit_10_power, filters: *throttle_avg, name: "${circuit_name_10} power" }
+  - { platform: copy, source_id: circuit_11_power, filters: *throttle_avg, name: "${circuit_name_11} power" }
+  - { platform: copy, source_id: circuit_12_power, filters: *throttle_avg, name: "${circuit_name_12} power" }
+  - { platform: copy, source_id: circuit_13_power, filters: *throttle_avg, name: "${circuit_name_13} power" }
+  - { platform: copy, source_id: circuit_14_power, filters: *throttle_avg, name: "${circuit_name_14} power" }
+  # - { platform: copy, source_id: circuit_15_power, filters: *throttle_avg, name: "${circuit_name_15} power" }
+  # - { platform: copy, source_id: circuit_16_power, filters: *throttle_avg, name: "${circuit_name_16} power" }
 
   # Range Power
   - platform: template
-    name: "${circuit_name_1}${power_suffix_name}"
+    name: "${circuit_name_1} power"
     lambda: return id(circuit_1_power).state + id(circuit_2_power).state;
     update_interval: never
     id: range_power
@@ -345,7 +348,7 @@ sensor:
 
   # Range Daily
   - platform: total_daily_energy
-    name: "${circuit_name_1}${daily_suffix_name}"
+    name: "${circuit_name_1} daily"
     power_id: range_power
     accuracy_decimals: 2
     method: left
@@ -355,7 +358,7 @@ sensor:
 
   # Dryer Power
   - platform: template
-    name: "${circuit_name_3}${power_suffix_name}"
+    name: "${circuit_name_3} power"
     lambda: return id(circuit_3_power).state + id(circuit_4_power).state;
     update_interval: never
     id: dryer_power
@@ -366,7 +369,7 @@ sensor:
 
   # Dryer Daily
   - platform: total_daily_energy
-    name: "${circuit_name_3}${daily_suffix_name}"
+    name: "${circuit_name_3} daily"
     power_id: dryer_power
     accuracy_decimals: 2
     method: left
@@ -385,7 +388,7 @@ sensor:
 
   # Mains Total Daily
   - platform: total_daily_energy
-    name: "${total_name}${daily_suffix_name}"
+    name: "${total_name} daily"
     power_id: total_power
     accuracy_decimals: 2
     method: left
@@ -421,7 +424,7 @@ sensor:
 
   # Home Balance Daily
   - platform: total_daily_energy
-    name: "${balance_name}${daily_suffix_name}"
+    name: "${balance_name} daily"
     power_id: balance_power
     accuracy_decimals: 2
     method: left
@@ -430,19 +433,19 @@ sensor:
     unit_of_measurement: "kWh"
 
   # Circuit Daily Energy
-  # - { power_id:  "circuit_1_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_1}${daily_suffix_name}" }
-  # - { power_id:  "circuit_2_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_2}${daily_suffix_name}" }
-  # - { power_id:  "circuit_3_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_3}${daily_suffix_name}" }
-  # - { power_id:  "circuit_4_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_4}${daily_suffix_name}" }
-  - { power_id:  "circuit_5_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_5}${daily_suffix_name}" }
-  - { power_id:  "circuit_6_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_6}${daily_suffix_name}" }
-  - { power_id:  "circuit_7_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_7}${daily_suffix_name}" }
-  - { power_id:  "circuit_8_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_8}${daily_suffix_name}" }
-  - { power_id:  "circuit_9_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_9}${daily_suffix_name}" }
-  - { power_id: "circuit_10_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_10}${daily_suffix_name}" }
-  - { power_id: "circuit_11_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_11}${daily_suffix_name}" }
-  - { power_id: "circuit_12_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_12}${daily_suffix_name}" }
-  - { power_id: "circuit_13_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_13}${daily_suffix_name}" }
-  - { power_id: "circuit_14_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_14}${daily_suffix_name}" }
-  # - { power_id: "circuit_15_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_15}${daily_suffix_name}" }
-  # - { power_id: "circuit_16_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_16}${daily_suffix_name}" }
+  # - { power_id:  "circuit_1_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_1} daily" }
+  # - { power_id:  "circuit_2_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_2} daily" }
+  # - { power_id:  "circuit_3_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_3} daily" }
+  # - { power_id:  "circuit_4_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_4} daily" }
+  - { power_id:  "circuit_5_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_5} daily" }
+  - { power_id:  "circuit_6_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_6} daily" }
+  - { power_id:  "circuit_7_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_7} daily" }
+  - { power_id:  "circuit_8_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_8} daily" }
+  - { power_id:  "circuit_9_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name:  "${circuit_name_9} daily" }
+  - { power_id: "circuit_10_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_10} daily" }
+  - { power_id: "circuit_11_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_11} daily" }
+  - { power_id: "circuit_12_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_12} daily" }
+  - { power_id: "circuit_13_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_13} daily" }
+  - { power_id: "circuit_14_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_14} daily" }
+  # - { power_id: "circuit_15_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_15} daily" }
+  # - { power_id: "circuit_16_power", platform: total_daily_energy, accuracy_decimals: 2, method: left, restore: false, unit_of_measurement: "kWh", filters: [ *throttle_time, multiply: 0.001], name: "${circuit_name_16} daily" }
