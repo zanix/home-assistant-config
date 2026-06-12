@@ -1936,10 +1936,11 @@ views:
                   card_mod:
                     style:
                       .: "{% if is_state(config.entity, \"on\") %}\nha-card:after\
-                        \ {\n  content: \"{{ expand(config.entity) | selectattr('state',\
-                        \ '==', 'on') | list | count }}\";\n  position: absolute;\n\
-                        \  color: var(--amber-color);\n  font-weight: bolder;\n  top:\
-                        \ -2px;\n  right: 2px;\n  font-size: 12px;\n}\n{% endif %}\n"
+                        \ {\n  content: '{{ expand(config.entity) | selectattr(\"\
+                        state\", \"==\", \"on\") | list | count }}';\n  position:\
+                        \ absolute;\n  color: var(--amber-color);\n  font-weight:\
+                        \ bolder;\n  top: -2px;\n  right: 2px;\n  font-size: 12px;\n\
+                        }\n{% endif %}\n"
                   tap_action:
                     action: more-info
                 - type: template
@@ -3259,9 +3260,9 @@ views:
         cards:
           - type: custom:windy-card
             default_mode: map_only
-            metric_temp: default
-            metric_rain: default
-            metric_wind: default
+            metric_temp: °F
+            metric_rain: in
+            metric_wind: mph
             zoom: 7
             overlay: wind
             product: ecmwf
@@ -3926,78 +3927,75 @@ views:
               action: none
       - type: grid
         cards:
-          - type: vertical-stack
+          - type: custom:bubble-card
+            card_type: pop-up
+            hash: '#camera-doorbell'
+            button_type: name
+            name: Doorbell
+            show_icon: false
+            width_desktop: calc(100% - var(--mdc-drawer-width))
+            margin_top_mobile: calc(0px - var(--header-height))
+            modules: []
+            sub_button:
+              main: []
+              bottom: []
+            slider_fill_orientation: left
+            slider_value_position: right
             cards:
-              - type: custom:bubble-card
-                card_type: pop-up
-                hash: '#camera-doorbell'
-                button_type: name
-                name: Doorbell
-                show_icon: false
-                width_desktop: calc(100% - var(--mdc-drawer-width))
-                margin_top_mobile: calc(0px - var(--header-height))
-                modules: []
-                sub_button:
-                  main: []
-                  bottom: []
-                slider_fill_orientation: left
-                slider_value_position: right
-              - type: vertical-stack
-                cards:
-                  - type: custom:advanced-camera-card
-                    cameras:
-                      - camera_entity: camera.doorbell_clear
-                    status_bar:
-                      style: none
-                    menu:
-                      style: outside
-                      position: bottom
-                      buttons:
-                        iris:
-                          enabled: false
-                        live:
-                          enabled: false
-                        clips:
-                          enabled: false
-                        timeline:
-                          enabled: false
-                        media_player:
-                          enabled: false
-                        fullscreen:
-                          alignment: opposing
-                          priority: 10
-                        play:
-                          enabled: true
+              - type: custom:advanced-camera-card
+                cameras:
+                  - camera_entity: camera.doorbell_clear
+                status_bar:
+                  style: none
+                menu:
+                  style: outside
+                  position: bottom
+                  buttons:
+                    iris:
+                      enabled: false
                     live:
-                      draggable: false
-                      preload: true
-                      controls:
-                        builtin: false
-                      lazy_load: false
-                    dimensions:
-                      aspect_ratio_mode: dynamic
-                    performance:
-                      style:
-                        border_radius: false
-                    view: {}
-                  - type: custom:webrtc-camera
-                    ui: true
-                    streams:
-                      - url: doorbell_talk
-                        mode: webrtc
-                        media: audio
-                        name: Listening
-                      - url: doorbell_talk
-                        mode: webrtc
-                        media: audio, microphone
-                        name: Talking
-                    style: '.controls { position: inherit; } .volume { --mdc-icon-size:
-                      32px; padding: 4px 6px; display: flex !important; align-items:
-                      center; } .stream { font-size: 24px; padding: 4px 8px; flex:
-                      1 0 0; } .player { height: 0 } .space, .header, .fullscreen,
-                      .screenshot, .pictureinpicture { display: none }
+                      enabled: false
+                    clips:
+                      enabled: false
+                    timeline:
+                      enabled: false
+                    media_player:
+                      enabled: false
+                    fullscreen:
+                      alignment: opposing
+                      priority: 10
+                    play:
+                      enabled: true
+                live:
+                  draggable: false
+                  preload: true
+                  controls:
+                    builtin: false
+                  lazy_load: false
+                dimensions:
+                  aspect_ratio_mode: dynamic
+                performance:
+                  style:
+                    border_radius: false
+                view: {}
+              - type: custom:webrtc-camera
+                ui: true
+                streams:
+                  - url: doorbell_talk
+                    mode: webrtc
+                    media: audio
+                    name: Listening
+                  - url: doorbell_talk
+                    mode: webrtc
+                    media: audio, microphone
+                    name: Talking
+                style: '.controls { position: inherit; } .volume { --mdc-icon-size:
+                  32px; padding: 4px 6px; display: flex !important; align-items: center;
+                  } .stream { font-size: 24px; padding: 4px 8px; flex: 1 0 0; } .player
+                  { height: 0 } .space, .header, .fullscreen, .screenshot, .pictureinpicture
+                  { display: none }
 
-                      '
+                  '
     badges:
       - type: custom:mushroom-template-badge
         label: Security
@@ -9425,14 +9423,16 @@ views:
                 color_icon: true
               home:
                 color_icon: true
-                secondary_info:
-                  template: ''
                 subtract_individual: false
                 use_metadata: false
               individual:
                 - entity: sensor.emporiavue_sub_total_power
                   name: Sub Panel
                   secondary_info: {}
+                - entity: sensor.emporiavue_sub_furnace_power
+                  name: Furnace
+                  icon: mdi:hvac
+                  display_zero_tolerance: 10
                 - entity: sensor.emporiavue_main_a_c_power
                   name: A/C
                   icon: mdi:air-conditioner
@@ -9442,30 +9442,18 @@ views:
                   name: Range
                   icon: mdi:stove
                   display_zero_tolerance: 10
-                - entity: sensor.emporiavue_sub_furnace_power
-                  name: Furnace
-                  icon: mdi:hvac
-                  display_zero_tolerance: 10
                 - entity: sensor.emporiavue_main_dryer_power
                   name: Dryer
                   icon: mdi:tumble-dryer
                   display_zero_tolerance: 10
             clickable_entities: true
             display_zero_lines:
-              mode: show
+              mode: transparency
               transparency: 50
-              grey_color:
-                - 189
-                - 189
-                - 189
             use_new_flow_rate_model: true
-            w_decimals: 0
-            kw_decimals: 1
-            min_flow_rate: 0.75
-            max_flow_rate: 6
+            base_decimals: 0
             max_expected_power: 2000
             min_expected_power: 0.01
-            watt_threshold: 1000
             transparency_zero_lines: 0
             dashboard_link: /energy
       - type: grid
@@ -11678,6 +11666,7 @@ views:
                           service: browser_mod.popup
                           data:
                             popup_card_id: camera-living
+                            tag: camera
                 - type: grid
                   square: false
                   cards:
@@ -12050,6 +12039,7 @@ views:
                           service: browser_mod.popup
                           data:
                             popup_card_id: camera-family
+                            tag: camera
                 - type: grid
                   square: false
                   cards:
@@ -13858,6 +13848,7 @@ views:
                           service: browser_mod.popup
                           data:
                             popup_card_id: camera-garage
+                            tag: camera
                 - type: heading
                   icon: mdi:lightbulb-group
                   heading: Lights
@@ -16730,7 +16721,7 @@ views:
                     cards:
                       - type: heading
                         icon: mdi:gas-station
-                        heading: Gas Prices
+                        heading: Fill-up Prices
                         heading_style: title
                       - type: markdown
                         card_mod:
@@ -16742,30 +16733,24 @@ views:
                           \ {\n  \"Costco\": states('sensor.costco_regular_gas') |\
                           \ float(3),\n  \"Maverik\": (states('sensor.maverik_regular_gas')\
                           \ | float(3)) - 0.1\n} %} {%- for name, price in stations.items()\
-                          \ -%}\n  {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{\
-                          \ \"${:.2f}\".format(gal_remain * price) }}\n{% endfor %}"
+                          \ -%}\n  {{ name }}: {{ \"${:.2f}\".format(gal_remain *\
+                          \ price) }} @ {{ \"${:.2f}\".format(price) }}/gal\n{% endfor\
+                          \ %}"
                   cards:
-                    - type: custom:auto-entities
-                      filter:
-                        include:
-                          - options:
-                              type: entity
-                            integration: gasbuddy
-                        exclude:
-                          - options: {}
-                            name: '* Updated'
-                          - options: {}
-                            entity_id: '*mid*'
-                          - options: {}
-                            state: unavailable
-                          - options: {}
-                            state: unknown
-                      sort:
-                        method: state
-                      card:
-                        type: custom:layout-card
-                        cards: []
-                        layout_type: masonry
+                    - type: custom:gasbuddy-card
+                      default_mode: gas
+                      device_id: ba4cc0d5203e0ef611759d784f951844
+                      show_trend_indicator: true
+                      compact: true
+                      show_fuel_types:
+                        - regular_gas
+                    - type: custom:gasbuddy-card
+                      device_id: ffe0f6c9afd56c18336075064fc31c54
+                      default_mode: gas
+                      show_trend_indicator: true
+                      compact: true
+                      show_fuel_types:
+                        - regular_gas
                 - type: map
                   entities:
                     - entity: device_tracker.ascent
@@ -17438,33 +17423,27 @@ views:
                         content: "{%- set level = states('sensor.kona_fuel_level')\
                           \ | float(100) -%} {%- set capacity = 13.2 -%} {%- set gal_remain\
                           \ = (100 - level) / 100 * capacity -%} {% set stations =\
-                          \ {\n  \"Costco\": states('sensor.costco_regular_gas') |\
+                          \ {\n  \"Costco\": states('sensor.costco_premium_gas') |\
                           \ float(3),\n  \"Maverik\": (states('sensor.maverik_midgrade_gas')\
                           \ | float(3)) - 0.1\n} %} {%- for name, price in stations.items()\
-                          \ -%}\n  {{ name }}: {{ \"${:.2f}\".format(price) }} ⸱ {{\
-                          \ \"${:.2f}\".format(gal_remain * price) }}\n{% endfor %}"
+                          \ -%}\n  {{ name }}: {{ \"${:.2f}\".format(gal_remain *\
+                          \ price) }} @ {{ \"${:.2f}\".format(price) }}/gal\n{% endfor\
+                          \ %}"
                   cards:
-                    - type: custom:auto-entities
-                      filter:
-                        include:
-                          - options:
-                              type: entity
-                            integration: gasbuddy
-                        exclude:
-                          - options: {}
-                            name: '* Updated'
-                          - options: {}
-                            entity_id: '*maverik_regular*'
-                          - options: {}
-                            state: unavailable
-                          - options: {}
-                            state: unknown
-                      sort:
-                        method: state
-                      card:
-                        type: custom:layout-card
-                        cards: []
-                        layout_type: masonry
+                    - type: custom:gasbuddy-card
+                      default_mode: gas
+                      device_id: ba4cc0d5203e0ef611759d784f951844
+                      show_trend_indicator: true
+                      compact: true
+                      show_fuel_types:
+                        - premium_gas
+                    - type: custom:gasbuddy-card
+                      device_id: ffe0f6c9afd56c18336075064fc31c54
+                      default_mode: gas
+                      show_trend_indicator: true
+                      compact: true
+                      show_fuel_types:
+                        - midgrade_gas
                 - type: map
                   entities:
                     - entity: device_tracker.kona_location

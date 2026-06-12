@@ -483,7 +483,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>39 Dashboard Plugins</summary>
+<details><summary>40 Dashboard Plugins</summary>
 
 ### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.27.4]
 
@@ -532,6 +532,10 @@ Expander card for HomeAssistant
 ### [Fold Entity Row](https://github.com/thomasloven/lovelace-fold-entity-row) [v.2.3.2]
 
 🔹 A foldable row for entities card, containing other rows
+
+### [Gasbuddy Card](https://github.com/firstof9/gasbuddy-card) [v1.5.0]
+
+Home Assistant custom Lovelace card for the GasBuddy integration displaying gas prices and EV charging station data.
 
 ### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.10]
 
