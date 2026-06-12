@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5442 |
-| Sensors        | 1758 |
-| Binary Sensors | 378 |
+| All Entities   | 5530 |
+| Sensors        | 1778 |
+| Binary Sensors | 381 |
 | Lights         | 77 |
-| Switches       | 783 |
+| Switches       | 789 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -307,7 +307,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.7.2]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.7.4]
 
 Automatically update Home Assistant blueprints via native update entities
 
@@ -341,7 +341,7 @@ Home Assistant integration for Dreame robot vacuums with map support
 
 Authors: [@tasshack](https://github.com/tasshack).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.3]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.4]
 
 Frigate integration for Home Assistant
 
@@ -395,13 +395,13 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.3.6]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.4.0]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.3.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.3.1]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -413,7 +413,7 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.2]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.3]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -449,19 +449,19 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.14]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.16]
 
 Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v7.4.1]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v7.4.2]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.6.0]
+### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.6.1]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
@@ -509,7 +509,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.2.2]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.2.3]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -525,7 +525,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.1.3]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.1.5]
 
 Expander card for HomeAssistant
 
@@ -633,7 +633,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.8.0]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.9.0]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
