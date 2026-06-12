@@ -1,0 +1,450 @@
+blueprint:
+  name: Manual Control Status Tracker
+  description: >
+    # ⏹️ Manual Control Status Tracker
+    
+    **Version: 1.1**
+
+
+    🤔🔛 Who's in Control: Track the Entity, Know the Source.
+    
+    
+    **If you like my blueprints, and would like to show your support or just say thank you?** [Click Here](https://www.paypal.com/donate/?hosted_button_id=WAZS3QSDTPGA8) 🙂
+    
+    
+    <details>
+    <summary><b>The Automation Process:</b> 👈</summary>
+
+
+    - **Manual Tracking:**
+      - Monitors the selected **Target Entities** for manual actions (ON, OFF, brightness, colour, effect, etc.).
+      - Updates the **Manual Control Tracker - Toggle Helper** when a manual change is detected.
+      - Ignores automation-driven changes such as scripts or scenes (if configured).
+
+    - **Manual ON Action:**
+      - Choose what happens when a **Target Entity** is manually turned ON, or select Do Nothing.
+
+    - **Manual OFF Action:**
+      - Choose what happens when a **Target Entity** is manually turned ON, OFF, or select Do Nothing.
+
+    - **Light Control Option:**
+      - Optionally include brightness, colour temperature, RGB, RGBW, RGBWW, or effect changes as manual actions.
+
+    - **Sync Option:**
+      - When enabled, turning OFF any one **Target Entity** will automatically turn OFF all other Target Entities.
+
+    - **Script & Scene Option:**
+      - Prevents misidentifying automation-driven changes as manual when scripts or scenes run shortly before a Target Entity changes.
+
+    - **Auto OFF Options:**
+      - Automatically turns OFF the **Target Entities** and/or the **Manual Control Tracker - Toggle Helper**.
+      - The time delay starts from the last manual change, not just from when the entity was first turned ON.
+    </details>
+
+
+    Need help? 
+
+    - FAQ: [Click Here](https://community.home-assistant.io/t/826502/2)
+  
+    - Community Support Including Updates: [Click Here](https://community.home-assistant.io/t/826502)
+
+
+    Required = *
+  domain: automation
+  input:
+    trigger:
+      name: "Target Entities *"
+      icon: mdi:cog-outline
+      collapsed: true
+      input:
+        target_entities:
+          name: Target Entities To Track *
+          description: >
+            Select the entities to monitor and determine if they are manually changed according to the available options below.
+            These entities will be tracked specifically for manual actions, distinguishing them from automation-driven changes.
+
+
+            Typically, these are lights, switches, or fans used in one of my other blueprints, allowing you to disable automations or trigger particular options.
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                domain: 
+                  - light
+                  - switch
+        manual_on_action:
+          name: Manual ON Action
+          description: >
+            Choose what will happen to the selected **Manual Control Tracker** when any **Target Entity** is manually turned ON.
+          default: turn_tracker_on
+          selector:
+            select:
+              options:
+                - label: Turn Manual Control Tracker ON
+                  value: turn_tracker_on
+                - label: Do nothing
+                  value: do_nothing
+        manual_off_action:
+          name: Manual OFF Action
+          description: >
+            Choose what will happen to the selected **Manual Control Tracker** when any **Target Entity** is manually turned OFF.
+          default: turn_tracker_off
+          selector:
+            select:
+              options:
+                - label: Turn Manual Control Tracker ON
+                  value: turn_tracker_on
+                - label: Turn Manual Control Tracker OFF
+                  value: turn_tracker_off
+                - label: Do nothing
+                  value: do_nothing
+        include_light_control_state_changes:
+          name: Light Control State Changes Option (Optional)
+          description: >
+            Choose whether to consider any manual light control actions, including brightness, colour temperature, RGB, RGBW, RGBWW or effects changes, when evaluating the **Target Entities**.
+          default: disable_light_control_state_changes
+          selector:
+            select:
+              options:
+                - label: Enable Light Control State Changes
+                  value: enable_light_control_state_changes
+                - label: Disable Light Control State Changes
+                  value: disable_light_control_state_changes
+        sync_target_entities_off:
+          name: Sync Target Entities Off Option (Optional)
+          description: >
+            Enable this option to automatically turn OFF all Target Entities when any single Target Entity is turned OFF manually.
+            Useful when using multiple Target Entities together so they turn OFF together.
+          default: disable_sync_target_entities_off
+          selector:
+            select:
+              options:
+                - label: Enable Sync Target Entities Off
+                  value: enable_sync_target_entities_off
+                - label: Disable Sync Target Entities Off
+                  value: disable_sync_target_entities_off
+    tracker:
+      name: "Tracker Helper *"
+      icon: mdi:radar
+      collapsed: true
+      input:
+        manual_tracking:
+          name: Manual Control Tracker - Toggle Helper *
+          description: >
+            Select the entity to update when a **Target Entity** is manually changed, reflecting the manual control state.
+
+
+            This is typically a toggle helper used in the bypass of one of my other blueprints (commonly used in Option 3).
+          default: []
+          selector:
+            entity:
+              filter:
+                domain:
+                  - input_boolean
+        manual_tracking_time_delay:
+          name: Manual Control Tracker - Toggle Helper Time Delay
+          description: >
+            This sets how long the **Manual Control Tracker - Toggle Helper** will remain ON after you manually turn OFF a **Target Entity**.
+
+
+            This delay is useful when the helper is used as a bypass in one of my other blueprints, giving you time to leave the room (and let the motion sensor clear) before the helper turns OFF.
+            It helps prevent the lights from turning back ON unexpectedly.
+
+
+            ⚠️ **Note** - Applies only when **Turn Manual Control Tracker OFF** is selected in the **Manual OFF Action** input.
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 120
+              step: 1
+              unit_of_measurement: seconds
+    scripts:
+      name: "Scripts & Scenes"
+      icon: mdi:script-text-play-outline
+      collapsed: true
+      input:
+        include_script_scene:
+          name: Script or Scene Option (Optional)
+          description: >
+            Choose whether to consider recent script or scene activity when tracking manual control.
+            When enabled, the blueprint will check if any of the selected scripts or scenes were run shortly before a Target Entity was manually changed.
+            This helps prevent automation-driven changes from being falsely identified as manual actions.
+          default: disable_script_scene
+          selector:
+            select:
+              options:
+                - label: Enable Scripts & Scenes
+                  value: "enable_script_scene"
+                - label: Disable Scripts & Scenes
+                  value: "disable_script_scene"
+        script_or_scene:
+          name: Script & Scenes
+          description: >
+            Select any scripts or scenes that may change the state of the Target Entities.
+            These will be monitored for recent activity to help the blueprint distinguish between manual actions and automation-driven changes.
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                domain:
+                  - script
+                  - scene
+    auto_off:
+      name: "Auto OFF"
+      icon: mdi:refresh-auto
+      collapsed: true
+      input:
+        include_auto_off:
+          name: Auto OFF Option (Optional)
+          description: >
+            Choose whether to use the Auto OFF option and which entities it should affect.
+          default: disable_auto_off
+          selector:
+            select:
+              options:
+                - label: Enable Auto OFF - Target Entity & Toggle Helper
+                  value: "enable_all_auto_off"
+                - label: Enable Auto OFF - Toggle Helper
+                  value: "enable_manual_tracking_auto_off"
+                - label: Disable Auto OFF
+                  value: "disable_auto_off"
+        time_delay:
+          name: Auto OFF - Time Delay
+          description: >
+            Determines how long the selected entities will remain ON after the last manual change before being automatically turned OFF.
+            This includes manual ON/OFF actions or attribute changes such as brightness, color, or other adjustments.
+          default: 10
+          selector:
+            number:
+              min: 0
+              max: 60
+              step: 0.5
+              unit_of_measurement: minutes
+
+mode: restart
+max_exceeded: silent
+
+variables:
+  target_entities: !input target_entities
+  manual_on_action: !input manual_on_action
+  manual_off_action: !input manual_off_action
+  include_light_control_state_changes: !input include_light_control_state_changes
+  sync_target_entities_off: !input sync_target_entities_off
+  manual_tracking: !input manual_tracking
+  manual_tracking_time_delay: !input manual_tracking_time_delay
+  include_script_scene: !input include_script_scene
+  script_or_scene: !input script_or_scene
+  include_auto_off: !input include_auto_off
+  time_delay: !input time_delay
+
+  target_entities_on: >-
+    {{ expand(target_entities)
+      | selectattr('state', 'eq', 'on')
+      | map(attribute='entity_id')
+      | list }}
+
+triggers:
+  - trigger: state
+    entity_id: !input target_entities
+    from: "off"
+    to: "on"
+    id: "t1"
+  - trigger: state
+    entity_id: !input target_entities
+    from: "on"
+    to: "off"
+    id: "t2"
+  - trigger: state
+    entity_id: !input target_entities
+    id: "t3"
+
+# All Conditions
+condition:
+#Trigger conditions
+  - condition: or
+    conditions:
+      - condition: and # trigger from off to on manualy
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.id == 't1' and trigger.to_state.context.parent_id is none }}"
+          - condition: template
+            value_template: "{{ manual_on_action == 'turn_tracker_on' }}"
+          - condition: template
+            value_template: >-
+              {% if include_script_scene == 'enable_script_scene' %}
+                {% set threshold = 2 %}
+                {% set recent = namespace(found=false) %}
+                {% for entity_id in script_or_scene %}
+                  {% set state_obj = states[entity_id] %}
+                  {% if state_obj is not none %}
+                    {% set diff = (now() - state_obj.last_changed).total_seconds() %}
+                    {% if diff <= threshold %}
+                      {% set recent.found = true %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {{ not recent.found }}
+              {% else %}
+                true
+              {% endif %}
+      - condition: and # trigger change of state manualy
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.id == 't3' and trigger.to_state.context.parent_id is none }}"
+          - condition: template
+            value_template: "{{ include_light_control_state_changes == 'enable_light_control_state_changes' }}"
+          - condition: template
+            value_template: >-
+              {% set from_attrs = trigger.from_state.attributes if trigger.from_state else {} %}
+              {% set to_attrs = trigger.to_state.attributes if trigger.to_state else {} %}
+              {% if trigger.from_state.state == 'on' and trigger.to_state.state == 'on' %}
+                {{ 
+                  from_attrs.brightness != to_attrs.brightness
+                  or from_attrs.color_temp != to_attrs.color_temp
+                  or from_attrs.rgb_color != to_attrs.rgb_color
+                  or from_attrs.rgbw_color != to_attrs.rgbw_color
+                  or from_attrs.rgbww_color != to_attrs.rgbww_color
+                  or from_attrs.effect != to_attrs.effect
+                }}
+              {% else %}
+                false
+              {% endif %}
+          - condition: template
+            value_template: >-
+              {% if include_script_scene == 'enable_script_scene' %}
+                {% set threshold = 2 %}
+                {% set recent = namespace(found=false) %}
+                {% for entity_id in script_or_scene %}
+                  {% set state_obj = states[entity_id] %}
+                  {% if state_obj is not none %}
+                    {% set diff = (now() - state_obj.last_changed).total_seconds() %}
+                    {% if diff <= threshold %}
+                      {% set recent.found = true %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {{ not recent.found }}
+              {% else %}
+                true
+              {% endif %}
+      - condition: and # trigger from on to off manualy
+        conditions:
+          - condition: template
+            value_template: "{{ trigger.id == 't2' and trigger.to_state.context.parent_id is none }}"
+          - condition: template
+            value_template: "{{ (manual_off_action == 'turn_tracker_on') or (manual_off_action == 'turn_tracker_off') }}"
+          - condition: template
+            value_template: >-
+              {% if include_script_scene == 'enable_script_scene' %}
+                {% set threshold = 2 %}
+                {% set recent = namespace(found=false) %}
+                {% for entity_id in script_or_scene %}
+                  {% set state_obj = states[entity_id] %}
+                  {% if state_obj is not none %}
+                    {% set diff = (now() - state_obj.last_changed).total_seconds() %}
+                    {% if diff <= threshold %}
+                      {% set recent.found = true %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+                {{ not recent.found }}
+              {% else %}
+                true
+              {% endif %}
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: 
+              - 't1'
+              - 't3'
+        sequence:
+          - action: homeassistant.turn_on
+            target:
+              entity_id: !input manual_tracking
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ include_auto_off == 'enable_all_auto_off' }}"
+                sequence:
+                  - delay: 
+                      minutes: !input time_delay
+                  - action: homeassistant.turn_off
+                    target:
+                      entity_id: "{{ target_entities_on }}"
+                  - action: homeassistant.turn_off
+                    target:
+                      entity_id: !input manual_tracking
+              - conditions:
+                  - condition: template
+                    value_template: "{{ include_auto_off == 'enable_manual_tracking_auto_off' }}"
+                sequence:
+                  - delay: 
+                      minutes: !input time_delay
+                  - action: homeassistant.turn_off
+                    target:
+                      entity_id: !input manual_tracking
+      - conditions:
+          - condition: trigger
+            id: 't2'
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ manual_off_action == 'turn_tracker_on' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ sync_target_entities_off == 'enable_sync_target_entities_off'}}"
+                        sequence:
+                          - action: homeassistant.turn_off
+                            target:
+                              entity_id: "{{ target_entities_on }}"
+                  - action: homeassistant.turn_on
+                    target:
+                      entity_id: !input manual_tracking
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ include_auto_off == 'enable_all_auto_off' }}"
+                        sequence:
+                          - delay: 
+                              minutes: !input time_delay
+                          - action: homeassistant.turn_off
+                            target:
+                              entity_id: "{{ target_entities_on }}"
+                          - action: homeassistant.turn_off
+                            target:
+                              entity_id: !input manual_tracking
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ include_auto_off == 'enable_manual_tracking_auto_off' }}"
+                        sequence:
+                          - delay: 
+                              minutes: !input time_delay
+                          - action: homeassistant.turn_off
+                            target:
+                              entity_id: !input manual_tracking
+              - conditions:
+                  - condition: template
+                    value_template: "{{ manual_off_action == 'turn_tracker_off' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ sync_target_entities_off == 'enable_sync_target_entities_off'}}"
+                        sequence:
+                          - action: homeassistant.turn_off
+                            target:
+                              entity_id: "{{ target_entities_on }}"
+                  - alias: "Wait the number of seconds set in the manual tracking time delay"
+                    delay:
+                      seconds: !input manual_tracking_time_delay
+                  - action: homeassistant.turn_off
+                    target:
+                      entity_id: !input manual_tracking
