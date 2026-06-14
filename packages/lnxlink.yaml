@@ -66,6 +66,19 @@ script:
                 value: Erebus
               - label: Cartago
                 value: cartago
+      notification_type:
+        name: Notification type
+        description: >-
+          Send or clear notification
+        default: notify
+        selector:
+          select:
+            mode: dropdown
+            options:
+              - value: notify
+                label: Send notification
+              - value: clear_notification
+                label: Remove notifications with a tag
       title:
         name: 'Title'
         example: 'Startup: Home Assistant is Up and Running!'
@@ -74,18 +87,25 @@ script:
       message:
         name: 'Message'
         example: 'Message text'
-        required: true
         selector:
           text:
             multiline: true
+      tag:
+        name: 'Tag'
+        description: >-
+          Unique tag for the notification. For updating/replacing or clearing
+          specific notifications.
+        example: 'tag'
+        selector:
+          text:
       icon:
-        name: Icon
-        example: local/icons/home-assistant.png
+        name: 'Icon'
+        example: 'local/icons/home-assistant.png'
         selector:
           text:
       image:
         name: 'Image'
-        description: Overrides icon when used.
+        description: 'Overrides icon when used.'
         example: 'local/image.png'
         selector:
           text:
@@ -97,9 +117,9 @@ script:
           entity:
             domain: camera
       sound:
-        name: Sound
-        description: Local or Publicly available URL for a sound to play with the notification.
-        example: local/sound.wav
+        name: 'Sound'
+        description: 'Local or Publicly available URL for a sound to play with the notification.'
+        example: 'local/sound.wav'
         selector:
           text:
       actions:
@@ -128,22 +148,24 @@ script:
               - low
               - critical
       enable_debug:
-        name: Enable debug output?
+        name: 'Enable debug output?'
         selector:
           constant:
             value: true
-            label: Enabled
+            label: 'Enabled'
 
     sequence:
       - alias: Set local variables for reuse in this script.
         variables:
           debug: "{{ iif(enable_debug is defined, enable_debug, false) }}"
+          notification_type: "{{ notification_type | default('notify') }}"
           payload:
             title: "{{ title | default('', true) }}"
             message: "{{ message | default('', true) }}"
             urgency: '{{ importance | default("normal") }}'
             timeout: '{{ (duration | default(5)) * 1000 }}'
             buttons: "{{ actions | default(none, true) }}"
+            uniqueid: "{{ tag | default(none, true) }}"
             sound: |-
               {%- if sound is string -%}
                 {%- if sound.startswith("http") -%}
@@ -155,6 +177,12 @@ script:
                 {{ none }}
               {%- endif -%}
           payload_data: |-
+            {%- if notification_type == 'clear_notification' -%}
+              {%- set payload = {
+                "action": "close",
+                "uniqueid": tag | default(none, true)
+              } -%}
+            {%- endif -%}
             {%- set _ = namespace(data={}) -%}
             {%- for k, v in payload.items() -%}
               {%- if not v == None -%}
@@ -193,8 +221,8 @@ script:
               message: |-
                 computer: {{ computer }}
                 payload: {{ payload_data }}
-                icon_path: {{ icon_path }} ({{ icon }})
-                image_path: {{ image_path }} ({{ image }})
+                icon_path: {{ icon_path }}{%- if icon -%} ({{ icon }}){%- endif %}
+                image_path: {{ image_path }}{%- if image -%} ({{ image }}){%- endif %}
                 camera: {{ camera }}
 
       - alias: Loop through computer list
@@ -207,10 +235,11 @@ script:
                     - condition: template
                       value_template: "{{ camera is string }}"
                   sequence:
-                    - action: mqtt.publish
+                    - action: notify.send_message
+                      target:
+                        entity_id: 'notify.{{ repeat.item | lower }}'
                       data:
-                        topic: lnxlink/{{ repeat.item | lower }}/commands/notify
-                        payload: |-
+                        message: |-
                           {%- set data = dict(payload_data, **{
                             "iconUrl": state_attr("sensor.hass_config", "internal_url") ~ state_attr(camera, "entity_picture"),
                           }) -%}
@@ -221,10 +250,11 @@ script:
                     - condition: template
                       value_template: "{{ image is string }}"
                   sequence:
-                    - action: mqtt.publish
+                    - action: notify.send_message
+                      target:
+                        entity_id: 'notify.{{ repeat.item | lower }}'
                       data:
-                        topic: lnxlink/{{ repeat.item | lower }}/commands/notify
-                        payload: |-
+                        message: |-
                           {%- set data = dict(payload_data, **{
                             "iconUrl": image_path,
                           }) -%}
@@ -233,10 +263,11 @@ script:
               # Send a basic notification message.
               default:
                 - alias: Send a basic, link, or actionable notification message.
-                  action: mqtt.publish
+                  action: notify.send_message
+                  target:
+                    entity_id: 'notify.{{ repeat.item | lower }}'
                   data:
-                    topic: lnxlink/{{ repeat.item | lower }}/commands/notify
-                    payload: |-
+                    message: |-
                       {%- set data = dict(payload_data, **{
                         "iconUrl": icon_path | default(state_attr("sensor.hass_config", "internal_url") ~ "/local/icons/home-assistant.png", true),
                       }) -%}
