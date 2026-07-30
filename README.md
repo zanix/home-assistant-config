@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5480 |
-| Sensors        | 1728 |
-| Binary Sensors | 381 |
-| Lights         | 77 |
-| Switches       | 792 |
+| All Entities   | 5470 |
+| Sensors        | 1729 |
+| Binary Sensors | 378 |
+| Lights         | 76 |
+| Switches       | 786 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -295,7 +295,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 <details><summary>32 Custom Integrations</summary>
 
-### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.30.1]
+### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.31.0]
 
 Adaptive Lighting custom component for Home Assistant
 
@@ -307,13 +307,13 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.9.1]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.10.2]
 
-Automatically update Home Assistant blueprints via native update entities
+Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.0.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.1.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -323,7 +323,7 @@ Bubble Card Tools is a custom integration that handles the Bubble Card backend. 
 
 Authors: [@Clooos](https://github.com/Clooos).
 
-### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.0.7]
+### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.5.0]
 
 ☑️ ChoreOps - A sophisticated household task and routine manager for Home Assistant. Gamify your chores for motivation, or just ensure the trash gets taken out on time.
 
@@ -347,13 +347,13 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.3.0]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.5.0]
 
 Component to integrate with GasBuddy fuel price tracker.
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2026.2.1]
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2026.6.0]
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
@@ -371,7 +371,7 @@ Home Assistant Google Home custom component
 
 Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://github.com/DurgNomis-drol), [@ArnyminerZ](https://github.com/ArnyminerZ), [@KapJI](https://github.com/KapJI).
 
-### [Gui Recorder](https://github.com/ideaalab/gui-recorder) [v0.8.34]
+### [Gui Recorder](https://github.com/ideaalab/gui-recorder) [v0.8.35]
 
 Home Assistant custom component: manage recorder config and DB maintenance from a sidebar GUI panel (SQLite only)
 
@@ -401,13 +401,13 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.5.2]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.5.3]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.5.2]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.8.1]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -419,7 +419,7 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.7]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.19]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -431,13 +431,13 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa](https://github.com/timniklas/hass-neakasa) [v1.2.1]
+### [Neakasa](https://github.com/tabascoz/hass-neakasa) [v1.3.0]
 
-Home Assistant Neakasa Integration
+Neakasa Integration for Home Assistant
 
-Authors: [@timniklas](https://github.com/timniklas).
+Authors: [@tabascoz](https://github.com/tabascoz).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.5.5]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.6.0]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -455,13 +455,13 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.23]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.25]
 
 Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v7.6.1]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v7.7.1]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
@@ -515,7 +515,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.2.4]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.2.5]
 
 Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
 
@@ -527,11 +527,11 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.9.4]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.10.5]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.1.7]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.1.11]
 
 Expander card for HomeAssistant
 
@@ -539,11 +539,11 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gasbuddy Card](https://github.com/firstof9/gasbuddy-card) [v1.5.0]
+### [Gasbuddy Card](https://github.com/firstof9/gasbuddy-card) [v1.5.2]
 
 Home Assistant custom Lovelace card for the GasBuddy integration displaying gas prices and EV charging station data.
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.11]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.12]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -555,7 +555,7 @@ Bring new life to Home Assistant. By mapping entities to a SVG-object, you're ab
 
 A card for Home Assistant Lovelace for exploring the history of your entities interactively and in real time.
 
-### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.4.0]
+### [Horizon Card](https://github.com/rejuvenate/lovelace-horizon-card) [v1.5.3]
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
@@ -567,7 +567,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v14.0.1]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v14.0.2]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -575,7 +575,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.17]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.21]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -643,7 +643,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.11.1]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.11.2]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
@@ -653,11 +653,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 ---
 
-</details><details><summary>2 Themes</summary>
-
-### [HA LCARS](https://github.com/th3jesta/ha-lcars) [vHA-LCARS-4.0.2]
-
-LCARS theme for Home Assistant
+</details><details><summary>1 Themes</summary>
 
 ### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.14]
 
@@ -885,7 +881,7 @@ Material Design 3 Theme for Home Assistant
 - 📱 MagicMirror Dim at Sunset
 - 📱 MagicMirror On/Off Presence
 - 📱 MagicMirror On/Off Schedule
-- 📱 MagicMirror Recover Disconnect
+- 📱 MagicMirror Recover Disconnect 🚫
 - 🔒 Door Lock Jammed
 - 🔒 Lock Doors when Away
 - 🔔 Doorbell Object or Ring
@@ -906,7 +902,7 @@ Material Design 3 Theme for Home Assistant
 - 🚦 Emma Light Switch Status
 - 🚦 Ethan Light Switch Status
 - 🚦 Garage Entry Light Switch Status
-- 🚦 Garage Light Switch Status
+- 🚦 Garage Light Switch Status 🚫
 - 🚦 Joshua Office Light Switch Status 🚫
 - 🚦 Outside Entry Light Switch Status
 - 🤖 Robot Vacuum Error
@@ -932,7 +928,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.6.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.7.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
