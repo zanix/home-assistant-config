@@ -3,7 +3,7 @@ blueprint:
   description: >
     # 🚿 Bathroom Humidity Exhaust Fan
 
-    **Version: 2.6**
+    **Version: 2.7**
 
 
     Step into the future of freshness - customize it your way and experience the convenience of automated humidity control! 🌿🚿
@@ -45,6 +45,9 @@ blueprint:
       - **Automation Link Option:**
           - This feature simplifies the process of automatically disabling your other automations by providing an automation linking mechanism.
 
+      - **Operating Hours Option:**
+          - This allows you to restrict automatic operation of the automation to the selected times and days. The manual trigger, manual fan switch and bypass will still work outside the operating hours.
+
       - **Bypass Functionality Option:**
           - This allows you to bypass the automation, offering manual control and additional customization capabilities.
 
@@ -67,7 +70,6 @@ blueprint:
 
     Required = *
   domain: automation
-  author: Blackshome
   input:
     trigger_settings:
       name: "Auto Triggers *"
@@ -684,6 +686,72 @@ blueprint:
               max: 40
               step: 0.5
               unit_of_measurement: minutes
+    operating_hours:
+      name: "Operating Hours"
+      icon: mdi:clock-outline
+      collapsed: true
+      input:
+        include_operating_hours:
+          name: Operating Hours (Optional)
+          description: >
+            Restrict the automation to only run between the start and end times on the selected days.
+
+
+            The operating hours only apply to automatic operation.
+            The manual trigger, manual fan switch and bypass will still work outside the selected times, allowing you to manually run the fan when needed.
+          default: operating_hours_disabled
+          selector:
+            select:
+              options:
+                - label: Enable operating hours
+                  value: "operating_hours_enabled"
+                - label: Disable operating hours
+                  value: "operating_hours_disabled"
+        operating_hours_start_time:
+          name: Start Time
+          description: >
+            Set the operating hours start time.
+          default: 00:00:00
+          selector:
+            time:
+        operating_hours_end_time:
+          name: End Time
+          description: >
+            Set the operating hours end time.
+          default: 00:00:00
+          selector:
+            time:
+        operating_hours_days:
+          name: Days
+          description: >
+            Select the days the operating hours will apply to.
+          default:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+          selector:
+            select:
+              multiple: true
+              mode: list
+              options:
+                - label: Monday
+                  value: "mon"
+                - label: Tuesday
+                  value: "tue"
+                - label: Wednesday
+                  value: "wed"
+                - label: Thursday
+                  value: "thu"
+                - label: Friday
+                  value: "fri"
+                - label: Saturday
+                  value: "sat"
+                - label: Sunday
+                  value: "sun"
     bypass_settings:
       name: "Bypass"
       icon: mdi:cog-pause-outline
@@ -751,6 +819,7 @@ blueprint:
               max: 240
               step: 1
               unit_of_measurement: minutes
+  source_url: https://gist.github.com/Blackshome/8e09a8213b834f1be4ab49ba880abed8
 
 mode: restart
 max_exceeded: silent
@@ -804,6 +873,10 @@ variables:
   include_bypass: !input include_bypass
   by_pass: !input by_pass
   bypass_options: !input bypass_options
+  include_operating_hours: !input include_operating_hours
+  operating_hours_start_time: !input operating_hours_start_time
+  operating_hours_end_time: !input operating_hours_end_time
+  operating_hours_days: !input operating_hours_days
   include_bypass_auto_off: !input include_bypass_auto_off
   bypass_auto_off_delay: !input bypass_auto_off_delay
 
@@ -1042,6 +1115,25 @@ condition:
             id:
               - 't8'
           - "{{ (include_manual_trigger == 'enable_manual_trigger') or (include_manual_trigger == 'enable_manual_trigger_time_delay') }}"
+
+# Check The Operating Hours
+  - condition: or
+    conditions:
+      - "{{ include_operating_hours == 'operating_hours_disabled' }}"
+      - condition: and
+        conditions:
+          - "{{ include_operating_hours == 'operating_hours_enabled' }}"
+          - condition: time
+            after: !input operating_hours_start_time
+            before: !input operating_hours_end_time
+            weekday: !input operating_hours_days
+      - condition: trigger
+        id:
+          - 't2'
+          - 't5'
+          - 't6'
+          - 't7'
+          - 't8'
 
 # Check Humidity Derivative Sensor By-pass
   - condition: or
