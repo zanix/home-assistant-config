@@ -756,7 +756,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>150 Automations</summary>
+<details><summary>151 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -817,10 +817,12 @@ Material Design 3 Theme for Home Assistant
 - 🐱 Cat Litterbox Full
 - 🐱 Cat Litterbox Litter Low
 - 💡 All Lights off when Away
+- 💡 Cold Storage Room Light
 - 💡 Dim Front Lights at Night
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps on/off
+- 💡 Outside Lights Off Daytime
 - 💡 School Departure Light Indicator 🚫
 - 💡 Turn Lights On when Arrive
 - 💦 Basement Bathroom Humidity Exhaust Fan
@@ -865,10 +867,10 @@ Material Design 3 Theme for Home Assistant
 - 📋 [Inovelli] Ethan Switch
 - 📋 [Inovelli] Family Room Aux Switch
 - 📋 [Inovelli] Family Room Switch
-- 📋 [Inovelli] Garage Switch
 - 📋 [Inovelli] Joshua Office Switch
 - 📋 [Inovelli] Living Room Fan Light Switch
 - 📋 [Inovelli] Main Bedroom Switch
+- 📋 [Inovelli] Outside Garage Switch
 - 📋 [Sensor Light] Basement Hallway
 - 📍 Itinerary Tracker Notification
 - 📦 Clear Packages Out for Delivery
@@ -881,7 +883,7 @@ Material Design 3 Theme for Home Assistant
 - 📱 MagicMirror Dim at Sunset
 - 📱 MagicMirror On/Off Presence
 - 📱 MagicMirror On/Off Schedule
-- 📱 MagicMirror Recover Disconnect 🚫
+- 📱 MagicMirror Recover Disconnect
 - 🔒 Door Lock Jammed
 - 🔒 Lock Doors when Away
 - 🔔 Doorbell Object or Ring
@@ -901,10 +903,9 @@ Material Design 3 Theme for Home Assistant
 - 🚦 Amy Office Light Switch Status 🚫
 - 🚦 Emma Light Switch Status
 - 🚦 Ethan Light Switch Status
-- 🚦 Garage Entry Light Switch Status
-- 🚦 Garage Light Switch Status 🚫
 - 🚦 Joshua Office Light Switch Status 🚫
 - 🚦 Outside Entry Light Switch Status
+- 🚦 Outside Garage Light Switch Status
 - 🤖 Robot Vacuum Error
 - 🧺 Dryer Notifications
 - 🧺 Washer Notifications

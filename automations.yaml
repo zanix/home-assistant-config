@@ -898,7 +898,6 @@
       | lower)) | list | count > 0 }}
 
       '
-    enabled: true
   - condition: template
     value_template: '{{ not [''.automation_script_fail_detector''] | select(''in'',
       trigger.event.data.name | lower) | list }}'
@@ -976,57 +975,62 @@
     not_to:
     - unavailable
     - unknown
-  conditions: []
+  conditions:
+  - alias: Triggers are available
+    condition: template
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n   and
+      not trigger.to_state.attributes in ['unknown', 'unavailable', none]\n}}"
   actions:
   - variables:
       devices: '{{ trigger.to_state.state | int(default=0) }}'
       title: Low Battery Level{{ iif(devices > 1, 's', '') }} ({{ devices }})
-      sensors: "{% if not trigger.to_state.state in ['unknown', 'unavailable', none]
-        %}\n  {% set result = namespace(sensors=[]) %}\n  {% for entity in trigger.to_state.attributes.entity_id
-        %}\n    {% set device = states.sensor[entity.split('.')[1]] %}\n    {% set
-        name = device.name | replace(':', '') | regex_replace(find = ' battery level',
-        replace = '', ignorecase = true) %}\n    {% set result.sensors = result.sensors
-        + [name ~ ' (' ~ device.state | round ~ '%)'] %}\n  {% endfor %}\n{% endif
-        %}\n{{ result.sensors }}"
-  - if:
-    - condition: template
-      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
-        | int(default=0)) > 0 }}"
-    then:
-    - parallel:
-      - data:
-          notification_id: low-battery-alert
-        action: persistent_notification.dismiss
-      - data:
-          send_to: joshua
-          notification_type: clear_notification
-          tag: low-battery-alert
-        action: script.notify_mobile
-      - data:
-          computer:
-          - erebus
-          notification_type: clear_notification
-          tag: low-battery-alert
-        action: script.notify_lnxlink
-    else:
-    - parallel:
-      - data:
-          title: '{{ title }}'
-          message: '{{ iif(sensors | count > 0, ''- '', '''') }}{{ sensors | join(''\n-
-            '') }}'
-          notification_id: low-battery-alert
-        action: persistent_notification.create
-      - data:
-          send_to: joshua
-          title: '{{ title }}'
-          message: '{{ sensors | join(''<br>'') }}'
-          notification_icon: mdi:battery-alert
-          color: '#f44336'
-          icon: local/icons/battery-alert.png
-          group: System
-          tag: low-battery-alert
-          url: dashboard-system/overview
-        action: script.notify_mobile
+      sensors: "{% set result = namespace(sensors=[]) %}\n{% if devices > 0 %}\n  {%
+        for entity in trigger.to_state.attributes.entity_id %}\n    {% set device
+        = states.sensor[entity.split('.')[1]] %}\n    {% set name = device.name |
+        replace(':', '') | regex_replace(find = ' battery level', replace = '', ignorecase
+        = true) %}\n    {% set result.sensors = result.sensors + [name ~ ' (' ~ device.state
+        | round ~ '%)'] %}\n  {% endfor %}\n{% endif %}\n{{ result.sensors }}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{% if not trigger.to_state in ['unknown', 'unavailable',
+          none]\n  and not trigger.to_state.state in ['unknown', 'unavailable', none]
+          %}\n{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
+          | int(default=0)) > 0 }}\n{% endif %}"
+      sequence:
+      - parallel:
+        - data:
+            notification_id: low-battery-alert
+          action: persistent_notification.dismiss
+        - data:
+            send_to: joshua
+            notification_type: clear_notification
+            tag: low-battery-alert
+          action: script.notify_mobile
+      alias: Clear notifications
+    - conditions:
+      - condition: template
+        value_template: '{{ devices | count > 0 }}'
+      sequence:
+      - parallel:
+        - data:
+            title: '{{ title }}'
+            message: '- {{ sensors | join(''\n- '') }}'
+            notification_id: low-battery-alert
+          action: persistent_notification.create
+        - data:
+            send_to: joshua
+            title: '{{ title }}'
+            message: '{{ sensors | join(''<br>'') }}'
+            notification_icon: mdi:battery-alert
+            color: '#f44336'
+            icon: local/icons/battery-alert.png
+            group: System
+            tag: low-battery-alert
+            url: dashboard-system/overview
+          action: script.notify_mobile
+      alias: Send notifications
   mode: single
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
@@ -1137,15 +1141,20 @@
     enabled: false
   - event_type: dreame_vacuum_task_status
     trigger: event
+    enabled: false
   - event_type: dreame_vacuum_consumable
     trigger: event
+    enabled: false
   - event_type: dreame_vacuum_information
     trigger: event
+    enabled: false
   - event_type: dreame_vacuum_warning
     trigger: event
+    enabled: false
   - event_type: dreame_vacuum_error
     trigger: event
     event_data: {}
+    enabled: false
   conditions: []
   actions:
   - data:
@@ -1240,7 +1249,12 @@
     - unavailable
     - unknown
     trigger: state
-  conditions: []
+  conditions:
+  - alias: Triggers are available
+    condition: template
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n   and
+      not trigger.to_state.attributes in ['unknown', 'unavailable', none]\n}}"
   actions:
   - variables:
       offline: '{{ trigger.to_state.state | int(default=0) }}'
@@ -1250,22 +1264,27 @@
         \" (\" ~ as_datetime(state) | relative_time ~ \")\", \" (Unknown)\") %}\n
         \ {% set name = state_attr(entity_id, \"friendly_name\") | regex_replace(find
         = \" last seen\", replace = \"\", ignorecase = true) %}\n  {% set result.sensors
-        = result.sensors + [name ~ time] %}\n{% endfor %}{{ result.sensors }}"
-  - if:
-    - condition: template
-      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
-        | int(default=0)) > 0 }}"
-    then:
-    - data:
-        notification_id: offline-devices
-      action: persistent_notification.dismiss
-    else:
-    - data:
-        title: '{{ title }}'
-        message: '{{ iif(sensors | count > 0, ''- '', '''') }}{{ sensors | join(''\n-
-          '') }}'
-        notification_id: offline-devices
-      action: persistent_notification.create
+        = result.sensors + [name ~ time] %}\n{% endfor %} {{ result.sensors }}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and
+          (trigger.from_state.state | int(default=0)) > 0 }}"
+      sequence:
+      - data:
+          notification_id: offline-devices
+        action: persistent_notification.dismiss
+      alias: Clear notifications
+    - conditions:
+      - condition: template
+        value_template: '{{ sensors | count > 0 }}'
+      sequence:
+      - data:
+          title: '{{ title }}'
+          message: '- {{ sensors | join(''\n- '') }}'
+          notification_id: offline-devices
+        action: persistent_notification.create
+      alias: Send notifications
   mode: restart
 - id: '1665696553212'
   alias: ⚙️ RAM Usage High
@@ -1361,11 +1380,9 @@
       - media_player.ardena
       - media_player.nasya
     action: script.hass_publish_sensors
-  - data:
-      message: Startup automation complete...
-    action: browser_mod.notification
   - variables:
       title: Home Assistant Started
+      message: Startup automation complete...
       icon: local/icons/home-assistant.png
       icon_mdi: mdi:home-assistant
       color: '#2196f3'
@@ -1373,8 +1390,12 @@
       tag: startup
   - parallel:
     - data:
+        message: '{{ message }}'
+      action: browser_mod.notification
+    - data:
         send_to: joshua
         title: '{{ title }}'
+        message: '{{ message }}'
         notification_icon: '{{ icon_mdi }}'
         color: '{{ color }}'
         icon: '{{ icon }}'
@@ -1385,6 +1406,7 @@
         computer:
         - erebus
         title: '{{ title }}'
+        message: '{{ message }}'
         icon: '{{ icon }}'
         tag: '{{ tag }}'
       action: script.notify_lnxlink
@@ -1424,87 +1446,105 @@
     - unavailable
     - unknown
   conditions:
-  - condition: template
+  - alias: Home Assistant started more than 5 minutes ago
+    condition: template
     value_template: '{{ now() > states(''sensor.uptime'') | as_datetime + timedelta(seconds=300)
       }}'
-    alias: Home Assistant started more than 5 minutes ago
+  - alias: Triggers are available
+    condition: template
+    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
+      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n   and
+      not trigger.to_state.attributes in ['unknown', 'unavailable', none]\n}}"
   actions:
   - variables:
       updates: '{{ trigger.to_state.state | int(default=0) }}'
+      entities: '{{ [] }}
+
+        '
       title: Update{{ iif(updates > 1, 's', '') }} Pending ({{ updates }})
       icon: local/icons/update.png
       icon_mdi: mdi:update
       color: '#4caf50'
       tag: hacs-update
-  - if:
-    - condition: template
-      value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and (trigger.from_state.state
-        | int(default=0)) > 0 }}"
-    then:
-    - data:
-        notification_id: hacs-update
-      action: persistent_notification.dismiss
-    - data:
-        send_to: joshua
-        notification_type: clear_notification
-        tag: hacs-update
-      action: script.notify_mobile
-    - data:
-        computer:
-        - erebus
-        notification_type: clear_notification
-        tag: hacs-update
-      action: script.notify_lnxlink
-    else:
-    - parallel:
-      - data:
-          title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
-            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
-            'latest_version') -%}\n    {% set update = '__' ~ state_attr(repo, 'friendly_name')
-            | replace(' update', '') ~ ':__ _' ~ state_attr(repo, 'installed_version')
-            ~ '_ ➜ _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set list.updates
-            = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
-            | join('\\n') }}"
-          notification_id: '{{ tag }}'
-        action: persistent_notification.create
-      - data:
-          send_to: joshua
-          title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
-            -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
-            'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo, 'friendly_name')
-            | replace(' update', '') ~ ':</b> <em>' ~ state_attr(repo, 'installed_version')
-            ~ '</em> ➜ <em>' ~ state_attr(repo, 'latest_version') ~ '</em>' %}\n    {%-
-            set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor
-            -%} {{ list.updates | join('<br>') }}"
-          notification_icon: '{{ icon_mdi }}'
-          color: '{{ color }}'
-          icon: '{{ icon }}'
-          group: Upgrade
-          tag: '{{ tag }}'
-          url: config/updates
-        action: script.notify_mobile
-      - data:
-          computer:
-          - erebus
-          title: '{{ title }}'
-          message: "{%- set list = namespace(updates=[]) -%}\n{%- for repo in state_attr(\"sensor.updates\",
-            \"entity_id\") -%}\n  {%- if state_attr(repo, 'installed_version') !=
-            state_attr(repo, 'latest_version') -%}\n    {% set update = '<b>' ~ state_attr(repo,
-            'friendly_name') | replace(' update', '') ~ ':</b> <i>' ~ state_attr(repo,
-            'installed_version') ~ '</i> ➜ <i>' ~ state_attr(repo, 'latest_version')
-            ~ '</i>' %}\n    {%- set list.updates = list.updates + [update] -%}\n
-            \ {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join('<br>') }}"
-          icon: '{{ icon }}'
-          tag: '{{ tag }}'
-        action: script.notify_lnxlink
-  - delay:
-      hours: 0
-      minutes: 2
-      seconds: 0
-      milliseconds: 0
-  mode: single
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ (trigger.to_state.state | int(default=0)) == 0\n  and
+          (trigger.from_state.state | int(default=0)) > 0 }}"
+      sequence:
+      - alias: Dismiss notifications in parallel
+        parallel:
+        - data:
+            notification_id: '{{ tag }}'
+          action: persistent_notification.dismiss
+        - data:
+            send_to: joshua
+            notification_type: clear_notification
+            tag: '{{ tag }}'
+          action: script.notify_mobile
+        - data:
+            computer:
+            - erebus
+            notification_type: clear_notification
+            tag: '{{ tag }}'
+          action: script.notify_lnxlink
+      alias: Clear notifications
+    - conditions:
+      - condition: template
+        value_template: '{{ updates > 0 }}'
+      sequence:
+      - alias: Send notifications in parallel
+        parallel:
+        - data:
+            title: '{{ title }}'
+            message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+              -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+              'latest_version') -%}\n    {% set name = state_attr(repo, 'friendly_name')\n
+              \      | regex_replace(' update', '', true)\n       | regex_replace('lantea
+              container ', '', true)\n    %}\n    {% set update = '__' ~ name ~ ':__
+              _' ~ state_attr(repo, 'installed_version') ~ '_ ➜ _' ~ state_attr(repo,
+              'latest_version') ~ '_' %}\n    {%- set list.updates = list.updates
+              + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('\\n')
+              }}"
+            notification_id: '{{ tag }}'
+          action: persistent_notification.create
+        - data:
+            send_to: joshua
+            title: '{{ title }}'
+            message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
+              -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
+              'latest_version') -%}\n    {% set name = state_attr(repo, 'friendly_name')\n
+              \      | regex_replace(' update', '', true)\n       | regex_replace('lantea
+              container ', '', true)\n    %}\n    {% set update = '<b>' ~ name ~ ':</b>
+              <em>' ~ state_attr(repo, 'installed_version') ~ '</em> ➜ <em>' ~ state_attr(repo,
+              'latest_version') ~ '</em>' %}\n    {%- set list.updates = list.updates
+              + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('<br>')
+              }}"
+            notification_icon: '{{ icon_mdi }}'
+            color: '{{ color }}'
+            icon: '{{ icon }}'
+            group: Upgrade
+            tag: '{{ tag }}'
+            url: config/updates
+          action: script.notify_mobile
+        - data:
+            computer:
+            - erebus
+            title: '{{ title }}'
+            message: "{%- set list = namespace(updates=[]) -%}\n{%- for repo in state_attr(\"sensor.updates\",
+              \"entity_id\") -%}\n  {%- if state_attr(repo, 'installed_version') !=
+              state_attr(repo, 'latest_version') -%}\n    {% set name = state_attr(repo,
+              'friendly_name')\n       | regex_replace(' update', '', true)\n       |
+              regex_replace('lantea container ', '', true)\n    %}\n    {% set update
+              = '<b>' ~ name ~ ':</b> <i>' ~ state_attr(repo, 'installed_version')
+              ~ '</i> ➜ <i>' ~ state_attr(repo, 'latest_version') ~ '</i>' %}\n    {%-
+              set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%-
+              endfor -%}\n{{ list.updates | join('<br>') }}"
+            icon: '{{ icon }}'
+            tag: '{{ tag }}'
+          action: script.notify_lnxlink
+      alias: Send notifications
+  mode: restart
 - id: '1725915027719'
   alias: ⚡ Tariff Changes
   description: Sets the current tariff and sends a notification.
@@ -1939,7 +1979,7 @@
           entity_id: timer.ge_dishwasher
         data:
           duration: '{{ time_remaining }}'
-        action: timer.change
+        action: timer.start
     - conditions:
       - condition: state
         entity_id: sensor.ge_dishwasher_operating_mode
@@ -2011,7 +2051,7 @@
   description: Sends notification when the microwave is finished
   triggers:
   - entity_id:
-    - sensor.emporiavue_sub_kitchen_island_power
+    - sensor.emporiavue_main_microwave_power
     above: 100
     trigger: numeric_state
   actions:
@@ -2023,7 +2063,7 @@
       color: '#e91e63'
   - wait_for_trigger:
     - entity_id:
-      - sensor.emporiavue_sub_kitchen_island_power
+      - sensor.emporiavue_main_microwave_power
       for:
         hours: 0
         minutes: 0
@@ -2670,6 +2710,17 @@
       entity_id: light.outside_entry
     action: light.turn_on
   mode: single
+- id: '1785707660629'
+  alias: "\U0001F4A1 Cold Storage Room Light"
+  description: Automatically controls cold storage room lights
+  use_blueprint:
+    path: Blackshome/sensor-light.yaml
+    input:
+      motion_trigger:
+      - binary_sensor.cold_storage_contact_contact
+      light_switch:
+        entity_id: light.cold_storage
+      time_delay: 2
 - id: '1665686521519'
   alias: "\U0001F4A1 Front Lights off at Sunrise"
   description: Turns the front lights off at sunrise
@@ -2752,6 +2803,72 @@
       sequence:
       - entity_id: light.living_room_floor_lamp
         action: light.turn_off
+  mode: single
+- id: '1785821240790'
+  alias: "\U0001F4A1 Outside Lights Off Daytime"
+  description: ''
+  triggers:
+  - trigger: sun.elevation_crossed_threshold
+    options:
+      for: 00:00:00
+      threshold:
+        type: above
+        value:
+          active_choice: number
+          number: 2
+  - trigger: light.turned_on
+    target:
+      entity_id:
+      - light.outside_back
+      - light.outside_side
+    options:
+      behavior: each
+      for: 00:00:00
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: sun.elevation
+        options:
+          threshold:
+            type: above
+            value:
+              active_choice: number
+              number: 2
+      - condition: light.is_on
+        target:
+          entity_id:
+          - light.outside_back
+        options:
+          behavior: any
+          for: 00:00:00
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.outside_back
+        data: {}
+    - conditions:
+      - condition: sun.elevation
+        options:
+          threshold:
+            type: above
+            value:
+              active_choice: number
+              number: 2
+      - condition: light.is_on
+        target:
+          entity_id:
+          - light.outside_side
+        options:
+          behavior: any
+          for: 00:00:00
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.outside_side
+        data: {}
   mode: single
 - id: '1728622562146'
   alias: "\U0001F4A1 School Departure Light Indicator"
@@ -3779,9 +3896,13 @@
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
-  - condition: state
-    entity_id: group.people
-    state: not_home
+  - condition: zone.not_in_zone
+    target:
+      entity_id: group.people
+    options:
+      behavior: any
+      for: 00:00:00
+      zone: zone.home
   - condition: state
     entity_id: input_boolean.door_open_alerts
     state: 'on'
@@ -4004,9 +4125,13 @@
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
-  - condition: state
-    entity_id: group.people
-    state: not_home
+  - condition: zone.not_in_zone
+    target:
+      entity_id: group.people
+    options:
+      behavior: any
+      for: 00:00:00
+      zone: zone.home
   - condition: state
     entity_id: input_boolean.garage_door_open_alerts
     state: 'on'
@@ -4149,43 +4274,55 @@
   description: Sends notification to check Guest Mode status when returning home,
     after 12 hours, or when leaving without it on
   triggers:
-  - entity_id: group.people
-    from: not_home
-    to: home
+  - trigger: zone.entered
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for:
+        hours: 0
+        minutes: 2
+        seconds: 0
+      behavior: first
+      zone: zone.home
     id: returning_home
-    trigger: state
   - entity_id: input_boolean.guest_mode
     to: 'on'
     for:
       hours: 12
     id: time_check
     trigger: state
-  - entity_id:
-    - group.people
-    from:
-    - home
-    to:
-    - not_home
+  - trigger: zone.left
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for:
+        hours: 0
+        minutes: 2
+        seconds: 0
+      zone: zone.home
+      behavior: all
     id: leaving_home
-    trigger: state
-    for:
-      hours: 0
-      minutes: 2
-      seconds: 0
   conditions:
   - condition: or
     conditions:
     - condition: and
       conditions:
-      - condition: template
-        value_template: '{{ trigger.id in [''returning_home'', ''time_check''] }}'
+      - condition: trigger
+        id:
+        - returning_home
+        - time_check
       - condition: state
         entity_id: input_boolean.guest_mode
         state: 'on'
     - condition: and
       conditions:
-      - condition: template
-        value_template: '{{ trigger.id == ''leaving_home'' }}'
+      - condition: trigger
+        id:
+        - leaving_home
       - condition: state
         entity_id: input_boolean.guest_mode
         state: 'off'
@@ -4957,8 +5094,8 @@
             target:
               entity_id: light.amy_office_switch
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: script.amy_office_lights_day_mode
           data: {}
       down_single: []
@@ -4969,18 +5106,18 @@
             target:
               entity_id: light.amy_office_switch
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: script.amy_office_lights_night_mode
           data: {}
-      switch: event.amy_office_switch_action
+      switch: e79a6ca06895f9b4f0a5df91c4107244
 - id: '1673311612826'
   alias: "\U0001F4CB [Inovelli] Emma Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.emma_bedroom_action
+      switch: 31a80970131c1f65b1d56f5a956fcc7c
       config_single:
       - action: switch.toggle
         metadata: {}
@@ -5011,7 +5148,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.ethan_bedroom_action
+      switch: 7ebd8ef9f41b7efcc669b877a66071ed
       config_single:
       - action: switch.toggle
         metadata: {}
@@ -5042,7 +5179,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.family_room_aux_action
+      switch: f3e387f716cce209d3780f200d5bbc81
       config_single:
       - parallel:
         - action: script.inovelli_blue_led
@@ -5050,8 +5187,8 @@
             target:
               entity_id: light.family_room_aux
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: light.toggle
           target:
             entity_id:
@@ -5064,8 +5201,8 @@
             target:
               entity_id: light.family_room_aux
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: script.family_room_play_mode
           metadata: {}
           data:
@@ -5076,7 +5213,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.family_room_action
+      switch: 8c88d8e6496dc8310c36043fb9777c3d
       config_single:
       - parallel:
         - action: script.inovelli_blue_led
@@ -5084,8 +5221,8 @@
             target:
               entity_id: light.family_room
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: light.toggle
           target:
             entity_id:
@@ -5098,19 +5235,19 @@
             target:
               entity_id: light.family_room
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: script.family_room_play_mode
           metadata: {}
           data:
             activity: Computer
 - id: '1667779442976'
-  alias: "\U0001F4CB [Inovelli] Garage Switch"
+  alias: "\U0001F4CB [Inovelli] Outside Garage Switch"
   description: Custom button actions for the Inovelli switch
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.garage_action
+      switch: 9eb27ef905c744323c3f90c70e273e66
       config_single:
       - parallel:
         - action: script.inovelli_blue_led
@@ -5118,8 +5255,8 @@
             target:
               entity_id: light.garage
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: light.toggle
           metadata: {}
           data: {}
@@ -5132,8 +5269,8 @@
             target:
               entity_id: light.garage
             color: Pink
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - data: {}
           target:
             entity_id: cover.garage_door
@@ -5144,7 +5281,7 @@
           skip_condition: true
         target:
           entity_id:
-          - automation.garage_light_switch_status
+          - automation.outside_garage_light_switch_status
         action: automation.trigger
       config_triple:
       - parallel:
@@ -5153,8 +5290,8 @@
             target:
               entity_id: light.garage
             color: Blue
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - data: {}
           action: script.ascent_remote_start
       - delay:
@@ -5162,7 +5299,7 @@
       - data:
           skip_condition: true
         target:
-          entity_id: automation.garage_light_switch_status
+          entity_id: automation.outside_garage_light_switch_status
         action: automation.trigger
       config_quadruple:
       - parallel:
@@ -5171,8 +5308,8 @@
             target:
               entity_id: light.garage
             color: Cyan
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - data: {}
           action: script.kona_remote_start
       - delay:
@@ -5180,7 +5317,7 @@
       - data:
           skip_condition: true
         target:
-          entity_id: automation.garage_light_switch_status
+          entity_id: automation.outside_garage_light_switch_status
         action: automation.trigger
       down_triple:
       - parallel:
@@ -5189,8 +5326,8 @@
             target:
               entity_id: light.garage
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - target:
             entity_id: light.inside_lights
           data: {}
@@ -5200,7 +5337,7 @@
       - data:
           skip_condition: true
         target:
-          entity_id: automation.garage_light_switch_status
+          entity_id: automation.outside_garage_light_switch_status
         action: automation.trigger
 - id: '1667779857021'
   alias: "\U0001F4CB [Inovelli] Joshua Office Switch"
@@ -5208,33 +5345,33 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.joshua_office_switch_action
+      switch: 5c5cfa2c042537c7e2914542f95d79bb
       up_single:
-      - action: script.joshua_office_lights_on
-        data: {}
       - action: adaptive_lighting.set_manual_control
         metadata: {}
         data:
           manual_control: true
           lights:
           - light.joshua_office
+      - action: script.joshua_office_lights_on
+        data: {}
       up_double:
+      - action: adaptive_lighting.set_manual_control
+        metadata: {}
+        data:
+          manual_control: true
+          lights:
+          - light.joshua_office
       - parallel:
         - action: script.inovelli_blue_led
           data:
             target:
               entity_id: light.joshua_office_switch
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: script.joshua_office_lights_day_mode
           data: {}
-        - action: adaptive_lighting.set_manual_control
-          metadata: {}
-          data:
-            manual_control: true
-            lights:
-            - light.joshua_office
       down_single:
       - action: light.turn_off
         data: {}
@@ -5247,8 +5384,8 @@
             target:
               entity_id: light.joshua_office_switch
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: script.joshua_office_lights_night_mode
           data: {}
       config_single:
@@ -5258,8 +5395,8 @@
             target:
               entity_id: light.joshua_office_switch
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: light.toggle
           metadata: {}
           data: {}
@@ -5272,8 +5409,8 @@
             target:
               entity_id: light.joshua_office_switch
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - action: light.toggle
           metadata: {}
           data: {}
@@ -5285,14 +5422,14 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.living_room_fan_light_action
+      switch: 8ce1c59e4fc48be4be66588690ccc023
       config_single:
       - parallel:
         - action: script.inovelli_blue_led
           data:
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
             target:
               entity_id: light.living_room_fan_light
         - data: {}
@@ -5305,8 +5442,8 @@
         - action: script.inovelli_blue_led
           data:
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
             target:
               entity_id: light.living_room_fan_light
         - data: {}
@@ -5319,7 +5456,7 @@
   use_blueprint:
     path: starbuck93/z2m-inovelli-blue-series-2-in-1-switch-dimmer.yaml
     input:
-      switch: event.main_bedroom_action
+      switch: 4cfedaca9103f5461239c366baa9bd2a
       config_single:
       - parallel:
         - action: script.inovelli_blue_led
@@ -5327,8 +5464,8 @@
             target:
               entity_id: light.main_bedroom
             color: Yellow
-            effect: Chase
-            duration: 3 Seconds
+            effect: Fast Chase
+            duration: 2 Seconds
         - data: {}
           target:
             entity_id: light.main_bedroom_floor_lamp
@@ -5735,32 +5872,39 @@
   alias: "\U0001F512 Lock Doors when Away"
   description: ''
   triggers:
-  - trigger: state
-    entity_id:
-    - group.people
-    from:
-    - home
-    to:
-    - not_home
-    for:
-      hours: 0
-      minutes: 5
-      seconds: 0
+  - trigger: zone.left
+    options:
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
+      behavior: all
+      zone: zone.home
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
   conditions:
   - condition: state
     entity_id: input_boolean.guest_mode
     state: 'off'
-  - condition: state
-    entity_id: lock.all_locks
-    state: unlocked
+  - condition: lock.is_unlocked
+    target:
+      entity_id: lock.all_locks
+    options:
+      for: 00:00:00
   actions:
   - if:
-    - condition: state
-      entity_id: lock.front_door
-      state: unlocked
-    - condition: state
-      entity_id: binary_sensor.front_door_contact
-      state: 'off'
+    - condition: lock.is_unlocked
+      target:
+        entity_id: lock.front_door
+      options:
+        for: 00:00:00
+    - condition: door.is_closed
+      target:
+        entity_id: binary_sensor.front_door_contact
+      options:
+        for: 00:00:00
     then:
     - metadata: {}
       data: {}
@@ -5768,12 +5912,16 @@
         entity_id: lock.front_door
       action: lock.lock
   - if:
-    - condition: state
-      entity_id: lock.garage_entry
-      state: unlocked
-    - condition: state
-      entity_id: binary_sensor.garage_entry_contact
-      state: 'off'
+    - condition: lock.is_unlocked
+      target:
+        entity_id: lock.garage_entry
+      options:
+        for: 00:00:00
+    - condition: door.is_closed
+      target:
+        entity_id: binary_sensor.garage_entry_contact
+      options:
+        for: 00:00:00
     then:
     - metadata: {}
       data: {}
@@ -7337,131 +7485,105 @@
         action: script.inovelli_blue_led
   mode: restart
 - id: '1722871416531'
-  alias: "\U0001F6A6 Garage Entry Light Switch Status"
-  description: Set garage entry light switch LED when garage entry lock state has
-    changed
+  alias: "\U0001F6A6 Outside Garage Light Switch Status"
+  description: 'Set outside garage switch LED based on remote start timers, garage
+    door, and garage entry lock.
+
+    '
   triggers:
+  - event: start
+    trigger: homeassistant
   - entity_id:
+    - cover.garage_door
+    - timer.ascent_remote_start
+    - timer.kona_remote_start
     - lock.garage_entry
     trigger: state
   actions:
   - choose:
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.to_state.state == ''locked'' }}'
-      sequence:
-      - data:
-          target:
-            entity_id: light.outside_garage_switch
-        action: script.inovelli_blue_led
-    - conditions:
-      - condition: template
-        value_template: '{{ trigger.to_state.state == ''unlocked'' }}'
-      sequence:
-      - data:
-          color: Red
-          effect: Open/Close
-          level: 40
-          target:
-            entity_id: light.outside_garage_switch
-        action: script.inovelli_blue_led
-  mode: restart
-- id: '1665688313389'
-  alias: "\U0001F6A6 Garage Light Switch Status"
-  description: Set Garage light switch LED when Garage Door and light status
-  triggers:
-  - entity_id:
-    - cover.garage_door
-    - light.garage
-    - timer.ascent_remote_start
-    - timer.kona_remote_start
-    trigger: state
-  conditions: []
-  actions:
-  - choose:
-    - conditions:
+    - alias: Subaru remote start
+      conditions:
       - condition: state
         entity_id: timer.ascent_remote_start
         state: active
       sequence:
-      - data:
+      - action: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
           color: Blue
           effect: Fast Siren
           level: 60
-          target:
-            entity_id: light.garage
-        action: script.inovelli_blue_led
-    - conditions:
+    - alias: Kona remote start
+      conditions:
       - condition: state
         entity_id: timer.kona_remote_start
         state: active
       sequence:
-      - data:
+      - action: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
           color: Cyan
           effect: Fast Siren
           level: 60
-          target:
-            entity_id: light.garage
-        action: script.inovelli_blue_led
-    - conditions:
+    - alias: Garage opening
+      conditions:
       - condition: state
         entity_id: cover.garage_door
         state: opening
       sequence:
-      - data:
+      - action: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
           color: Yellow
           effect: Fast Rising
           level: 40
-          target:
-            entity_id: light.garage
-        action: script.inovelli_blue_led
-    - conditions:
+    - alias: Garage closing
+      conditions:
       - condition: state
         entity_id: cover.garage_door
         state: closing
       sequence:
-      - data:
+      - action: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
           color: Yellow
           effect: Fast Falling
           level: 40
-          target:
-            entity_id: light.garage
-        action: script.inovelli_blue_led
-    - conditions:
+    - alias: Garage open
+      conditions:
       - condition: state
         entity_id: cover.garage_door
         state: open
       sequence:
-      - choose:
-        - conditions:
-          - condition: state
-            entity_id: light.garage
-            state: 'on'
-          sequence:
-          - data:
-              color: Pink
-              effect: Medium Rising
-              level: 40
-              target:
-                entity_id: light.garage
-            action: script.inovelli_blue_led
-        - conditions:
-          - condition: state
-            entity_id: light.garage
-            state: 'off'
-          sequence:
-          - data:
-              color: Red
-              effect: Medium Rising
-              level: 40
-              target:
-                entity_id: light.garage
-            action: script.inovelli_blue_led
+      - action: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
+          color: Red
+          effect: Medium Rising
+          level: 40
+    - alias: Garage entry unlocked
+      conditions:
+      - condition: state
+        entity_id: lock.garage_entry
+        state: unlocked
+      sequence:
+      - action: script.inovelli_blue_led
+        data:
+          target:
+            entity_id: light.outside_garage_switch
+          color: Red
+          effect: Open/Close
+          level: 40
     default:
-    - data:
+    - action: script.inovelli_blue_led
+      data:
         target:
-          entity_id: light.garage
-      action: script.inovelli_blue_led
+          entity_id: light.outside_garage_switch
   mode: restart
 - id: '1665688406559'
   alias: "\U0001F6A6 Joshua Office Light Switch Status"
@@ -7516,7 +7638,8 @@
     trigger: state
   actions:
   - choose:
-    - conditions:
+    - alias: Front door locked
+      conditions:
       - condition: template
         value_template: '{{ trigger.to_state.state == ''locked'' }}'
       sequence:
@@ -7524,7 +7647,8 @@
           target:
             entity_id: light.outside_entry_switch
         action: script.inovelli_blue_led
-    - conditions:
+    - alias: Front door unlocked
+      conditions:
       - condition: template
         value_template: '{{ trigger.to_state.state == ''unlocked'' }}'
       sequence:
@@ -8089,8 +8213,8 @@
       include_max_humidity: maximum_humidity_enabled
       time_out: 40
       time_delay: 20
-      rising_humidity: 1.5
-      falling_humidity: -1.5
+      rising_humidity: 1.2
+      falling_humidity: -1.2
 - id: '1778458587669'
   alias: "\U0001F4A6 Basement Bathroom Humidity Exhaust Fan"
   description: ''
