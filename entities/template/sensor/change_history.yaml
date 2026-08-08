@@ -35,5 +35,10 @@ sensor:
     attributes:
       changes: >
         {% set current = this.attributes.get('changes', {}) %}
-        {% set new = {trigger.entity_id: trigger.to_state.last_changed.isoformat()} %}
-        {{ dict(current, **new) }}
+        {% if not trigger.to_state in ['unknown', 'unavailable', none]
+          and not trigger.to_state.last_changed in ['unknown', 'unavailable', none] %}
+          {% set new = {trigger.entity_id: trigger.to_state.last_changed.isoformat()} %}
+          {{ dict(current, **new) }}
+        {% else %}
+          {{ current }}
+        {% endif %}
