@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5470 |
-| Sensors        | 1729 |
-| Binary Sensors | 378 |
-| Lights         | 76 |
-| Switches       | 786 |
+| All Entities   | 5547 |
+| Sensors        | 1743 |
+| Binary Sensors | 379 |
+| Lights         | 81 |
+| Switches       | 797 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -46,10 +46,6 @@ Many integrations can only be enabled from within the UI, here is a list of inte
 ### [AdGuard Home](https://www.home-assistant.io/integrations/adguard)
 
 The AdGuard integration allows you to control and monitor your AdGuard Home instance.
-
-### [AirNow](https://www.home-assistant.io/integrations/airnow)
-
-The airnow integration uses the AirNow web service as a source for air quality data for your location.
 
 ### [Android Debug Bridge](https://www.home-assistant.io/integrations/androidtv)
 
@@ -97,10 +93,6 @@ Connect ESPHome devices directly with the native ESPHome API.
 
 The filesize sensor is for displaying the size in MB of a file.
 
-### [Glances](https://www.home-assistant.io/integrations/glances)
-
-The glances integration allows you to monitor the system information provided by the Glances API.
-
 ### [Google Cast](https://www.home-assistant.io/integrations/cast)
 
 Google Cast integration.
@@ -112,6 +104,10 @@ The google_cloud platform allows you to use Google Cloud Platform API and integr
 ### [Google Generative AI](https://hass.clarkjo.info/config/integrations/integration/google_generative_ai_conversation)
 
 The Google Generative AI integration adds a conversation agent powered by Google Generative AI in Home Assistant.
+
+### [Holiday](https://www.home-assistant.io/integrations/holiday)
+
+Create a calendar of holidays in Home Assistant for powering automations.
 
 ### [HomeKit Device](https://www.home-assistant.io/integrations/homekit_controller)
 
@@ -164,6 +160,10 @@ Allows extremely lightweight publish/subscribe messaging transport
 ### [MusicCast](https://www.home-assistant.io/integrations/yamaha_musiccast)
 
 The Yamaha MusicCast integration allows you to control Yamaha MusicCast Receivers
+
+### [Nintendo Switch parental controls](https://www.home-assistant.io/integrations/nintendo_parental_controls)
+
+Integrates with the Nintendo Switch Parental Controls service, allowing parents to monitor and control screentime for their children.
 
 ### [OpenAI Conversation](https://www.home-assistant.io/integrations/openai_conversation)
 
@@ -265,13 +265,13 @@ The uptime integration provides a sensor that stores the timestamp (date and tim
 
 The Utility Meter integration provides functionality to track consumptions of various utilities (e.g., energy, gas, water, heating).
 
-### [Vizio SmartCast](https://www.home-assistant.io/integrations/vizio)
-
-The vizio integration allows you to control SmartCast-compatible TVs and sound bars
-
 ### [Wake on LAN](https://www.home-assistant.io/integrations/wake_on_lan)
 
 The wake_on_lan integration enables the ability to send magic packets to Wake on LAN capable devices to turn them on.
+
+### [Waze Travel Time](https://www.home-assistant.io/integrations/waze_travel_time)
+
+Provides travel time from Waze.
 
 ### [Withings](https://www.home-assistant.io/integrations/withings)
 
@@ -307,17 +307,17 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.10.2]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.12.0]
 
 Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.1.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.2.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
-### [Bubble Card Tools](https://github.com/Clooos/Bubble-Card-Tools) [v1.0.2]
+### [Bubble Card Tools](https://github.com/Clooos/Bubble-Card-Tools) [v1.1.1]
 
 Bubble Card Tools is a custom integration that handles the Bubble Card backend. Required for the Module Store and module installs.
 
@@ -407,7 +407,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.8.1]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.9.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -419,13 +419,13 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.19]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.20]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2025.11.0]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.8.1]
 
 Fill out your Media Player Entity with MQTT Topics
 
@@ -437,7 +437,7 @@ Neakasa Integration for Home Assistant
 
 Authors: [@tabascoz](https://github.com/tabascoz).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.6.0]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.6.1]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -449,7 +449,7 @@ A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
 Authors: [@frenck](https://github.com/frenck).
 
-### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.22]
+### [Subaru (Hacs)](https://github.com/G-Two/homeassistant-subaru) [v0.7.23]
 
 MySubaru Connected Services Custom Component for Home Assistant
 
@@ -461,7 +461,7 @@ Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v7.7.1]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.0.0]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
@@ -517,7 +517,7 @@ Battery state card for Home Assistant
 
 ### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.2.5]
 
-Bubble Card is a minimalist card collection for Home Assistant with a nice pop-up touch.
+Bubble Card is a minimalist and customizable card collection for Home Assistant, featuring modern pop-ups and an integrated Module Store with over 100 community-made modules.
 
 ### [Button Card](https://github.com/custom-cards/button-card) [v7.0.1]
 
@@ -531,7 +531,7 @@ Bubble Card is a minimalist card collection for Home Assistant with a nice pop-u
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.1.11]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.1.12]
 
 Expander card for HomeAssistant
 
@@ -559,7 +559,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.8.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.9.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -575,7 +575,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.21]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.23]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -587,7 +587,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.1.1]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.2.2]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -643,7 +643,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.11.2]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.13.0]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
