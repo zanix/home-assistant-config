@@ -519,7 +519,7 @@ Battery state card for Home Assistant
 
 Bubble Card is a minimalist and customizable card collection for Home Assistant, featuring modern pop-ups and an integrated Module Store with over 100 community-made modules.
 
-### [Button Card](https://github.com/custom-cards/button-card) [v7.0.1]
+### [Button Card](https://github.com/custom-cards/button-card) [v7.1.0-de.2]
 
 ❇️ Lovelace button-card for home assistant
 
