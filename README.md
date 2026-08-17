@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5565 |
-| Sensors        | 1748 |
+| All Entities   | 5567 |
+| Sensors        | 1751 |
 | Binary Sensors | 379 |
 | Lights         | 81 |
-| Switches       | 797 |
+| Switches       | 800 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -313,7 +313,7 @@ Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.2.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.2.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -371,7 +371,7 @@ Home Assistant Google Home custom component
 
 Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://github.com/DurgNomis-drol), [@ArnyminerZ](https://github.com/ArnyminerZ), [@KapJI](https://github.com/KapJI).
 
-### [Gui Recorder](https://github.com/ideaalab/gui-recorder) [v0.8.35]
+### [Gui Recorder](https://github.com/ideaalab/gui-recorder) [v0.8.37]
 
 Home Assistant custom component: manage recorder config and DB maintenance from a sidebar GUI panel (SQLite only)
 
@@ -407,7 +407,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.10.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.10.1]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -419,7 +419,7 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.21]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.25]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -437,7 +437,7 @@ Neakasa Integration for Home Assistant
 
 Authors: [@tabascoz](https://github.com/tabascoz).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v1.6.1]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.0.2]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -461,7 +461,7 @@ Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.0.0]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.0.1]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
@@ -527,11 +527,11 @@ Bubble Card is a minimalist and customizable card collection for Home Assistant,
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.10.6]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.10.7]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.2.0]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.2.1]
 
 Expander card for HomeAssistant
 
@@ -575,7 +575,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.23]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.24]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -639,7 +639,7 @@ This custom card allows you to display vehicle information in your Home Assistan
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.4.2]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.4.3]
 
 Home Assistant Lovelace Windrose Card
 
@@ -823,7 +823,7 @@ Material Design 3 Theme for Home Assistant
 - 💡 Front Lights on at Sunset
 - 💡 Living Room Lamps on/off
 - 💡 Outside Lights Off Daytime
-- 💡 School Departure Light Indicator 🚫
+- 💡 School Departure Light Indicator
 - 💡 Turn Lights On when Arrive
 - 💦 Basement Bathroom Humidity Exhaust Fan
 - 💦 Bathroom Humidity Exhaust Fan
@@ -857,7 +857,7 @@ Material Design 3 Theme for Home Assistant
 - 📅 Emma's Projector On/Off
 - 📅 Ethan's Projector On/Off
 - 📅 Garbage Collection Event Generator
-- 📅 Grow Light On/Off
+- 📅 Grow Light On/Off 🚫
 - 📅 Living Room Fan On/Off
 - 📅 Main Bedroom Fan On/Off
 - 📅 Update KidsChore UI Helpers
@@ -929,7 +929,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.8.1-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.8.2-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
