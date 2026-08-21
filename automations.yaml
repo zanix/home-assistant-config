@@ -2717,7 +2717,7 @@
     path: Blackshome/sensor-light.yaml
     input:
       motion_trigger:
-      - binary_sensor.cold_storage_contact_contact
+      - binary_sensor.cold_storage_door_contact
       light_switch:
         entity_id: light.cold_storage
       time_delay: 2
@@ -3706,79 +3706,100 @@
   alias: "\U0001F4AC Door Closed"
   description: Clears notification when doors are closed
   triggers:
-  - entity_id:
-    - binary_sensor.front_door_contact
-    - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_contact
-    - binary_sensor.garage_side_door_contact
-    - binary_sensor.cold_storage_contact_contact
-    from: 'on'
-    to: 'off'
-    for:
-      seconds: 30
-    trigger: state
+  - trigger: door.closed
+    target:
+      entity_id:
+      - binary_sensor.front_door_contact
+      - binary_sensor.sliding_door_contact
+      - binary_sensor.garage_entry_contact
+      - binary_sensor.garage_side_door_contact
+      - binary_sensor.cold_storage_door_contact
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
   conditions: []
   actions:
-  - data:
-      send_to: parents
-      notification_type: clear_notification
-      tag: door-{{ trigger.to_state.object_id }}
-    action: script.notify_mobile
-  - data:
-      computer:
-      - erebus
-      notification_type: clear_notification
-      tag: door-{{ trigger.to_state.object_id }}
-    action: script.notify_lnxlink
-  - if:
-    - condition: template
-      value_template: '{{ expand("binary_sensor.all_doors") | selectattr("state",
-        "==", "on") | map(attribute="entity_id") | list | count == 0 }}'
-    then:
-    - target:
-        entity_id: input_boolean.door_open_alerts
-      data: {}
-      action: input_boolean.turn_on
+  - parallel:
     - data:
         send_to: parents
         notification_type: clear_notification
-        tag: door-alerts-ignored
+        tag: door-{{ trigger.to_state.object_id }}
       action: script.notify_mobile
     - data:
         computer:
         - erebus
         notification_type: clear_notification
-        tag: door-alerts-ignored
+        tag: door-{{ trigger.to_state.object_id }}
       action: script.notify_lnxlink
+    alias: Clear notifications
+  - if:
+    - condition: door.is_closed
+      target:
+        entity_id: binary_sensor.all_doors
+      options:
+        behavior: any
+        for: 00:00:00
+    then:
+    - target:
+        entity_id: input_boolean.door_open_alerts
+      data: {}
+      action: input_boolean.turn_on
+    - parallel:
+      - data:
+          send_to: parents
+          notification_type: clear_notification
+          tag: door-alerts-ignored
+        action: script.notify_mobile
+      - data:
+          computer:
+          - erebus
+          notification_type: clear_notification
+          tag: door-alerts-ignored
+        action: script.notify_lnxlink
+      alias: Send notifications
   mode: parallel
 - id: '1665687917160'
   alias: "\U0001F4AC Door Left Open"
   description: Sends notification when a door is left open
   triggers:
-  - entity_id:
-    - binary_sensor.front_door_contact
-    - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_contact
-    - binary_sensor.garage_side_door_contact
-    - binary_sensor.cold_storage_contact_contact
-    from: 'off'
-    to: 'on'
-    for:
-      minutes: 5
-    trigger: state
+  - trigger: door.opened
+    target:
+      entity_id:
+      - binary_sensor.front_door_contact
+      - binary_sensor.sliding_door_contact
+      - binary_sensor.garage_entry_contact
+      - binary_sensor.garage_side_door_contact
+      - binary_sensor.cold_storage_door_contact
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
   conditions:
-  - condition: state
-    entity_id: input_boolean.door_open_alerts
-    state: 'on'
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.door_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
   actions:
   - repeat:
       until:
-      - or:
-        - condition: state
-          entity_id: input_boolean.door_open_alerts
-          state: 'off'
+      - condition: or
+        conditions:
+        - condition: switch.is_off
+          target:
+            entity_id: input_boolean.door_open_alerts
+          options:
+            behavior: any
+            for: 00:00:00
         - condition: template
-          value_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
+          value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+          alias: If trigger to-state entity is off
       sequence:
       - variables:
           title: '{{ trigger.to_state.name }}'
@@ -3842,29 +3863,45 @@
             - media_player.office_speaker
             message: '{{ message }}'
           action: script.notify_speech
-      - wait_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
+        alias: Send notifications
+      - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
 - id: '1665687973181'
   alias: "\U0001F4AC Door Left Open and Leaving"
   description: Sends notification if a door is open and everybody leaves
   triggers:
-  - trigger: state
-    entity_id: group.people
-    from: home
-    to: not_home
-    for:
-      minutes: 1
+  - trigger: zone.left
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for:
+        hours: 0
+        minutes: 1
+        seconds: 0
+      behavior: all
+      zone: zone.home
   conditions:
-  - condition: state
-    entity_id: input_boolean.guest_mode
-    state: 'off'
-  - condition: template
-    value_template: '{{ expand("binary_sensor.all_doors") | selectattr("state", "==",
-      "on") | map(attribute="entity_id") | list | count > 0 }}'
-  - condition: state
-    entity_id: input_boolean.door_open_alerts
-    state: 'on'
+  - condition: switch.is_off
+    target:
+      entity_id: input_boolean.guest_mode
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.door_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: door.is_open
+    target:
+      entity_id: binary_sensor.all_doors
+    options:
+      behavior: any
+      for: 00:00:00
   actions:
   - variables:
       title: Door Left Open
@@ -3900,29 +3937,42 @@
   alias: "\U0001F4AC Door Opened and Away"
   description: Sends notification if a door is open when people are away
   triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.front_door_contact
-    - binary_sensor.sliding_door_contact
-    - binary_sensor.garage_entry_contact
-    - binary_sensor.garage_side_door_contact
-    - binary_sensor.cold_storage_contact_contact
-    from: 'off'
-    to: 'on'
-  conditions:
-  - condition: state
-    entity_id: input_boolean.guest_mode
-    state: 'off'
-  - condition: zone.not_in_zone
+  - trigger: door.opened
     target:
-      entity_id: group.people
+      entity_id:
+      - binary_sensor.front_door_contact
+      - binary_sensor.sliding_door_contact
+      - binary_sensor.garage_entry_contact
+      - binary_sensor.garage_side_door_contact
+      - binary_sensor.cold_storage_door_contact
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 0
+  conditions:
+  - condition: switch.is_off
+    target:
+      entity_id: input_boolean.guest_mode
     options:
       behavior: any
       for: 00:00:00
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.door_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: zone.not_in_zone
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for: 00:00:00
+      behavior: all
       zone: zone.home
-  - condition: state
-    entity_id: input_boolean.door_open_alerts
-    state: 'on'
   actions:
   - variables:
       title: Door Opened
@@ -3956,39 +4006,43 @@
   alias: "\U0001F4AC Garage Door Closed"
   description: Clears notifications when the garage door closes
   triggers:
-  - entity_id:
-    - cover.garage_door
-    to:
-    - closed
-    trigger: state
+  - trigger: garage_door.closed
+    target:
+      entity_id: cover.garage_door
+    options:
+      for: 00:00:00
   conditions: []
   actions:
   - target:
       entity_id: input_boolean.garage_door_open_alerts
     data: {}
     action: input_boolean.turn_on
-  - data:
-      send_to: parents
-      notification_type: clear_notification
-      tag: garage-door
-    action: script.notify_mobile
-  - data:
-      computer:
-      - erebus
-      notification_type: clear_notification
-      tag: garage-door
-    action: script.notify_lnxlink
+  - parallel:
+    - data:
+        send_to: parents
+        notification_type: clear_notification
+        tag: garage-door
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        notification_type: clear_notification
+        tag: garage-door
+      action: script.notify_lnxlink
+    alias: Clear notifications
   mode: single
 - id: '1665689284289'
   alias: "\U0001F4AC Garage Door Left Open"
   description: Sends notification if the garage door is left open
   triggers:
-  - trigger: state
-    entity_id:
-    - cover.garage_door
-    to: open
-    for:
-      minutes: 30
+  - trigger: garage_door.opened
+    target:
+      entity_id: cover.garage_door
+    options:
+      for:
+        hours: 0
+        minutes: 30
+        seconds: 0
   conditions:
   - condition: state
     entity_id: binary_sensor.garage_multisensor_motion_detection
@@ -3999,12 +4053,17 @@
   actions:
   - repeat:
       until:
-      - or:
-        - condition: state
-          entity_id: input_boolean.garage_door_open_alerts
-          state: 'off'
+      - condition: or
+        conditions:
+        - condition: switch.is_off
+          target:
+            entity_id: input_boolean.garage_door_open_alerts
+          options:
+            behavior: any
+            for: 00:00:00
         - condition: template
-          value_template: '{{ is_state(trigger.to_state.entity_id, ''closed'') }}'
+          value_template: '{{ is_state(trigger.to_state.entity_id, "closed") }}'
+          alias: If trigger to-state entity is off
       sequence:
       - variables:
           title: '{{ trigger.to_state.name }}'
@@ -4073,6 +4132,7 @@
             - media_player.office_speaker
             message: '{{ message }}'
           action: script.notify_speech
+        alias: Send notifications
       - wait_template: '{{ is_state(trigger.to_state.entity_id, ''closed'') }}'
         timeout: 00:30:00
   mode: single
@@ -4080,22 +4140,37 @@
   alias: "\U0001F4AC Garage Door Left Open and Leaving"
   description: Sends notification if a door is open and everybody leaves
   triggers:
-  - trigger: state
-    entity_id: group.people
-    from: home
-    to: not_home
-    for:
-      minutes: 1
+  - trigger: zone.left
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for:
+        hours: 0
+        minutes: 1
+        seconds: 0
+      behavior: all
+      zone: zone.home
   conditions:
-  - condition: state
-    entity_id: input_boolean.guest_mode
-    state: 'off'
-  - condition: state
-    entity_id: cover.garage_door
-    state: open
-  - condition: state
-    entity_id: input_boolean.garage_door_open_alerts
-    state: 'on'
+  - condition: switch.is_off
+    target:
+      entity_id: input_boolean.guest_mode
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.garage_door_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: garage_door.is_open
+    target:
+      entity_id: cover.garage_door
+    options:
+      behavior: any
+      for: 00:00:00
   - condition: numeric_state
     entity_id: automation.automatic_gate
     attribute: current
@@ -4135,23 +4210,34 @@
   alias: "\U0001F4AC Garage Door Opened and Away"
   description: Sends notification if the garage door opens while people are away
   triggers:
-  - trigger: state
-    entity_id: cover.garage_door
-    to: open
+  - trigger: garage_door.opened
+    target:
+      entity_id: cover.garage_door
+    options:
+      behavior: each
+      for: 00:00:00
   conditions:
-  - condition: state
-    entity_id: input_boolean.guest_mode
-    state: 'off'
+  - condition: switch.is_off
+    target:
+      entity_id: input_boolean.guest_mode
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.garage_door_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
   - condition: zone.not_in_zone
     target:
-      entity_id: group.people
+      entity_id:
+      - person.amy
+      - person.joshua
     options:
       behavior: any
       for: 00:00:00
       zone: zone.home
-  - condition: state
-    entity_id: input_boolean.garage_door_open_alerts
-    state: 'on'
   - condition: numeric_state
     entity_id: automation.automatic_gate
     attribute: current
