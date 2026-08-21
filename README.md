@@ -33,9 +33,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5567 |
-| Sensors        | 1751 |
-| Binary Sensors | 379 |
+| All Entities   | 5588 |
+| Sensors        | 1760 |
+| Binary Sensors | 387 |
 | Lights         | 81 |
 | Switches       | 800 |
 
@@ -756,7 +756,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>151 Automations</summary>
+<details><summary>154 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -773,7 +773,7 @@ Material Design 3 Theme for Home Assistant
 - ☑️ Guest Mode Check Handler
 - ☑️ Ignore Door Alerts
 - ☑️ Ignore Garage Door Alerts
-- ☑️ Ignore Window Alerts 🚫
+- ☑️ Ignore Window Alerts
 - ☑️ Retry Remote Start Ascent
 - ☑️ Retry Remote Start Kona
 - ☑️ Turn on Water Main
@@ -853,7 +853,10 @@ Material Design 3 Theme for Home Assistant
 - 💬 Kona Fuel Level Low
 - 💬 Kona Remote Start Expired Notification
 - 💬 Kona Started
+- 💬 Window Closed
 - 💬 Window Left Open 🚫
+- 💬 Window Left Open and Leaving
+- 💬 Window Opened and Away
 - 📅 Emma's Projector On/Off
 - 📅 Ethan's Projector On/Off
 - 📅 Garbage Collection Event Generator

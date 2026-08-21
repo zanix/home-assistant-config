@@ -1702,6 +1702,24 @@ views:
             entity: binary_sensor.all_doors
             state: 'on'
       - type: custom:mushroom-template-badge
+        entity: binary_sensor.all_windows
+        label: Windows
+        content: '{{ expand(entity) | selectattr(''state'', ''=='', ''on'') | list
+          | count }}'
+        icon: '{{ iif(is_state(entity, "on"), "mdi:window-open", "mdi:window-closed")
+          }}'
+        color: '{{ iif(is_state(entity, "on"), "cyan", "grey") }}'
+        tap_action:
+          action: fire-dom-event
+          browser_mod:
+            service: browser_mod.popup
+            data:
+              popup_card_id: windows
+        visibility:
+          - condition: state
+            entity: binary_sensor.all_windows
+            state: 'on'
+      - type: custom:mushroom-template-badge
         entity: light.all_lights
         label: Lights
         content: '{{ expand(entity) | selectattr(''state'', ''=='', ''on'') | list
@@ -3024,6 +3042,50 @@ views:
               icon: mdi:door
             grid_options:
               columns: 6
+          - type: heading
+            icon: mdi:window-closed
+            heading: Windows
+            heading_style: subtitle
+            badges:
+              - type: custom:mushroom-template-badge
+                entity: input_boolean.window_open_alerts
+                label: Window
+                content: '{{ state_translated(entity) }}'
+                icon: mdi:{{ iif(is_state(entity, "off"), "window-minimize", "window-closed")
+                  }}
+                color: "{% if is_state(entity, \"off\") %}\n  yellow\n{% else %}\n\
+                  \  green\n{% endif %}"
+                tap_action:
+                  action: more-info
+                hold_action:
+                  action: toggle
+          - type: custom:streamline-card
+            template: window_card
+            variables:
+              name: Kitchen
+              entity: binary_sensor.kitchen_window_contact
+              battery_entity: sensor.kitchen_window_battery
+              icon: mdi:window
+            grid_options:
+              columns: 6
+          - type: custom:streamline-card
+            template: window_card
+            variables:
+              name: Living Room Left
+              entity: binary_sensor.living_room_left_window_contact
+              battery_entity: sensor.living_room_left_window_battery
+              icon: mdi:window
+            grid_options:
+              columns: 6
+          - type: custom:streamline-card
+            template: window_card
+            variables:
+              name: Joshua Office
+              entity: binary_sensor.joshua_office_window_contact
+              battery_entity: sensor.joshua_office_window_battery
+              icon: mdi:window
+            grid_options:
+              columns: 6
       - type: grid
         cards:
           - type: heading
@@ -3400,6 +3462,14 @@ views:
         content: '{{ expand(entity) | selectattr(''state'', ''=='', ''on'') | list
           | count }}'
         icon: '{{ iif(is_state(entity, "on"), "mdi:door-open", "mdi:door") }}'
+        color: '{{ iif(is_state(entity, "on"), "cyan", "grey") }}'
+      - type: custom:mushroom-template-badge
+        entity: binary_sensor.all_windows
+        label: Windows
+        content: '{{ expand(entity) | selectattr(''state'', ''=='', ''on'') | list
+          | count }}'
+        icon: '{{ iif(is_state(entity, "on"), "mdi:window-open", "mdi:window-closed")
+          }}'
         color: '{{ iif(is_state(entity, "on"), "cyan", "grey") }}'
       - type: custom:mushroom-template-badge
         entity: input_boolean.guest_mode
@@ -13741,6 +13811,33 @@ views:
               filter:
                 include:
                   - group: binary_sensor.all_doors
+                    options:
+                      type: tile
+                      features_position: bottom
+                      vertical: false
+                      state_content:
+                        - state
+                        - last_changed
+                      tap_action:
+                        action: none
+              card:
+                type: custom:layout-card
+                cards: []
+                layout_type: masonry
+              sort:
+                method: friendly_name
+          - type: custom:popup-card
+            title: Windows
+            icon: mdi:window-closed
+            icon_close: false
+            dismissable: true
+            adaptive: true
+            popup_card_id: windows
+            card:
+              type: custom:auto-entities
+              filter:
+                include:
+                  - group: binary_sensor.all_windows
                     options:
                       type: tile
                       features_position: bottom

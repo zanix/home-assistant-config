@@ -3084,3 +3084,35 @@ lock_config_card:
           attribute: remaining
         end_time:
           state: true
+window_card:
+  card:
+    type: custom:mushroom-template-card
+    entity: '[[entity]]'
+    primary: '[[name]]'
+    secondary: >-
+      {% from "util.jinja" import nominal_change_history %} {{
+      state_translated(entity) }} ⸱ {{ nominal_change_history(entity) }}
+    icon: '[[icon]]{{ "-open" if is_state(entity, "on") else "-closed" }}'
+    color: '{{ iif(is_state(entity, "on"), "red", "green") }}'
+    features_position: bottom
+    tap_action:
+      action: more-info
+    icon_tap_action:
+      action: fire-dom-event
+      browser_mod:
+        service: browser_mod.more_info
+        data:
+          entity: '[[battery_entity]]'
+    card_mod:
+      style:
+        ha-tile-icon$: |
+          {% if int(states("[[battery_entity]]"), 0) <= 50 %}
+          {% from "util.jinja" import battery_color %}
+          .container {
+            /* Radial progress bar */
+            background:
+              radial-gradient(var(--card-background-color) 60%, transparent calc(60% + 1px)),
+              conic-gradient(var(--{{ battery_color("[[battery_entity]]") }}-color) {{ states("[[battery_entity]]") }}% 0%, var(--card-background-color) 0% 100%
+            );
+          }
+          {% endif %}

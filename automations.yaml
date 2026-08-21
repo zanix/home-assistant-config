@@ -4691,29 +4691,100 @@
       entity_id: timer.kona_remote_start
     action: timer.cancel
   mode: single
+- id: '1787259054989'
+  alias: "\U0001F4AC Window Closed"
+  description: Clears notification when windows are closed
+  triggers:
+  - trigger: window.closed
+    target:
+      entity_id:
+      - binary_sensor.kitchen_window_contact
+      - binary_sensor.living_room_left_window_contact
+      - binary_sensor.joshua_office_window_contact
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 30
+  conditions: []
+  actions:
+  - parallel:
+    - data:
+        send_to: parents
+        notification_type: clear_notification
+        tag: window-{{ trigger.to_state.object_id }}
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        notification_type: clear_notification
+        tag: window-{{ trigger.to_state.object_id }}
+      action: script.notify_lnxlink
+    alias: Clear notifications
+  - if:
+    - condition: window.is_closed
+      target:
+        entity_id: binary_sensor.all_windows
+      options:
+        behavior: any
+        for: 00:00:00
+    then:
+    - target:
+        entity_id: input_boolean.window_open_alerts
+      data: {}
+      action: input_boolean.turn_on
+    - parallel:
+      - data:
+          send_to: parents
+          notification_type: clear_notification
+          tag: window-alerts-ignored
+        action: script.notify_mobile
+      - data:
+          computer:
+          - erebus
+          notification_type: clear_notification
+          tag: window-alerts-ignored
+        action: script.notify_lnxlink
+      alias: Send notifications
+  mode: parallel
 - id: '1665700388935'
   alias: "\U0001F4AC Window Left Open"
-  description: Sends notification if a window is left open
+  description: Sends notification when a window is left open
   triggers:
-  - trigger: state
-    entity_id: binary_sensor.front_door_contact
-    from: 'off'
-    to: 'on'
-    for:
-      minutes: 30
+  - trigger: window.opened
+    target:
+      entity_id:
+      - binary_sensor.kitchen_window_contact
+      - binary_sensor.living_room_left_window_contact
+      - binary_sensor.joshua_office_window_contact
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 30
+        seconds: 0
   conditions:
-  - condition: state
-    entity_id: input_boolean.window_open_alerts
-    state: 'on'
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.window_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
   actions:
   - repeat:
       until:
-      - or:
-        - condition: state
-          entity_id: input_boolean.window_open_alerts
-          state: 'off'
+      - condition: or
+        conditions:
+        - condition: switch.is_off
+          target:
+            entity_id: input_boolean.window_open_alerts
+          options:
+            behavior: any
+            for: 00:00:00
         - condition: template
-          value_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
+          value_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
+          alias: If trigger to-state entity is off
       sequence:
       - variables:
           title: '{{ trigger.to_state.name }}'
@@ -4731,6 +4802,7 @@
       - parallel:
         - data:
             send_to: parents
+            location: home
             title: '{{ title }}'
             message: '{{ message }}'
             notification_icon: '{{ icon_mdi }}'
@@ -4739,7 +4811,6 @@
             group: '{{ group }}'
             channel: Security
             interruption_level: critical
-            car_ui: true
             tag: '{{ tag }}'
             url: '{{ url }}'
             actions: '{{ notification_actions }}'
@@ -4777,9 +4848,143 @@
             - media_player.office_speaker
             message: '{{ message }}'
           action: script.notify_speech
-      - wait_template: '{{ is_state(trigger.to_state.entity_id, ''off'') }}'
+        alias: Send notifications
+      - wait_template: '{{ is_state(trigger.to_state.entity_id, "off") }}'
         timeout: 00:05:00
   mode: parallel
+- id: '1787272260444'
+  alias: "\U0001F4AC Window Left Open and Leaving"
+  description: Sends notification if a window is open and everybody leaves
+  triggers:
+  - trigger: zone.left
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for:
+        hours: 0
+        minutes: 1
+        seconds: 0
+      behavior: all
+      zone: zone.home
+  conditions:
+  - condition: switch.is_off
+    target:
+      entity_id: input_boolean.guest_mode
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.window_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: window.is_open
+    target:
+      entity_id: binary_sensor.all_windows
+    options:
+      behavior: any
+      for: 00:00:00
+  actions:
+  - variables:
+      title: Window Left Open
+      icon: local/icons/window-open.png
+      icon_mdi: mdi:window-open
+      color: '#9c27b0'
+      group: Security
+      url: lovelace/security
+      message: "{%- from \"util.jinja\" import get_friendly_names -%} {%- set windows
+        = expand(\"binary_sensor.all_windows\")\n  | selectattr(\"state\", \"==\",
+        \"on\")\n  | map(attribute=\"entity_id\") | list\n-%} {%- if windows | length
+        == 1 -%}\n  The {{ get_friendly_names(windows) }} was open when you left!\n{%-
+        else -%}\n  The {{ get_friendly_names(windows) }} were open when you left!\n{%-
+        endif -%}"
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      channel: Security
+      car_ui: true
+      interruption_level: critical
+      url: '{{ url }}'
+      actions:
+      - action: ignore_window_alerts
+        title: Ignore
+    action: script.notify_mobile
+  mode: single
+- id: '1787272470902'
+  alias: "\U0001F4AC Window Opened and Away"
+  description: Sends notification if a window is open when people are away
+  triggers:
+  - trigger: window.opened
+    target:
+      entity_id:
+      - binary_sensor.kitchen_window_contact
+      - binary_sensor.living_room_left_window_contact
+      - binary_sensor.joshua_office_window_contact
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 0
+  conditions:
+  - condition: switch.is_off
+    target:
+      entity_id: input_boolean.guest_mode
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: switch.is_on
+    target:
+      entity_id: input_boolean.window_open_alerts
+    options:
+      behavior: any
+      for: 00:00:00
+  - condition: zone.not_in_zone
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for: 00:00:00
+      behavior: all
+      zone: zone.home
+  actions:
+  - variables:
+      title: Window Opened
+      message: The {{ trigger.to_state.attributes.friendly_name }} opened and no one
+        is home.
+      icon: local/icons/window-open.png
+      icon_mdi: mdi:window-open
+      color: '#9c27b0'
+      tag: window-{{ trigger.to_state.object_id }}
+      group: Security
+      url: lovelace/security
+  - data:
+      send_to: parents
+      title: '{{ title }}'
+      message: '{{ message }}'
+      notification_icon: '{{ icon_mdi }}'
+      color: '{{ color }}'
+      icon: '{{ icon }}'
+      group: '{{ group }}'
+      channel: Security
+      interruption_level: critical
+      tag: '{{ tag }}'
+      car_ui: true
+      url: '{{ url }}'
+      actions:
+      - action: ignore_window_alerts
+        title: Ignore
+    action: script.notify_mobile
+  mode: single
 - id: '1710955585340'
   alias: "\U0001F4C5 Emma's Projector On/Off"
   description: ''
