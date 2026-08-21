@@ -307,7 +307,7 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.12.2]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.13.0]
 
 Automatically update Home Assistant blueprints via native update entities.
 
@@ -323,7 +323,7 @@ Bubble Card Tools is a custom integration that handles the Bubble Card backend. 
 
 Authors: [@Clooos](https://github.com/Clooos).
 
-### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.5.0]
+### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.5.1]
 
 ☑️ ChoreOps - A sophisticated household task and routine manager for Home Assistant. Gamify your chores for motivation, or just ensure the trash gets taken out on time.
 
@@ -353,7 +353,7 @@ Component to integrate with GasBuddy fuel price tracker.
 
 Authors: [@firstof9](https://github.com/firstof9).
 
-### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2026.6.0]
+### [Ge Home (Smarthq)](https://github.com/simbaja/ha_gehome) [v2026.8.0]
 
 GE Home Appliances (SmartHQ) for Home Assistant
 
@@ -419,7 +419,7 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.25]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.27]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -437,7 +437,7 @@ Neakasa Integration for Home Assistant
 
 Authors: [@tabascoz](https://github.com/tabascoz).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.0.2]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.0.3]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -531,7 +531,7 @@ Bubble Card is a minimalist and customizable card collection for Home Assistant,
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.2.1]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.2.2]
 
 Expander card for HomeAssistant
 
@@ -639,11 +639,11 @@ This custom card allows you to display vehicle information in your Home Assistan
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.4.3]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.4.4]
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.13.0]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.14.0]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
