@@ -794,6 +794,10 @@ actions:
   - alias: Format the notification message
     variables:
       message: "{{ message.format(driver_name=driver_name) }}"
+      tts_message: |
+        {%- from 'message.jinja' import map_usename -%}
+        {%- set name = map_usename(driver_name) -%}
+        {{ message.format(driver_name=name) }}
   - parallel:
       - alias: Notify each user except the driver about itinerary start
         repeat:
@@ -842,7 +846,7 @@ actions:
             action: script.notify_speech
             data:
               media_player: "{{ speaker_tts_devices }}"
-              message: '{{ message }}'
+              message: '{{ tts_message }}'
             continue_on_error: true
   - alias: If travel time sensors set
     if:
@@ -1068,6 +1072,20 @@ actions:
                               ) | round
                             )
                           }}
+                        tts_message: |
+                          {%- from 'message.jinja' import map_usename -%}
+                          {%- set name = map_usename(driver_name) -%}
+                          {{
+                            message.format(
+                              driver_name=name,
+                              remaining_minutes=(
+                                (
+                                  arrival_timestamp
+                                  - now() | as_timestamp
+                                ) / 60
+                              ) | round
+                            )
+                          }}
                     - sequence: *play_speaker_tts
                     - alias: Mark nearly arrived TTS as already sent
                       variables:
@@ -1215,6 +1233,10 @@ actions:
       - alias: Format the notification message
         variables:
           message: "{{ message.format(driver_name=driver_name) }}"
+          tts_message: |
+            {%- from 'message.jinja' import map_usename -%}
+            {%- set name = map_usename(driver_name) -%}
+            {{ message.format(driver_name=name) }}
       - parallel:
           - alias: Send arrival notification to each user
             repeat:
