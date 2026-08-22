@@ -5,34 +5,30 @@
 #
 # https://www.home-assistant.io/integrations/template/
 #
+trigger:
+  - trigger: event
+    event_type: battery_notes_battery_threshold
+    event_data:
+      battery_low: true
+  - trigger: event
+    event_type: battery_notes_battery_threshold
+    event_data:
+      battery_low: false
 sensor:
   - name: Low Battery Devices
     icon: 'mdi:battery-{{ iif(this.state | int(default=0) == 0, "check", "alert") }}'
-    state: '{{ this.attributes.get("entity_id", []) | count }}'
+    state: >-
+      {{ expand(integration_entities('battery_notes')
+        | select('search', '_battery_plus$'))
+        | selectattr('attributes.battery_low', 'eq', true)
+        | map(attribute='entity_id')
+        | list | count
+      }}
     attributes:
       entity_id: >-
-        {% set threshold = 30 %}
-        {% set custom_entities = {
-          'sensor.dishwasher_leak_battery_level': 10,
-          'sensor.pixel_10_amy_battery_level': 0,
-          'sensor.pixel_watch_3_amy_battery_level': 0,
-          'sensor.pixel_10_joshua_battery_level': 0,
-          'sensor.pixel_watch_3_joshua_battery_level': 0,
-          'sensor.quest_battery_level': 15,
-          'sensor.dustin_mopman_battery_level': 0,
-          'sensor.r2dee2_battery_level': 0
-        } %}
-        {% set result = namespace(devices=[]) %}
-        {% set devices = states.sensor
-          | reject('in', ['unknown', 'unavailable', 'undefined'])
-          | rejectattr('state', 'in', ['unknown', 'unavailable', 'undefined'])
-          | rejectattr('attributes.device_class', 'undefined')
-          | selectattr('attributes.device_class', '==', 'battery')
+        {{ expand(integration_entities('battery_notes')
+          | select('search', '_battery_plus$'))
+          | selectattr('attributes.battery_low', 'eq', true)
+          | map(attribute='entity_id')
           | list
-        %}
-        {% for device in devices %}
-          {% if device.state | int(-1) <= custom_entities[device.entity_id] | default(threshold) %}
-            {% set result.devices = result.devices + [device.entity_id] %}
-          {% endif %}
-        {% endfor %}
-        {{ result.devices }}
+        }}

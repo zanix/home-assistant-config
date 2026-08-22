@@ -967,14 +967,14 @@
   alias: ⚙️ Battery Level Low
   description: Sends a notification when a device battery level is low
   triggers:
-  - entity_id: sensor.low_battery_devices
-    trigger: state
-    not_from:
-    - unavailable
-    - unknown
-    not_to:
-    - unavailable
-    - unknown
+  - trigger: event
+    event_type: battery_notes_battery_threshold
+    event_data:
+      battery_low: true
+  - trigger: event
+    event_type: battery_notes_battery_threshold
+    event_data:
+      battery_low: false
   conditions:
   - alias: Triggers are available
     condition: template
@@ -982,15 +982,21 @@
       \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n   and
       not trigger.to_state.attributes in ['unknown', 'unavailable', none]\n}}"
   actions:
+  - action: battery_notes.check_battery_low
+    metadata: {}
+    data:
+      raise_events: false
+    response_variable: devices
   - variables:
-      devices: '{{ trigger.to_state.state | int(default=0) }}'
-      title: Low Battery Level{{ iif(devices > 1, 's', '') }} ({{ devices }})
-      sensors: "{% set result = namespace(sensors=[]) %}\n{% if devices > 0 %}\n  {%
-        for entity in trigger.to_state.attributes.entity_id %}\n    {% set device
-        = states.sensor[entity.split('.')[1]] %}\n    {% set name = device.name |
-        replace(':', '') | regex_replace(find = ' battery level', replace = '', ignorecase
-        = true) %}\n    {% set result.sensors = result.sensors + [name ~ ' (' ~ device.state
-        | round ~ '%)'] %}\n  {% endfor %}\n{% endif %}\n{{ result.sensors }}"
+      device_count: '{{ devices | list | count }}'
+      title: Low Battery Level{{ iif(device_count > 1, 's', '') }} ({{ device_count
+        }})
+      messages: "{% set result = namespace(messages=[]) %}\n{% if device_count > 0
+        %}\n  {% for device in devices %}\n    {% set message = \"{name} {level}%
+        ({count}×{type})\".format(\n      name=device.name,\n      level=device.battery_level,\n
+        \     count=device.battery_quantity,\n      type=device.battery_type\n    )
+        %}\n    {% set result.messages = result.messages + [message] %}\n  {% endfor
+        %}\n{% endif %}\n{{ result.messages }}"
   - choose:
     - conditions:
       - condition: template
@@ -1016,13 +1022,13 @@
       - parallel:
         - data:
             title: '{{ title }}'
-            message: '- {{ sensors | join(''\n- '') }}'
+            message: '- {{ messages | join(''\n- '') }}'
             notification_id: low-battery-alert
           action: persistent_notification.create
         - data:
             send_to: joshua
             title: '{{ title }}'
-            message: '{{ sensors | join(''<br>'') }}'
+            message: '{{ messages | join(''<br>'') }}'
             notification_icon: mdi:battery-alert
             color: '#f44336'
             icon: local/icons/battery-alert.png

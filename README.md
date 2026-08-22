@@ -33,9 +33,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5588 |
-| Sensors        | 1760 |
-| Binary Sensors | 387 |
+| All Entities   | 5795 |
+| Sensors        | 1871 |
+| Binary Sensors | 437 |
 | Lights         | 81 |
 | Switches       | 800 |
 
@@ -293,7 +293,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>32 Custom Integrations</summary>
+<details><summary>33 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.31.0]
 
@@ -307,7 +307,13 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.13.0]
+### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.5.3]
+
+A Home Assistant integration to provide battery details of devices
+
+Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
+
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.13.2]
 
 Automatically update Home Assistant blueprints via native update entities.
 
