@@ -437,11 +437,11 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa](https://github.com/tabascoz/hass-neakasa) [v1.3.0]
+### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.3.4]
 
-Neakasa Integration for Home Assistant
+Home Assistant cloud-push integration for the Neakasa M1 self-cleaning litter box (real-time MQTT + polling fallback)
 
-Authors: [@tabascoz](https://github.com/tabascoz).
+Authors: [@roquerodrigo](https://github.com/roquerodrigo).
 
 ### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.0.3]
 
