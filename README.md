@@ -33,9 +33,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5795 |
-| Sensors        | 1871 |
-| Binary Sensors | 437 |
+| All Entities   | 5798 |
+| Sensors        | 1873 |
+| Binary Sensors | 438 |
 | Lights         | 81 |
 | Switches       | 800 |
 
@@ -313,13 +313,13 @@ A Home Assistant integration to provide battery details of devices
 
 Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.13.2]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.13.3]
 
 Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.2.1]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.2.2]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -467,7 +467,7 @@ Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.0.1]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.1.0]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
@@ -537,7 +537,7 @@ Bubble Card is a minimalist and customizable card collection for Home Assistant,
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.2.2]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.3.0]
 
 Expander card for HomeAssistant
 
@@ -549,7 +549,7 @@ Expander card for HomeAssistant
 
 Home Assistant custom Lovelace card for the GasBuddy integration displaying gas prices and EV charging station data.
 
-### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.4.12]
+### [Gauge Card Pro](https://github.com/benjamin-dcs/gauge-card-pro) [v2.5.0]
 
 Build beautiful Gauge cards using 🌈 gradients and 🛠️ templates
 
@@ -565,7 +565,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.9.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.10.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -573,7 +573,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v14.0.2]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v14.1.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -581,7 +581,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.24]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.25]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -645,7 +645,7 @@ This custom card allows you to display vehicle information in your Home Assistan
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.4.4]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.6.0]
 
 Home Assistant Lovelace Windrose Card
 
@@ -661,7 +661,7 @@ This card provides a user-friendly way to fully control map-based vacuums in Hom
 
 </details><details><summary>1 Themes</summary>
 
-### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.14]
+### [Material You Theme   A Fully Featured Implementation Of Material Design 3](https://github.com/Nerwyn/material-you-theme) [v5.0.15]
 
 Material Design 3 Theme for Home Assistant
 
@@ -770,7 +770,7 @@ Material Design 3 Theme for Home Assistant
 - ⏯ Family Room Sound Mode
 - ⏯ Living Room Media Off
 - ⏯ Living Room Media State at Night 🚫
-- ⏯ Living Room Sound Mode 🚫
+- ⏯ Living Room Sound Mode
 - ⏯ Main Bedroom Media Off
 - ⏯ PS4 Harmony Activity
 - ☑️ Cat Feeder Filled
@@ -823,7 +823,6 @@ Material Design 3 Theme for Home Assistant
 - 🐱 Cat Litterbox Full
 - 🐱 Cat Litterbox Litter Low
 - 💡 All Lights off when Away
-- 💡 Cold Storage Room Light
 - 💡 Dim Front Lights at Night
 - 💡 Front Lights off at Sunrise
 - 💡 Front Lights on at Sunset
@@ -881,6 +880,7 @@ Material Design 3 Theme for Home Assistant
 - 📋 [Inovelli] Main Bedroom Switch
 - 📋 [Inovelli] Outside Garage Switch
 - 📋 [Sensor Light] Basement Hallway
+- 📋 [Sensor Light] Cold Storage Room
 - 📍 Itinerary Tracker Notification
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Delivered
@@ -938,7 +938,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.8.2-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.8.3-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
