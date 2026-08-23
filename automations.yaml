@@ -45,11 +45,12 @@
   alias: ⏯ Family Room Media Off
   description: Ensure the Family Room media is turned off
   triggers:
-  - trigger: state
-    entity_id:
-    - remote.androidtv_family_room
-    from: 'on'
-    to: 'off'
+  - trigger: remote.turned_off
+    target:
+      entity_id: remote.androidtv_family_room
+    options:
+      behavior: each
+      for: 00:00:00
   conditions: []
   actions:
   - action: media_player.turn_off
@@ -65,39 +66,47 @@
   alias: ⏯ Family Room Media State at Night
   description: Brighten/Dim the lights when Media is paused
   triggers:
-  - entity_id:
-    - media_player.androidtv_family_room
-    trigger: state
+  - trigger: state
+    entity_id: media_player.universal_family_room
   conditions:
-  - condition: state
-    entity_id: sun.sun
-    state: below_horizon
-  - condition: state
-    entity_id: light.family_room
-    state: 'on'
+  - condition: sun.is_set
+    options: {}
+  - condition: light.is_on
+    target:
+      entity_id: light.family_room
+    options:
+      behavior: any
+      for: 00:00:00
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: media_player.androidtv_family_room
-        state: paused
+      - condition: media_player.is_paused
+        target:
+          entity_id: media_player.universal_family_room
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - data:
           transition: 5
-          brightness_pct: 100
+          brightness_pct: 80
         target:
           entity_id: light.family_room
         action: light.turn_on
     - conditions:
-      - condition: state
-        entity_id: media_player.androidtv_family_room
-        state: playing
+      - condition: media_player.is_playing
+        target:
+          entity_id: media_player.universal_family_room
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - data:
-          transition: 5
+          transition: 1
           brightness_pct: 20
         action: light.turn_on
-  mode: single
+        target:
+          entity_id: light.family_room
 - id: '1665696328059'
   alias: ⏯ Family Room Sound Mode
   description: Changes the reciever sound mode based on Source
@@ -136,11 +145,12 @@
   alias: ⏯ Living Room Media Off
   description: Ensure the Living Room media is turned off
   triggers:
-  - trigger: state
-    entity_id:
-    - remote.androidtv_living_room
-    from: 'on'
-    to: 'off'
+  - trigger: remote.turned_off
+    target:
+      entity_id: remote.androidtv_living_room
+    options:
+      behavior: each
+      for: 00:00:00
   conditions: []
   actions:
   - action: media_player.turn_off
@@ -156,38 +166,47 @@
   alias: ⏯ Living Room Media State at Night
   description: Brighten/Dim the lights when Media is paused
   triggers:
-  - entity_id:
-    - media_player.androidtv_living_room
-    trigger: state
+  - trigger: state
+    entity_id: media_player.universal_living_room
   conditions:
-  - condition: state
-    entity_id: sun.sun
-    state: below_horizon
-  - condition: state
-    entity_id: light.living_room_fan_light
-    state: 'on'
+  - condition: sun.is_set
+    options: {}
+  - condition: light.is_on
+    target:
+      entity_id: light.living_room_fan_light
+    options:
+      behavior: any
+      for: 00:00:00
   actions:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: media_player.androidtv_living_room
-        state: paused
+      - condition: media_player.is_paused
+        target:
+          entity_id: media_player.universal_living_room
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - data:
           transition: 5
-          brightness_pct: 60
+          brightness_pct: 80
         target:
           entity_id: light.living_room_fan_light
         action: light.turn_on
     - conditions:
-      - condition: state
-        entity_id: media_player.androidtv_living_room
-        state: playing
+      - condition: media_player.is_playing
+        target:
+          entity_id: media_player.universal_living_room
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - data:
-          transition: 5
+          transition: 1
           brightness_pct: 20
         action: light.turn_on
+        target:
+          entity_id: light.living_room_fan_light
 - id: '1665696345535'
   alias: ⏯ Living Room Sound Mode
   description: Changes the soundbar sound mode based on Source
@@ -215,17 +234,19 @@
   alias: ⏯ Main Bedroom Media Off
   description: Automatically turn off the Media Center in the Main Bedroom
   triggers:
-  - trigger: state
-    entity_id:
-    - remote.harmony_main_bedroom
-    from: 'on'
-    to: 'off'
+  - trigger: remote.turned_off
+    target:
+      entity_id: remote.harmony_main_bedroom
+    options:
+      behavior: each
+      for: 00:00:00
     id: remote
-  - trigger: state
-    entity_id:
-    - remote.androidtv_main_bedroom
-    from: 'on'
-    to: 'off'
+  - trigger: remote.turned_off
+    target:
+      entity_id: remote.androidtv_main_bedroom
+    options:
+      behavior: each
+      for: 00:00:00
     id: media
   conditions: []
   actions:
@@ -950,10 +971,9 @@
   triggers:
   - at: 03:00:00
     trigger: time
-  conditions:
-  - condition: template
-    value_template: '{{ now().isoweekday() == 7 }}'
-    alias: Today is Sunday
+    weekday:
+    - sun
+  conditions: []
   actions:
   - action: hassio.backup_full
     data:
@@ -1044,12 +1064,9 @@
   triggers:
   - at: 00:00:00
     trigger: time
-  conditions:
-  - condition: time
     weekday:
     - mon
-    before: 00:00:00
-    after: 00:00:00
+  conditions: []
   actions:
   - data: {}
     action: tts.clear_cache
@@ -1060,11 +1077,11 @@
   description: Disables an integration during a specified time period and re-enables
     it afterwards
   triggers:
-  - at: '22:00:00'
-    id: disable_time
-    trigger: time
   - at: 02:00:00
     id: enable_time
+    trigger: time
+  - at: '22:00:00'
+    id: disable_time
     trigger: time
   conditions:
   - condition: template
@@ -1682,10 +1699,12 @@
   description: Sets MSR-1 LED color Alerts when CO2 levels in Joshua's Office are
     high
   triggers:
-  - entity_id:
-    - sensor.apollo_msr_1_office_co2
-    to:
-    trigger: state
+  - trigger: air_quality.co2_changed
+    target:
+      entity_id: sensor.apollo_msr_1_office_co2
+    options:
+      threshold:
+        type: any
   - event: start
     trigger: homeassistant
   conditions: []
@@ -1759,21 +1778,23 @@
   alias: ✴️ Joshua Office Light On/Off Presence
   description: Turn on/off the light based on presence
   triggers:
-  - entity_id:
-    - binary_sensor.apollo_msr_1_office_radar_target
+  - trigger: occupancy.detected
+    target:
+      entity_id: binary_sensor.apollo_msr_1_office_radar_target
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to: 'on'
-    trigger: state
-  - entity_id:
-    - binary_sensor.apollo_msr_1_office_radar_target
+  - trigger: occupancy.cleared
+    target:
+      entity_id: binary_sensor.apollo_msr_1_office_radar_target
+    options:
+      behavior: each
+      for:
+        hours: 0
+        minutes: 5
+        seconds: 0
     id: 'off'
-    to:
-    - 'off'
-    for:
-      hours: 0
-      minutes: 5
-      seconds: 0
-    trigger: state
   conditions: []
   actions:
   - choose:
@@ -2332,10 +2353,15 @@
   alias: "\U0001F384 XMas Lights On/Off"
   description: ''
   triggers:
-  - event: sunset
-    offset: -00:20:00
+  - trigger: sun.sunset
+    options:
+      offset:
+        hours: 0
+        minutes: 20
+        seconds: 0
+        days: 0
+      offset_type: before
     id: 'on'
-    trigger: sun
   - at: input_datetime.xmas_lights_off
     id: 'off'
     trigger: time
@@ -2348,26 +2374,40 @@
     - conditions:
       - condition: trigger
         id: 'on'
-      sequence: []
+      sequence:
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.outside_eve
+        data: {}
     - conditions:
       - condition: trigger
         id: 'off'
-      sequence: []
+      sequence:
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.outside_eve
+        data: {}
   mode: single
 - id: '1665697781484'
   alias: "\U0001F384 XMas Tree On/Off"
   description: ''
   triggers:
-  - entity_id:
-    - schedule.xmas_tree
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.xmas_tree
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to:
-    - 'on'
-    trigger: state
-  - entity_id: schedule.xmas_tree
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.xmas_tree
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'off'
-    to: 'off'
-    trigger: state
   conditions:
   - condition: state
     entity_id: binary_sensor.is_xmas
@@ -2416,16 +2456,22 @@
       - condition: trigger
         id:
         - day
-      - condition: state
-        entity_id: person.joshua
-        state: home
+      - condition: zone.in_zone
+        target:
+          entity_id: person.joshua
+        options:
+          behavior: any
+          for: 00:00:00
+          zone: zone.home
       - condition: state
         entity_id: binary_sensor.workday_sensor
         state: 'on'
       sequence:
-      - data:
+      - action: switch.turn_on
+        metadata: {}
+        target:
           entity_id: switch.erebus
-        action: switch.turn_on
+        data: {}
       - action: light.turn_on
         metadata: {}
         data:
@@ -3120,22 +3166,25 @@
   description: Shuts off the water main and sends a notification when a water leak
     is detected
   triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.basement_bathroom_sink_leak_water_leak
-    - binary_sensor.basement_bathroom_toilet_water_leak_detected
-    - binary_sensor.bathroom_sink_leak_water_leak
-    - binary_sensor.bathroom_toilet_leak_water_leak_detected
-    - binary_sensor.dishwasher_leak_water_leak_detected
-    - binary_sensor.fridge_leak_water_leak
-    - binary_sensor.kitchen_sink_leak_water_leak
-    - binary_sensor.main_bathroom_left_sink_leak_water_leak
-    - binary_sensor.main_bathroom_right_sink_leak_water_leak
-    - binary_sensor.main_bathroom_toilet_water_leak_detected
-    - binary_sensor.washer_leak_water_leak_detected
-    - binary_sensor.water_heater_leak_water_leak_detected
-    - binary_sensor.water_main_valve_water_leak_detected
-    to: 'on'
+  - trigger: moisture.detected
+    target:
+      entity_id:
+      - binary_sensor.basement_bathroom_sink_leak_water_leak
+      - binary_sensor.basement_bathroom_toilet_water_leak_detected
+      - binary_sensor.bathroom_sink_leak_water_leak
+      - binary_sensor.bathroom_toilet_leak_water_leak_detected
+      - binary_sensor.dishwasher_leak_water_leak_detected
+      - binary_sensor.fridge_leak_water_leak
+      - binary_sensor.kitchen_sink_leak_water_leak
+      - binary_sensor.main_bathroom_left_sink_leak_water_leak
+      - binary_sensor.main_bathroom_right_sink_leak_water_leak
+      - binary_sensor.main_bathroom_toilet_water_leak_detected
+      - binary_sensor.washer_leak_water_leak_detected
+      - binary_sensor.water_heater_leak_water_leak_detected
+      - binary_sensor.water_main_valve_water_leak_detected
+    options:
+      behavior: each
+      for: 00:00:00
   conditions: []
   actions:
   - variables:
@@ -3178,48 +3227,50 @@
       - valve.water_main_valve
       to: closed
     timeout: 00:00:30
-  - data:
-      send_to: parents
-      title: '{{ title }}'
-      message: '{{ message }}'
-      notification_icon: '{{ icon_mdi }}'
-      color: '{{ color }}'
-      icon: '{{ icon }}'
-      group: '{{ group }}'
-      tag: '{{ tag }}'
-      car_ui: true
-      interruption_level: critical
-      channel: '{{ channel }}'
-      importance: high
-      url: lovelace/utility
-      actions: '{{ notification_actions }}'
-    action: script.notify_mobile
-  - data:
-      entity:
-      - media_player.nasya
-      title: '{{ title }}'
-      message: '{{ message }}'
-      actions: '{{ notification_actions }}'
-    action: script.notify_hass_agent
-  - data:
-      computer:
-      - erebus
-      title: '{{ title }}'
-      message: '{{ message }}'
-      tag: '{{ tag }}'
-      icon: '{{ icon }}'
-      importance: critical
-      actions:
-      - Turn Water Main On
-    action: script.notify_lnxlink
-  - data:
-      title: '{{ title }}'
-      message: '{{ message }}'
-      icon: '{{ icon_mdi }}'
-      background_color: '{{ color }}'
-      action_1_id: '{{ notification_actions[0].action }}'
-      action_1_label: '{{ notification_actions[0].title }}'
-    action: script.notify_quickbars
+  - alias: Send notifications
+    parallel:
+    - data:
+        send_to: parents
+        title: '{{ title }}'
+        message: '{{ message }}'
+        notification_icon: '{{ icon_mdi }}'
+        color: '{{ color }}'
+        icon: '{{ icon }}'
+        group: '{{ group }}'
+        tag: '{{ tag }}'
+        car_ui: true
+        interruption_level: critical
+        channel: '{{ channel }}'
+        importance: high
+        url: lovelace/utility
+        actions: '{{ notification_actions }}'
+      action: script.notify_mobile
+    - data:
+        entity:
+        - media_player.nasya
+        title: '{{ title }}'
+        message: '{{ message }}'
+        actions: '{{ notification_actions }}'
+      action: script.notify_hass_agent
+    - data:
+        computer:
+        - erebus
+        title: '{{ title }}'
+        message: '{{ message }}'
+        tag: '{{ tag }}'
+        icon: '{{ icon }}'
+        importance: critical
+        actions:
+        - Turn Water Main On
+      action: script.notify_lnxlink
+    - data:
+        title: '{{ title }}'
+        message: '{{ message }}'
+        icon: '{{ icon_mdi }}'
+        background_color: '{{ color }}'
+        action_1_id: '{{ notification_actions[0].action }}'
+        action_1_label: '{{ notification_actions[0].title }}'
+      action: script.notify_quickbars
   - delay:
       minutes: 5
   mode: single
@@ -5084,25 +5135,32 @@
   alias: "\U0001F4C5 Emma's Projector On/Off"
   description: ''
   triggers:
-  - entity_id: schedule.emma_projector
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.emma_projector
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to: 'on'
-    trigger: state
-  - entity_id:
-    - schedule.emma_projector
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.emma_projector
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'off'
-    to:
-    - 'off'
-    trigger: state
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id: 'on'
-      - condition: state
-        entity_id: light.nebula_projector_emma_light
-        state: 'off'
+      - condition: light.is_off
+        target:
+          entity_id: light.nebula_projector_emma_light
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - data: {}
         target:
@@ -5121,25 +5179,32 @@
   alias: "\U0001F4C5 Ethan's Projector On/Off"
   description: ''
   triggers:
-  - entity_id:
-    - schedule.ethan_projector
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.ethan_projector
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to:
-    - 'on'
-    trigger: state
-  - entity_id: schedule.ethan_projector
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.ethan_projector
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'off'
-    to: 'off'
-    trigger: state
   conditions: []
   actions:
   - choose:
     - conditions:
       - condition: trigger
         id: 'on'
-      - condition: state
-        entity_id: light.nebula_projector_ethan_light
-        state: 'off'
+      - condition: light.is_off
+        target:
+          entity_id: light.nebula_projector_ethan_light
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - data: {}
         target:
@@ -5185,18 +5250,20 @@
   alias: "\U0001F4C5 Grow Light On/Off"
   description: ''
   triggers:
-  - entity_id:
-    - schedule.grow_light
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.grow_light
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to:
-    - 'on'
-    trigger: state
-  - entity_id:
-    - schedule.grow_light
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.grow_light
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'off'
-    to:
-    - 'off'
-    trigger: state
   conditions: []
   actions:
   - choose:
@@ -5223,14 +5290,20 @@
   alias: "\U0001F4C5 Living Room Fan On/Off"
   description: ''
   triggers:
-  - entity_id: schedule.living_room_fan
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.living_room_fan
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to: 'on'
-    trigger: state
-  - entity_id: schedule.living_room_fan
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.living_room_fan
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'off'
-    to: 'off'
-    trigger: state
   conditions: []
   actions:
   - choose:
@@ -5256,14 +5329,20 @@
   alias: "\U0001F4C5 Main Bedroom Fan On/Off"
   description: ''
   triggers:
-  - entity_id: schedule.main_bedroom_fan
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.main_bedroom_fan
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'on'
-    to: 'on'
-    trigger: state
-  - entity_id: schedule.main_bedroom_fan
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.main_bedroom_fan
+    options:
+      behavior: each
+      for: 00:00:00
     id: 'off'
-    to: 'off'
-    trigger: state
   conditions: []
   actions:
   - choose:
@@ -5273,14 +5352,15 @@
         - 'on'
       sequence:
       - wait_for_trigger:
-        - trigger: state
-          entity_id:
-          - binary_sensor.bed_presence_f56148_bed_occupied_either
-          to: 'on'
-          for:
-            hours: 0
-            minutes: 0
-            seconds: 30
+        - trigger: occupancy.detected
+          target:
+            entity_id: binary_sensor.bed_presence_f56148_bed_occupied_either
+          options:
+            behavior: each
+            for:
+              hours: 0
+              minutes: 0
+              seconds: 30
         continue_on_timeout: true
         timeout:
           hours: 1
@@ -5297,14 +5377,15 @@
         - 'off'
       sequence:
       - wait_for_trigger:
-        - trigger: state
-          entity_id:
-          - binary_sensor.bed_presence_f56148_bed_occupied_either
-          to: 'off'
-          for:
-            hours: 0
-            minutes: 0
-            seconds: 30
+        - trigger: occupancy.cleared
+          target:
+            entity_id: binary_sensor.bed_presence_f56148_bed_occupied_either
+          options:
+            behavior: each
+            for:
+              hours: 0
+              minutes: 0
+              seconds: 30
         continue_on_timeout: true
         timeout:
           hours: 1
@@ -6907,22 +6988,20 @@
   alias: "\U0001F514 Reolink Doorbell - Object Seen"
   description: Sends a notification when an object is detected on the doorbell
   triggers:
-  - trigger: state
+  - trigger: motion.detected
+    target:
+      entity_id: binary_sensor.doorbell_person
+    options:
+      behavior: each
+      for: 00:00:00
     id: person
-    entity_id:
-    - binary_sensor.doorbell_person
-    from:
-    - 'off'
-    to:
-    - 'on'
-  - trigger: state
+  - trigger: motion.detected
+    target:
+      entity_id: binary_sensor.doorbell_pet
+    options:
+      behavior: each
+      for: 00:00:00
     id: pet
-    entity_id:
-    - binary_sensor.doorbell_pet
-    from:
-    - 'off'
-    to:
-    - 'on'
   - event_type: mobile_app_notification_action
     event_data:
       action: silence_doorbell
@@ -7179,15 +7258,19 @@
   description: Adjusts the Main Bedroom ceiling fan light status based on the time
     of day.
   triggers:
-  - trigger: state
-    entity_id:
-    - schedule.main_bedroom_fan
-    to: 'off'
+  - trigger: schedule.block_ended
+    target:
+      entity_id: schedule.main_bedroom_fan
+    options:
+      behavior: each
+      for: 00:00:00
     id: bright
-  - trigger: state
-    entity_id:
-    - schedule.main_bedroom_fan
-    to: 'on'
+  - trigger: schedule.block_started
+    target:
+      entity_id: schedule.main_bedroom_fan
+    options:
+      behavior: each
+      for: 00:00:00
     id: dim
   conditions: []
   actions:
@@ -7196,9 +7279,12 @@
       - condition: trigger
         id:
         - bright
-      - condition: state
-        entity_id: binary_sensor.bed_presence_f56148_bed_occupied_either
-        state: 'off'
+      - condition: occupancy.is_not_detected
+        target:
+          entity_id: binary_sensor.bed_presence_f56148_bed_occupied_either
+        options:
+          behavior: any
+          for: 00:00:00
       sequence:
       - action: script.inovelli_blue_led_set_defaults
         metadata: {}
@@ -7212,14 +7298,15 @@
         - bright
       sequence:
       - wait_for_trigger:
-        - trigger: state
-          entity_id:
-          - binary_sensor.bed_presence_f56148_bed_occupied_either
-          to: 'off'
-          for:
-            hours: 0
-            minutes: 2
-            seconds: 0
+        - trigger: occupancy.cleared
+          target:
+            entity_id: binary_sensor.bed_presence_f56148_bed_occupied_either
+          options:
+            behavior: each
+            for:
+              hours: 0
+              minutes: 2
+              seconds: 0
         continue_on_timeout: true
         timeout:
           hours: 1
