@@ -226,6 +226,29 @@
         'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  Adaptive
         Sound\n{%- elif trigger.to_state.attributes.source in ['Spotify'] -%}\n  Surround\n{%-
         else -%}\n  Standard\n{%- endif -%}"
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ trigger.to_state.attributes.source == ''SmartTube'' }}'
+      - condition: media_player.is_volume
+        target:
+          entity_id: media_player.universal_living_room
+        options:
+          behavior: any
+          for: 00:00:00
+          threshold:
+            type: above
+            value:
+              active_choice: number
+              number: 12
+      sequence:
+      - action: media_player.volume_set
+        metadata: {}
+        target:
+          entity_id: media_player.universal_living_room
+        data:
+          volume_level: 10
+      alias: Conditionally reduce volume
   - delay:
       seconds: 30
   mode: single
@@ -1102,9 +1125,15 @@
         data:
           config_entry_id: 01KBZM96B8FXBJVS3ZJTG14ZZV
       - data:
-          message: Integration has been disabled for the night
+          message: Integration has been disabled
           title: Integration Disabled
         action: notify.persistent_notification
+      - action: automation.turn_off
+        metadata: {}
+        target:
+          entity_id: automation.disable_integration_during_time
+        data:
+          stop_actions: true
     - conditions:
       - condition: trigger
         id: enable_time
@@ -1113,7 +1142,7 @@
         data:
           config_entry_id: 01KBZM96B8FXBJVS3ZJTG14ZZV
       - data:
-          message: Integration has been re-enabled
+          message: Integration has been enabled
           title: Integration Enabled
         action: notify.persistent_notification
 - id: '1665696511584'
@@ -1122,7 +1151,7 @@
   triggers:
   - entity_id:
     - sensor.disk_use_percent
-    above: 89
+    above: 79
     trigger: numeric_state
   conditions: []
   actions:
@@ -1151,6 +1180,7 @@
         icon: local/icons/micro-sd.png
         tag: system-disk
       action: script.notify_lnxlink
+    alias: Send notifications
   mode: single
 - id: '1665696446379'
   alias: ⚙️ Event Sniffer
@@ -1233,21 +1263,23 @@
       in notification\n    or \"login attempt\" in notification\n  )\n  and not \"127.0.0.1\"
       in notification\n}}"
   actions:
-  - data:
-      send_to: joshua
-      title: '{{ trigger.notification.title }}'
-      message: '{{ trigger.notification.message }}'
-      notification_icon: mdi:home-assistant
-      color: '#2196f3'
-      icon: local/icons/home-assistant.png
-    action: script.notify_mobile
-  - data:
-      computer:
-      - erebus
-      title: '{{ trigger.notification.title }}'
-      message: '{{ trigger.notification.message }}'
-      icon: local/icons/home-assistant.png
-    action: script.notify_lnxlink
+  - parallel:
+    - data:
+        send_to: joshua
+        title: '{{ trigger.notification.title }}'
+        message: '{{ trigger.notification.message }}'
+        notification_icon: mdi:home-assistant
+        color: '#2196f3'
+        icon: local/icons/home-assistant.png
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        title: '{{ trigger.notification.title }}'
+        message: '{{ trigger.notification.message }}'
+        icon: local/icons/home-assistant.png
+      action: script.notify_lnxlink
+    alias: Send notifications
   mode: single
 - id: '1734643266064'
   alias: ⚙️ Forward Reload Templates
@@ -1315,7 +1347,7 @@
   triggers:
   - entity_id:
     - sensor.memory_use_percent
-    above: 59
+    above: 79
     trigger: numeric_state
   conditions: []
   actions:
@@ -1344,6 +1376,7 @@
         icon: local/icons/memory.png
         tag: system-ram
       action: script.notify_lnxlink
+    alias: Send notifications
   mode: single
 - id: '1702017706466'
   alias: ⚙️ Scan Interval
@@ -1351,6 +1384,8 @@
   triggers:
   - minutes: '*'
     trigger: time_pattern
+    hours: '*'
+    seconds: '10'
   actions:
   - variables:
       entities:
@@ -1366,6 +1401,7 @@
         - target:
             entity_id: '{{ repeat.item[0] }}'
           action: homeassistant.update_entity
+          data: {}
 - id: '1665696596579'
   alias: ⚙️ Startup
   description: Actions to run at startup
@@ -1444,16 +1480,17 @@
   alias: ⚙️ Update Database Filesize Sensor
   description: Updates the file size sensor for the database.
   triggers:
-  - minutes: /30
+  - minutes: '30'
     seconds: '0'
     hours: '*'
     trigger: time_pattern
   conditions: []
   actions:
-  - data: {}
-    target:
-      entity_id: sensor.home_assistant_v2_db_size
-    action: homeassistant.update_entity
+  - action: homeassistant.update_entity
+    metadata: {}
+    data:
+      entity_id:
+      - sensor.home_assistant_v2_db_size
   mode: single
 - id: '1665696538493'
   alias: ⚙️ Updates Available
@@ -2494,17 +2531,26 @@
           entity_id:
           - switch.joshua_office_shelf_led
           - switch.joshua_office_workbench
-      - action: light.turn_on
-        metadata: {}
-        data:
-          transition: 360
-          rgb_color:
-          - 255
-          - 165
-          - 0
-          brightness_pct: 50
-        target:
-          entity_id: light.wled_joshua_office_desk
+      - if:
+        - condition: light.is_on
+          target:
+            entity_id: light.wled_joshua_office_desk
+          options:
+            behavior: any
+            for: 00:00:00
+        then:
+        - action: light.turn_on
+          metadata: {}
+          data:
+            transition: 360
+            rgb_color:
+            - 255
+            - 165
+            - 0
+            brightness_pct: 50
+          target:
+            entity_id: light.wled_joshua_office_desk
+        alias: Change desk LED if on
   mode: single
 - id: '1706291631355'
   alias: "\U0001F431 Cat Feeder Empty Notification"
@@ -2763,8 +2809,8 @@
     action: light.turn_on
   mode: single
 - id: '1785707660629'
-  alias: "\U0001F4A1 Cold Storage Room Light"
-  description: Automatically controls cold storage room lights
+  alias: "\U0001F4CB [Sensor Light] Cold Storage Room"
+  description: Automatically controls cold storage room light
   use_blueprint:
     path: Blackshome/sensor-light.yaml
     input:
@@ -2772,7 +2818,7 @@
       - binary_sensor.cold_storage_door_contact
       light_switch:
         entity_id: light.cold_storage
-      time_delay: 2
+      time_delay: 1
 - id: '1665686521519'
   alias: "\U0001F4A1 Front Lights off at Sunrise"
   description: Turns the front lights off at sunrise
@@ -3111,6 +3157,7 @@
         - media_player.office_speaker
         message: '{{ message }}'
       action: script.notify_speech
+    alias: Send notifications
   mode: single
 - id: '1665697614552'
   alias: "\U0001F4A7 Softener Salt Level Low"
@@ -3160,6 +3207,7 @@
         icon: '{{ icon }}'
         tag: '{{ tag }}'
       action: script.notify_lnxlink
+    alias: Send notifications
   mode: single
 - id: '1665697122708'
   alias: "\U0001F4A7 Water Leak Detected"
@@ -5890,6 +5938,8 @@
       - use_brightness
       night_light_transition_on: 1
       night_light_transition_off: 2
+      time_delay: 3
+      night_time_delay: 3
 - id: '1767724933503'
   alias: "\U0001F4CD Itinerary Tracker Notification"
   description: ''
@@ -5933,17 +5983,19 @@
       trigger.from_state.state in ['unknown', 'unavailable']\n  and not trigger.to_state.state
       in ['unknown', 'unavailable'] }}"
   actions:
-  - data:
-      send_to: parents
-      notification_type: clear_notification
-      tag: delivery-packages-pending
-    action: script.notify_mobile
-  - data:
-      computer:
-      - erebus
-      notification_type: clear_notification
-      tag: delivery-packages-pending
-    action: script.notify_lnxlink
+  - alias: Send notifications
+    parallel:
+    - data:
+        send_to: parents
+        notification_type: clear_notification
+        tag: delivery-packages-pending
+      action: script.notify_mobile
+    - data:
+        computer:
+        - erebus
+        notification_type: clear_notification
+        tag: delivery-packages-pending
+      action: script.notify_lnxlink
   mode: single
 - id: '1741307009888'
   alias: "\U0001F4E6 Mail Delivered"
@@ -6004,6 +6056,7 @@
         image: '{{ image }}'
         background_color: '{{ color }}'
       action: script.notify_quickbars
+    alias: Send notifications
   mode: single
 - id: '1665682414590'
   alias: "\U0001F4E6 Mail Today"
@@ -6069,6 +6122,7 @@
         background_color: '{{ color }}'
         duration: 15
       action: script.notify_quickbars
+    alias: Send notifications
   mode: single
 - id: '1665682445018'
   alias: "\U0001F4E6 Packages Delivered"
@@ -6133,6 +6187,7 @@
         image: '{{ image }}'
         background_color: '{{ color }}'
       action: script.notify_quickbars
+    alias: Send notifications
   mode: single
 - id: '1665682458887'
   alias: "\U0001F4E6 Packages Out for Delivery"
@@ -6187,6 +6242,7 @@
         icon: '{{ icon_mdi }}'
         background_color: '{{ color }}'
       action: script.notify_quickbars
+    alias: Send notifications
   mode: single
 - id: '1665685653869'
   alias: "\U0001F4E6 Update USPS Mail Camera"
@@ -6442,7 +6498,8 @@
         id:
         - ring
       sequence:
-      - parallel:
+      - alias: Send notifications
+        parallel:
         - if:
           - condition: state
             entity_id: input_boolean.audio_notifications
@@ -6461,6 +6518,7 @@
                     media_location: '{{ media_location }}'
                     volume: '{{ volume }}'
                 action: script.turn_on
+          alias: Conditionally send speech notification
         - data:
             send_to: parents
             title: '{{ title }}'
@@ -6528,6 +6586,7 @@
             data:
               effect: Solid
             action: light.turn_on
+          alias: Conditionally send Joshua desk notification
   mode: single
 - id: '1693003933194'
   alias: "\U0001F514 Frigate Doorbell - Event Handler"
@@ -7044,13 +7103,14 @@
       - condition: trigger
         id: silence
       sequence:
-      - parallel:
-        - variables:
-            title: Doorbell Motion Silenced
-            message: Motion notifications have been silenced for {{ silence_timer
-              }} minutes.
-            notification_icon: mdi:doorbell-video
-            color: '#e91e63'
+      - variables:
+          title: Doorbell Motion Silenced
+          message: Motion notifications have been silenced for {{ silence_timer }}
+            minutes.
+          notification_icon: mdi:doorbell-video
+          color: '#e91e63'
+      - alias: Send notifications
+        parallel:
         - data:
             send_to: parents
             title: '{{ title }}'
@@ -7165,7 +7225,8 @@
               + [state] -%}\n{%- endfor -%} {{ iif(state_filter.allow | reject | first
               | default(true), true, false) }}"
           sequence:
-          - parallel:
+          - alias: Send notifications
+            parallel:
             - if:
               - condition: trigger
                 id:
@@ -7178,6 +7239,7 @@
                   - media_player.office_speaker
                   message: A {{ label }} was detected at the front door.
                 action: script.notify_speech
+              alias: Conditionally send speech notification
             - data:
                 send_to: parents
                 title: '{{ title }}'
@@ -7226,32 +7288,28 @@
                 action_1_label: '{{ actions[1].title }}'
               action: script.notify_quickbars
             - if:
-              - condition: trigger
-                id:
-                - initial
+              - condition: state
+                entity_id: light.wled_joshua_office_desk
+                state: 'on'
               then:
-              - if:
-                - condition: state
+              - data:
+                  value: '80'
+                target:
+                  entity_id: number.wled_joshua_office_desk_speed
+                action: number.set_value
+              - target:
                   entity_id: light.wled_joshua_office_desk
-                  state: 'on'
-                then:
-                - data:
-                    value: '80'
-                  target:
-                    entity_id: number.wled_joshua_office_desk_speed
-                  action: number.set_value
-                - target:
-                    entity_id: light.wled_joshua_office_desk
-                  data:
-                    effect: Phased
-                  action: light.turn_on
-                - delay:
-                    seconds: 5
-                - target:
-                    entity_id: light.wled_joshua_office_desk
-                  data:
-                    effect: Solid
-                  action: light.turn_on
+                data:
+                  effect: Phased
+                action: light.turn_on
+              - delay:
+                  seconds: 5
+              - target:
+                  entity_id: light.wled_joshua_office_desk
+                data:
+                  effect: Solid
+                action: light.turn_on
+              alias: Conditionally send Joshua desk notification
   mode: parallel
 - id: '1727824341800'
   alias: "\U0001F557 Main Bedroom Ceiling Fan Default Light Status"
