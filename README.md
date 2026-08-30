@@ -905,7 +905,7 @@ Material Design 3 Theme for Home Assistant
 - 🖥️ [Erebus] Microphone/Camera Active
 - 🖥️ [Quest] Charge Complete
 - 🖥️ [Quest] Interactive
-- 🖥️ [Work Josh] Microphone/Camera Active
+- 🖥️ [Workstation] Microphone/Camera Active
 - 🖨️ Low Toner
 - 🖨️ Out of Paper
 - 🗺️ Leaving Zone
