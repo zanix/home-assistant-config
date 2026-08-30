@@ -211,9 +211,10 @@
   alias: ⏯ Living Room Sound Mode
   description: Changes the soundbar sound mode based on Source
   triggers:
-  - entity_id: media_player.universal_living_room
-    attribute: source
+  - entity_id:
+    - media_player.androidtv_living_room
     trigger: state
+    attribute: app_name
   conditions:
   - condition: not
     conditions:
@@ -222,17 +223,17 @@
       state: 'off'
   actions:
   - variables:
-      sound_mode: "{%- if trigger.to_state.attributes.source in ['SmartTube', 'YouTube',
-        'YouTube Kids', 'Cartoon Network', 'PBS Kids', 'Crunchyroll'] -%}\n  Adaptive
-        Sound\n{%- elif trigger.to_state.attributes.source in ['Spotify'] -%}\n  Surround\n{%-
-        else -%}\n  Standard\n{%- endif -%}"
+      app_name: '{{ trigger.to_state.attributes.app_name  }}'
+      sound_mode: "{%- if app_name in ['SmartTube', 'YouTube', 'YouTube Kids', 'Cartoon
+        Network', 'PBS Kids', 'Crunchyroll'] -%}\n  Adaptive Sound\n{%- elif app_name
+        in ['Spotify'] -%}\n  Surround\n{%- else -%}\n  Standard\n{%- endif -%}"
   - choose:
     - conditions:
       - condition: template
-        value_template: '{{ trigger.to_state.attributes.source == ''SmartTube'' }}'
+        value_template: '{{ app_name == ''SmartTube'' }}'
       - condition: media_player.is_volume
         target:
-          entity_id: media_player.universal_living_room
+          entity_id: media_player.samsung_soundbar
         options:
           behavior: any
           for: 00:00:00
@@ -244,14 +245,12 @@
       sequence:
       - action: media_player.volume_set
         metadata: {}
-        target:
-          entity_id: media_player.universal_living_room
         data:
-          volume_level: 10
+          volume_level: 0.1
+        target:
+          entity_id: media_player.samsung_soundbar
       alias: Conditionally reduce volume
-  - delay:
-      seconds: 30
-  mode: single
+  mode: restart
   max_exceeded: silent
 - id: '1665685997408'
   alias: ⏯ Main Bedroom Media Off
@@ -938,27 +937,24 @@
       level: ERROR
   conditions:
   - condition: template
-    value_template: '{{ [''automation.'', ''script.''] | select(''in'', (trigger.event.data.name
-      | lower)) | list | count > 0 }}
-
-      '
-  - condition: template
-    value_template: '{{ not [''.automation_script_fail_detector''] | select(''in'',
-      trigger.event.data.name | lower) | list }}'
+    value_template: "{% set name = trigger.event.data.name | lower %}\n{{ ('automation.'
+      in name or 'script.' in name)\n   and 'automation_fail_detector' not in name
+      }}\n"
   actions:
   - action: persistent_notification.create
     metadata: {}
     data:
-      title: '{{ trigger.event.data.name.split(''.'')[2] }} has failed: {{ trigger.event.data.name
-        }}'
+      title: '{{ trigger.event.data.name.split(''.'')[-1] }} has Failed'
       message: '>> {{ trigger.event.data.name }} <<
 
         Error Message: {{ trigger.event.data.message }}
 
         Source File: {{ trigger.event.data.source }}
 
-        Time: {{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}    {% if trigger.event.data.exception
-        != '''' %}Exception Details: {{ trigger.event.data.exception }}{% endif %}'
+        Time: {{ now().strftime(''%Y-%m-%d %H:%M:%S'') }}
+
+        {% if trigger.event.data.exception != '''' %}Exception Details: {{ trigger.event.data.exception
+        }}{% endif %}'
   mode: queued
   max: 20
   max_exceeded: silent
@@ -1018,25 +1014,21 @@
     event_type: battery_notes_battery_threshold
     event_data:
       battery_low: false
-  conditions:
-  - alias: Triggers are available
-    condition: template
-    value_template: "{{ not trigger.to_state in ['unknown', 'unavailable', none]\n
-      \  and not trigger.to_state.state in ['unknown', 'unavailable', none]\n   and
-      not trigger.to_state.attributes in ['unknown', 'unavailable', none]\n}}"
+  conditions: []
   actions:
   - action: battery_notes.check_battery_low
     metadata: {}
     data:
       raise_events: false
-    response_variable: devices
+    response_variable: battery_notes
   - variables:
+      devices: '{{ battery_notes.check_battery_battery_low }}'
       device_count: '{{ devices | list | count }}'
       title: Low Battery Level{{ iif(device_count > 1, 's', '') }} ({{ device_count
         }})
       messages: "{% set result = namespace(messages=[]) %}\n{% if device_count > 0
         %}\n  {% for device in devices %}\n    {% set message = \"{name} {level}%
-        ({count}×{type})\".format(\n      name=device.name,\n      level=device.battery_level,\n
+        ({count}×{type})\".format(\n      name=device.device_name,\n      level=device.battery_level,\n
         \     count=device.battery_quantity,\n      type=device.battery_type\n    )
         %}\n    {% set result.messages = result.messages + [message] %}\n  {% endfor
         %}\n{% endif %}\n{{ result.messages }}"
@@ -1081,6 +1073,54 @@
           action: script.notify_mobile
       alias: Send notifications
   mode: single
+- id: '1787666581709'
+  alias: ⚙️ Battery Replaced
+  description: Battery Replaced
+  triggers:
+  - trigger: event
+    event_type: battery_notes_battery_increased
+  conditions: []
+  actions:
+  - action: battery_notes.set_battery_replaced
+    data:
+      device_id: '{{ trigger.event.data.device_id }}'
+      source_entity_id: '{{ trigger.event.data.source_entity_id }}'
+    enabled: false
+  - alias: Check battery is not rechargeable
+    if:
+    - condition: template
+      value_template: '{{ trigger.event.data.battery_type != "Rechargeable" }}'
+    then:
+    - variables:
+        title: Battery Replaced
+        message: '{{ trigger.event.data.device_name }} ({{ trigger.event.data.battery_type
+          }}) battery was replaced.'
+        icon_mdi: mdi:battery-alert
+        icon: local/icons/battery-alert.png
+        color: '#f44336'
+        group: System
+        tag: battery-{{ trigger.event.data.device_id }}
+        url: dashboard-system/overview
+    - alias: Send notifications
+      parallel:
+      - action: persistent_notification.create
+        metadata: {}
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: '{{ tag }}'
+      - action: script.notify_mobile
+        data:
+          send_to: joshua
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_icon: mdi:battery-alert
+          color: '#f44336'
+          icon: local/icons/battery-alert.png
+          group: System
+          tag: low-battery-alert
+          url: dashboard-system/overview
+  mode: queued
 - id: '1665696488378'
   alias: ⚙️ Clear TTS Cache
   description: Clears the TTS cache once a week
@@ -3005,6 +3045,12 @@
         action: light.turn_on
         target:
           entity_id: light.kitchen_island
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.amy_office
+        data:
+          effect: breathe
     - conditions:
       - condition: trigger
         id:
@@ -4482,6 +4528,19 @@
   description: Sends notification to check Guest Mode status when returning home,
     after 12 hours, or when leaving without it on
   triggers:
+  - trigger: zone.left
+    target:
+      entity_id:
+      - person.amy
+      - person.joshua
+    options:
+      for:
+        hours: 0
+        minutes: 2
+        seconds: 0
+      zone: zone.home
+      behavior: all
+    id: leaving_home
   - trigger: zone.entered
     target:
       entity_id:
@@ -4501,19 +4560,6 @@
       hours: 12
     id: time_check
     trigger: state
-  - trigger: zone.left
-    target:
-      entity_id:
-      - person.amy
-      - person.joshua
-    options:
-      for:
-        hours: 0
-        minutes: 2
-        seconds: 0
-      zone: zone.home
-      behavior: all
-    id: leaving_home
   conditions:
   - condition: or
     conditions:
@@ -6321,6 +6367,7 @@
         - media_player.living_room_speaker
         message: '{{ message }}'
       action: script.notify_speech
+    alias: Send notifications
   mode: single
 - id: '1665686913548'
   alias: "\U0001F512 Lock Doors when Away"
@@ -7801,6 +7848,16 @@
   - condition: time
     after: 08:00:00
     before: '22:00:00'
+  - alias: If not leaving work
+    condition: not
+    conditions:
+    - condition: and
+      conditions:
+      - condition: template
+        value_template: '{{ trigger.from_state.state == "Work" }}'
+      - condition: time
+        after: 08:00:00
+        before: '16:00:00'
   actions:
   - variables:
       zone_name: '{{ trigger.from_state.state }}'
@@ -7842,6 +7899,7 @@
         - media_player.office_speaker
         message: '{{ message }}'
       action: script.notify_speech
+    alias: Send notifications
   mode: single
 - id: '1725260717620'
   alias: "\U0001F6A6 Amy Office Light Switch Status"

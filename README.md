@@ -762,7 +762,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>154 Automations</summary>
+<details><summary>155 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -786,8 +786,9 @@ Material Design 3 Theme for Home Assistant
 - ♨️ iBBQ Grill Alerts
 - ⚙️ Action Sniffer [Zigbee] 🚫
 - ⚙️ Automated Backup
-- ⚙️ Automation Fail Detector
+- ⚙️ Automation Fail Detector 🚫
 - ⚙️ Battery Level Low
+- ⚙️ Battery Replaced
 - ⚙️ Clear TTS Cache 🚫
 - ⚙️ Disable Integration During Time 🚫
 - ⚙️ Disk Space Low
