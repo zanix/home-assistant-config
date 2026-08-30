@@ -1,0 +1,1768 @@
+room-card-plus:
+  name: Room Card Plus
+  version: v1.2.0
+  creator: Lucio
+  link: https://github.com/Clooos/Bubble-Card/discussions/1919
+  supported:
+    - button
+  description: |
+    I've been templating this "room" Bubble Card for a couple of years and  decided to share it as a module.
+
+    Room Card Plus focuses on being customizable with optional conditions:
+    • Title + state layout controls (positioning, spacing, responsive text sizing)
+    • Main icon customization: icon / color / animation / background (with optional OFF opacity)
+    • Rule-based styling (or static styling) using conditions for icon, color, background and animations
+    • Sub-button layout tweaks (size, gap, radius, how many columns) to fit any dashboard
+    • **Footer Drawer**: optionally move sub-buttons into a slide-up drawer with a center-bottom handle
+
+    My favourite feature: replacing the default state with "Entity States" — you can pick one or multiple entities and control what shows (text, icon, or both), plus per-entity color, animation, ordering, and conditions.
+
+      Support: https://buymeacoffee.com/luciotorelli
+  code: |
+    code: |2-
+          .large .bubble-button-card-container {
+            --row-size: ${this.config["room-card-plus"]?.rows || 2.5};
+            height: calc(var(--row-height) * var(--row-size) + var(--row-gap) * (var(--row-size) - 1)) !important;
+          }
+
+          .bubble-background,
+          .large .bubble-container {
+            border-radius: ${(this.config["room-card-plus"]?.card_radius ?? 22) + 'px'};
+          }
+
+          .large .bubble-container { overflow: clip; }
+
+          .bubble-button-card {
+            display: grid;
+            grid-template-areas:
+              "n n n b"
+              "s s . b"
+              "s s . b"
+              "i i . b";
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr 1fr;
+            justify-items: right;
+            align-items: center;
+          }
+
+          .bubble-name-container {
+            grid-area: n;
+            justify-self: start;
+
+            padding-top: ${(this.config["room-card-plus"]?.ts_pad_top ?? 30) + 'px'} !important;
+            padding-left: ${(this.config["room-card-plus"]?.ts_pad_left ?? 20) + 'px'} !important;
+
+            margin: 0 !important;
+            padding-right: 0 !important;
+            padding-bottom: 0 !important;
+
+            height: ${(this.config["room-card-plus"]?.ts_block_height ?? 52) + 'px'} !important;
+            max-width: calc(100% - ${(this.config["room-card-plus"]?.title_max_width_offset ?? 20)}%) !important;
+
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            gap: ${(this.config["room-card-plus"]?.ts_gap ?? 1) + 'px'} !important;
+            overflow: hidden;
+          }
+
+          .bubble-name {
+            font-weight: 700;
+            font-size: clamp(
+              ${(this.config["room-card-plus"]?.title_em_mobile ?? 0.8)}em,
+              2vw,
+              ${(this.config["room-card-plus"]?.title_em_desktop ?? 1.125)}em
+            ) !important;
+            line-height: 1.1;
+            margin: 0 !important;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+
+          .bubble-state {
+            grid-area: s;
+            font-weight: 700;
+            font-size: ${(this.config["room-card-plus"]?.state_size_em ?? 0.95)}em !important;
+            line-height: 1.1;
+            margin: 0 !important;
+            width: 100%;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+
+          /* Main icon color hook (ONLY used when module sets --bubble-icon-color) */
+          .bubble-main-icon-container,
+          .bubble-icon-container {
+            color: var(--bubble-icon-color) !important;
+          }
+
+          @keyframes sc_pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+          @keyframes sc_ping  { 0%{transform:scale(1);opacity:1} 70%{transform:scale(1.25);opacity:.2} 100%{transform:scale(1.3);opacity:0} }
+          @keyframes sc_spin  { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+          @keyframes sc_bounce{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+          .room-card-plus-state-item {
+            display: inline-flex;
+            align-items: center;
+            gap: ${(this.config["room-card-plus"]?.state_icon_gap ?? 1) + 'px'};
+            white-space: nowrap;
+          }
+
+          .room-card-plus-state-item ha-icon {
+            padding-right: 0;
+            vertical-align: middle;
+            display: inline-block;
+          }
+
+          /* ===== Sub-button container (standard, non-footer mode) ===== */
+          .bubble-sub-button-container {
+            grid-area: b;
+
+            --slim-sb-size: ${(this.config["room-card-plus"]?.sub_button_size ?? 40) + 'px'};
+            --slim-sb-gap: ${(this.config["room-card-plus"]?.sub_button_gap ?? 10) + 'px'};
+            --slim-sb-radius: ${(this.config["room-card-plus"]?.sub_button_radius ?? 30) + 'px'};
+            --slim-sb-per-col: ${(this.config["room-card-plus"]?.sub_buttons_per_column ?? 3)};
+            --slim-sb-col-gap: ${(this.config["room-card-plus"]?.sub_button_column_gap ?? 8) + 'px'};
+            --slim-sb-left-shift: ${(this.config["room-card-plus"]?.sub_button_left_shift ?? 6) + 'px'};
+
+            display: grid !important;
+            grid-auto-flow: column !important;
+            grid-template-rows: repeat(var(--slim-sb-per-col), var(--slim-sb-size)) !important;
+            grid-auto-columns: var(--slim-sb-size) !important;
+
+            row-gap: var(--slim-sb-gap) !important;
+            column-gap: var(--slim-sb-col-gap) !important;
+
+            align-content: center !important;
+            justify-content: end !important;
+
+            right: 0 !important;
+            max-height: 95%;
+            padding-right: 10px;
+            transform: translateX(0);
+            z-index: auto !important;
+          }
+
+          .bubble-sub-button-container:focus-within { z-index: 99 !important; }
+
+          .bubble-sub-button-container.room-card-plus-two-cols {
+            transform: translateX(calc(-1 * var(--slim-sb-left-shift)));
+          }
+
+          .bubble-sub-button {
+            height: var(--slim-sb-size) !important;
+            width: var(--slim-sb-size) !important;
+            min-width: var(--slim-sb-size) !important;
+            border-radius: var(--slim-sb-radius) !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .bubble-sub-button.hidden {
+            display: none !important;
+          }
+
+          /* Optional on/off color overrides for main (top) sub-buttons */
+          ${this.config["room-card-plus"]?.main_sb_off_color ? `
+          .bubble-sub-button-container .bubble-sub-button.background-off {
+            background-color: ${this.config["room-card-plus"].main_sb_off_color} !important;
+          }` : ''}
+          ${this.config["room-card-plus"]?.main_sb_on_color ? `
+          .bubble-sub-button-container .bubble-sub-button.background-on {
+            background-color: ${this.config["room-card-plus"].main_sb_on_color} !important;
+          }` : ''}
+
+          .bubble-icon-container {
+            grid-area: i;
+
+            width: ${(this.config["room-card-plus"]?.icon_width ?? 100) + 'px'} !important;
+            height: ${(this.config["room-card-plus"]?.icon_height ?? 60) + 'px'} !important;
+
+            position: absolute !important;
+            left: ${(this.config["room-card-plus"]?.icon_left ?? -12) + 'px'} !important;
+            bottom: ${(this.config["room-card-plus"]?.icon_bottom ?? -10) + 'px'} !important;
+            top: auto !important;
+
+            /* baseline (JS will override with rules + off-opacity) */
+            background-color: ${(this.config["room-card-plus"]?.main_icon_bg_color ?? '#ffc47e')} !important;
+
+            transition: background-color 0.3s ease;
+          }
+
+          .bubble-icon-container {
+            border-radius: ${(() => {
+              const s = this.config["room-card-plus"]?.icon_corner_style ?? 'diagonal';
+              const r = (this.config["room-card-plus"]?.icon_radius ?? 32);
+
+              const tl = this.config["room-card-plus"]?.icon_radius_tl;
+              const tr = this.config["room-card-plus"]?.icon_radius_tr;
+              const br = this.config["room-card-plus"]?.icon_radius_br;
+              const bl = this.config["room-card-plus"]?.icon_radius_bl;
+
+              const hasCustom = tl !== undefined || tr !== undefined || br !== undefined || bl !== undefined;
+              if (hasCustom) return `${(tl ?? 0)}px ${(tr ?? 0)}px ${(br ?? 0)}px ${(bl ?? 0)}px`;
+
+              if (s === 'square') return `0px`;
+              if (s === 'rounded') return `${r}px`;
+              return `0px ${r}px 0px ${r}px`;
+            })()} !important;
+          }
+
+          .bubble-icon {
+            width: ${(this.config["room-card-plus"]?.icon_size ?? 50) + 'px'};
+            height: ${(this.config["room-card-plus"]?.icon_size ?? 50) + 'px'};
+            padding: 0;
+            position: relative !important;
+            --mdc-icon-size: ${(this.config["room-card-plus"]?.icon_size ?? 50) + 'px'} !important;
+            opacity: 0.8 !important;
+            color: ${this.config["room-card-plus"]?.icon_color ?? '#1c1c1c'} !important;
+            transform: translate(${(this.config["room-card-plus"]?.icon_offset_x ?? 0) + 'px'}, ${(this.config["room-card-plus"]?.icon_offset_y ?? 0) + 'px'});
+          }
+
+          /* ===== FOOTER DRAWER STYLES ===== */
+
+          /* Allow drawer to overflow below the card */
+          .bubble-container.rcp-footer-overflow {
+            overflow: visible !important;
+            z-index: 1;
+          }
+
+          .bubble-container.rcp-footer-overflow.rcp-drawer-elevated {
+            z-index: 999;
+          }
+
+          /* When drawer is open, flatten the bottom corners so the drawer
+             continues seamlessly — no gap behind rounded corners */
+          .bubble-container.rcp-footer-overflow.rcp-drawer-elevated {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+          }
+
+          .rcp-drawer-elevated .bubble-background {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+          }
+
+          /* Clip the card wrapper so the icon doesn't bleed outside the card,
+             while the drawer (a sibling of the wrapper) still overflows */
+          .bubble-button-card {
+            overflow: hidden !important;
+          }
+
+          /*
+           * IMMEDIATELY hide the bottom sub-button container when footer is enabled.
+           * This is a config-driven CSS rule so it applies before JS even runs,
+           * preventing bottom sub-buttons from ever affecting the main card layout.
+           *
+           * Bubble Card adds 'with-bottom-buttons' to the container and 'fixed-top'
+           * to the wrapper when bottom sub-buttons exist. These classes change the
+           * entire card layout (baseline alignment, flex wrapping, content container).
+           * We must forcefully revert ALL of these side-effects.
+           */
+          ${this.config["room-card-plus"]?.footer_enabled ? `
+          .bubble-sub-button-bottom-container {
+            display: none !important;
+            position: absolute !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            overflow: hidden !important;
+          }
+
+          /* Revert 'fixed-top' on wrapper — Bubble adds this when bottom sub-buttons exist */
+          .bubble-button-card.fixed-top {
+            align-items: center !important;
+          }
+
+          /* Revert the content container changes that fixed-top causes */
+          .bubble-button-card.fixed-top .bubble-content-container {
+            display: contents !important;
+            align-items: unset !important;
+            align-self: unset !important;
+            overflow: unset !important;
+            flex-grow: unset !important;
+            margin-top: 0 !important;
+            min-height: unset !important;
+          }
+
+          /* Revert the sub-button container's fixed-top alignment */
+          .bubble-sub-button-container.fixed-top {
+            align-self: center !important;
+          }
+
+          /*
+           * When bottom sub-buttons exist, Bubble adds .groups-layout-inline to the
+           * container and wraps buttons in a .bubble-sub-button-group child.
+           * The container's grid was designed for direct button children — now it has
+           * ONE child (the group div) so grid-template-rows for 3 items breaks.
+           *
+           * Fix: container becomes a simple flex passthrough (still in grid-area b),
+           * the GROUP gets the actual column grid layout with all the slim-sb vars.
+           */
+          .bubble-sub-button-container.groups-layout-inline {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: end !important;
+            justify-content: center !important;
+          }
+
+          .bubble-sub-button-container .bubble-sub-button-group {
+            display: grid !important;
+            grid-auto-flow: column !important;
+            grid-template-rows: repeat(var(--slim-sb-per-col), var(--slim-sb-size)) !important;
+            grid-auto-columns: var(--slim-sb-size) !important;
+            row-gap: var(--slim-sb-gap) !important;
+            column-gap: var(--slim-sb-col-gap) !important;
+            align-items: center !important;
+            justify-content: end !important;
+            flex-direction: unset !important;
+            margin-top: 0 !important;
+          }
+
+          /* Undo the margin-top that fixed-top adds to the sub-button container */
+          .fixed-top .bubble-sub-button-container {
+            margin-top: 0 !important;
+          }
+          ` : ''}
+
+          .rcp-footer-handle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 2px 18px 4px 18px;
+            border-radius: 0 0 ${(this.config["room-card-plus"]?.footer_handle_radius ?? 14)}px ${(this.config["room-card-plus"]?.footer_handle_radius ?? 14)}px;
+            background: ${this.config["room-card-plus"]?.footer_handle_bg ?? 'transparent'};
+            transition: background-color 0.2s ease;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+          }
+
+          .rcp-footer-handle:active {
+            opacity: 0.8;
+          }
+
+          .rcp-footer-handle ha-icon {
+            --mdc-icon-size: ${(this.config["room-card-plus"]?.footer_handle_icon_size ?? 20)}px;
+            color: ${this.config["room-card-plus"]?.footer_handle_icon_color ?? 'var(--primary-text-color)'};
+            opacity: 0.7;
+            transition: opacity 0.2s ease, transform 0.35s ease;
+          }
+
+          .rcp-footer-handle.rcp-drawer-open ha-icon {
+            transform: rotate(180deg);
+            opacity: 1;
+          }
+
+          .rcp-footer-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+          }
+
+          .rcp-footer-overlay.rcp-drawer-open {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          /* Clip wrapper sits flush at the card bottom edge */
+          .rcp-footer-clip {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            overflow: hidden;
+            pointer-events: none;
+            max-height: 70vh;
+          }
+
+          .rcp-footer-clip.rcp-drawer-open {
+            pointer-events: auto;
+          }
+
+          /* Drawer slides down into the clip area */
+          .rcp-footer-drawer {
+            background: ${this.config["room-card-plus"]?.footer_drawer_bg ?? 'var(--card-background-color, rgba(30,30,30,0.95))'};
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 0 0 ${(this.config["room-card-plus"]?.footer_drawer_radius ?? 22)}px ${(this.config["room-card-plus"]?.footer_drawer_radius ?? 22)}px;
+            padding: 12px 12px 16px 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            transform: translateY(-100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            touch-action: none;
+            overflow-y: auto;
+          }
+
+          .rcp-footer-drawer.rcp-drawer-open {
+            transform: translateY(0);
+          }
+
+          .rcp-footer-drawer.rcp-drawer-dragging {
+            transition: none;
+          }
+
+          .rcp-footer-drawer-grip {
+            width: 36px;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--primary-text-color);
+            opacity: 0.25;
+            margin: 12px auto 0 auto;
+          }
+
+          .rcp-footer-drawer-grid {
+            display: grid;
+            grid-template-columns: repeat(${this.config["room-card-plus"]?.footer_columns ?? 3}, 1fr);
+            gap: ${(this.config["room-card-plus"]?.footer_grid_gap ?? 10)}px;
+            justify-items: center;
+            align-items: start;
+          }
+
+          .rcp-footer-drawer-grid .bubble-sub-button {
+            height: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
+            width: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
+            min-width: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
+            border-radius: ${(this.config["room-card-plus"]?.footer_button_radius ?? 30)}px !important;
+          }
+
+          /* Configurable on/off colors for footer (bottom) sub-buttons */
+          .rcp-footer-drawer-grid .bubble-sub-button.background-off {
+            background-color: ${this.config["room-card-plus"]?.footer_sb_off_color ?? '#1c1111'} !important;
+          }
+          ${this.config["room-card-plus"]?.footer_sb_on_color ? `
+          .rcp-footer-drawer-grid .bubble-sub-button.background-on {
+            background-color: ${this.config["room-card-plus"].footer_sb_on_color} !important;
+          }` : ''}
+
+          ${(() => {
+            try {
+              const cfg = this.config["room-card-plus"] || {};
+
+              const boolVal = (v, def) => {
+                if (v === undefined || v === null) return def;
+                if (typeof v === 'boolean') return v;
+                if (typeof v === 'string') {
+                  const s = v.trim().toLowerCase();
+                  if (s === 'true') return true;
+                  if (s === 'false') return false;
+                }
+                return def;
+              };
+
+              const animToCss = (name, dur=1.2) => {
+                const d = Number(dur ?? 1.2);
+                const ds = (isNaN(d) || d <= 0) ? 1.2 : d;
+                switch (name) {
+                  case 'pulse': return `sc_pulse ${ds}s ease-in-out infinite`;
+                  case 'ping':  return `sc_ping ${ds}s ease-out infinite`;
+                  case 'spin':  return `sc_spin ${ds}s linear infinite`;
+                  case 'bounce':return `sc_bounce ${ds}s ease-in-out infinite`;
+                  case 'none':
+                  default: return '';
+                }
+              };
+
+              const evalCondFallback = (condObj) => {
+                if (!condObj || typeof condObj !== 'object' || !condObj.condition) return false;
+                const t = condObj.condition;
+
+                switch (t) {
+                  case 'state': {
+                    const eid = condObj.entity_id || condObj.entity;
+                    if (!eid || !hass.states[eid]) return false;
+                    const v = condObj.attribute
+                      ? hass.states[eid].attributes?.[condObj.attribute]
+                      : hass.states[eid].state;
+                    if (v === undefined) return false;
+                    return Array.isArray(condObj.state) ? condObj.state.includes(v) : v === condObj.state;
+                  }
+                  case 'numeric_state': {
+                    const eid = condObj.entity_id || condObj.entity;
+                    if (!eid || !hass.states[eid]) return false;
+                    const raw = condObj.attribute
+                      ? hass.states[eid].attributes?.[condObj.attribute]
+                      : hass.states[eid].state;
+                    const n = parseFloat(raw);
+                    if (isNaN(n)) return false;
+                    let ok = true;
+                    if (condObj.above !== undefined) ok = ok && (n > parseFloat(condObj.above));
+                    if (condObj.below !== undefined) ok = ok && (n < parseFloat(condObj.below));
+                    return ok;
+                  }
+                  case 'and':
+                    return Array.isArray(condObj.conditions) && condObj.conditions.every(evalCondFallback);
+                  case 'or':
+                    return Array.isArray(condObj.conditions) && condObj.conditions.some(evalCondFallback);
+                  case 'not':
+                    if (Array.isArray(condObj.conditions) && condObj.conditions[0]) return !evalCondFallback(condObj.conditions[0]);
+                    if (condObj.condition_obj) return !evalCondFallback(condObj.condition_obj);
+                    return false;
+                  default:
+                    return false;
+                }
+              };
+
+              const checkAllConditions = (cProp) => {
+                if (!cProp) return true;
+                const arr = [].concat(cProp).filter(Boolean);
+                if (typeof checkConditionsMet === 'function') return checkConditionsMet(arr, hass);
+                return arr.every(evalCondFallback);
+              };
+
+              const toRulesArray = (rules) => {
+                if (!rules) return [];
+                if (Array.isArray(rules)) return rules.filter(Boolean);
+                if (typeof rules === 'object') {
+                  return Object.keys(rules)
+                    .sort((a,b)=>parseInt(a)-parseInt(b))
+                    .map(k => rules[k])
+                    .filter(Boolean);
+                }
+                return [];
+              };
+
+              const firstMatch = (rules, keyName) => {
+                const arr = toRulesArray(rules);
+                for (const r of arr) {
+                  if (!r) continue;
+                  if (checkAllConditions(r.condition)) {
+                    if (r[keyName] !== undefined && r[keyName] !== null && r[keyName] !== '') return r[keyName];
+                    if (r.stop !== false) return null;
+                  }
+                }
+                return null;
+              };
+
+              const pullEntitiesFrom = (x, set) => {
+                if (!x) return;
+                const s = JSON.stringify(x);
+
+                const matches1 = s.match(/"entity_id"\s*:\s*"([^"]+)"/g);
+                if (matches1) matches1.forEach(m => set.add(m.split('"')[3]));
+
+                const matches2 = s.match(/"entity"\s*:\s*"([^"]+)"/g);
+                if (matches2) matches2.forEach(m => set.add(m.split('"')[3]));
+              };
+
+              const normalizeColor = (c) => {
+                if (!c) return '';
+                const s = String(c).trim();
+                if (!s) return '';
+                if (s.startsWith('#') || s.startsWith('rgb') || s.startsWith('hsl') || s.startsWith('var(')) return s;
+                return `var(--${s}-color)`;
+              };
+
+              const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+
+              const hexToRgba = (hex, a) => {
+                const h = String(hex).trim().replace('#','');
+                if (![3,4,6,8].includes(h.length)) return null;
+                const to255 = (s) => parseInt(s, 16);
+                let r,g,b;
+                if (h.length <= 4) {
+                  r = to255(h[0] + h[0]);
+                  g = to255(h[1] + h[1]);
+                  b = to255(h[2] + h[2]);
+                } else {
+                  r = to255(h.slice(0,2));
+                  g = to255(h.slice(2,4));
+                  b = to255(h.slice(4,6));
+                }
+                return `rgba(${r}, ${g}, ${b}, ${a})`;
+              };
+
+              const applyOpacity = (color, a) => {
+                const c = String(color).trim();
+                if (c.startsWith('#')) {
+                  const rgba = hexToRgba(c, a);
+                  if (rgba) return rgba;
+                }
+                return `color-mix(in srgb, ${c} ${Math.round(a*100)}%, transparent)`;
+              };
+
+              /* =============================
+                 MAIN ICON (icon + color + background)
+                 ============================= */
+
+              this._rcp_main_cache ??= { defaultIcon: null, lastState: null, observer: null };
+
+              const mainIconEl = card.querySelector('.bubble-main-icon') || icon || null;
+              const mainIconContainer = card.querySelector('.bubble-main-icon-container') || null;
+              const iconBgEl = card.querySelector('.bubble-icon-container') || null;
+
+              /* Reusable function to apply all icon/color/animation/background state */
+              const applyIconState = (state) => {
+                if (!state) return;
+                const mel = card.querySelector('.bubble-main-icon') || icon || null;
+                const mcont = card.querySelector('.bubble-main-icon-container') || null;
+                const bgEl = card.querySelector('.bubble-icon-container') || null;
+
+                if (mel) {
+                  if (state.icon) {
+                    if (mel.icon !== state.icon) mel.icon = state.icon;
+                    if (mel.getAttribute?.('icon') !== state.icon) mel.setAttribute('icon', state.icon);
+                  }
+                  if (state.color) {
+                    card.style.setProperty('--bubble-icon-color', state.color, 'important');
+                    card.style.setProperty('--paper-item-icon-color', state.color, 'important');
+                    card.style.setProperty('--mdc-icon-button-icon-color', state.color, 'important');
+                    mel.style.setProperty('color', state.color, 'important');
+                    if (mcont) mcont.style.setProperty('color', state.color, 'important');
+                  } else {
+                    card.style.setProperty('--bubble-icon-color', 'initial', 'important');
+                    card.style.setProperty('--paper-item-icon-color', 'initial', 'important');
+                    card.style.setProperty('--mdc-icon-button-icon-color', 'initial', 'important');
+                    mel.style.removeProperty('color');
+                    if (mcont) mcont.style.removeProperty('color');
+                  }
+                  if (state.anim) {
+                    mel.style.setProperty('animation', state.anim, 'important');
+                    mel.style.setProperty('display', 'inline-block', 'important');
+                  } else {
+                    mel.style.removeProperty('animation');
+                  }
+                  mel.style.setProperty('--mdc-icon-size', `${state.size}px`, 'important');
+                }
+                if (bgEl && state.bg) {
+                  bgEl.style.setProperty('background-color', state.bg, 'important');
+                }
+              };
+
+              /* Compute current state */
+              let currentIconState = null;
+
+              if (mainIconEl) {
+                if (!this._rcp_main_cache.defaultIcon) {
+                  const cfgIcon = (this.config?.icon || '').trim();
+                  const domIcon = mainIconEl.icon || mainIconEl.getAttribute?.('icon') || '';
+                  this._rcp_main_cache.defaultIcon = cfgIcon || domIcon || null;
+                }
+
+                const testIcon = (cfg.main_icon_test_icon || '').trim();
+                const ruleIcon = firstMatch(cfg.main_icon_icon_rules, 'icon');
+                const finalIcon = testIcon || ruleIcon || this._rcp_main_cache.defaultIcon || '';
+
+                const ruleColorRaw = firstMatch(cfg.main_icon_color_rules, 'color');
+                const ruleColor = normalizeColor(ruleColorRaw);
+
+                const ruleAnimName = firstMatch(cfg.main_icon_animation_rules, 'animation');
+                const ruleAnimDur  = firstMatch(cfg.main_icon_animation_rules, 'duration');
+                const ruleAnim = animToCss(ruleAnimName, ruleAnimDur);
+
+                const size = Number(cfg.icon_size ?? 50);
+
+                let bgFinal = null;
+                if (iconBgEl) {
+                  const bgRuleRaw = firstMatch(cfg.main_icon_bg_color_rules, 'color');
+                  const bgBase = normalizeColor(bgRuleRaw || cfg.main_icon_bg_color || '#ffc47e');
+                  const offPct = Number(cfg.main_icon_bg_off_opacity ?? 20);
+                  const pct = clamp(offPct, 0, 100);
+                  const alpha = pct / 100;
+                  const ent = this.config?.entity;
+                  const st = ent ? hass.states?.[ent]?.state : null;
+                  const isOff = (st === 'off' || st === 'unavailable' || st === 'unknown');
+                  bgFinal = isOff ? applyOpacity(bgBase, alpha) : bgBase;
+                }
+
+                currentIconState = { icon: finalIcon, color: ruleColor, anim: ruleAnim, size, bg: bgFinal };
+                this._rcp_main_cache.lastState = currentIconState;
+              }
+
+              /* Apply current state */
+              applyIconState(currentIconState);
+
+              /* MutationObserver: reapply icon/color/animation when Bubble Card
+                 resets the icon element (navigation, popup, re-render).
+                 Re-entrancy guard prevents infinite loop (applyIconState sets
+                 styles which would trigger the observer again). */
+              if (!this._rcp_main_cache.observer && iconBgEl) {
+                const mc = this._rcp_main_cache;
+                mc._applying = false;
+                const obs = new MutationObserver(() => {
+                  if (mc._applying || !mc.lastState) return;
+                  mc._applying = true;
+                  requestAnimationFrame(() => {
+                    applyIconState(mc.lastState);
+                    mc._applying = false;
+                  });
+                });
+                obs.observe(iconBgEl, { childList: true, subtree: true, attributes: true, attributeFilter: ['icon', 'style'] });
+                mc.observer = obs;
+              }
+
+              /* =============================
+                 STATE ENTITIES
+                 ============================= */
+              const stateEl = card.querySelector('.bubble-state');
+              if (!stateEl) return '';
+
+              const entities = cfg.state_entities || [];
+              if (!Array.isArray(entities) || entities.length === 0) return '';
+
+              const watched2 = new Set();
+              const mainEnt2 = this.config?.entity;
+              if (mainEnt2) watched2.add(mainEnt2);
+
+              entities.forEach(o => {
+                if (o?.entity) watched2.add(o.entity);
+                pullEntitiesFrom(o?.condition, watched2);
+                pullEntitiesFrom(o?.icon_rules, watched2);
+                pullEntitiesFrom(o?.color_rules, watched2);
+                pullEntitiesFrom(o?.animation_rules, watched2);
+              });
+
+              let sig2 = '';
+              for (const eid of watched2) {
+                const st = hass.states?.[eid];
+                if (st) sig2 += st.last_updated;
+              }
+
+              const hasMarker = stateEl.querySelector?.('.room-card-plus-state-marker');
+              this._sc_state_cache ??= { lastSig: '', lastHtml: '', observer: null };
+
+              const mustRebuild = (!hasMarker);
+              if (!mustRebuild && sig2 && sig2 === this._sc_state_cache.lastSig) return '';
+
+              this._sc_state_cache.lastSig = sig2 || 'static_done';
+
+              const gapPx = Number(cfg.state_multi_gap ?? 0);
+
+              const items = [];
+              entities.forEach((o, idx) => {
+                if (!o?.entity) return;
+                const st = hass.states?.[o.entity];
+                if (!st) return;
+                if (!checkAllConditions(o.condition)) return;
+
+                const raw = o.attribute ? st.attributes?.[o.attribute] : st.state;
+                if (raw === undefined || raw === null) return;
+
+                let value = raw;
+                const num = parseFloat(raw);
+                if (!isNaN(num)) {
+                  const d = o.decimals ?? 0;
+                  value = d > 0 ? num.toFixed(d) : String(Math.trunc(num));
+                }
+
+                const unit = boolVal(o.show_unit, true) ? (st.attributes?.unit_of_measurement || '') : '';
+                const showText = boolVal(o.show_text, true);
+                const showIcon = boolVal(o.show_icon, false);
+
+                const icon2 = firstMatch(o.icon_rules, 'icon') || st.attributes?.icon || null;
+                const color2 = normalizeColor(firstMatch(o.color_rules, 'color') || '');
+
+                const animName2 = firstMatch(o.animation_rules, 'animation');
+                const animDur2  = firstMatch(o.animation_rules, 'duration');
+                const anim2 = animToCss(animName2, animDur2);
+
+                const isz = Number(o.icon_size ?? 14);
+
+                items.push({
+                  order: Number(o.order_priority ?? 100) + (idx / 1000),
+                  html: (() => {
+                    let html = `<span class="room-card-plus-state-item" style="${anim2 ? `animation:${anim2} !important; display:inline-block;` : ''} ${color2 ? `color:${color2} !important;` : ''}">`;
+                    if (showIcon && icon2) {
+                      html += `<ha-icon icon="${icon2}"
+                                style="padding-right:6px; --mdc-icon-size:${isz}px; vertical-align:middle; display:inline-block; ${color2 ? `color:${color2} !important;` : ''}">
+                              </ha-icon>`;
+                    }
+                    if (showText) {
+                      const txt = `${value}${unit ? ' ' + unit : ''}`;
+                      html += `<span class="room-card-plus-state-text" style="${color2 ? `color:${color2} !important;` : ''}">${txt}</span>`;
+                    }
+                    html += `</span>`;
+                    return html;
+                  })()
+                });
+              });
+
+              items.sort((a,b) => a.order - b.order);
+
+              const sepRaw = (cfg.state_separator ?? '').toString();
+              const sep = sepRaw.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+              const sepGapL = Number(cfg.state_separator_gap_left ?? 6);
+              const sepGapR = Number(cfg.state_separator_gap_right ?? 6);
+              const joiner = sep
+                ? `<span class="room-card-plus-state-sep" style="display:inline-flex; align-items:center; padding-left:${sepGapL}px; padding-right:${sepGapR}px; opacity:0.5; user-select:none;">${sep}</span>`
+                : `<span style="display:inline-block; width:${gapPx}px;"></span>`;
+
+              const html =
+                `<span class="room-card-plus-state-marker" style="display:none;"></span>` +
+                items.map(i => i.html).join(joiner);
+
+              /* Force-write if marker was missing (Bubble Card overwrote our content)
+                 OR if the HTML actually changed (entity state updated) */
+              if (mustRebuild || html !== this._sc_state_cache.lastHtml) {
+                this._sc_state_cache.lastHtml = html;
+                stateEl.innerHTML = html || '';
+              }
+
+              /* MutationObserver: re-apply cached HTML whenever Bubble Card
+                 overwrites .bubble-state (navigation, popup, re-render).
+                 Only one observer per card lifetime. */
+              if (!this._sc_state_cache.observer && stateEl) {
+                const cache = this._sc_state_cache;
+                const obs = new MutationObserver(() => {
+                  if (!cache.lastHtml) return;
+                  if (!stateEl.querySelector('.room-card-plus-state-marker')) {
+                    stateEl.innerHTML = cache.lastHtml;
+                  }
+                });
+                obs.observe(stateEl, { childList: true, characterData: true, subtree: true });
+                cache.observer = obs;
+              }
+
+            } catch (e) {
+              console.error('[room-card-plus] error:', e);
+            }
+            return '';
+          })()}
+
+          ${(() => {
+            try {
+              const cfg = this.config["room-card-plus"] || {};
+              const perCol = Number(cfg.sub_buttons_per_column ?? 3);
+              const cont = card.querySelector('.bubble-sub-button-container');
+              if (!cont || !perCol) return '';
+              const btns = cont.querySelectorAll('.bubble-sub-button');
+              cont.classList.toggle('room-card-plus-two-cols', btns.length > perCol);
+            } catch (e) {
+              console.error('[room-card-plus] sub-button layout error:', e);
+            }
+            return '';
+          })()}
+
+          ${(() => {
+            /* =============================
+               FOOTER DRAWER (opens DOWNWARD, uses BOTTOM sub-buttons)
+               ============================= */
+            try {
+              const cfg = this.config["room-card-plus"] || {};
+
+              const boolVal = (v, def) => {
+                if (v === undefined || v === null) return def;
+                if (typeof v === 'boolean') return v;
+                if (typeof v === 'string') {
+                  const s = v.trim().toLowerCase();
+                  return s === 'true' ? true : s === 'false' ? false : def;
+                }
+                return def;
+              };
+
+              const footerEnabled = boolVal(cfg.footer_enabled, false);
+
+              this._rcp_footer ??= {
+                initialized: false,
+                isOpen: false,
+                handleEl: null,
+                clipEl: null,
+                drawerEl: null,
+                overlayEl: null,
+                gridEl: null,
+                drawerHeight: 0,
+                movedButtons: false
+              };
+
+              const fc = this._rcp_footer;
+
+              /* Find the bubble-container (parent that needs overflow:visible) */
+              const bubbleContainer = card.closest('.bubble-container') || card.querySelector('.bubble-container') || card;
+
+              /* Bottom sub-buttons container */
+              const bottomSubCont = card.querySelector('.bubble-sub-button-bottom-container');
+
+              /* ---- If footer is disabled, tear down and restore ---- */
+              if (!footerEnabled) {
+                if (fc.initialized) {
+                  fc.handleEl?.remove();
+                  fc.clipEl?.remove();
+                  fc.overlayEl?.remove();
+                  bubbleContainer.classList.remove('rcp-footer-overflow', 'rcp-drawer-elevated');
+                  fc.initialized = false;
+                  fc.isOpen = false;
+                  fc.movedButtons = false;
+                }
+                return '';
+              }
+
+              /* ---- Toggle function (declared early so handlers can reference it) ---- */
+              const toggleDrawer = (open) => {
+                fc.isOpen = open;
+                fc.drawerEl.style.transform = '';
+
+                fc.clipEl.classList.toggle('rcp-drawer-open', open);
+                fc.drawerEl.classList.toggle('rcp-drawer-open', open);
+                fc.handleEl.classList.toggle('rcp-drawer-open', open);
+                fc.overlayEl.classList.toggle('rcp-drawer-open', open);
+
+                /* Elevate card z-index while open so drawer appears above sibling cards */
+                bubbleContainer.classList.toggle('rcp-drawer-elevated', open);
+              };
+
+              /* ---- First-time setup ---- */
+              if (!fc.initialized) {
+                const container = card.querySelector('.bubble-button-card') || card;
+
+                /* Make the card allow visible overflow */
+                bubbleContainer.classList.add('rcp-footer-overflow');
+
+                /* Overlay (fixed backdrop) — appended to outer container */
+                const overlay = document.createElement('div');
+                overlay.className = 'rcp-footer-overlay';
+                overlay.addEventListener('click', () => { toggleDrawer(false); }, { passive: true });
+                bubbleContainer.appendChild(overlay);
+                fc.overlayEl = overlay;
+
+                /* Handle (center-bottom icon) — appended to outer container */
+                const handle = document.createElement('div');
+                handle.className = 'rcp-footer-handle';
+                const handleIcon = document.createElement('ha-icon');
+                handleIcon.setAttribute('icon', cfg.footer_handle_icon || 'mdi:menu');
+                handle.appendChild(handleIcon);
+                bubbleContainer.appendChild(handle);
+                fc.handleEl = handle;
+
+                /* Clip wrapper — appended to outer container */
+                const clip = document.createElement('div');
+                clip.className = 'rcp-footer-clip';
+
+                /* Drawer panel inside clip */
+                const drawer = document.createElement('div');
+                drawer.className = 'rcp-footer-drawer';
+
+                const grid = document.createElement('div');
+                grid.className = 'rcp-footer-drawer-grid';
+                drawer.appendChild(grid);
+
+                const grip = document.createElement('div');
+                grip.className = 'rcp-footer-drawer-grip';
+                drawer.appendChild(grip);
+
+                clip.appendChild(drawer);
+                bubbleContainer.appendChild(clip);
+                fc.clipEl = clip;
+                fc.drawerEl = drawer;
+                fc.gridEl = grid;
+
+                /* ---- Handle: combined click + pull-to-open/close (touch) ---- */
+
+                let handleDrag = null;  /* { startY, moved } */
+
+                handle.addEventListener('touchstart', (e) => {
+                  handleDrag = { startY: e.touches[0].clientY, moved: false };
+
+                  /* Measure drawer height for drag calculation */
+                  drawer.style.transition = 'none';
+                  drawer.classList.add('rcp-drawer-open');
+                  fc.drawerHeight = drawer.offsetHeight || 200;
+                  if (!fc.isOpen) {
+                    drawer.classList.remove('rcp-drawer-open');
+                    drawer.style.transform = 'translateY(-100%)';
+                  }
+                }, { passive: true });
+
+                handle.addEventListener('touchmove', (e) => {
+                  if (!handleDrag) return;
+                  const currentY = e.touches[0].clientY;
+                  const delta = currentY - handleDrag.startY;
+                  if (Math.abs(delta) > 5) handleDrag.moved = true;
+
+                  if (!fc.isOpen) {
+                    /* Pulling DOWN to open: delta > 0 */
+                    const progress = Math.max(0, Math.min(1, delta / fc.drawerHeight));
+                    /* -100% → 0%: translate = -100 + progress*100 */
+                    drawer.style.transform = `translateY(${-100 + progress * 100}%)`;
+                  } else {
+                    /* Pulling UP to close: delta < 0 */
+                    const progress = Math.max(0, Math.min(1, -delta / fc.drawerHeight));
+                    /* 0% → -100% */
+                    drawer.style.transform = `translateY(${-progress * 100}%)`;
+                  }
+                }, { passive: true });
+
+                handle.addEventListener('touchend', (e) => {
+                  if (!handleDrag) return;
+                  const endY = e.changedTouches[0].clientY;
+                  const delta = endY - handleDrag.startY;
+                  const wasDrag = handleDrag.moved;
+                  handleDrag = null;
+
+                  drawer.style.transition = '';
+                  drawer.style.transform = '';
+
+                  if (wasDrag) {
+                    /* Determine by drag direction and threshold */
+                    if (!fc.isOpen && delta > 40) {
+                      toggleDrawer(true);
+                    } else if (fc.isOpen && delta < -40) {
+                      toggleDrawer(false);
+                    } else {
+                      /* Snap back to current state */
+                      toggleDrawer(fc.isOpen);
+                    }
+                  }
+                  /* If not a drag, let the click handler fire naturally */
+                }, { passive: true });
+
+                /* Click handler: toggle on tap (won't fire if drag was detected) */
+                handle.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  toggleDrawer(!fc.isOpen);
+                }, { passive: false });
+
+                /* ---- Drawer body: drag-up-to-close (touch) ---- */
+                let drawerDrag = null;
+
+                drawer.addEventListener('touchstart', (e) => {
+                  drawerDrag = { startY: e.touches[0].clientY };
+                  drawer.classList.add('rcp-drawer-dragging');
+                }, { passive: true });
+
+                drawer.addEventListener('touchmove', (e) => {
+                  if (!drawerDrag) return;
+                  const currentY = e.touches[0].clientY;
+                  const delta = drawerDrag.startY - currentY; /* positive = dragging up */
+                  if (delta > 0) {
+                    drawer.style.transform = `translateY(-${delta}px)`;
+                  }
+                }, { passive: true });
+
+                drawer.addEventListener('touchend', (e) => {
+                  if (!drawerDrag) return;
+                  drawer.classList.remove('rcp-drawer-dragging');
+                  const delta = drawerDrag.startY - e.changedTouches[0].clientY;
+                  drawerDrag = null;
+
+                  if (delta > 60) {
+                    toggleDrawer(false);
+                  } else {
+                    drawer.style.transform = '';
+                  }
+                }, { passive: true });
+
+                fc.initialized = true;
+              }
+
+              /* ---- Move BOTTOM sub-buttons into drawer grid ---- */
+              if (bottomSubCont && fc.gridEl) {
+                const btns = bottomSubCont.querySelectorAll('.bubble-sub-button');
+                const currentCount = fc.gridEl.querySelectorAll('.bubble-sub-button').length;
+
+                if (btns.length > 0 && btns.length !== currentCount) {
+                  fc.gridEl.innerHTML = '';
+                  btns.forEach(btn => {
+                    fc.gridEl.appendChild(btn);
+                  });
+                  fc.movedButtons = true;
+                }
+              }
+
+            } catch (e) {
+              console.error('[room-card-plus] footer drawer error:', e);
+            }
+            return '';
+          })()}
+  editor:
+    - type: expandable
+      title: Card settings
+      icon: mdi:card-bulleted
+      schema:
+        - name: card_radius
+          label: Card radius (px)
+          default: 22
+          selector:
+            number:
+              min: 0
+              max: 40
+              step: 1
+    - type: expandable
+      title: Title & State size
+      icon: mdi:format-size
+      schema:
+        - name: title_em_mobile
+          label: Title size (mobile, em)
+          default: 0.8
+          selector:
+            number:
+              min: 0.6
+              max: 1.2
+              step: 0.05
+        - name: title_em_desktop
+          label: Title size (desktop, em)
+          default: 1.125
+          selector:
+            number:
+              min: 0.8
+              max: 1.6
+              step: 0.05
+        - name: state_size_em
+          label: State font size (em)
+          default: 0.95
+          selector:
+            number:
+              min: 0.7
+              max: 1.6
+              step: 0.05
+        - name: ts_gap
+          label: Gap between title & state (px)
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 12
+              step: 1
+    - type: expandable
+      title: Title & State positioning
+      icon: mdi:cursor-move
+      schema:
+        - name: ts_pad_top
+          label: Top padding (px)
+          default: 30
+          selector:
+            number:
+              min: 0
+              max: 40
+              step: 1
+        - name: ts_pad_left
+          label: Left padding (px)
+          default: 20
+          selector:
+            number:
+              min: 0
+              max: 40
+              step: 1
+        - name: ts_block_height
+          label: Title/State block height (px)
+          default: 52
+          selector:
+            number:
+              min: 24
+              max: 140
+              step: 2
+        - name: title_max_width_offset
+          label: Text max-width offset (%)
+          default: 20
+          selector:
+            number:
+              min: 10
+              max: 60
+              step: 1
+    - type: expandable
+      title: State entities
+      icon: mdi:information-outline
+      schema:
+        - name: state_multi_gap
+          label: Gap between state entities (px)
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 24
+              step: 1
+        - name: state_separator
+          label: Separator between states (e.g. · or |, leave empty for none)
+          selector:
+            text:
+        - name: state_separator_gap_left
+          label: Gap left of separator (px)
+          default: 6
+          selector:
+            number:
+              min: 0
+              max: 24
+              step: 1
+        - name: state_separator_gap_right
+          label: Gap right of separator (px)
+          default: 6
+          selector:
+            number:
+              min: 0
+              max: 24
+              step: 1
+        - name: state_icon_gap
+          label: Icon ↔ text gap (px) (default)
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 16
+              step: 1
+        - name: state_entities
+          label: State entities
+          selector:
+            object:
+              multiple: true
+              fields:
+                name:
+                  label: Name
+                  required: true
+                  selector:
+                    text: {}
+                order_priority:
+                  label: Order priority (left → right)
+                  selector:
+                    number:
+                      min: 1
+                      max: 50
+                      step: 1
+                      mode: box
+                entity:
+                  label: Entity
+                  required: true
+                  selector:
+                    entity: {}
+                attribute:
+                  label: Attribute (optional)
+                  selector:
+                    attribute: {}
+                decimals:
+                  label: Decimals (numeric only)
+                  default: 0
+                  selector:
+                    number:
+                      min: 0
+                      max: 3
+                      step: 1
+                show_unit:
+                  label: Show unit
+                  default: true
+                  selector:
+                    boolean: {}
+                condition:
+                  label: Condition (optional)
+                  selector:
+                    condition: {}
+                show_icon:
+                  label: Show icon
+                  default: false
+                  selector:
+                    boolean: {}
+                show_text:
+                  label: Show text
+                  default: true
+                  selector:
+                    boolean: {}
+                icon_size:
+                  label: Icon size (px)
+                  default: 14
+                  selector:
+                    number:
+                      min: 10
+                      max: 24
+                      step: 1
+                icon_rules:
+                  label: Icon rules (optional)
+                  selector:
+                    object:
+                      multiple: true
+                      fields:
+                        name:
+                          label: Rule name (optional)
+                          selector:
+                            text: {}
+                        condition:
+                          label: Condition (optional)
+                          selector:
+                            condition: {}
+                        icon:
+                          label: Icon
+                          selector:
+                            icon: {}
+                        stop:
+                          label: Stop after match
+                          default: true
+                          selector:
+                            boolean: {}
+                color_rules:
+                  label: Color rules (optional)
+                  selector:
+                    object:
+                      multiple: true
+                      fields:
+                        name:
+                          label: Rule name (optional)
+                          selector:
+                            text: {}
+                        condition:
+                          label: Condition (optional)
+                          selector:
+                            condition: {}
+                        color:
+                          label: Color (hex/css or ui_color name)
+                          selector:
+                            text: {}
+                        stop:
+                          label: Stop after match
+                          default: true
+                          selector:
+                            boolean: {}
+                animation_rules:
+                  label: Animation rules (optional)
+                  selector:
+                    object:
+                      multiple: true
+                      fields:
+                        name:
+                          label: Rule name (optional)
+                          selector:
+                            text: {}
+                        condition:
+                          label: Condition (optional)
+                          selector:
+                            condition: {}
+                        animation:
+                          label: Animation
+                          selector:
+                            select:
+                              options:
+                                - label: None
+                                  value: none
+                                - label: Pulse
+                                  value: pulse
+                                - label: Ping
+                                  value: ping
+                                - label: Spin
+                                  value: spin
+                                - label: Bounce
+                                  value: bounce
+                        duration:
+                          label: Duration (seconds)
+                          default: 1.2
+                          selector:
+                            number:
+                              min: 0.3
+                              max: 5
+                              step: 0.1
+                        stop:
+                          label: Stop after match
+                          default: true
+                          selector:
+                            boolean: {}
+              label_field: name
+              description_field: entity
+    - type: expandable
+      title: Main Icon Styling & Positioning
+      icon: mdi:emoticon-outline
+      schema:
+        - type: constant
+          label: "─── Icon Container ───"
+        - name: icon_width
+          label: Container width (px)
+          default: 100
+          selector:
+            number:
+              min: 60
+              max: 180
+              step: 1
+        - name: icon_height
+          label: Container height (px)
+          default: 60
+          selector:
+            number:
+              min: 40
+              max: 140
+              step: 1
+        - name: icon_corner_style
+          label: Corner style
+          default: diagonal
+          selector:
+            select:
+              options:
+                - label: Diagonal (0 R 0 R)
+                  value: diagonal
+                - label: Rounded (all corners)
+                  value: rounded
+                - label: Square
+                  value: square
+        - name: icon_radius
+          label: Corner radius (px)
+          default: 32
+          selector:
+            number:
+              min: 0
+              max: 60
+              step: 1
+        - name: icon_radius_tl
+          label: Corner radius TL (px) — optional
+          selector:
+            number:
+              min: 0
+              max: 60
+              step: 1
+        - name: icon_radius_tr
+          label: Corner radius TR (px) — optional
+          selector:
+            number:
+              min: 0
+              max: 60
+              step: 1
+        - name: icon_radius_br
+          label: Corner radius BR (px) — optional
+          selector:
+            number:
+              min: 0
+              max: 60
+              step: 1
+        - name: icon_radius_bl
+          label: Corner radius BL (px) — optional
+          selector:
+            number:
+              min: 0
+              max: 60
+              step: 1
+        - name: main_icon_bg_color
+          label: Background color (hex/css/ui_color)
+          default: '#ffc47e'
+          selector:
+            text: {}
+        - name: main_icon_bg_off_opacity
+          label: Background opacity when entity is OFF (%)
+          default: 20
+          selector:
+            number:
+              min: 0
+              max: 100
+              step: 1
+        - type: constant
+          label: "─── Icon Container Positioning ───"
+        - name: icon_left
+          label: Container left offset (px)
+          default: -12
+          selector:
+            number:
+              min: -80
+              max: 40
+              step: 1
+        - name: icon_bottom
+          label: Container bottom offset (px)
+          default: -10
+          selector:
+            number:
+              min: -80
+              max: 40
+              step: 1
+        - type: constant
+          label: "─── Icon Positioning ───"
+        - name: icon_size
+          label: Icon size (px)
+          default: 50
+          selector:
+            number:
+              min: 24
+              max: 80
+              step: 1
+        - name: icon_offset_x
+          label: Horizontal offset (px)
+          default: 0
+          selector:
+            number:
+              min: -30
+              max: 30
+              step: 1
+        - name: icon_offset_y
+          label: Vertical offset (px)
+          default: 0
+          selector:
+            number:
+              min: -30
+              max: 30
+              step: 1
+        - name: icon_color
+          label: Icon color (default)
+          default: '#1c1c1c'
+          selector:
+            text: {}
+        - name: main_icon_test_icon
+          label: Test icon override (forces icon)
+          selector:
+            icon: {}
+    - type: expandable
+      title: Main Icon Rules
+      icon: mdi:shield-star-outline
+      schema:
+        - name: main_icon_icon_rules
+          label: Icon rules (optional)
+          selector:
+            object:
+              multiple: true
+              fields:
+                name:
+                  label: Rule name (optional)
+                  selector:
+                    text: {}
+                condition:
+                  label: Condition (optional)
+                  selector:
+                    condition: {}
+                icon:
+                  label: Icon
+                  selector:
+                    icon: {}
+                stop:
+                  label: Stop after match
+                  default: true
+                  selector:
+                    boolean: {}
+        - name: main_icon_color_rules
+          label: Color rules (optional)
+          selector:
+            object:
+              multiple: true
+              fields:
+                name:
+                  label: Rule name (optional)
+                  selector:
+                    text: {}
+                condition:
+                  label: Condition (optional)
+                  selector:
+                    condition: {}
+                color:
+                  label: Color (hex/css or ui_color name)
+                  selector:
+                    text: {}
+                stop:
+                  label: Stop after match
+                  default: true
+                  selector:
+                    boolean: {}
+        - name: main_icon_animation_rules
+          label: Animation rules (optional)
+          selector:
+            object:
+              multiple: true
+              fields:
+                name:
+                  label: Rule name (optional)
+                  selector:
+                    text: {}
+                condition:
+                  label: Condition (optional)
+                  selector:
+                    condition: {}
+                animation:
+                  label: Animation
+                  selector:
+                    select:
+                      options:
+                        - label: None
+                          value: none
+                        - label: Pulse
+                          value: pulse
+                        - label: Ping
+                          value: ping
+                        - label: Spin
+                          value: spin
+                        - label: Bounce
+                          value: bounce
+                duration:
+                  label: Duration (seconds)
+                  default: 1.2
+                  selector:
+                    number:
+                      min: 0.3
+                      max: 5
+                      step: 0.1
+                stop:
+                  label: Stop after match
+                  default: true
+                  selector:
+                    boolean: {}
+        - name: main_icon_bg_color_rules
+          label: Background color rules (optional)
+          selector:
+            object:
+              multiple: true
+              fields:
+                name:
+                  label: Rule name (optional)
+                  selector:
+                    text: {}
+                condition:
+                  label: Condition (optional)
+                  selector:
+                    condition: {}
+                color:
+                  label: Background color (hex/css or ui_color name)
+                  selector:
+                    text: {}
+                stop:
+                  label: Stop after match
+                  default: true
+                  selector:
+                    boolean: {}
+    - type: expandable
+      title: Main Sub-button Layout
+      icon: mdi:dots-vertical
+      schema:
+        - name: sub_button_size
+          label: Sub-button size (px)
+          default: 32
+          selector:
+            number:
+              min: 28
+              max: 60
+              step: 1
+        - name: sub_button_gap
+          label: Gap between sub-buttons (px)
+          default: 10
+          selector:
+            number:
+              min: 0
+              max: 24
+              step: 1
+        - name: sub_button_radius
+          label: Sub-button radius (px)
+          default: 30
+          selector:
+            number:
+              min: 0
+              max: 30
+              step: 1
+        - name: sub_buttons_per_column
+          label: Buttons per column
+          default: 3
+          selector:
+            number:
+              min: 1
+              max: 8
+              step: 1
+        - name: sub_button_column_gap
+          label: Column gap (px)
+          default: 8
+          selector:
+            number:
+              min: 0
+              max: 24
+              step: 1
+        - name: sub_button_left_shift
+          label: Left shift when 2 columns (px)
+          default: 6
+          selector:
+            number:
+              min: 0
+              max: 30
+              step: 1
+        - name: main_sb_off_color
+          label: Off background color override (hex/css)
+          selector:
+            text: {}
+        - name: main_sb_on_color
+          label: On background color override (hex/css)
+          selector:
+            text: {}
+    - type: expandable
+      title: Bottom Sub-buttons Layout
+      icon: mdi:dots-horizontal
+      schema:
+        - name: footer_button_size
+          label: Button size (px)
+          default: 46
+          selector:
+            number:
+              min: 28
+              max: 64
+              step: 1
+        - name: footer_button_radius
+          label: Button radius (px)
+          default: 30
+          selector:
+            number:
+              min: 0
+              max: 32
+              step: 1
+        - name: footer_columns
+          label: Grid columns
+          default: 3
+          selector:
+            number:
+              min: 2
+              max: 6
+              step: 1
+        - name: footer_grid_gap
+          label: Grid gap (px)
+          default: 10
+          selector:
+            number:
+              min: 4
+              max: 24
+              step: 1
+        - name: footer_sb_off_color
+          label: Off background color
+          default: '#1c1111'
+          selector:
+            text: {}
+        - name: footer_sb_on_color
+          label: On background color override (hex/css)
+          selector:
+            text: {}
+    - type: expandable
+      title: Footer Drawer
+      icon: mdi:arrow-collapse-up
+      schema:
+        - name: footer_enabled
+          label: Enable footer drawer
+          default: false
+          selector:
+            boolean: {}
+        - name: footer_handle_icon
+          label: Handle icon
+          default: mdi:menu
+          selector:
+            icon: {}
+        - name: footer_handle_icon_size
+          label: Handle icon size (px)
+          default: 20
+          selector:
+            number:
+              min: 14
+              max: 32
+              step: 1
+        - name: footer_handle_icon_color
+          label: Handle icon color
+          default: var(--primary-text-color)
+          selector:
+            text: {}
+        - name: footer_handle_radius
+          label: Handle corner radius (px)
+          default: 14
+          selector:
+            number:
+              min: 0
+              max: 24
+              step: 1
+        - name: footer_handle_bg
+          label: Handle background color (css)
+          default: transparent
+          selector:
+            text: {}
+        - name: footer_drawer_bg
+          label: Drawer background color (css)
+          default: var(--card-background-color, rgba(30,30,30,0.95))
+          selector:
+            text: {}
+        - name: footer_drawer_radius
+          label: Drawer corner radius (px)
+          default: 22
+          selector:
+            number:
+              min: 0
+              max: 40
+              step: 1
