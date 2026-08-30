@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5798 |
-| Sensors        | 1873 |
-| Binary Sensors | 438 |
+| All Entities   | 5906 |
+| Sensors        | 1932 |
+| Binary Sensors | 452 |
 | Lights         | 81 |
-| Switches       | 800 |
+| Switches       | 809 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -301,7 +301,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.22]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.25]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -313,7 +313,7 @@ A Home Assistant integration to provide battery details of devices
 
 Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.13.3]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.14.0]
 
 Automatically update Home Assistant blueprints via native update entities.
 
@@ -347,7 +347,7 @@ Home Assistant integration for Dreame robot vacuums with map support
 
 Authors: [@tasshack](https://github.com/tasshack).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.4]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.5]
 
 Frigate integration for Home Assistant
 
@@ -407,7 +407,7 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.5.3]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.6.1]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
@@ -425,7 +425,7 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.27]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.29]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -437,19 +437,19 @@ Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.3.4]
+### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.4.0]
 
 Home Assistant cloud-push integration for the Neakasa M1 self-cleaning litter box (real-time MQTT + polling fallback)
 
 Authors: [@roquerodrigo](https://github.com/roquerodrigo).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.0.3]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.1.0]
 
 OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
-### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.0.0]
+### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.1.0]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
@@ -473,7 +473,7 @@ Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.6.3]
+### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.8.0]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
@@ -497,7 +497,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>40 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v7.27.4]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v8.0.0]
 
 A comprehensive camera card for Home Assistant
 
@@ -521,7 +521,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.2.5]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.3.0]
 
 Bubble Card is a minimalist and customizable card collection for Home Assistant, featuring modern pop-ups and an integrated Module Store with over 100 community-made modules.
 
@@ -565,7 +565,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v6.10.0]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v7.0.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -645,11 +645,11 @@ This custom card allows you to display vehicle information in your Home Assistan
 
 Minimalistic uptime card for Home Assistant Lovelace UI
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.6.0]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.7.0]
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.14.0]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.14.1]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
