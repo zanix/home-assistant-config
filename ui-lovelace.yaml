@@ -4724,7 +4724,7 @@ views:
                               adaptive: true
                               content:
                                 type: custom:streamline-card
-                                template: updates_list_arch
+                                template: updates_list_fedora
                                 variables:
                                   - entity: sensor.workstation_system_updates_count
           - type: custom:button-card
@@ -4781,35 +4781,6 @@ views:
                         entity: binary_sensor.athos_camera_used
                         icon_color: red
                         content_info: none
-                    - type: conditional
-                      conditions:
-                        - condition: numeric_state
-                          entity: sensor.athos_system_updates_count
-                          above: 0
-                      chip:
-                        type: template
-                        entity: sensor.athos_system_updates_count
-                        icon: mdi:arrow-up-bold-circle
-                        icon_color: red
-                        card_mod:
-                          style:
-                            .: "{% if int(states(config.entity), 0) > 0 %}\nha-card:after\
-                              \ {\n  content: \"{{ int(states(config.entity), 0) }}\"\
-                              ;\n  position: absolute;\n  color: var(--red-color);\n\
-                              \  font-weight: bolder;\n  top: -2px;\n  right: 2px;\n\
-                              \  font-size: 12px;\n}\n{% endif %}\n"
-                        tap_action:
-                          action: fire-dom-event
-                          browser_mod:
-                            service: browser_mod.popup
-                            data:
-                              title: System Updates
-                              adaptive: true
-                              content:
-                                type: custom:streamline-card
-                                template: updates_list_fedora
-                                variables:
-                                  - entity: sensor.athos_system_updates_count
           - type: custom:button-card
             layout_options:
               grid_columns: 2
@@ -5876,8 +5847,6 @@ views:
                   hide_main_background: true
                   styles: ".bubble-sub-button-1 > ha-icon {\n  color: var(--red-color)\
                     \ !important;\n}\n.bubble-sub-button-2 > ha-icon {\n  color: var(--red-color)\
-                    \ !important;\n}\n.bubble-sub-button-3 > ha-icon {\n  color: var(--red-color)\
-                    \ !important;\n}\n.bubble-sub-button-4 > ha-icon {\n  color: var(--red-color)\
                     \ !important;\n}"
                   sub_button:
                     main: []
@@ -5896,28 +5865,6 @@ views:
                           - condition: state
                             entity: binary_sensor.athos_camera_used
                             state: 'on'
-                      - entity: sensor.athos_system_updates_count
-                        name: System Updates
-                        show_background: false
-                        show_state: true
-                        icon: mdi:arrow-up-bold-circle
-                        tap_action:
-                          action: fire-dom-event
-                          browser_mod:
-                            service: browser_mod.popup
-                            data:
-                              title: System Updates
-                              adaptive: true
-                              tag: updates
-                              content:
-                                type: custom:streamline-card
-                                template: updates_list_fedora
-                                variables:
-                                  - entity: sensor.athos_system_updates_count
-                        visibility:
-                          - condition: numeric_state
-                            entity: sensor.athos_system_updates_count
-                            above: 0
                   modules: []
                 - type: custom:streamline-card
                   template: computer_power
@@ -15694,14 +15641,19 @@ views:
                       - type: custom:mushroom-template-card
                         primary: Remote Start
                         secondary: "{%- if is_state(\"device_tracker.ascent\", \"\
-                          home\") -%}\n  Press and Hold to Open the Garage and Start\n\
-                          {%- else -%}\n  Press and Hold to Start\n{%- endif -%}"
+                          home\") -%}\n  Press to Open the Garage and Start\n{%- else\
+                          \ -%}\n  Press to Start\n{%- endif -%}"
                         icon: mdi:key-wireless
                         entity: script.ascent_remote_start
                         color: '{{ iif(is_state(entity, "on"), "green", "amber") }}'
                         features_position: bottom
                         tap_action:
-                          action: none
+                          confirmation:
+                            text: Start the Ascent?
+                          action: call-service
+                          service: script.turn_on
+                          target:
+                            entity_id: script.ascent_remote_start
                         hold_action:
                           action: call-service
                           service: script.turn_on
@@ -16281,15 +16233,19 @@ views:
                       - type: custom:mushroom-template-card
                         primary: Remote Start
                         secondary: "{%- if is_state(\"device_tracker.kona_location\"\
-                          , \"home\") -%}\n  Press and Hold to Open the Garage and\
-                          \ Start\n{%- else -%}\n  Press and Hold to Start\n{%- endif\
-                          \ -%}"
+                          , \"home\") -%}\n  Press to Open the Garage and Start\n\
+                          {%- else -%}\n  Press to Start\n{%- endif -%}"
                         icon: mdi:key-wireless
                         entity: script.kona_remote_start
                         color: '{{ iif(is_state(entity, "on"), "green", "amber") }}'
                         features_position: bottom
                         tap_action:
-                          action: none
+                          confirmation:
+                            text: Start the Kona?
+                          action: call-service
+                          service: script.turn_on
+                          target:
+                            entity_id: script.kona_remote_start
                         hold_action:
                           action: call-service
                           service: script.turn_on
@@ -17441,12 +17397,19 @@ views:
                       - entity: switch.ge_oven_light
                         name: Light
                         show_name: true
-                        show_state: true
                         fill_width: false
                         tap_action:
                           action: toggle
                         hold_action:
                           action: more-info
+                      - entity: switch.ge_oven_control_lock
+                        name: Controls
+                        show_name: true
+                        fill_width: false
+                        tap_action:
+                          action: more-info
+                        hold_action:
+                          action: toggle
                       - entity: binary_sensor.ge_oven_remote_enabled
                         name: Remote
                         icon: mdi:remote
@@ -17454,6 +17417,7 @@ views:
                         fill_width: false
                         tap_action:
                           action: none
+                  rows: 0.938
                 - type: custom:mushroom-template-card
                   entity: water_heater.ge_oven
                   primary: "{% if has_value(entity) and is_state(entity, 'Off') %}\n\
