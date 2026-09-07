@@ -341,54 +341,63 @@ notify_quickbars:
             sound_volume_percent: >-
               {{ _ev.sound_volume_percent if _ev.get('sound_volume_percent') else '' }}
 
-    - wait_for_trigger:
-        - trigger: event
-          event_type: quickbars.action
-      timeout:
-        seconds: "{{ duration if duration > 0 else 300 }}"
-      continue_on_timeout: false
+    - alias: If actions are set, wait for action
+      if:
+        - condition: template
+          value_template: |-
+            {{ (action_1_id and action_1_action is defined)
+              or (action_2_id and action_2_action is defined)
+              or (action_3_id and action_3_action is defined)
+            }}
+      then:
+        - wait_for_trigger:
+            - trigger: event
+              event_type: quickbars.action
+          timeout:
+            seconds: "{{ duration if duration > 0 else 300 }}"
+          continue_on_timeout: false
 
-    - variables:
-        _action_id: "{{ wait.trigger.event.data.action_id | default('') }}"
-        _trigger_cid: "{{ wait.trigger.event.data.cid | default('') }}"
+        - variables:
+            _action_id: "{{ wait.trigger.event.data.action_id | default('') }}"
+            _trigger_cid: "{{ wait.trigger.event.data.cid | default('') }}"
 
-    - condition: template
-      value_template: "{{ _trigger_cid == _cid }}"
+        - condition: template
+          value_template: "{{ _trigger_cid == _cid }}"
 
-    - choose:
-        # Action 1
-        - conditions:
-            - condition: template
-              value_template: "{{ _action_id == action_1_id and action_1_action is defined }}"
-          sequence:
-            - alias: Loop through action_1_action
-              repeat:
-                for_each: '{{ action_1_action }}'
-                sequence:
-                  - action: "{{ repeat.item.action }}"
-                    data: "{{ repeat.item.data }}"
-                    target: "{{ repeat.item.target }}"
-        # Action 2
-        - conditions:
-            - condition: template
-              value_template: "{{ _action_id == action_2_id and action_2_action is defined }}"
-          sequence:
-            - alias: Loop through action_2_action
-              repeat:
-                for_each: '{{ action_2_action }}'
-                sequence:
-                  - action: "{{ repeat.item.action }}"
-                    data: "{{ repeat.item.data }}"
-                    target: "{{ repeat.item.target }}"
-        # Action 3
-        - conditions:
-            - condition: template
-              value_template: "{{ _action_id == action_3_id and action_3_action is defined }}"
-          sequence:
-            - alias: Loop through action_3_action
-              repeat:
-                for_each: '{{ action_3_action }}'
-                sequence:
-                  - action: "{{ repeat.item.action }}"
-                    data: "{{ repeat.item.data }}"
-                    target: "{{ repeat.item.target }}"
+        - choose:
+            # Action 1
+            - conditions:
+                - condition: template
+                  value_template: "{{ _action_id == action_1_id and action_1_action is defined }}"
+              sequence:
+                - alias: Loop through action_1_action
+                  repeat:
+                    for_each: '{{ action_1_action }}'
+                    sequence:
+                      - action: "{{ repeat.item.action }}"
+                        data: "{{ repeat.item.data }}"
+                        target: "{{ repeat.item.target }}"
+            # Action 2
+            - conditions:
+                - condition: template
+                  value_template: "{{ _action_id == action_2_id and action_2_action is defined }}"
+              sequence:
+                - alias: Loop through action_2_action
+                  repeat:
+                    for_each: '{{ action_2_action }}'
+                    sequence:
+                      - action: "{{ repeat.item.action }}"
+                        data: "{{ repeat.item.data }}"
+                        target: "{{ repeat.item.target }}"
+            # Action 3
+            - conditions:
+                - condition: template
+                  value_template: "{{ _action_id == action_3_id and action_3_action is defined }}"
+              sequence:
+                - alias: Loop through action_3_action
+                  repeat:
+                    for_each: '{{ action_3_action }}'
+                    sequence:
+                      - action: "{{ repeat.item.action }}"
+                        data: "{{ repeat.item.data }}"
+                        target: "{{ repeat.item.target }}"
