@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5906 |
-| Sensors        | 1932 |
-| Binary Sensors | 452 |
+| All Entities   | 5609 |
+| Sensors        | 1961 |
+| Binary Sensors | 427 |
 | Lights         | 81 |
-| Switches       | 809 |
+| Switches       | 822 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -307,13 +307,13 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.5.3]
+### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.6.3]
 
 A Home Assistant integration to provide battery details of devices
 
 Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.14.0]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.14.5]
 
 Automatically update Home Assistant blueprints via native update entities.
 
@@ -329,7 +329,7 @@ Bubble Card Tools is a custom integration that handles the Bubble Card backend. 
 
 Authors: [@Clooos](https://github.com/Clooos).
 
-### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.5.1]
+### [Choreops](https://github.com/ccpk1/ChoreOps) [v1.5.2]
 
 ☑️ ChoreOps - A sophisticated household task and routine manager for Home Assistant. Gamify your chores for motivation, or just ensure the trash gets taken out on time.
 
@@ -347,7 +347,7 @@ Home Assistant integration for Dreame robot vacuums with map support
 
 Authors: [@tasshack](https://github.com/tasshack).
 
-### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.5]
+### [Frigate](https://github.com/blakeblackshear/frigate-hass-integration) [v5.15.6]
 
 Frigate integration for Home Assistant
 
@@ -413,7 +413,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.10.1]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.11.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -425,7 +425,7 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.29]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.5.31]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
@@ -443,13 +443,13 @@ Home Assistant cloud-push integration for the Neakasa M1 self-cleaning litter bo
 
 Authors: [@roquerodrigo](https://github.com/roquerodrigo).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.1.0]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.2.0]
 
 OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
-### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.1.0]
+### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.4.0]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
@@ -461,7 +461,7 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.25]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.1.26]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -473,7 +473,7 @@ Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.8.0]
+### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.9.1]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
@@ -497,7 +497,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>40 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v8.0.0]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v8.0.2]
 
 A comprehensive camera card for Home Assistant
 
@@ -593,7 +593,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.2.2]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.2.3]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -649,7 +649,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 Home Assistant Lovelace Windrose Card
 
-### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.14.1]
+### [Windy Card](https://github.com/timmaurice/lovelace-windy-card) [v1.14.2]
 
 A Lovelace card that embeds the Windy.com interactive weather map and spot forecast directly into your Home Assistant dashboard.
 
