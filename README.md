@@ -874,8 +874,7 @@ Material Design 3 Theme for Home Assistant
 - 📋 [Inovelli] Amy Office Switch
 - 📋 [Inovelli] Emma Switch
 - 📋 [Inovelli] Ethan Switch
-- 📋 [Inovelli] Family Room Aux Switch
-- 📋 [Inovelli] Family Room Switch
+- 📋 [Inovelli] Family Room Switches
 - 📋 [Inovelli] Joshua Office Switch
 - 📋 [Inovelli] Living Room Fan Light Switch
 - 📋 [Inovelli] Main Bedroom Switch

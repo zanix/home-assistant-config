@@ -1,0 +1,2620 @@
+blueprint:
+  name: "Inovelli Blue Series Bulk Configuration (Z2M) 💡"
+  description: >
+    # 💡 Inovelli Blue Series Bulk Configuration (Zigbee2MQTT)
+
+    **Version: 1.2**
+
+
+    ## One automation that can push settings to one or multiple Inovelli Blue Series devices at the same time!
+
+
+    ### Supported Models and Firmwares:
+      - ### On/off switch (VZM30-SN)
+          - FW 1.02
+      - ### 2-in-1 switch + dimmer (VZM31-SN)
+          - FW 2.18
+      - ### mmWave Zigbee Dimmer (VZM32-SN)
+          - FW 1.00
+      - ### Fan controller (VZM35-SN)
+          - FW 1.07
+      - ### Fan Canopy Module (VZM36)
+          - FW 1.01
+
+
+    <details>
+    <summary><b>Automation Details:</b> 👈</summary>
+      - **Zigbee2MQTT is REQUIRED**
+        - Device targets will be filtered on MQTT integration configured Inovelli devices.
+        - Setting push/payloads are only setup to work with Zigbee2MQTT
+
+      - **Target Devices:**
+        - Targeting a single or list of devices is supported.
+        - Areas and Labels are also supported.
+        - When mixing Invovelli devices, areas with other devices, or labels with other devices the automation will filter by device model and Inovelli devices to apply setting configs that are supported by that specific model.
+
+      - **Trigger:**
+        - A trigger is optional for automations.
+        - This allows for linking similar bulk configs to sync from a single trigger or allowing a manual run without a trigger.
+
+      - **Notification Title:**
+        - Once the config sync is complete for the list of targeted devices, a persistant Home Assistant notficiation will be sent.
+        - The notification has a customizable title that can be descriptive of what devices or settings are being changed.
+        - The notification description will output the list of device(s) by name that were changed.
+
+      - **Config Settings:**
+        - All configuration settings for all Blue series devices are supported.
+        - Settings are grouped relative to each other for easier organization.
+        - All config settings are supported for each model, however any settings related to LED effects, current state/brightness, or fan modes are not supported in this automation.
+        - For device models with similar but unique values, adjustments have been made to those specific points. The automation will ensure it adapts to each model and settings it supports (EX: SmartBulb/SmartFan modes can be set from one point, mmWave settings only to mmWave models).
+
+      - **Enable/Disable Settings:**
+        - All settings are disabled by default.
+        - This allows you to only enable the points that you want to change. If enabled that point value will push to all targeted devices if its supported on that model.
+
+      - **Settings Values:**
+        - Values are set to factory defaults. Values will not be sent unless its enabled using the toggle.
+    </details>
+
+  domain: automation
+  input:
+    target_sync_devices:
+      name: Targeted Inovelli Devices, Areas, or Labels
+      description: Select Inovelli devices (VZM30, VZM31, VZM32, VZM35, or Canopy Module), areas, or labels containing those devices. Automation will filter out any device that is not a supported Inovelli device.
+      selector:
+        target:
+          device:
+            integration: mqtt
+            manufacturer: Inovelli
+            #model:
+            #  - "On/off switch"
+            #  - "2-in-1 switch + dimmer"
+            #  - "mmWave Zigbee Dimmer"
+            #  - "Fan controller"
+            #  - "Fan Canopy Module"
+
+    sync_trigger:
+      name: Automation Trigger (Optional)
+      description: "Define how the automation should run (e.g., button, time, or manual)."
+      default: []
+      selector:
+        trigger: {}
+
+    notification_title:
+      name: Notification Title
+      description: The title for the completion notification. Helpful for differentiating automations based on which configs or groups are being changed.
+      default: "✅ Inovelli Bulk Configuration Complete"
+      selector:
+        text:
+
+    mqtt_topic:
+      name: MQTT Topic
+      description: Define the MQTT topic for your devices
+      default:  "zigbee2mqtt"
+      selector:
+        text:
+
+    # ========================================
+    # DIMMING & RAMP RATES
+    # ========================================
+    dimming_section:
+      name: >
+        ## ⚡ Dimming & Ramp Rates
+      description: >
+        ### Settings group for defining dimming and ramp on/off speeds.
+
+      collapsed: true
+      input:
+        # P1
+        p1_enable:
+          name: "Enable P1: Dimming Speed Up (Remote)"
+          default: false
+          selector: { boolean: {} }
+        p1_dimming_speed_up_remote:
+          name: "Value P1: Dimming Speed Up (Remote)"
+          description: "Speed that light dims up from hub. 0=instant, each unit=100ms. Default=25 (2.5s)"
+          default: 25
+          selector:
+            { number: { min: 0, max: 126, unit_of_measurement: "x100ms" } }
+
+        # P2
+        p2_enable:
+          name: "Enable P2: Dimming Speed Up (Local)"
+          default: false
+          selector: { boolean: {} }
+        p2_dimming_speed_up_local:
+          name: "Value P2: Dimming Speed Up (Local)"
+          description: "Speed that light dims up from switch. 127=sync with P1. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        # P3
+        p3_enable:
+          name: "Enable P3: Ramp Rate Off to On (Remote)"
+          default: false
+          selector: { boolean: {} }
+        p3_ramp_rate_off_to_on_remote:
+          name: "Value P3: Ramp Rate Off to On (Remote)"
+          description: "Speed light turns on from hub. 127=sync with P1. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        # P4
+        p4_enable:
+          name: "Enable P4: Ramp Rate Off to On (Local)"
+          default: false
+          selector: { boolean: {} }
+        p4_ramp_rate_off_to_on_local:
+          name: "Value P4: Ramp Rate Off to On (Local)"
+          description: "Speed light turns on from switch. 127=sync with P1. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        # P5
+        p5_enable:
+          name: "Enable P5: Dimming Speed Down (Remote)"
+          default: false
+          selector: { boolean: {} }
+        p5_dimming_speed_down_remote:
+          name: "Value P5: Dimming Speed Down (Remote)"
+          description: "Speed light dims down from hub. 127=sync with P1. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        # P6
+        p6_enable:
+          name: "Enable P6: Dimming Speed Down (Local)"
+          default: false
+          selector: { boolean: {} }
+        p6_dimming_speed_down_local:
+          name: "Value P6: Dimming Speed Down (Local)"
+          description: "Speed light dims down from switch. 127=sync with P2. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        # P7
+        p7_enable:
+          name: "Enable P7: Ramp Rate On to Off (Remote)"
+          default: false
+          selector: { boolean: {} }
+        p7_ramp_rate_on_to_off_remote:
+          name: "Value P7: Ramp Rate On to Off (Remote)"
+          description: "Speed light turns off from hub. 127=sync with P3. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        # P8
+        p8_enable:
+          name: "Enable P8: Ramp Rate On to Off (Local)"
+          default: false
+          selector: { boolean: {} }
+        p8_ramp_rate_on_to_off_local:
+          name: "Value P8: Ramp Rate On to Off (Local)"
+          description: "Speed light turns off from switch. 127=sync with P4. Default=127"
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+    # ========================================
+    # BRIGHTNESS LEVELS
+    # ========================================
+    brightness_section:
+      name: >
+        ## 🔆 Brightness Levels / Power Restored Level
+
+      description: >
+        ### Configure the minimum/maximum brightness levels, default levels, and brightness level after power is restored.
+
+      collapsed: true
+      input:
+        # P9
+        p9_enable:
+          name: "Enable P9: Minimum Dim Level"
+          default: false
+          selector: { boolean: {} }
+        p9_minimum_dim_level:
+          name: "Value: P9 Minimum Dim Level"
+          description: "Minimum brightness level. Useful for LED bulbs that flicker at low levels."
+          default: 1
+          selector: { number: { min: 1, max: 254 } }
+
+        # P10
+        p10_enable:
+          name: "Enable P10: Maximum Dim Level"
+          default: false
+          selector: { boolean: {} }
+        p10_maximum_dim_level:
+          name: "Value: P10 Maximum Dim Level"
+          description: "Maximum brightness level. Useful to limit max brightness."
+          default: 255
+          selector: { number: { min: 2, max: 255 } }
+
+        # P13
+        p13_enable:
+          name: "Enable P13: Default Level (Local)"
+          default: false
+          selector: { boolean: {} }
+        p13_default_dim_level_local:
+          name: "Value: P13 Default Level (Local)"
+          description: "Default brightness when turned on at switch. 255=last state. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        # P14
+        p14_enable:
+          name: "Enable P14: Default Level (Remote)"
+          default: false
+          selector: { boolean: {} }
+        p14_default_dim_level_remote:
+          name: "Value: P14 Default Level (Remote)"
+          description: "Default brightness when turned on from hub. 255=last state. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        # P15
+        p15_enable:
+          name: "Enable P15: Level After Power Restored"
+          default: false
+          selector: { boolean: {} }
+        p15_level_after_power_restored:
+          name: "Value: P15 Level After Power Restored"
+          description: "State after power failure. 0=off, 1-254=level, 255=previous. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+    # ========================================
+    # BASIC SWITCH SETTINGS
+    # ========================================
+    basic_section:
+      name: >
+        ## ⚙️ Basic Switch Settings
+
+      description: >
+        ### Settings that change core switch behavior and configuration.
+
+      collapsed: true
+      input:
+        # P11
+        p11_enable:
+          name: "Enable P11: Invert Switch"
+          default: false
+          selector: { boolean: {} }
+        p11_invert_switch:
+          name: "Value: P11 Invert Switch"
+          description: "Invert paddle orientation (for upside-down installation)"
+          default: "No"
+          selector:
+            select:
+              options: ["No", "Yes"]
+
+        # P12
+        p12_enable:
+          name: "Enable P12: Auto-Off Timer"
+          default: false
+          selector: { boolean: {} }
+        p12_auto_off_timer:
+          name: "Value: P12 Auto-Off Timer"
+          description: "Automatically turn off after X seconds. 0=disabled. Default=0"
+          default: 0
+          selector: { number: { min: 0, max: 32767, unit_of_measurement: "s" } }
+
+        # P22
+        p22_enable:
+          name: "Enable P22: Switch Type"
+          default: false
+          selector: { boolean: {} }
+        p22_switch_type:
+          name: "Value: P22 Switch Type"
+          description: >
+            Set the switch configuration.
+
+              **Setting applies to models:
+                - On/off switch
+                - mmWave Zigbee Dimmer
+                - Fan controller**
+          default: "Single Pole"
+          selector:
+            select:
+              options:
+                - "Single Pole"
+                - "Aux Switch"
+        p22_switch_type_2in1:
+          name: "Value: P22 Switch Type"
+          description: >
+            Set the switch configuration.
+
+              **Setting applies to models:
+                - 2-in-1 switch + dimmer**
+          default: "Single Pole"
+          selector:
+            select:
+              options:
+                - "Single Pole"
+                - "3-Way Dumb Switch"
+                - "3-Way Aux Switch"
+                - "Single-Pole Full Sine Wave"
+
+        # P25
+        p25_enable:
+          name: "Enable P25: Higher Output (Non-Neutral)"
+          default: false
+          selector: { boolean: {} }
+        p25_non_neutral_output:
+          name: "Value: P25 Higher Output (Non-Neutral)"
+          description: "Increase brightness for non-neutral installations"
+          default: "Disabled (default)"
+          selector:
+            select:
+              options:
+                - "Disabled (default)"
+                - "Enabled"
+
+        # P50
+        p50_enable:
+          name: "Enable P50: Button Press Delay"
+          default: false
+          selector: { boolean: {} }
+        p50_button_press_delay:
+          name: "Value: P50 Button Press Delay"
+          description: "0ms=instant response (disables multi-tap), up to 900ms"
+          default: "500ms"
+          selector:
+            select:
+              options:
+                [
+                  "0ms",
+                  "100ms",
+                  "200ms",
+                  "300ms",
+                  "400ms",
+                  "500ms",
+                  "600ms",
+                  "700ms",
+                  "800ms",
+                  "900ms",
+                ]
+
+        # P52
+        p52_enable:
+          name: "Enable P52: Smart Bulb Mode"
+          default: false
+          selector: { boolean: {} }
+        p52_smart_bulb_mode:
+          name: "Value: P52 Smart Bulb Mode"
+          description: >
+            Keep power constant for smart bulbs controlled by commands.
+
+              **Setting applies to models:
+                - On/off switch
+                - 2-in-1 switch + dimmer
+                - mmWave Zigbee Dimmer**
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Smart Bulb Mode"]
+        p52_smart_fan_mode:
+          name: "Value: P52 Smart Fan Mode"
+          description: >
+            Keep power constant for smart fans controlled by commands.
+
+              **Setting applies to models:
+                - Fan controller**
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Smart Fan Mode"]
+
+        # P258
+        p258_enable:
+          name: "Enable P258: Switch Mode"
+          default: false
+          selector: { boolean: {} }
+        p258_switch_mode:
+          name: "Value: P258 Switch Mode"
+          description: >
+            Use as Dimmer or simple On/Off switch
+
+              **Setting applies to models:
+                - On/off switch
+                - 2-in-1 switch + dimmer
+                - mmWave Zigbee Dimmer**
+          default: "Dimmer"
+          selector:
+            select:
+              options: ["Dimmer", "On/Off"]
+        p258_switch_mode_fan:
+          name: "Value: P258 Fan Mode"
+          description: >
+            Ceiling fan with 3-speed or exhaust fan on/off.
+
+              **Setting applies to models:
+                - Fan controller**
+          default: "Ceiling Fan (3-Speed)"
+          selector:
+            select:
+              options:
+                - "Ceiling Fan (3-Speed)"
+                - "Exhaust Fan (On/Off)"
+
+        # P259
+        p259_enable:
+          name: "Enable P259: One LED Mode"
+          default: false
+          selector: { boolean: {} }
+        p259_one_led_mode:
+          name: "Value: P259 One LED Mode"
+          description: "In On/Off mode, use full LED bar or just one LED"
+          default: "All"
+          selector:
+            select:
+              options: ["All", "One"]
+
+    # ========================================
+    # DOUBLE TAP SETTINGS
+    # ========================================
+    double_tap_section:
+      name: >
+        ## 👆 Double Tap Settings
+      description: >
+        ### Configure setting for double-tap up/down behavior and double-tap of config buttton.
+      collapsed: true
+      input:
+        # P53
+        p53_enable:
+          name: "Enable P53: 2x Tap Up Feature"
+          default: false
+          selector: { boolean: {} }
+        p53_enable_2x_tap_up:
+          name: "Value: P53 Enable 2x Tap Up"
+          description: "Enable double-tap UP to set level to P55 value"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P54
+        p54_enable:
+          name: "Enable P54: 2x Tap Down Feature"
+          default: false
+          selector: { boolean: {} }
+        p54_enable_2x_tap_down:
+          name: "Value: P54 Enable 2x Tap Down"
+          description: "Enable double-tap DOWN to set level to P56 value"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P55
+        p55_enable:
+          name: "Enable P55: 2x Tap Up Level"
+          default: false
+          selector: { boolean: {} }
+        p55_2x_tap_up_level:
+          name: "Value: P55 2x Tap Up Level"
+          description: "Set this brightness level on double-tap UP (if enabled by P53). 255 = send ON command. Default=254"
+          default: 254
+          selector: { number: { min: 2, max: 255 } }
+
+        # P56
+        p56_enable:
+          name: "Enable P56: 2x Tap Down Level"
+          default: false
+          selector: { boolean: {} }
+        p56_2x_tap_down_level:
+          name: "Value: P56 2x Tap Down Level"
+          description: "Set this brightness level on double-tap DOWN (if enabled by P54). 255 = send OFF command. Default=2"
+          default: 2
+          selector: { number: { min: 0, max: 255 } }
+
+        # P262
+        p262_enable:
+          name: "Enable P262: Clear Notification via 2x Tap"
+          default: false
+          selector: { boolean: {} }
+        p262_clear_notification_2x_tap:
+          name: "Value: P262 Clear Notification via 2x Tap"
+          description: "Double-tap Config button to clear LED notifications"
+          default: "Enabled (Default)"
+          selector:
+            select:
+              options: ["Enabled (Default)", "Disabled"]
+
+    # ========================================
+    # POWER & ENERGY REPORTING
+    # ========================================
+    power_section:
+      name: >
+        ## ⚡ Power & Energy Reporting
+      description: >
+        ### Configure power/energy monitoring and reporting intervals.
+      collapsed: true
+      input:
+        # P18
+        p18_enable:
+          name: "Enable P18: Active Power Reports"
+          default: false
+          selector: { boolean: {} }
+        p18_active_power_reports:
+          name: "Value: P18 Active Power Reports"
+          description: "Percent power level change that will result in a new power report being sent. 0 = Disabled. Default=10"
+          default: 10
+          selector: { number: { min: 0, max: 32767, unit_of_measurement: "s" } }
+
+        # P19
+        p19_enable:
+          name: "Enable P19: Periodic Power & Energy Reports"
+          default: false
+          selector: { boolean: {} }
+        p19_periodic_power_energy_reports:
+          name: "Value: P19 Periodic Power & Energy Reports"
+          description: "Time period between consecutive power & energy reports being sent (in seconds). The timer is reset after each report is sent. Default=3600s (1hr)"
+          default: 3600
+          selector: { number: { min: 0, max: 32767, unit_of_measurement: "s" } }
+
+        # P20
+        p20_enable:
+          name: "Enable P20: Active Energy Reports"
+          default: false
+          selector: { boolean: {} }
+        p20_active_energy_reports:
+          name: "Value: P20 Active Energy Reports"
+          description: "Energy reports Energy level change which will result in sending a new energy report.0 = disabled, 1-32767 = 0.01kWh-327.67kWh. Default setting: 10 (0.1 kWh)"
+          default: 10
+          selector:
+            { number: { min: 0, max: 32767, unit_of_measurement: "kWh x100" } }
+
+    # ========================================
+    # LED GLOBAL SETTINGS
+    # ========================================
+    led_global_section:
+      name: >
+        ## 🌈 Global LED Bar Settings
+      description: >
+        ### Default LED colors and brightness for LED Bar
+      collapsed: true
+      input:
+        # P17
+        p17_enable:
+          name: "Enable P17: LED Indicator Timeout"
+          default: false
+          selector: { boolean: {} }
+        p17_led_indicator_timeout:
+          name: "Value: P17 LED Indicator Timeout"
+          description: "Shows the level that the load is at for x number of seconds after the load is adjusted and then returns to the Default LED state."
+          default: "Stay On"
+          selector:
+            select:
+              options:
+                - "Stay Off"
+                - "1 Second"
+                - "2 Seconds"
+                - "3 Seconds"
+                - "4 Seconds"
+                - "5 Seconds"
+                - "6 Seconds"
+                - "7 Seconds"
+                - "8 Seconds"
+                - "9 Seconds"
+                - "10 Seconds"
+                - "Stay On"
+
+        # P95
+        p95_enable:
+          name: "Enable P95: Global LED Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p95_default_led_color_on:
+          name: "Value: P95 Global LED Color (On)"
+          description: >
+            Set the color of the LED Indicator when the load is on.
+              - RED=0
+              - ORANGE=21
+              - YELLOW=42
+              - GREEN=85
+              - CYAN=127
+              - BLUE=170 (default)
+              - VIOLET=212
+              - PINK=234
+              - WHITE=255
+          default: 170
+          selector: { number: { min: 0, max: 255 } }
+
+        # P96
+        p96_enable:
+          name: "Enable P96: Global LED Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p96_default_led_color_off:
+          name: "Value: P96 Global LED Color (Off)"
+          description: >
+            Set the color of the LED Indicator when the load is off.
+              - RED=0
+              - ORANGE=21
+              - YELLOW=42
+              - GREEN=85
+              - CYAN=127
+              - BLUE=170 (default)
+              - VIOLET=212
+              - PINK=234
+              - WHITE=255
+          default: 170
+          selector: { number: { min: 0, max: 255 } }
+
+        # P97
+        p97_enable:
+          name: "Enable P97: Global LED Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p97_default_led_intensity_on:
+          name: "Value: P97 Global LED Intensity (On)"
+          description: "Set the intensity of the LED Indicator when the load is on. Default=33%"
+          default: 33
+          selector: { number: { min: 0, max: 100, unit_of_measurement: "%" } }
+
+        # P98
+        p98_enable:
+          name: "Enable P98: Global LED Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p98_default_led_intensity_off:
+          name: "Value: P98 Global LED Intensity (Off)"
+          description: "Set the intensity of the LED Indicator when the load is off. Default=1%"
+          default: 1
+          selector: { number: { min: 0, max: 100, unit_of_measurement: "%" } }
+
+        # P100
+        p100_enable:
+          name: "Enable P100: LED Bar Scaling"
+          default: false
+          selector: { boolean: {} }
+        p100_led_bar_scaling:
+          name: "Value: P100 LED Bar Scaling"
+          description: >
+            Method used for scaling.
+              - Gen3=modern VZM-style (default)
+              - Gen2=legacy LZW-style
+          default: "Gen3 method (VZM-style)"
+          selector:
+            select:
+              options:
+                - "Gen3 method (VZM-style)"
+                - "Gen2 method (LZW-style)"
+
+    # ========================================
+    # LED SEGMENT 1 (Bottom)
+    # ========================================
+    led1_section:
+      name: >
+        ## 💡 LED Segment 1 (Bottom)
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p60_enable:
+          name: "Enable P60: LED 1 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p60_led1_color_on:
+          name: "Value: P60 LED 1 Color (On)"
+          description: "0-254:This is the color of the LED strip in a hex representation. 255:Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p61_enable:
+          name: "Enable P61: LED 1 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p61_led1_color_off:
+          name: "Value: P61 LED 1 Color (Off)"
+          description: "0-254:This is the color of the LED strip in a hex representation. 255:Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p62_enable:
+          name: "Enable P62: LED 1 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p62_led1_intensity_on:
+          name: "Value: P62 LED 1 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p63_enable:
+          name: "Enable P63: LED 1 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p63_led1_intensity_off:
+          name: "Value: P63 LED 1 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter."
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # LED SEGMENT 2
+    # ========================================
+    led2_section:
+      name: >
+        ## 💡 LED Segment 2
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p65_enable:
+          name: "Enable P65: LED 2 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p65_led2_color_on:
+          name: "Value: P65 LED 2 Color (On)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p66_enable:
+          name: "Enable P66: LED 2 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p66_led2_color_off:
+          name: "Value: P66 LED 2 Color (Off)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p67_enable:
+          name: "Enable P67: LED 2 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p67_led2_intensity_on:
+          name: "Value: P67 LED 2 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p68_enable:
+          name: "Enable P68: LED 2 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p68_led2_intensity_off:
+          name: "Value: P68 LED 2 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # LED SEGMENT 3
+    # ========================================
+    led3_section:
+      name: >
+        ## 💡 LED Segment 3
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p70_enable:
+          name: "Enable P70: LED 3 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p70_led3_color_on:
+          name: "Value: P70 LED 3 Color (On)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p71_enable:
+          name: "Enable P71: LED 3 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p71_led3_color_off:
+          name: "Value: P71 LED 3 Color (Off)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p72_enable:
+          name: "Enable P72: LED 3 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p72_led3_intensity_on:
+          name: "Value: P72 LED 3 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p73_enable:
+          name: "Enable P73: LED 3 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p73_led3_intensity_off:
+          name: "Value: P73 LED 3 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # LED SEGMENT 4
+    # ========================================
+    led4_section:
+      name: >
+        ## 💡 LED Segment 4
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p75_enable:
+          name: "Enable P75: LED 4 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p75_led4_color_on:
+          name: "Value: P75 LED 4 Color (On)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p76_enable:
+          name: "Enable P76: LED 4 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p76_led4_color_off:
+          name: "Value: P76 LED 4 Color (Off)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p77_enable:
+          name: "Enable P77: LED 4 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p77_led4_intensity_on:
+          name: "Value: P77 LED 4 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p78_enable:
+          name: "Enable P78: LED 4 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p78_led4_intensity_off:
+          name: "Value: P78 LED 4 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # LED SEGMENT 5
+    # ========================================
+    led5_section:
+      name: >
+        ## 💡 LED Segment 5
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p80_enable:
+          name: "Enable P80: LED 5 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p80_led5_color_on:
+          name: "Value: P80 LED 5 Color (On)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p81_enable:
+          name: "Enable P81: LED 5 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p81_led5_color_off:
+          name: "Value: P81 LED 5 Color (Off)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p82_enable:
+          name: "Enable P82: LED 5 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p82_led5_intensity_on:
+          name: "Value: P82 LED 5 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p83_enable:
+          name: "Enable P83: LED 5 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p83_led5_intensity_off:
+          name: "Value: P83 LED 5 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # LED SEGMENT 6
+    # ========================================
+    led6_section:
+      name: >
+        ## 💡 LED Segment 6
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p85_enable:
+          name: "Enable P85: LED 6 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p85_led6_color_on:
+          name: "Value: P85 LED 6 Color (On)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p86_enable:
+          name: "Enable P86: LED 6 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p86_led6_color_off:
+          name: "Value: P86 LED 6 Color (Off)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p87_enable:
+          name: "Enable P87: LED 6 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p87_led6_intensity_on:
+          name: "Value: P87 LED 6 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p88_enable:
+          name: "Enable P88: LED 6 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p88_led6_intensity_off:
+          name: "Value: P88 LED 6 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # LED SEGMENT 7 (Top)
+    # ========================================
+    led7_section:
+      name: >
+        ## 💡 LED Segment 7 (Top)
+      description: >
+        Helpful Hex Color Codes:
+          - RED=0
+          - ORANGE=21
+          - YELLOW=42
+          - GREEN=85
+          - CYAN=127
+          - BLUE=170 (default)
+          - VIOLET=212
+          - PINK=234
+          - WHITE=254
+      collapsed: true
+      input:
+        p90_enable:
+          name: "Enable P90: LED 7 Color (On)"
+          default: false
+          selector: { boolean: {} }
+        p90_led7_color_on:
+          name: "Value: P90 LED 7 Color (On)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p91_enable:
+          name: "Enable P91: LED 7 Color (Off)"
+          default: false
+          selector: { boolean: {} }
+        p91_led7_color_off:
+          name: "Value: P91 LED 7 Color (Off)"
+          description: "0-254: This is the color of the LED strip in a hex representation. 255: Synchronization with default all LED strip color parameter. Default=255"
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        p92_enable:
+          name: "Enable P92: LED 7 Intensity (On)"
+          default: false
+          selector: { boolean: {} }
+        p92_led7_intensity_on:
+          name: "Value: P92 LED 7 Intensity (On)"
+          description: "Intensity of LED strip when on. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+        p93_enable:
+          name: "Enable P93: LED 7 Intensity (Off)"
+          default: false
+          selector: { boolean: {} }
+        p93_led7_intensity_off:
+          name: "Value: P93 LED 7 Intensity (Off)"
+          description: "Intensity of LED strip when off. 101 = Synchronized with default all LED strip intensity parameter. Default=101"
+          default: 101
+          selector: { number: { min: 0, max: 101 } }
+
+    # ========================================
+    # ADVANCED FEATURES
+    # ========================================
+    advanced_section:
+      name: >
+        ## 🔧 Advanced Features
+      description: >
+        ### Other settings for Aux switches, bindings, fan control, and local protection.
+      collapsed: true
+      input:
+        # P120
+        p120_enable:
+          name: "Enable P120: Single-Tap Behavior (Fan Mode)"
+          default: false
+          selector: { boolean: {} }
+        p120_single_tap_behavior:
+          name: "Value: P120 Single-Tap Behavior"
+          description: "Old=On/Off, New=Cycles levels P131-133, Down Always Off=Down always off"
+          default: "Old Behavior"
+          selector:
+            select:
+              options:
+                - "Old Behavior"
+                - "New Behavior"
+                - "Down Always Off"
+
+        # P121
+        p121_enable:
+          name: "Enable P121: Fan Timer Mode"
+          default: false
+          selector: { boolean: {} }
+        p121_fan_timer_mode:
+          name: "Value: P121 Fan Timer Mode"
+          description: "Enable or disable advanced timer mode to have the switch act like a bathroom fan timer"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P123
+        p123_enable:
+          name: "Enable P123: Aux Switch Unique Scenes"
+          default: false
+          selector: { boolean: {} }
+        p123_aux_switch_unique_scenes:
+          name: "Value: P123 Aux Switch Unique Scenes"
+          description: "Enable unique scene IDs for Aux switches vs main switch"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P125
+        p125_enable:
+          name: "Enable P125: Binding Default Level"
+          default: false
+          selector: { boolean: {} }
+        p125_binding_default_level:
+          name: "Value: P125 Binding Default Level"
+          description: "Send Move_To_Level commands using Default Level setting"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P130
+        p130_enable:
+          name: "Enable P130: Fan Control Mode"
+          default: false
+          selector: { boolean: {} }
+        p130_fan_control_mode:
+          name: "Value: P130 Fan Control Mode"
+          description: "How Config button (End Point 3 (EP3) binding) controls bound fan modules"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Multi Tap", "Cycle"]
+
+        # P131
+        p131_enable:
+          name: "Enable P131: Fan Low Level"
+          default: false
+          selector: { boolean: {} }
+        p131_fan_low_level:
+          name: "Value: P131 Fan Low Level"
+          description: "Level for low fan speed (EP3). Default=63"
+          default: 63
+          selector: { number: { min: 2, max: 254 } }
+
+        # P132
+        p132_enable:
+          name: "Enable P132: Fan Medium Level"
+          default: false
+          selector: { boolean: {} }
+        p132_fan_medium_level:
+          name: "Value: P132 Fan Medium Level"
+          description: "Level for medium fan speed (EP3). Default=128"
+          default: 128
+          selector: { number: { min: 2, max: 254 } }
+
+        # P133
+        p133_enable:
+          name: "Enable P133: Fan High Level"
+          default: false
+          selector: { boolean: {} }
+        p133_fan_high_level:
+          name: "Value: P133 Fan High Level"
+          description: "Level for high fan speed (EP3). Default=254"
+          default: 254
+          selector: { number: { min: 2, max: 254 } }
+
+        # P134
+        p134_enable:
+          name: "Enable P134: Fan LED Color"
+          default: false
+          selector: { boolean: {} }
+        p134_fan_led_color:
+          name: "Value: P134 Fan LED Color"
+          description: >
+            LED color for fan control mode.
+              - RED=0
+              - ORANGE=21
+              - YELLOW=42
+              - GREEN=85
+              - CYAN=127
+              - BLUE=170
+              - VIOLET=212 (default)
+              - PINK=234
+              - WHITE=254
+          default: 212
+          selector: { number: { min: 0, max: 255 } }
+
+        # P256
+        p256_enable:
+          name: "Enable P256: Local Protection (Child Lock)"
+          default: false
+          selector: { boolean: {} }
+        p256_local_protection:
+          name: "Value: P256 Local Protection"
+          description: "Disable physical paddle control (child lock)"
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P260
+        p260_enable:
+          name: "Enable P260: Firmware Update Indicator"
+          default: false
+          selector: { boolean: {} }
+        p260_firmware_update_indicator:
+          name: "Value: P260 Firmware Update Indicator"
+          description: "Show firmware update progress on LED bar"
+          default: "Enabled"
+          selector:
+            select:
+              options: ["Disabled", "Enabled"]
+
+        # P261
+        p261_enable:
+          name: "Enable P261: Relay Click Sound (2-in-1 Dimmer Only)"
+          default: false
+          selector: { boolean: {} }
+        p261_relay_click_sound:
+          name: "Value: P261 Relay Click Sound"
+          description: >
+            In neutral on/off setups, disable click for 'simulated' mode.
+
+              **Setting applies to models:
+                  - 2-in-1 dimmer**
+          default: "Disabled (Click Sound On)"
+          selector:
+            select:
+              options:
+                - "Disabled (Click Sound On)"
+                - "Enabled (Click Sound Off)"
+
+    # ========================================
+    # mmWAVE SENSOR SETTINGS (VZM32-SN ONLY)
+    # ========================================
+    mmwave_section:
+      name: >
+        ## 📡 mmWave Sensor Settings (mmWave/VZM32-SN model only)
+      description: >
+        ### Configure detection boundaries and sensitivity for mmWave Zigbee Dimmer
+      collapsed: true
+      input:
+        # P101
+        p101_enable:
+          name: "Enable P101: mmWave Minimum Height (Floor Boundary)"
+          default: false
+          selector: { boolean: {} }
+        p101_mmwave_min_height:
+          name: "Value: P101 Minimum Height"
+          description: "Floor boundary for detection. Defines the detection area (negative values are below the switch, positive values are above). Default=-300cm"
+          default: -300
+          selector:
+            { number: { min: -600, max: 600, unit_of_measurement: "cm" } }
+
+        # P102
+        p102_enable:
+          name: "Enable P102: mmWave Maximum Height (Ceiling Boundary)"
+          default: false
+          selector: { boolean: {} }
+        p102_mmwave_max_height:
+          name: "Value: P102 Maximum Height"
+          description: "Ceiling boundary for detection. Defines the detection area (negative values are below the switch, positive values are above). Default=300cm"
+          default: 300
+          selector:
+            { number: { min: -600, max: 600, unit_of_measurement: "cm" } }
+
+        # P103
+        p103_enable:
+          name: "Enable P103: mmWave Minimum Width (Left Boundary)"
+          default: false
+          selector: { boolean: {} }
+        p103_mmwave_min_width:
+          name: "Value: P103 Minimum Width"
+          description: "Left boundary for detection. Defines the detection area (negative values are left of the switch facing away from the wall, positive values are right). Default=-600cm"
+          default: -600
+          selector:
+            { number: { min: -600, max: 600, unit_of_measurement: "cm" } }
+
+        # P104
+        p104_enable:
+          name: "Enable P104: mmWave Maximum Width (Right Boundary)"
+          default: false
+          selector: { boolean: {} }
+        p104_mmwave_max_width:
+          name: "Value: P104 Maximum Width"
+          description: "Right boundary for detection. Defines the detection area (negative values are left of the switch facing away from the wall, positive values are right). Default=600cm"
+          default: 600
+          selector:
+            { number: { min: -600, max: 600, unit_of_measurement: "cm" } }
+
+        # P105
+        p105_enable:
+          name: "Enable P105: mmWave Minimum Depth (Closest Detection)"
+          default: false
+          selector: { boolean: {} }
+        p105_mmwave_min_depth:
+          name: "Value: P105 Minimum Depth"
+          description: "Closest detection distance. Defines the detection area in front of the switch. Default=0cm"
+          default: 0
+          selector: { number: { min: 0, max: 600, unit_of_measurement: "cm" } }
+
+        # P106
+        p106_enable:
+          name: "Enable P106: mmWave Maximum Depth (Farthest Detection)"
+          default: false
+          selector: { boolean: {} }
+        p106_mmwave_max_depth:
+          name: "Value: P106 Maximum Depth"
+          description: "Farthest detection distance. Defines the detection area in front of the switch. Default=600cm"
+          default: 600
+          selector: { number: { min: 0, max: 600, unit_of_measurement: "cm" } }
+
+        # P110
+        p110_enable:
+          name: "Enable P110: Light On Presence Behavior"
+          default: false
+          selector: { boolean: {} }
+        p110_light_on_presence_behavior:
+          name: "Value: P110 Light On Presence Behavior"
+          description: >
+            Controls whether the wired load is automatically turned on / off by the presence detector.
+              - Disabled (manual control of the load)
+              - Occupancy (default; turn on automatically with presence; turn off automatically without presence)
+              - Vacancy (does not turn on automatically; turn off automatically without presence)
+              - Wasteful Occupancy (turn on automatically with presence; does not turn off automatically)
+              - Mirrored Occupancy (turn on automatically without presence; turn off automatically with presence)
+              - Mirrored Vacancy (turn on automatically without presence; does not turn off automatically)
+              - Mirrored Wasteful Occupancy (does not turn on automatically; turns off automatically with presence)
+          default: "Occupancy (default)"
+          selector:
+            select:
+              options:
+                - "Disabled"
+                - "Occupancy (default)"
+                - "Vacancy"
+                - "Wasteful Occupancy"
+                - "Mirrored Occupancy"
+                - "Mirrored Vacancy"
+                - "Mirrored Wasteful Occupancy"
+
+        # P112
+        p112_enable:
+          name: "Enable P112: mmWave Detection Sensitivity"
+          default: false
+          selector: { boolean: {} }
+        p112_mmwave_detection_sensitivity:
+          name: "Value: P112 Detection Sensitivity"
+          description: "The sensitivity of the mmWave sensor."
+          default: "High (default)"
+          selector:
+            select:
+              options:
+                - "Low"
+                - "Medium"
+                - "High (default)"
+
+        # P113
+        p113_enable:
+          name: "Enable P113: mmWave Detection Delay"
+          default: false
+          selector: { boolean: {} }
+        p113_mmwave_detection_delay:
+          name: "Value: P113 Detection Delay"
+          description: "The time from detecting a person to triggering an action."
+          default: "Fast (0.2s, default)"
+          selector:
+            select:
+              options:
+                - "Slow (5s)"
+                - "Medium (1s)"
+                - "Fast (0.2s, default)"
+
+        # P114
+        p114_enable:
+          name: "Enable P114: mmWave Time Out"
+          default: false
+          selector: { boolean: {} }
+        p114_mmwave_timeout:
+          name: "Value: P114 Time Out"
+          description: "This changes the duration, measured in seconds, after the mmWave radar detects transition from the presence of a person to their absence. Default = 10 (seconds)."
+          default: 10
+          selector:
+            { number: { min: 0, max: 4294967295, unit_of_measurement: "s" } }
+
+        # P114
+        p115_enable:
+          name: "Enable PXXX: mmWave Stay Life"
+          default: false
+          selector: { boolean: {} }
+        p115_mmwave_staylife:
+          name: "Value: PXXX mmWave Stay Life"
+          description: "The delay time of the stay area is set to 50ms when it is set to 1, to 1 second when it is set to 20, and the default value is 300, that is, 15 seconds"
+          default: 300
+          selector:
+            { number: { min: 0, max: 4294967295, unit_of_measurement: "s" } }
+
+        # PXXX
+        p116_enable:
+          name: "Enable PXXX: mmWave Target Info Report"
+          default: false
+          selector: { boolean: {} }
+        p116_mmwave_target_report:
+          name: "Value: PXXX mmWave Target Info Report"
+          description: "Send target info report when bound to mmWave cluster."
+          default: "Disable (default)"
+          selector:
+            select:
+              options:
+                - "Disable (default)"
+                - "Enable"
+
+        # P117
+        p117_enable:
+          name: "Enable P117: Room Size Preset"
+          default: false
+          selector: { boolean: {} }
+        p117_room_size_preset:
+          name: "Value: P117 Room Size Preset"
+          description: >
+            Allows selection of predefined room dimensions for mmWave sensor processing. Useful for optimizing detection zones based on installation environment. Defaults to Custom which allows for manual dimension configuration via other parameters. Options:
+              - Custom (User-defined)
+              - Small (X: −100 to 100, Y: 0 to 200, Z: −100 to 100)
+              - Medium (X: −160 to 160, Y: 0 to 280, Z: −100 to 100)
+              - Large (X: −210 to 210, Y: 0 to 360, Z: −100 to 100)
+          default: "Custom"
+          selector:
+            select:
+              options:
+                - "Custom"
+                - "Small"
+                - "Medium"
+                - "Large"
+
+        # PXXX
+        p263_enable:
+          name: "Enable PXXX: OTA Image Type for mmWave"
+          default: false
+          selector: { boolean: {} }
+        p263_ota_image_type:
+          name: "Value: PXXX OTA Image Type"
+          description: "Which endpoint should the switch advertise for OTA update (Zigbee, mmWave, or both)."
+          default: "Alternating (259 & 260) (default)"
+          selector:
+            select:
+              options:
+                - "Zigbee (259)"
+                - "mmWave (260)"
+                - "Alternating (259 & 260) (default)"
+
+    # ========================================
+    # CANOPY MODULE - Light SETTINGS
+    # ========================================
+    canopy_light_section:
+      name: >
+        ## 💡 Canopy Module **LIGHT** Settings (Fan Canopy Module/VZM36 model only)
+      description: >
+        ### Configure light (endpoint 1) settings for Inovelli Canopy Module
+      collapsed: true
+      input:
+        # Light Endpoint (_1)
+        canopy_p1_enable:
+          name: "Enable P1: Light Dimming Speed Up"
+          default: false
+          selector: { boolean: {} }
+        canopy_p1_light_dimming_speed_up:
+          name: "Value: P1 Light Dimming Speed Up"
+          description: "This changes the speed that the light dims up when controlled from the hub. A setting of 0 turns the light immediately on. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 25 (2.5s)"
+          default: 25
+          selector:
+            { number: { min: 0, max: 126, unit_of_measurement: "x100ms" } }
+
+        canopy_p3_enable:
+          name: "Enable P3: Light Ramp Rate Off to On"
+          default: false
+          selector: { boolean: {} }
+        canopy_p3_light_ramp_rate_off_to_on:
+          name: "Value: P3 Light Ramp Rate Off to On"
+          description: "This changes the speed that the light turns on when controlled from the hub. A setting of 0 turns the light immediately on. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 127 - Keep in sync with dimmingSpeedUpRemote setting."
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        canopy_p5_enable:
+          name: "Enable P5: Light Dimming Speed Down"
+          default: false
+          selector: { boolean: {} }
+        canopy_p5_light_dimming_speed_down:
+          name: "Value: P5 Light Dimming Speed Down"
+          description: "This changes the speed that the light dims down when controlled from the hub. A setting of 0 turns the light immediately off. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 127 - Keep in sync with dimmingSpeedUpRemote setting."
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        canopy_p7_enable:
+          name: "Enable P7: Light Ramp Rate On to Off"
+          default: false
+          selector: { boolean: {} }
+        canopy_p7_light_ramp_rate_on_to_off:
+          name: "Value: P7 Light Ramp Rate On to Off"
+          description: "This changes the speed that the light turns off when controlled from the hub. A setting of 'instant' turns the light immediately off. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 127 - Keep in sync with rampRateOffToOnRemote setting."
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        canopy_p9_enable:
+          name: "Enable P9: Light Minimum Dim Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_p9_light_minimum_dim_level:
+          name: "Value: P9 Light Minimum Dim Level"
+          description: "The minimum level that the dimmer allows the bulb to be dimmed to. Useful when the user has an LED bulb that does not turn on or flickers at a lower level."
+          default: 1
+          selector: { number: { min: 1, max: 254 } }
+
+        canopy_p10_enable:
+          name: "Enable P10: Light Maximum Dim Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_p10_light_maximum_dim_level:
+          name: "Value: P10 Light Maximum Dim Level"
+          description: "The maximum level that the dimmer allows the bulb to be dimmed to.Useful when the user has an LED bulb that reaches its maximum level before the dimmer value of 99 or when the user wants to limit the maximum brightness."
+          default: 255
+          selector: { number: { min: 2, max: 255 } }
+
+        canopy_p12_enable:
+          name: "Enable P12: Light Auto-Off Timer"
+          default: false
+          selector: { boolean: {} }
+        canopy_p12_light_auto_off_timer:
+          name: "Value: P12 Light Auto-Off Timer"
+          description: "Automatically turns the light off after this many seconds. When the light is turned on a timer is started. When the timer expires, the light is turned off. 0 = Auto off is disabled."
+          default: 0
+          selector: { number: { min: 0, max: 32767, unit_of_measurement: "s" } }
+
+        canopy_p14_enable:
+          name: "Enable P14: Light Default Dim Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_p14_light_default_dim_level:
+          name: "Value: P14 Light Default Dim Level"
+          description: "Default level for the light when it is turned on from the hub. A setting of 255 means that the light will return to the level that it was on before it was turned off."
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        canopy_p15_enable:
+          name: "Enable P15: Light Level After Power Restored"
+          default: false
+          selector: { boolean: {} }
+        canopy_p15_light_level_after_power_restored:
+          name: "Value: P15 Light Level After Power Restored"
+          description: "The state the light should return to when power is restored after power failure. 0 = off, 1-254 = level, 255 = previous."
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        canopy_p25_enable:
+          name: "Enable P25: Light Higher Output (Non-Neutral)"
+          default: false
+          selector: { boolean: {} }
+        canopy_p25_light_non_neutral_output:
+          name: "Value: P25 Light Higher Output (Non-Neutral)"
+          description: "Increase level in non-neutral mode for light."
+          default: "Disabled (default)"
+          selector:
+            select:
+              options: ["Disabled (default)", "Enabled"]
+
+        canopy_p26_enable:
+          name: "Enable P26: Dimming Mode"
+          default: false
+          selector: { boolean: {} }
+        canopy_p26_light_dimming_mode:
+          name: "Value: P26 Light Dimming Mode"
+          description: "Switches the dimming mode from leading edge (default) to trailing edge. 1. Trailing Edge is only available on neutral single-pole and neutral multi-way with an aux/add-on switch (multi-way with a dumb/existing switch and non-neutral setups are not supported and will default back to Leading Edge)."
+          default: "Leading edge"
+          selector:
+            select:
+              options: ["Leading edge", "Trailing edge"]
+
+        canopy_p34_enable:
+          name: "Enable P34: Quick Start Time Light"
+          default: false
+          selector: { boolean: {} }
+        canopy_p34_quick_start_light:
+          name: "Value: P34 Quick Start Light"
+          description: "Duration of full power output while lamp transitions from Off to On. In 60th of second. 0 = disable, 1 = 1/60s, 60 = 1s"
+          default: 0
+          selector: { number: { min: 0, max: 60 } }
+
+        canopy_p35_enable:
+          name: "Enable P35: Quick Start Light Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_p35_quick_start_light_level:
+          name: "Value: P35 Quick Start Light Level"
+          description: "Level of power output during Quick Start Light time (P34)."
+          default: 254
+          selector: { number: { min: 1, max: 254 } }
+
+        canopy_p52_enable:
+          name: "Enable P52: Light Smart Bulb Mode"
+          default: false
+          selector: { boolean: {} }
+        canopy_p52_light_smart_bulb_mode:
+          name: "Value: P52 Light Smart Bulb Mode"
+          description: "For use with Smart Bulbs that need constant power and are controlled via commands rather than power."
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Smart Bulb Mode"]
+
+        canopy_p95_enable:
+          name: "Enable P95: Light LED Color"
+          default: false
+          selector: { boolean: {} }
+        canopy_p95_light_led_color:
+          name: "Value: P95 Light LED Color"
+          description: "Set the color of the LED Indicator when the load is on."
+          default: 170
+          selector: { number: { min: 0, max: 255 } }
+
+        canopy_p97_enable:
+          name: "Enable P97: Light LED Intensity"
+          default: false
+          selector: { boolean: {} }
+        canopy_p97_light_led_intensity:
+          name: "Value: P97 Light LED Intensity"
+          description: "Set the intensity of the LED Indicator when the load is on."
+          default: 20
+          selector: { number: { min: 0, max: 100, unit_of_measurement: "%" } }
+
+        canopy_p258_enable:
+          name: "Enable P258: Light Switch Mode"
+          default: false
+          selector: { boolean: {} }
+        canopy_p258_light_switch_mode:
+          name: "Value: P258 Light Switch Mode"
+          description: "Use device as a Dimmer or an On/Off switch."
+          default: "Dimmer"
+          selector:
+            select:
+              options: ["Dimmer", "On/Off"]
+
+    # ========================================
+    # CANOPY MODULE - Fan SETTINGS
+    # ========================================
+    canopy_fan_section:
+      name: >
+        ## 💨 Canopy Module **FAN** Settings (Fan Canopy Module/VZM36 model only)
+      description: >
+        ### Configure fan (endpoint 2) settings for Inovelli Canopy Module
+      collapsed: true
+      input:
+        # Fan Endpoint (_2)
+        canopy_fan_p1_enable:
+          name: "Enable P1: Fan Speed Up"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p1_speed_up:
+          name: "Value: P1 Fan Speed Up"
+          description: "This changes the speed that the fan ramps up when controlled from the hub. A setting of 0 turns the fan immediately on. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 25 (2.5s)"
+          default: 25
+          selector:
+            { number: { min: 0, max: 126, unit_of_measurement: "x100ms" } }
+
+        canopy_fan_p3_enable:
+          name: "Enable P3: Fan Ramp Rate Off to On"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p3_ramp_rate_off_to_on:
+          name: "Value: P3 Fan Ramp Rate Off to On"
+          description: "This changes the speed that the fan turns on when controlled from the hub. A setting of 0 turns the fan immediately on. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 127 - Keep in sync with dimmingSpeedUpRemote setting."
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        canopy_fan_p5_enable:
+          name: "Enable P5: Fan Speed Down"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p5_speed_down:
+          name: "Value: P5 Fan Speed Down"
+          description: "This changes the speed that the fan ramps down when controlled from the hub. A setting of 0 turns the fan immediately off. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 127 - Keep in sync with dimmingSpeedUpRemote setting."
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        canopy_fan_p7_enable:
+          name: "Enable P7: Fan Ramp Rate On to Off"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p7_ramp_rate_on_to_off:
+          name: "Value: P7 Fan Ramp Rate On to Off"
+          description: "This changes the speed that the fan turns off when controlled from the hub. A setting of 'instant' turns the fan immediately off. Increasing the value slows down the transition speed. Every number represents 100ms. Default = 127 - Keep in sync with rampRateOffToOnRemote setting."
+          default: 127
+          selector:
+            { number: { min: 0, max: 127, unit_of_measurement: "x100ms" } }
+
+        canopy_fan_p9_enable:
+          name: "Enable P9: Fan Minimum Speed Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p9_minimum_speed_level:
+          name: "Value: P9 Fan Minimum Speed Level"
+          description: "The minimum level that the fan can be set to."
+          default: 1
+          selector: { number: { min: 1, max: 254 } }
+
+        canopy_fan_p10_enable:
+          name: "Enable P10: Fan Maximum Speed Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p10_maximum_speed_level:
+          name: "Value: P10 Fan Maximum Speed Level"
+          description: "The maximum level that the fan can be set to."
+          default: 255
+          selector: { number: { min: 2, max: 255 } }
+
+        canopy_fan_p12_enable:
+          name: "Enable P12: Fan Auto-Off Timer"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p12_auto_off_timer:
+          name: "Value: P12 Fan Auto-Off Timer"
+          description: "Automatically turns the fan off after this many seconds. When the fan is turned on a timer is started. When the timer expires, the switch is turned off. 0 = Auto off is disabled."
+          default: 0
+          selector: { number: { min: 0, max: 32767, unit_of_measurement: "s" } }
+
+        canopy_fan_p14_enable:
+          name: "Enable P14: Fan Default Speed Level"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p14_default_speed_level:
+          name: "Value: P14 Fan Default Speed Level"
+          description: "Default level for the fan when it is turned on from the hub. A setting of 255 means that the fan will return to the level that it was on before it was turned off."
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        canopy_fan_p15_enable:
+          name: "Enable P15: Fan Speed Level After Power Restored"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p15_speed_after_power_restored:
+          name: "Value: P15 Fan Speed Level After Power Restored"
+          description: "The state the fan should return to when power is restored after power failure. 0 = off, 1-254 = level, 255 = previous."
+          default: 255
+          selector: { number: { min: 0, max: 255 } }
+
+        canopy_fan_p23_enable:
+          name: "Enable P34: Quick Start Time Fan"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p23_quick_start_fan:
+          name: "Value: P34 Quick Start Fan"
+          description: "Duration of full power output while fan transitions from Off to On. In 60th of second. 0 = disable, 1 = 1/60s, 60 = 1s"
+          default: 0
+          selector: { number: { min: 0, max: 60 } }
+
+        canopy_fan_p52_enable:
+          name: "Enable P52: Fan Remote Control Mode"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p52_remote_control_mode:
+          name: "Value: P52 Fan Remote Control Mode"
+          description: "For use with Smart Fans that need constant power and are controlled via commands rather than power."
+          default: "Disabled"
+          selector:
+            select:
+              options: ["Disabled", "Smart Fan Mode"]
+
+        canopy_fan_p258_enable:
+          name: "Enable P258: Fan Switch Mode"
+          default: false
+          selector: { boolean: {} }
+        canopy_fan_p258_switch_mode:
+          name: "Value: P258 Fan Switch Mode"
+          description: "Use device in ceiling fan (3-Speed) or in exhaust fan (On/Off) mode."
+          default: "Ceiling Fan (3-Speed)"
+          selector:
+            select:
+              options: ["Ceiling Fan (3-Speed)", "Exhaust Fan (On/Off)"]
+
+# This pulls from the input. If the input is empty, the automation is manual-only.
+trigger: !input sync_trigger
+
+# =================================================
+# AUTOMATION ACTIONS
+# =================================================
+action:
+  # STEP 1: Define raw input
+  - variables:
+      raw_targets: !input target_sync_devices
+      ui_title: !input notification_title
+      mqtt_topic: !input mqtt_topic
+      target_manufature: Inovelli
+      target_model:
+        [
+          2-in-1 switch + dimmer,
+          On/off switch,
+          mmWave Zigbee Dimmer,
+          Fan controller,
+          Fan canopy module,
+        ]
+
+  # STEP 2: Resolve all targets (Area, Label, Entity, Device) into a single ID list
+  - variables:
+      target_devices: >
+        {% set ns = namespace(devices=[]) %}
+        {% set valid_models = target_model %}
+        {# Check Devices (direct device selection) #}
+        {% if raw_targets.device_id is defined and raw_targets.device_id %}
+          {% set d = raw_targets.device_id %}
+          {% set d_list = [d] if d is string else d %}
+          {% for device in d_list %}
+            {% if device_attr(device, 'manufacturer') == 'Inovelli' and device_attr(device, 'model') in valid_models %}
+              {% set ns.devices = ns.devices + [device] %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {# Check Entities #}
+        {% if raw_targets.entity_id is defined and raw_targets.entity_id %}
+          {% set e = raw_targets.entity_id %}
+          {% set e_list = [e] if e is string else e %}
+          {% for entity in e_list %}
+            {% set dev_id = device_id(entity) %}
+            {% if dev_id and dev_id not in ns.devices %}
+              {% if device_attr(dev_id, 'manufacturer') == 'Inovelli' and device_attr(dev_id, 'model') in valid_models %}
+                {% set ns.devices = ns.devices + [dev_id] %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        {# Check Floors #}
+        {% if raw_targets.floor_id is defined and raw_targets.floor_id %}
+          {% set f = raw_targets.floor_id %}
+          {% set f_list = [f] if f is string else f %}
+          {% for floor in f_list %}
+            {% for area in floor_areas(floor) %}
+              {% for entity in area_entities(area) %}
+                {% set dev_id = device_id(entity) %}
+                {% if dev_id and dev_id not in ns.devices %}
+                  {% if device_attr(dev_id, 'manufacturer') == 'Inovelli'
+                        and device_attr(dev_id, 'model') in valid_models %}
+                    {% set ns.devices = ns.devices + [dev_id] %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+        {# Check Areas #}
+        {% if raw_targets.area_id is defined and raw_targets.area_id %}
+          {% set a = raw_targets.area_id %}
+          {% set a_list = [a] if a is string else a %}
+          {% for area in a_list %}
+            {% for entity in area_entities(area) %}
+              {% set dev_id = device_id(entity) %}
+              {% if dev_id and dev_id not in ns.devices %}
+                {% if device_attr(dev_id, 'manufacturer') == 'Inovelli'
+                      and device_attr(dev_id, 'model') in valid_models %}
+                  {% set ns.devices = ns.devices + [dev_id] %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+        {# Check Labels #}
+        {% if raw_targets.label_id is defined and raw_targets.label_id %}
+          {% set l = raw_targets.label_id %}
+          {% set l_list = [l] if l is string else l %}
+          {% for label in l_list %}
+            {% for dev_id in label_devices(label) %}
+              {% if dev_id and dev_id not in ns.devices %}
+                {% if device_attr(dev_id, 'manufacturer') == 'Inovelli' and device_attr(dev_id, 'model') in valid_models %}
+                  {% set ns.devices = ns.devices + [dev_id] %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+        {{ ns.devices | unique | list }}
+
+  # STEP 3: Now that target_devices is defined, create the readable names string
+  - variables:
+      device_names_string: >
+        {% set names = target_devices
+          | map('device_attr', 'name')
+          | reject('none')
+          | list %}
+        {%- for name in names -%}
+          {{ '\n' }}- {{ name }}
+        {%- endfor -%}
+
+  - service: system_log.write
+    data:
+      level: info
+      message: "Starting Inovelli VZM31-SN configuration for {{ target_devices | count }} device(s)."
+
+  - repeat:
+      for_each: "{{ target_devices }}"
+      sequence:
+        - variables:
+            device_id: "{{ repeat.item }}"
+            device_name: "{{ device_attr(device_id, 'name') }}"
+            device_model: "{{ device_attr(device_id, 'model') }}"
+
+            # Device Type Detection
+            is_2in1: "{{ device_model == '2-in-1 switch + dimmer' }}"
+            is_onoff: "{{ device_model == 'On/off switch' }}"
+            is_mmwave: "{{ device_model == 'mmWave Zigbee Dimmer' }}"
+            is_fan: "{{ device_model == 'Fan controller' }}"
+            is_canopy: "{{ device_model == 'Fan canopy module' }}"
+
+            # --- BRIDGE BLOCK: Mapping Inputs to Variables ---
+            # Text/Individual Parameters
+            p11_enable: !input p11_enable
+            p11_invert_switch: !input p11_invert_switch
+            p17_enable: !input p17_enable
+            p17_led_indicator_timeout: !input p17_led_indicator_timeout
+            p22_enable: !input p22_enable
+            p22_switch_type: !input p22_switch_type
+            p25_enable: !input p25_enable
+            p25_non_neutral_output: !input p25_non_neutral_output
+            p50_enable: !input p50_enable
+            p50_button_press_delay: !input p50_button_press_delay
+            p52_enable: !input p52_enable
+            p52_smart_bulb_mode: !input p52_smart_bulb_mode
+            p53_enable: !input p53_enable
+            p53_enable_2x_tap_up: !input p53_enable_2x_tap_up
+            p54_enable: !input p54_enable
+            p54_enable_2x_tap_down: !input p54_enable_2x_tap_down
+            p100_enable: !input p100_enable
+            p100_led_bar_scaling: !input p100_led_bar_scaling
+            p120_enable: !input p120_enable
+            p120_single_tap_behavior: !input p120_single_tap_behavior
+            p121_enable: !input p121_enable
+            p121_fan_timer_mode: !input p121_fan_timer_mode
+            p123_enable: !input p123_enable
+            p123_aux_switch_unique_scenes: !input p123_aux_switch_unique_scenes
+            p125_enable: !input p125_enable
+            p125_binding_default_level: !input p125_binding_default_level
+            p130_enable: !input p130_enable
+            p130_fan_control_mode: !input p130_fan_control_mode
+            p256_enable: !input p256_enable
+            p256_local_protection: !input p256_local_protection
+            p258_enable: !input p258_enable
+            p258_switch_mode: !input p258_switch_mode
+            p259_enable: !input p259_enable
+            p259_one_led_mode: !input p259_one_led_mode
+            p260_enable: !input p260_enable
+            p260_firmware_update_indicator: !input p260_firmware_update_indicator
+            p261_enable: !input p261_enable
+            p261_relay_click_sound: !input p261_relay_click_sound
+            p262_enable: !input p262_enable
+            p262_clear_notification_2x_tap: !input p262_clear_notification_2x_tap
+
+            # Numeric/JSON Parameters
+            p1_enable: !input p1_enable
+            p1_dimming_speed_up_remote: !input p1_dimming_speed_up_remote
+            p2_enable: !input p2_enable
+            p2_dimming_speed_up_local: !input p2_dimming_speed_up_local
+            p3_enable: !input p3_enable
+            p3_ramp_rate_off_to_on_remote: !input p3_ramp_rate_off_to_on_remote
+            p4_enable: !input p4_enable
+            p4_ramp_rate_off_to_on_local: !input p4_ramp_rate_off_to_on_local
+            p5_enable: !input p5_enable
+            p5_dimming_speed_down_remote: !input p5_dimming_speed_down_remote
+            p6_enable: !input p6_enable
+            p6_dimming_speed_down_local: !input p6_dimming_speed_down_local
+            p7_enable: !input p7_enable
+            p7_ramp_rate_on_to_off_remote: !input p7_ramp_rate_on_to_off_remote
+            p8_enable: !input p8_enable
+            p8_ramp_rate_on_to_off_local: !input p8_ramp_rate_on_to_off_local
+            p9_enable: !input p9_enable
+            p9_minimum_dim_level: !input p9_minimum_dim_level
+            p10_enable: !input p10_enable
+            p10_maximum_dim_level: !input p10_maximum_dim_level
+            p12_enable: !input p12_enable
+            p12_auto_off_timer: !input p12_auto_off_timer
+            p13_enable: !input p13_enable
+            p13_default_dim_level_local: !input p13_default_dim_level_local
+            p14_enable: !input p14_enable
+            p14_default_dim_level_remote: !input p14_default_dim_level_remote
+            p15_enable: !input p15_enable
+            p15_level_after_power_restored: !input p15_level_after_power_restored
+            p18_enable: !input p18_enable
+            p18_active_power_reports: !input p18_active_power_reports
+            p19_enable: !input p19_enable
+            p19_periodic_power_energy_reports: !input p19_periodic_power_energy_reports
+            p20_enable: !input p20_enable
+            p20_active_energy_reports: !input p20_active_energy_reports
+            p55_enable: !input p55_enable
+            p55_2x_tap_up_level: !input p55_2x_tap_up_level
+            p56_enable: !input p56_enable
+            p56_2x_tap_down_level: !input p56_2x_tap_down_level
+            p60_enable: !input p60_enable
+            p60_led1_color_on: !input p60_led1_color_on
+            p61_enable: !input p61_enable
+            p61_led1_color_off: !input p61_led1_color_off
+            p62_enable: !input p62_enable
+            p62_led1_intensity_on: !input p62_led1_intensity_on
+            p63_enable: !input p63_enable
+            p63_led1_intensity_off: !input p63_led1_intensity_off
+            p65_enable: !input p65_enable
+            p65_led2_color_on: !input p65_led2_color_on
+            p66_enable: !input p66_enable
+            p66_led2_color_off: !input p66_led2_color_off
+            p67_enable: !input p67_enable
+            p67_led2_intensity_on: !input p67_led2_intensity_on
+            p68_enable: !input p68_enable
+            p68_led2_intensity_off: !input p68_led2_intensity_off
+            p70_enable: !input p70_enable
+            p70_led3_color_on: !input p70_led3_color_on
+            p71_enable: !input p71_enable
+            p71_led3_color_off: !input p71_led3_color_off
+            p72_enable: !input p72_enable
+            p72_led3_intensity_on: !input p72_led3_intensity_on
+            p73_enable: !input p73_enable
+            p73_led3_intensity_off: !input p73_led3_intensity_off
+            p75_enable: !input p75_enable
+            p75_led4_color_on: !input p75_led4_color_on
+            p76_enable: !input p76_enable
+            p76_led4_color_off: !input p76_led4_color_off
+            p77_enable: !input p77_enable
+            p77_led4_intensity_on: !input p77_led4_intensity_on
+            p78_enable: !input p78_enable
+            p78_led4_intensity_off: !input p78_led4_intensity_off
+            p80_enable: !input p80_enable
+            p80_led5_color_on: !input p80_led5_color_on
+            p81_enable: !input p81_enable
+            p81_led5_color_off: !input p81_led5_color_off
+            p82_enable: !input p82_enable
+            p82_led5_intensity_on: !input p82_led5_intensity_on
+            p83_enable: !input p83_enable
+            p83_led5_intensity_off: !input p83_led5_intensity_off
+            p85_enable: !input p85_enable
+            p85_led6_color_on: !input p85_led6_color_on
+            p86_enable: !input p86_enable
+            p86_led6_color_off: !input p86_led6_color_off
+            p87_enable: !input p87_enable
+            p87_led6_intensity_on: !input p87_led6_intensity_on
+            p88_enable: !input p88_enable
+            p88_led6_intensity_off: !input p88_led6_intensity_off
+            p90_enable: !input p90_enable
+            p90_led7_color_on: !input p90_led7_color_on
+            p91_enable: !input p91_enable
+            p91_led7_color_off: !input p91_led7_color_off
+            p92_enable: !input p92_enable
+            p92_led7_intensity_on: !input p92_led7_intensity_on
+            p93_enable: !input p93_enable
+            p93_led7_intensity_off: !input p93_led7_intensity_off
+            p95_enable: !input p95_enable
+            p95_default_led_color_on: !input p95_default_led_color_on
+            p96_enable: !input p96_enable
+            p96_default_led_color_off: !input p96_default_led_color_off
+            p97_enable: !input p97_enable
+            p97_default_led_intensity_on: !input p97_default_led_intensity_on
+            p98_enable: !input p98_enable
+            p98_default_led_intensity_off: !input p98_default_led_intensity_off
+            p131_enable: !input p131_enable
+            p131_fan_low_level: !input p131_fan_low_level
+            p132_enable: !input p132_enable
+            p132_fan_medium_level: !input p132_fan_medium_level
+            p133_enable: !input p133_enable
+            p133_fan_high_level: !input p133_fan_high_level
+            p134_enable: !input p134_enable
+            p134_fan_led_color: !input p134_fan_led_color
+
+            # mmWave-specific parameters
+            p101_enable: !input p101_enable
+            p101_mmwave_min_height: !input p101_mmwave_min_height
+            p102_enable: !input p102_enable
+            p102_mmwave_max_height: !input p102_mmwave_max_height
+            p103_enable: !input p103_enable
+            p103_mmwave_min_width: !input p103_mmwave_min_width
+            p104_enable: !input p104_enable
+            p104_mmwave_max_width: !input p104_mmwave_max_width
+            p105_enable: !input p105_enable
+            p105_mmwave_min_depth: !input p105_mmwave_min_depth
+            p106_enable: !input p106_enable
+            p106_mmwave_max_depth: !input p106_mmwave_max_depth
+            p110_enable: !input p110_enable
+            p110_light_on_presence_behavior: !input p110_light_on_presence_behavior
+            p112_enable: !input p112_enable
+            p112_mmwave_detection_sensitivity: !input p112_mmwave_detection_sensitivity
+            p113_enable: !input p113_enable
+            p113_mmwave_detection_delay: !input p113_mmwave_detection_delay
+            p114_enable: !input p114_enable
+            p114_mmwave_timeout: !input p114_mmwave_timeout
+            p117_enable: !input p117_enable
+            p117_room_size_preset: !input p117_room_size_preset
+            p263_enable: !input p263_enable
+            p263_ota_image_type: !input p263_ota_image_type
+
+            # Canopy Module Light Parameters
+            canopy_p1_enable: !input canopy_p1_enable
+            canopy_p1_light_dimming_speed_up: !input canopy_p1_light_dimming_speed_up
+            canopy_p3_enable: !input canopy_p3_enable
+            canopy_p3_light_ramp_rate_off_to_on: !input canopy_p3_light_ramp_rate_off_to_on
+            canopy_p5_enable: !input canopy_p5_enable
+            canopy_p5_light_dimming_speed_down: !input canopy_p5_light_dimming_speed_down
+            canopy_p7_enable: !input canopy_p7_enable
+            canopy_p7_light_ramp_rate_on_to_off: !input canopy_p7_light_ramp_rate_on_to_off
+            canopy_p9_enable: !input canopy_p9_enable
+            canopy_p9_light_minimum_dim_level: !input canopy_p9_light_minimum_dim_level
+            canopy_p10_enable: !input canopy_p10_enable
+            canopy_p10_light_maximum_dim_level: !input canopy_p10_light_maximum_dim_level
+            canopy_p12_enable: !input canopy_p12_enable
+            canopy_p12_light_auto_off_timer: !input canopy_p12_light_auto_off_timer
+            canopy_p14_enable: !input canopy_p14_enable
+            canopy_p14_light_default_dim_level: !input canopy_p14_light_default_dim_level
+            canopy_p15_enable: !input canopy_p15_enable
+            canopy_p15_light_level_after_power_restored: !input canopy_p15_light_level_after_power_restored
+            canopy_p25_enable: !input canopy_p25_enable
+            canopy_p25_light_non_neutral_output: !input canopy_p25_light_non_neutral_output
+            canopy_p26_enable: !input canopy_p26_enable
+            canopy_p26_light_dimming_mode: !input canopy_p26_light_dimming_mode
+            canopy_p34_enable: !input canopy_p34_enable
+            canopy_p34_quick_start_light: !input canopy_p34_quick_start_light
+            canopy_p35_enable: !input canopy_p35_enable
+            canopy_p35_quick_start_light_level: !input canopy_p35_quick_start_light_level
+            canopy_p52_enable: !input canopy_p52_enable
+            canopy_p52_light_smart_bulb_mode: !input canopy_p52_light_smart_bulb_mode
+            canopy_p95_enable: !input canopy_p95_enable
+            canopy_p95_light_led_color: !input canopy_p95_light_led_color
+            canopy_p97_enable: !input canopy_p97_enable
+            canopy_p97_light_led_intensity: !input canopy_p97_light_led_intensity
+            canopy_p258_enable: !input canopy_p258_enable
+            canopy_p258_light_switch_mode: !input canopy_p258_light_switch_mode
+
+            # Canopy Module Fan Parameters
+            canopy_fan_p1_enable: !input canopy_fan_p1_enable
+            canopy_fan_p1_speed_up: !input canopy_fan_p1_speed_up
+            canopy_fan_p3_enable: !input canopy_fan_p3_enable
+            canopy_fan_p3_ramp_rate_off_to_on: !input canopy_fan_p3_ramp_rate_off_to_on
+            canopy_fan_p5_enable: !input canopy_fan_p5_enable
+            canopy_fan_p5_speed_down: !input canopy_fan_p5_speed_down
+            canopy_fan_p7_enable: !input canopy_fan_p7_enable
+            canopy_fan_p7_ramp_rate_on_to_off: !input canopy_fan_p7_ramp_rate_on_to_off
+            canopy_fan_p9_enable: !input canopy_fan_p9_enable
+            canopy_fan_p9_minimum_speed_level: !input canopy_fan_p9_minimum_speed_level
+            canopy_fan_p10_enable: !input canopy_fan_p10_enable
+            canopy_fan_p10_maximum_speed_level: !input canopy_fan_p10_maximum_speed_level
+            canopy_fan_p12_enable: !input canopy_fan_p12_enable
+            canopy_fan_p12_auto_off_timer: !input canopy_fan_p12_auto_off_timer
+            canopy_fan_p14_enable: !input canopy_fan_p14_enable
+            canopy_fan_p14_default_speed_level: !input canopy_fan_p14_default_speed_level
+            canopy_fan_p15_enable: !input canopy_fan_p15_enable
+            canopy_fan_p15_speed_after_power_restored: !input canopy_fan_p15_speed_after_power_restored
+            canopy_fan_p23_enable: !input canopy_fan_p23_enable
+            canopy_fan_p23_quick_start_fan: !input canopy_fan_p23_quick_start_fan
+            canopy_fan_p52_enable: !input canopy_fan_p52_enable
+            canopy_fan_p52_remote_control_mode: !input canopy_fan_p52_remote_control_mode
+            canopy_fan_p258_enable: !input canopy_fan_p258_enable
+            canopy_fan_p258_switch_mode: !input canopy_fan_p258_switch_mode
+
+            # Undefined Points at this time
+            p115_enable: !input p115_enable
+            p115_mmwave_staylife: !input p115_mmwave_staylife
+            p116_enable: !input p116_enable
+            p116_mmwave_target_report: !input p116_mmwave_target_report
+
+        - service: system_log.write
+          data:
+            level: info
+            message: "Configuring {{ device_name }} ({{ device_model }})"
+
+        # Individual Topic Logic
+        - if: "{{ p11_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/invertSwitch"
+                payload: "{{ p11_invert_switch }}"
+
+        # P17: LED Indicator Timeout
+        - if: "{{ p17_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/loadLevelIndicatorTimeout"
+                payload: "{{ p17_led_indicator_timeout }}"
+
+        # P22: Switch Type (Device-Specific Options)
+        - if: "{{ p22_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/switchType"
+                payload: >
+                  {% if is_2in1 %}{{ p22_switch_type_2in1 }}
+                  {% else %}{{ p22_switch_type }}{% endif %}
+
+        # P25: Higher Output in Non-Neutral
+        - if: "{{ p25_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/higherOutputInNonNeutral"
+                payload: "{{ p25_non_neutral_output }}"
+
+        # P50: Button Delay
+        - if: "{{ p50_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/buttonDelay"
+                payload: "{{ p50_button_press_delay }}"
+
+        # P52: Smart Bulb/Fan Mode (Device-Specific)
+        - if: "{{ p52_enable }}"
+          then:
+            - if: "{{ is_fan }}"
+              then:
+                - service: mqtt.publish
+                  data:
+                    topic: "{{ mqtt_topic }}/{{ device_name }}/set/smartBulbMode"
+                    payload: !input p52_smart_fan_mode
+              else:
+                - service: mqtt.publish
+                  data:
+                    topic: "{{ mqtt_topic }}/{{ device_name }}/set/smartBulbMode"
+                    payload: !input p52_smart_bulb_mode
+
+        # P53: Double Tap Up to Param 55
+        - if: "{{ p53_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/doubleTapUpToParam55"
+                payload: "{{ p53_enable_2x_tap_up }}"
+
+        # P54: Double Tap Down to Param 56
+        - if: "{{ p54_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/doubleTapDownToParam56"
+                payload: "{{ p54_enable_2x_tap_down }}"
+
+        # P100: LED Bar Scaling
+        - if: "{{ p100_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/ledBarScaling"
+                payload: "{{ p100_led_bar_scaling }}"
+
+        # ===== mmWAVE SENSOR PARAMETERS (VZM32-SN ONLY) =====
+
+        # P110: Light On Presence Behavior
+        - if: "{{ p110_enable and is_mmwave }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/mmwaveControlWiredDevice"
+                payload: "{{ p110_light_on_presence_behavior }}"
+
+        # P112: Detection Sensitivity
+        - if: "{{ p112_enable and is_mmwave }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/mmWaveDetectSensitivity"
+                payload: "{{ p112_mmwave_detection_sensitivity }}"
+
+        # P113: Detection Delay
+        - if: "{{ p113_enable and is_mmwave }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/mmWaveDetectTrigger"
+                payload: "{{ p113_mmwave_detection_delay }}"
+
+        # PXXX: MmWave Target Info Report
+        - if: "{{ p116_enable and is_mmwave }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/mmWaveTargetInfoReport"
+                payload: "{{ p116_mmwave_target_report }}"
+
+        # P117: Room Size Preset
+        - if: "{{ p117_enable and is_mmwave }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/mmWaveRoomSizePreset"
+                payload: "{{ p117_room_size_preset }}"
+
+        # PXXX: OTA Image Type
+        - if: "{{ p263_enable and is_mmwave }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/otaImageType"
+                payload: "{{ p263_ota_image_type }}"
+
+        # ======================================================
+
+        # P120: Single Tap Behavior
+        - if: "{{ p120_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/singleTapBehavior"
+                payload: "{{ p120_single_tap_behavior }}"
+
+        # P121: Fan Timer Display
+        - if: "{{ p121_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/fanTimerMode"
+                payload: "{{ p121_fan_timer_mode }}"
+
+        # P123: Aux Switch Unique Scenes
+        - if: "{{ p123_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/auxSwitchUniqueScenes"
+                payload: "{{ p123_aux_switch_unique_scenes }}"
+
+        # P125: Binding Off to On Sync Level
+        - if: "{{ p125_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/bindingOffToOnSyncLevel"
+                payload: "{{ p125_binding_default_level }}"
+
+        # P130: Fan Control Mode
+        - if: "{{ p130_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/fanControlMode"
+                payload: "{{ p130_fan_control_mode }}"
+
+        # P256: Local Protection
+        - if: "{{ p256_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/localProtection"
+                payload: "{{ p256_local_protection }}"
+
+        # P258: Output Mode (Device-Specific)
+        - if: "{{ p258_enable }}"
+          then:
+            - if: "{{ is_fan }}"
+              then:
+                - service: mqtt.publish
+                  data:
+                    topic: "{{ mqtt_topic }}/{{ device_name }}/set/outputMode"
+                    payload: !input p258_switch_mode_fan
+              else:
+                - service: mqtt.publish
+                  data:
+                    topic: "{{ mqtt_topic }}/{{ device_name }}/set/outputMode"
+                    payload: !input p258_switch_mode
+        # P259: On/Off LED Mode
+        - if: "{{ p259_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/onOffLedMode"
+                payload: "{{ p259_one_led_mode }}"
+
+        # P260: Firmware Update Indicator
+        - if: "{{ p260_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/firmwareUpdateInProgressIndicator"
+                payload: "{{ p260_firmware_update_indicator }}"
+
+        # P261: Relay Click Sound (2-in-1 ONLY)
+        - if: "{{ p261_enable and is_2in1 }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/relayClick"
+                payload: !input p261_relay_click_sound
+
+        # P262: Double Tap Clear Notifications
+        - if: "{{ p262_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/doubleTapClearNotifications"
+                payload: "{{ p262_clear_notification_2x_tap }}"
+
+        # ===== Fan Canopy PARAMETERS (VZM36 ONLY) =====
+
+        # P25: Higher Output (Non-Neutral) - Light Endpoint
+        - if: "{{ is_canopy and canopy_p25_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/higherOutputInNonNeutral_1"
+                payload: "{{ canopy_p25_light_non_neutral_output }}"
+
+        # P26: Dimming Mode - Light Endpoint
+        - if: "{{ is_canopy and canopy_p26_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/dimmingMode_1"
+                payload: "{{ canopy_p26_light_dimming_mode }}"
+
+        # P52: Smart Bulb Mode - Light Endpoint
+        - if: "{{ is_canopy and canopy_p52_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/smartBulbMode_1"
+                payload: "{{ canopy_p52_light_smart_bulb_mode }}"
+
+        # P258: Switch Mode - Light Endpoint
+        - if: "{{ is_canopy and canopy_p258_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/outputMode_1"
+                payload: "{{ canopy_p258_light_switch_mode }}"
+
+        # P52: Remote Control Mode - Fan Endpoint
+        - if: "{{ is_canopy and canopy_fan_p52_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/smartBulbMode_2"
+                payload: "{{ canopy_fan_p52_remote_control_mode }}"
+
+        # P258: Fan Switch Mode - Fan Endpoint
+        - if: "{{ is_canopy and canopy_fan_p258_enable }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "{{ mqtt_topic }}/{{ device_name }}/set/outputMode_2"
+                payload: "{{ canopy_fan_p258_switch_mode }}"
+
+        # ===== NUMERIC PARAMETERS (Individual Loops) =====
+        - variables:
+            numeric_params: >
+              {% set ns = namespace(items=[]) %}
+              {# Dimming & Performance #}
+              {% if p1_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedUpRemote', 'val': p1_dimming_speed_up_remote}] %}{% endif %}
+              {% if p2_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedUpLocal', 'val': p2_dimming_speed_up_local}] %}{% endif %}
+              {% if p3_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOffToOnRemote', 'val': p3_ramp_rate_off_to_on_remote}] %}{% endif %}
+              {% if p4_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOffToOnLocal', 'val': p4_ramp_rate_off_to_on_local}] %}{% endif %}
+              {% if p5_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedDownRemote', 'val': p5_dimming_speed_down_remote}] %}{% endif %}
+              {% if p6_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedDownLocal', 'val': p6_dimming_speed_down_local}] %}{% endif %}
+              {% if p7_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOnToOffRemote', 'val': p7_ramp_rate_on_to_off_remote}] %}{% endif %}
+              {% if p8_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOnToOffLocal', 'val': p8_ramp_rate_on_to_off_local}] %}{% endif %}
+              {% if p9_enable %}{% set ns.items = ns.items + [{'key': 'minimumLevel', 'val': p9_minimum_dim_level}] %}{% endif %}
+              {% if p10_enable %}{% set ns.items = ns.items + [{'key': 'maximumLevel', 'val': p10_maximum_dim_level}] %}{% endif %}
+              {% if p12_enable %}{% set ns.items = ns.items + [{'key': 'autoTimerOff', 'val': p12_auto_off_timer}] %}{% endif %}
+              {% if p13_enable %}{% set ns.items = ns.items + [{'key': 'defaultLevelLocal', 'val': p13_default_dim_level_local}] %}{% endif %}
+              {% if p14_enable %}{% set ns.items = ns.items + [{'key': 'defaultLevelRemote', 'val': p14_default_dim_level_remote}] %}{% endif %}
+              {% if p15_enable %}{% set ns.items = ns.items + [{'key': 'stateAfterPowerRestored', 'val': p15_level_after_power_restored}] %}{% endif %}
+
+              {# Power Reports #}
+              {% if p18_enable %}{% set ns.items = ns.items + [{'key': 'activePowerReports', 'val': p18_active_power_reports}] %}{% endif %}
+              {% if p19_enable %}{% set ns.items = ns.items + [{'key': 'periodicPowerAndEnergyReports', 'val': p19_periodic_power_energy_reports}] %}{% endif %}
+              {% if p20_enable %}{% set ns.items = ns.items + [{'key': 'activeEnergyReports', 'val': p20_active_energy_reports}] %}{% endif %}
+
+              {# Tap Levels #}
+              {% if p55_enable %}{% set ns.items = ns.items + [{'key': 'brightnessLevelForDoubleTapUp', 'val': p55_2x_tap_up_level}] %}{% endif %}
+              {% if p56_enable %}{% set ns.items = ns.items + [{'key': 'brightnessLevelForDoubleTapDown', 'val': p56_2x_tap_down_level}] %}{% endif %}
+
+              {# LED Bar Individual LEDs (P60 - P93) #}
+              {% if p60_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed1ColorWhenOn', 'val': p60_led1_color_on}] %}{% endif %}
+              {% if p61_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed1ColorWhenOff', 'val': p61_led1_color_off}] %}{% endif %}
+              {% if p62_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed1IntensityWhenOn', 'val': p62_led1_intensity_on}] %}{% endif %}
+              {% if p63_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed1IntensityWhenOff', 'val': p63_led1_intensity_off}] %}{% endif %}
+              {% if p65_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed2ColorWhenOn', 'val': p65_led2_color_on}] %}{% endif %}
+              {% if p66_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed2ColorWhenOff', 'val': p66_led2_color_off}] %}{% endif %}
+              {% if p67_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed2IntensityWhenOn', 'val': p67_led2_intensity_on}] %}{% endif %}
+              {% if p68_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed2IntensityWhenOff', 'val': p68_led2_intensity_off}] %}{% endif %}
+              {% if p70_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed3ColorWhenOn', 'val': p70_led3_color_on}] %}{% endif %}
+              {% if p71_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed3ColorWhenOff', 'val': p71_led3_color_off}] %}{% endif %}
+              {% if p72_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed3IntensityWhenOn', 'val': p72_led3_intensity_on}] %}{% endif %}
+              {% if p73_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed3IntensityWhenOff', 'val': p73_led3_intensity_off}] %}{% endif %}
+              {% if p75_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed4ColorWhenOn', 'val': p75_led4_color_on}] %}{% endif %}
+              {% if p76_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed4ColorWhenOff', 'val': p76_led4_color_off}] %}{% endif %}
+              {% if p77_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed4IntensityWhenOn', 'val': p77_led4_intensity_on}] %}{% endif %}
+              {% if p78_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed4IntensityWhenOff', 'val': p78_led4_intensity_off}] %}{% endif %}
+              {% if p80_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed5ColorWhenOn', 'val': p80_led5_color_on}] %}{% endif %}
+              {% if p81_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed5ColorWhenOff', 'val': p81_led5_color_off}] %}{% endif %}
+              {% if p82_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed5IntensityWhenOn', 'val': p82_led5_intensity_on}] %}{% endif %}
+              {% if p83_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed5IntensityWhenOff', 'val': p83_led5_intensity_off}] %}{% endif %}
+              {% if p85_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed6ColorWhenOn', 'val': p85_led6_color_on}] %}{% endif %}
+              {% if p86_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed6ColorWhenOff', 'val': p86_led6_color_off}] %}{% endif %}
+              {% if p87_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed6IntensityWhenOn', 'val': p87_led6_intensity_on}] %}{% endif %}
+              {% if p88_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed6IntensityWhenOff', 'val': p88_led6_intensity_off}] %}{% endif %}
+              {% if p90_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed7ColorWhenOn', 'val': p90_led7_color_on}] %}{% endif %}
+              {% if p91_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed7ColorWhenOff', 'val': p91_led7_color_off}] %}{% endif %}
+              {% if p92_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed7IntensityWhenOn', 'val': p92_led7_intensity_on}] %}{% endif %}
+              {% if p93_enable %}{% set ns.items = ns.items + [{'key': 'defaultLed7IntensityWhenOff', 'val': p93_led7_intensity_off}] %}{% endif %}
+
+              {# LED Bar Global (P95 - P98) #}
+              {% if p95_enable %}{% set ns.items = ns.items + [{'key': 'ledColorWhenOn', 'val': p95_default_led_color_on}] %}{% endif %}
+              {% if p96_enable %}{% set ns.items = ns.items + [{'key': 'ledColorWhenOff', 'val': p96_default_led_color_off}] %}{% endif %}
+              {% if p97_enable %}{% set ns.items = ns.items + [{'key': 'ledIntensityWhenOn', 'val': p97_default_led_intensity_on}] %}{% endif %}
+              {% if p98_enable %}{% set ns.items = ns.items + [{'key': 'ledIntensityWhenOff', 'val': p98_default_led_intensity_off}] %}{% endif %}
+
+              {# Fan Control Specifics (P131 - P134) #}
+              {% if p131_enable %}{% set ns.items = ns.items + [{'key': 'lowLevelForFanControlMode', 'val': p131_fan_low_level}] %}{% endif %}
+              {% if p132_enable %}{% set ns.items = ns.items + [{'key': 'mediumLevelForFanControlMode', 'val': p132_fan_medium_level}] %}{% endif %}
+              {% if p133_enable %}{% set ns.items = ns.items + [{'key': 'highLevelForFanControlMode', 'val': p133_fan_high_level}] %}{% endif %}
+              {% if p134_enable %}{% set ns.items = ns.items + [{'key': 'ledColorForFanControlMode', 'val': p134_fan_led_color}] %}{% endif %}
+
+              {# mmWave Sensor Boundaries (P101-P106, P114) #}
+              {% if is_mmwave and p101_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveHeightMin', 'val': p101_mmwave_min_height}] %}{% endif %}
+              {% if is_mmwave and p102_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveHeightMax', 'val': p102_mmwave_max_height}] %}{% endif %}
+              {% if is_mmwave and p103_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveWidthMin', 'val': p103_mmwave_min_width}] %}{% endif %}
+              {% if is_mmwave and p104_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveWidthMax', 'val': p104_mmwave_max_width}] %}{% endif %}
+              {% if is_mmwave and p105_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveDepthMin', 'val': p105_mmwave_min_depth}] %}{% endif %}
+              {% if is_mmwave and p106_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveDepthMax', 'val': p106_mmwave_max_depth}] %}{% endif %}
+              {% if is_mmwave and p114_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveHoldTime', 'val': p114_mmwave_timeout}] %}{% endif %}
+              {% if is_mmwave and p115_enable %}{% set ns.items = ns.items + [{'key': 'mmWaveStayLife', 'val': p115_mmwave_staylife}] %}{% endif %}
+
+              {# Canopy Module Light Endpoint (_1) #}
+              {% if is_canopy and canopy_p1_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedUpRemote_1', 'val': canopy_p1_light_dimming_speed_up}] %}{% endif %}
+              {% if is_canopy and canopy_p3_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOffToOnRemote_1', 'val': canopy_p3_light_ramp_rate_off_to_on}] %}{% endif %}
+              {% if is_canopy and canopy_p5_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedDownRemote_1', 'val': canopy_p5_light_dimming_speed_down}] %}{% endif %}
+              {% if is_canopy and canopy_p7_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOnToOffRemote_1', 'val': canopy_p7_light_ramp_rate_on_to_off}] %}{% endif %}
+              {% if is_canopy and canopy_p9_enable %}{% set ns.items = ns.items + [{'key': 'minimumLevel_1', 'val': canopy_p9_light_minimum_dim_level}] %}{% endif %}
+              {% if is_canopy and canopy_p10_enable %}{% set ns.items = ns.items + [{'key': 'maximumLevel_1', 'val': canopy_p10_light_maximum_dim_level}] %}{% endif %}
+              {% if is_canopy and canopy_p12_enable %}{% set ns.items = ns.items + [{'key': 'autoTimerOff_1', 'val': canopy_p12_light_auto_off_timer}] %}{% endif %}
+              {% if is_canopy and canopy_p14_enable %}{% set ns.items = ns.items + [{'key': 'defaultLevelRemote_1', 'val': canopy_p14_light_default_dim_level}] %}{% endif %}
+              {% if is_canopy and canopy_p15_enable %}{% set ns.items = ns.items + [{'key': 'stateAfterPowerRestored_1', 'val': canopy_p15_light_level_after_power_restored}] %}{% endif %}
+              {% if is_canopy and canopy_p34_enable %}{% set ns.items = ns.items + [{'key': 'quickStartTime_1', 'val': canopy_p34_quick_start_light}] %}{% endif %}
+              {% if is_canopy and canopy_p35_enable %}{% set ns.items = ns.items + [{'key': 'quickStartLevel_1', 'val': canopy_p35_quick_start_light_level}] %}{% endif %}
+              {% if is_canopy and canopy_p95_enable %}{% set ns.items = ns.items + [{'key': 'ledColorWhenOn_1', 'val': canopy_p95_light_led_color}] %}{% endif %}
+              {% if is_canopy and canopy_p97_enable %}{% set ns.items = ns.items + [{'key': 'ledIntensityWhenOn_1', 'val': canopy_p97_light_led_intensity}] %}{% endif %}
+
+              {# Canopy Module Fan Endpoint (_2) #}
+              {% if is_canopy and canopy_fan_p1_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedUpRemote_2', 'val': canopy_fan_p1_speed_up}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p3_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOffToOnRemote_2', 'val': canopy_fan_p3_ramp_rate_off_to_on}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p5_enable %}{% set ns.items = ns.items + [{'key': 'dimmingSpeedDownRemote_2', 'val': canopy_fan_p5_speed_down}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p7_enable %}{% set ns.items = ns.items + [{'key': 'rampRateOnToOffRemote_2', 'val': canopy_fan_p7_ramp_rate_on_to_off}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p9_enable %}{% set ns.items = ns.items + [{'key': 'minimumLevel_2', 'val': canopy_fan_p9_minimum_speed_level}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p10_enable %}{% set ns.items = ns.items + [{'key': 'maximumLevel_2', 'val': canopy_fan_p10_maximum_speed_level}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p12_enable %}{% set ns.items = ns.items + [{'key': 'autoTimerOff_2', 'val': canopy_fan_p12_auto_off_timer}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p14_enable %}{% set ns.items = ns.items + [{'key': 'defaultLevelRemote_2', 'val': canopy_fan_p14_default_speed_level}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p15_enable %}{% set ns.items = ns.items + [{'key': 'stateAfterPowerRestored_2', 'val': canopy_fan_p15_speed_after_power_restored}] %}{% endif %}
+              {% if is_canopy and canopy_fan_p23_enable %}{% set ns.items = ns.items + [{'key': 'quickStartTime_2', 'val': canopy_fan_p23_quick_start_fan}] %}{% endif %}
+
+              {{ ns.items }}
+
+        # --- Loop through each enabled parameter and send a separate message ---
+        - repeat:
+            for_each: "{{ numeric_params }}"
+            sequence:
+              - service: mqtt.publish
+                data:
+                  topic: "{{ mqtt_topic }}/{{ device_name }}/set/{{ repeat.item.key }}"
+                  payload: "{{ repeat.item.val }}"
+              - delay:
+                  milliseconds: 200
+
+        - delay: "00:00:01"
+
+  - service: persistent_notification.create
+    data:
+      title: "{{ ui_title }}"
+      message: "Successfully configured {{ target_devices | count }} device(s):{{'\n'}}{{ device_names_string }}"
+      notification_id: "inovelli_sync_{{ this.entity_id }}"
+
+mode: single

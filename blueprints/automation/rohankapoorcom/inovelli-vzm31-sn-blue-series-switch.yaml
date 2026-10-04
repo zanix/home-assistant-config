@@ -1,0 +1,225 @@
+# yamllint disable-line rule:line-length
+---
+blueprint:
+  name: Inovelli Blue Series VZM31-SN Switch (Zigbee2MQTT)
+  description: Create automations for the Inovelli Blue Series VZM31-SN Switch.
+  domain: automation
+  input:
+    inovelli_switch:
+      name: Inovelli Switch
+      description: List of available Inovelli VZM31-SN switch.
+      selector:
+        device:
+          integration: mqtt
+          manufacturer: Inovelli
+          multiple: true
+    command_path_base:
+      name: Default Command Path Base
+      description: Set the base path for the MQTT command path. This is `zigbee2mqtt` by default.
+      default: zigbee2mqtt
+      selector:
+        text:
+    config_button:
+      name: Config Press 1x
+      description: Action to run, when the config button is pressed one time.
+      default: []
+      selector:
+        action: {}
+    button_a:
+      name: Up/On Press 1x
+      description: Action to run, when the Up button is pressed one time.
+      default: []
+      selector:
+        action: {}
+    button_b:
+      name: Down/Off Press 1x
+      description: Action to run, when the Down button is pressed one time.
+      default: []
+      selector:
+        action: {}
+    config_button_held:
+      name: Config Press Held Down
+      description: Action to run, when the config button is pressed and held.
+      default: []
+      selector:
+        action: {}
+    button_a_held:
+      name: Up/On Held
+      description: Action to run, when the Up button is pressed and held.
+      default: []
+      selector:
+        action: {}
+    button_b_held:
+      name: Down/Off Held
+      description: Action to run, when the Down button is pressed and held.
+      default: []
+      selector:
+        action: {}
+    config_button_released:
+      name: Config Press Hold Release
+      description: Action to run, when the config button is released after being held.
+      default: []
+      selector:
+        action: {}
+    button_a_released:
+      name: Up/On Released
+      description: Action to run, when the Up button is released after being held.
+      default: []
+      selector:
+        action: {}
+    button_b_released:
+      name: Down/Off Released
+      description: Action to run, when the Down button is released after being held.
+      default: []
+      selector:
+        action: {}
+    config_button2:
+      name: Config Press 2x
+      description: Action to run, when the config button is pressed two times.
+      default: []
+      selector:
+        action: {}
+    button_a2:
+      name: Up/On Press 2x
+      description: Action to run, when the Up button is pressed two times.
+      default: []
+      selector:
+        action: {}
+    button_b2:
+      name: Down/Off Press 2x
+      description: Action to run, when the Down button is pressed two times.
+      default: []
+      selector:
+        action: {}
+    config_button3:
+      name: Config Press 3x
+      description: Action to run, when the config button is pressed three times.
+      default: []
+      selector:
+        action: {}
+    button_a3:
+      name: Up/On Press 3x
+      description: Action to run, when the up button is pressed three times.
+      default: []
+      selector:
+        action: {}
+    button_b3:
+      name: Down/Off Press 3x
+      description: Action to run, when the Down button is pressed three times.
+      default: []
+      selector:
+        action: {}
+    config_button4:
+      name: Config Press 4x
+      description: Action to run, when the config button is pressed four times.
+      default: []
+      selector:
+        action: {}
+    button_a4:
+      name: Up/On Press 4x
+      description: Action to run, when the Up button is pressed four times.
+      default: []
+      selector:
+        action: {}
+    button_b4:
+      name: Down/Off Press 4x
+      description: Action to run, when the Down button is pressed four times.
+      default: []
+      selector:
+        action: {}
+    config_button5:
+      name: Config Press 5x
+      description: Action to run, when the config button is pressed five times.
+      default: []
+      selector:
+        action: {}
+    button_a5:
+      name: Up/On Press 5x
+      description: Action to run, when the Up button is pressed five times.
+      default: []
+      selector:
+        action: {}
+    button_b5:
+      name: Down/Off Press 5x
+      description: Action to run, when the Down button is pressed five times.
+      default: []
+      selector:
+        action: {}
+  source_url: https://github.com/rohankapoorcom/homeassistant-config/blob/master/blueprints/automation/rohankapoorcom/inovelli-vzm31-sn-blue-series-switch.yaml
+mode: single
+max_exceeded: silent
+variables:
+  command_path_base: !input 'command_path_base'
+  device_id: !input 'inovelli_switch'
+trigger_variables:
+  command_path_base: !input 'command_path_base'
+triggers:
+  - trigger: mqtt
+    topic: "{{command_path_base}}/+"
+conditions:
+  - condition: template
+    value_template: >
+      {% set ns = namespace(topics=[]) %}
+      {% for id in device_id %}
+        {% set ns.topics = ns.topics + [ command_path_base + "/" + device_attr(id, 'name') ] %}
+      {% endfor %}
+      {{ trigger.topic in ns.topics }}
+  - condition: template
+    value_template: '{{ trigger.payload_json.action is defined }}'
+actions:
+  - variables:
+      button_id: '{{ trigger.payload_json.action }}'
+      switch_name: "{{ trigger.topic.split('/')[1] }}"
+      switch_device_id: >-
+        {% set ns = namespace(found='') %}
+        {% for id in device_id %}
+          {% if device_attr(id, 'name') == switch_name %}
+            {% set ns.found = id %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.found }}
+      switch_entities: "{{ device_entities(switch_device_id) }}"
+      switch_light_entity_id: "{{ device_entities(switch_device_id) | select('match','^light\\.') | list | first }}"
+  - choose:
+      - conditions: '{{ button_id == "config_single" }}'
+        sequence: !input 'config_button'
+      - conditions: '{{ button_id == "up_single" }}'
+        sequence: !input 'button_a'
+      - conditions: '{{ button_id == "down_single" }}'
+        sequence: !input 'button_b'
+      - conditions: '{{ button_id == "config_held" }}'
+        sequence: !input 'config_button_held'
+      - conditions: '{{ button_id == "up_held" }}'
+        sequence: !input 'button_a_held'
+      - conditions: '{{ button_id == "down_held" }}'
+        sequence: !input 'button_b_held'
+      - conditions: '{{ button_id == "config_release" }}'
+        sequence: !input 'config_button_released'
+      - conditions: '{{ button_id == "up_release" }}'
+        sequence: !input 'button_a_released'
+      - conditions: '{{ button_id == "down_release" }}'
+        sequence: !input 'button_b_released'
+      - conditions: '{{ button_id == "config_double" }}'
+        sequence: !input 'config_button2'
+      - conditions: '{{ button_id == "up_double" }}'
+        sequence: !input 'button_a2'
+      - conditions: '{{ button_id == "down_double" }}'
+        sequence: !input 'button_b2'
+      - conditions: '{{ button_id == "config_triple" }}'
+        sequence: !input 'config_button3'
+      - conditions: '{{ button_id == "up_triple" }}'
+        sequence: !input 'button_a3'
+      - conditions: '{{ button_id == "down_triple" }}'
+        sequence: !input 'button_b3'
+      - conditions: '{{ button_id == "config_quadruple" }}'
+        sequence: !input 'config_button4'
+      - conditions: '{{ button_id == "up_quadruple" }}'
+        sequence: !input 'button_a4'
+      - conditions: '{{ button_id == "down_quadruple" }}'
+        sequence: !input 'button_b4'
+      - conditions: '{{ button_id == "config_quintuple" }}'
+        sequence: !input 'config_button5'
+      - conditions: '{{ button_id == "up_quintuple" }}'
+        sequence: !input 'button_a5'
+      - conditions: '{{ button_id == "down_quintuple" }}'
+        sequence: !input 'button_b5'
