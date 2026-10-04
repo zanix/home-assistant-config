@@ -105,6 +105,10 @@ The google_cloud platform allows you to use Google Cloud Platform API and integr
 
 The Google Generative AI integration adds a conversation agent powered by Google Generative AI in Home Assistant.
 
+### [Google Maps Travel Time](https://www.home-assistant.io/integrations/google_travel_time)
+
+Provides travel time from the Google Maps Routes API.
+
 ### [Holiday](https://www.home-assistant.io/integrations/holiday)
 
 Create a calendar of holidays in Home Assistant for powering automations.
