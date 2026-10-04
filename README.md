@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5610 |
-| Sensors        | 1961 |
-| Binary Sensors | 427 |
+| All Entities   | 5652 |
+| Sensors        | 1973 |
+| Binary Sensors | 451 |
 | Lights         | 81 |
-| Switches       | 822 |
+| Switches       | 825 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -882,6 +882,7 @@ Material Design 3 Theme for Home Assistant
 - 📋 [Inovelli] Outside Garage Switch
 - 📋 [Sensor Light] Basement Hallway
 - 📋 [Sensor Light] Cold Storage Room
+- 📋 [Sensor Light] Utility Room
 - 📍 Itinerary Tracker Notification
 - 📦 Clear Packages Out for Delivery
 - 📦 Mail Delivered
