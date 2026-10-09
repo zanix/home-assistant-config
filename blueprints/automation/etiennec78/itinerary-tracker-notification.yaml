@@ -793,11 +793,12 @@ actions:
       - stop: Vehicle left
   - alias: Format the notification message
     variables:
-      message: "{{ message.format(driver_name=driver_name) }}"
       tts_message: |
-        {%- from 'message.jinja' import map_username -%}
-        {%- set name = map_username(driver_name) -%}
-        {{ message.format(driver_name=name) }}
+        {% set names = {'Amy':'Mom','Joshua':'Dad'} %}
+        {% if driver_name in names %}{% set _name = names[driver_name] %}
+        {%- else -%}{% set _name = driver_name %}{% endif %}
+        {{ message.format(driver_name=_name) }}
+      message: "{{ message.format(driver_name=driver_name) }}"
   - parallel:
       - alias: Notify each user except the driver about itinerary start
         repeat:
@@ -1060,10 +1061,13 @@ actions:
                         message: *get_message
                     - alias: Format the notification message
                       variables:
-                        message: >-
+                        tts_message: |
+                          {% set names = {'Amy':'Mom','Joshua':'Dad'} %}
+                          {% if driver_name in names %}{% set _name = names[driver_name] %}
+                          {%- else -%}{% set _name = driver_name %}{% endif %}
                           {{
                             message.format(
-                              driver_name=driver_name,
+                              driver_name=_name,
                               remaining_minutes=(
                                 (
                                   arrival_timestamp
@@ -1072,12 +1076,10 @@ actions:
                               ) | round
                             )
                           }}
-                        tts_message: |
-                          {%- from 'message.jinja' import map_username -%}
-                          {%- set name = map_username(driver_name) -%}
+                        message: >-
                           {{
                             message.format(
-                              driver_name=name,
+                              driver_name=driver_name,
                               remaining_minutes=(
                                 (
                                   arrival_timestamp
@@ -1102,12 +1104,17 @@ actions:
                     - alias: Calculate ETA
                       variables:
                         remaining: >-
-                            {% if state_attr(travel_time_sensor, 'duration') is not none %}
+                            {% if state_attr(travel_time_sensor, 'duration') | is_number %}
                               {{ state_attr(travel_time_sensor, 'duration') | float * 60 }}
-                            {% elif state_attr(travel_time_sensor, 'unit_of_measurement') == "min" %}
+                            {% elif is_state_attr(travel_time_sensor, 'unit_of_measurement', 'min') %}
                               {{ states(travel_time_sensor) | float * 60 }}
-                            {% elif state_attr(travel_time_sensor, 'unit_of_measurement') == "s" %}
+                            {% elif is_state_attr(travel_time_sensor, 'unit_of_measurement', 's') %}
                               {{ states(travel_time_sensor) | float }}
+                            {% elif is_state_attr(travel_time_sensor, 'device_class', 'timestamp') %}
+                              {{
+                                states(travel_time_sensor) | as_timestamp
+                                - states[travel_time_sensor].last_updated | as_timestamp
+                              }}
                             {% else %}
                               {{ none }}
                             {% endif %}
@@ -1232,11 +1239,12 @@ actions:
           message: *get_message
       - alias: Format the notification message
         variables:
-          message: "{{ message.format(driver_name=driver_name) }}"
           tts_message: |
-            {%- from 'message.jinja' import map_username -%}
-            {%- set name = map_username(driver_name) -%}
-            {{ message.format(driver_name=name) }}
+            {% set names = {'Amy':'Mom','Joshua':'Dad'} %}
+            {% if driver_name in names %}{% set _name = names[driver_name] %}
+            {%- else -%}{% set _name = driver_name %}{% endif %}
+            {{ message.format(driver_name=_name) }}
+          message: "{{ message.format(driver_name=driver_name) }}"
       - parallel:
           - alias: Send arrival notification to each user
             repeat:
