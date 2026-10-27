@@ -33,9 +33,9 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5608 |
-| Sensors        | 1885 |
-| Binary Sensors | 500 |
+| All Entities   | 5637 |
+| Sensors        | 1889 |
+| Binary Sensors | 505 |
 | Lights         | 81 |
 | Switches       | 824 |
 
@@ -311,19 +311,19 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.7.0]
+### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.7.2]
 
 A Home Assistant integration to provide battery details of devices
 
 Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.15.0]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.17.2]
 
 Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.2.3]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.4.0]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -345,7 +345,7 @@ Authors: [@ccpk1](https://github.com/ccpk1).
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v2.0.1]
+### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v2.0.2]
 
 Home Assistant integration for Dreame robot vacuums with map support
 
@@ -357,7 +357,7 @@ Frigate integration for Home Assistant
 
 Authors: [@blakeblackshear](https://github.com/blakeblackshear), [@dermotduffy](https://github.com/dermotduffy), [@NickM-27](https://github.com/NickM-27).
 
-### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.6.1]
+### [Gasbuddy](https://github.com/firstof9/ha-gasbuddy) [v1.6.3]
 
 Component to integrate with GasBuddy fuel price tracker.
 
@@ -375,17 +375,17 @@ Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.13.3]
+### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.15.0]
 
 Home Assistant Google Home custom component
 
 Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://github.com/DurgNomis-drol), [@ArnyminerZ](https://github.com/ArnyminerZ), [@KapJI](https://github.com/KapJI).
 
-### [Gui Recorder](https://github.com/martinandersen84/gui-recorder) [v0.8.39]
+### [Gui Recorder](https://github.com/martinandersen84/gui-recorder) [v0.8.40]
 
 Home Assistant custom component: manage recorder config and DB maintenance from a sidebar GUI panel (SQLite only)
 
-Authors: [@ideaalab](https://github.com/ideaalab).
+Authors: [@martinandersen84](https://github.com/martinandersen84).
 
 ### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v2.0.5]
 
@@ -417,7 +417,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.17.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.20.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -429,13 +429,13 @@ hacs integration for lube logger
 
 Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
-### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.6.4]
+### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.6.9]
 
 Home Assistant integration providing day of package counts and USPS informed delivery images.
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.9.2]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.10.0]
 
 Fill out your Media Player Entity with MQTT Topics
 
@@ -447,13 +447,13 @@ Home Assistant cloud-push integration for the Neakasa M1 self-cleaning litter bo
 
 Authors: [@roquerodrigo](https://github.com/roquerodrigo).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.2.1]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.2.3]
 
 OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
-### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.7.0]
+### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.11.1]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
 
@@ -465,19 +465,19 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.2.5]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.2.13]
 
 Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.3.1]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.4.0]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/ruaan-deysel/ha-unraid) [v2026.10.1]
+### [UNRAID](https://github.com/tinkerologie/ha-unraid) [v2026.10.5]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
@@ -499,7 +499,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 </details>
 
-<details><summary>41 Dashboard Plugins</summary>
+<details><summary>42 Dashboard Plugins</summary>
 
 ### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v8.1.0]
 
@@ -525,7 +525,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.4.1]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.4.2]
 
 Bubble Card is a minimalist and customizable card collection for Home Assistant, featuring modern pop-ups and an integrated Module Store with over 100 community-made modules.
 
@@ -537,15 +537,19 @@ Bubble Card is a minimalist and customizable card collection for Home Assistant,
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.11.1]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.11.2]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
-### [Dreame Vacuum Map Card](https://github.com/noambergauz/dreame-vacuum-map-card) [v1.6.0]
+### [Dreame Vacuum Map Card](https://github.com/noambergauz/dreame-vacuum-map-card) [v1.6.2]
 
 Dreame Vacuum Map Card for Home Assistant Integration
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.3.3]
+### [Entity Progress Card](https://github.com/francois-le-ko4la/lovelace-entity-progress-card) [v1.6.3]
+
+Entity progress card for Home Assistant
+
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.3.6]
 
 Expander card for HomeAssistant
 
@@ -553,7 +557,7 @@ Expander card for HomeAssistant
 
 🔹 A foldable row for entities card, containing other rows
 
-### [Gasbuddy Card](https://github.com/firstof9/gasbuddy-card) [v1.5.2]
+### [Gasbuddy Card](https://github.com/firstof9/gasbuddy-card) [v1.6.0]
 
 Home Assistant custom Lovelace card for the GasBuddy integration displaying gas prices and EV charging station data.
 
@@ -573,7 +577,7 @@ A card for Home Assistant Lovelace for exploring the history of your entities in
 
 Sun Card successor: Visualize the position of the Sun over the horizon.
 
-### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v7.1.1]
+### [Hourly Weather Card](https://github.com/decompil3d/lovelace-hourly-weather) [v7.2.0]
 
 Hourly weather card for Home Assistant. Visualize upcoming weather conditions as a colored horizontal bar.
 
@@ -581,7 +585,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v14.2.1]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v15.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -589,7 +593,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.26]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.27]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
@@ -947,7 +951,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.9.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.10.4-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
