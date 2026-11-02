@@ -8831,3 +8831,97 @@
       time_delay: 20
       rising_humidity: 1.5
       falling_humidity: -1.5
+- id: '1793309948382'
+  alias: "\U0001F525 Fireplace: Sync Thermostat Mode"
+  description: Syncs thermostat preset mode when the fireplace turns on or off.
+  triggers:
+  - entity_id: switch.fireplace_power
+    from: 'off'
+    to: 'on'
+    id: fireplace_on
+    trigger: state
+  - entity_id: switch.fireplace_power
+    from: 'on'
+    to: 'off'
+    id: fireplace_off
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: fireplace_on
+      sequence:
+      - target:
+          entity_id: climate.ecobee_cloud
+        data:
+          preset_mode: Fireplace
+        action: climate.set_preset_mode
+    - conditions:
+      - condition: trigger
+        id: fireplace_off
+      sequence:
+      - target:
+          entity_id: climate.ecobee_cloud
+        data:
+          preset_mode: home
+        action: climate.set_preset_mode
+  mode: single
+- id: '1793310429092'
+  alias: "\U0001F525 Fireplace: Safety Auto-Shutoff Timer"
+  description: Turns off the fireplace after running for the duration specified in
+    the helper.
+  triggers:
+  - entity_id: switch.fireplace_power
+    to: 'on'
+    for:
+      minutes: '{{ states(''input_number.fireplace_auto_off_minutes'') | int(120)
+        }}'
+    trigger: state
+  actions:
+  - target:
+      entity_id: switch.fireplace_power
+    action: switch.turn_off
+  - action: script.notify_mobile
+    metadata: {}
+    data:
+      send_to:
+      - parents
+      location: home
+      title: Fireplace Auto-Shutoff
+      message: The fireplace was automatically turned off after reaching the maximum
+        runtime limit of {{ states("input_number.fireplace_auto_off_minutes") }}.
+      notification_icon: mdi:fireplace-off
+  mode: restart
+- id: '1793310619343'
+  alias: "\U0001F525 Fireplace: Flame Modulation on Temperature"
+  description: Lowers flame height when room temperature rises above threshold.
+  triggers:
+  - entity_id:
+    - sensor.ecobee_cloud_temperature
+    above: input_number.fireplace_target_temperature
+    trigger: numeric_state
+  conditions:
+  - condition: state
+    entity_id: switch.fireplace_power
+    state: 'on'
+  - condition: numeric_state
+    entity_id: number.fireplace_flame
+    above: 2
+  actions:
+  - target:
+      entity_id: number.fireplace_flame
+    data:
+      value: 2
+    action: number.set_value
+  - action: script.notify_mobile
+    metadata: {}
+    data:
+      send_to:
+      - parents
+      location: home
+      title: Fireplace Flame Lowered
+      message: Room temperature reached {{ states('input_number.fireplace_target_temperature')
+        }}°F. Flame level reduced to 2.
+      notification_icon: mdi:fireplace
+  mode: single

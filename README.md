@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5637 |
-| Sensors        | 1889 |
+| All Entities   | 5687 |
+| Sensors        | 1911 |
 | Binary Sensors | 505 |
 | Lights         | 81 |
-| Switches       | 824 |
+| Switches       | 826 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -453,6 +453,12 @@ OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
+### [Proflame2 Home Assistant Integration](https://github.com/jeffgregx2/HACS-Proflame2) [v0.6.0]
+
+HA Plugin to add support for Proflame2 RF controllers (fireplaces)
+
+Authors: [@jeffgregx2](https://github.com/jeffgregx2).
+
 ### [Spook 👻 Your Homie](https://github.com/frenck/spook) [v5.11.1]
 
 A scary 👻 powerful toolbox 🧰 for Home Assistant 🏡
@@ -686,6 +692,7 @@ Material Design 3 Theme for Home Assistant
 ### Climate
 
 - [EcoBee Enhanced Thermostat](https://www.amazon.com/dp/B09XXTQPXC) - Smart Thermostat with [extra sensors](https://www.amazon.com/dp/B07NQVWRR3)
+- [LILYGO T-Embed CC1101 ESP32-S3](https://www.amazon.com/dp/B0DWX1M76H) - DIY ESP32-S3 with CC1101 for RF control of a fireplace insert. Flashed with [ESPHome](https://esphome.io) for local control
 
 ### Lighting
 
@@ -774,7 +781,7 @@ Material Design 3 Theme for Home Assistant
 > [!NOTE]
 > For more details, see the [automations.xml][automations] file and `automation:` blocks in [integrations].
 
-<details><summary>155 Automations</summary>
+<details><summary>158 Automations</summary>
 
 - ⏯ Ensure Android TV Apps are Running 🚫
 - ⏯ Family Room Media Off
@@ -913,6 +920,9 @@ Material Design 3 Theme for Home Assistant
 - 🔔 Frigate Doorbell - Event Handler 🚫
 - 🔔 Frigate Doorbell - Object Seen 🚫
 - 🔔 Reolink Doorbell - Object Seen
+- 🔥 Fireplace: Flame Modulation on Temperature
+- 🔥 Fireplace: Safety Auto-Shutoff Timer
+- 🔥 Fireplace: Sync Thermostat Mode
 - 🕗 Main Bedroom Ceiling Fan Default LED Status
 - 🖥️ [Ardena] Power on Activity
 - 🖥️ [Erebus] Microphone/Camera Active

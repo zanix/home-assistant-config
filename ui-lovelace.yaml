@@ -54,6 +54,19 @@ views:
                   action: navigate
                   navigation_path: climate
               - type: custom:mushroom-template-badge
+                entity: switch.fireplace_power
+                label: Fireplace
+                content: '{{ state_translated(entity) }}'
+                icon: mdi:fireplace{{ iif(not is_state(entity, "on"), "-off") }}
+                color: "{% if is_state(entity, \"on\") %}\n  red\n{% else %}\n  grey\n\
+                  {% endif %}"
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      popup_card_id: fireplace
+              - type: custom:mushroom-template-badge
                 entity: sensor.airgradient_kitchen_pm_2_5_aqi
                 label: AQI
                 content: '{{ states(entity) | int(default="?") }} / {{ states("sensor.home_aqi_us_aqi")
@@ -3858,26 +3871,88 @@ views:
             card_type: climate
             entity: climate.ecobee
             card_layout: large
-            show_state: true
+            state_content: state
             styles: "${card.querySelector('.bubble-name').innerText = [\n    (hass.formatEntityState(hass.states[\"\
               sensor.ecobee_mode\"]) || \"\"),\n    (hass.formatEntityAttributeValue(hass.states[entity],\
               \ \"current_temperature\") || \"\")\n  ].filter(n => n).join(\" ⸱ \"\
               )\n}"
             sub_button:
-              - name: HVAC modes menu
-                select_attribute: hvac_modes
-                state_background: false
-                show_arrow: false
-              - name: Profile
-                entity: climate.ecobee_cloud
-                select_attribute: preset_modes
-                state_background: false
-                show_arrow: false
-              - name: Fan modes menu
-                entity: climate.ecobee
-                select_attribute: fan_modes
-                state_background: false
-                show_arrow: false
+              main:
+                - name: HVAC modes menu
+                  select_attribute: hvac_modes
+                  state_background: false
+                  show_arrow: false
+                  sub_button_type: select
+                - name: Profile
+                  entity: climate.ecobee_cloud
+                  select_attribute: preset_modes
+                  state_background: false
+                  show_arrow: false
+                  sub_button_type: select
+                - name: Fan modes menu
+                  entity: climate.ecobee
+                  select_attribute: fan_modes
+                  state_background: false
+                  show_arrow: false
+                  sub_button_type: select
+              bottom: []
+          - type: custom:bubble-card
+            card_type: button
+            entity: switch.fireplace_power
+            name: Fireplace
+            icon: mdi:fireplace
+            state_content: state
+            button_type: state
+            tap_action:
+              action: fire-dom-event
+              browser_mod:
+                service: browser_mod.popup
+                data:
+                  popup_card_id: fireplace
+            button_action:
+              tap_action:
+                action: fire-dom-event
+                browser_mod:
+                  service: browser_mod.popup
+                  data:
+                    popup_card_id: fireplace
+            sub_button:
+              main:
+                - name: Controls
+                  buttons_layout: inline
+                  group:
+                    - entity: switch.fireplace_power
+                      name: Power
+                    - entity: number.fireplace_flame
+                      name: Flame Level
+                      state_content: state
+                      state_background: false
+                      hide_when_parent_unavailable: true
+                    - entity: number.fireplace_fan
+                      name: Fan
+                      state_content: state
+                      state_background: false
+                      hide_when_parent_unavailable: true
+                    - entity: number.fireplace_light
+                      name: Light
+                      icon: mdi:lightbulb
+                      state_content: state
+                      state_background: false
+                      hide_when_parent_unavailable: true
+                    - entity: input_number.fireplace_target_temperature
+                      name: Temperature
+                      icon: mdi:thermometer
+                      state_content: state
+                      state_background: false
+                      hide_when_parent_unavailable: true
+                    - entity: input_number.fireplace_auto_off_minutes
+                      name: Timer
+                      icon: mdi:timer
+                      state_background: false
+                      hide_when_parent_unavailable: true
+            styles: "${card.querySelector('.bubble-state').innerText =\n  hass.states['sensor.fireplace'].attributes?.last_issue\
+              \ !== 'None'\n  ? hass.states['sensor.fireplace'].state + \" · \" +\
+              \ hass.states['sensor.fireplace'].attributes?.last_issue\n  : hass.states['sensor.fireplace'].state}"
           - type: heading
             icon: mdi:history
             heading: Running Mode History
@@ -18313,6 +18388,103 @@ views:
                   entity: light.outside_eve
                   name: Eve
                   vertical: true
+          - type: custom:popup-card
+            title: Fireplace
+            icon: mdi:fireplace
+            icon_close: false
+            dismissable: true
+            adaptive: true
+            popup_card_id: fireplace
+            card:
+              type: vertical-stack
+              cards:
+                - type: tile
+                  entity: switch.fireplace_power
+                  name: Fireplace Power
+                  icon: mdi:fireplace
+                  color: pink
+                  vertical: false
+                  icon_tap_action:
+                    action: more-info
+                  features:
+                    - type: toggle
+                  features_position: inline
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
+                - type: tile
+                  entity: number.fireplace_flame
+                  name: Flame Level
+                  color: red
+                  vertical: false
+                  features:
+                    - style: slider
+                      type: numeric-input
+                  features_position: inline
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
+                - type: tile
+                  entity: number.fireplace_fan
+                  name: Blower Fan
+                  color: green
+                  vertical: false
+                  features:
+                    - style: slider
+                      type: numeric-input
+                  features_position: inline
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
+                - type: tile
+                  entity: number.fireplace_light
+                  name: Accent Light
+                  color: amber
+                  vertical: false
+                  features:
+                    - style: slider
+                      type: numeric-input
+                  features_position: inline
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
+                - type: tile
+                  entity: input_number.fireplace_target_temperature
+                  name: Target Temp
+                  icon: mdi:thermometer
+                  color: deep-orange
+                  vertical: false
+                  features:
+                    - style: slider
+                      type: numeric-input
+                  features_position: inline
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
+                - type: tile
+                  entity: input_number.fireplace_auto_off_minutes
+                  name: Auto-off
+                  icon: mdi:timer
+                  color: cyan
+                  vertical: false
+                  features:
+                    - style: slider
+                      type: numeric-input
+                  features_position: inline
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
+                - type: markdown
+                  content: '**Current State:** {{ states(''sensor.fireplace'') }}
+
+                    {% set issue = state_attr(''sensor.fireplace'', ''last_issue'')
+                    %} {% if issue and issue != ''None'' %} ⚠️ **Last Issue:** {{
+                    issue }} {% endif %}
+
+                    '
+                  card_mod:
+                    style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
+                      \ 0;\n}\n"
       - type: grid
         cards:
           - type: custom:popup-card

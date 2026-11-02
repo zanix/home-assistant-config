@@ -1,0 +1,77 @@
+---
+# HACS-Proflame2: Control a Proflame2 fireplace
+# https://github.com/jeffgregx2/HACS-Proflame2
+
+substitutions:
+  name: fireplace-lilygo
+  friendly_name: Fireplace-LilyGO
+  proflame2_payload_bit_length_override: "0"
+  proflame2_package_ref: "main"
+
+packages:
+  proflame2_tembed_base: github://jeffgregx2/HACS-Proflame2/esphome/packages/proflame2_tembed_base.yaml@${proflame2_package_ref}
+  proflame2_tembed_display: github://jeffgregx2/HACS-Proflame2/esphome/packages/proflame2_tembed_display.yaml@${proflame2_package_ref}
+
+esphome:
+  name: $name
+  friendly_name: $friendly_name
+
+esp32:
+  variant: esp32s3
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret encryption_key
+
+ota:
+  platform: esphome
+  encryption:
+
+wifi:
+  ssid: !secret wifi_not_ssid
+  password: !secret wifi_not_password
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "AP-${name}"
+    password: !secret ap_password
+    ap_timeout: 3min
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    timezone: America/Boise
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+
+  - platform: wifi_info
+    ip_address:
+      name: "IP"
+    ssid:
+      name: "SSID"
+    bssid:
+      name: "BSSID"
+
+button:
+  - platform: restart
+    name: "Restart"
+
+sensor:
+  - platform: uptime
+    name: "Uptime"
+    unit_of_measurement: h
+    filters:
+      - lambda: return int((x + 1800.0) / 3600.0);
+
+  - platform: wifi_signal
+    name: "Wifi Signal"
+    update_interval: 5min
