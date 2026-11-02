@@ -1,6 +1,6 @@
 smart_icons:
   name: "Smart Icons"
-  version: "1.11.3"
+  version: "1.11.4"
   creator: "Zsolt"
   link: "https://github.com/Clooos/Bubble-Card/discussions/1750"
 
@@ -52,6 +52,7 @@ smart_icons:
     <li><code>label_value: "42%"</code> / <code>label_value_js</code> — replaces the sub-button's name line</li>
     <li><code>label_attribute: current_temperature</code> — value from an attribute (same formatting pipeline)</li>
     <li><code>label: "ETA"</code> — static label next to the value; <code>two_column: true</code> = value-left / dimmed-label-right grid</li>
+    <li><code>label_value_color: true</code> — paint the value in the entry's resolved icon colour, so one threshold ramp colours both; the label stays neutral</li>
     <li><code>hide: true</code> — hide the sub-button entirely while the entry's conditions match</li>
     </ul>
     <br><b>Card text (target: card)</b><br>
@@ -390,8 +391,18 @@ smart_icons:
       gap: 0 8px;
       width: 100%;
     }
-    .smart-sub-label .metric-value { text-align: left; font-weight: 600; }
-    .smart-sub-label .metric-label { opacity: 0.7; }
+    /* Key and value, one vocabulary wherever they appear: a label built from
+       label_value_js, and Bubble's own "Name · State" restructured by
+       splitLabel. The key is secondary text -- it never changes and is only
+       there to say what the number is -- and the value is primary and semibold.
+       A ramp may repaint the value via label_value_color; the key stays neutral
+       so the colour means the reading, not the row. */
+    .metric-value {
+      text-align: left;
+      font-weight: 600;
+      color: var(--primary-text-color);
+    }
+    .metric-label { color: var(--secondary-text-color); }
     .smart-icon-text {
       position: absolute;
       inset: 0;
@@ -493,8 +504,8 @@ smart_icons:
         const config = this.config["smart_icons"];
         if (!config) return '';
 
-        if (!window._smartIcons || window._smartIcons.version !== '1.11.3') {
-          const SI = { version: '1.11.3', hass: null };
+        if (!window._smartIcons || window._smartIcons.version !== '1.11.4') {
+          const SI = { version: '1.11.4', hass: null };
 
           const thresholdCache = new WeakMap();
           SI.helpers = {
@@ -1373,11 +1384,11 @@ smart_icons:
             }
           };
 
-          SI.renderLabel = (nameContainer, label, twoColumn, flash, animate) => {
+          SI.renderLabel = (nameContainer, label, twoColumn, flash, animate, valueColor) => {
             const v = label.value || '', l = label.label || '';
             const prevVal = nameContainer.dataset.smartTweenVal;
             nameContainer.dataset.smartTweenVal = v;
-            const sig = `${twoColumn ? '2' : '1'}|${v}|${l}`;
+            const sig = `${twoColumn ? '2' : '1'}|${v}|${l}|${valueColor || ''}`;
             if (nameContainer.dataset.smartLabel === sig && nameContainer.querySelector('.smart-sub-label')) return;
             const changed = nameContainer.dataset.smartFlashSig !== undefined &&
                             nameContainer.dataset.smartFlashSig !== sig;
@@ -1387,24 +1398,40 @@ smart_icons:
             const span = document.createElement('span');
             span.className = 'smart-sub-label';
             if (flash && changed) span.classList.add('smart-flash');
-            if (twoColumn) {
-              if (v) {
-                const ve = document.createElement('span');
-                ve.className = 'metric-value';
-                ve.textContent = v;
-                if (animate && changed && prevVal) SI.tweenText(ve, prevVal, v);
-                span.appendChild(ve);
-              }
-              if (l) {
-                const le = document.createElement('span');
-                le.className = 'metric-label';
-                le.textContent = l;
-                span.appendChild(le);
-              }
-            } else {
-              span.textContent = l ? (v ? `${l} · ${v}` : l) : v;
-              if (animate && changed && prevVal && !l) SI.tweenText(span, prevVal, v);
-            }
+            const part = (cls, text) => {
+              const e = document.createElement('span');
+              e.className = cls;
+              e.textContent = text;
+              return e;
+            };
+            const ve = v ? part('metric-value', v) : null;
+            const le = l ? part('metric-label', twoColumn || !v ? l : `${l} · `) : null;
+            if (ve && valueColor) ve.style.color = valueColor;
+            if (ve && animate && changed && prevVal) SI.tweenText(ve, prevVal, v);
+            span.replaceChildren(...(twoColumn ? [ve, le] : [le, ve]).filter(Boolean));
+            nameContainer.replaceChildren(span);
+          };
+
+          SI.splitLabel = (nameContainer, valueColor) => {
+            const text = (nameContainer.textContent || '').trim();
+            if (!text) return;
+            const sig = `${text}|${valueColor || ''}`;
+            if (nameContainer.dataset.smartSplit === sig &&
+                nameContainer.querySelector('.smart-sub-split')) return;
+            nameContainer.dataset.smartSplit = sig;
+            const at = text.indexOf(' · ');
+            const span = document.createElement('span');
+            span.className = 'smart-sub-split';
+            const part = (cls, t) => {
+              const e = document.createElement('span');
+              e.className = cls;
+              e.textContent = t;
+              return e;
+            };
+            if (at > 0) span.appendChild(part('metric-label', text.slice(0, at + 3)));
+            const ve = part('metric-value', at > 0 ? text.slice(at + 3) : text);
+            if (valueColor) ve.style.color = valueColor;
+            span.appendChild(ve);
             nameContainer.replaceChildren(span);
           };
 
@@ -1704,10 +1731,11 @@ smart_icons:
           } else {
             const idx = parseInt(iconConfig.target.split('_')[1]);
             const container = getSubContainer(idx);
-            if (resolved.icon && subButtonIcon && subButtonIcon[idx - 1] && subButtonIcon[idx - 1].icon !== resolved.icon) {
-              subButtonIcon[idx - 1].icon = resolved.icon;
-            }
             if (container) {
+              const subIcon = container.querySelector('.bubble-sub-button-icon');
+              if (resolved.icon && subIcon && subIcon.icon !== resolved.icon) {
+                subIcon.icon = resolved.icon;
+              }
               const sb = `.bubble-sub-button-${idx}`;
               if (iconConfig.hide) {
                 iconStyles.push(`${sb} { display: none !important; }`);
@@ -1782,8 +1810,14 @@ smart_icons:
               }
               SI.applyText(container, resolved.text ?? null, resolved.iconColor, false, iconConfig.flash_on_change, iconConfig.animate_value);
               const nameContainer = container.querySelector('.bubble-sub-button-name-container');
-              if (nameContainer && resolved.label) {
-                SI.renderLabel(nameContainer, resolved.label, iconConfig.two_column, iconConfig.flash_on_change, iconConfig.animate_value);
+              if (nameContainer) {
+                const valueColor = iconConfig.label_value_color ? resolved.iconColor : undefined;
+                if (resolved.label) {
+                  SI.renderLabel(nameContainer, resolved.label, iconConfig.two_column,
+                    iconConfig.flash_on_change, iconConfig.animate_value, valueColor);
+                } else {
+                  SI.splitLabel(nameContainer, valueColor);
+                }
               }
             }
           }
@@ -2040,7 +2074,7 @@ smart_icons:
       function decorate(editor) {
       if (!Array.isArray(editor)) return editor;
 
-      const GROUPS = {"icons":{"conditions":"Visibility","condition_js":"Visibility","hide":"Visibility","icon":"Icon","icon_js":"Icon","icon_map":"Icon","icon_thresholds":"Icon","icon_color":"Icon color","icon_color_js":"Icon color","icon_color_map":"Icon color","icon_color_thresholds":"Icon color","icon_opacity":"Opacity / transform / filter","icon_opacity_js":"Opacity / transform / filter","icon_opacity_map":"Opacity / transform / filter","icon_opacity_thresholds":"Opacity / transform / filter","rotate":"Opacity / transform / filter","rotate_js":"Opacity / transform / filter","filter":"Opacity / transform / filter","filter_js":"Opacity / transform / filter","filter_map":"Opacity / transform / filter","filter_thresholds":"Opacity / transform / filter","background_color":"Background","background_color_js":"Background","background_color_map":"Background","background_color_thresholds":"Background","background_opacity":"Background","background_opacity_js":"Background","auto_contrast":"Background","text":"Text as icon + value formatting","text_js":"Text as icon + value formatting","text_map":"Text as icon + value formatting","text_thresholds":"Text as icon + value formatting","attribute":"Text as icon + value formatting","decimals":"Text as icon + value formatting","format":"Text as icon + value formatting","multiply":"Text as icon + value formatting","prefix":"Text as icon + value formatting","suffix":"Text as icon + value formatting","pair_attribute":"Text as icon + value formatting","animate_value":"Text as icon + value formatting","flash_on_change":"Text as icon + value formatting","label_value":"Sub-button value/label","label_value_js":"Sub-button value/label","label_attribute":"Sub-button value/label","label":"Sub-button value/label","two_column":"Sub-button value/label","card_name":"Card text (target: card)","card_name_js":"Card text (target: card)","card_name_map":"Card text (target: card)","card_name_thresholds":"Card text (target: card)","card_state":"Card text (target: card)","card_state_js":"Card text (target: card)","card_state_map":"Card text (target: card)","card_state_thresholds":"Card text (target: card)","card_state_parts":"Card text (target: card)","card_state_format":"Card text (target: card)","card_state_separator":"Card text (target: card)","text_color":"Card text (target: card)","text_color_js":"Card text (target: card)","text_color_map":"Card text (target: card)","text_color_thresholds":"Card text (target: card)","border_color":"Card styling (target: card)","border_color_js":"Card styling (target: card)","glow_color":"Card styling (target: card)","glow_color_js":"Card styling (target: card)","accent_color":"Card styling (target: card)","accent_color_js":"Card styling (target: card)","accent_color_map":"Card styling (target: card)","accent_color_thresholds":"Card styling (target: card)","accent_side":"Card styling (target: card)","accent_width":"Card styling (target: card)","background_image":"Card styling (target: card)","background_image_js":"Card styling (target: card)","background_blur":"Card styling (target: card)","background_dim":"Card styling (target: card)","progress":"Progress (ring / bar / fill)","progress_js":"Progress (ring / bar / fill)","progress_style":"Progress (ring / bar / fill)","progress_min":"Progress (ring / bar / fill)","progress_max":"Progress (ring / bar / fill)","progress_direction":"Progress (ring / bar / fill)","progress_thickness":"Progress (ring / bar / fill)","progress_color":"Progress (ring / bar / fill)","progress_color_stops":"Progress (ring / bar / fill)","progress_color_js":"Progress (ring / bar / fill)","progress_track_color":"Progress (ring / bar / fill)","sparkline":"Sparkline","sparkline_entity":"Sparkline","sparkline_hours":"Sparkline","sparkline_refresh":"Sparkline","sparkline_style":"Sparkline","sparkline_agg":"Sparkline","sparkline_smooth":"Sparkline","sparkline_color":"Sparkline","sparkline_height":"Sparkline","sparkline_scale":"Sparkline","sparkline_min":"Sparkline","sparkline_max":"Sparkline","sparkline_opacity":"Sparkline","effect":"Animation","effect_js":"Animation","effect_map":"Animation","effect_thresholds":"Animation","effect_speed":"Animation","effect_speed_js":"Animation","effect_target":"Animation","effect_target_js":"Animation","animation":"Animation","animation_js":"Animation","stale_after":"Freshness / availability","unavailable_style":"Freshness / availability","title":"Advanced","title_js":"Advanced","css":"Advanced","css_js":"Advanced"},"badges":{"conditions":"Visibility","condition_js":"Visibility","icon":"Content + value formatting","icon_js":"Content + value formatting","icon_map":"Content + value formatting","icon_thresholds":"Content + value formatting","text_js":"Content + value formatting","text_map":"Content + value formatting","text_thresholds":"Content + value formatting","show_entity_picture":"Content + value formatting","decimals":"Content + value formatting","format":"Content + value formatting","multiply":"Content + value formatting","prefix":"Content + value formatting","suffix":"Content + value formatting","animate_value":"Content + value formatting","flash_on_change":"Content + value formatting","position":"Placement & shape","position_js":"Placement & shape","shape":"Placement & shape","shape_js":"Placement & shape","scale":"Placement & shape","scale_js":"Placement & shape","font_scale":"Placement & shape","font_scale_js":"Placement & shape","h_offset":"Placement & shape","h_offset_js":"Placement & shape","v_offset":"Placement & shape","v_offset_js":"Placement & shape","background_color":"Colors","background_color_js":"Colors","background_color_map":"Colors","background_color_thresholds":"Colors","text_color":"Colors","text_color_js":"Colors","auto_contrast":"Colors","show_background":"Colors","tap_action":"Actions","hold_action":"Actions","effect":"Animation","effect_js":"Animation","effect_speed":"Animation","effect_speed_js":"Animation","glow_color":"Animation","glow_color_js":"Animation","animation":"Animation","animation_js":"Animation","title":"Advanced","title_js":"Advanced"}};
+      const GROUPS = {"icons":{"conditions":"Visibility","condition_js":"Visibility","hide":"Visibility","icon":"Icon","icon_js":"Icon","icon_map":"Icon","icon_thresholds":"Icon","icon_color":"Icon color","icon_color_js":"Icon color","icon_color_map":"Icon color","icon_color_thresholds":"Icon color","icon_opacity":"Opacity / transform / filter","icon_opacity_js":"Opacity / transform / filter","icon_opacity_map":"Opacity / transform / filter","icon_opacity_thresholds":"Opacity / transform / filter","rotate":"Opacity / transform / filter","rotate_js":"Opacity / transform / filter","filter":"Opacity / transform / filter","filter_js":"Opacity / transform / filter","filter_map":"Opacity / transform / filter","filter_thresholds":"Opacity / transform / filter","background_color":"Background","background_color_js":"Background","background_color_map":"Background","background_color_thresholds":"Background","background_opacity":"Background","background_opacity_js":"Background","auto_contrast":"Background","text":"Text as icon + value formatting","text_js":"Text as icon + value formatting","text_map":"Text as icon + value formatting","text_thresholds":"Text as icon + value formatting","attribute":"Text as icon + value formatting","decimals":"Text as icon + value formatting","format":"Text as icon + value formatting","multiply":"Text as icon + value formatting","prefix":"Text as icon + value formatting","suffix":"Text as icon + value formatting","pair_attribute":"Text as icon + value formatting","animate_value":"Text as icon + value formatting","flash_on_change":"Text as icon + value formatting","label_value":"Sub-button value/label","label_value_js":"Sub-button value/label","label_attribute":"Sub-button value/label","label":"Sub-button value/label","two_column":"Sub-button value/label","label_value_color":"Sub-button value/label","card_name":"Card text (target: card)","card_name_js":"Card text (target: card)","card_name_map":"Card text (target: card)","card_name_thresholds":"Card text (target: card)","card_state":"Card text (target: card)","card_state_js":"Card text (target: card)","card_state_map":"Card text (target: card)","card_state_thresholds":"Card text (target: card)","card_state_parts":"Card text (target: card)","card_state_format":"Card text (target: card)","card_state_separator":"Card text (target: card)","text_color":"Card text (target: card)","text_color_js":"Card text (target: card)","text_color_map":"Card text (target: card)","text_color_thresholds":"Card text (target: card)","border_color":"Card styling (target: card)","border_color_js":"Card styling (target: card)","glow_color":"Card styling (target: card)","glow_color_js":"Card styling (target: card)","accent_color":"Card styling (target: card)","accent_color_js":"Card styling (target: card)","accent_color_map":"Card styling (target: card)","accent_color_thresholds":"Card styling (target: card)","accent_side":"Card styling (target: card)","accent_width":"Card styling (target: card)","background_image":"Card styling (target: card)","background_image_js":"Card styling (target: card)","background_blur":"Card styling (target: card)","background_dim":"Card styling (target: card)","progress":"Progress (ring / bar / fill)","progress_js":"Progress (ring / bar / fill)","progress_style":"Progress (ring / bar / fill)","progress_min":"Progress (ring / bar / fill)","progress_max":"Progress (ring / bar / fill)","progress_direction":"Progress (ring / bar / fill)","progress_thickness":"Progress (ring / bar / fill)","progress_color":"Progress (ring / bar / fill)","progress_color_stops":"Progress (ring / bar / fill)","progress_color_js":"Progress (ring / bar / fill)","progress_track_color":"Progress (ring / bar / fill)","sparkline":"Sparkline","sparkline_entity":"Sparkline","sparkline_hours":"Sparkline","sparkline_refresh":"Sparkline","sparkline_style":"Sparkline","sparkline_agg":"Sparkline","sparkline_smooth":"Sparkline","sparkline_color":"Sparkline","sparkline_height":"Sparkline","sparkline_scale":"Sparkline","sparkline_min":"Sparkline","sparkline_max":"Sparkline","sparkline_opacity":"Sparkline","effect":"Animation","effect_js":"Animation","effect_map":"Animation","effect_thresholds":"Animation","effect_speed":"Animation","effect_speed_js":"Animation","effect_target":"Animation","effect_target_js":"Animation","animation":"Animation","animation_js":"Animation","stale_after":"Freshness / availability","unavailable_style":"Freshness / availability","title":"Advanced","title_js":"Advanced","css":"Advanced","css_js":"Advanced"},"badges":{"conditions":"Visibility","condition_js":"Visibility","icon":"Content + value formatting","icon_js":"Content + value formatting","icon_map":"Content + value formatting","icon_thresholds":"Content + value formatting","text_js":"Content + value formatting","text_map":"Content + value formatting","text_thresholds":"Content + value formatting","show_entity_picture":"Content + value formatting","decimals":"Content + value formatting","format":"Content + value formatting","multiply":"Content + value formatting","prefix":"Content + value formatting","suffix":"Content + value formatting","animate_value":"Content + value formatting","flash_on_change":"Content + value formatting","position":"Placement & shape","position_js":"Placement & shape","shape":"Placement & shape","shape_js":"Placement & shape","scale":"Placement & shape","scale_js":"Placement & shape","font_scale":"Placement & shape","font_scale_js":"Placement & shape","h_offset":"Placement & shape","h_offset_js":"Placement & shape","v_offset":"Placement & shape","v_offset_js":"Placement & shape","background_color":"Colors","background_color_js":"Colors","background_color_map":"Colors","background_color_thresholds":"Colors","text_color":"Colors","text_color_js":"Colors","auto_contrast":"Colors","show_background":"Colors","tap_action":"Actions","hold_action":"Actions","effect":"Animation","effect_js":"Animation","effect_speed":"Animation","effect_speed_js":"Animation","glow_color":"Animation","glow_color_js":"Animation","animation":"Animation","animation_js":"Animation","title":"Advanced","title_js":"Advanced"}};
       const GROUP_ICONS = {
         'Visibility': 'mdi:eye-outline',
         'Icon': 'mdi:shape-outline',
@@ -2603,6 +2637,11 @@ smart_icons:
             two_column:
               label: Two-column value/label
               description: Lay the value (left) and label (right) out as a grid.
+              selector:
+                boolean: {}
+            label_value_color:
+              label: Colour the value
+              description: Paint the value in this entry's resolved icon colour; the label stays neutral.
               selector:
                 boolean: {}
             # ── Card text (target: card) ──

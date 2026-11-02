@@ -1,8 +1,8 @@
 room-card-plus:
   name: Room Card Plus
-  version: v1.2.0
+  version: v1.3.4
   creator: Lucio
-  link: https://github.com/Clooos/Bubble-Card/discussions/1919
+  link: https://github.com/Clooos/Bubble-Card/discussions/2113
   supported:
     - button
   description: |
@@ -26,8 +26,9 @@ room-card-plus:
           }
 
           .bubble-background,
+          .large .bubble-button-card,
           .large .bubble-container {
-            border-radius: ${(this.config["room-card-plus"]?.card_radius ?? 22) + 'px'};
+            border-radius: ${(this.config["room-card-plus"]?.card_radius ?? 22) + 'px'} !important;
           }
 
           .large .bubble-container { overflow: clip; }
@@ -82,6 +83,8 @@ room-card-plus:
 
           .bubble-state {
             grid-area: s;
+
+            ${(this.config["room-card-plus"]?.state_entities?.length ? "display: flex !important; align-items: center;" : "")}
             font-weight: 700;
             font-size: ${(this.config["room-card-plus"]?.state_size_em ?? 0.95)}em !important;
             line-height: 1.1;
@@ -116,11 +119,23 @@ room-card-plus:
             display: inline-block;
           }
 
+          /* Bubble wraps sub-buttons in .bubble-sub-button-group (user groups, and an automatic group whenever bottom
+
+             sub-buttons exist). Flatten them so this module's column layout places every button (#8, drawer). */
+
+          .bubble-sub-button-container .bubble-sub-button-group {
+
+            display: contents !important;
+
+          }
+
+
           /* ===== Sub-button container (standard, non-footer mode) ===== */
           .bubble-sub-button-container {
             grid-area: b;
 
             --slim-sb-size: ${(this.config["room-card-plus"]?.sub_button_size ?? 40) + 'px'};
+        --slim-sb-width: ${(this.config["room-card-plus"]?.sub_button_width ?? this.config["room-card-plus"]?.sub_button_size ?? 40) + 'px'};
             --slim-sb-gap: ${(this.config["room-card-plus"]?.sub_button_gap ?? 10) + 'px'};
             --slim-sb-radius: ${(this.config["room-card-plus"]?.sub_button_radius ?? 30) + 'px'};
             --slim-sb-per-col: ${(this.config["room-card-plus"]?.sub_buttons_per_column ?? 3)};
@@ -130,7 +145,7 @@ room-card-plus:
             display: grid !important;
             grid-auto-flow: column !important;
             grid-template-rows: repeat(var(--slim-sb-per-col), var(--slim-sb-size)) !important;
-            grid-auto-columns: var(--slim-sb-size) !important;
+            grid-auto-columns: var(--slim-sb-width) !important;
 
             row-gap: var(--slim-sb-gap) !important;
             column-gap: var(--slim-sb-col-gap) !important;
@@ -153,8 +168,10 @@ room-card-plus:
 
           .bubble-sub-button {
             height: var(--slim-sb-size) !important;
-            width: var(--slim-sb-size) !important;
-            min-width: var(--slim-sb-size) !important;
+            width: var(--slim-sb-width) !important;
+            min-width: var(--slim-sb-width) !important;
+            max-width: var(--slim-sb-width) !important;
+            box-sizing: border-box !important;
             border-radius: var(--slim-sb-radius) !important;
             display: flex !important;
             align-items: center;
@@ -163,6 +180,34 @@ room-card-plus:
 
           .bubble-sub-button.hidden {
             display: none !important;
+          }
+
+          /* Inline slider sub-buttons (always_visible): keep them inside the sub-button cell so they never overflow the card.
+
+             Give them room with sub_button_width (pills). */
+
+          .bubble-sub-button-container .bubble-sub-slider-wrapper.inline {
+
+            width: var(--slim-sb-width) !important;
+
+            max-width: var(--slim-sb-width) !important;
+
+            height: var(--slim-sb-size) !important;
+
+            overflow: hidden !important;
+
+            border-radius: var(--slim-sb-radius) !important;
+
+          }
+
+          .bubble-sub-button-container .bubble-sub-slider-wrapper.inline .bubble-sub-button-slider {
+
+            min-width: 0 !important;
+
+            width: 100% !important;
+
+            height: 100% !important;
+
           }
 
           /* Optional on/off color overrides for main (top) sub-buttons */
@@ -202,13 +247,21 @@ room-card-plus:
               const br = this.config["room-card-plus"]?.icon_radius_br;
               const bl = this.config["room-card-plus"]?.icon_radius_bl;
 
-              const hasCustom = tl !== undefined || tr !== undefined || br !== undefined || bl !== undefined;
-              if (hasCustom) return `${(tl ?? 0)}px ${(tr ?? 0)}px ${(br ?? 0)}px ${(bl ?? 0)}px`;
-
-              if (s === 'square') return `0px`;
-              if (s === 'rounded') return `${r}px`;
-              return `0px ${r}px 0px ${r}px`;
+              /* Per-corner values override only their own corner; unset corners keep the corner style */
+              const base = s === 'circle' ? ['50%','50%','50%','50%']
+                : s === 'square' ? [0,0,0,0]
+                : s === 'rounded' ? [r,r,r,r]
+                : [0,r,0,r];
+              const px = v => (String(v).trim() !== '' && !isNaN(Number(v))) ? v + 'px' : v;
+              return [tl,tr,br,bl].map((v,i) => (v === undefined || v === null || v === '') ? px(base[i]) : px(v)).join(' ');
             })()} !important;
+          }
+
+          /* Bubble Card paints a 20% overlay (::before) on the icon block and sub-buttons with its own
+             fixed radius; make it follow the shape we set so corners never show a notch */
+          .bubble-icon-container::before,
+          .bubble-sub-button::before {
+            border-radius: inherit !important;
           }
 
           .bubble-icon {
@@ -222,7 +275,46 @@ room-card-plus:
             transform: translate(${(this.config["room-card-plus"]?.icon_offset_x ?? 0) + 'px'}, ${(this.config["room-card-plus"]?.icon_offset_y ?? 0) + 'px'});
           }
 
-          /* ===== FOOTER DRAWER STYLES ===== */
+          ${this.config["room-card-plus"]?.icon_corner_style === 'circle' ? `
+      /* Circle preset: a true circle (height follows width) with the icon centred; icon_offset_x/y still nudge it */
+      .bubble-icon-container {
+        height: ${(this.config["room-card-plus"]?.icon_width ?? 100) + 'px'} !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      .bubble-icon-container .bubble-main-icon { margin: 0 !important; position: relative !important; inset: auto !important; }
+      ` : ''}
+
+      ${this.config["room-card-plus"]?.state_two_lines ? `
+      /* Entity states stacked one per line */
+      .bubble-state {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        white-space: normal !important;
+        gap: 2px;
+      }
+      .bubble-state .room-card-plus-state-sep { display: none !important; }
+      .bubble-state > span[style*="inline-block"]:not([class]) { display: none !important; }
+      ` : ''}
+
+      ${this.config["room-card-plus"]?.title_wrap ? `
+      /* Long titles wrap onto two lines instead of scrolling or being cut */
+      .bubble-name-container, .bubble-name-container .bubble-name {
+        white-space: normal !important;
+        overflow: hidden !important;
+        display: -webkit-box !important;
+        -webkit-box-orient: vertical !important;
+        -webkit-line-clamp: 2 !important;
+        line-clamp: 2;
+        word-break: break-word;
+      }
+      .bubble-name-container .scrolling-container { animation: none !important; white-space: normal !important; }
+      .bubble-name-container .scrolling-container > *:not(:first-child) { display: none !important; }
+      ` : ''}
+
+      /* ===== FOOTER DRAWER STYLES ===== */
 
           /* Allow drawer to overflow below the card */
           .bubble-container.rcp-footer-overflow {
@@ -241,9 +333,17 @@ room-card-plus:
             border-bottom-right-radius: 0 !important;
           }
 
-          .rcp-drawer-elevated .bubble-background {
+          /* The wrapper clips the icon, so it must square off too or the icon keeps a rounded bite */
+          .rcp-drawer-elevated .bubble-background,
+          .bubble-container.rcp-footer-overflow.rcp-drawer-elevated .bubble-button-card,
+          .large .bubble-container.rcp-drawer-elevated .bubble-button-card {
             border-bottom-left-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
+          }
+
+          /* ...and the icon block meets the open drawer flush, without its own rounded bottom-left */
+          .bubble-container.rcp-footer-overflow.rcp-drawer-elevated .bubble-icon-container {
+            border-bottom-left-radius: 0 !important;
           }
 
           /* Clip the card wrapper so the icon doesn't bleed outside the card,
@@ -262,7 +362,7 @@ room-card-plus:
            * entire card layout (baseline alignment, flex wrapping, content container).
            * We must forcefully revert ALL of these side-effects.
            */
-          ${this.config["room-card-plus"]?.footer_enabled ? `
+          ${(this.config["room-card-plus"]?.footer_enabled ?? ((this.config.sub_button?.bottom || []).length > 0)) ? `
           .bubble-sub-button-bottom-container {
             display: none !important;
             position: absolute !important;
@@ -402,7 +502,7 @@ room-card-plus:
             -webkit-backdrop-filter: blur(16px);
             border-radius: 0 0 ${(this.config["room-card-plus"]?.footer_drawer_radius ?? 22)}px ${(this.config["room-card-plus"]?.footer_drawer_radius ?? 22)}px;
             padding: 12px 12px 16px 12px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            box-shadow: ${this.config["room-card-plus"]?.footer_drawer_shadow ?? "0 4px 24px rgba(0,0,0,0.25)"};
             transform: translateY(-100%);
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: transform;
@@ -438,13 +538,13 @@ room-card-plus:
           .rcp-footer-drawer-grid .bubble-sub-button {
             height: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
             width: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
-            min-width: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
+            min-width: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important; max-width: ${(this.config["room-card-plus"]?.footer_button_size ?? 46)}px !important;
             border-radius: ${(this.config["room-card-plus"]?.footer_button_radius ?? 30)}px !important;
           }
 
           /* Configurable on/off colors for footer (bottom) sub-buttons */
           .rcp-footer-drawer-grid .bubble-sub-button.background-off {
-            background-color: ${this.config["room-card-plus"]?.footer_sb_off_color ?? '#1c1111'} !important;
+            background-color: ${this.config["room-card-plus"]?.footer_sb_off_color ?? 'rgba(255,255,255,0.07)'} !important;
           }
           ${this.config["room-card-plus"]?.footer_sb_on_color ? `
           .rcp-footer-drawer-grid .bubble-sub-button.background-on {
@@ -678,7 +778,7 @@ room-card-plus:
                   const ent = this.config?.entity;
                   const st = ent ? hass.states?.[ent]?.state : null;
                   const isOff = (st === 'off' || st === 'unavailable' || st === 'unknown');
-                  bgFinal = isOff ? applyOpacity(bgBase, alpha) : bgBase;
+                  bgFinal = (isOff && !bgRuleRaw) ? applyOpacity(bgBase, alpha) : bgBase;
                 }
 
                 currentIconState = { icon: finalIcon, color: ruleColor, anim: ruleAnim, size, bg: bgFinal };
@@ -706,6 +806,37 @@ room-card-plus:
                 obs.observe(iconBgEl, { childList: true, subtree: true, attributes: true, attributeFilter: ['icon', 'style'] });
                 mc.observer = obs;
               }
+
+              /* Sub-button icon animations: sub_button_animation_rules [{button (1-based), condition, animation, duration}] */
+
+              try {
+
+                const sbRules = toRulesArray(cfg.sub_button_animation_rules);
+
+                if (sbRules.length || this._rcp_sb_anim) {
+
+                  const want = {};
+
+                  sbRules.forEach(r => { const n = Number(r?.button); if (!n || want[n] !== undefined) return; if (checkAllConditions(r.condition)) want[n] = animToCss(r.animation, r.duration); });
+
+                  card.querySelectorAll('.bubble-sub-button').forEach(b => {
+
+                    const k = [...b.classList].find(c => /^bubble-sub-button-\d+$/.test(c)); if (!k) return;
+
+                    const ic = b.querySelector('ha-icon'); if (!ic) return;
+
+                    const a = want[Number(k.split('-').pop())] || '';
+
+                    if (a) { if (ic.style.animation !== a) ic.style.setProperty('animation', a); } else if (ic.style.animation) ic.style.removeProperty('animation');
+
+                  });
+
+                  this._rcp_sb_anim = sbRules.length > 0;
+
+                }
+
+              } catch (e) { console.error('[room-card-plus] sub-button animation error:', e); }
+
 
               /* =============================
                  STATE ENTITIES
@@ -866,7 +997,7 @@ room-card-plus:
                 return def;
               };
 
-              const footerEnabled = boolVal(cfg.footer_enabled, false);
+              const footerEnabled = boolVal(cfg.footer_enabled, ((this.config.sub_button?.bottom || []).length > 0));
 
               this._rcp_footer ??= {
                 initialized: false,
@@ -1176,6 +1307,14 @@ room-card-plus:
               min: 0
               max: 24
               step: 1
+        - name: title_wrap
+          label: "Wrap long titles onto two lines"
+          selector:
+            boolean: {}
+        - name: state_two_lines
+          label: "Show entity states one per line"
+          selector:
+            boolean: {}
         - name: state_separator
           label: Separator between states (e.g. · or |, leave empty for none)
           selector:
@@ -1391,6 +1530,8 @@ room-card-plus:
                   value: rounded
                 - label: Square
                   value: square
+                - label: Circle (icon centred)
+                  value: circle
         - name: icon_radius
           label: Corner radius (px)
           default: 32
@@ -1614,7 +1755,7 @@ room-card-plus:
       schema:
         - name: sub_button_size
           label: Sub-button size (px)
-          default: 32
+          default: 40
           selector:
             number:
               min: 28
@@ -1628,6 +1769,10 @@ room-card-plus:
               min: 0
               max: 24
               step: 1
+        - name: sub_button_width
+          label: "Sub-button width (px) - wider than the size makes pills; also keeps slider sub-buttons inside the card"
+          selector:
+            number: {min: 20, max: 200, step: 1, mode: box}
         - name: sub_button_radius
           label: Sub-button radius (px)
           default: 30
@@ -1660,6 +1805,29 @@ room-card-plus:
               min: 0
               max: 30
               step: 1
+        - name: sub_button_animation_rules
+          label: "Sub-button icon animations (optional)"
+          selector:
+            object:
+              multiple: true
+              fields:
+                button:
+                  label: "Sub-button number (1 = first)"
+                  selector:
+                    number: {min: 1, max: 20, step: 1, mode: box}
+                condition:
+                  label: "Condition (optional)"
+                  selector:
+                    condition: {}
+                animation:
+                  label: Animation
+                  selector:
+                    select:
+                      options: [pulse, ping, spin, bounce, none]
+                duration:
+                  label: "Duration (s)"
+                  selector:
+                    number: {min: 0.2, max: 10, step: 0.1, mode: box}
         - name: main_sb_off_color
           label: Off background color override (hex/css)
           selector:
@@ -1706,7 +1874,7 @@ room-card-plus:
               step: 1
         - name: footer_sb_off_color
           label: Off background color
-          default: '#1c1111'
+          default: 'rgba(255,255,255,0.07)'
           selector:
             text: {}
         - name: footer_sb_on_color
@@ -1718,10 +1886,13 @@ room-card-plus:
       icon: mdi:arrow-collapse-up
       schema:
         - name: footer_enabled
-          label: Enable footer drawer
-          default: false
+          label: "Enable footer drawer (on by default when the card has bottom sub-buttons)"
           selector:
             boolean: {}
+        - name: footer_drawer_shadow
+          label: "Drawer shadow (CSS box-shadow; use none on light themes)"
+          selector:
+            text: {}
         - name: footer_handle_icon
           label: Handle icon
           default: mdi:menu
