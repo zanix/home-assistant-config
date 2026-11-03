@@ -697,7 +697,6 @@ Material Design 3 Theme for Home Assistant
 ### Lighting
 
 - [Aeotec Nano Dimmer](https://www.amazon.com/dp/B06XC4CH98) - Hard-wired into lamps with local control using a momentary switch on the metal frame of a lamp
-
 - [Govee Smart LED Floor Lamp](https://www.amazon.com/dp/B097T5YFZ3) - Nice white light (2200K-6500K) adjustable lamp
 - [Honeywell 39348/ZW4005 Switch](https://www.amazon.com/Honeywell-Interchangeable-Repeater-Extender-Required/dp/B07B3LY1SJ)
 - [Inovelli LZW30 Black Series On/Off Switch](https://support.inovelli.com/portal/en/kb/articles/products-switches-on-off-lzw30-spec-sheet)
@@ -709,6 +708,7 @@ Material Design 3 Theme for Home Assistant
 - [Tuya Star Projector](https://solution.tuya.com/projects/CMamw6tl7mwgzm) - Light and laser projector, [hacked](https://github.com/seberm/esphome-SK20-Nebula-Light/tree/master) with [Tuya Cloudcutter](https://github.com/tuya-cloudcutter/tuya-cloudcutter)
 - [WLED](https://github.com/Aircoookie/WLED) - DIY light strip
 - [Zooz ZEN71 On-Off Switch](https://www.getzooz.com/zooz-zen71-on-off-switch/)
+- [Zooz ZEN75 Heavy Duty Wall Switch](https://www.getzooz.com/zen75-heavy-duty-wall-switch/)
 
 ### Sensor
 
@@ -717,16 +717,18 @@ Material Design 3 Theme for Home Assistant
 - [Aqara Water Leak Sensor](https://www.amazon.com/dp/B07D39MSZS) - Detect water leaks
 - [Dome Water Leak Sensor](https://www.amazon.com/dp/B01LXR0B8Q) - Detect water leaks
 - [Emporia Vue 3](https://www.amazon.com/gp/product/B0C79PNK84) - Real Time Electricity Monitor/Meter
-  flashed for local data with [custom firmware](https://github.com/emporia-vue-local/esphome)
+  flashed for local data with [custom firmware](https://github.com/emporia-vue-local/esphome) for local monitoring
 - [ESPHome](https://esphome.io) - DIY devices
 - [THIRDREALITY Zigbee Motion Sensor](https://www.amazon.com/dp/B09MVKWBFF)
 - [THIRDREALITY Zigbee Temperature and Humidity Sensor](https://www.amazon.com/dp/B0BF9W3WMK)
 - [THIRDREALITY Zigbee Temperature and Humidity Sensor Lite](https://www.amazon.com/dp/B0D2NVJTS3)
+- [Tiny Zigbee3.0 Door/Window Sensor Contact Sensor](https://www.amazon.com/dp/B0GYCNQ9WJ)
 - [Zooz Z-Wave Long Range Q Sensor ZSE11](https://www.amazon.com/dp/B09GDL6BGY)
 
 ### Switch
 
 - [IKEA E1524/E1810 5-Button Remote Control](https://www.amazon.com/dp/B07KM1YZWW)
+- [Martin Jerry Switch for Bathroom Fan](https://www.amazon.com/dp/B0C7L49BXL) - Smart Humidity Sensor Switch, tasmota with ESP8285
 - [Philips Hue Dimmer Remote 324131092621](https://www.amazon.com/dp/B0167Z0P3I)
 - [SONOFF S31 Lite 15A Zigbee Smart Plug](https://www.amazon.com/dp/B08Y87WD1X) - Smart plug
 - [Tasmota](https://tasmota.github.io/docs/) - Flashed devices
@@ -748,9 +750,9 @@ Material Design 3 Theme for Home Assistant
 - [Nintendo Switch](https://www.amazon.com/dp/B0BFJWCYTL)
 - [nVidia Shield](https://www.nvidia.com/en-us/shield/) (2015, 2017, and 2019 versions)
 - [PlayStation 4 Pro](https://www.amazon.com/dp/B07K14XKZH)
-- [Plex](https://plex.tv)
+- [Jellyfin](https://jellyfin.org)
 - [Samsung HW-Q990C 11.1.4ch Soundbar](https://www.amazon.com/dp/B0BZK3SRR7)
-- [Vizio P-Series Quantum](https://www.vizio.com/en/tv/p-series-quantum)
+- [TCL 75Q51K](https://www.walmart.com/ip/TCL-75-Q-Series-QLED-4K-UHD-HDR-Smart-Google-TV-New-2025-Dolby-Vision-Dolby-Atmos-Motion-Rate-240-HDR-10-Auto-Game-Mode-75Q51K/14527123904)
 - [Vizio P-Series Quantum X](https://www.vizio.com/en/tv/p-series-quantum-x)
 
 ### Network
