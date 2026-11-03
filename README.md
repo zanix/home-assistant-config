@@ -323,7 +323,7 @@ Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.4.0]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.4.1]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -375,7 +375,7 @@ Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.15.0]
+### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.16.0]
 
 Home Assistant Google Home custom component
 
@@ -417,17 +417,11 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.20.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.21.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
 Authors: [@fuatakgun](https://github.com/fuatakgun).
-
-### [Lubelogger](https://github.com/hollowpnt92/lubelogger-ha) [v1.0.14]
-
-hacs integration for lube logger
-
-Authors: [@hollowpnt92](https://github.com/hollowpnt92).
 
 ### [Mail And Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages) [v0.6.9]
 
@@ -615,10 +609,6 @@ Minimalistic media card for Home Assistant Lovelace UI
 
 Build a beautiful Home Assistant dashboard easily
 
-### [Nested Lovelace Card](https://github.com/Liquidmasl/nested-lovelace-card) [v1.0.6]
-
-📐 Home Assistant Card: Group multiple cards into a single sleek card.
-
 ### [Opensprinkler Card](https://github.com/rianadon/opensprinkler-card) [v1.13]
 
 Home Assistant card for collecting OpenSprinkler status
@@ -662,6 +652,10 @@ This custom card allows you to display vehicle information in your Home Assistan
 ### [Uptime Card](https://github.com/dylandoamaral/uptime-card) [v0.16.0]
 
 Minimalistic uptime card for Home Assistant Lovelace UI
+
+### [Vertical Stack In Card](https://github.com/ofekashery/vertical-stack-in-card) [v1.1.4]
+
+📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
 ### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.7.0]
 
