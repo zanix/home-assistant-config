@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5687 |
-| Sensors        | 1911 |
-| Binary Sensors | 505 |
+| All Entities   | 5654 |
+| Sensors        | 1906 |
+| Binary Sensors | 502 |
 | Lights         | 81 |
-| Switches       | 826 |
+| Switches       | 823 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -307,13 +307,13 @@ A Home Assistant Integration for Bambu Lab Printers
 
 Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://github.com/AdrianGarside).
 
-### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.7.2]
+### [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) [v3.8.1]
 
 A Home Assistant integration to provide battery details of devices
 
 Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
 
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.17.2]
+### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.18.0]
 
 Automatically update Home Assistant blueprints via native update entities.
 
@@ -341,7 +341,7 @@ Authors: [@ccpk1](https://github.com/ccpk1).
 
 Authors: [@thomasloven](https://github.com/thomasloven).
 
-### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v2.0.2]
+### [Dreame Vacuum](https://github.com/Tasshack/dreame-vacuum) [v2.0.3]
 
 Home Assistant integration for Dreame robot vacuums with map support
 
@@ -371,7 +371,7 @@ Use Jinja and data from Home Assistant to generate your README.md file
 
 Authors: [@ludeeus](https://github.com/ludeeus).
 
-### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.16.0]
+### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.17.0]
 
 Home Assistant Google Home custom component
 
@@ -407,13 +407,13 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.6.2]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.6.3]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.21.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.22.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -425,19 +425,19 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.10.0]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.10.1]
 
 Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.4.3]
+### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.7.0]
 
 Home Assistant cloud-push integration for the Neakasa M1 self-cleaning litter box (real-time MQTT + polling fallback)
 
 Authors: [@roquerodrigo](https://github.com/roquerodrigo).
 
-### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.2.3]
+### [Opensprinkler Integration For Home Assistant](https://github.com/vinteo/hass-opensprinkler) [v2.2.4]
 
 OpenSprinkler Integration for Home Assistant
 
@@ -467,13 +467,13 @@ Control for Tapo cameras as a Home Assistant component
 
 Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
-### [Uix](https://github.com/Lint-Free-Technology/uix) [v8.4.0]
+### [Uix](https://github.com/Lint-Free-Technology/uix) [v9.0.0]
 
 💡 UI eXtension 💡 Add CSS styles to (almost) any part of the Home Assistant UI.
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/tinkerologie/ha-unraid) [v2026.10.5]
+### [UNRAID](https://github.com/tinkerologie/ha-unraid) [v2026.11.1]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
@@ -521,7 +521,7 @@ Customizable Animated Bar card for Home Assistant Lovelace
 
 Battery state card for Home Assistant
 
-### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.4.2]
+### [Bubble Card](https://github.com/Clooos/Bubble-Card) [v3.4.3]
 
 Bubble Card is a minimalist and customizable card collection for Home Assistant, featuring modern pop-ups and an integrated Module Store with over 100 community-made modules.
 
@@ -533,7 +533,7 @@ Bubble Card is a minimalist and customizable card collection for Home Assistant,
 
 🔹A collection of tools for other lovelace plugins to use
 
-### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.11.2]
+### [Custom Features For Home Assistant Cards](https://github.com/Nerwyn/custom-card-features) [v4.11.3]
 
 Home Assistant custom features for tile cards and more. Call any action using buttons, dropdowns, inputs, selectors, sliders, spinboxes, and toggles.
 
@@ -589,7 +589,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Get more control over the placement of lovelace cards.
 
-### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.27]
+### [Material You Utilities   Material Design 3 Color Theme Generation And Component Modification](https://github.com/Nerwyn/material-you-utilities) [v2.1.28]
 
 Material Design 3 Color Theme Generation and Component Modification for Home Assistant
 
