@@ -33,11 +33,11 @@ version of [Home Assistant][home-assistant] running on an Intel NUC5i5MYHE.
 
 | Description    | Value |
 | -------------- | -- |
-| All Entities   | 5654 |
-| Sensors        | 1906 |
-| Binary Sensors | 502 |
+| All Entities   | 5668 |
+| Sensors        | 1911 |
+| Binary Sensors | 508 |
 | Lights         | 81 |
-| Switches       | 823 |
+| Switches       | 826 |
 
 <details><summary>Stock Integrations</summary>
 
@@ -301,7 +301,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.2.26]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.3.0]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -319,7 +319,7 @@ Automatically update Home Assistant blueprints via native update entities.
 
 Authors: [@luuquangvu](https://github.com/luuquangvu).
 
-### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.4.1]
+### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.4.2]
 
 🔹 A Home Assistant integration to turn your browser into a controllable entity and media player
 
@@ -413,7 +413,7 @@ Home Assistant integration for managing Z-Wave enabled locks
 
 Authors: [@FutureTense](https://github.com/FutureTense), [@firstof9](https://github.com/firstof9), [@raman325](https://github.com/raman325), [@tykeal](https://github.com/tykeal).
 
-### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v3.22.0]
+### [Kia Uvo / Hyundai Bluelink](https://github.com/Hyundai-Kia-Connect/kia_uvo) [v4.0.0]
 
 A Home Assistant HACS integration that supports Kia Connect(Uvo) and Hyundai Bluelink. The integration supports the EU, Canada and the USA.
 
@@ -425,13 +425,13 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.10.1]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.11.0]
 
 Fill out your Media Player Entity with MQTT Topics
 
 Authors: [@bkbilly](https://github.com/bkbilly).
 
-### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.7.0]
+### [Neakasa Litterbox](https://github.com/roquerodrigo/ha-neakasa-litterbox) [v1.8.1]
 
 Home Assistant cloud-push integration for the Neakasa M1 self-cleaning litter box (real-time MQTT + polling fallback)
 
@@ -473,7 +473,7 @@ Authors: [@JurajNyiri](https://github.com/JurajNyiri).
 
 Authors: [@Lint-Free-Technology](https://github.com/Lint-Free-Technology).
 
-### [UNRAID](https://github.com/tinkerologie/ha-unraid) [v2026.11.1]
+### [UNRAID](https://github.com/tinkerologie/ha-unraid) [v2026.11.2]
 
 Monitor and control your Unraid server directly from Home Assistant. Track system metrics (CPU, RAM, disk usage), manage VMs and Docker containers, monitor UPS status, and receive real-time alerts. Features automated discovery and an easy-to-use interface for seamless integration with your smart home.
 
@@ -497,7 +497,7 @@ Authors: [@AlexxIT](https://github.com/AlexxIT).
 
 <details><summary>42 Dashboard Plugins</summary>
 
-### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v8.1.0]
+### [Advanced Camera Card](https://github.com/dermotduffy/advanced-camera-card) [v8.2.0]
 
 A comprehensive camera card for Home Assistant
 
@@ -545,7 +545,7 @@ Dreame Vacuum Map Card for Home Assistant Integration
 
 Entity progress card for Home Assistant
 
-### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.3.6]
+### [Expander Card](https://github.com/MelleD/lovelace-expander-card) [v7.3.7]
 
 Expander card for HomeAssistant
 
@@ -617,7 +617,7 @@ Adds highly configurable buttons that use actions and per-state styling.
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.3.7]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.6.0]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
