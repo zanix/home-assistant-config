@@ -1,0 +1,97 @@
+---
+# Board: M5Stack ATOM Lite (M5Stack)
+# https://github.com/htumanyan/navien
+
+substitutions:
+  device_name: navien
+  friendly_name: Navien
+  tx_pin: GPIO6
+  rx_pin: GPIO5
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: false
+  project:
+    name: htumanyan.navien-atoms3-rs485base
+    version: "1.0.0"
+
+esp32:
+  board: m5stack-atoms3
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+api:
+  encryption:
+    key: !secret encryption_key
+
+ota:
+  platform: esphome
+  encryption:
+
+wifi:
+  ssid: !secret wifi_not_ssid
+  password: !secret wifi_not_password
+  fast_connect: true
+  ap:
+    ssid: "AP-${device_name}"
+    password: !secret ap_password
+
+packages:
+  navien_base:
+    url: https://github.com/htumanyan/navien
+    ref: main
+    files: [esphome/packages/navien-base.yaml]
+    refresh: 30s
+
+# LED: green when API connected, off otherwise
+light:
+  - platform: esp32_rmt_led_strip
+    id: atom_led
+    internal: true
+    pin: GPIO35
+    num_leds: 1
+    channel_colors: GRB
+    chipset: WS2812
+  - platform: status_led
+    id: atom_status_led
+    internal: true
+    output: atom_status_output
+
+output:
+  - platform: template
+    id: atom_status_output
+    type: binary
+    write_action:
+      - if:
+          condition:
+            lambda: return state;
+          then:
+            - light.turn_on:
+                id: atom_led
+                red: 0%
+                green: 100%
+                blue: 0%
+                brightness: 80%
+          else:
+            - light.turn_off: atom_led
+
+# Physical button triggers safe-mode flash
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO41
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    id: gpio_button
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      - button.press: safe_mode_button
+
+dashboard_import:
+  package_import_url: github://htumanyan/navien/esphome/packages/navien-esphome-atoms3-lite-rs485base-esp32.yaml@main
+  import_full_config: false

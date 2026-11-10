@@ -67,6 +67,38 @@ views:
                     data:
                       popup_card_id: fireplace
               - type: custom:mushroom-template-badge
+                entity: water_heater.npe_240a2_navien
+                label: "{% if is_state('binary_sensor.npe_240a2_navien_connection_status',\
+                  \ 'off') %}\n  Offline\n{% elif (states('sensor.npe_240a2_navien_error_code')\
+                  \ | int) not in [0, 'none', 'unavailable', 'unknown', ''] %}\n \
+                  \ ERR: {{ states('sensor.npe_240a2_navien_error_code') }}\n{% else\
+                  \ %}\n  {{ states('sensor.npe_240a2_navien_operating_state')[:12]\
+                  \ }}\n{% endif %}"
+                content: "{% if is_state('binary_sensor.npe_240a2_navien_connection_status',\
+                  \ 'off') %}\n  Disconnected\n{% elif (states('sensor.npe_240a2_navien_error_code')\
+                  \ | int) not in [0, 'none', 'unavailable', 'unknown', ''] %}\n \
+                  \ Lvl {{ states('sensor.npe_240a2_navien_error_level') }}\n{% elif\
+                  \ is_state('binary_sensor.npe_240a2_navien_boiler_active', 'on')\
+                  \ %}\n  {{ states('sensor.npe_240a2_navien_inlet_temp') | round\
+                  \ }}° ➔ {{ states('sensor.npe_240a2_navien_outlet_temp') | round\
+                  \ }}°\n{% else %}\n  {{ states('sensor.npe_240a2_navien_outlet_temp')\
+                  \ | round }}°\n{% endif %}"
+                icon: "{% if is_state('binary_sensor.npe_240a2_navien_connection_status',\
+                  \ 'off') %}\n  mdi:wifi-off\n{% elif (states('sensor.npe_240a2_navien_error_code')\
+                  \ | int) not in [0, 'none', 'unavailable', 'unknown', ''] %}\n \
+                  \ mdi:alert-circle\n{% else %}\n  mdi:water-boiler\n{% endif %}"
+                color: "{% if is_state('binary_sensor.npe_240a2_navien_connection_status',\
+                  \ 'off') or (states('sensor.npe_240a2_navien_error_code') | int)\
+                  \ not in [0, 'none', 'unavailable', 'unknown', ''] %}\n  red\n{%\
+                  \ elif is_state('binary_sensor.npe_240a2_navien_boiler_active',\
+                  \ 'on') %}\n  red\n{% else %}\n  yellow\n{% endif %}"
+                tap_action:
+                  action: fire-dom-event
+                  browser_mod:
+                    service: browser_mod.popup
+                    data:
+                      popup_card_id: water-heater
+              - type: custom:mushroom-template-badge
                 entity: sensor.airgradient_kitchen_pm_2_5_aqi
                 label: AQI
                 content: '{{ states(entity) | int(default="?") }} / {{ states("sensor.home_aqi_us_aqi")
@@ -18641,6 +18673,132 @@ views:
                   card_mod:
                     style: "ha-card {\n  --ha-card-border-width: 0;\n  --ha-card-box-shadow:\
                       \ 0;\n}\n"
+          - type: custom:popup-card
+            title: Water Heater
+            icon: mdi:water-boiler
+            icon_close: false
+            dismissable: true
+            adaptive: true
+            popup_card_id: water-heater
+            card:
+              type: vertical-stack
+              cards:
+                - type: custom:bubble-card
+                  card_type: climate
+                  entity: water_heater.npe_240a2_navien
+                  card_layout: large
+                  styles: "${card.querySelector('.bubble-name').innerText = hass.formatEntityState(hass.states[\"\
+                    sensor.npe_240a2_navien_operating_state\"] || \"\")}\n/* Sub-button\
+                    \ 2: Boiler status styling */\n.bubble-sub-button-2 {\n  background-color:\
+                    \ ${hass.states['binary_sensor.npe_240a2_navien_boiler_active']?.state\
+                    \ === 'on' ? 'rgba(76, 175, 80, 0.2)' : 'transparent'};\n}\n.bubble-sub-button-2\
+                    \ ha-icon {\n  color: ${hass.states['binary_sensor.npe_240a2_navien_boiler_active']?.state\
+                    \ === 'on' ? 'var(--green-color)' : 'var(--grey-color)'};\n}\n\
+                    /* Sub-button 3: Recirculation status styling */\n.bubble-sub-button-3\
+                    \ {\n  background-color: ${hass.states['binary_sensor.npe_240a2_navien_recirculation_running']?.state\
+                    \ === 'on' ? 'rgba(76, 175, 80, 0.2)' : 'transparent'};\n}\n.bubble-sub-button-3\
+                    \ ha-icon {\n  color: ${hass.states['binary_sensor.npe_240a2_navien_recirculation_running']?.state\
+                    \ === 'on' ? 'var(--green-color)' : 'var(--grey-color)'};\n}\n\
+                    /* Sub-button 4: Connection status styling */\n.bubble-sub-button-4\
+                    \ {\n  background-color: ${hass.states['binary_sensor.npe_240a2_navien_connection_status']?.state\
+                    \ === 'on' ? 'rgba(76, 175, 80, 0.15)' : 'rgba(244, 67, 54, 0.2)'};\n\
+                    }\n.bubble-sub-button-4 ha-icon {\n  color: ${hass.states['binary_sensor.npe_240a2_navien_connection_status']?.state\
+                    \ === 'on' ? 'var(--green-color)' : 'var(--red-color)'};\n}"
+                  sub_button:
+                    main:
+                      - name: Operation
+                        entity: water_heater.npe_240a2_navien
+                        select_attribute: operation_list
+                        sub_button_type: select
+                        state_background: false
+                      - name: Boiler
+                        entity: binary_sensor.npe_240a2_navien_boiler_active
+                        icon: mdi:heating-coil
+                      - name: Recirculation
+                        entity: binary_sensor.npe_240a2_navien_recirculation_running
+                        icon: mdi:sync
+                        state_background: false
+                      - name: Connection
+                        entity: binary_sensor.npe_240a2_navien_connection_status
+                        icon: mdi:wifi
+                        state_background: false
+                    bottom: []
+                  button_type: switch
+                  hide_temperature: true
+                  state_color: false
+                  modules: []
+                  state_content: current_temperature
+                - type: custom:entity-progress-card
+                  entity: sensor.npe_240a2_navien_water_capacity_utilization
+                  frameless: true
+                  min_value: 0
+                  max_value: 100
+                  theme: optimal_when_low
+                  bar_effect:
+                    - shimmer
+                  name: Capacity
+                  grid_options:
+                    columns: full
+                - type: horizontal-stack
+                  cards:
+                    - type: custom:mini-graph-card
+                      name: Temperatures
+                      entities:
+                        - entity: sensor.npe_240a2_navien_inlet_temp
+                          name: Inlet
+                          show_state: true
+                          color: var(--blue-color)
+                        - entity: sensor.npe_240a2_navien_outlet_temp
+                          name: Outlet
+                          show_state: true
+                          color: var(--red-color)
+                      height: 90
+                      decimals: 0
+                      hours_to_show: 4
+                      points_per_hour: 6
+                    - type: custom:mini-graph-card
+                      name: Water Flow
+                      entities:
+                        - entity: sensor.npe_240a2_navien_water_flow
+                          name: Flow Rate
+                          color: var(--light-blue-color)
+                      height: 90
+                      hours_to_show: 4
+                      points_per_hour: 6
+                - type: horizontal-stack
+                  cards:
+                    - type: tile
+                      entity: sensor.npe_240a2_navien_current_gas_usage
+                      name: Current Gas
+                    - type: tile
+                      entity: sensor.npe_240a2_navien_accumulated_gas_usage
+                      name: Total Gas
+                      icon: mdi:gas-cylinder
+                - type: grid
+                  square: false
+                  cards:
+                    - type: custom:button-card
+                      template: button_label
+                      name: Recirculation Burst
+                      label: Press and Hold for Recirculation Burst
+                      icon: mdi:fire-circle
+                      variables:
+                        color: var(--pink-color)
+                      tap_action:
+                        action: none
+                      hold_action:
+                        action: perform-action
+                        perform_action: button.press
+                        target:
+                          entity_id: button.npe_240a2_navien_hot_button
+                      extra_styles: "[[[\n  return `\n  @media (hover: hover) {\n\
+                        \    ha-card:hover {\n      background: color-mix(in srgb,\
+                        \ ${variables.color}, transparent 80%) !important;\n    }\n\
+                        \  }\n  `\n]]]\n"
+                  card_mod:
+                    style:
+                      .: "#root {\n  display: flex !important;\n  flex-wrap: wrap;\n\
+                        \  justify-content: space-around;\n}\n"
       - type: grid
         cards:
           - type: custom:popup-card

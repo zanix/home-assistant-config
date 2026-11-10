@@ -683,6 +683,7 @@ Material Design 3 Theme for Home Assistant
 
 - [EcoBee Enhanced Thermostat](https://www.amazon.com/dp/B09XXTQPXC) - Smart Thermostat with [extra sensors](https://www.amazon.com/dp/B07NQVWRR3)
 - [LILYGO T-Embed CC1101 ESP32-S3](https://www.amazon.com/dp/B0DWX1M76H) - DIY ESP32-S3 with CC1101 for RF control of a fireplace insert. Flashed with [ESPHome](https://esphome.io) for local control
+- [Navien NPE-240A2](https://www.navieninc.com/products/npe-240a2) - Tankless water heater with [Atom Lite ESP32S3](https://www.amazon.com/dp/B0D6S1LD1G/) for local control and monitoring
 
 ### Lighting
 
