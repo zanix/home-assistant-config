@@ -293,7 +293,7 @@ The Z-Wave integration allows you to control a Z-Wave network via the [Z-Wave JS
 
 </details>
 
-<details><summary>33 Custom Integrations</summary>
+<details><summary>31 Custom Integrations</summary>
 
 ### [Adaptive Lighting](https://github.com/basnijholt/adaptive-lighting) [v1.32.0]
 
@@ -301,7 +301,7 @@ Adaptive Lighting custom component for Home Assistant
 
 Authors: [@basnijholt](https://github.com/basnijholt), [@RubenKelevra](https://github.com/RubenKelevra), [@th3w1zard1](https://github.com/th3w1zard1), [@protyposis](https://github.com/protyposis).
 
-### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.3.0]
+### [Bambu Lab](https://github.com/greghesp/ha-bambulab) [v2.4.0]
 
 A Home Assistant Integration for Bambu Lab Printers
 
@@ -312,12 +312,6 @@ Authors: [@greghesp](https://github.com/greghesp), [@AdrianGarside](https://gith
 A Home Assistant integration to provide battery details of devices
 
 Authors: [@andrew-codechimp](https://github.com/andrew-codechimp).
-
-### [Blueprints Updater](https://github.com/luuquangvu/blueprints-updater) [v2.18.0]
-
-Automatically update Home Assistant blueprints via native update entities.
-
-Authors: [@luuquangvu](https://github.com/luuquangvu).
 
 ### [Browser Mod](https://github.com/thomasloven/hass-browser_mod) [v3.4.2]
 
@@ -373,7 +367,7 @@ Authors: [@ludeeus](https://github.com/ludeeus).
 
 ### [Google Home](https://github.com/leikoilja/ha-google-home) [v1.17.0]
 
-Home Assistant Google Home custom component
+Google Home and Nest speakers: alarms, timers and Bluetooth presence tracking for Home Assistant
 
 Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://github.com/DurgNomis-drol), [@ArnyminerZ](https://github.com/ArnyminerZ), [@KapJI](https://github.com/KapJI).
 
@@ -382,12 +376,6 @@ Authors: [@leikoilja](https://github.com/leikoilja), [@DurgNomis-drol](https://g
 Home Assistant custom component: manage recorder config and DB maintenance from a sidebar GUI panel (SQLite only)
 
 Authors: [@martinandersen84](https://github.com/martinandersen84).
-
-### [Home Assistant Community Store (HACS)](https://github.com/hacs/integration) [v2.0.5]
-
-HACS gives you a powerful UI to handle downloads of all your custom needs.
-
-Authors: [@ludeeus](https://github.com/ludeeus).
 
 ### [Hass.Agent 2 Integration   Media Player & Notifications](https://github.com/hass-agent/HASS.Agent-Integration) [v2.1.3]
 
@@ -407,7 +395,7 @@ Authors: [@bruxy70](https://github.com/bruxy70).
 
 Authors: [@n00bcodr](https://github.com/n00bcodr).
 
-### [Keymaster](https://github.com/FutureTense/keymaster) [v0.6.3]
+### [Keymaster](https://github.com/FutureTense/keymaster) [v0.6.4]
 
 Home Assistant integration for managing Z-Wave enabled locks
 
@@ -425,7 +413,7 @@ Home Assistant integration providing day of package counts and USPS informed del
 
 Authors: [@moralmunky](https://github.com/moralmunky), [@firstof9](https://github.com/firstof9).
 
-### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.11.0]
+### [Mqtt Media Player](https://github.com/bkbilly/mqtt_media_player) [v2026.11.1]
 
 Fill out your Media Player Entity with MQTT Topics
 
@@ -443,7 +431,7 @@ OpenSprinkler Integration for Home Assistant
 
 Authors: [@vinteo](https://github.com/vinteo).
 
-### [Proflame2 Home Assistant Integration](https://github.com/jeffgregx2/HACS-Proflame2) [v0.6.0]
+### [Proflame2 Home Assistant Integration](https://github.com/jeffgregx2/HACS-Proflame2) [v0.7.1]
 
 HA Plugin to add support for Proflame2 RF controllers (fireplaces)
 
@@ -461,7 +449,7 @@ MySubaru Connected Services Custom Component for Home Assistant
 
 Authors: [@G-Two](https://github.com/G-Two).
 
-### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.2.13]
+### [Tapo: Cameras Control](https://github.com/JurajNyiri/HomeAssistant-Tapo-Control) [v7.2.14]
 
 Control for Tapo cameras as a Home Assistant component
 
@@ -581,7 +569,7 @@ Hourly weather card for Home Assistant. Visualize upcoming weather conditions as
 
 🔹 Use built-in elements in the wrong place
 
-### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v15.0.0]
+### [Kiosk Mode](https://github.com/NemesisRE/kiosk-mode) [v16.0.0]
 
 🙈 Hides the Home Assistant header and/or sidebar
 
@@ -601,7 +589,7 @@ Minimalistic graph card for Home Assistant Lovelace UI
 
 Minimalistic media card for Home Assistant Lovelace UI
 
-### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.2.3]
+### [Mushroom](https://github.com/piitaya/lovelace-mushroom) [v5.3.0]
 
 Build a beautiful Home Assistant dashboard easily
 
@@ -617,7 +605,7 @@ Adds highly configurable buttons that use actions and per-state styling.
 
 This is a fully customisable weather card for Home Assistant with a graphical configuration.
 
-### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.6.0]
+### [Power Flow Card Plus](https://github.com/flixlix/power-flow-card-plus) [v0.6.1]
 
 A power distribution card inspired by the official Energy Distribution card for Home Assistant
 
@@ -653,7 +641,7 @@ Minimalistic uptime card for Home Assistant Lovelace UI
 
 📐 Home Assistant Card: Group multiple cards into a single sleek card.
 
-### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.7.0]
+### [Wind Rose Card](https://github.com/aukedejong/lovelace-windrose-card) [v2.8.0]
 
 Home Assistant Lovelace Windrose Card
 
@@ -954,7 +942,7 @@ Readme generated by the [custom readme integration](https://github.com/custom-co
 [home-assistant]: https://home-assistant.io
 
 [ha-version]: https://www.home-assistant.io/blog/categories/release-notes/
-[ha-version-shield]: https://img.shields.io/badge/2026.10.4-555555?style=flat-square&logo=home-assistant
+[ha-version-shield]: https://img.shields.io/badge/2026.11.1-555555?style=flat-square&logo=home-assistant
 
 [github-build-status-shield]: https://img.shields.io/github/actions/workflow/status/zanix/home-assistant-config/home-assistant.yaml?branch=master&style=flat-square&logo=github-actions&logoColor=838B95
 [github-build-status]: https://github.com/zanix/home-assistant-config/actions/workflows/home-assistant.yaml
