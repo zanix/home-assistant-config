@@ -3,13 +3,13 @@ blueprint:
   description: >
     # 💡 Sensor Light
 
-    **Version: 8.7**
+    **Version: 8.8**
 
 
     Your lighting experience, your way - take control and customize it to perfection! 💡✨
 
 
-    **If you like my blueprints, and would like to show your support or just say thank you?** [Click Here](https://www.paypal.com/donate/?hosted_button_id=WAZS3QSDTPGA8) 🙂
+    **If you enjoy my blueprints and would like to show your support or simply say thank you, you can [support my work here](https://www.paypal.com/donate/?hosted_button_id=WAZS3QSDTPGA8)** 💙
 
 
     <details>
@@ -3510,7 +3510,7 @@ actions:
                           - "{{ (include_sun == 'sun_enabled') and (state_attr('sun.sun','elevation') >= sun_elevation | float(90)) }}"
                           - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_disabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) }}"
                           - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_enabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) and (expand(night_lights.entity_id) | selectattr('state', '==', 'off') | list | count > 0) }}"
-                          - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_enabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) and (is_state(night_boolean_scenes_scripts, 'off')) }}"
+                          - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_enabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) and (night_boolean_scenes_scripts != [] and is_state(night_boolean_scenes_scripts, 'off')) }}"
                           - condition: and
                             conditions:
                               - "{{ include_time == 'time_enabled' }}"
@@ -3996,7 +3996,7 @@ actions:
                         value_template: >
                           {{ (expand(light_switch.entity_id) | selectattr('state', '==', 'off') | list | count > 0)
                           or (expand(night_lights.entity_id) | selectattr('state', '==', 'off') | list | count > 0)
-                          or (is_state(boolean_scenes_scripts, 'off')) }}
+                          or (boolean_scenes_scripts != [] and is_state(boolean_scenes_scripts, 'off')) }}
                     sequence:
                       - alias: "Turn on the lights"
                         action: light.turn_on
@@ -4035,7 +4035,7 @@ actions:
                   - alias: "If manage scripts is enabled"
                     conditions:
                       - "{{ 'manage_scripts_crossing_over' in include_night_light_control }}"
-                      - "{{ (expand(light_switch.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (expand(night_lights.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (is_state(boolean_scenes_scripts, 'off')) }}"
+                      - "{{ (expand(light_switch.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (expand(night_lights.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (boolean_scenes_scripts != [] and is_state(boolean_scenes_scripts, 'off')) }}"
                     sequence:
                       - alias: "Turn off the script"
                         action: script.turn_on
@@ -5643,7 +5643,7 @@ actions:
                       - "{{ (include_sun == 'sun_enabled') and (state_attr('sun.sun','elevation') >= sun_elevation | float(90)) }}"
                       - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_disabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) }}"
                       - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_enabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) and (expand(light_switch.entity_id) | selectattr('state', '==', 'off') | list | count > 0) }}"
-                      - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_enabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) and (is_state(boolean_scenes_scripts, 'off')) }}"
+                      - "{{ (include_ambient == 'ambient_enabled') and (ambient_light_options == 'ambient_light_option_enabled') and ((states(ambient_light_sensor) | int) > (ambient_light_value | int)) and (boolean_scenes_scripts != [] and is_state(boolean_scenes_scripts, 'off')) }}"
                       - condition: and
                         conditions:
                           - condition: time
@@ -6161,7 +6161,7 @@ actions:
                     value_template: >
                       {{ (expand(light_switch.entity_id) | selectattr('state', '==', 'on') | list | count > 0)
                       or (expand(night_lights.entity_id) | selectattr('state', '==', 'on') | list | count > 0)
-                      or (is_state(night_boolean_scenes_scripts, 'on')) }}
+                      or (night_boolean_scenes_scripts != [] and is_state(night_boolean_scenes_scripts, 'on')) }}
                 sequence:
                   - choose:
                     - alias: "If transition is selected"
@@ -6247,7 +6247,7 @@ actions:
               - alias: "If manage scripts is enabled"
                 conditions:
                   - "{{ 'manage_scripts_crossing_over' in include_night_light_control }}"
-                  - "{{ (expand(light_switch.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (expand(night_lights.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (is_state(night_boolean_scenes_scripts, 'off')) }}"
+                  - "{{ (expand(light_switch.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (expand(night_lights.entity_id) | selectattr('state', '==', 'off') | list | count > 0) or (night_boolean_scenes_scripts != [] and is_state(night_boolean_scenes_scripts, 'off')) }}"
                 sequence:
                   - alias: "Turn off the script"
                     action: script.turn_on
@@ -6494,7 +6494,7 @@ actions:
                                 {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_max_brightness %}
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% if lux <= dynamic_lighting_min_lux %}
                                   {% set bv = dynamic_lighting_max_brightness %}
                                 {% elif lux >= dynamic_lighting_max_lux %}
@@ -6543,7 +6543,7 @@ actions:
                                 {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_max_brightness %}
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% if lux <= dynamic_lighting_min_lux %}
                                   {% set bv = dynamic_lighting_max_brightness %}
                                 {% elif lux >= dynamic_lighting_max_lux %}
@@ -6704,7 +6704,7 @@ actions:
                                 {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_min_brightness %}
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% if lux <= dynamic_lighting_min_lux %}
                                   {% set bv = dynamic_lighting_min_brightness %}
                                 {% elif lux >= dynamic_lighting_max_lux %}
@@ -6753,7 +6753,7 @@ actions:
                                 {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_min_brightness %}
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% if lux <= dynamic_lighting_min_lux %}
                                   {% set bv = dynamic_lighting_min_brightness %}
                                 {% elif lux >= dynamic_lighting_max_lux %}
@@ -7148,7 +7148,7 @@ actions:
                               should_wait: >
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% set elevation = state_attr('sun.sun', 'elevation') | float %}
                                 {% set start_slope = (dynamic_lighting_min_brightness - dynamic_lighting_max_brightness) / (dynamic_lighting_sun_elevation_start_rising - dynamic_lighting_sun_elevation_end_rising) %}
                                 {% set start_ak = (( start_slope * dynamic_lighting_sun_elevation_end_rising) * -1) + dynamic_lighting_max_brightness %}
@@ -7370,7 +7370,7 @@ actions:
                               should_wait: >
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% set elevation = state_attr('sun.sun', 'elevation') | float %}
                                 {% set start_slope = (dynamic_lighting_max_brightness - dynamic_lighting_min_brightness) / (dynamic_lighting_sun_elevation_start_rising - dynamic_lighting_sun_elevation_end_rising) %}
                                 {% set start_ak = (( start_slope * dynamic_lighting_sun_elevation_end_rising) * -1) + dynamic_lighting_min_brightness %}
@@ -7605,7 +7605,7 @@ actions:
                               should_wait: >
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% set elevation = state_attr('sun.sun', 'elevation') | float %}
                                 {% set start_slope = (dynamic_lighting_min_brightness - dynamic_lighting_max_brightness) / (dynamic_lighting_sun_elevation_start_rising - dynamic_lighting_sun_elevation_end_rising) %}
                                 {% set start_ak = (( start_slope * dynamic_lighting_sun_elevation_end_rising) * -1) + dynamic_lighting_max_brightness %}
@@ -7829,7 +7829,7 @@ actions:
                               should_wait: >
                                 {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                 {% set lec = le | count %}
-                                {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                 {% set elevation = state_attr('sun.sun', 'elevation') | float %}
                                 {% set start_slope = (dynamic_lighting_max_brightness - dynamic_lighting_min_brightness) / (dynamic_lighting_sun_elevation_start_rising - dynamic_lighting_sun_elevation_end_rising) %}
                                 {% set start_ak = (( start_slope * dynamic_lighting_sun_elevation_end_rising) * -1) + dynamic_lighting_min_brightness %}
@@ -8003,7 +8003,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_max_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_max_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -8074,7 +8074,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_max_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_max_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -8405,7 +8405,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_min_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_min_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -8476,7 +8476,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_min_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_min_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -9950,7 +9950,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_max_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_max_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -10033,7 +10033,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_max_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_max_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -10374,7 +10374,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_min_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_min_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
@@ -10457,7 +10457,7 @@ actions:
                                         {% set ak = (( slope * dynamic_lighting_min_lux) * -1) + dynamic_lighting_min_brightness %}
                                         {% set le = expand(light_entities) | rejectattr('state', 'in', ['unavailable', 'unknown']) | selectattr('attributes.brightness', 'defined') | map(attribute='entity_id') | list %}
                                         {% set lec = le | count %}
-                                        {% set lp = (expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum | float(default=255) / 255 * 100 / lec) | round(0) %}
+                                        {% set lp = ((expand(le) | map(attribute='attributes.brightness') | reject('equalto', None) | sum / 255 * 100 / lec) | round(0)) if lec > 0 else 0 %}
                                         {% if lux <= dynamic_lighting_min_lux %}
                                           {% set bv = dynamic_lighting_min_brightness %}
                                         {% elif lux >= dynamic_lighting_max_lux %}
