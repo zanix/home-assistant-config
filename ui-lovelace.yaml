@@ -16028,8 +16028,7 @@ views:
                   - group: sensor.offline_devices
                     options:
                       type: custom:mushroom-template-card
-                      primary: '{{ state_attr(entity, "friendly_name") | regex_replace(find="
-                        last seen", replace="", ignorecase=true) }}'
+                      primary: '{{ entity | device_name }}'
                       secondary: "{%- if has_value(entity) -%}\n  {{ as_datetime(states(entity)).strftime(\"\
                         %Y-%m-%d %-I:%M %p\") }}\n{%- else -%}\n  Unknown\n{%- endif\
                         \ -%}"
@@ -16062,22 +16061,22 @@ views:
                   \ {%- for entity_id in integration_entities('google_home')\n  if\
                   \ entity_id is contains '_timers'\n-%}\n  {%- set multiple = not\
                   \ loop.first or not loop.last -%}\n  {%- set suffix = ''\n    if\
-                  \ not multiple\n    else ' ⸱ ' + state_attr(entity_id, 'friendly_name')\
-                  \ | replace(' timers', '')\n  -%}\n  {%- for t in state_attr(entity_id,\
-                  \ 'timers') if as_timestamp(t.local_time_iso) > as_timestamp(now())\
-                  \ -%}\n    {%- set label = t.label if t.label else t.duration |\
-                  \ regex_replace('^0:0*', '') -%}\n    {%- set results.timers = results.timers\
-                  \ + [{\n      'entity': entity_id,\n      'icon': icon_map[t.status],\n\
-                  \      'duration': {'fixed': t.duration},\n      'end_time': {'fixed':\
-                  \ t.local_time_iso},\n      'name': label + suffix,\n      'state':\
-                  \ {'fixed': state_map[t.status] | default(t.status)},\n      'bar_width':\
-                  \ 'calc(70% - 10em)',\n      \"extend_paper_buttons_row\": {\n \
-                  \       \"position\": \"right\",\n        \"buttons\": [\n     \
-                  \     {\n            \"icon\": \"mdi:close\",\n            \"tooltip\"\
-                  : \"Dismiss\",\n            \"tap_action\": {\n              \"\
-                  action\": \"call-service\",\n              \"service\": \"google_home.delete_timer\"\
-                  ,\n              \"service_data\": {\n                \"timer_id\"\
-                  : t.timer_id,\n                \"entity_id\": entity_id,\n     \
+                  \ not multiple\n    else ' ⸱ ' ~ entity_id | device_name\n  -%}\n\
+                  \  {%- for t in state_attr(entity_id, 'timers') if as_timestamp(t.local_time_iso)\
+                  \ > as_timestamp(now()) -%}\n    {%- set label = t.label if t.label\
+                  \ else t.duration | regex_replace('^0:0*', '') -%}\n    {%- set\
+                  \ results.timers = results.timers + [{\n      'entity': entity_id,\n\
+                  \      'icon': icon_map[t.status],\n      'duration': {'fixed':\
+                  \ t.duration},\n      'end_time': {'fixed': t.local_time_iso},\n\
+                  \      'name': label + suffix,\n      'state': {'fixed': state_map[t.status]\
+                  \ | default(t.status)},\n      'bar_width': 'calc(70% - 10em)',\n\
+                  \      \"extend_paper_buttons_row\": {\n        \"position\": \"\
+                  right\",\n        \"buttons\": [\n          {\n            \"icon\"\
+                  : \"mdi:close\",\n            \"tooltip\": \"Dismiss\",\n      \
+                  \      \"tap_action\": {\n              \"action\": \"call-service\"\
+                  ,\n              \"service\": \"google_home.delete_timer\",\n  \
+                  \            \"service_data\": {\n                \"timer_id\":\
+                  \ t.timer_id,\n                \"entity_id\": entity_id,\n     \
                   \           \"skip_refresh\": False,\n              }\n        \
                   \    }\n          }\n        ]\n      }\n    }] -%}\n  {%- endfor\
                   \ -%}\n{%- endfor -%} {{ results.timers }}"

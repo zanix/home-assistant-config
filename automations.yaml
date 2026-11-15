@@ -1357,9 +1357,9 @@
       sensors: "{% set result = namespace(sensors=[]) %} {% for entity_id in trigger.to_state.attributes.entity_id
         %}\n  {% set state = states(entity_id) %}\n  {% set time = iif(has_value(entity_id),
         \" (\" ~ as_datetime(state) | relative_time ~ \")\", \" (Unknown)\") %}\n
-        \ {% set name = state_attr(entity_id, \"friendly_name\") | regex_replace(find
-        = \" last seen\", replace = \"\", ignorecase = true) %}\n  {% set result.sensors
-        = result.sensors + [name ~ time] %}\n{% endfor %} {{ result.sensors }}"
+        \ {% set name = (entity_id | device_name) | regex_replace(find = \" last seen\",
+        replace = \"\", ignorecase = true) %}\n  {% set result.sensors = result.sensors
+        + [name ~ time] %}\n{% endfor %} {{ result.sensors }}"
   - choose:
     - conditions:
       - condition: template
@@ -1599,13 +1599,13 @@
             title: '{{ title }}'
             message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
               -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
-              'latest_version') -%}\n    {% set name = state_attr(repo, 'friendly_name')\n
-              \      | regex_replace(' update', '', true)\n       | regex_replace('unraid
-              container ', '', true)\n    %}\n    {% set update = '__' ~ name ~ ':__
-              _' ~ state_attr(repo, 'installed_version') ~ '_ ➜ _' ~ state_attr(repo,
-              'latest_version') ~ '_' %}\n    {%- set list.updates = list.updates
-              + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('\\n')
-              }}"
+              'latest_version') -%}\n    {% set name = \"%s %s\" | format(repo | device_name,
+              repo | entity_name)\n       | regex_replace(' update', '', true)\n       |
+              regex_replace('unraid container ', '', true)\n    %}\n    {% set update
+              = '__' ~ name ~ ':__ _' ~ state_attr(repo, 'installed_version') ~ '_
+              ➜ _' ~ state_attr(repo, 'latest_version') ~ '_' %}\n    {%- set list.updates
+              = list.updates + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates
+              | join('\\n') }}"
             notification_id: '{{ tag }}'
           action: persistent_notification.create
         - data:
@@ -1613,13 +1613,13 @@
             title: '{{ title }}'
             message: "{%- set list = namespace(updates=[]) -%} {%- for repo in trigger.to_state.attributes.entity_id
               -%}\n  {%- if state_attr(repo, 'installed_version') != state_attr(repo,
-              'latest_version') -%}\n    {% set name = state_attr(repo, 'friendly_name')\n
-              \      | regex_replace(' update', '', true)\n       | regex_replace('unraid
-              container ', '', true)\n    %}\n    {% set update = '<b>' ~ name ~ ':</b>
-              <em>' ~ state_attr(repo, 'installed_version') ~ '</em> ➜ <em>' ~ state_attr(repo,
-              'latest_version') ~ '</em>' %}\n    {%- set list.updates = list.updates
-              + [update] -%}\n  {%- endif -%}\n{%- endfor -%} {{ list.updates | join('<br>')
-              }}"
+              'latest_version') -%}\n    {% set name = \"%s %s\" | format(repo | device_name,
+              repo | entity_name)\n       | regex_replace(' update', '', true)\n       |
+              regex_replace('unraid container ', '', true)\n    %}\n    {% set update
+              = '<b>' ~ name ~ ':</b> <em>' ~ state_attr(repo, 'installed_version')
+              ~ '</em> ➜ <em>' ~ state_attr(repo, 'latest_version') ~ '</em>' %}\n
+              \   {%- set list.updates = list.updates + [update] -%}\n  {%- endif
+              -%}\n{%- endfor -%} {{ list.updates | join('<br>') }}"
             notification_icon: '{{ icon_mdi }}'
             color: '{{ color }}'
             icon: '{{ icon }}'
@@ -1633,13 +1633,13 @@
             title: '{{ title }}'
             message: "{%- set list = namespace(updates=[]) -%}\n{%- for repo in state_attr(\"sensor.updates\",
               \"entity_id\") -%}\n  {%- if state_attr(repo, 'installed_version') !=
-              state_attr(repo, 'latest_version') -%}\n    {% set name = state_attr(repo,
-              'friendly_name')\n       | regex_replace(' update', '', true)\n       |
-              regex_replace('unraid container ', '', true)\n    %}\n    {% set update
-              = '<b>' ~ name ~ ':</b> <i>' ~ state_attr(repo, 'installed_version')
-              ~ '</i> ➜ <i>' ~ state_attr(repo, 'latest_version') ~ '</i>' %}\n    {%-
-              set list.updates = list.updates + [update] -%}\n  {%- endif -%}\n{%-
-              endfor -%}\n{{ list.updates | join('<br>') }}"
+              state_attr(repo, 'latest_version') -%}\n    {% set name = \"%s %s\"
+              | format(repo | device_name, repo | entity_name)\n       | regex_replace('
+              update', '', true)\n       | regex_replace('unraid container ', '',
+              true)\n    %}\n    {% set update = '<b>' ~ name ~ ':</b> <i>' ~ state_attr(repo,
+              'installed_version') ~ '</i> ➜ <i>' ~ state_attr(repo, 'latest_version')
+              ~ '</i>' %}\n    {%- set list.updates = list.updates + [update] -%}\n
+              \ {%- endif -%}\n{%- endfor -%}\n{{ list.updates | join('<br>') }}"
             icon: '{{ icon }}'
             tag: '{{ tag }}'
           action: script.notify_lnxlink
@@ -4151,8 +4151,7 @@
   actions:
   - variables:
       title: Door Opened
-      message: The {{ trigger.to_state.attributes.friendly_name }} opened and no one
-        is home.
+      message: The {{ trigger.entity_id | device_name }} opened and no one is home.
       icon: local/icons/door-open.png
       icon_mdi: mdi:door-open
       color: '#00bcd4'
@@ -5243,8 +5242,7 @@
   actions:
   - variables:
       title: Window Opened
-      message: The {{ trigger.to_state.attributes.friendly_name }} opened and no one
-        is home.
+      message: The {{ trigger.entity_id | device_name }} opened and no one is home.
       icon: local/icons/window-open.png
       icon_mdi: mdi:window-open
       color: '#9c27b0'
@@ -6379,8 +6377,8 @@
   conditions: []
   actions:
   - variables:
-      lock: '{{ trigger.to_state.attributes.friendly_name | replace('' jammed'', '''')
-        }}'
+      lock: '{{ "%s %s" | format(trigger.entity_id | device_name, trigger.entity_id
+        | entity_name) | trim | replace(" jammed", "") }}'
       title: '{{ lock }} Issue'
       message: Check the {{ lock }}, something is wrong.
       icon: local/icons/lock-smart.png
@@ -7794,7 +7792,7 @@
   actions:
   - variables:
       title: Printer Alert
-      message: The {{ trigger.to_state.attributes.friendly_name }} is low
+      message: The {{ trigger.entity_id | entity_name }} is low
       icon: local/icons/printer-alert.png
       icon_mdi: mdi:printer-alert
       color: '#ff5722'
@@ -7847,7 +7845,7 @@
   actions:
   - variables:
       title: Printer Alert
-      message: The {{ trigger.to_state.attributes.friendly_name }} is out of paper
+      message: The {{ trigger.entity_id | device_name }} is out of paper
       icon: local/icons/printer-alert.png
       icon_mdi: mdi:printer-alert
       color: '#ff5722'
@@ -7917,7 +7915,7 @@
   actions:
   - variables:
       zone_name: '{{ trigger.from_state.state }}'
-      name: '{{ trigger.to_state.attributes.friendly_name }}'
+      name: '{{ trigger.entity_id | entity_name }}'
       title: '{{ name }} Leaving {{ zone_name }}'
       message: '{%- from "message.jinja" import leaving_zone -%} {{ leaving_zone(name,
         zone_name) }}'
