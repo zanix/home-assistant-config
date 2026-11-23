@@ -1460,6 +1460,7 @@
       data:
         addon: 45df7312_zigbee2mqtt
       action: hassio.addon_restart
+      enabled: false
     - data: {}
       target:
         entity_id:
@@ -2958,14 +2959,14 @@
   alias: "\U0001F4A1 Outside Lights Off Daytime"
   description: ''
   triggers:
-  - trigger: sun.elevation_crossed_threshold
+  - trigger: sun.sunrise
     options:
-      for: 00:00:00
-      threshold:
-        type: above
-        value:
-          active_choice: number
-          number: 1
+      offset:
+        days: 0
+        hours: 0
+        minutes: 0
+        seconds: 0
+    id: sunrise
   - trigger: light.turned_on
     target:
       entity_id:
@@ -2974,51 +2975,46 @@
     options:
       behavior: each
       for: 00:00:00
+    id: manual_on
+  - entity_id: timer.outside_light_override
+    to: idle
+    id: override
+    trigger: state
   conditions: []
   actions:
   - choose:
     - conditions:
-      - condition: sun.elevation
-        options:
-          threshold:
-            type: above
-            value:
-              active_choice: number
-              number: 1
-      - condition: light.is_on
+      - condition: trigger
+        id:
+        - manual_on
+        - sunrise
+      - condition: state
+        entity_id: input_boolean.outside_light_daytime_override
+        state: 'off'
+      - condition: sun.is_up
+        options: {}
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id: light.outside_back
+      - action: light.turn_off
+        target:
+          entity_id: light.outside_side
+    - conditions:
+      - condition: trigger
+        id:
+        - override
+      - condition: sun.is_up
+        options: {}
+      sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.outside_light_daytime_override
+      - action: light.turn_off
         target:
           entity_id:
           - light.outside_back
-        options:
-          behavior: any
-          for: 00:00:00
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        target:
-          entity_id: light.outside_back
-        data: {}
-    - conditions:
-      - condition: sun.elevation
-        options:
-          threshold:
-            type: above
-            value:
-              active_choice: number
-              number: 1
-      - condition: light.is_on
-        target:
-          entity_id:
           - light.outside_side
-        options:
-          behavior: any
-          for: 00:00:00
-      sequence:
-      - action: light.turn_off
-        metadata: {}
-        target:
-          entity_id: light.outside_side
-        data: {}
   mode: single
 - id: '1728622562146'
   alias: "\U0001F4A1 School Departure Light Indicator"
@@ -8973,3 +8969,32 @@
         }}°F. Flame level reduced to 2.
       notification_icon: mdi:fireplace
   mode: single
+- id: '1794787155676'
+  alias: "\U0001F4CB [Zooz] Outside Back Light Switch"
+  description: Custom button actions for a Zooz switch
+  use_blueprint:
+    path: austinmroczek/zooz-zen71-switch-automation-helper.yaml
+    input:
+      zooz_zen71: 01cadab20eb154c0a1971775e5223ba1
+      switch_up_2x:
+      - action: input_boolean.turn_on
+        metadata: {}
+        target:
+          entity_id: input_boolean.outside_light_daytime_override
+        data: {}
+      - action: light.turn_on
+        metadata: {}
+        target:
+          entity_id: light.outside_back
+        data: {}
+      switch_down_2x:
+      - action: input_boolean.turn_off
+        metadata: {}
+        target:
+          entity_id: input_boolean.outside_light_daytime_override
+        data: {}
+      - action: light.turn_off
+        metadata: {}
+        target:
+          entity_id: light.outside_back
+        data: {}
