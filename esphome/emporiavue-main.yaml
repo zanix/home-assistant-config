@@ -137,6 +137,13 @@ wifi:
 #  on_disconnect:
 #    - light.turn_off: ethernet_led
 
+udp:
+
+packet_transport:
+  platform: udp
+  providers:
+    - name: emporiavue-sub
+
 preferences:
   # avoid wearing out the flash lifespan with rapidly-updating sensor data!
   # please also make sure `restore: false` is set on all `platform: total_daily_energy` sensors below.
@@ -308,6 +315,12 @@ sensor:
         - component.update: range_power
         - component.update: dryer_power
 
+  # Sub-panel total power received via UDP
+  - platform: packet_transport
+    provider: emporiavue-sub
+    remote_id: total_power
+    id: sub_panel_total_power
+
   # The copy sensors filter and send the power state to HA
   - { platform: copy, source_id: phase_a_power, filters: [ *throttle_time, *throttle_avg ], name: "${phase_a_name} power" }
   - { platform: copy, source_id: phase_b_power, filters: [ *throttle_time, *throttle_avg ], name: "${phase_b_name} power" }
@@ -399,7 +412,9 @@ sensor:
   # Home Balance
   - platform: template
     lambda: !lambda |-
+      float sub_power = isnan(id(sub_panel_total_power).state) ? 0.0f : id(sub_panel_total_power).state;
       return max(0.0f, id(total_power).state -
+        sub_power -
         id( circuit_1_power).state -
         id( circuit_2_power).state -
         id( circuit_3_power).state -
@@ -415,7 +430,8 @@ sensor:
         id(circuit_13_power).state -
         id(circuit_14_power).state -
         id(circuit_15_power).state -
-        id(circuit_16_power).state);
+        id(circuit_16_power).state
+      );
     update_interval: never
     id: balance_power
     device_class: power
