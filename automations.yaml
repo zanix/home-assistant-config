@@ -3229,53 +3229,96 @@
   mode: single
 - id: '1665697614552'
   alias: "\U0001F4A7 Softener Salt Level Low"
-  description: Sends a notification when the water softener salt level is low
+  description: Sends repeating notifications when salt is low and clears them when
+    refilled
   triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sensor.water_softener_salt_monitor_salt_level
-    below: 15
-    for:
-      hours: 24
-  conditions: []
+  - trigger: state
+    entity_id: binary_sensor.water_softener_salt_low
+    to: 'on'
+    id: alert
+  - trigger: time
+    at: '10:00:00'
+    id: repeat
+  - trigger: homeassistant
+    event: start
+    id: startup
+  - trigger: state
+    entity_id: binary_sensor.water_softener_salt_low
+    to: 'off'
+    id: resolved
+  conditions:
+  - alias: Prevent startup/time triggers from firing if the sensor is unavailable
+      or off
+    condition: or
+    conditions:
+    - condition: trigger
+      id: resolved
+    - condition: state
+      entity_id: binary_sensor.water_softener_salt_low
+      state: 'on'
+  - condition: time
+    after: 08:00:00
+    before: '21:00:00'
   actions:
   - variables:
+      salt_level: '{{ states(''sensor.water_softener_salt_monitor_salt_level'') |
+        round(0) }}'
       title: Water Softener
-      message: The salt level in the water softener is low.
+      message: The salt level in the water softener is low ({{ salt_level }}%).
       icon: local/icons/arrow-expand-vertical.png
       icon_mdi: mdi:arrow-expand-vertical
       color: '#03a9f4'
       tag: water-softener
-  - parallel:
-    - data:
-        title: '{{ title }}'
-        message: '{{ message }}'
-        notification_id: '{{ tag }}'
-      action: persistent_notification.create
-    - data:
-        send_to: parents
-        title: '{{ title }}'
-        message: '{{ message }}'
-        notification_icon: '{{ icon_mdi }}'
-        color: '{{ color }}'
-        icon: '{{ icon }}'
-        tag: '{{ tag }}'
-      action: script.notify_mobile
-    - data:
-        entity:
-        - media_player.nasya
-        title: '{{ title }}'
-        message: '{{ message }}'
-      action: script.notify_hass_agent
-    - data:
-        computer:
-        - erebus
-        title: '{{ title }}'
-        message: '{{ message }}'
-        icon: '{{ icon }}'
-        tag: '{{ tag }}'
-      action: script.notify_lnxlink
-    alias: Send notifications
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: resolved
+      sequence:
+      - parallel:
+        - action: persistent_notification.dismiss
+          data:
+            notification_id: '{{ tag }}'
+        - action: script.notify_mobile
+          data:
+            send_to: parents
+            notification_type: clear_notification
+            tag: '{{ tag }}'
+        - action: script.notify_lnxlink
+          data:
+            notification_type: clear_notification
+            tag: '{{ tag }}'
+        alias: Clear notifications
+    default:
+    - parallel:
+      - action: persistent_notification.create
+        data:
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_id: '{{ tag }}'
+      - action: script.notify_mobile
+        data:
+          send_to: parents
+          title: '{{ title }}'
+          message: '{{ message }}'
+          notification_icon: '{{ icon_mdi }}'
+          color: '{{ color }}'
+          icon: '{{ icon }}'
+          tag: '{{ tag }}'
+      - action: script.notify_hass_agent
+        data:
+          entity:
+          - media_player.nasya
+          title: '{{ title }}'
+          message: '{{ message }}'
+      - action: script.notify_lnxlink
+        data:
+          computer:
+          - erebus
+          title: '{{ title }}'
+          message: '{{ message }}'
+          icon: '{{ icon }}'
+          tag: '{{ tag }}'
+      alias: Send notifications
   mode: single
 - id: '1665697122708'
   alias: "\U0001F4A7 Water Leak Detected"
